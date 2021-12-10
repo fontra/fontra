@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import json
-import requests
+import aiohttp
 import urllib3
 
 
@@ -13,8 +13,8 @@ class Client(object):
     """
     Client to interact with the Robo-CJK back-end.
     Usage:
-        c = Client(host, username, password)
-        data = c.projects_list()
+        c = await Client.connect(host, username, password)
+        data = await c.projects_list()
     """
 
     @classmethod
@@ -44,11 +44,14 @@ class Client(object):
         return json.dumps(l) if l else None
 
 
-    def __init__(self, host, username, password):
+    @classmethod
+    async def connect(cls, host, username, password):
         """
         Initialize a new Robo-CJK API client using the given credentials,
         then authentication is automatically managed by the client, no need to do anything.
         """
+        self = cls()
+
         if not host or not any([host.startswith(protocol) for protocol in ['http://', 'https://']]):
             raise ValueError('Invalid host: {}'.format(host))
         if not username:
@@ -64,11 +67,14 @@ class Client(object):
         self._username = username
         self._password = password
         self._auth_token = None
-        self._session = requests.Session()
+
+        self._session = aiohttp.ClientSession(connector=aiohttp.TCPConnector(verify_ssl=False))
+        session = await self._session.__aenter__()
+        assert session is self._session
 
         try:
             # check if there are robocjk apis available at the given host
-            response = self._api_call('ping')
+            response = await self._api_call('ping')
             assert response['data'] == 'pong'
         except Exception as e:
             # invalid host
@@ -77,10 +83,15 @@ class Client(object):
                     self._host, e))
 
         # obtain the auth token to prevent 401 error on first call
-        self.auth_token()
+        await self.auth_token()
+        return self
 
 
-    def _api_call(self, view_name, params=None):
+    async def close(self):
+        await self._session.__aexit__(None, None, None)
+
+
+    async def _api_call(self, view_name, params=None):
         """
         Call an API method by its 'view-name' passing the given params.
         """
@@ -103,20 +114,18 @@ class Client(object):
         options = {
             'data': data,
             'headers': headers,
-            'timeout': (3.05, 60.0, ),
-            'verify': False,
-            # 'verify': self._host.startswith('https://'),
+            'timeout': 30.0,
         }
         # send post request
-        response = self._session.post(url, **options)
-        if response.status_code == 401:
-            # unauthorized - request a new auth token
-            self.auth_token()
-            if self._auth_token:
-                # re-send previously unauthorized request
-                return self._api_call(view_name, params)
-        # read response json data and return dict
-        response_data = response.json()
+        async with self._session.post(url, **options) as response:
+            if response.status == 401:
+                # unauthorized - request a new auth token
+                await self.auth_token()
+                if self._auth_token:
+                    # re-send previously unauthorized request
+                    return await self._api_call(view_name, params)
+            # read response json data and return dict
+            response_data = await response.json()
         return response_data
 
 
@@ -200,7 +209,7 @@ class Client(object):
         return abs_url
 
 
-    def auth_token(self):
+    async def auth_token(self):
         """
         Get an authorization token for the current user.
         """
@@ -208,7 +217,7 @@ class Client(object):
             'username': self._username,
             'password': self._password,
         }
-        response = self._api_call('auth_token', params)
+        response = await self._api_call('auth_token', params)
         # update auth token
         self._auth_token = response.get('data', {}).get('auth_token', self._auth_token)
         return response
@@ -219,38 +228,38 @@ class Client(object):
     #    raise NotImplementedError()
 
 
-    def user_list(self):
+    async def user_list(self):
         """
         Get the list of all Users.
         """
-        return self._api_call('user_list')
+        return await self._api_call('user_list')
 
 
-    def user_me(self):
+    async def user_me(self):
         """
         Get the data of the current User.
         """
-        return self._api_call('user_me')
+        return await self._api_call('user_me')
 
 
-    def project_list(self):
+    async def project_list(self):
         """
         Get the list of all Projects.
         """
-        return self._api_call('project_list')
+        return await self._api_call('project_list')
 
 
-    def project_get(self, project_uid):
+    async def project_get(self, project_uid):
         """
         Get the data of a specific Project.
         """
         params = {
             'project_uid': project_uid,
         }
-        return self._api_call('project_get', params)
+        return await self._api_call('project_get', params)
 
 
-    def project_create(self, name, repo_url, repo_branch='master'):
+    async def project_create(self, name, repo_url, repo_branch='master'):
         """
         Create a new Project with the specified name and repository url.
         """
@@ -259,30 +268,30 @@ class Client(object):
             'repo_url': repo_url,
             'repo_branch': repo_branch,
         }
-        return self._api_call('project_create', params)
+        return await self._api_call('project_create', params)
 
 
-    def font_list(self, project_uid):
+    async def font_list(self, project_uid):
         """
         Get the list of all Fonts.
         """
         params = {
             'project_uid': project_uid,
         }
-        return self._api_call('font_list', params)
+        return await self._api_call('font_list', params)
 
 
-    def font_get(self, font_uid):
+    async def font_get(self, font_uid):
         """
         Get the data of a specific Font.
         """
         params = {
             'font_uid': font_uid,
         }
-        return self._api_call('font_get', params)
+        return await self._api_call('font_get', params)
 
 
-    def font_create(self, project_uid, name, fontlib=None, features=None, designspace=None):
+    async def font_create(self, project_uid, name, fontlib=None, features=None, designspace=None):
         """
         Create a new Font with the specified project_uid and name.
         Optionally, it is possible to pass also fontlib, features and designspace.
@@ -294,10 +303,10 @@ class Client(object):
             'features': self._if_str(features),
             'designspace': self._if_json(designspace),
         }
-        return self._api_call('font_create', params)
+        return await self._api_call('font_create', params)
 
 
-    def font_update(self, font_uid, fontlib=None, features=None, designspace=None):
+    async def font_update(self, font_uid, fontlib=None, features=None, designspace=None):
         """
         Update the fontlib and/or features and/or designspace of a specific Font.
         """
@@ -307,20 +316,20 @@ class Client(object):
             'features': self._if_str(features),
             'designspace': self._if_json(designspace),
         }
-        return self._api_call('font_update', params)
+        return await self._api_call('font_update', params)
 
 
-    def glyphs_composition_get(self, font_uid):
+    async def glyphs_composition_get(self, font_uid):
         """
         Get the glyphs-composition data of a specific Font.
         """
         params = {
             'font_uid': font_uid,
         }
-        return self._api_call('glyphs_composition_get', params)
+        return await self._api_call('glyphs_composition_get', params)
 
 
-    def glyphs_composition_update(self, font_uid, data):
+    async def glyphs_composition_update(self, font_uid, data):
         """
         Update the glyphs-composition of a specific Font.
         """
@@ -328,10 +337,10 @@ class Client(object):
             'font_uid': font_uid,
             'data': self._if_json(data),
         }
-        return self._api_call('glyphs_composition_update', params)
+        return await self._api_call('glyphs_composition_update', params)
 
 
-    def glif_list(self,
+    async def glif_list(self,
             font_uid, status=None,
             updated_by_current_user=None, updated_by=None,
             is_locked_by_current_user=None, is_locked_by=None, is_locked=None, is_empty=None,
@@ -353,10 +362,10 @@ class Client(object):
             'has_components': has_components,
             'has_unicode': has_unicode,
         }
-        return self._api_call('glif_list', params)
+        return await self._api_call('glif_list', params)
 
 
-    def glif_lock(self, font_uid, atomic_elements=None, deep_components=None, character_glyphs=None, return_layers=False, return_related=False):
+    async def glif_lock(self, font_uid, atomic_elements=None, deep_components=None, character_glyphs=None, return_layers=False, return_related=False):
         """
         Lock lists of Atomic Elements / Deep Components / Character Glyphs of a Font by their id or name.
         """
@@ -371,10 +380,10 @@ class Client(object):
             'return_layers': return_layers,
             'return_related': return_related,
         }
-        return self._api_call('glif_lock', params)
+        return await self._api_call('glif_lock', params)
 
 
-    def glif_unlock(self, font_uid, atomic_elements=None, deep_components=None, character_glyphs=None, return_layers=False, return_related=False):
+    async def glif_unlock(self, font_uid, atomic_elements=None, deep_components=None, character_glyphs=None, return_layers=False, return_related=False):
         """
         Unlock lists of Atomic Elements / Deep Components / Character Glyphs of a Font by their id or name.
         """
@@ -389,10 +398,10 @@ class Client(object):
             'return_layers': return_layers,
             'return_related': return_related,
         }
-        return self._api_call('glif_unlock', params)
+        return await self._api_call('glif_unlock', params)
 
 
-    def atomic_element_list(self,
+    async def atomic_element_list(self,
             font_uid, status=None,
             updated_by_current_user=None, updated_by=None,
             is_locked_by_current_user=None, is_locked_by=None, is_locked=None, is_empty=None,
@@ -414,10 +423,10 @@ class Client(object):
             'has_components': has_components,
             'has_unicode': has_unicode,
         }
-        return self._api_call('atomic_element_list', params)
+        return await self._api_call('atomic_element_list', params)
 
 
-    def atomic_element_get(self, font_uid, atomic_element_id, return_layers=True, return_related=True):
+    async def atomic_element_get(self, font_uid, atomic_element_id, return_layers=True, return_related=True):
         """
         Get the data of an Atomic Element.
         """
@@ -428,10 +437,10 @@ class Client(object):
             'return_layers': return_layers,
             'return_related': return_related,
         }
-        return self._api_call('atomic_element_get', params)
+        return await self._api_call('atomic_element_get', params)
 
 
-    def atomic_element_create(self, font_uid, atomic_element_data, return_layers=False, return_related=False):
+    async def atomic_element_create(self, font_uid, atomic_element_data, return_layers=False, return_related=False):
         """
         Create a new Atomic Element with the specified glif data.
         """
@@ -441,10 +450,10 @@ class Client(object):
             'return_layers': return_layers,
             'return_related': return_related,
         }
-        return self._api_call('atomic_element_create', params)
+        return await self._api_call('atomic_element_create', params)
 
 
-    def atomic_element_update(self, font_uid, atomic_element_id, atomic_element_data, ignore_lock=False, return_layers=False, return_related=False):
+    async def atomic_element_update(self, font_uid, atomic_element_id, atomic_element_data, ignore_lock=False, return_layers=False, return_related=False):
         """
         Update the glif data of an Atomic Element.
         """
@@ -457,10 +466,10 @@ class Client(object):
             'return_layers': return_layers,
             'return_related': return_related,
         }
-        return self._api_call('atomic_element_update', params)
+        return await self._api_call('atomic_element_update', params)
 
 
-    def atomic_element_update_status(self, font_uid, atomic_element_id, atomic_element_status, ignore_lock=False, return_layers=False, return_related=False):
+    async def atomic_element_update_status(self, font_uid, atomic_element_id, atomic_element_status, ignore_lock=False, return_layers=False, return_related=False):
         """
         Update the status of an Atomic Element.
         Status value must be one of the following: 'todo', 'wip', 'checking-1', 'checking-2', 'checking-3', 'done'.
@@ -474,10 +483,10 @@ class Client(object):
             'return_layers': return_layers,
             'return_related': return_related,
         }
-        return self._api_call('atomic_element_update_status', params)
+        return await self._api_call('atomic_element_update_status', params)
 
 
-    def atomic_element_delete(self, font_uid, atomic_element_id, ignore_lock=False):
+    async def atomic_element_delete(self, font_uid, atomic_element_id, ignore_lock=False):
         """
         Delete an Atomic Element (and all its layers).
         """
@@ -487,10 +496,10 @@ class Client(object):
             'name': self._if_str(atomic_element_id),
             'ignore_lock': ignore_lock,
         }
-        return self._api_call('atomic_element_delete', params)
+        return await self._api_call('atomic_element_delete', params)
 
 
-    def atomic_element_lock(self, font_uid, atomic_element_id, return_layers=False, return_related=False):
+    async def atomic_element_lock(self, font_uid, atomic_element_id, return_layers=False, return_related=False):
         """
         Lock an Atomic Element by the current user.
         """
@@ -501,10 +510,10 @@ class Client(object):
             'return_layers': return_layers,
             'return_related': return_related,
         }
-        return self._api_call('atomic_element_lock', params)
+        return await self._api_call('atomic_element_lock', params)
 
 
-    def atomic_element_unlock(self, font_uid, atomic_element_id, return_layers=False, return_related=False):
+    async def atomic_element_unlock(self, font_uid, atomic_element_id, return_layers=False, return_related=False):
         """
         Unlock an Atomic Element by the current user.
         """
@@ -515,10 +524,10 @@ class Client(object):
             'return_layers': return_layers,
             'return_related': return_related,
         }
-        return self._api_call('atomic_element_unlock', params)
+        return await self._api_call('atomic_element_unlock', params)
 
 
-    def atomic_element_layer_create(self, font_uid, atomic_element_id, layer_name, layer_data, ignore_lock=False, return_layers=True, return_related=False):
+    async def atomic_element_layer_create(self, font_uid, atomic_element_id, layer_name, layer_data, ignore_lock=False, return_layers=True, return_related=False):
         """
         Create a new Atomic Element Layer with the provided layer glif data.
         """
@@ -532,10 +541,10 @@ class Client(object):
             'return_layers': return_layers,
             'return_related': return_related,
         }
-        return self._api_call('atomic_element_layer_create', params)
+        return await self._api_call('atomic_element_layer_create', params)
 
 
-    def atomic_element_layer_rename(self, font_uid, atomic_element_id, layer_id, layer_new_name, ignore_lock=False, return_layers=True, return_related=False):
+    async def atomic_element_layer_rename(self, font_uid, atomic_element_id, layer_id, layer_new_name, ignore_lock=False, return_layers=True, return_related=False):
         """
         Rename an Atomic Element Layer with a new name.
         """
@@ -550,10 +559,10 @@ class Client(object):
             'return_layers': return_layers,
             'return_related': return_related,
         }
-        return self._api_call('atomic_element_layer_rename', params)
+        return await self._api_call('atomic_element_layer_rename', params)
 
 
-    def atomic_element_layer_update(self, font_uid, atomic_element_id, layer_id, layer_data, ignore_lock=False, return_layers=True, return_related=False):
+    async def atomic_element_layer_update(self, font_uid, atomic_element_id, layer_id, layer_data, ignore_lock=False, return_layers=True, return_related=False):
         """
         Update an Atomic Element Layer glif data.
         """
@@ -568,10 +577,10 @@ class Client(object):
             'return_layers': return_layers,
             'return_related': return_related,
         }
-        return self._api_call('atomic_element_layer_update', params)
+        return await self._api_call('atomic_element_layer_update', params)
 
 
-    def atomic_element_layer_delete(self, font_uid, atomic_element_id, layer_id, ignore_lock=False, return_layers=True, return_related=False):
+    async def atomic_element_layer_delete(self, font_uid, atomic_element_id, layer_id, ignore_lock=False, return_layers=True, return_related=False):
         """
         Delete an Atomic Element Layer.
         """
@@ -585,10 +594,10 @@ class Client(object):
             'return_layers': return_layers,
             'return_related': return_related,
         }
-        return self._api_call('atomic_element_layer_delete', params)
+        return await self._api_call('atomic_element_layer_delete', params)
 
 
-    def deep_component_list(self,
+    async def deep_component_list(self,
             font_uid, status=None,
             updated_by_current_user=None, updated_by=None,
             is_locked_by_current_user=None, is_locked_by=None, is_locked=None, is_empty=None,
@@ -610,10 +619,10 @@ class Client(object):
             'has_components': has_components,
             'has_unicode': has_unicode,
         }
-        return self._api_call('deep_component_list', params)
+        return await self._api_call('deep_component_list', params)
 
 
-    def deep_component_get(self, font_uid, deep_component_id, return_layers=True, return_related=True):
+    async def deep_component_get(self, font_uid, deep_component_id, return_layers=True, return_related=True):
         """
         Get the data of a Deep Component.
         """
@@ -624,10 +633,10 @@ class Client(object):
             'return_layers': return_layers,
             'return_related': return_related,
         }
-        return self._api_call('deep_component_get', params)
+        return await self._api_call('deep_component_get', params)
 
 
-    def deep_component_create(self, font_uid, deep_component_data, return_layers=False, return_related=False):
+    async def deep_component_create(self, font_uid, deep_component_data, return_layers=False, return_related=False):
         """
         Create a new Deep Component with the specified glif data.
         """
@@ -637,10 +646,10 @@ class Client(object):
             'return_layers': return_layers,
             'return_related': return_related,
         }
-        return self._api_call('deep_component_create', params)
+        return await self._api_call('deep_component_create', params)
 
 
-    def deep_component_update(self, font_uid, deep_component_id, deep_component_data, ignore_lock=False, return_layers=False, return_related=False):
+    async def deep_component_update(self, font_uid, deep_component_id, deep_component_data, ignore_lock=False, return_layers=False, return_related=False):
         """
         Update the data of a Deep Component.
         """
@@ -653,10 +662,10 @@ class Client(object):
             'return_layers': return_layers,
             'return_related': return_related,
         }
-        return self._api_call('deep_component_update', params)
+        return await self._api_call('deep_component_update', params)
 
 
-    def deep_component_update_status(self, font_uid, deep_component_id, deep_component_status, ignore_lock=False, return_layers=False, return_related=False):
+    async def deep_component_update_status(self, font_uid, deep_component_id, deep_component_status, ignore_lock=False, return_layers=False, return_related=False):
         """
         Update the status of a Deep Component.
         Status value must be one of the following: 'todo', 'wip', 'checking-1', 'checking-2', 'checking-3', 'done'.
@@ -670,10 +679,10 @@ class Client(object):
             'return_layers': return_layers,
             'return_related': return_related,
         }
-        return self._api_call('deep_component_update_status', params)
+        return await self._api_call('deep_component_update_status', params)
 
 
-    def deep_component_delete(self, font_uid, deep_component_id, ignore_lock=False, return_layers=False, return_related=False):
+    async def deep_component_delete(self, font_uid, deep_component_id, ignore_lock=False, return_layers=False, return_related=False):
         """
         Delete a Deep Component.
         """
@@ -685,10 +694,10 @@ class Client(object):
             'return_layers': return_layers,
             'return_related': return_related,
         }
-        return self._api_call('deep_component_delete', params)
+        return await self._api_call('deep_component_delete', params)
 
 
-    def deep_component_lock(self, font_uid, deep_component_id, return_layers=False, return_related=False):
+    async def deep_component_lock(self, font_uid, deep_component_id, return_layers=False, return_related=False):
         """
         Lock a Deep Component by the current user.
         """
@@ -699,10 +708,10 @@ class Client(object):
             'return_layers': return_layers,
             'return_related': return_related,
         }
-        return self._api_call('deep_component_lock', params)
+        return await self._api_call('deep_component_lock', params)
 
 
-    def deep_component_unlock(self, font_uid, deep_component_id, return_layers=False, return_related=False):
+    async def deep_component_unlock(self, font_uid, deep_component_id, return_layers=False, return_related=False):
         """
         Unlock a Deep Component by the current user.
         """
@@ -713,10 +722,10 @@ class Client(object):
             'return_layers': return_layers,
             'return_related': return_related,
         }
-        return self._api_call('deep_component_unlock', params)
+        return await self._api_call('deep_component_unlock', params)
 
 
-    def character_glyph_list(self,
+    async def character_glyph_list(self,
             font_uid, status=None,
             updated_by_current_user=None, updated_by=None,
             is_locked_by_current_user=None, is_locked_by=None, is_locked=None, is_empty=None,
@@ -738,10 +747,10 @@ class Client(object):
             'has_components': has_components,
             'has_unicode': has_unicode,
         }
-        return self._api_call('character_glyph_list', params)
+        return await self._api_call('character_glyph_list', params)
 
 
-    def character_glyph_get(self, font_uid, character_glyph_id, return_layers=True, return_related=True):
+    async def character_glyph_get(self, font_uid, character_glyph_id, return_layers=True, return_related=True):
         """
         Get the data of a Character Glyph.
         """
@@ -752,10 +761,10 @@ class Client(object):
             'return_layers': return_layers,
             'return_related': return_related,
         }
-        return self._api_call('character_glyph_get', params)
+        return await self._api_call('character_glyph_get', params)
 
 
-    def character_glyph_create(self, font_uid, character_glyph_data, return_layers=False, return_related=False):
+    async def character_glyph_create(self, font_uid, character_glyph_data, return_layers=False, return_related=False):
         """
         Create a new Character Glyph with the specified glif data.
         """
@@ -765,10 +774,10 @@ class Client(object):
             'return_layers': return_layers,
             'return_related': return_related,
         }
-        return self._api_call('character_glyph_create', params)
+        return await self._api_call('character_glyph_create', params)
 
 
-    def character_glyph_update(self, font_uid, character_glyph_id, character_glyph_data, ignore_lock=False, return_layers=False, return_related=False):
+    async def character_glyph_update(self, font_uid, character_glyph_id, character_glyph_data, ignore_lock=False, return_layers=False, return_related=False):
         """
         Update the data of a Character Glyph.
         """
@@ -781,10 +790,10 @@ class Client(object):
             'return_layers': return_layers,
             'return_related': return_related,
         }
-        return self._api_call('character_glyph_update', params)
+        return await self._api_call('character_glyph_update', params)
 
 
-    def character_glyph_update_status(self, font_uid, character_glyph_id, character_glyph_status, ignore_lock=False, return_layers=False, return_related=False):
+    async def character_glyph_update_status(self, font_uid, character_glyph_id, character_glyph_status, ignore_lock=False, return_layers=False, return_related=False):
         """
         Update the status of a Character Glyph.
         Status value must be one of the following: 'todo', 'wip', 'checking-1', 'checking-2', 'checking-3', 'done'.
@@ -798,10 +807,10 @@ class Client(object):
             'return_layers': return_layers,
             'return_related': return_related,
         }
-        return self._api_call('character_glyph_update_status', params)
+        return await self._api_call('character_glyph_update_status', params)
 
 
-    def character_glyph_delete(self, font_uid, character_glyph_id, ignore_lock=False, return_layers=False, return_related=False):
+    async def character_glyph_delete(self, font_uid, character_glyph_id, ignore_lock=False, return_layers=False, return_related=False):
         """
         Delete a Character Glyph (and all its layers).
         """
@@ -813,10 +822,10 @@ class Client(object):
             'return_layers': return_layers,
             'return_related': return_related,
         }
-        return self._api_call('character_glyph_delete', params)
+        return await self._api_call('character_glyph_delete', params)
 
 
-    def character_glyph_lock(self, font_uid, character_glyph_id, return_layers=False, return_related=False):
+    async def character_glyph_lock(self, font_uid, character_glyph_id, return_layers=False, return_related=False):
         """
         Lock a Character Glyph by the current user.
         """
@@ -827,10 +836,10 @@ class Client(object):
             'return_layers': return_layers,
             'return_related': return_related,
         }
-        return self._api_call('character_glyph_lock', params)
+        return await self._api_call('character_glyph_lock', params)
 
 
-    def character_glyph_unlock(self, font_uid, character_glyph_id, return_layers=False, return_related=False):
+    async def character_glyph_unlock(self, font_uid, character_glyph_id, return_layers=False, return_related=False):
         """
         Unlock a Character Glyph by the current user.
         """
@@ -841,10 +850,10 @@ class Client(object):
             'return_layers': return_layers,
             'return_related': return_related,
         }
-        return self._api_call('character_glyph_unlock', params)
+        return await self._api_call('character_glyph_unlock', params)
 
 
-    def character_glyph_layer_create(self, font_uid, character_glyph_id, layer_name, layer_data, ignore_lock=False, return_layers=True, return_related=False):
+    async def character_glyph_layer_create(self, font_uid, character_glyph_id, layer_name, layer_data, ignore_lock=False, return_layers=True, return_related=False):
         """
         Create a new Character Glyph Layer with the provided layer glif data.
         """
@@ -858,10 +867,10 @@ class Client(object):
             'return_layers': return_layers,
             'return_related': return_related,
         }
-        return self._api_call('character_glyph_layer_create', params)
+        return await self._api_call('character_glyph_layer_create', params)
 
 
-    def character_glyph_layer_rename(self, font_uid, character_glyph_id, layer_id, layer_new_name, ignore_lock=False, return_layers=True, return_related=False):
+    async def character_glyph_layer_rename(self, font_uid, character_glyph_id, layer_id, layer_new_name, ignore_lock=False, return_layers=True, return_related=False):
         """
         Rename a Character Glyph Layer with a new name.
         """
@@ -876,10 +885,10 @@ class Client(object):
             'return_layers': return_layers,
             'return_related': return_related,
         }
-        return self._api_call('character_glyph_layer_rename', params)
+        return await self._api_call('character_glyph_layer_rename', params)
 
 
-    def character_glyph_layer_update(self, font_uid, character_glyph_id, layer_id, layer_data, ignore_lock=False, return_layers=True, return_related=False):
+    async def character_glyph_layer_update(self, font_uid, character_glyph_id, layer_id, layer_data, ignore_lock=False, return_layers=True, return_related=False):
         """
         Update a Character Glyph Layer glif data.
         """
@@ -894,10 +903,10 @@ class Client(object):
             'return_layers': return_layers,
             'return_related': return_related,
         }
-        return self._api_call('character_glyph_layer_update', params)
+        return await self._api_call('character_glyph_layer_update', params)
 
 
-    def character_glyph_layer_delete(self, font_uid, character_glyph_id, layer_id, ignore_lock=False, return_layers=True, return_related=False):
+    async def character_glyph_layer_delete(self, font_uid, character_glyph_id, layer_id, ignore_lock=False, return_layers=True, return_related=False):
         """
         Delete a Character Glyph Layer.
         """
@@ -911,5 +920,5 @@ class Client(object):
             'return_layers': return_layers,
             'return_related': return_related,
         }
-        return self._api_call('character_glyph_layer_delete', params)
+        return await self._api_call('character_glyph_layer_delete', params)
 

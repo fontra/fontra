@@ -1,5 +1,5 @@
 import asyncio
-from urllib.parse import urlparse, urlsplit, urlunsplit
+from urllib.parse import urlsplit, urlunsplit
 from fontTools.ufoLib.glifLib import readGlyphFromString
 from .pen import PathBuilderPointPen
 from .rcjkclient import Client
@@ -19,17 +19,17 @@ class RCJKMySQLBackend:
             raise ValueError(f"invalid path: {path}")
         _, project_name, font_name = path_parts
 
-        self.client = Client(
+        self.client = await Client.connect(
             host=plainURL,
             username=parsed.username,
             password=parsed.password,
         )
 
         self.project_uid = _get_uid_by_name(
-            self.client.project_list()["data"], project_name
+            (await self.client.project_list())["data"], project_name
         )
         self.font_uid = _get_uid_by_name(
-            self.client.font_list(self.project_uid)["data"], font_name
+            (await self.client.font_list(self.project_uid))["data"], font_name
         )
         self._glyphMapping = None
         self._glyphDataCache = {}
@@ -39,19 +39,11 @@ class RCJKMySQLBackend:
         return sorted(await self.getReversedCmap())
 
     async def getReversedCmap(self):
-        loop = asyncio.get_running_loop()
-        return await loop.run_in_executor(None, self._getReversedCmapSync)
-
-    async def getGlyph(self, glyphName):
-        loop = asyncio.get_running_loop()
-        return await loop.run_in_executor(None, self._getGlyphSync, glyphName)
-
-    def _getReversedCmapSync(self):
         self._glyphMapping = {}
         revCmap = {}
         for typeCode, methodName in _glyphListMethods.items():
             method = getattr(self.client, methodName)
-            response = method(self.font_uid)
+            response = await method(self.font_uid)
             for glyphInfo in response["data"]:
                 unicode_hex = glyphInfo.get("unicode_hex")
                 if unicode_hex:
@@ -62,13 +54,13 @@ class RCJKMySQLBackend:
                 self._glyphMapping[glyphInfo["name"]] = (typeCode, glyphInfo["id"])
         return revCmap
 
-    def _getGlyphSync(self, glyphName):
+    async def getGlyph(self, glyphName):
         typeCode, glyphID = self._glyphMapping[glyphName]
         glyphData = self._glyphDataCache.get((typeCode, glyphID))
         if glyphData is None:
             getMethodName = _getGlyphMethods[typeCode]
             method = getattr(self.client, getMethodName)
-            response = method(
+            response = await method(
                 self.font_uid, glyphID, return_layers=True, return_related=True
             )
             glyphData = response["data"]
@@ -88,7 +80,7 @@ class RCJKMySQLBackend:
             assert typeCode == glyphDict["type_code"]
             assert glyphID == glyphDict["id"]
             self._glyphDataCache[(typeCode, glyphID)] = glyphDict
-            # No need to recurse into glyphDict["made_of"], as _getGlyphSync
+            # No need to recurse into glyphDict["made_of"], as getGlyph
             # does that for us.
 
 
