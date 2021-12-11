@@ -1,5 +1,5 @@
 import asyncio
-from urllib.parse import urlsplit, urlunsplit
+from urllib.parse import urlsplit
 import aiohttp
 from fontTools.ufoLib.glifLib import readGlyphFromString
 from .pen import PathBuilderPointPen
