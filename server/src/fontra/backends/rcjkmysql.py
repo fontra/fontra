@@ -6,6 +6,14 @@ from .pen import PathBuilderPointPen
 from .rcjkclient import Client
 
 
+class HTTPError(Exception):
+    pass
+
+
+class AuthenticationError(Exception):
+    pass
+
+
 class ClientAsync(Client):
     def _connect(self):
         # Override with no-op, as we need to handle the connection separately
@@ -46,6 +54,8 @@ class ClientAsync(Client):
                 if self._auth_token:
                     # re-send previously unauthorized request
                     return await self._api_call(view_name, params)
+            elif response.status != 200:
+                raise HTTPError(response.status)
             # read response json data and return dict
             response_data = await response.json()
         return response_data
@@ -58,7 +68,10 @@ class ClientAsync(Client):
             "username": self._username,
             "password": self._password,
         }
-        response = await self._api_call("auth_token", params)
+        try:
+            response = await self._api_call("auth_token", params)
+        except HTTPError as e:
+            raise AuthenticationError("authentication failed") from e
         # update auth token
         self._auth_token = response.get("data", {}).get("auth_token", self._auth_token)
         return response
