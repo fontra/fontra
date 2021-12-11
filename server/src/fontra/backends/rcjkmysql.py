@@ -8,6 +8,8 @@ from .rcjkclient import Client
 
 class ClientAsync(Client):
     def _connect(self):
+        # Override with no-op, as we need to handle the connection separately
+        # as an async method.
         pass
 
     async def connect(self):
