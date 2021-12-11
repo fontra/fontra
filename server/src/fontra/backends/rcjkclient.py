@@ -13,8 +13,8 @@ class Client(object):
     """
     Client to interact with the Robo-CJK back-end.
     Usage:
-        c = await Client.connect(host, username, password)
-        data = await c.projects_list()
+        c = Client(host, username, password)
+        data = c.projects_list()
     """
 
     @classmethod
@@ -44,14 +44,11 @@ class Client(object):
         return json.dumps(l) if l else None
 
 
-    @classmethod
-    async def connect(cls, host, username, password):
+    def __init__(self, host, username, password):
         """
         Initialize a new Robo-CJK API client using the given credentials,
         then authentication is automatically managed by the client, no need to do anything.
         """
-        self = cls()
-
         if not host or not any([host.startswith(protocol) for protocol in ['http://', 'https://']]):
             raise ValueError('Invalid host: {}'.format(host))
         if not username:
@@ -67,14 +64,16 @@ class Client(object):
         self._username = username
         self._password = password
         self._auth_token = None
+        self._connect()
 
-        self._session = aiohttp.ClientSession(connector=aiohttp.TCPConnector(verify_ssl=False))
-        session = await self._session.__aenter__()
-        assert session is self._session
+    def _connect(self):
+        import requests
+
+        self._session = requests.Session()
 
         try:
             # check if there are robocjk apis available at the given host
-            response = await self._api_call('ping')
+            response = self._api_call('ping')
             assert response['data'] == 'pong'
         except Exception as e:
             # invalid host
@@ -83,18 +82,35 @@ class Client(object):
                     self._host, e))
 
         # obtain the auth token to prevent 401 error on first call
-        await self.auth_token()
-        return self
+        self.auth_token()
 
 
-    async def close(self):
-        await self._session.__aexit__(None, None, None)
-
-
-    async def _api_call(self, view_name, params=None):
+    def _api_call(self, view_name, params=None):
         """
         Call an API method by its 'view-name' passing the given params.
         """
+        url, data, headers = self._prepare_request(view_name, params)
+        # request options
+        options = {
+            'data': data,
+            'headers': headers,
+            'timeout': (3.05, 60.0, ),
+            'verify': False,
+        }
+        # send post request
+        response = self._session.post(url, **options)
+        if response.status_code == 401:
+            # unauthorized - request a new auth token
+            self.auth_token()
+            if self._auth_token:
+                # re-send previously unauthorized request
+                return self._api_call(view_name, params)
+        # read response json data and return dict
+        response_data = response.json()
+        return response_data
+
+
+    def _prepare_request(self, view_name, params):
         # get api absolute url
         url = self._api_url(view_name)
         # clean request post data (remove empty entries)
@@ -110,23 +126,7 @@ class Client(object):
             headers['Authorization'] = 'Bearer {}'.format(self._auth_token)
         headers['Cache-Control'] = 'no-cache'
         headers['Pragma'] = 'no-cache'
-        # request options
-        options = {
-            'data': data,
-            'headers': headers,
-            'timeout': 30.0,
-        }
-        # send post request
-        async with self._session.post(url, **options) as response:
-            if response.status == 401:
-                # unauthorized - request a new auth token
-                await self.auth_token()
-                if self._auth_token:
-                    # re-send previously unauthorized request
-                    return await self._api_call(view_name, params)
-            # read response json data and return dict
-            response_data = await response.json()
-        return response_data
+        return url, data, headers
 
 
     def _api_url(self, view_name):
@@ -209,7 +209,7 @@ class Client(object):
         return abs_url
 
 
-    async def auth_token(self):
+    def auth_token(self):
         """
         Get an authorization token for the current user.
         """
@@ -217,7 +217,7 @@ class Client(object):
             'username': self._username,
             'password': self._password,
         }
-        response = await self._api_call('auth_token', params)
+        response = self._api_call('auth_token', params)
         # update auth token
         self._auth_token = response.get('data', {}).get('auth_token', self._auth_token)
         return response

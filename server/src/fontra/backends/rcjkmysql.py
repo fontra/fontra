@@ -1,8 +1,61 @@
 import asyncio
 from urllib.parse import urlsplit, urlunsplit
+import aiohttp
 from fontTools.ufoLib.glifLib import readGlyphFromString
 from .pen import PathBuilderPointPen
 from .rcjkclient import Client
+
+
+class ClientAsync(Client):
+    def _connect(self):
+        pass
+
+    async def connect(self):
+        self._session = aiohttp.ClientSession(connector=aiohttp.TCPConnector(verify_ssl=False))
+        session = await self._session.__aenter__()
+        assert session is self._session
+
+        try:
+            # check if there are robocjk apis available at the given host
+            response = await self._api_call('ping')
+            assert response['data'] == 'pong'
+        except Exception as e:
+            # invalid host
+            raise ValueError(
+                'Unable to call RoboCJK APIs at host: {} - Exception: {}'.format(
+                    self._host, e))
+
+        # obtain the auth token to prevent 401 error on first call
+        await self.auth_token()
+
+    async def close(self):
+        await self._session.__aexit__(None, None, None)
+
+    async def _api_call(self, view_name, params=None):
+        url, data, headers = self._prepare_request(view_name, params)
+        async with self._session.post(url, data=data, headers=headers) as response:
+            if response.status == 401:
+                # unauthorized - request a new auth token
+                await self.auth_token()
+                if self._auth_token:
+                    # re-send previously unauthorized request
+                    return await self._api_call(view_name, params)
+            # read response json data and return dict
+            response_data = await response.json()
+        return response_data
+
+    async def auth_token(self):
+        """
+        Get an authorization token for the current user.
+        """
+        params = {
+            'username': self._username,
+            'password': self._password,
+        }
+        response = await self._api_call('auth_token', params)
+        # update auth token
+        self._auth_token = response.get('data', {}).get('auth_token', self._auth_token)
+        return response
 
 
 class RCJKMySQLBackend:
@@ -19,11 +72,12 @@ class RCJKMySQLBackend:
             raise ValueError(f"invalid path: {path}")
         _, project_name, font_name = path_parts
 
-        self.client = await Client.connect(
+        self.client = ClientAsync(
             host=plainURL,
             username=parsed.username,
             password=parsed.password,
         )
+        await self.client.connect()
 
         self.project_uid = _get_uid_by_name(
             (await self.client.project_list())["data"], project_name
