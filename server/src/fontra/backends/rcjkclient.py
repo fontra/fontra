@@ -95,6 +95,7 @@ class Client(object):
             'headers': headers,
             'timeout': (3.05, 60.0, ),
             'verify': False,
+            # 'verify': self._host.startswith('https://'),
         }
         # send post request
         response = self._session.post(url, **options)
