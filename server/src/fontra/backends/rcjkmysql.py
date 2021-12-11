@@ -34,9 +34,7 @@ class ClientAsync(Client):
         except Exception as e:
             # invalid host
             raise ValueError(
-                "Unable to call RoboCJK APIs at host: {} - Exception: {}".format(
-                    self._host, e
-                )
+                f"Unable to call RoboCJK APIs at host: {self._host} - Exception: {e}"
             )
 
         # obtain the auth token to prevent 401 error on first call
