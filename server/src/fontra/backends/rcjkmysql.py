@@ -13,19 +13,23 @@ class ClientAsync(Client):
         pass
 
     async def connect(self):
-        self._session = aiohttp.ClientSession(connector=aiohttp.TCPConnector(verify_ssl=False))
+        self._session = aiohttp.ClientSession(
+            connector=aiohttp.TCPConnector(verify_ssl=False)
+        )
         session = await self._session.__aenter__()
         assert session is self._session
 
         try:
             # check if there are robocjk apis available at the given host
-            response = await self._api_call('ping')
-            assert response['data'] == 'pong'
+            response = await self._api_call("ping")
+            assert response["data"] == "pong"
         except Exception as e:
             # invalid host
             raise ValueError(
-                'Unable to call RoboCJK APIs at host: {} - Exception: {}'.format(
-                    self._host, e))
+                "Unable to call RoboCJK APIs at host: {} - Exception: {}".format(
+                    self._host, e
+                )
+            )
 
         # obtain the auth token to prevent 401 error on first call
         await self.auth_token()
@@ -51,12 +55,12 @@ class ClientAsync(Client):
         Get an authorization token for the current user.
         """
         params = {
-            'username': self._username,
-            'password': self._password,
+            "username": self._username,
+            "password": self._password,
         }
-        response = await self._api_call('auth_token', params)
+        response = await self._api_call("auth_token", params)
         # update auth token
-        self._auth_token = response.get('data', {}).get('auth_token', self._auth_token)
+        self._auth_token = response.get("data", {}).get("auth_token", self._auth_token)
         return response
 
 
