@@ -3,10 +3,10 @@
   <head>
     <meta charset="utf-8"/>
     <title>Fontra</title>
-    <link href="/css/ui-styling.css" rel="stylesheet">
-    <link href="/css/slider.css" rel="stylesheet">
-    <link href="/css/core.css" rel="stylesheet">
-    <link href="/editor/editor.css" rel="stylesheet">
+    <link href="./css/ui-styling.css" rel="stylesheet">
+    <link href="./css/slider.css" rel="stylesheet">
+    <link href="./css/core.css" rel="stylesheet">
+    <link href="./css/editor/editor.css" rel="stylesheet">
   </head>
   <body>
 
@@ -98,7 +98,7 @@
   </div>
   </body>
     <script type="module">
-      import { EditorController } from "/editor/editor.js";
+      import { EditorController } from "./js/editor/editor.js";
 
       async function startApp() {
         window.editorController = await EditorController.fromWebSocket();

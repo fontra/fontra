@@ -22,7 +22,7 @@ export async function startupLandingPage(authenticateFunc) {
 
   for (const project of projectList) {
     const projectElement = document.createElement("a")
-    projectElement.href = "./editor.html/-/" + project;
+    projectElement.href = "./editor.html?" + project;
     projectElement.className = "project-item";
     projectElement.append(project);
     projectListContainer.appendChild(projectElement);
