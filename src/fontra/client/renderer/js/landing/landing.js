@@ -1,9 +1,10 @@
-import { loaderSpinner } from "/core/loader-spinner.js";
-import { getRemoteProxy } from "/core/remote.js";
-import { autoReload, themeSwitchFromLocalStorage } from "/core/utils.js";
+import { loaderSpinner } from "../core/loader-spinner.js";
+import { getRemoteProxy } from "../core/remote.js";
+import { autoReload, themeSwitchFromLocalStorage } from "../core/utils.js";
 
 
 export async function startupLandingPage(authenticateFunc) {
+  console.log("ydasda");
   if (autoReload()) {
     // Will reload
     return;
@@ -21,7 +22,7 @@ export async function startupLandingPage(authenticateFunc) {
 
   for (const project of projectList) {
     const projectElement = document.createElement("a")
-    projectElement.href = "/editor/-/" + project;
+    projectElement.href = "./editor.html/-/" + project;
     projectElement.className = "project-item";
     projectElement.append(project);
     projectListContainer.appendChild(projectElement);
@@ -30,6 +31,7 @@ export async function startupLandingPage(authenticateFunc) {
 
 
 async function fetchJSON(url) {
-  const response = await fetch(url);
+  // TODO: discover localhost
+  const response = await fetch(`http://localhost:8000${url}`);
   return await response.json();
 }
