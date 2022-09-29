@@ -29,6 +29,8 @@ Fontra is an in-development browser-based font editor. It consists of two main p
 
     `pip install -e .`
 
+    `npm install`
+
 
 ## Running Fontra
 

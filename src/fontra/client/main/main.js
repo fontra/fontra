@@ -1,15 +1,54 @@
 const windowStateKeeper = require('electron-window-state')
 const getMenubarTemplate = require('./menubar')
 const ChildProcess = require('child_process')
+const fse = require('fs-extra');
+const path = require('path');
+const firstRun = require('electron-first-run');
+ 
+const isFirstRun = firstRun()
 
 const { app, BrowserWindow, Menu } = require('electron')
-const path = require('path')
+// const path = require('path')
 
 const [, , projectPath] = process.argv;
 
 const apiPids = [];
 
 function createWindow () {
+  //if (isFirstRun) {
+    //try {
+      const appDir = process.env.APPDATA || (process.platform == 'darwin' ? process.env.HOME + '/Library/Preferences' : process.env.HOME + "/.local/share")
+      console.log(appDir)
+      const pythonVersion = ChildProcess.execSync(
+        'python -V',
+      );
+      const [majorVersion, minorVersion] = pythonVersion.toString().split('.');
+      if (majorVersion !== 'Python 3' || parseInt(minorVersion, 10) < 10) {
+        throw new Error('Python must be in your path and v3.10 or above')
+      }
+
+      fontraDir = path.resolve(appDir, './fontra');
+
+      if (fse.pathExistsSync(fontraDir)) {
+        console.log('exists')
+        fse.removeSync(fontraDir);
+      }
+
+      fse.mkdirSync(fontraDir)
+      srcDir = path.resolve(fontraDir, './src')
+      fse.copySync('./src', srcDir)
+      fse.copySync('./pyproject.toml', path.resolve(fontraDir, './pyproject.toml'))
+      fse.copySync('./pyproject.toml', path.resolve(fontraDir, './pyproject.toml'))
+      fse.copySync('./requirements.txt', path.resolve(fontraDir, './requirements.txt'))
+      fse.copySync('./setup.py', path.resolve(fontraDir, './setup.py'))
+
+    //} catch(e) {
+    //  throw new Error("problems with first run")
+    //  firstRun.clear()
+    //}
+  //}
+
+
   try {
     global.portNumber = 8000;
     global.apiUrl = `http://127.0.0.1:8000`;

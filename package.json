@@ -3,11 +3,16 @@
   "dependencies": {
     "chai": "^4.3.4",
     "electron": "^20.2.0",
+    "electron-first-run": "^3.0.0",
     "electron-window-state": "^5.0.3",
+    "fs-extra": "^10.1.0",
     "mocha": "^9.1.3"
   },
   "scripts": {
     "start": "electron .",
     "test": "mocha test-js --reporter spec"
+  },
+  "devDependencies": {
+    "electron-packager": "^16.0.0"
   }
 }
