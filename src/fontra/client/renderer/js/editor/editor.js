@@ -100,13 +100,17 @@ export class EditorController {
       return;
     }
     const pathItems = window.location.pathname.split("/");
+    console.log(window.location);
     // assert pathItems[0] === ""
     // assert pathItems[1] === "editor"
     // assert pathItems[2] === "-"
-    const projectPath = pathItems.slice(3).join("/");
+    const projectPath = window.location.hash ? window.location.hash.slice(1) : pathItems.slice(3).join("/");
+    console.log(projectPath)
+    // TODO: move these to global variables
+    const host = window.location.host ? window.location.host : 'localhost:8000';
     document.title = `Fontra — ${projectPath}`;
-    const protocol = window.location.protocol === "http:" ? "ws" : "wss";
-    const wsURL = `${protocol}://${window.location.host}/websocket/${projectPath}`;
+    const protocol = window.location.protocol === "https:" ? "wss" : "ws";
+    const wsURL = `${protocol}://${host}/websocket/${projectPath}`;
 
     const remoteFontEngine = await getRemoteProxy(wsURL);
     const editorController = new EditorController(remoteFontEngine);
