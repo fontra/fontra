@@ -29,6 +29,17 @@ Fontra is an in-development browser-based font editor. It consists of two main p
 
     `pip install -e .`
 
+
+## Running Fontra
+
+### In an Electron app
+
+- Run an Electron app with a path to a folder containing fonts (.designspace, .ufo, .ttf or .otf):
+
+    `npm run start -- /path/to/a/folder`
+
+### In a web browser
+
 - Start the fontra server with a path to a folder containing fonts (.designspace, .ufo, .ttf or .otf), using the `filesystem` subcommand:
 
     `fontra --launch filesystem /path/to/a/folder`
