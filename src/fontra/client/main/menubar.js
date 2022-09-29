@@ -2,7 +2,7 @@
 
 // Function for creating (and recreating) the menubar
 
-export default function getMenubarTemplate(win) {
+function getMenubarTemplate(win) {
     return [
         {
         label: "File",
@@ -39,4 +39,5 @@ export default function getMenubarTemplate(win) {
         }
     ];
 }
-  
+
+module.exports = getMenubarTemplate

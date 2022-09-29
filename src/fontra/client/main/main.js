@@ -1,4 +1,5 @@
-const windowStateKeeper = require('electron-window-state');
+const windowStateKeeper = require('electron-window-state')
+const getMenubarTemplate = require('./menubar')
 
 const { app, BrowserWindow, Menu } = require('electron')
 const path = require('path')
@@ -7,7 +8,7 @@ function createWindow () {
   const mainWindowState = windowStateKeeper({
     defaultWidth: 1280,
     defaultHeight: 800
-  });
+  })
   
   // Create the browser window.
     const win = new BrowserWindow({
@@ -25,12 +26,12 @@ function createWindow () {
       //   enableRemoteModule: true,
       //   preload: path.join(__dirname, 'preload.js')
       // }
-    });
+    })
 
     win.loadFile('src/fontra/client/renderer/landing.html')
 
-    mainWindowState.manage(win);
-    Menu.setApplicationMenu(Menu.buildFromTemplate(getMenubarTemplate(win)));
+    mainWindowState.manage(win)
+    Menu.setApplicationMenu(Menu.buildFromTemplate(getMenubarTemplate(win)))
   // addWindowListeners(win);
   
 }
