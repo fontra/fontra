@@ -1,10 +1,40 @@
 const windowStateKeeper = require('electron-window-state')
 const getMenubarTemplate = require('./menubar')
+const ChildProcess = require('child_process')
 
 const { app, BrowserWindow, Menu } = require('electron')
 const path = require('path')
 
+const [, arg] = process.argv;
+
+const apiPids = [];
+
 function createWindow () {
+  try {
+    global.portNumber = 8000;
+    global.apiUrl = `http://127.0.0.1:8000`;
+
+    const python = ChildProcess.spawn(
+      'fontra',
+      ['--http-port',
+       global.portNumber,
+       'filesystem',
+       '../aktiv-grotesk-vf/'
+      ], {
+        env: {...process.env}
+      }
+    );
+    python.stdout.on("data", data => {
+      console.log("data: ", data.toString("utf8"));
+    });
+    python.stderr.on("data", data => {
+      console.log(`stderr: ${data}`);
+    });
+    apiPids.push(python.pid);
+  } catch (e) {
+    console.log(e);
+  }
+
   const mainWindowState = windowStateKeeper({
     defaultWidth: 1280,
     defaultHeight: 800
@@ -34,6 +64,13 @@ function createWindow () {
     Menu.setApplicationMenu(Menu.buildFromTemplate(getMenubarTemplate(win)))
   // addWindowListeners(win);
   
+  win.on("close", () => {
+    // App close handler
+    apiPids.forEach((pid) => {
+      process.kill(pid);
+    });
+  });
+  
 }
 
 app.whenReady().then(() => {
@@ -47,6 +84,7 @@ app.whenReady().then(() => {
     }
   })
 })
+
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
