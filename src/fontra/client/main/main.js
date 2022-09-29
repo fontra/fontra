@@ -5,7 +5,7 @@ const ChildProcess = require('child_process')
 const { app, BrowserWindow, Menu } = require('electron')
 const path = require('path')
 
-const [, arg] = process.argv;
+const [, , projectPath] = process.argv;
 
 const apiPids = [];
 
@@ -19,7 +19,7 @@ function createWindow () {
       ['--http-port',
        global.portNumber,
        'filesystem',
-       '../aktiv-grotesk-vf/'
+       projectPath
       ], {
         env: {...process.env}
       }
