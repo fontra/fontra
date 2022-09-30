@@ -10,7 +10,7 @@ console.log(process.env)
 
 const [, , projectPath] = process.argv;
 
-const absoluteProjectPath = path.resolve('.', projectPath);
+const absoluteProjectPath = path.resolve('.', projectPath || '.');
 const appDir = process.env.APPDATA || (process.platform == 'darwin' ? process.env.HOME + '/Library/Preferences' : process.env.HOME + "/.local/share");
 const fontraDir = path.resolve(appDir, './fontraServer');
 

@@ -1,13 +1,18 @@
 const path = require('path');
 const fse = require('fs-extra');
 const ChildProcess = require('child_process');
+const { platform } = require('os');
+
+function venvBinDir() {
+  return process.platform == 'win32' ? 'Scripts' : 'bin';
+}
 
 function makeActivatedVenv(fontraDir) {
-  const venvDir = path.resolve(fontraDir, '/venv');
+  const venvDir = path.join(fontraDir, 'venv');
   const envs = {
     ...process.env,
     VIRTUAL_ENV: venvDir,
-    PATH: `${venvDir}/Scripts:${process.env.PATH}`
+    PATH: `${venvDir}/${venvBinDir()}:${process.env.PATH}`
   }
   delete envs.PYTHONHOME;
   return envs
@@ -28,9 +33,9 @@ function installServer(fontraDir) {
       fse.removeSync(fontraDir);
     }
 
-    // TODO: This can be tidied up using copySync's filter function
     fse.mkdirSync(fontraDir)
-    fse.copyFileSync('./dist/fontra-0.0.0-py3-none-any.whl', path.resolve(fontraDir, 'fontra-0.0.0-py3-none-any.whl'))
+    const whl = path.join(process.resourcesPath, 'extraResources','fontra-0.0.0-py3-none-any.whl');
+    console.log(whl)
 
     const output = ChildProcess.execSync(
       'python -m venv venv',
@@ -39,11 +44,13 @@ function installServer(fontraDir) {
       }
     );
 
+    console.log(env);
     const output2 = ChildProcess.execSync(
-      'pip install fontra-0.0.0-py3-none-any.whl',
+      `${path.join(env.VIRTUAL_ENV, venvBinDir(), 'pip')} install ${whl}`,
       {
         cwd: fontraDir,
-        env
+        env,
+        shell: true
       }
     );
    }
@@ -60,7 +67,8 @@ function installServer(fontraDir) {
         'fontra',
         ['--http-port', global.portNumber, 'filesystem', absoluteProjectPath], {
           env,
-          cwd: fontraDir
+          cwd: fontraDir,
+          shell: true
         }
       );
       python.stdout.on("data", data => {

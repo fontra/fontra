@@ -20,7 +20,16 @@
     "appId": "fontra",
     "win": {
       "icon": "electron-icons/icon.png"
-    }
+    },
+    "extraResources": [
+      {
+        "from": "./src/extraResources/",
+        "to": "extraResources",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ]
   },
   "devDependencies": {
     "electron": "^20.2.0",
