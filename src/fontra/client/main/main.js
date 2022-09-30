@@ -41,11 +41,14 @@ function createWindow () {
     // }
   })
 
-  if (isFirstRun) {
+  //isFirstRun = true
+
+  if (true) {
     win.loadFile('src/fontra/client/renderer/firstRun.html')
     win.webContents.once("did-finish-load", () => {
         installServer(fontraDir)
-        runServer(fontraDir, absoluteProjectPath, apiPids)
+        runServer(fontraDir, absoluteProjectPath, apiPids)  
+        win.loadFile('src/fontra/client/renderer/landing.html')
     })
   
   
@@ -53,9 +56,10 @@ function createWindow () {
   } else {
     win.loadFile('src/fontra/client/renderer/welcome.html')
     runServer(fontraDir, absoluteProjectPath, apiPids)
+    win.loadFile('src/fontra/client/renderer/landing.html')
   }
   
-  mainWindowState.manage( win)
+  mainWindowState.manage(win)
   Menu.setApplicationMenu(Menu.buildFromTemplate(getMenubarTemplate(win)))
 
   

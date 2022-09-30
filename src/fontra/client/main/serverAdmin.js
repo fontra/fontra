@@ -42,16 +42,17 @@ function installServer(fontraDir) {
 
 
    function runServer(fontraDir, absoluteProjectPath, apiPids) {
-    console.log('running server')
-    try {
+    console.log('running server', fontraDir)
+    //try {
       global.portNumber = 8000;
       global.apiUrl = `http://127.0.0.1:8000`;
   
       const python = ChildProcess.spawn(
         'call',
-        ['./src/scripts/run-server-win.bat', global.portNumber, absoluteProjectPath], {
+        ['./src/scripts/run_server_win.bat', global.portNumber, absoluteProjectPath], {
           env: {...process.env},
-          cwd: fontraDir
+          cwd: fontraDir,
+          shell: true
         }
       );
       python.stdout.on("data", data => {
@@ -61,11 +62,9 @@ function installServer(fontraDir) {
         console.log(`stderr: ${data}`);
       });
       apiPids.push(python.pid);
-    } catch (e) {
-      console.log(e);
-    }
-  
-    win.loadFile('src/fontra/client/renderer/landing.html')
+   // } catch (e) {
+    //  console.log(e);
+   // }
   }
 
    module.exports = {installServer, runServer}
