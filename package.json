@@ -15,7 +15,10 @@
     "dist": "electron-builder"
   },
   "build": {
-    "appId": "fontra"
+    "appId": "fontra",
+    "win": {
+      "icon": "electron-icons/icon.png"
+    }
   },
   "devDependencies": {
     "electron": "^20.2.0",
