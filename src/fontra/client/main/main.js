@@ -7,7 +7,7 @@ const firstRun = require('electron-first-run');
 const isFirstRun = firstRun()
 
 const { app, BrowserWindow, Menu } = require('electron');
-// const path = require('path')
+console.log(process.env)
 
 const [, , projectPath] = process.argv;
 
@@ -41,9 +41,7 @@ function createWindow () {
     // }
   })
 
-  //isFirstRun = true
-
-  if (true) {
+  if (isFirstRun) {
     win.loadFile('src/fontra/client/renderer/firstRun.html')
     win.webContents.once("did-finish-load", () => {
         installServer(fontraDir)
