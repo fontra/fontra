@@ -2,9 +2,8 @@ const windowStateKeeper = require('electron-window-state')
 const getMenubarTemplate = require('./menubar')
 const {installServer, runServer} = require('./serverAdmin')
 const path = require('path');
-const firstRun = require('electron-first-run');
- 
-const isFirstRun = firstRun()
+
+// change to does venv exist? does fontra exist? install wheel if not (maybe also check version)
 
 const { app, BrowserWindow, Menu } = require('electron');
 console.log(process.env)
@@ -13,7 +12,7 @@ const [, , projectPath] = process.argv;
 
 const absoluteProjectPath = path.resolve('.', projectPath);
 const appDir = process.env.APPDATA || (process.platform == 'darwin' ? process.env.HOME + '/Library/Preferences' : process.env.HOME + "/.local/share");
-const fontraDir = path.resolve(appDir, './fontra');
+const fontraDir = path.resolve(appDir, './fontraServer');
 
 const apiPids = [];
 
@@ -41,7 +40,7 @@ function createWindow () {
     // }
   })
 
-  if (isFirstRun) {
+  if (true) {
     win.loadFile('src/fontra/client/renderer/firstRun.html')
     win.webContents.once("did-finish-load", () => {
         installServer(fontraDir)

@@ -2,8 +2,20 @@ const path = require('path');
 const fse = require('fs-extra');
 const ChildProcess = require('child_process');
 
+function makeActivatedVenv(fontraDir) {
+  const venvDir = path.resolve(fontraDir, '/venv');
+  const envs = {
+    ...process.env,
+    VIRTUAL_ENV: venvDir,
+    PATH: `${venvDir}/Scripts:${process.env.PATH}`
+  }
+  delete envs.PYTHONHOME;
+  return envs
+}
+
 function installServer(fontraDir) {
     console.log('Installing server...')
+    const env = makeActivatedVenv(fontraDir);
     const pythonVersion = ChildProcess.execSync(
       'python -V',
     );
@@ -18,12 +30,7 @@ function installServer(fontraDir) {
 
     // TODO: This can be tidied up using copySync's filter function
     fse.mkdirSync(fontraDir)
-    fse.copySync('./.git', path.resolve(fontraDir, './.git'))
-    fse.copySync('./src', path.resolve(fontraDir, './src'))
-    fse.copySync('./fontra-icon.svg', path.resolve(fontraDir, './fontra-icon.svg'))
-    fse.copySync('./pyproject.toml', path.resolve(fontraDir, './pyproject.toml'))
-    fse.copySync('./requirements.txt', path.resolve(fontraDir, './requirements.txt'))
-    fse.copySync('./setup.py', path.resolve(fontraDir, './setup.py'))
+    fse.copyFileSync('./dist/fontra-0.0.0-py3-none-any.whl', path.resolve(fontraDir, 'fontra-0.0.0-py3-none-any.whl'))
 
     const output = ChildProcess.execSync(
       'python -m venv venv',
@@ -33,26 +40,27 @@ function installServer(fontraDir) {
     );
 
     const output2 = ChildProcess.execSync(
-      'call ./src/scripts/install_server_win.bat',
+      'pip install fontra-0.0.0-py3-none-any.whl',
       {
-        cwd: fontraDir
+        cwd: fontraDir,
+        env
       }
     );
    }
 
 
    function runServer(fontraDir, absoluteProjectPath, apiPids) {
+    const env = makeActivatedVenv(fontraDir);
     console.log('running server', fontraDir)
     //try {
       global.portNumber = 8000;
       global.apiUrl = `http://127.0.0.1:8000`;
   
       const python = ChildProcess.spawn(
-        'call',
-        ['./src/scripts/run_server_win.bat', global.portNumber, absoluteProjectPath], {
-          env: {...process.env},
-          cwd: fontraDir,
-          shell: true
+        'fontra',
+        ['--http-port', global.portNumber, 'filesystem', absoluteProjectPath], {
+          env,
+          cwd: fontraDir
         }
       );
       python.stdout.on("data", data => {
