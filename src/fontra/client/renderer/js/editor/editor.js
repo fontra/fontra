@@ -100,12 +100,10 @@ export class EditorController {
       return;
     }
     const pathItems = window.location.pathname.split("/");
-    console.log(window.location);
     // assert pathItems[0] === ""
     // assert pathItems[1] === "editor"
     // assert pathItems[2] === "-"
     const projectPath = window.location.hash ? window.location.hash.slice(1) : pathItems.slice(3).join("/");
-    console.log(projectPath)
     // TODO: move these to global variables
     const host = window.location.host ? window.location.host : 'localhost:8000';
     document.title = `Fontra — ${projectPath}`;

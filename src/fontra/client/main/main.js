@@ -6,7 +6,6 @@ const path = require('path');
 // change to does venv exist? does fontra exist? install wheel if not (maybe also check version)
 
 const { app, BrowserWindow, Menu } = require('electron');
-console.log(process.env)
 
 const [, , projectPath] = process.argv;
 

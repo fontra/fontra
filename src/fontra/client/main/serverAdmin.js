@@ -44,7 +44,6 @@ function installServer() {
     }
 
     const whl = path.join(process.resourcesPath, 'extraResources','fontra-0.0.0-py3-none-any.whl');
-    console.log(whl)
 
     if (!fse.pathExistsSync(env.VIRTUAL_ENV)) {
       ChildProcess.execSync(
@@ -67,7 +66,7 @@ function installServer() {
 
    async function runServer(absoluteProjectPath) {
     const env = makeActivatedVenv();
-    console.log('running server')
+    console.log('running server...');
     //try {
       global.portNumber = 8000;
   

@@ -4,7 +4,6 @@ import { autoReload, themeSwitchFromLocalStorage } from "../core/utils.js";
 
 
 export async function startupLandingPage(authenticateFunc) {
-  console.log("ydasda");
   if (autoReload()) {
     // Will reload
     return;
