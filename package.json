@@ -15,7 +15,7 @@
     "dist": "electron-builder"
   },
   "build": {
-    "appId": "fontra",
+    "appId": "fontra"
   },
   "devDependencies": {
     "electron": "^20.2.0",
