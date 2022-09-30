@@ -1,14 +1,13 @@
 const path = require('path');
 const fse = require('fs-extra');
 const ChildProcess = require('child_process');
-const { platform } = require('os');
 
 function venvBinDir() {
   return process.platform == 'win32' ? 'Scripts' : 'bin';
 }
 
-function makeActivatedVenv(fontraDir) {
-  const venvDir = path.join(fontraDir, 'venv');
+function makeActivatedVenv() {
+  const venvDir = path.join(global.fontraDir, 'venv');
   const envs = {
     ...process.env,
     VIRTUAL_ENV: venvDir,
@@ -18,9 +17,20 @@ function makeActivatedVenv(fontraDir) {
   return envs
 }
 
-function installServer(fontraDir) {
+function restartServer(win, newPath) {
+  global.apiPids.forEach((pid) => {
+    process.kill(pid);
+  });
+
+  global.apiPids = [];
+
+  runServer(newPath);
+  win.loadFile('src/fontra/client/renderer/landing.html')
+}
+
+function installServer() {
     console.log('Installing server...')
-    const env = makeActivatedVenv(fontraDir);
+    const env = makeActivatedVenv();
     const pythonVersion = ChildProcess.execSync(
       'python -V',
     );
@@ -29,46 +39,43 @@ function installServer(fontraDir) {
       throw new Error('Python must be in your path and v3.10 or above')
     }
 
-    if (fse.pathExistsSync(fontraDir)) {
-      fse.removeSync(fontraDir);
+    if (!fse.pathExistsSync(global.fontraDir)) {
+      fse.mkdirSync(global.fontraDir);
     }
 
-    fse.mkdirSync(fontraDir)
     const whl = path.join(process.resourcesPath, 'extraResources','fontra-0.0.0-py3-none-any.whl');
     console.log(whl)
 
-    const output = ChildProcess.execSync(
-      'python -m venv venv',
-      {
-        cwd: fontraDir
-      }
-    );
+    if (!fse.pathExistsSync(env.VIRTUAL_ENV)) {
+      ChildProcess.execSync(
+        'python -m venv venv',
+        {
+          cwd: global.fontraDir
+        }
+      );
+    }
 
-    console.log(env);
     const output2 = ChildProcess.execSync(
       `${path.join(env.VIRTUAL_ENV, venvBinDir(), 'pip')} install ${whl}`,
       {
-        cwd: fontraDir,
+        cwd: global.fontraDir,
         env,
-        shell: true
       }
     );
    }
 
 
-   function runServer(fontraDir, absoluteProjectPath, apiPids) {
-    const env = makeActivatedVenv(fontraDir);
-    console.log('running server', fontraDir)
+   async function runServer(absoluteProjectPath) {
+    const env = makeActivatedVenv();
+    console.log('running server')
     //try {
       global.portNumber = 8000;
-      global.apiUrl = `http://127.0.0.1:8000`;
   
       const python = ChildProcess.spawn(
-        'fontra',
+        `${path.join(env.VIRTUAL_ENV, venvBinDir(), 'fontra')}`,
         ['--http-port', global.portNumber, 'filesystem', absoluteProjectPath], {
           env,
-          cwd: fontraDir,
-          shell: true
+          cwd: global.fontraDir,
         }
       );
       python.stdout.on("data", data => {
@@ -77,10 +84,10 @@ function installServer(fontraDir) {
       python.stderr.on("data", data => {
         console.log(`stderr: ${data}`);
       });
-      apiPids.push(python.pid);
+      global.apiPids.push(python.pid);
    // } catch (e) {
     //  console.log(e);
    // }
   }
 
-   module.exports = {installServer, runServer}
+  module.exports = {installServer, runServer, restartServer}

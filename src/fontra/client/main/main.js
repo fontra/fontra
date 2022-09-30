@@ -1,6 +1,6 @@
 const windowStateKeeper = require('electron-window-state')
 const getMenubarTemplate = require('./menubar')
-const {installServer, runServer} = require('./serverAdmin')
+const {installServer, runServer, restartServer} = require('./serverAdmin')
 const path = require('path');
 
 // change to does venv exist? does fontra exist? install wheel if not (maybe also check version)
@@ -12,9 +12,9 @@ const [, , projectPath] = process.argv;
 
 const absoluteProjectPath = path.resolve('.', projectPath || '.');
 const appDir = process.env.APPDATA || (process.platform == 'darwin' ? process.env.HOME + '/Library/Preferences' : process.env.HOME + "/.local/share");
-const fontraDir = path.resolve(appDir, './fontraServer');
 
-const apiPids = [];
+global.fontraDir = path.resolve(appDir, './fontraServer');
+global.apiPids = [];
 
 function createWindow () {
   const mainWindowState = windowStateKeeper({
@@ -43,26 +43,20 @@ function createWindow () {
   if (true) {
     win.loadFile('src/fontra/client/renderer/firstRun.html')
     win.webContents.once("did-finish-load", () => {
-        installServer(fontraDir)
-        runServer(fontraDir, absoluteProjectPath, apiPids)  
+        installServer()
+        runServer(absoluteProjectPath)  
         win.loadFile('src/fontra/client/renderer/landing.html')
     })
-  
-  
-    // addWindowListeners(win);  
-  } else {
-    win.loadFile('src/fontra/client/renderer/welcome.html')
-    runServer(fontraDir, absoluteProjectPath, apiPids)
-    win.loadFile('src/fontra/client/renderer/landing.html')
   }
   
+  
   mainWindowState.manage(win)
-  Menu.setApplicationMenu(Menu.buildFromTemplate(getMenubarTemplate(win)))
+  Menu.setApplicationMenu(Menu.buildFromTemplate(getMenubarTemplate(win, restartServer)))
 
   
   win.on("close", () => {
     // App close handler
-    apiPids.forEach((pid) => {
+    global.apiPids.forEach((pid) => {
       process.kill(pid);
     });
   });
