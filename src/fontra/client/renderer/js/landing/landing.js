@@ -28,9 +28,18 @@ export async function startupLandingPage(authenticateFunc) {
   }
 }
 
+function wait(delay){
+  return new Promise((resolve) => setTimeout(resolve, delay));
+}
 
 async function fetchJSON(url) {
-  // TODO: discover localhost
-  const response = await fetch(`http://localhost:8000${url}`);
-  return await response.json();
+  // TODO: discover localhost and make this event based
+  for (let i = 0; i < 5; i++) {
+    try {
+      const response = await fetch(`http://localhost:8000${url}`);
+      return await response.json();
+    } catch (e) {
+      await wait(1000)
+    }
+  }
 }
