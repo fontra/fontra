@@ -10,17 +10,20 @@ const { app, BrowserWindow, Menu } = require('electron');
 const [, , projectPath] = process.argv;
 
 const absoluteProjectPath = path.resolve('.', projectPath || '.');
-const appDir = process.env.APPDATA || (process.platform == 'darwin' ? process.env.HOME + '/Library/Preferences' : process.env.HOME + "/.local/share");
+const appDir = process.env.APPDATA || (process.platform === 'darwin' ? process.env.HOME + '/Library/Preferences' : process.env.HOME + "/.local/share");
 
 global.fontraDir = path.resolve(appDir, './fontraServer');
 global.apiPids = [];
+global.shellPath = process.env.PATH;
 
 // fix shell environment variables for macs
 (async function getEnvVariables() {
-  const {shellEnvSync} = await import('shell-env');
-  const envVariables = shellEnvSync();
-  console.log(envVariables.PATH);
-  global.shellPath = envVariables.PATH;
+  if (process.platform === 'darwin') {
+    const {shellEnvSync} = await import('shell-env');
+    const envVariables = shellEnvSync();
+    console.log(envVariables.PATH);
+    global.shellPath = envVariables.PATH;
+  }
 })();
 
 async function createWindow () {

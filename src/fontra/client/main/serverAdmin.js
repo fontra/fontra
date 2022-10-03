@@ -37,12 +37,13 @@ async function restartServer(win, newPath) {
 function installServer() {
     console.log('Installing server...')
     const env = makeActivatedVenv();
+    const opts = process.platform === 'darwin' ? {
+      env,
+      shell: true
+    } : {};
     const pythonVersion = ChildProcess.execSync(
       `${pythonCommand()} -V`,
-      {
-        env,
-        shell: true
-      }
+      opts
     );
     const [majorVersion, minorVersion] = pythonVersion.toString().split('.');
     if (majorVersion !== 'Python 3' || parseInt(minorVersion, 10) < 10) {
