@@ -1,9 +1,14 @@
 const path = require('path');
 const fse = require('fs-extra');
+const fp = require("find-free-port");
 const ChildProcess = require('child_process');
 
 function venvBinDir() {
   return process.platform == 'win32' ? 'Scripts' : 'bin';
+}
+
+function pythonCommand() {
+  return process.platform == 'darwin' ? 'python3' : 'python';
 }
 
 function makeActivatedVenv() {
@@ -11,20 +16,21 @@ function makeActivatedVenv() {
   const envs = {
     ...process.env,
     VIRTUAL_ENV: venvDir,
-    PATH: `${venvDir}/${venvBinDir()}:${process.env.PATH}`
+    PATH: `${venvDir}/${venvBinDir()}:${global.shellPath}`
   }
+  console.log(envs);
   delete envs.PYTHONHOME;
   return envs
 }
 
-function restartServer(win, newPath) {
+async function restartServer(win, newPath) {
   global.apiPids.forEach((pid) => {
     process.kill(pid);
   });
 
   global.apiPids = [];
 
-  runServer(newPath);
+  await runServer(newPath);
   win.loadFile('src/fontra/client/renderer/landing.html')
 }
 
@@ -32,7 +38,11 @@ function installServer() {
     console.log('Installing server...')
     const env = makeActivatedVenv();
     const pythonVersion = ChildProcess.execSync(
-      'python -V',
+      `${pythonCommand()} -V`,
+      {
+        env,
+        shell: true
+      }
     );
     const [majorVersion, minorVersion] = pythonVersion.toString().split('.');
     if (majorVersion !== 'Python 3' || parseInt(minorVersion, 10) < 10) {
@@ -47,7 +57,7 @@ function installServer() {
 
     if (!fse.pathExistsSync(env.VIRTUAL_ENV)) {
       ChildProcess.execSync(
-        'python -m venv venv',
+        `${pythonCommand()} -m venv venv`,
         {
           cwd: global.fontraDir
         }
@@ -68,11 +78,11 @@ function installServer() {
     const env = makeActivatedVenv();
     console.log('running server...');
     //try {
-      global.portNumber = 8000;
+      const portNumber = await fp(8000)
   
       const python = ChildProcess.spawn(
         `${path.join(env.VIRTUAL_ENV, venvBinDir(), 'fontra')}`,
-        ['--http-port', global.portNumber, 'filesystem', absoluteProjectPath], {
+        ['--http-port', portNumber, 'filesystem', absoluteProjectPath], {
           env,
           cwd: global.fontraDir,
         }

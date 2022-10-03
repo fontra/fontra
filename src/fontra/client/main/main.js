@@ -15,7 +15,15 @@ const appDir = process.env.APPDATA || (process.platform == 'darwin' ? process.en
 global.fontraDir = path.resolve(appDir, './fontraServer');
 global.apiPids = [];
 
-function createWindow () {
+// fix shell environment variables for macs
+(async function getEnvVariables() {
+  const {shellEnvSync} = await import('shell-env');
+  const envVariables = shellEnvSync();
+  console.log(envVariables.PATH);
+  global.shellPath = envVariables.PATH;
+})();
+
+async function createWindow () {
   const mainWindowState = windowStateKeeper({
     defaultWidth: 1280,
     defaultHeight: 800
@@ -39,15 +47,13 @@ function createWindow () {
     // }
   })
 
-  if (true) {
-    win.loadFile('src/fontra/client/renderer/firstRun.html')
-    win.webContents.once("did-finish-load", () => {
-        installServer()
-        runServer(absoluteProjectPath)  
-        win.loadFile('src/fontra/client/renderer/landing.html')
-    })
-  }
-  
+  win.loadFile('src/fontra/client/renderer/firstRun.html')
+  win.webContents.once("did-finish-load", async () => {
+      installServer()
+      await runServer(absoluteProjectPath)  
+      win.loadFile('src/fontra/client/renderer/landing.html')
+  })
+
   
   mainWindowState.manage(win)
   Menu.setApplicationMenu(Menu.buildFromTemplate(getMenubarTemplate(win, restartServer)))
@@ -77,6 +83,8 @@ app.whenReady().then(() => {
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
+    app.quit()
+  } else {
     app.quit()
   }
 })
