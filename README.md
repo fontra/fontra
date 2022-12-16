@@ -147,3 +147,7 @@ The following list of features is not complete, but gives you a rough idea of wh
   - Pluggable client views ✅
   - Pluggable read/write storage backends ✅
   - Client-agnostic and storage-agnostic server centerpiece ✅
+
+### Future possibilities
+
+- Serverless Fontra
