@@ -145,13 +145,14 @@ The following list of features is not complete, but gives you a rough idea of wh
 
 ### Code structure
 
-- Client / server architecture (JavaScript / Python) ✅
+- Client/server architecture (JavaScript/Python) ✅
 - Local or (networked) remote server ✅
-- Communication via JSON objects ✅
+- Client/server communication via JSON objects over a WebSocket ✅
 - Highly modular:
   - Pluggable client views ✅
   - Pluggable read/write storage backends ✅
   - Client-agnostic and storage-agnostic server centerpiece ✅
+- Asynchronous programming model using async/await
 
 ### Future possibilities
 
