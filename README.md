@@ -113,18 +113,19 @@ The following list of features is not complete, but gives you a rough idea of wh
 
 ### Deployment
 
-- Basic desktop bundle for macOS and Windows ✅ (Via [Fontra Pak](https://github.com/BlackFoundryCom/fontra-pak))
+- Basic standalone desktop application for macOS and Windows ✅ (Via [Fontra Pak](https://github.com/BlackFoundryCom/fontra-pak))
+- Basic multi-user server deployment with database storage ✅ (Via [fontra-rcjk](https://github.com/BlackFoundryCom/fontra-rcjk/), [django-robo-cjk](https://github.com/BlackFoundryCom/django-robo-cjk), behind NGINX)
 - Research GitHub REST API: can Fontra be a GitHub gateway in a practical way?
 - Research database solutions for server-based font storage
 
 ### Scripting
 
 - A Python scripting library that talks directly to the Fontra server
-- JS Scripting for in-browser automation
-- Python Scripting for in-browser automation via WASM/PyOdide
-- Add various plug-in APIs, for example
-  - visualization layer plug-ins
-  - tool plug-ins
+- JS scripting for in-browser automation
+- Python scripting for in-browser automation via WASM/PyOdide
+- Add various plug-in APIs, for example:
+  - Visualization layer plug-ins for the glyph editor
+  - Tool plug-ins
 
 ### Export
 
