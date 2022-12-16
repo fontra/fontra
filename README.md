@@ -57,7 +57,7 @@ The following list of features is not complete, but gives you a rough idea of wh
 - Respond to external .ufo changes (automatic reload) ✅
 - Read .ttf + variable .ttf ✅
 - Read .otf + variable .otf ✅
-- Write .ttf + variable .ttf (For "hot fixes". Currently not planned, will still require export step.)
+- Write .ttf + variable .ttf (For “hot fixes”. Currently not planned, will still require export step.)
 - Write .otf + variable .otf (Ditto.)
 - Respond to external .ttf and .otf changes (automatic reload)
 
