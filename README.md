@@ -81,7 +81,12 @@ The following list of features is not complete, but gives you a rough idea of wh
 - Basic outline editing (move points) ✅
 - Basic pen tool (draw points) ✅
 - Edit (variable) component parameters ✅
-- Decomponse (variable) component ✅
+- Decompose (variable) component ✅
+- First-class support for quadratic curves ✅
+- Interactive sidebearing editing
+- Numeric sidebearing editing
+- Numeric advance width editing ✅
+- Pen tool for quadratic curves
 - Advanced outline editing (adding/removing points)
 - Connecting open paths
 - Knife tool
@@ -91,6 +96,7 @@ The following list of features is not complete, but gives you a rough idea of wh
 - Add / remove (variable) components
 - Edit local variation axes and sources/layers
 - Built-in support for Non-Linear Interpolation
+- Remove overlap and other path operators
 
 ### Font-level viewing / editing
 
@@ -99,6 +105,11 @@ The following list of features is not complete, but gives you a rough idea of wh
 - Edit kerning
 - Edit OpenType features
 - Edit variation axes
+
+### Multiple windows
+
+- Propagate changes across multiple windows in real time ✅
+- Browser URL encodes most view settings ✅
 
 ### Deployment
 
@@ -125,3 +136,13 @@ The following list of features is not complete, but gives you a rough idea of wh
 - Visualizing the selection of others
 - Add review notes / comments
 - Suggested edits
+
+### Code structure
+
+- Client / server architecture (JavaScript / Python) ✅
+- Local or (networked) remote server ✅
+- Communication via JSON objects ✅
+- Highly modular:
+  - Pluggable client views ✅
+  - Pluggable read/write storage backends ✅
+  - Client-agnostic and storage-agnostic server centerpiece ✅
