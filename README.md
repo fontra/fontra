@@ -83,6 +83,7 @@ The following list of features is not complete, but gives you a rough idea of wh
 - Edit (variable) component parameters ✅
 - Decompose (variable) component ✅
 - First-class support for quadratic curves ✅
+- Multi-level undo/redo, per glyph ✅
 - Interactive sidebearing editing
 - Numeric sidebearing editing
 - Numeric advance width editing ✅
