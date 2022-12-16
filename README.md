@@ -45,7 +45,9 @@ Fontra is an in-development browser-based font editor. It consists of two main p
 
 ## Roadmap
 
-### I/O
+The following list of features is not complete, but gives you a rough idea of where we are now, and where we are headed.
+
+### Input / Output
 
 - Read .designspace ✅
 - Write .designspace
