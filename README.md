@@ -51,12 +51,15 @@ The following list of features is not complete, but gives you a rough idea of wh
 
 - Read .designspace ✅
 - Write .designspace
+- Respond to external .designspace changes (automatic reload)
 - Read .ufo ✅
 - Write .ufo ✅
+- Respond to external .ufo changes (automatic reload) ✅
 - Read .ttf + variable .ttf ✅
 - Read .otf + variable .otf ✅
 - Write .ttf + variable .ttf (For "hot fixes". Currently not planned, will still require export step.)
 - Write .otf + variable .otf (Ditto.)
+- Respond to external .ttf and .otf changes (automatic reload)
 
 ### Text viewing / editing
 
@@ -68,19 +71,24 @@ The following list of features is not complete, but gives you a rough idea of wh
 - Advanced character / glyph search
 - Display kerning
 - Apply proper text shaping
+- Full screen mode
+- Right-to-left mode
+- Vertical top-to-bottom mode
 
 ### Glyph editing
 
 - Enter “edit mode” for glyph by double-clicking on a glyph in the text ✅
 - Basic outline editing (move points) ✅
 - Basic pen tool (draw points) ✅
-- Edit component parameters ✅
+- Edit (variable) component parameters ✅
+- Decomponse (variable) component ✅
 - Advanced outline editing (adding/removing points)
 - Connecting open paths
 - Knife tool
+- Shape tool
 - Copy / paste
 - Create new glyphs
-- Add / remove components
+- Add / remove (variable) components
 - Edit local variation axes and sources/layers
 - Built-in support for Non-Linear Interpolation
 
