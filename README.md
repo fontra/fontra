@@ -45,7 +45,7 @@ Fontra is an in-development browser-based font editor. It consists of two main p
 
 ## Roadmap
 
-The following list of features is not complete, but gives you a rough idea of where we are now, and where we are headed. A green checkmark means: “This feature is implemented”.
+The following list of features is not complete, but gives you a rough idea of where we are now, and where we are headed. A green checkmark means: “This feature has been implemented”.
 
 ### Input / Output
 
