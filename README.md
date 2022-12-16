@@ -67,11 +67,11 @@ The following list of features is not complete, but gives you a rough idea of wh
 - Multi-line text ✅
 - Basic glyph selection (pick glyph from list) ✅
 - Basic designspace navigation (via axis sliders) ✅
+- Show live interpolation ✅
 - Hand tool for scrolling ✅
 - Scroll with gestures ✅
 - Zoom with gestures ✅
 - Zoom with short-cuts ✅
-- Show live interpolation ✅
 - Advanced character / glyph search
 - Display kerning
 - Apply proper text shaping
