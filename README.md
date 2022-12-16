@@ -42,3 +42,76 @@ Fontra is an in-development browser-based font editor. It consists of two main p
 - To use Fontra with .rcjk data on disk, or to connect to a remote rcjk server, install the [`fontra-rcjk`](https://github.com/BlackFoundryCom/fontra-rcjk) plugin package. Then you can start it with a robocjk server hostname, using the `rcjk` subcommand provided by the `fontra-rcjk` plugin:
 
     `fontra --launch rcjk some-robocjk-server.some-domain.com`
+
+## Roadmap
+
+### I/O
+
+- Read .designspace ✅
+- Write .designspace
+- Read .ufo ✅
+- Write .ufo ✅
+- Read .ttf + variable .ttf ✅
+- Read .otf + variable .otf ✅
+- Write .ttf + variable .ttf (For "hot fixes". Currently not planned, will still require export step.)
+- Write .otf + variable .otf (Ditto.)
+
+### Text viewing / editing
+
+- Basic live text entry, including `/glyphname` notation ✅
+- Multi-line text ✅
+- Basic glyph selection (pick glyph from list) ✅
+- Basic designspace navigation (via axis sliders) ✅
+- Show live interpolation ✅
+- Advanced character / glyph search
+- Display kerning
+- Apply proper text shaping
+
+### Glyph editing
+
+- Enter “edit mode” for glyph by double-clicking on a glyph in the text ✅
+- Basic outline editing (move points) ✅
+- Basic pen tool (draw points) ✅
+- Edit component parameters ✅
+- Advanced outline editing (adding/removing points)
+- Connecting open paths
+- Knife tool
+- Copy / paste
+- Create new glyphs
+- Add / remove components
+- Edit local variation axes and sources/layers
+- Built-in support for Non-Linear Interpolation
+
+### Font-level viewing / editing
+
+- Cell-based font overview
+- List-based font overview
+- Edit kerning
+- Edit OpenType features
+- Edit variation axes
+
+### Deployment
+
+- Basic desktop bundle for macOS and Windows ✅ (Via [Fontra Pak](https://github.com/BlackFoundryCom/fontra-pak))
+- Research GitHub REST API: can Fontra be a GitHub gateway in a practical way?
+- Research database solutions for server-based font storage
+
+### Scripting
+
+- A Python scripting library that talks directly to the Fontra server
+- JS Scripting for in-browser automation
+- Python Scripting for in-browser automation via WASM/PyOdide
+- Add various plug-in APIs, for example
+  - visualization layer plug-ins
+  - tool plug-ins
+
+### Export
+
+- FontMake/Fontations integration
+- Incremental compilation using Fontations
+
+### Collaborative features
+
+- Visualizing the selection of others
+- Add review notes / comments
+- Suggested edits
