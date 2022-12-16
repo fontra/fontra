@@ -151,3 +151,4 @@ The following list of features is not complete, but gives you a rough idea of wh
 ### Future possibilities
 
 - Serverless Fontra
+- Peer-to-peer collaboration
