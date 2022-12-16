@@ -114,7 +114,7 @@ The following list of features is not complete, but gives you a rough idea of wh
 ### Deployment
 
 - Basic standalone desktop application for macOS and Windows ✅ (Via [Fontra Pak](https://github.com/BlackFoundryCom/fontra-pak))
-- Basic multi-user server deployment with database storage ✅ (Via [fontra-rcjk](https://github.com/BlackFoundryCom/fontra-rcjk/), [django-robo-cjk](https://github.com/BlackFoundryCom/django-robo-cjk), behind NGINX)
+- Basic multi-user server deployment with database storage ✅ (Via [fontra-rcjk](https://github.com/BlackFoundryCom/fontra-rcjk), [django-robo-cjk](https://github.com/BlackFoundryCom/django-robo-cjk), behind NGINX)
 - Research GitHub REST API: can Fontra be a GitHub gateway in a practical way?
 - Research database solutions for server-based font storage
 
