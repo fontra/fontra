@@ -1,0 +1,10 @@
+// Check all settings and what they mean in this gist:
+// https://gist.github.com/adbutterfield/6b91625b5b07ca2c29f6322245e3e2bb
+{
+  "bracketSpacing": true,
+  "printWidth": 80,
+  "semi": true,
+  "singleQuote": true,
+  "tabWidth": 2,
+  "useTabs": false
+}
