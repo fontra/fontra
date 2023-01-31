@@ -3,8 +3,8 @@
   --landing-foreground-color-light: black;
   --landing-background-color-dark: black;
   --landing-foreground-color-dark: white;
-  --landing-project-item-hover-color-light: #E8E8E8;
-  --landing-project-item-active-color-light: #CCC;
+  --landing-project-item-hover-color-light: #e8e8e8;
+  --landing-project-item-active-color-light: #ccc;
   --landing-project-item-hover-color-dark: #444;
   --landing-project-item-active-color-dark: #666;
 
@@ -22,7 +22,6 @@
 }
 
 @media (prefers-color-scheme: dark) {
-
   :root {
     --landing-background-color: var(--landing-background-color-dark);
     --landing-foreground-color: var(--landing-foreground-color-dark);
@@ -36,16 +35,13 @@
     --landing-project-item-hover-color: var(--landing-project-item-hover-color-light);
     --landing-project-item-active-color: var(--landing-project-item-active-color-light);
   }
-
 }
-
 
 a {
   color: inherit;
   text-decoration: inherit;
   cursor: pointer;
 }
-
 
 .landing-body {
   height: 100%;
@@ -79,7 +75,6 @@ a {
   display: flex;
   flex-direction: column;
   gap: 0.25em;
-
 }
 .login-label {
   color: gray;
@@ -90,7 +85,7 @@ a {
 .login-input {
   font-family: fontra-ui-regular, sans-serif;
   font-size: 1em;
-  width:  20em;
+  width: 20em;
   padding: 0.25em;
   color: var(--landing-foreground-color);
   background-color: var(--landing-background-color);
@@ -98,7 +93,7 @@ a {
 
 .login-button {
   border-radius: 2em;
-  background-color: #46F;
+  background-color: #46f;
   width: max-content;
   color: white;
   padding: 0.5em 1.1em 0.5em 1em;
@@ -111,12 +106,12 @@ a {
 }
 
 .login-button:hover {
-  background-color: #24D;
+  background-color: #24d;
   cursor: pointer;
 }
 
 .login-button:active {
-  background-color: #02A;
+  background-color: #02a;
   cursor: pointer;
 }
 
