@@ -38,6 +38,10 @@ EXTENSIONS = ["css", "html", "ico", "js", "svg", "woff2"]
             """  "/some-dir/some-module.dummy.js" """,
         ),
         (
+            """  "some-dir/some-module.js" """,
+            """  "some-dir/some-module.js" """,
+        ),
+        (
             """  './some-module.js' """,
             """  './some-module.dummy.js' """,
         ),
