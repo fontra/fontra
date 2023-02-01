@@ -140,23 +140,19 @@ function normalizedPosition(container, contextMenu, mouseX, mouseY) {
   const containerX = mouseX - containerOffsetX;
   const containerY = mouseY - containerOffsetY;
 
-  const outOfBoundsOnX =
-    containerX + contextMenu.clientWidth > container.clientWidth;
+  const outOfBoundsOnX = containerX + contextMenu.clientWidth > container.clientWidth;
 
-  const outOfBoundsOnY =
-    containerY + contextMenu.clientHeight > container.clientHeight;
+  const outOfBoundsOnY = containerY + contextMenu.clientHeight > container.clientHeight;
 
   let normalizedX = mouseX;
   let normalizedY = mouseY;
 
   if (outOfBoundsOnX) {
-    normalizedX =
-      containerOffsetX + container.clientWidth - contextMenu.clientWidth;
+    normalizedX = containerOffsetX + container.clientWidth - contextMenu.clientWidth;
   }
 
   if (outOfBoundsOnY) {
-    normalizedY =
-      containerOffsetY + container.clientHeight - contextMenu.clientHeight;
+    normalizedY = containerOffsetY + container.clientHeight - contextMenu.clientHeight;
   }
 
   return [normalizedX, normalizedY];

@@ -68,11 +68,7 @@ function _drawMultiGlyphsLayer(model, controller, skipSelected = true) {
   context.fillStyle = controller.drawingParameters.glyphFillColor;
   for (const glyphLine of model.positionedLines) {
     for (const glyph of glyphLine.glyphs) {
-      if (
-        skipSelected &&
-        glyph === selectedGlyph &&
-        model.selectedGlyphIsEditing
-      ) {
+      if (skipSelected && glyph === selectedGlyph && model.selectedGlyphIsEditing) {
         continue;
       }
       withSavedState(context, () => {
@@ -98,8 +94,7 @@ export const drawCJKDesignFrameLayer = requireEditingGlyph(
     const [emW, emH] = cjkDesignFrameParameters['em_Dimension'];
     const characterFace = cjkDesignFrameParameters['characterFace'] / 100;
     const [shiftX, shiftY] = cjkDesignFrameParameters['shift'] || [0, -120];
-    const [overshootInside, overshootOutside] =
-      cjkDesignFrameParameters['overshoot'];
+    const [overshootInside, overshootOutside] = cjkDesignFrameParameters['overshoot'];
     const [faceW, faceH] = [emW * characterFace, emH * characterFace];
     const [faceX, faceY] = [(emW - faceW) / 2, (emH - faceH) / 2];
     let horizontalLine = cjkDesignFrameParameters['horizontalLine'];
@@ -132,10 +127,7 @@ export const drawCJKDesignFrameLayer = requireEditingGlyph(
       ]) {
         strokeLine(context, 0, y, emW, y);
       }
-      for (const x of [
-        centerX + emW * verticalLine,
-        centerX - emW * verticalLine,
-      ]) {
+      for (const x of [centerX + emW * verticalLine, centerX - emW * verticalLine]) {
         strokeLine(context, x, 0, x, emH);
       }
     } else {
@@ -190,9 +182,7 @@ export function drawUndefinedGlyphsLayer(model, controller) {
           context.scale(1, -1);
           context.fillText(glyph.glyphName, glyph.glyph.xAdvance / 2, 0);
           if (glyph.character) {
-            const uniStr = makeUPlusStringFromCodePoint(
-              glyph.character.codePointAt(0)
-            );
+            const uniStr = makeUPlusStringFromCodePoint(glyph.character.codePointAt(0));
             context.fillText(
               uniStr,
               glyph.glyph.xAdvance / 2,
@@ -235,27 +225,23 @@ export const drawSidebearingsLayer = requireEditingGlyph(
   })
 );
 
-export const drawHoveredEmptyGlyphLayer = requireHoveredGlyph(
-  (model, controller) => {
-    _drawSelectedEmptyGlyphLayer(
-      model,
-      controller,
-      model.hoveredGlyph,
-      'hoveredEmptyGlyphColor'
-    );
-  }
-);
+export const drawHoveredEmptyGlyphLayer = requireHoveredGlyph((model, controller) => {
+  _drawSelectedEmptyGlyphLayer(
+    model,
+    controller,
+    model.hoveredGlyph,
+    'hoveredEmptyGlyphColor'
+  );
+});
 
-export const drawSelectedEmptyGlyphLayer = requireSelectedGlyph(
-  (model, controller) => {
-    _drawSelectedEmptyGlyphLayer(
-      model,
-      controller,
-      model.selectedGlyph,
-      'selectedEmptyGlyphColor'
-    );
-  }
-);
+export const drawSelectedEmptyGlyphLayer = requireSelectedGlyph((model, controller) => {
+  _drawSelectedEmptyGlyphLayer(
+    model,
+    controller,
+    model.selectedGlyph,
+    'selectedEmptyGlyphColor'
+  );
+});
 
 function _drawSelectedEmptyGlyphLayer(
   model,
@@ -283,42 +269,28 @@ function _drawSelectedEmptyGlyphLayer(
   } else {
     context.fillStyle = fillColor;
   }
-  context.fillRect(
-    box.xMin,
-    box.yMin,
-    box.xMax - box.xMin,
-    box.yMax - box.yMin
-  );
+  context.fillRect(box.xMin, box.yMin, box.xMax - box.xMin, box.yMax - box.yMin);
 }
 
-export const drawHoveredGlyphLayer = requireHoveredGlyph(
-  (model, controller) => {
-    _drawSelectedGlyphLayer(
-      model,
-      controller,
-      model.hoveredGlyph,
-      'hoveredGlyphStrokeColor'
-    );
-  }
-);
+export const drawHoveredGlyphLayer = requireHoveredGlyph((model, controller) => {
+  _drawSelectedGlyphLayer(
+    model,
+    controller,
+    model.hoveredGlyph,
+    'hoveredGlyphStrokeColor'
+  );
+});
 
-export const drawSelectedGlyphLayer = requireSelectedGlyph(
-  (model, controller) => {
-    _drawSelectedGlyphLayer(
-      model,
-      controller,
-      model.selectedGlyph,
-      'selectedGlyphStrokeColor'
-    );
-  }
-);
+export const drawSelectedGlyphLayer = requireSelectedGlyph((model, controller) => {
+  _drawSelectedGlyphLayer(
+    model,
+    controller,
+    model.selectedGlyph,
+    'selectedGlyphStrokeColor'
+  );
+});
 
-function _drawSelectedGlyphLayer(
-  model,
-  controller,
-  selectedGlyph,
-  strokeColorName
-) {
+function _drawSelectedGlyphLayer(model, controller, selectedGlyph, strokeColorName) {
   const context = controller.context;
   const [lineIndex, glyphIndex] = selectedGlyph.split('/');
   const positionedGlyph = model.positionedLines[lineIndex].glyphs[glyphIndex];
@@ -398,14 +370,7 @@ export const drawStartPointsLayer = requireEditingGlyph(
         endAngle += angle - START_POINT_ARC_GAP_ANGLE;
       }
       context.beginPath();
-      context.arc(
-        startPoint.x,
-        startPoint.y,
-        radius,
-        startAngle,
-        endAngle,
-        false
-      );
+      context.arc(startPoint.x, startPoint.y, radius, startAngle, endAngle, false);
       context.stroke();
       startPointIndex = contourInfo.endPoint + 1;
     }
@@ -428,27 +393,16 @@ export const drawNodesLayer = requireEditingGlyph(
 export const drawComponentSelectionLayer = requireEditingGlyph(
   glyphTranslate((model, controller, context, glyph, drawingParameters) => {
     const isHoverSelected =
-      model.selection?.size &&
-      isSuperset(model.selection, model.hoverSelection);
-    const { component: hoveredComponentIndices } = parseSelection(
-      model.hoverSelection
-    );
+      model.selection?.size && isSuperset(model.selection, model.hoverSelection);
+    const { component: hoveredComponentIndices } = parseSelection(model.hoverSelection);
     const hoveredComponentIndex = hoveredComponentIndices?.[0];
-    const combinedSelection = lenientUnion(
-      model.selection,
-      model.hoverSelection
-    );
-    const { component: combinedComponentIndices } =
-      parseSelection(combinedSelection);
+    const combinedSelection = lenientUnion(model.selection, model.hoverSelection);
+    const { component: combinedComponentIndices } = parseSelection(combinedSelection);
 
-    const hoveredComponentStrokeColor =
-      drawingParameters.hoveredComponentStrokeColor;
-    const selectedComponentStrokeColor =
-      drawingParameters.selectedComponentStrokeColor;
-    const hoveredComponentLineWidth =
-      drawingParameters.hoveredComponentLineWidth;
-    const selectedComponentLineWidth =
-      drawingParameters.selectedComponentLineWidth;
+    const hoveredComponentStrokeColor = drawingParameters.hoveredComponentStrokeColor;
+    const selectedComponentStrokeColor = drawingParameters.selectedComponentStrokeColor;
+    const hoveredComponentLineWidth = drawingParameters.hoveredComponentLineWidth;
+    const selectedComponentLineWidth = drawingParameters.selectedComponentLineWidth;
 
     for (const componentIndex of combinedComponentIndices || []) {
       const drawSelectionFill =
@@ -535,13 +489,7 @@ function fillNode(context, pt, cornerNodeSize, smoothNodeSize, handleNodeSize) {
   }
 }
 
-function strokeNode(
-  context,
-  pt,
-  cornerNodeSize,
-  smoothNodeSize,
-  handleNodeSize
-) {
+function strokeNode(context, pt, cornerNodeSize, smoothNodeSize, handleNodeSize) {
   if (!pt.type && !pt.smooth) {
     strokeSquareNode(context, pt, cornerNodeSize);
   } else if (!pt.type) {
@@ -552,12 +500,7 @@ function strokeNode(
 }
 
 function fillSquareNode(context, pt, nodeSize) {
-  context.fillRect(
-    pt.x - nodeSize / 2,
-    pt.y - nodeSize / 2,
-    nodeSize,
-    nodeSize
-  );
+  context.fillRect(pt.x - nodeSize / 2, pt.y - nodeSize / 2, nodeSize, nodeSize);
 }
 
 function fillRoundNode(context, pt, nodeSize) {
@@ -567,12 +510,7 @@ function fillRoundNode(context, pt, nodeSize) {
 }
 
 function strokeSquareNode(context, pt, nodeSize) {
-  context.strokeRect(
-    pt.x - nodeSize / 2,
-    pt.y - nodeSize / 2,
-    nodeSize,
-    nodeSize
-  );
+  context.strokeRect(pt.x - nodeSize / 2, pt.y - nodeSize / 2, nodeSize, nodeSize);
 }
 
 function strokeRoundNode(context, pt, nodeSize) {

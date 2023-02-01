@@ -7,10 +7,7 @@ import {
   sectRect,
   unionRect,
 } from '../core/rectangle.js';
-import {
-  pointInConvexPolygon,
-  rectIntersectsPolygon,
-} from '../core/convex-hull.js';
+import { pointInConvexPolygon, rectIntersectsPolygon } from '../core/convex-hull.js';
 import { parseSelection } from '../core/utils.js';
 import { mapForward, mapBackward } from '../core/var-model.js';
 import { difference, isEqualSet, updateSet } from '../core/set-ops.js';
@@ -177,10 +174,7 @@ export class SceneModel {
   async getSelectedSource() {
     const glyphName = this.getSelectedGlyphName();
     if (glyphName) {
-      return await this.fontController.getSourceIndex(
-        glyphName,
-        this.getLocation()
-      );
+      return await this.fontController.getSourceIndex(glyphName, this.getLocation());
     } else {
       return undefined;
     }
@@ -279,10 +273,7 @@ export class SceneModel {
       this.textAlignment
     );
 
-    const usedGlyphNames = getUsedGlyphNames(
-      this.fontController,
-      this.positionedLines
-    );
+    const usedGlyphNames = getUsedGlyphNames(this.fontController, this.positionedLines);
     const cachedGlyphNames = difference(
       this.fontController.getCachedGlyphNames(),
       usedGlyphNames
@@ -299,14 +290,8 @@ export class SceneModel {
     if (isEqualSet(currentGlyphNames, previousGlyphNames)) {
       return;
     }
-    const unsubscribeGlyphNames = difference(
-      previousGlyphNames,
-      currentGlyphNames
-    );
-    const subscribeGlyphNames = difference(
-      currentGlyphNames,
-      previousGlyphNames
-    );
+    const unsubscribeGlyphNames = difference(previousGlyphNames, currentGlyphNames);
+    const subscribeGlyphNames = difference(currentGlyphNames, previousGlyphNames);
     if (unsubscribeGlyphNames.size) {
       this.fontController.unsubscribeChanges(
         makeGlyphNamesPattern(unsubscribeGlyphNames),
@@ -452,10 +437,8 @@ export class SceneModel {
       const instance = this.getSelectedStaticGlyphController();
       const boundses = [];
 
-      const {
-        point: selectedPointIndices,
-        component: selectedComponentIndices,
-      } = parseSelection(this.selection);
+      const { point: selectedPointIndices, component: selectedComponentIndices } =
+        parseSelection(this.selection);
 
       selectedPointIndices?.forEach((pointIndex) => {
         const pt = instance.path.getPoint(pointIndex);
@@ -603,10 +586,7 @@ function getUsedGlyphNames(fontController, positionedLines) {
   for (const line of positionedLines) {
     for (const glyph of line.glyphs) {
       usedGlyphNames.add(glyph.glyph.name);
-      updateSet(
-        usedGlyphNames,
-        fontController.iterGlyphMadeOf(glyph.glyph.name)
-      );
+      updateSet(usedGlyphNames, fontController.iterGlyphMadeOf(glyph.glyph.name));
     }
   }
   return usedGlyphNames;

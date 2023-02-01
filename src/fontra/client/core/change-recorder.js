@@ -41,11 +41,7 @@ function getVarPackedPathProxyMethods(subject, changes) {
     },
     deleteContour(index) {
       changes.addChange('deleteContour', index);
-      changes.addRollbackChange(
-        'insertContour',
-        index,
-        subject.getContour(index)
-      );
+      changes.addRollbackChange('insertContour', index, subject.getContour(index));
       subject.deleteContour(index);
     },
     insertPoint(contourIndex, contourPointIndex, point) {

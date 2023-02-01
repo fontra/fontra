@@ -107,9 +107,7 @@ describe('var-model tests', () => {
     });
 
     it('throw non-unique locations', () => {
-      expect(() => new VariationModel([{}, {}])).to.throw(
-        'locations must be unique'
-      );
+      expect(() => new VariationModel([{}, {}])).to.throw('locations must be unique');
       expect(
         () =>
           new VariationModel([
@@ -139,9 +137,7 @@ describe('var-model tests', () => {
 
   describe('normalizeLocation tests', () => {
     it('-1,0,1', () => {
-      const axes = [
-        { name: 'wght', minValue: 100, defaultValue: 400, maxValue: 900 },
-      ];
+      const axes = [{ name: 'wght', minValue: 100, defaultValue: 400, maxValue: 900 }];
       expect(normalizeLocation({ wght: 400 }, axes)).to.deep.equal({
         wght: 0.0,
       });
@@ -163,9 +159,7 @@ describe('var-model tests', () => {
     });
 
     it('0,0,1', () => {
-      const axes = [
-        { name: 'wght', minValue: 0, defaultValue: 0, maxValue: 1000 },
-      ];
+      const axes = [{ name: 'wght', minValue: 0, defaultValue: 0, maxValue: 1000 }];
       expect(normalizeLocation({ wght: 0 }, axes)).to.deep.equal({ wght: 0.0 });
       expect(normalizeLocation({ wght: -1 }, axes)).to.deep.equal({
         wght: 0.0,
@@ -182,9 +176,7 @@ describe('var-model tests', () => {
     });
 
     it('0,1,1', () => {
-      const axes = [
-        { name: 'wght', minValue: 0, defaultValue: 1000, maxValue: 1000 },
-      ];
+      const axes = [{ name: 'wght', minValue: 0, defaultValue: 1000, maxValue: 1000 }];
       expect(normalizeLocation({ wght: 0 }, axes)).to.deep.equal({
         wght: -1.0,
       });
@@ -210,10 +202,7 @@ describe('var-model tests', () => {
       expect(supportScalar({ wght: 0.2 }, { wght: [0, 2, 3] })).to.equal(0.1);
       expect(supportScalar({ wght: 2.5 }, { wght: [0, 2, 4] })).to.equal(0.75);
       expect(
-        supportScalar(
-          { wght: 2.5, wdth: 0 },
-          { wght: [0, 2, 4], wdth: [-1, 0, +1] }
-        )
+        supportScalar({ wght: 2.5, wdth: 0 }, { wght: [0, 2, 4], wdth: [-1, 0, +1] })
       ).to.equal(0.75);
       expect(
         supportScalar(
@@ -223,16 +212,10 @@ describe('var-model tests', () => {
         )
       ).to.equal(0.375);
       expect(
-        supportScalar(
-          { wght: 2.5, wdth: 0 },
-          { wght: [0, 2, 4], wdth: [-1, 0, +1] }
-        )
+        supportScalar({ wght: 2.5, wdth: 0 }, { wght: [0, 2, 4], wdth: [-1, 0, +1] })
       ).to.equal(0.75);
       expect(
-        supportScalar(
-          { wght: 2.5, wdth: 0.5 },
-          { wght: [0, 2, 4], wdth: [-1, 0, +1] }
-        )
+        supportScalar({ wght: 2.5, wdth: 0.5 }, { wght: [0, 2, 4], wdth: [-1, 0, +1] })
       ).to.equal(0.75);
     });
   });
@@ -328,12 +311,8 @@ describe('var-model tests', () => {
     });
 
     it('multi segment mapping', () => {
-      expect(piecewiseLinearMap(15, { 10: 100, 20: 200, 30: 1000 })).to.equal(
-        150
-      );
-      expect(piecewiseLinearMap(25, { 10: 100, 20: 200, 30: 1000 })).to.equal(
-        600
-      );
+      expect(piecewiseLinearMap(15, { 10: 100, 20: 200, 30: 1000 })).to.equal(150);
+      expect(piecewiseLinearMap(25, { 10: 100, 20: 200, 30: 1000 })).to.equal(600);
     });
   });
 

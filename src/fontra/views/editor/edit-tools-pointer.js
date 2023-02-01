@@ -20,10 +20,7 @@ export class PointerTool extends BaseTool {
     const point = sceneController.localPoint(event);
     const size = sceneController.mouseClickMargin;
     const selRect = centeredRect(point.x, point.y, size);
-    sceneController.hoverSelection = this.sceneModel.selectionAtPoint(
-      point,
-      size
-    );
+    sceneController.hoverSelection = this.sceneModel.selectionAtPoint(point, size);
     sceneController.hoveredGlyph = this.sceneModel.glyphAtPoint(point);
     if (sceneController.hoverSelection?.size) {
       this.canvasController.canvas.style.cursor = 'pointer';
@@ -96,11 +93,7 @@ export class PointerTool extends BaseTool {
     sceneController.hoveredGlyph = undefined;
 
     if (initiateRectSelect) {
-      return await this.handleRectSelect(
-        eventStream,
-        initialEvent,
-        initialSelection
-      );
+      return await this.handleRectSelect(eventStream, initialEvent, initialSelection);
     } else if (initiateDrag) {
       return await this.handleDragSelection(eventStream, initialEvent);
     }
@@ -111,8 +104,7 @@ export class PointerTool extends BaseTool {
     if (!selection || !selection.size) {
       sceneController.selectedGlyph = this.sceneModel.glyphAtPoint(point);
       sceneController.selectedGlyphIsEditing = !!sceneController.selectedGlyph;
-      const positionedGlyph =
-        sceneController.sceneModel.getSelectedPositionedGlyph();
+      const positionedGlyph = sceneController.sceneModel.getSelectedPositionedGlyph();
       if (positionedGlyph?.isUndefined) {
         sceneController.selectedGlyphIsEditing = false;
         // Create a new glyph
@@ -141,10 +133,10 @@ export class PointerTool extends BaseTool {
         }
       }
     } else {
-      const instance =
-        this.sceneModel.getSelectedPositionedGlyph().glyph.instance;
-      const { point: pointIndices, component: componentIndices } =
-        parseSelection(sceneController.selection);
+      const instance = this.sceneModel.getSelectedPositionedGlyph().glyph.instance;
+      const { point: pointIndices, component: componentIndices } = parseSelection(
+        sceneController.selection
+      );
       if (componentIndices?.length) {
         componentIndices.sort();
         sceneController.doubleClickedComponentIndices = componentIndices;
@@ -156,88 +148,60 @@ export class PointerTool extends BaseTool {
   }
 
   async handlePointsDoubleClick(pointIndices) {
-    await this.sceneController.editInstance(
-      (sendIncrementalChange, instance) => {
-        const changes = recordChanges(instance, (instance) => {
-          const path = instance.path;
-          for (const pointIndex of pointIndices) {
-            const pointType = path.pointTypes[pointIndex];
-            const [prevIndex, prevPoint, nextIndex, nextPoint] = neighborPoints(
-              path,
-              pointIndex
-            );
-            if (
-              (!prevPoint ||
-                !nextPoint ||
-                (!prevPoint.type && !nextPoint.type)) &&
-              pointType !== VarPackedPath.SMOOTH_FLAG
-            ) {
-              continue;
-            }
-            if (
-              pointType === VarPackedPath.ON_CURVE ||
-              pointType === VarPackedPath.SMOOTH_FLAG
-            ) {
-              const newPointType =
-                pointType === VarPackedPath.ON_CURVE
-                  ? VarPackedPath.SMOOTH_FLAG
-                  : VarPackedPath.ON_CURVE;
-              path.pointTypes[pointIndex] = newPointType;
-              if (newPointType === VarPackedPath.SMOOTH_FLAG) {
-                const anchorPoint = path.getPoint(pointIndex);
-                if (prevPoint?.type && nextPoint?.type) {
-                  // Fix-up both incoming and outgoing handles
-                  const [newPrevPoint, newNextPoint] = alignHandles(
-                    prevPoint,
-                    anchorPoint,
-                    nextPoint
-                  );
-                  path.setPointPosition(
-                    prevIndex,
-                    newPrevPoint.x,
-                    newPrevPoint.y
-                  );
-                  path.setPointPosition(
-                    nextIndex,
-                    newNextPoint.x,
-                    newNextPoint.y
-                  );
-                } else if (prevPoint?.type) {
-                  // Fix-up incoming handle
-                  const newPrevPoint = alignHandle(
-                    nextPoint,
-                    anchorPoint,
-                    prevPoint
-                  );
-                  path.setPointPosition(
-                    prevIndex,
-                    newPrevPoint.x,
-                    newPrevPoint.y
-                  );
-                } else if (nextPoint?.type) {
-                  // Fix-up outgoing handle
-                  const newNextPoint = alignHandle(
-                    prevPoint,
-                    anchorPoint,
-                    nextPoint
-                  );
-                  path.setPointPosition(
-                    nextIndex,
-                    newNextPoint.x,
-                    newNextPoint.y
-                  );
-                }
+    await this.sceneController.editInstance((sendIncrementalChange, instance) => {
+      const changes = recordChanges(instance, (instance) => {
+        const path = instance.path;
+        for (const pointIndex of pointIndices) {
+          const pointType = path.pointTypes[pointIndex];
+          const [prevIndex, prevPoint, nextIndex, nextPoint] = neighborPoints(
+            path,
+            pointIndex
+          );
+          if (
+            (!prevPoint || !nextPoint || (!prevPoint.type && !nextPoint.type)) &&
+            pointType !== VarPackedPath.SMOOTH_FLAG
+          ) {
+            continue;
+          }
+          if (
+            pointType === VarPackedPath.ON_CURVE ||
+            pointType === VarPackedPath.SMOOTH_FLAG
+          ) {
+            const newPointType =
+              pointType === VarPackedPath.ON_CURVE
+                ? VarPackedPath.SMOOTH_FLAG
+                : VarPackedPath.ON_CURVE;
+            path.pointTypes[pointIndex] = newPointType;
+            if (newPointType === VarPackedPath.SMOOTH_FLAG) {
+              const anchorPoint = path.getPoint(pointIndex);
+              if (prevPoint?.type && nextPoint?.type) {
+                // Fix-up both incoming and outgoing handles
+                const [newPrevPoint, newNextPoint] = alignHandles(
+                  prevPoint,
+                  anchorPoint,
+                  nextPoint
+                );
+                path.setPointPosition(prevIndex, newPrevPoint.x, newPrevPoint.y);
+                path.setPointPosition(nextIndex, newNextPoint.x, newNextPoint.y);
+              } else if (prevPoint?.type) {
+                // Fix-up incoming handle
+                const newPrevPoint = alignHandle(nextPoint, anchorPoint, prevPoint);
+                path.setPointPosition(prevIndex, newPrevPoint.x, newPrevPoint.y);
+              } else if (nextPoint?.type) {
+                // Fix-up outgoing handle
+                const newNextPoint = alignHandle(prevPoint, anchorPoint, nextPoint);
+                path.setPointPosition(nextIndex, newNextPoint.x, newNextPoint.y);
               }
             }
           }
-        });
-        return {
-          changes: changes,
-          undoLabel: 'toggle smooth',
-          broadcast: true,
-        };
-      }
-    );
+        }
+      });
+      return {
+        changes: changes,
+        undoLabel: 'toggle smooth',
+        broadcast: true,
+      };
+    });
   }
 
   async handleRectSelect(eventStream, initialEvent, initialSelection) {
@@ -255,10 +219,7 @@ export class PointerTool extends BaseTool {
       sceneController.selectionRect = selRect;
 
       if (event.shiftKey) {
-        sceneController.selection = symmetricDifference(
-          initialSelection,
-          selection
-        );
+        sceneController.selection = symmetricDifference(initialSelection, selection);
       } else {
         sceneController.selection = selection;
       }
@@ -268,63 +229,55 @@ export class PointerTool extends BaseTool {
 
   async handleDragSelection(eventStream, initialEvent) {
     const sceneController = this.sceneController;
-    await sceneController.editInstance(
-      async (sendIncrementalChange, instance) => {
-        const initialPoint = sceneController.localPoint(initialEvent);
+    await sceneController.editInstance(async (sendIncrementalChange, instance) => {
+      const initialPoint = sceneController.localPoint(initialEvent);
 
-        const behaviorFactory = new EditBehaviorFactory(
-          instance,
-          sceneController.selection
-        );
-        let behaviorName = getBehaviorName(initialEvent);
-        let editBehavior = behaviorFactory.getBehavior(behaviorName);
+      const behaviorFactory = new EditBehaviorFactory(
+        instance,
+        sceneController.selection
+      );
+      let behaviorName = getBehaviorName(initialEvent);
+      let editBehavior = behaviorFactory.getBehavior(behaviorName);
 
-        let editChange;
+      let editChange;
 
-        for await (const event of eventStream) {
-          const newEditBehaviorName = getBehaviorName(event);
-          if (behaviorName !== newEditBehaviorName) {
-            applyChange(instance, editBehavior.rollbackChange);
-            await sendIncrementalChange(editBehavior.rollbackChange);
-            behaviorName = newEditBehaviorName;
-            editBehavior = behaviorFactory.getBehavior(behaviorName);
-          }
-          const currentPoint = sceneController.localPoint(event);
-          const delta = {
-            x: currentPoint.x - initialPoint.x,
-            y: currentPoint.y - initialPoint.y,
-          };
-          editChange = editBehavior.makeChangeForDelta(delta);
-          applyChange(instance, editChange);
-          await sendIncrementalChange(editChange, true); // true: "may drop"
+      for await (const event of eventStream) {
+        const newEditBehaviorName = getBehaviorName(event);
+        if (behaviorName !== newEditBehaviorName) {
+          applyChange(instance, editBehavior.rollbackChange);
+          await sendIncrementalChange(editBehavior.rollbackChange);
+          behaviorName = newEditBehaviorName;
+          editBehavior = behaviorFactory.getBehavior(behaviorName);
         }
-        const changes = ChangeCollector.fromChanges(
-          editChange,
-          editBehavior.rollbackChange
-        );
-        return {
-          undoLabel: 'drag selection',
-          changes: changes,
-          broadcast: true,
+        const currentPoint = sceneController.localPoint(event);
+        const delta = {
+          x: currentPoint.x - initialPoint.x,
+          y: currentPoint.y - initialPoint.y,
         };
+        editChange = editBehavior.makeChangeForDelta(delta);
+        applyChange(instance, editChange);
+        await sendIncrementalChange(editChange, true); // true: "may drop"
       }
-    );
+      const changes = ChangeCollector.fromChanges(
+        editChange,
+        editBehavior.rollbackChange
+      );
+      return {
+        undoLabel: 'drag selection',
+        changes: changes,
+        broadcast: true,
+      };
+    });
   }
 }
 
 function getBehaviorName(event) {
-  const behaviorNames = [
-    'default',
-    'constrain',
-    'alternate',
-    'alternate-constrain',
-  ];
+  const behaviorNames = ['default', 'constrain', 'alternate', 'alternate-constrain'];
   return behaviorNames[boolInt(event.shiftKey) + 2 * boolInt(event.altKey)];
 }
 
 function neighborPoints(path, pointIndex) {
-  const [contourIndex, contourPointIndex] =
-    path.getContourAndPointIndex(pointIndex);
+  const [contourIndex, contourPointIndex] = path.getContourAndPointIndex(pointIndex);
   const contourStartIndex = path.getAbsolutePointIndex(contourIndex, 0);
   const numPoints = path.getNumPointsOfContour(contourIndex);
   const isClosed = path.contourInfo[contourIndex].isClosed;
@@ -367,12 +320,7 @@ function alignHandles(handleIn, anchorPoint, handleOut) {
 }
 
 function alignHandleAlongDirection(direction, anchorPoint, handlePoint) {
-  const length = vector.vectorLength(
-    vector.subVectors(handlePoint, anchorPoint)
-  );
-  const handleVector = vector.mulVector(
-    vector.normalizeVector(direction),
-    length
-  );
+  const length = vector.vectorLength(vector.subVectors(handlePoint, anchorPoint));
+  const handleVector = vector.mulVector(vector.normalizeVector(direction), length);
   return vector.roundVector(vector.addVectors(anchorPoint, handleVector));
 }

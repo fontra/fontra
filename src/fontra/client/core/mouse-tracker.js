@@ -13,24 +13,12 @@ export class MouseTracker {
   }
 
   _addEventListeners(element) {
-    element.addEventListener('mousedown', (event) =>
-      this.handleMouseDown(event)
-    );
-    element.addEventListener('touchstart', (event) =>
-      this.handleMouseDown(event)
-    );
-    element.addEventListener('keydown', (event) =>
-      this.handleModifierKeyChange(event)
-    );
-    element.addEventListener('keyup', (event) =>
-      this.handleModifierKeyChange(event)
-    );
-    element.addEventListener('mousemove', (event) =>
-      this.handleMouseMove(event)
-    );
-    element.addEventListener('touchmove', (event) =>
-      this.handleMouseMove(event)
-    );
+    element.addEventListener('mousedown', (event) => this.handleMouseDown(event));
+    element.addEventListener('touchstart', (event) => this.handleMouseDown(event));
+    element.addEventListener('keydown', (event) => this.handleModifierKeyChange(event));
+    element.addEventListener('keyup', (event) => this.handleModifierKeyChange(event));
+    element.addEventListener('mousemove', (event) => this.handleMouseMove(event));
+    element.addEventListener('touchmove', (event) => this.handleMouseMove(event));
     element.addEventListener('touchend', (event) => this.handleMouseUp(event));
 
     if (!window._fontraDidInstallMouseTrackerListeners) {

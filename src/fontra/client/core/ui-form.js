@@ -72,8 +72,7 @@ export class Form {
     if (fieldItem.value !== undefined) {
       valueElement.innerText = fieldItem.value;
       this._fieldGetters[fieldItem.key] = () => valueElement.innerText;
-      this._fieldSetters[fieldItem.key] = (value) =>
-        (valueElement.innerText = value);
+      this._fieldSetters[fieldItem.key] = (value) => (valueElement.innerText = value);
     }
   }
 
@@ -97,11 +96,7 @@ export class Form {
     inputElement.step = 'any';
     inputElement.disabled = fieldItem.disabled;
     inputElement.onchange = (event) => {
-      this._fieldChanging(
-        fieldItem.key,
-        parseFloat(inputElement.value),
-        undefined
-      );
+      this._fieldChanging(fieldItem.key, parseFloat(inputElement.value), undefined);
     };
     this._fieldGetters[fieldItem.key] = () => inputElement.value;
     this._fieldSetters[fieldItem.key] = (value) => (inputElement.value = value);
@@ -156,11 +151,7 @@ export class Form {
     inputElement.onchange = (event) => {
       sliderElement.value = inputElement.value;
       inputElement.value = sliderElement.value; // Use slider's clamping
-      this._fieldChanging(
-        fieldItem.key,
-        parseFloat(inputElement.value),
-        undefined
-      );
+      this._fieldChanging(fieldItem.key, parseFloat(inputElement.value), undefined);
     };
     this._fieldGetters[fieldItem.key] = () => sliderElement.value;
     this._fieldSetters[fieldItem.key] = (value) => {

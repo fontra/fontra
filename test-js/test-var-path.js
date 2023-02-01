@@ -306,11 +306,7 @@ describe('VarPackedPath Tests', () => {
   it('cubic 1 off-curve point', () => {
     const p = new VarPackedPath(
       new VarArray(0, 0, 0, 100, 100, 0),
-      [
-        VarPackedPath.ON_CURVE,
-        VarPackedPath.OFF_CURVE_CUBIC,
-        VarPackedPath.ON_CURVE,
-      ],
+      [VarPackedPath.ON_CURVE, VarPackedPath.OFF_CURVE_CUBIC, VarPackedPath.ON_CURVE],
       [{ endPoint: 2, isClosed: true }]
     );
     expect(p._checkIntegrity()).to.equal(false);
@@ -490,9 +486,7 @@ describe('VarPackedPath Tests', () => {
     [{ endPoint: 3, isClosed: true }]
   );
 
-  const iterPointsInRectTestPoints = Array.from(
-    iterPointsInRectTestPath.iterPoints()
-  );
+  const iterPointsInRectTestPoints = Array.from(iterPointsInRectTestPath.iterPoints());
   for (const [i, pt] of enumerate(iterPointsInRectTestPoints)) {
     pt.pointIndex = i;
   }
@@ -1084,8 +1078,6 @@ describe('VarPackedPath Tests', () => {
     expect(p.getNumPointsOfContour(0)).to.equal(2);
     expect(p.getNumPointsOfContour(1)).to.equal(3);
     expect(p.getNumPointsOfContour(2)).to.equal(4);
-    expect(() => p.getNumPointsOfContour(3)).to.throw(
-      'contourIndex out of bounds: 3'
-    );
+    expect(() => p.getNumPointsOfContour(3)).to.throw('contourIndex out of bounds: 3');
   });
 });

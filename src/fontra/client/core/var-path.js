@@ -149,10 +149,7 @@ export class VarPackedPath {
     const contour = this.contourInfo[contourIndex];
     const startPoint = this._getContourStartPoint(contourIndex);
     return {
-      coordinates: this.coordinates.slice(
-        startPoint * 2,
-        (contour.endPoint + 1) * 2
-      ),
+      coordinates: this.coordinates.slice(startPoint * 2, (contour.endPoint + 1) * 2),
       pointTypes: this.pointTypes.slice(startPoint, contour.endPoint + 1),
       isClosed: contour.isClosed,
     };
@@ -161,8 +158,7 @@ export class VarPackedPath {
   setContour(contourIndex, contour) {
     contourIndex = this._normalizeContourIndex(contourIndex);
     const startPoint = this._getContourStartPoint(contourIndex);
-    const numOldPoints =
-      this.contourInfo[contourIndex].endPoint + 1 - startPoint;
+    const numOldPoints = this.contourInfo[contourIndex].endPoint + 1 - startPoint;
     this._replacePoints(
       startPoint,
       numOldPoints,
@@ -207,8 +203,7 @@ export class VarPackedPath {
     if (point.x === undefined) {
       return undefined;
     }
-    const pointType =
-      this.pointTypes[pointIndex] & VarPackedPath.POINT_TYPE_MASK;
+    const pointType = this.pointTypes[pointIndex] & VarPackedPath.POINT_TYPE_MASK;
     if (pointType) {
       point['type'] =
         pointType === VarPackedPath.OFF_CURVE_CUBIC
@@ -226,10 +221,7 @@ export class VarPackedPath {
   }
 
   getPointPosition(pointIndex) {
-    return [
-      this.coordinates[pointIndex * 2],
-      this.coordinates[pointIndex * 2 + 1],
-    ];
+    return [this.coordinates[pointIndex * 2], this.coordinates[pointIndex * 2 + 1]];
   }
 
   setPointPosition(pointIndex, x, y) {
@@ -279,10 +271,7 @@ export class VarPackedPath {
 
   deletePoint(contourIndex, contourPointIndex) {
     contourIndex = this._normalizeContourIndex(contourIndex);
-    const pointIndex = this.getAbsolutePointIndex(
-      contourIndex,
-      contourPointIndex
-    );
+    const pointIndex = this.getAbsolutePointIndex(contourIndex, contourPointIndex);
     this.coordinates.splice(pointIndex * 2, 2);
     this.pointTypes.splice(pointIndex, 1);
     this._moveEndPoints(contourIndex, -1);
@@ -326,21 +315,14 @@ export class VarPackedPath {
     if (contourPointIndex < 0) {
       contourPointIndex += numPoints;
     }
-    if (
-      contourPointIndex < 0 ||
-      contourPointIndex >= numPoints + (forInsert ? 1 : 0)
-    ) {
-      throw new Error(
-        `contourPointIndex out of bounds: ${originalContourPointIndex}`
-      );
+    if (contourPointIndex < 0 || contourPointIndex >= numPoints + (forInsert ? 1 : 0)) {
+      throw new Error(`contourPointIndex out of bounds: ${originalContourPointIndex}`);
     }
     return startPoint + contourPointIndex;
   }
 
   _getContourStartPoint(contourIndex) {
-    return contourIndex === 0
-      ? 0
-      : this.contourInfo[contourIndex - 1].endPoint + 1;
+    return contourIndex === 0 ? 0 : this.contourInfo[contourIndex - 1].endPoint + 1;
   }
 
   *iterPoints() {
@@ -381,10 +363,8 @@ export class VarPackedPath {
         nextIndex <= endPoint;
         nextIndex++
       ) {
-        const prevType =
-          this.pointTypes[prevIndex] & VarPackedPath.POINT_TYPE_MASK;
-        const nextType =
-          this.pointTypes[nextIndex] & VarPackedPath.POINT_TYPE_MASK;
+        const prevType = this.pointTypes[prevIndex] & VarPackedPath.POINT_TYPE_MASK;
+        const nextType = this.pointTypes[nextIndex] & VarPackedPath.POINT_TYPE_MASK;
         if (prevType != nextType) {
           yield [
             {
@@ -540,14 +520,10 @@ export class VarPackedPath {
       } else {
         // draw quad blob
         // create copy of contour points, and insert implied on-curve at front
-        const blobCoordinates = coordinates.slice(
-          startPoint * 2,
-          (endPoint + 1) * 2
-        );
+        const blobCoordinates = coordinates.slice(startPoint * 2, (endPoint + 1) * 2);
         const blobPointTypes = pointTypes.slice(startPoint, endPoint + 1);
         const xMid = (blobCoordinates[0] + blobCoordinates[endPoint * 2]) / 2;
-        const yMid =
-          (blobCoordinates[1] + blobCoordinates[endPoint * 2 + 1]) / 2;
+        const yMid = (blobCoordinates[1] + blobCoordinates[endPoint * 2 + 1]) / 2;
         blobCoordinates.unshift(xMid, yMid);
         blobPointTypes.unshift(VarPackedPath.ON_CURVE);
         drawContourToPath(
@@ -570,10 +546,7 @@ export class VarPackedPath {
     for (let i = 0; i < this.coordinates.length; i += 2) {
       const x = this.coordinates[i];
       const y = this.coordinates[i + 1];
-      [coordinates[i], coordinates[i + 1]] = transformation.transformPoint(
-        x,
-        y
-      );
+      [coordinates[i], coordinates[i + 1]] = transformation.transformPoint(x, y);
     }
     return new this.constructor(coordinates, this.pointTypes, this.contourInfo);
   }

@@ -203,9 +203,7 @@ export class VariableGlyphController {
     if (sourceIndex !== undefined) {
       instance = this.getLayerGlyph(this.sources[sourceIndex].layerName);
     } else {
-      instance = this.instantiate(
-        normalizeLocation(location, this.combinedAxes)
-      );
+      instance = this.instantiate(normalizeLocation(location, this.combinedAxes));
     }
 
     if (!instance) {
@@ -284,10 +282,7 @@ export class StaticGlyphController {
 
   get flattenedPath() {
     if (this._flattenedPath === undefined) {
-      this._flattenedPath = joinPaths([
-        this.instance.path,
-        this.componentsPath,
-      ]);
+      this._flattenedPath = joinPaths([this.instance.path, this.componentsPath]);
     }
     return this._flattenedPath;
   }
@@ -314,9 +309,7 @@ export class StaticGlyphController {
 
   get componentsPath() {
     if (this._componentsPath === undefined) {
-      this._componentsPath = joinPaths(
-        this.components.map((compo) => compo.path)
-      );
+      this._componentsPath = joinPaths(this.components.map((compo) => compo.path));
     }
     return this._componentsPath;
   }
@@ -350,11 +343,7 @@ class ComponentController {
   }
 
   async setupPath(getGlyphFunc, parentLocation) {
-    this.path = await getComponentPath(
-      this.compo,
-      getGlyphFunc,
-      parentLocation
-    );
+    this.path = await getComponentPath(this.compo, getGlyphFunc, parentLocation);
   }
 
   get path2d() {
@@ -400,9 +389,7 @@ async function getNestedComponentPaths(
   }
   let inst;
   try {
-    inst = glyph.instantiate(
-      normalizeLocation(compoLocation, glyph.combinedAxes)
-    );
+    inst = glyph.instantiate(normalizeLocation(compoLocation, glyph.combinedAxes));
   } catch (error) {
     if (error.name !== 'VariationError') {
       throw error;
@@ -440,12 +427,7 @@ async function getComponentPaths(
 
   for (const compo of components || []) {
     paths.push(
-      await getNestedComponentPaths(
-        compo,
-        getGlyphFunc,
-        parentLocation,
-        transformation
-      )
+      await getNestedComponentPaths(compo, getGlyphFunc, parentLocation, transformation)
     );
   }
   return paths;

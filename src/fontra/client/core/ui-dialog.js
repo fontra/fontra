@@ -45,10 +45,7 @@ export function dialog(headline, message, buttonDefs, autoDismissTimeout) {
   if (buttonDefs.length === 1) {
     buttonDefs[0].isDefaultButton = true;
   }
-  for (const [buttonIndex, buttonDef] of enumerate(
-    buttonDefs,
-    4 - buttonDefs.length
-  )) {
+  for (const [buttonIndex, buttonDef] of enumerate(buttonDefs, 4 - buttonDefs.length)) {
     const buttonElement = document.createElement('input');
     buttonElement.type = 'button';
     buttonElement.className = `ui-dialog-button button-${buttonIndex}`;

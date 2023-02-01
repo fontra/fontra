@@ -16,10 +16,7 @@ import {
 export class EditBehaviorFactory {
   constructor(instance, selection) {
     const selectionByType = parseSelection(selection);
-    this.contours = unpackContours(
-      instance.path,
-      selectionByType['point'] || []
-    );
+    this.contours = unpackContours(instance.path, selectionByType['point'] || []);
     this.components = unpackComponents(
       instance.components,
       selectionByType['component'] || []
@@ -52,11 +49,7 @@ class EditBehavior {
     this.pointEditFuncs = pointEditFuncs;
 
     this.componentEditFuncs = [];
-    for (
-      let componentIndex = 0;
-      componentIndex < components.length;
-      componentIndex++
-    ) {
+    for (let componentIndex = 0; componentIndex < components.length; componentIndex++) {
       if (components[componentIndex]) {
         this.componentEditFuncs.push(
           makeComponentTransformFunc(components[componentIndex], componentIndex)
@@ -128,21 +121,13 @@ function makeRollbackChange(contours, participatingPointIndices, components) {
     pointRollback.push(
       ...contourPointIndices.map((pointIndex) => {
         const point = contour.points[pointIndex];
-        return makePointChange(
-          pointIndex + contour.startIndex,
-          point.x,
-          point.y
-        );
+        return makePointChange(pointIndex + contour.startIndex, point.x, point.y);
       })
     );
   }
 
   const componentRollback = [];
-  for (
-    let componentIndex = 0;
-    componentIndex < components.length;
-    componentIndex++
-  ) {
+  for (let componentIndex = 0; componentIndex < components.length; componentIndex++) {
     const component = components[componentIndex];
     if (!component) {
       continue;
@@ -243,10 +228,7 @@ function makePointEditFuncs(contours, behavior) {
     if (!contour) {
       continue;
     }
-    const [editFuncs, pointIndices] = makeContourPointEditFuncs(
-      contour,
-      behavior
-    );
+    const [editFuncs, pointIndices] = makeContourPointEditFuncs(contour, behavior);
     pointEditFuncs.push(...editFuncs);
     participatingPointIndices[contourIndex] = pointIndices;
   }
@@ -275,15 +257,8 @@ function makeContourPointEditFuncs(contour, behavior) {
       continue;
     }
     // console.log(i, match.action, match.ruleIndex);
-    const [
-      prevPrevPrev,
-      prevPrev,
-      prev,
-      thePoint,
-      next,
-      nextNext,
-      nextNextNext,
-    ] = match.direction > 0 ? neighborIndices : reversed(neighborIndices);
+    const [prevPrevPrev, prevPrev, prev, thePoint, next, nextNext, nextNextNext] =
+      match.direction > 0 ? neighborIndices : reversed(neighborIndices);
     participatingPointIndices.push(thePoint);
     const actionFunctionFactory = behavior.actions[match.action];
     if (actionFunctionFactory === undefined) {
@@ -329,10 +304,7 @@ function makeContourPointEditFuncs(contour, behavior) {
       });
     }
   }
-  return [
-    editFuncsTransform.concat(editFuncsConstrain),
-    participatingPointIndices,
-  ];
+  return [editFuncsTransform.concat(editFuncsConstrain), participatingPointIndices];
 }
 
 export function constrainHorVerDiag(vector) {
@@ -360,29 +332,13 @@ export function constrainHorVerDiag(vector) {
 
 const actionFactories = {
   DontMove: (prevPrevPrev, prevPrev, prev, thePoint, next, nextNext) => {
-    return (
-      transform,
-      prevPrevPrev,
-      prevPrev,
-      prev,
-      thePoint,
-      next,
-      nextNext
-    ) => {
+    return (transform, prevPrevPrev, prevPrev, prev, thePoint, next, nextNext) => {
       return thePoint;
     };
   },
 
   Move: (prevPrevPrev, prevPrev, prev, thePoint, next, nextNext) => {
-    return (
-      transform,
-      prevPrevPrev,
-      prevPrev,
-      prev,
-      thePoint,
-      next,
-      nextNext
-    ) => {
+    return (transform, prevPrevPrev, prevPrev, prev, thePoint, next, nextNext) => {
       return transform.constrained(thePoint);
     };
   },
@@ -390,15 +346,7 @@ const actionFactories = {
   RotateNext: (prevPrevPrev, prevPrev, prev, thePoint, next, nextNext) => {
     const handle = vector.subVectors(thePoint, prev);
     const handleLength = Math.hypot(handle.x, handle.y);
-    return (
-      transform,
-      prevPrevPrev,
-      prevPrev,
-      prev,
-      thePoint,
-      next,
-      nextNext
-    ) => {
+    return (transform, prevPrevPrev, prevPrev, prev, thePoint, next, nextNext) => {
       const delta = vector.subVectors(prev, prevPrev);
       if (!delta.x && !delta.y) {
         // The angle is undefined, atan2 will return 0, let's just not touch the point
@@ -413,26 +361,11 @@ const actionFactories = {
     };
   },
 
-  ConstrainPrevAngle: (
-    prevPrevPrev,
-    prevPrev,
-    prev,
-    thePoint,
-    next,
-    nextNext
-  ) => {
+  ConstrainPrevAngle: (prevPrevPrev, prevPrev, prev, thePoint, next, nextNext) => {
     const pt1 = prevPrev;
     const pt2 = prev;
     const perpVector = vector.rotateVector90CW(vector.subVectors(pt2, pt1));
-    return (
-      transform,
-      prevPrevPrev,
-      prevPrev,
-      prev,
-      thePoint,
-      next,
-      nextNext
-    ) => {
+    return (transform, prevPrevPrev, prevPrev, prev, thePoint, next, nextNext) => {
       let point = transform.free(thePoint);
       const [intersection, t1, t2] = vector.intersect(
         pt1,
@@ -451,15 +384,7 @@ const actionFactories = {
     const pt1 = prev;
     const pt2 = next;
     const perpVector = vector.rotateVector90CW(vector.subVectors(pt2, pt1));
-    return (
-      transform,
-      prevPrevPrev,
-      prevPrev,
-      prev,
-      thePoint,
-      next,
-      nextNext
-    ) => {
+    return (transform, prevPrevPrev, prevPrev, prev, thePoint, next, nextNext) => {
       let point = transform.free(thePoint);
       const [intersection, t1, t2] = vector.intersect(
         pt1,
@@ -474,26 +399,11 @@ const actionFactories = {
     };
   },
 
-  ConstrainMiddleTwo: (
-    prevPrevPrev,
-    prevPrev,
-    prev,
-    thePoint,
-    next,
-    nextNext
-  ) => {
+  ConstrainMiddleTwo: (prevPrevPrev, prevPrev, prev, thePoint, next, nextNext) => {
     const pt1 = prevPrev;
     const pt2 = next;
     const perpVector = vector.rotateVector90CW(vector.subVectors(pt2, pt1));
-    return (
-      transform,
-      prevPrevPrev,
-      prevPrev,
-      prev,
-      thePoint,
-      next,
-      nextNext
-    ) => {
+    return (transform, prevPrevPrev, prevPrev, prev, thePoint, next, nextNext) => {
       let point = transform.free(thePoint);
       const [intersection, t1, t2] = vector.intersect(
         pt1,
@@ -508,24 +418,9 @@ const actionFactories = {
     };
   },
 
-  TangentIntersect: (
-    prevPrevPrev,
-    prevPrev,
-    prev,
-    thePoint,
-    next,
-    nextNext
-  ) => {
+  TangentIntersect: (prevPrevPrev, prevPrev, prev, thePoint, next, nextNext) => {
     const nextHandle = vector.subVectors(thePoint, next);
-    return (
-      transform,
-      prevPrevPrev,
-      prevPrev,
-      prev,
-      thePoint,
-      next,
-      nextNext
-    ) => {
+    return (transform, prevPrevPrev, prevPrev, prev, thePoint, next, nextNext) => {
       let point = transform.free(thePoint);
       const [intersection, t1, t2] = vector.intersect(
         prevPrev,
@@ -540,30 +435,10 @@ const actionFactories = {
     };
   },
 
-  TangentIntersectLive: (
-    prevPrevPrev,
-    prevPrev,
-    prev,
-    thePoint,
-    next,
-    nextNext
-  ) => {
-    return (
-      transform,
-      prevPrevPrev,
-      prevPrev,
-      prev,
-      thePoint,
-      next,
-      nextNext
-    ) => {
+  TangentIntersectLive: (prevPrevPrev, prevPrev, prev, thePoint, next, nextNext) => {
+    return (transform, prevPrevPrev, prevPrev, prev, thePoint, next, nextNext) => {
       let point = transform.free(thePoint);
-      const [intersection, t1, t2] = vector.intersect(
-        prevPrev,
-        prev,
-        next,
-        nextNext
-      );
+      const [intersection, t1, t2] = vector.intersect(prevPrev, prev, next, nextNext);
       if (!intersection) {
         return thePoint;
       }
@@ -574,15 +449,7 @@ const actionFactories = {
   HandleIntersect: (prevPrevPrev, prevPrev, prev, thePoint, next, nextNext) => {
     const handlePrev = vector.subVectors(thePoint, prev);
     const handleNext = vector.subVectors(thePoint, next);
-    return (
-      transform,
-      prevPrevPrev,
-      prevPrev,
-      prev,
-      thePoint,
-      next,
-      nextNext
-    ) => {
+    return (transform, prevPrevPrev, prevPrev, prev, thePoint, next, nextNext) => {
       const [intersection, t1, t2] = vector.intersect(
         prev,
         vector.addVectors(prev, handlePrev),
@@ -597,19 +464,9 @@ const actionFactories = {
   },
 
   ConstrainHandle: (prevPrevPrev, prevPrev, prev, thePoint, next, nextNext) => {
-    return (
-      transform,
-      prevPrevPrev,
-      prevPrev,
-      prev,
-      thePoint,
-      next,
-      nextNext
-    ) => {
+    return (transform, prevPrevPrev, prevPrev, prev, thePoint, next, nextNext) => {
       const newPoint = transform.free(thePoint);
-      const handleVector = transform.constrainDelta(
-        vector.subVectors(newPoint, prev)
-      );
+      const handleVector = transform.constrainDelta(vector.subVectors(newPoint, prev));
       return vector.addVectors(prev, handleVector);
     };
   },
@@ -622,22 +479,10 @@ const actionFactories = {
     next,
     nextNext
   ) => {
-    return (
-      transform,
-      prevPrevPrev,
-      prevPrev,
-      prev,
-      thePoint,
-      next,
-      nextNext
-    ) => {
+    return (transform, prevPrevPrev, prevPrev, prev, thePoint, next, nextNext) => {
       const newPoint = transform.free(thePoint);
-      const handlePrev = transform.constrainDelta(
-        vector.subVectors(newPoint, prev)
-      );
-      const handleNext = transform.constrainDelta(
-        vector.subVectors(newPoint, next)
-      );
+      const handlePrev = transform.constrainDelta(vector.subVectors(newPoint, prev));
+      const handleNext = transform.constrainDelta(vector.subVectors(newPoint, next));
 
       const [intersection, t1, t2] = vector.intersect(
         prev,
@@ -661,19 +506,9 @@ const actionFactories = {
     nextNext
   ) => {
     const tangentPrev = vector.subVectors(prev, prevPrev);
-    return (
-      transform,
-      prevPrevPrev,
-      prevPrev,
-      prev,
-      thePoint,
-      next,
-      nextNext
-    ) => {
+    return (transform, prevPrevPrev, prevPrev, prev, thePoint, next, nextNext) => {
       const newPoint = transform.free(thePoint);
-      const handleNext = transform.constrainDelta(
-        vector.subVectors(newPoint, next)
-      );
+      const handleNext = transform.constrainDelta(vector.subVectors(newPoint, next));
 
       const [intersection, t1, t2] = vector.intersect(
         prev,
@@ -692,62 +527,24 @@ const actionFactories = {
     const lenPrevNext = vector.distance(next, prev);
     const lenPrev = vector.distance(thePoint, prev);
     let t = lenPrevNext > 0.0001 ? lenPrev / lenPrevNext : 0;
-    return (
-      transform,
-      prevPrevPrev,
-      prevPrev,
-      prev,
-      thePoint,
-      next,
-      nextNext
-    ) => {
+    return (transform, prevPrevPrev, prevPrev, prev, thePoint, next, nextNext) => {
       const prevNext = vector.subVectors(next, prev);
       return vector.addVectors(prev, vector.mulVector(prevNext, t));
     };
   },
 
-  InterpolatePrevPrevNext: (
-    prevPrevPrev,
-    prevPrev,
-    prev,
-    thePoint,
-    next,
-    nextNext
-  ) => {
+  InterpolatePrevPrevNext: (prevPrevPrev, prevPrev, prev, thePoint, next, nextNext) => {
     const lenPrevPrevNext = vector.distance(next, prevPrev);
     const lenPrevPrev = vector.distance(thePoint, prevPrev);
     let t = lenPrevPrevNext > 0.0001 ? lenPrevPrev / lenPrevPrevNext : 0;
-    return (
-      transform,
-      prevPrevPrev,
-      prevPrev,
-      prev,
-      thePoint,
-      next,
-      nextNext
-    ) => {
+    return (transform, prevPrevPrev, prevPrev, prev, thePoint, next, nextNext) => {
       const prevPrevNext = vector.subVectors(next, prevPrev);
       return vector.addVectors(prevPrev, vector.mulVector(prevPrevNext, t));
     };
   },
 
-  ConstrainAroundPrevPrev: (
-    prevPrevPrev,
-    prevPrev,
-    prev,
-    thePoint,
-    next,
-    nextNext
-  ) => {
-    return (
-      transform,
-      prevPrevPrev,
-      prevPrev,
-      prev,
-      thePoint,
-      next,
-      nextNext
-    ) => {
+  ConstrainAroundPrevPrev: (prevPrevPrev, prevPrev, prev, thePoint, next, nextNext) => {
+    return (transform, prevPrevPrev, prevPrev, prev, thePoint, next, nextNext) => {
       const newPoint = transform.free(thePoint);
       const handleVector = transform.constrainDelta(
         vector.subVectors(newPoint, prevPrev)
@@ -764,15 +561,7 @@ const actionFactories = {
     next,
     nextNext
   ) => {
-    return (
-      transform,
-      prevPrevPrev,
-      prevPrev,
-      prev,
-      thePoint,
-      next,
-      nextNext
-    ) => {
+    return (transform, prevPrevPrev, prevPrev, prev, thePoint, next, nextNext) => {
       const newPoint = transform.free(thePoint);
       const handleVector = transform.constrainDelta(
         vector.subVectors(newPoint, prevPrevPrev)
@@ -786,16 +575,7 @@ const defaultRules = [
   //   prev3       prevPrev    prev        the point   next        nextNext    Constrain   Action
 
   // Default rule: if no other rules apply, just move the selected point
-  [
-    ANY | NIL,
-    ANY | NIL,
-    ANY | NIL,
-    ANY | SEL,
-    ANY | NIL,
-    ANY | NIL,
-    false,
-    'Move',
-  ],
+  [ANY | NIL, ANY | NIL, ANY | NIL, ANY | SEL, ANY | NIL, ANY | NIL, false, 'Move'],
 
   // Unselected off-curve point next to a smooth point next to a selected point
   [
@@ -854,16 +634,7 @@ const defaultRules = [
     false,
     'Move',
   ],
-  [
-    ANY | NIL,
-    OFF,
-    SMO | SEL,
-    OFF | UNS,
-    OFF | SHA | NIL,
-    ANY | NIL,
-    false,
-    'Move',
-  ],
+  [ANY | NIL, OFF, SMO | SEL, OFF | UNS, OFF | SHA | NIL, ANY | NIL, false, 'Move'],
 
   // An unselected off-curve between two on-curve points
   [
@@ -950,26 +721,8 @@ const defaultRules = [
     false,
     'ConstrainPrevAngle',
   ],
-  [
-    ANY | NIL,
-    ANY | SEL,
-    SMO | UNS,
-    ANY | SEL,
-    SMO | UNS,
-    ANY | SEL,
-    false,
-    'DontMove',
-  ],
-  [
-    ANY | NIL,
-    ANY | SEL,
-    SMO | UNS,
-    ANY | SEL,
-    SMO | UNS,
-    SMO | UNS,
-    false,
-    'DontMove',
-  ],
+  [ANY | NIL, ANY | SEL, SMO | UNS, ANY | SEL, SMO | UNS, ANY | SEL, false, 'DontMove'],
+  [ANY | NIL, ANY | SEL, SMO | UNS, ANY | SEL, SMO | UNS, SMO | UNS, false, 'DontMove'],
 
   // Selected tangent with selected handle: constrain at original tangent line
   [
@@ -1098,16 +851,7 @@ const alternateRules = [
   //   prev3       prevPrev    prev        the point   next        nextNext    Constrain   Action
 
   // Default rule: if no other rules apply, just move the selected point
-  [
-    ANY | NIL,
-    ANY | NIL,
-    ANY | NIL,
-    ANY | SEL,
-    ANY | NIL,
-    ANY | NIL,
-    false,
-    'Move',
-  ],
+  [ANY | NIL, ANY | NIL, ANY | NIL, ANY | SEL, ANY | NIL, ANY | NIL, false, 'Move'],
 
   // Selected smooth before unselected off-curve
   [
@@ -1228,28 +972,10 @@ const alternateRules = [
   ],
 
   // An unselected smooth point between two selected off-curves
-  [
-    ANY | NIL,
-    ANY | NIL,
-    OFF | SEL,
-    SMO | UNS,
-    OFF | SEL,
-    ANY | NIL,
-    true,
-    'Move',
-  ],
+  [ANY | NIL, ANY | NIL, OFF | SEL, SMO | UNS, OFF | SEL, ANY | NIL, true, 'Move'],
 
   // Two unselected smooth points between two selected off-curves
-  [
-    ANY | NIL,
-    OFF | SEL,
-    SMO | UNS,
-    SMO | UNS,
-    OFF | SEL,
-    ANY | NIL,
-    true,
-    'Move',
-  ],
+  [ANY | NIL, OFF | SEL, SMO | UNS, SMO | UNS, OFF | SEL, ANY | NIL, true, 'Move'],
 
   // Two selected points locked by angle
   [
@@ -1284,16 +1010,7 @@ const alternateRules = [
   ],
 
   // Selected off-curve locked between two selected smooth points
-  [
-    ANY | NIL,
-    ANY | NIL,
-    SMO | SEL,
-    OFF | SEL,
-    SMO | SEL,
-    ANY | NIL,
-    false,
-    'DontMove',
-  ],
+  [ANY | NIL, ANY | NIL, SMO | SEL, OFF | SEL, SMO | SEL, ANY | NIL, false, 'DontMove'],
 ];
 
 const alternateConstrainRules = alternateRules.concat([

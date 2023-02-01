@@ -127,10 +127,7 @@ export class EditorController {
     const canvas = document.querySelector('#edit-canvas');
     canvas.focus();
 
-    const canvasController = new CanvasController(
-      canvas,
-      this.drawingParameters
-    );
+    const canvasController = new CanvasController(canvas, this.drawingParameters);
     this.canvasController = canvasController;
     // We need to do isPointInPath without having a context, we'll pass a bound method
     const isPointInPath = canvasController.context.isPointInPath.bind(
@@ -153,27 +150,21 @@ export class EditorController {
 
     this.sceneController = new SceneController(sceneModel, canvasController);
     // TODO move event stuff out of here
-    this.sceneController.addEventListener(
-      'selectedGlyphChanged',
-      async (event) => {
-        await this.updateSlidersAndSources();
-        this.sourcesList.setSelectedItemIndex(
-          await this.sceneController.getSelectedSource()
-        );
-      }
-    );
+    this.sceneController.addEventListener('selectedGlyphChanged', async (event) => {
+      await this.updateSlidersAndSources();
+      this.sourcesList.setSelectedItemIndex(
+        await this.sceneController.getSelectedSource()
+      );
+    });
     this.sceneController.addEventListener(
       'selectedGlyphIsEditingChanged',
       async (event) => {
         // console.log("selectedGlyphIsEditingChanged");
       }
     );
-    this.sceneController.addEventListener(
-      'doubleClickedComponents',
-      async (event) => {
-        this.doubleClickedComponentsCallback(event);
-      }
-    );
+    this.sceneController.addEventListener('doubleClickedComponents', async (event) => {
+      this.doubleClickedComponentsCallback(event);
+    });
 
     this.initSidebars();
     this.initMiniConsole();
@@ -431,9 +422,7 @@ export class EditorController {
   }
 
   tabClick(event, side) {
-    const sidebarContainer = document.querySelector(
-      `.sidebar-container.${side}`
-    );
+    const sidebarContainer = document.querySelector(`.sidebar-container.${side}`);
     const clickedTab = event.target;
     const sidebars = {};
     for (const sideBarContent of document.querySelectorAll(
@@ -478,8 +467,7 @@ export class EditorController {
   fixTextEntryHeight() {
     // This adapts the text entry height to its content
     this.textEntryElement.style.height = 'auto';
-    this.textEntryElement.style.height =
-      this.textEntryElement.scrollHeight + 14 + 'px';
+    this.textEntryElement.style.height = this.textEntryElement.scrollHeight + 14 + 'px';
   }
 
   async setTextAlignment(align) {
@@ -494,9 +482,7 @@ export class EditorController {
     await this.sceneController.setTextAlignment(align);
     const [minXPost, maxXPost] =
       this.sceneController.sceneModel.getTextHorizontalExtents();
-    this.canvasController.setViewBox(
-      offsetRect(viewBox, minXPost - minXPre, 0)
-    );
+    this.canvasController.setViewBox(offsetRect(viewBox, minXPost - minXPre, 0));
     this.updateWindowLocation();
   }
 
@@ -556,15 +542,12 @@ export class EditorController {
   }
 
   get drawingParameters() {
-    return this.isThemeDark
-      ? this.drawingParametersDark
-      : this.drawingParametersLight;
+    return this.isThemeDark ? this.drawingParametersDark : this.drawingParametersLight;
   }
 
   async glyphSearchFieldChanged(value) {
     const searchItems = value.split(/\s+/).filter((item) => item.length);
-    this.glyphNamesListFilterFunc = (item) =>
-      glyphFilterFunc(item, searchItems);
+    this.glyphNamesListFilterFunc = (item) => glyphFilterFunc(item, searchItems);
     this.setFilteredGlyphNamesListContent();
   }
 
@@ -646,8 +629,7 @@ export class EditorController {
     const localLocations = {};
     const glyphInfos = [];
 
-    for (const componentIndex of this.sceneController
-      .doubleClickedComponentIndices) {
+    for (const componentIndex of this.sceneController.doubleClickedComponentIndices) {
       const glyphName = instance.components[componentIndex].name;
       const location = instance.components[componentIndex].location;
       if (location) {
@@ -809,18 +791,14 @@ export class EditorController {
   }
 
   async externalChange(change) {
-    const selectedGlyphName =
-      this.sceneController.sceneModel.getSelectedGlyphName();
+    const selectedGlyphName = this.sceneController.sceneModel.getSelectedGlyphName();
     const editState = this.sceneController.sceneModel.getSelectedGlyphState();
 
     await this.fontController.applyChange(change, true);
 
     if (matchChangePath(change, ['glyphMap'])) {
       this.sceneController.sceneModel.updateGlyphLinesCharacterMapping();
-      if (
-        editState?.isEditing &&
-        !this.fontController.hasGlyph(selectedGlyphName)
-      ) {
+      if (editState?.isEditing && !this.fontController.hasGlyph(selectedGlyphName)) {
         // The glyph being edited got deleted, change state merely "selected"
         this.sceneController.sceneModel.setSelectedGlyphState({
           ...editState,
@@ -865,12 +843,8 @@ export class EditorController {
     }
     await this.fontController.reloadGlyphs(glyphNames);
     await this.sceneController.sceneModel.updateScene();
-    const selectedGlyphName =
-      this.sceneController.sceneModel.getSelectedGlyphName();
-    if (
-      selectedGlyphName !== undefined &&
-      glyphNames.includes(selectedGlyphName)
-    ) {
+    const selectedGlyphName = this.sceneController.sceneModel.getSelectedGlyphName();
+    if (selectedGlyphName !== undefined && glyphNames.includes(selectedGlyphName)) {
       this.updateSelectionInfo();
     }
     this.canvasController.setNeedsUpdate();
@@ -988,10 +962,7 @@ export class EditorController {
       // The edit comes from the selection info box itself, so we shouldn't update it
       return;
     }
-    if (
-      editMethodName === 'editIncremental' ||
-      editMethodName === 'editFinal'
-    ) {
+    if (editMethodName === 'editIncremental' || editMethodName === 'editFinal') {
       this.updateSelectionInfo();
     }
   }
@@ -1009,11 +980,7 @@ export class EditorController {
     const instance = glyphController?.instance;
     const glyphName = glyphController?.name;
     let unicodes = this.fontController.glyphMap[glyphName] || [];
-    if (
-      positionedGlyph?.isUndefined &&
-      positionedGlyph.character &&
-      !unicodes.length
-    ) {
+    if (positionedGlyph?.isUndefined && positionedGlyph.character && !unicodes.length) {
       // Glyph does not yet exist in the font, so varGlyphController is undefined,
       // But we can grab the unicode from positionedGlyph.character anyway.
       unicodes = [positionedGlyph.character.codePointAt(0)];
@@ -1050,8 +1017,7 @@ export class EditorController {
     );
 
     for (const index of componentIndices || []) {
-      const componentKey = (...path) =>
-        JSON.stringify(['components', index, ...path]);
+      const componentKey = (...path) => JSON.stringify(['components', index, ...path]);
 
       formContents.push({ type: 'divider' });
       const component = instance.components[index];
@@ -1121,9 +1087,7 @@ export class EditorController {
       }
     }
     if (!formContents.length) {
-      this.infoForm.setFieldDescriptions([
-        { type: 'text', value: '(No selection)' },
-      ]);
+      this.infoForm.setFieldDescriptions([{ type: 'text', value: '(No selection)' }]);
     } else {
       this.infoForm.setFieldDescriptions(formContents);
       await this._setupSelectionInfoHandlers(glyphName);

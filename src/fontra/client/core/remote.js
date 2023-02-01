@@ -41,10 +41,7 @@ export class RemoteObject {
     document.addEventListener(
       'visibilitychange',
       (event) => {
-        if (
-          document.visibilityState === 'visible' &&
-          this.websocket.readyState > 1
-        ) {
+        if (document.visibilityState === 'visible' && this.websocket.readyState > 1) {
           // console.log("wake reconnect");
           this.connect();
         }
@@ -59,9 +56,7 @@ export class RemoteObject {
       return this._connectPromise;
     }
     if (this.websocket?.readyState <= 1) {
-      throw new Error(
-        'assert -- trying to open new websocket while we still have one'
-      );
+      throw new Error('assert -- trying to open new websocket while we still have one');
     }
     this.websocket = new WebSocket(this.wsURL);
     this.websocket.onmessage = (event) => this._handleIncomingMessage(event);
@@ -102,9 +97,7 @@ export class RemoteObject {
         try {
           let method = this.receiver[message['method-name']];
           if (method === undefined) {
-            throw new Error(
-              `undefined receiver method: ${message['method-name']}`
-            );
+            throw new Error(`undefined receiver method: ${message['method-name']}`);
           }
           method = method.bind(this.receiver);
           const returnValue = await method(...message['arguments']);
@@ -159,9 +152,6 @@ function* _genNextClientCallID() {
 
 function randomUUIDFallback() {
   return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, (c) =>
-    (
-      c ^
-      (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (c / 4)))
-    ).toString(16)
+    (c ^ (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (c / 4)))).toString(16)
   );
 }

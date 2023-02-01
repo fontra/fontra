@@ -98,14 +98,10 @@ function convertPointType(matchPoint) {
   const doesntExist = matchPoint & NIL;
 
   if (sel && unsel) {
-    throw new Error(
-      "assert -- can't match matchPoint that is selected and unselected"
-    );
+    throw new Error("assert -- can't match matchPoint that is selected and unselected");
   }
   if (!(sharp || smooth || offcurve)) {
-    throw new Error(
-      'assert -- matchPoint must be at least sharp, smooth or off-curve'
-    );
+    throw new Error('assert -- matchPoint must be at least sharp, smooth or off-curve');
   }
 
   const pointTypes = [];
@@ -187,18 +183,10 @@ function _findPointMatch(matchTree, neighborIndices, contourPoints) {
   // }
   let matchSpecific, matchWildcard;
   if (branchSpecific) {
-    matchSpecific = _findPointMatch(
-      branchSpecific,
-      neighborIndices,
-      contourPoints
-    );
+    matchSpecific = _findPointMatch(branchSpecific, neighborIndices, contourPoints);
   }
   if (branchWildcard) {
-    matchWildcard = _findPointMatch(
-      branchWildcard,
-      neighborIndices,
-      contourPoints
-    );
+    matchWildcard = _findPointMatch(branchWildcard, neighborIndices, contourPoints);
   }
   // if (matchSpecific && matchWildcard) {
   //   console.log("+++", matchSpecific, matchWildcard);

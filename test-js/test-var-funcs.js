@@ -50,10 +50,7 @@ describe('var-funcs tests', () => {
     });
 
     it('add nested objects', () => {
-      const result = addItemwise(
-        { a: { x: 10 }, b: 2 },
-        { b: 2, a: { x: 20 } }
-      );
+      const result = addItemwise({ a: { x: 10 }, b: 2 }, { b: 2, a: { x: 20 } });
       expect(result).to.deep.equal({ a: { x: 30 }, b: 4 });
     });
 
@@ -135,10 +132,7 @@ describe('var-funcs tests', () => {
     });
 
     it('sub nested objects', () => {
-      const result = subItemwise(
-        { a: { x: 10 }, b: 2 },
-        { b: 2, a: { x: 20 } }
-      );
+      const result = subItemwise({ a: { x: 10 }, b: 2 }, { b: 2, a: { x: 20 } });
       expect(result).to.deep.equal({ a: { x: -10 }, b: 0 });
     });
 

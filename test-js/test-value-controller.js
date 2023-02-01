@@ -33,25 +33,17 @@ describe('ValueController Tests', () => {
     expect(result2).to.deep.equal([100, 300, 30]);
     expect(result3).to.deep.equal([100, 200, 300, 20, 30]);
 
-    expect(() => vc.set(10, 'obs1')).to.throw(
-      "can't set value: unknown observerID"
-    );
+    expect(() => vc.set(10, 'obs1')).to.throw("can't set value: unknown observerID");
   });
 
   it('falsey observerID throw test', async () => {
     const vc = new ValueController();
-    expect(() => vc.addObserver()).to.throw(
-      'missing/falsey observerID argument'
-    );
-    expect(() => vc.addObserver(null)).to.throw(
-      'missing/falsey observerID argument'
-    );
+    expect(() => vc.addObserver()).to.throw('missing/falsey observerID argument');
+    expect(() => vc.addObserver(null)).to.throw('missing/falsey observerID argument');
     expect(() => vc.addObserver(undefined)).to.throw(
       'missing/falsey observerID argument'
     );
-    expect(() => vc.addObserver('')).to.throw(
-      'missing/falsey observerID argument'
-    );
+    expect(() => vc.addObserver('')).to.throw('missing/falsey observerID argument');
   });
 
   it('double observe throw test', async () => {

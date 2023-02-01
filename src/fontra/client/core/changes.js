@@ -26,15 +26,8 @@ export class ChangeCollector {
     this._forwardChanges = [];
     if (this._parentCollector) {
       this._parentCollector._ensureForwardChanges();
-      if (
-        equalPath(
-          this._path,
-          lastItem(this._parentCollector._forwardChanges)?.p
-        )
-      ) {
-        this._forwardChanges = lastItem(
-          this._parentCollector._forwardChanges
-        ).c;
+      if (equalPath(this._path, lastItem(this._parentCollector._forwardChanges)?.p)) {
+        this._forwardChanges = lastItem(this._parentCollector._forwardChanges).c;
       } else {
         this._parentCollector._forwardChanges.push({
           p: this._path,

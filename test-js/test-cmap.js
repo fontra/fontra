@@ -50,9 +50,7 @@ describe('characterMap tests', () => {
           expectedCharacterMap
         );
       } else {
-        expect(() => makeCharacterMapFromGlyphMap(glyphMap, strict)).to.throw(
-          error
-        );
+        expect(() => makeCharacterMapFromGlyphMap(glyphMap, strict)).to.throw(error);
       }
     });
   }

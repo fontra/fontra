@@ -209,9 +209,7 @@ describe('recordChanges tests', () => {
   for (const [index, testCase] of enumerate(testData)) {
     it(`${testCase.testName} #${index}`, () => {
       const subject = copyObject(testCase.subject);
-      expect(testCase.subject.constructor.name).to.equal(
-        subject.constructor.name
-      );
+      expect(testCase.subject.constructor.name).to.equal(subject.constructor.name);
       if (testCase.expectedError) {
         expect(() => {
           const changes = recordChanges(subject, testCase.operation);
@@ -223,9 +221,7 @@ describe('recordChanges tests', () => {
           expect(changes.change).to.deep.equal(testCase.expectedChange);
         }
         if (testCase.expectedRollbackChange) {
-          expect(changes.rollbackChange).to.deep.equal(
-            testCase.expectedRollbackChange
-          );
+          expect(changes.rollbackChange).to.deep.equal(testCase.expectedRollbackChange);
         }
 
         // Test applying the rollback and change again

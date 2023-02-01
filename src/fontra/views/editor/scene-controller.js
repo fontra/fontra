@@ -42,8 +42,7 @@ export class SceneController {
     switch (editMethodName) {
       case 'editBegin':
         {
-          const glyphController =
-            this.sceneModel.getSelectedPositionedGlyph().glyph;
+          const glyphController = this.sceneModel.getSelectedPositionedGlyph().glyph;
           this.sceneModel.ghostPath = glyphController.flattenedPath2d;
         }
         break;
@@ -120,15 +119,13 @@ export class SceneController {
       this.localPoint(event),
       this.mouseClickMargin
     );
-    if (
-      !clickedSelection.size ||
-      !isSuperset(this.selection, clickedSelection)
-    ) {
+    if (!clickedSelection.size || !isSuperset(this.selection, clickedSelection)) {
       this.selection = clickedSelection;
     }
 
-    const { point: pointSelection, component: componentSelection } =
-      parseSelection(this.selection);
+    const { point: pointSelection, component: componentSelection } = parseSelection(
+      this.selection
+    );
     const contextMenuItems = [
       {
         title: 'Reverse Contour Direction',
@@ -141,8 +138,7 @@ export class SceneController {
         callback: () => this.setStartPoint(),
       },
       {
-        title:
-          'Decompose Component' + (componentSelection?.length === 1 ? '' : 's'),
+        title: 'Decompose Component' + (componentSelection?.length === 1 ? '' : 's'),
         disabled: !componentSelection?.length,
         callback: () => this.decomposeSelectedComponents(),
       },
@@ -304,10 +300,7 @@ export class SceneController {
   }
 
   async setGlobalAndLocalLocations(globalLocation, localLocations) {
-    await this.sceneModel.setGlobalAndLocalLocations(
-      globalLocation,
-      localLocations
-    );
+    await this.sceneModel.setGlobalAndLocalLocations(globalLocation, localLocations);
     this.canvasController.setNeedsUpdate();
   }
 
@@ -378,11 +371,10 @@ export class SceneController {
       );
       return;
     }
-    const editContext =
-      await this.sceneModel.fontController.getGlyphEditContext(
-        glyphController,
-        senderID || this
-      );
+    const editContext = await this.sceneModel.fontController.getGlyphEditContext(
+      glyphController,
+      senderID || this
+    );
     const sendIncrementalChange = async (change, mayDrop = false) => {
       if (change && hasChange(change)) {
         await editContext.editIncremental(change, mayDrop);
@@ -519,9 +511,7 @@ export class SceneController {
         contourToPointMap.forEach((contourPointIndex, contourIndex) => {
           if (contourPointIndex === 0) {
             // Already start point
-            newSelection.add(
-              `point/${path.getAbsolutePointIndex(contourIndex, 0)}`
-            );
+            newSelection.add(`point/${path.getAbsolutePointIndex(contourIndex, 0)}`);
             return;
           }
           if (!path.contourInfo[contourIndex].isClosed) {
@@ -533,9 +523,7 @@ export class SceneController {
           contour.points.push(...head);
           instance.path.deleteContour(contourIndex);
           instance.path.insertContour(contourIndex, packContour(contour));
-          newSelection.add(
-            `point/${path.getAbsolutePointIndex(contourIndex, 0)}`
-          );
+          newSelection.add(`point/${path.getAbsolutePointIndex(contourIndex, 0)}`);
         });
       });
 
@@ -553,13 +541,12 @@ export class SceneController {
       const { component: componentSelection } = parseSelection(this.selection);
       componentSelection.sort((a, b) => (a > b) - (a < b));
 
-      const { path: newPath, components: newComponents } =
-        await decomposeComponents(
-          instance.components,
-          componentSelection,
-          this.getGlobalLocation(),
-          (glyphName) => this.sceneModel.fontController.getGlyph(glyphName)
-        );
+      const { path: newPath, components: newComponents } = await decomposeComponents(
+        instance.components,
+        componentSelection,
+        this.getGlobalLocation(),
+        (glyphName) => this.sceneModel.fontController.getGlyph(glyphName)
+      );
 
       const changes = recordChanges(instance, (instance) => {
         const path = instance.path;

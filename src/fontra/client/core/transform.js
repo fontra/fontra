@@ -18,10 +18,7 @@ export class Transform {
     // 	>>> t = t.scale(2.5, 5.5)
     // 	>>> t.transformPoint(100, 100)
     // 	(250.0, 550.0)
-    return [
-      this.xx * x + this.yx * y + this.dx,
-      this.xy * x + this.yy * y + this.dy,
-    ];
+    return [this.xx * x + this.yx * y + this.dx, this.xy * x + this.yy * y + this.dy];
   }
 
   translate(x, y) {

@@ -24,9 +24,7 @@ describe('Path Changes Tests', () => {
     const test = tests[i];
     const testName = test['testName'];
     const inputPathName = test['inputPathName'];
-    const expectedPath = VarPackedPath.fromUnpackedContours(
-      test['expectedPath']
-    );
+    const expectedPath = VarPackedPath.fromUnpackedContours(test['expectedPath']);
 
     const subject = VarPackedPath.fromUnpackedContours(
       copyObject(inputPaths[inputPathName])

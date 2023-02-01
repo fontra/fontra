@@ -6,10 +6,7 @@ import {
   matchChangePath,
 } from './changes.js';
 import { getGlyphMapProxy, makeCharacterMapFromGlyphMap } from './cmap.js';
-import {
-  StaticGlyphController,
-  VariableGlyphController,
-} from './glyph-controller.js';
+import { StaticGlyphController, VariableGlyphController } from './glyph-controller.js';
 import { LRUCache } from './lru-cache.js';
 import { StaticGlyph, VariableGlyph } from './var-glyph.js';
 import { locationToString } from './var-model.js';
@@ -37,10 +34,7 @@ export class FontController {
   async initialize() {
     const glyphMap = await this.font.getGlyphMap();
     this.characterMap = makeCharacterMapFromGlyphMap(glyphMap, false);
-    this._rootObject['glyphMap'] = getGlyphMapProxy(
-      glyphMap,
-      this.characterMap
-    );
+    this._rootObject['glyphMap'] = getGlyphMapProxy(glyphMap, this.characterMap);
     this._rootObject['axes'] = await this.font.getGlobalAxes();
     this._rootObject['unitsPerEm'] = await this.font.getUnitsPerEm();
     this._rootObject['lib'] = await this.font.getFontLib();
@@ -108,10 +102,7 @@ export class FontController {
     let glyphPromise = this._glyphsPromiseCache.get(glyphName);
     if (glyphPromise === undefined) {
       glyphPromise = this._getGlyph(glyphName);
-      const purgedGlyphName = this._glyphsPromiseCache.put(
-        glyphName,
-        glyphPromise
-      );
+      const purgedGlyphName = this._glyphsPromiseCache.put(glyphName, glyphPromise);
       // if (purgedGlyphName) {
       //   console.log("purging", purgedGlyphName);
       //   this.font.unloadGlyph(purgedGlyphName);
@@ -216,20 +207,14 @@ export class FontController {
     }
     let instancePromise = this._glyphInstancePromiseCache.get(instanceCacheKey);
     if (instancePromise === undefined) {
-      instancePromise = this._getGlyphInstance(
-        glyphName,
-        location,
-        instanceCacheKey
-      );
+      instancePromise = this._getGlyphInstance(glyphName, location, instanceCacheKey);
       const deletedItem = this._glyphInstancePromiseCache.put(
         instanceCacheKey,
         instancePromise
       );
       if (deletedItem !== undefined) {
         const chacheGlyphName = (await deletedItem.value)?.name;
-        this._glyphInstancePromiseCacheKeys[chacheGlyphName]?.delete(
-          instanceCacheKey
-        );
+        this._glyphInstancePromiseCacheKeys[chacheGlyphName]?.delete(instanceCacheKey);
       }
       if (this._glyphInstancePromiseCacheKeys[glyphName] === undefined) {
         this._glyphInstancePromiseCacheKeys[glyphName] = new Set();
@@ -346,9 +331,8 @@ export class FontController {
   }
 
   _purgeInstanceCache(glyphName) {
-    for (const instanceCacheKey of this._glyphInstancePromiseCacheKeys[
-      glyphName
-    ] || []) {
+    for (const instanceCacheKey of this._glyphInstancePromiseCacheKeys[glyphName] ||
+      []) {
       this._glyphInstancePromiseCache.delete(instanceCacheKey);
     }
     delete this._glyphInstancePromiseCacheKeys[glyphName];
@@ -365,11 +349,7 @@ export class FontController {
   pushUndoRecord(change, rollbackChange, undoInfo) {
     const glyphNames = collectGlyphNames(change);
     const rbgn = collectGlyphNames(rollbackChange);
-    if (
-      glyphNames.length !== 1 ||
-      rbgn.length !== 1 ||
-      glyphNames[0] !== rbgn[0]
-    ) {
+    if (glyphNames.length !== 1 || rbgn.length !== 1 || glyphNames[0] !== rbgn[0]) {
       throw new Error('assertion -- change inconsistency for glyph undo');
     }
     const glyphName = glyphNames[0];
@@ -446,9 +426,7 @@ class GlyphEditContext {
   }
 
   async setup() {
-    const varGlyph = await this.fontController.getGlyph(
-      this.glyphController.name
-    );
+    const varGlyph = await this.fontController.getGlyph(this.glyphController.name);
     const layerIndex = varGlyph.getLayerIndex(
       varGlyph.sources[this.glyphController.sourceIndex].layerName
     );
@@ -468,16 +446,12 @@ class GlyphEditContext {
     await this.fontController.glyphChanged(this.glyphController.name);
     change = consolidateChanges(change, this.baseChangePath);
     if (mayDrop) {
-      this._throttledEditIncrementalTimeoutID =
-        this.throttledEditIncremental(change);
+      this._throttledEditIncrementalTimeoutID = this.throttledEditIncremental(change);
     } else {
       clearTimeout(this._throttledEditIncrementalTimeoutID);
       this.fontController.font.editIncremental(change);
     }
-    await this.fontController.notifyEditListeners(
-      'editIncremental',
-      this.senderID
-    );
+    await this.fontController.notifyEditListeners('editIncremental', this.senderID);
   }
 
   async editFinal(change, rollback, undoInfo, broadcast = false) {

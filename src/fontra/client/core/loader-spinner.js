@@ -18,10 +18,7 @@ function incrementSpinnerStatus() {
   if (spinnerStatus == 0) {
     const spinner = document.querySelector('#global-loader-spinner');
     cancelTimer();
-    spinnerStartTimerID = setTimeout(
-      () => (spinner.style.display = 'inherit'),
-      300
-    );
+    spinnerStartTimerID = setTimeout(() => (spinner.style.display = 'inherit'), 300);
   }
   spinnerStatus += 1;
 }

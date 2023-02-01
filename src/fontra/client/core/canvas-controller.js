@@ -153,8 +153,7 @@ export class CanvasController {
 
   handleSafariGestureChange(event) {
     event.preventDefault();
-    const zoomFactor =
-      (this._initialMagnification * event.scale) / this.magnification;
+    const zoomFactor = (this._initialMagnification * event.scale) / this.magnification;
     this._doPinchMagnify(event, zoomFactor);
   }
 

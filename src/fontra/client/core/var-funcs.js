@@ -2,9 +2,7 @@ import { VariationError } from './errors.js';
 
 export function addItemwise(a, b) {
   if (typeof a !== typeof b) {
-    throw new VariationError(
-      `incompatible object types: typeof ${a} != typeof ${b}`
-    );
+    throw new VariationError(`incompatible object types: typeof ${a} != typeof ${b}`);
   }
   if (typeof a === 'string') {
     if (a !== b) {
@@ -25,9 +23,7 @@ export function addItemwise(a, b) {
 
 export function subItemwise(a, b) {
   if (typeof a !== typeof b) {
-    throw new VariationError(
-      `incompatible object types: typeof ${a} != typeof ${b}`
-    );
+    throw new VariationError(`incompatible object types: typeof ${a} != typeof ${b}`);
   } else if (typeof a === 'string') {
     if (a !== b) {
       throw new VariationError(`unexpected different strings: ${a} != ${b}`);

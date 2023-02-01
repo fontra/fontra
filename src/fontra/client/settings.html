@@ -29,9 +29,7 @@
     </style>
   </head>
   <body>
-    <a href="/"
-      ><img src="/images/fontra-icon.svg" width="100" height="100"
-    /></a>
+    <a href="/"><img src="/images/fontra-icon.svg" width="100" height="100" /></a>
     <div>
       <h1>Fontra Settings</h1>
       <h2>Theme</h2>
@@ -81,9 +79,7 @@
 
     const themeValue = localStorage.getItem('fontra-theme');
     if (themeValue) {
-      for (const element of document.querySelectorAll(
-        'input[name="theme-settings"]'
-      )) {
+      for (const element of document.querySelectorAll('input[name="theme-settings"]')) {
         element.checked = themeValue === element.value;
       }
       themeSwitch(themeValue);

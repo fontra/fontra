@@ -8,9 +8,7 @@ export class VariationModel {
   constructor(locations, axisOrder = null) {
     this.locations = locations;
     this.axisOrder = axisOrder || [];
-    const locationsSet = new Set(
-      locations.map((item) => locationToString(item))
-    );
+    const locationsSet = new Set(locations.map((item) => locationToString(item)));
     if (locationsSet.size != locations.length) {
       console.log('locations:', locations);
       throw new VariationError('locations must be unique');
@@ -23,9 +21,7 @@ export class VariationModel {
     const locationsStr = locations.map(locationToString);
     const thisLocationsStr = this.locations.map(locationToString);
     this.mapping = locationsStr.map((loc) => thisLocationsStr.indexOf(loc));
-    this.reverseMapping = thisLocationsStr.map((loc) =>
-      locationsStr.indexOf(loc)
-    );
+    this.reverseMapping = thisLocationsStr.map((loc) => locationsStr.indexOf(loc));
 
     this._computeMasterSupports();
   }
@@ -189,10 +185,7 @@ export class VariationModel {
 
 function sortedLocations(locations, axisOrder = null) {
   // decorate, sort, undecorate
-  const decoratedLocations = getDecoratedMasterLocations(
-    locations,
-    axisOrder || []
-  );
+  const decoratedLocations = getDecoratedMasterLocations(locations, axisOrder || []);
   decoratedLocations.sort((a, b) => deepCompare(a[0], b[0]));
   return decoratedLocations.map((item) => item[1]);
 }
@@ -313,12 +306,7 @@ export function normalizeLocation(location, axisList) {
     if (v === undefined) {
       v = axis.defaultValue;
     }
-    out[axis.name] = normalizeValue(
-      v,
-      axis.minValue,
-      axis.defaultValue,
-      axis.maxValue
-    );
+    out[axis.name] = normalizeValue(v, axis.minValue, axis.defaultValue, axis.maxValue);
   }
   return out;
 }

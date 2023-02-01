@@ -18,56 +18,51 @@ export class PenTool extends BaseTool {
 
   async handleDrag(eventStream, initialEvent) {
     if (!this.sceneModel.selectedGlyphIsEditing) {
-      await this.editor.tools['pointer-tool'].handleDrag(
-        eventStream,
-        initialEvent
-      );
+      await this.editor.tools['pointer-tool'].handleDrag(eventStream, initialEvent);
       return;
     }
 
-    await this.sceneController.editInstance(
-      async (sendIncrementalChange, instance) => {
-        const behavior = getPenToolBehavior(
-          this.sceneController,
-          initialEvent,
-          instance.path
-        );
-        if (!behavior) {
-          // Nothing to do
-          return;
-        }
+    await this.sceneController.editInstance(async (sendIncrementalChange, instance) => {
+      const behavior = getPenToolBehavior(
+        this.sceneController,
+        initialEvent,
+        instance.path
+      );
+      if (!behavior) {
+        // Nothing to do
+        return;
+      }
 
-        const initialChanges = recordChanges(instance, (instance) => {
-          behavior.initialChanges(instance.path, initialEvent);
+      const initialChanges = recordChanges(instance, (instance) => {
+        behavior.initialChanges(instance.path, initialEvent);
+      });
+      this.sceneController.selection = behavior.selection;
+      await sendIncrementalChange(initialChanges.change);
+      let preDragChanges = new ChangeCollector();
+      let dragChanges = new ChangeCollector();
+
+      if (await shouldInitiateDrag(eventStream, initialEvent)) {
+        preDragChanges = recordChanges(instance, (instance) => {
+          behavior.setupDrag(instance.path, initialEvent);
         });
         this.sceneController.selection = behavior.selection;
-        await sendIncrementalChange(initialChanges.change);
-        let preDragChanges = new ChangeCollector();
-        let dragChanges = new ChangeCollector();
-
-        if (await shouldInitiateDrag(eventStream, initialEvent)) {
-          preDragChanges = recordChanges(instance, (instance) => {
-            behavior.setupDrag(instance.path, initialEvent);
+        await sendIncrementalChange(preDragChanges.change);
+        for await (const event of eventStream) {
+          dragChanges = recordChanges(instance, (instance) => {
+            behavior.drag(instance.path, event);
           });
-          this.sceneController.selection = behavior.selection;
-          await sendIncrementalChange(preDragChanges.change);
-          for await (const event of eventStream) {
-            dragChanges = recordChanges(instance, (instance) => {
-              behavior.drag(instance.path, event);
-            });
-            await sendIncrementalChange(dragChanges.change, true); // true: "may drop"
-          }
-          await sendIncrementalChange(dragChanges.change);
+          await sendIncrementalChange(dragChanges.change, true); // true: "may drop"
         }
-
-        const finalChanges = initialChanges.concat(preDragChanges, dragChanges);
-
-        return {
-          changes: finalChanges,
-          undoLabel: behavior.undoLabel,
-        };
+        await sendIncrementalChange(dragChanges.change);
       }
-    );
+
+      const finalChanges = initialChanges.concat(preDragChanges, dragChanges);
+
+      return {
+        changes: finalChanges,
+        undoLabel: behavior.undoLabel,
+      };
+    });
   }
 }
 
@@ -126,8 +121,7 @@ function getPenToolBehavior(sceneController, initialEvent, path) {
       if (pointIndex !== undefined) {
         const [clickedContourIndex, clickedContourPointIndex] =
           path.getContourAndPointIndex(pointIndex);
-        const numClickedContourPoints =
-          path.getNumPointsOfContour(clickedContourIndex);
+        const numClickedContourPoints = path.getNumPointsOfContour(clickedContourIndex);
         if (
           clickedContourPointIndex === 0 ||
           clickedContourPointIndex === numClickedContourPoints - 1
@@ -154,8 +148,7 @@ function getPenToolBehavior(sceneController, initialEvent, path) {
     }
   }
 
-  const getPointFromEvent = (event) =>
-    sceneController.selectedGlyphPoint(event);
+  const getPointFromEvent = (event) => sceneController.selectedGlyphPoint(event);
 
   return new PenToolBehavior(getPointFromEvent, appendInfo, behaviorFuncs);
 }
@@ -167,10 +160,8 @@ class PenToolBehavior {
     this.getPointFromEvent = getPointFromEvent;
     this.context = { ...appendInfo };
     this.context.curveType = 'cubic';
-    this.context.appendBias =
-      this.context.appendMode === AppendModes.APPEND ? 1 : 0;
-    this.context.prependBias =
-      this.context.appendMode === AppendModes.PREPEND ? 1 : 0;
+    this.context.appendBias = this.context.appendMode === AppendModes.APPEND ? 1 : 0;
+    this.context.prependBias = this.context.appendMode === AppendModes.PREPEND ? 1 : 0;
     this.context.appendDirection =
       this.context.appendMode === AppendModes.APPEND ? +1 : -1;
     this.behaviorFuncs = behaviorFuncs;
@@ -198,12 +189,7 @@ class PenToolBehavior {
   }
 }
 
-function insertContourAndSetupAnchorPoint(
-  context,
-  path,
-  point,
-  shiftConstrain
-) {
+function insertContourAndSetupAnchorPoint(context, path, point, shiftConstrain) {
   path.insertContour(context.contourIndex, emptyContour());
   context.anchorIndex = context.contourPointIndex;
 }
@@ -260,20 +246,18 @@ function insertHandleInOut(context, path, point, shiftConstrain) {
 }
 
 function _insertHandleIn(context, path, point, shiftConstrain) {
-  path.insertPoint(
-    context.contourIndex,
-    context.anchorIndex + context.prependBias,
-    { ...point, type: context.curveType }
-  );
+  path.insertPoint(context.contourIndex, context.anchorIndex + context.prependBias, {
+    ...point,
+    type: context.curveType,
+  });
   context.anchorIndex += context.appendBias;
 }
 
 function _insertHandleOut(context, path, point, shiftConstrain) {
-  path.insertPoint(
-    context.contourIndex,
-    context.anchorIndex + context.appendBias,
-    { ...point, type: context.curveType }
-  );
+  path.insertPoint(context.contourIndex, context.anchorIndex + context.appendBias, {
+    ...point,
+    type: context.curveType,
+  });
   context.anchorIndex += context.prependBias;
 }
 
@@ -306,17 +290,13 @@ function closeContour(context, path, point, shiftConstrain) {
   const numPoints = path.getNumPointsOfContour(context.contourIndex);
   if (!context.contourPointIndex) {
     const lastPointIndex = numPoints - 1;
-    const lastPoint = path.getContourPoint(
-      context.contourIndex,
-      lastPointIndex
-    );
+    const lastPoint = path.getContourPoint(context.contourIndex, lastPointIndex);
     path.deletePoint(context.contourIndex, lastPointIndex);
     path.insertPoint(context.contourIndex, 0, lastPoint);
   }
   // When appending, we pretend the anchor index is beyond the last point,
   // so we insert the handle at the end of the contour, instead of at the front
-  context.anchorIndex =
-    context.appendMode === AppendModes.APPEND ? numPoints : 0;
+  context.anchorIndex = context.appendMode === AppendModes.APPEND ? numPoints : 0;
   context.anchorPoint = path.getContourPoint(context.contourIndex, 0);
   context.selection = getPointSelection(path, context.contourIndex, 0);
 }
@@ -328,19 +308,12 @@ function dragHandle(context, path, point, shiftConstrain) {
   }
   if (context.handleInAbsIndex !== undefined) {
     const oppositePoint = oppositeHandle(context.anchorPoint, point);
-    path.setPointPosition(
-      context.handleInAbsIndex,
-      oppositePoint.x,
-      oppositePoint.y
-    );
+    path.setPointPosition(context.handleInAbsIndex, oppositePoint.x, oppositePoint.y);
   }
 }
 
 function getPointSelection(path, contourIndex, contourPointIndex) {
-  const pointIndex = path.getAbsolutePointIndex(
-    contourIndex,
-    contourPointIndex
-  );
+  const pointIndex = path.getAbsolutePointIndex(contourIndex, contourPointIndex);
   return new Set([`point/${pointIndex}`]);
 }
 
@@ -405,8 +378,6 @@ function oppositeHandle(anchorPoint, handlePoint) {
 }
 
 function shiftConstrain(anchorPoint, handlePoint) {
-  const delta = constrainHorVerDiag(
-    vector.subVectors(handlePoint, anchorPoint)
-  );
+  const delta = constrainHorVerDiag(vector.subVectors(handlePoint, anchorPoint));
   return vector.addVectors(anchorPoint, delta);
 }
