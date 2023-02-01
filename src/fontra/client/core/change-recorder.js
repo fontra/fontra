@@ -1,71 +1,84 @@
-import { ChangeCollector, applyChange, consolidateChanges } from "./changes.js";
-import { range, reversed } from "./utils.js";
-
+import { ChangeCollector, applyChange, consolidateChanges } from './changes.js';
+import { range, reversed } from './utils.js';
 
 export function recordChanges(subject, func) {
   const changes = new ChangeCollector();
   try {
     func(getProxy(subject, changes));
-  } catch(error) {
+  } catch (error) {
     applyChange(subject, changes.rollbackChange);
     throw error;
   }
   return changes;
 }
 
-
 function getArrayProxyMethods(subject, changes) {
   return {
     push(...items) {
-      changes.addChange("+", subject.length, ...items);
-      changes.addRollbackChange("-", subject.length, items.length);
+      changes.addChange('+', subject.length, ...items);
+      changes.addRollbackChange('-', subject.length, items.length);
       subject.push(...items);
     },
     splice(index, deleteCount, ...items) {
-      changes.addChange(":", index, deleteCount, ...items);
-      changes.addRollbackChange(":", index, items.length, ...subject.slice(index, index + deleteCount));
+      changes.addChange(':', index, deleteCount, ...items);
+      changes.addRollbackChange(
+        ':',
+        index,
+        items.length,
+        ...subject.slice(index, index + deleteCount)
+      );
       subject.splice(index, deleteCount, ...items);
-    }
+    },
   };
 }
-
 
 function getVarPackedPathProxyMethods(subject, changes) {
   return {
     insertContour(index, contour) {
-      changes.addChange("insertContour", index, contour);
-      changes.addRollbackChange("deleteContour", index);
+      changes.addChange('insertContour', index, contour);
+      changes.addRollbackChange('deleteContour', index);
       subject.insertContour(index, contour);
     },
     deleteContour(index) {
-      changes.addChange("deleteContour", index);
-      changes.addRollbackChange("insertContour", index, subject.getContour(index));
+      changes.addChange('deleteContour', index);
+      changes.addRollbackChange(
+        'insertContour',
+        index,
+        subject.getContour(index)
+      );
       subject.deleteContour(index);
     },
     insertPoint(contourIndex, contourPointIndex, point) {
-      changes.addChange("insertPoint", contourIndex, contourPointIndex, point);
-      changes.addRollbackChange("deletePoint", contourIndex, contourPointIndex);
+      changes.addChange('insertPoint', contourIndex, contourPointIndex, point);
+      changes.addRollbackChange('deletePoint', contourIndex, contourPointIndex);
       subject.insertPoint(contourIndex, contourPointIndex, point);
     },
     deletePoint(contourIndex, contourPointIndex) {
-      changes.addChange("deletePoint", contourIndex, contourPointIndex);
-      changes.addRollbackChange("insertPoint", contourIndex, contourPointIndex, subject.getContourPoint(contourIndex, contourPointIndex));
+      changes.addChange('deletePoint', contourIndex, contourPointIndex);
+      changes.addRollbackChange(
+        'insertPoint',
+        contourIndex,
+        contourPointIndex,
+        subject.getContourPoint(contourIndex, contourPointIndex)
+      );
       subject.deletePoint(contourIndex, contourPointIndex);
     },
     setPointPosition(pointIndex, x, y) {
-      changes.addChange("=xy", pointIndex, x, y);
-      changes.addRollbackChange("=xy", pointIndex, ...subject.getPointPosition(pointIndex));
+      changes.addChange('=xy', pointIndex, x, y);
+      changes.addRollbackChange(
+        '=xy',
+        pointIndex,
+        ...subject.getPointPosition(pointIndex)
+      );
       subject.setPointPosition(pointIndex, x, y);
     },
   };
 }
 
-
 export const proxyMethodsMap = {
-  "Array": getArrayProxyMethods,
-  "VarPackedPath": getVarPackedPathProxyMethods,  // Poss. need to change the key to VarPackedPath.name when minifying
-}
-
+  Array: getArrayProxyMethods,
+  VarPackedPath: getVarPackedPathProxyMethods, // Poss. need to change the key to VarPackedPath.name when minifying
+};
 
 function getProxy(subject, changes) {
   if (!needsProxy(subject)) {
@@ -81,11 +94,11 @@ function getProxy(subject, changes) {
       if (isArray && !isNaN(prop)) {
         prop = parseInt(prop);
       }
-      changes.addChange("=", prop, value);
+      changes.addChange('=', prop, value);
       if (!isArray && subject[prop] === undefined) {
-        changes.addRollbackChange("d", prop);
+        changes.addRollbackChange('d', prop);
       } else {
-        changes.addRollbackChange("=", prop, subject[prop]);
+        changes.addRollbackChange('=', prop, subject[prop]);
       }
       subject[prop] = value;
       return true;
@@ -100,13 +113,9 @@ function getProxy(subject, changes) {
         prop = parseInt(prop);
       }
       subject = subject[prop];
-      return (
-        needsProxy(subject)
-        ?
-        getProxy(subject, changes.subCollector(prop))
-        :
-        subject
-      );
+      return needsProxy(subject)
+        ? getProxy(subject, changes.subCollector(prop))
+        : subject;
     },
 
     deleteProperty(subject, prop) {
@@ -116,18 +125,17 @@ function getProxy(subject, changes) {
         if (subject[prop] === undefined) {
           throw new Error("can't delete undefined property");
         }
-        changes.addChange("d", prop);
-        changes.addRollbackChange("=", prop, subject[prop]);
+        changes.addChange('d', prop);
+        changes.addRollbackChange('=', prop, subject[prop]);
         delete subject[prop];
       }
       return true;
-    }
-  }
+    },
+  };
 
   return new Proxy(subject, handler);
 }
 
-
 function needsProxy(subject) {
-  return subject !== null && typeof subject === "object";
+  return subject !== null && typeof subject === 'object';
 }

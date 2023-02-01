@@ -1,6 +1,5 @@
-import { equalRect, normalizeRect, sectRect } from "./rectangle.js";
-import { reversed } from "./utils.js";
-
+import { equalRect, normalizeRect, sectRect } from './rectangle.js';
+import { reversed } from './utils.js';
 
 export function pointInConvexPolygon(x, y, polygon) {
   // Adapted from a comment on
@@ -11,7 +10,7 @@ export function pointInConvexPolygon(x, y, polygon) {
     return false;
   }
 
-  const testPoint = {"x": x, "y": y};
+  const testPoint = { x: x, y: y };
 
   // n>2 Keep track of cross product sign changes
   let pos = 0;
@@ -46,7 +45,6 @@ export function pointInConvexPolygon(x, y, polygon) {
   return true;
 }
 
-
 export function rectIntersectsPolygon(rect, polygon) {
   // Return true when the rectangle intersects the polygon, or if the
   // polygon is fully enclosed by the rectangle. It misses the case
@@ -62,14 +60,17 @@ export function rectIntersectsPolygon(rect, polygon) {
   return false;
 }
 
-
-const EPSILON = 0.0001;  // we deal with font units, this should be small enough
-
+const EPSILON = 0.0001; // we deal with font units, this should be small enough
 
 function lineIntersectsRect(p1, p2, rect) {
   // Return true if line p1,p2 intersects any of the sides of rect,
   // or if it is fully enclosed by rect.
-  const lineRect = normalizeRect({"xMin": p1.x, "yMin": p1.y, "xMax": p2.x, "yMax": p2.y});
+  const lineRect = normalizeRect({
+    xMin: p1.x,
+    yMin: p1.y,
+    xMax: p2.x,
+    yMax: p2.y,
+  });
   const lineSectRect = sectRect(rect, lineRect);
   if (!lineSectRect) {
     return false;
@@ -92,7 +93,7 @@ function lineIntersectsRect(p1, p2, rect) {
     }
     const v = [p1.y + t[0] * dy, p1.y + t[1] * dy];
     v.sort(compare);
-    return (v[0] <= rect.yMax && v[1] >= rect.yMin);
+    return v[0] <= rect.yMax && v[1] >= rect.yMin;
   } else {
     const t = clipT(p1.y, dy, rect.yMin, rect.yMax);
     if (!t) {
@@ -100,11 +101,10 @@ function lineIntersectsRect(p1, p2, rect) {
     }
     const v = [p1.x + t[0] * dx, p1.x + t[1] * dx];
     v.sort(compare);
-    return (v[0] <= rect.xMax && v[1] >= rect.xMin);
+    return v[0] <= rect.xMax && v[1] >= rect.xMin;
   }
-  return false;  // unreachable
+  return false; // unreachable
 }
-
 
 function clipT(a, b, minimum, maximum) {
   const t = [(minimum - a) / b, (maximum - a) / b];
@@ -118,12 +118,10 @@ function clipT(a, b, minimum, maximum) {
   return t[0] <= t[1] ? t : undefined;
 }
 
-
 function compare(a, b) {
   // Return -1 when a < b, 1 when a > b, and 0 when a == b
   return (a > b) - (a < b);
 }
-
 
 export function convexHull(points) {
   // Adapted from https://en.wikipedia.org/wiki/Graham_scan
@@ -140,13 +138,15 @@ export function convexHull(points) {
   return upper.concat(lower);
 }
 
-
 function halfConvexHull(points) {
   // Returns half of the convex hull for a set of sorted points.
   // Call with the points reversed for the other half.
   const stack = [];
   for (const point of points) {
-    while (stack.length > 1 && ccw(stack[stack.length-2], stack[stack.length-1], point) <= 0) {
+    while (
+      stack.length > 1 &&
+      ccw(stack[stack.length - 2], stack[stack.length - 1], point) <= 0
+    ) {
       stack.pop();
     }
     stack.push(point);
@@ -154,7 +154,6 @@ function halfConvexHull(points) {
   stack.pop();
   return stack;
 }
-
 
 function ccw(p1, p2, p3) {
   // Return a positive number if p1,p2,p3 make a counter-clockwise turn,

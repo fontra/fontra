@@ -1,8 +1,6 @@
 // based on https://www.section.io/engineering-education/lru-cache-implementation-in-javascript/
 
-
 export class LRUCache {
-
   constructor(capacity) {
     this.capacity = capacity;
     this.map = new Map(); // this stores the entire array
@@ -45,7 +43,7 @@ export class LRUCache {
     } else {
       // check if map size is at capacity
       if (this.map.size === this.capacity) {
-        deletedItem = {key: this.head.next.key, value: this.head.next.value};
+        deletedItem = { key: this.head.next.key, value: this.head.next.value };
         //delete item both from map and DLL
         this.map.delete(deletedItem.key); // delete first element of list
         this.head.next = this.head.next.next; // update first element as next element
@@ -114,7 +112,5 @@ export class LRUCache {
       keys.push(node.key);
     }
     return keys;
-
   }
-
 }

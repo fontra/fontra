@@ -15,7 +15,6 @@ export function objectsEqual(obj1, obj2) {
   return true;
 }
 
-
 export function withSavedState(context, func) {
   context.save();
   try {
@@ -26,7 +25,6 @@ export function withSavedState(context, func) {
   }
   context.restore();
 }
-
 
 export function scheduleCalls(func, timeout = 0) {
   // Schedule calls to func with a timer. If a previously scheduled call
@@ -46,7 +44,6 @@ export function scheduleCalls(func, timeout = 0) {
   };
 }
 
-
 export function throttleCalls(func, minTime) {
   // Return a wrapped function. If the function gets called before
   // minTime (in ms) has elapsed since the last call, don't call
@@ -56,7 +53,7 @@ export function throttleCalls(func, minTime) {
   return (...args) => {
     if (timeoutID !== null) {
       clearTimeout(timeoutID);
-      timeoutID = null
+      timeoutID = null;
     }
     const now = Date.now();
     if (now - lastTime > minTime) {
@@ -74,56 +71,48 @@ export function throttleCalls(func, minTime) {
   };
 }
 
-
 export function parseCookies(str) {
   // https://www.geekstrick.com/snippets/how-to-parse-cookies-in-javascript/
   if (!str.trim()) {
     return {};
   }
   return str
-  .split(';')
-  .map(v => v.split('='))
-  .reduce((acc, v) => {
-    acc[decodeURIComponent(v[0].trim())] = decodeURIComponent(v[1].trim());
-    return acc;
-  }, {});
+    .split(';')
+    .map((v) => v.split('='))
+    .reduce((acc, v) => {
+      acc[decodeURIComponent(v[0].trim())] = decodeURIComponent(v[1].trim());
+      return acc;
+    }, {});
 }
-
 
 export function capitalizeFirstLetter(s) {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
-
 export function hyphenatedToCamelCase(s) {
-  return s.replace(/-([a-z])/g, m => m[1].toUpperCase());
+  return s.replace(/-([a-z])/g, (m) => m[1].toUpperCase());
 }
 
-
-export const THEME_KEY = "fontra-theme";
-
+export const THEME_KEY = 'fontra-theme';
 
 export function themeSwitch(value) {
-  const rootElement = document.querySelector("html");
-  rootElement.classList.remove("light-theme");
-  rootElement.classList.remove("dark-theme");
-  if (value !== "automatic") {
-    rootElement.classList.add(value + "-theme");
+  const rootElement = document.querySelector('html');
+  rootElement.classList.remove('light-theme');
+  rootElement.classList.remove('dark-theme');
+  if (value !== 'automatic') {
+    rootElement.classList.add(value + '-theme');
   }
 }
-
 
 export function themeSwitchFromLocalStorage() {
   _themeSwitchFromLocalStorage();
 
-  addEventListener("storage", event => {
+  addEventListener('storage', (event) => {
     if (event.key === THEME_KEY) {
       _themeSwitchFromLocalStorage();
     }
   });
-
 }
-
 
 function _themeSwitchFromLocalStorage() {
   const themeValue = localStorage.getItem(THEME_KEY);
@@ -132,30 +121,26 @@ function _themeSwitchFromLocalStorage() {
   }
 }
 
-
 export function hasShortcutModifierKey(event) {
-  if (navigator.platform.toLowerCase().indexOf("mac") >= 0) {
+  if (navigator.platform.toLowerCase().indexOf('mac') >= 0) {
     return event.metaKey;
   } else {
     return event.ctrlKey;
   }
 }
 
-
 export const arrowKeyDeltas = {
-  "ArrowUp": [0, 1],
-  "ArrowDown": [0, -1],
-  "ArrowLeft": [-1, 0],
-  "ArrowRight": [1, 0],
-}
-
+  ArrowUp: [0, 1],
+  ArrowDown: [0, -1],
+  ArrowLeft: [-1, 0],
+  ArrowRight: [1, 0],
+};
 
 export function modulo(v, n) {
   // Modulo with Python behavior for negative values of `v`
   // Assumes `n` to be positive
-  return v >= 0 ? v % n : (v % n + n) % n;
+  return v >= 0 ? v % n : ((v % n) + n) % n;
 }
-
 
 export function sign(v) {
   if (v > 0) {
@@ -167,22 +152,19 @@ export function sign(v) {
   }
 }
 
-
 export function boolInt(v) {
   // Return 1 if `v` is true-y, 0 if `v` is false-y
   return v ? 1 : 0;
 }
 
-
-export function *reversed(seq) {
+export function* reversed(seq) {
   // Like Python's reversed(seq) builtin
   for (let i = seq.length - 1; i >= 0; i--) {
     yield seq[i];
   }
 }
 
-
-export function *enumerate(iterable, start = 0) {
+export function* enumerate(iterable, start = 0) {
   let i = start;
   for (const item of iterable) {
     yield [i, item];
@@ -190,8 +172,7 @@ export function *enumerate(iterable, start = 0) {
   }
 }
 
-
-export function *range(start, stop, step = 1) {
+export function* range(start, stop, step = 1) {
   if (stop === undefined) {
     stop = start;
     start = 0;
@@ -201,12 +182,11 @@ export function *range(start, stop, step = 1) {
   }
 }
 
-
 export async function tryFinally(func, finallyFunc) {
   let error;
   try {
     await func();
-  } catch(e) {
+  } catch (e) {
     error = e;
   }
   await finallyFunc();
@@ -215,11 +195,10 @@ export async function tryFinally(func, finallyFunc) {
   }
 }
 
-
 export function parseSelection(selection) {
   const result = {};
   for (const item of selection) {
-    const [tp, index] = item.split("/");
+    const [tp, index] = item.split('/');
     if (result[tp] === undefined) {
       result[tp] = [];
     }
@@ -232,16 +211,13 @@ export function parseSelection(selection) {
   return result;
 }
 
-
 export function makeUPlusStringFromCodePoint(codePoint) {
-  if (codePoint && typeof codePoint != "number") {
-    throw new Error(`codePoint argument must be a number or falsey; ${typeof codePoint} found`);
+  if (codePoint && typeof codePoint != 'number') {
+    throw new Error(
+      `codePoint argument must be a number or falsey; ${typeof codePoint} found`
+    );
   }
-  return (
-    typeof codePoint == "number"
-    ?
-    "U+" + codePoint.toString(16).toUpperCase().padStart(4, "0")
-    :
-    ""
-  );
+  return typeof codePoint == 'number'
+    ? 'U+' + codePoint.toString(16).toUpperCase().padStart(4, '0')
+    : '';
 }

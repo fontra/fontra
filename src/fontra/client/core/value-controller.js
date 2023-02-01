@@ -1,5 +1,4 @@
 export class ValueController {
-
   constructor() {
     this._observers = new Map();
   }
@@ -23,10 +22,10 @@ export class ValueController {
 
   addObserver(observerID, valueCallback) {
     if (!observerID) {
-      throw new Error("missing/falsey observerID argument");
+      throw new Error('missing/falsey observerID argument');
     }
     if (this._observers.has(observerID)) {
-      throw new Error("observerID must be unique");
+      throw new Error('observerID must be unique');
     }
     this._observers.set(observerID, valueCallback);
   }
@@ -34,5 +33,4 @@ export class ValueController {
   removeObserver(observerID) {
     this._observers.delete(observerID);
   }
-
 }

@@ -1,11 +1,11 @@
 :root {
-  --editor-glyphs-search-input-background-color-light: #EEE;
+  --editor-glyphs-search-input-background-color-light: #eee;
   --editor-glyphs-search-input-background-color-dark: #333;
 
   --editor-glyphs-search-input-foreground-color-light: black;
   --editor-glyphs-search-input-foreground-color-dark: white;
 
-  --editor-text-entry-input-background-color-light: #EEE;
+  --editor-text-entry-input-background-color-light: #eee;
   --editor-text-entry-input-background-color-dark: #333;
 
   --editor-text-entry-input-foreground-color-light: black;
@@ -14,16 +14,16 @@
   --editor-overlay-item-background-color-light: white;
   --editor-overlay-item-background-color-dark: #484848;
 
-  --editor-tool-button-hover-background-color-light: #EEE;
+  --editor-tool-button-hover-background-color-light: #eee;
   --editor-tool-button-hover-background-color-dark: #333;
 
-  --editor-tool-button-active-background-color-light: #CCC;
+  --editor-tool-button-active-background-color-light: #ccc;
   --editor-tool-button-active-background-color-dark: #555;
 
   --editor-tool-button-selected-background-color-light: #666;
-  --editor-tool-button-selected-background-color-dark: #CCC;
+  --editor-tool-button-selected-background-color-dark: #ccc;
 
-  --editor-mini-console-background-color-light: #DDD;
+  --editor-mini-console-background-color-light: #ddd;
   --editor-mini-console-background-color-dark: #444;
 
   --editor-mini-console-foreground-color-light: black;
@@ -31,65 +31,141 @@
 }
 
 :root {
-  --editor-glyphs-search-input-background-color: var(--editor-glyphs-search-input-background-color-light);
-  --editor-glyphs-search-input-foreground-color: var(--editor-glyphs-search-input-foreground-color-light);
-  --editor-text-entry-input-background-color: var(--editor-text-entry-input-background-color-light);
-  --editor-text-entry-input-foreground-color: var(--editor-text-entry-input-foreground-color-light);
-  --editor-overlay-item-background-color: var(--editor-overlay-item-background-color-light);
-  --editor-tool-button-hover-background-color: var(--editor-tool-button-hover-background-color-light);
-  --editor-tool-button-active-background-color: var(--editor-tool-button-active-background-color-light);
-  --editor-tool-button-selected-background-color: var(--editor-tool-button-selected-background-color-light);
-  --editor-mini-console-background-color: var(--editor-mini-console-background-color-light);
-  --editor-mini-console-foreground-color: var(--editor-mini-console-foreground-color-light);
+  --editor-glyphs-search-input-background-color: var(
+    --editor-glyphs-search-input-background-color-light
+  );
+  --editor-glyphs-search-input-foreground-color: var(
+    --editor-glyphs-search-input-foreground-color-light
+  );
+  --editor-text-entry-input-background-color: var(
+    --editor-text-entry-input-background-color-light
+  );
+  --editor-text-entry-input-foreground-color: var(
+    --editor-text-entry-input-foreground-color-light
+  );
+  --editor-overlay-item-background-color: var(
+    --editor-overlay-item-background-color-light
+  );
+  --editor-tool-button-hover-background-color: var(
+    --editor-tool-button-hover-background-color-light
+  );
+  --editor-tool-button-active-background-color: var(
+    --editor-tool-button-active-background-color-light
+  );
+  --editor-tool-button-selected-background-color: var(
+    --editor-tool-button-selected-background-color-light
+  );
+  --editor-mini-console-background-color: var(
+    --editor-mini-console-background-color-light
+  );
+  --editor-mini-console-foreground-color: var(
+    --editor-mini-console-foreground-color-light
+  );
 }
 
 :root.dark-theme {
-  --editor-glyphs-search-input-background-color: var(--editor-glyphs-search-input-background-color-dark);
-  --editor-glyphs-search-input-foreground-color: var(--editor-glyphs-search-input-foreground-color-dark);
-  --editor-text-entry-input-background-color: var(--editor-text-entry-input-background-color-dark);
-  --editor-text-entry-input-foreground-color: var(--editor-text-entry-input-foreground-color-dark);
-  --editor-overlay-item-background-color: var(--editor-overlay-item-background-color-dark);
-  --editor-tool-button-hover-background-color: var(--editor-tool-button-hover-background-color-dark);
-  --editor-tool-button-active-background-color: var(--editor-tool-button-active-background-color-dark);
-  --editor-tool-button-selected-background-color: var(--editor-tool-button-selected-background-color-dark);
-  --editor-mini-console-background-color: var(--editor-mini-console-background-color-dark);
-  --editor-mini-console-foreground-color: var(--editor-mini-console-foreground-color-dark);
+  --editor-glyphs-search-input-background-color: var(
+    --editor-glyphs-search-input-background-color-dark
+  );
+  --editor-glyphs-search-input-foreground-color: var(
+    --editor-glyphs-search-input-foreground-color-dark
+  );
+  --editor-text-entry-input-background-color: var(
+    --editor-text-entry-input-background-color-dark
+  );
+  --editor-text-entry-input-foreground-color: var(
+    --editor-text-entry-input-foreground-color-dark
+  );
+  --editor-overlay-item-background-color: var(
+    --editor-overlay-item-background-color-dark
+  );
+  --editor-tool-button-hover-background-color: var(
+    --editor-tool-button-hover-background-color-dark
+  );
+  --editor-tool-button-active-background-color: var(
+    --editor-tool-button-active-background-color-dark
+  );
+  --editor-tool-button-selected-background-color: var(
+    --editor-tool-button-selected-background-color-dark
+  );
+  --editor-mini-console-background-color: var(
+    --editor-mini-console-background-color-dark
+  );
+  --editor-mini-console-foreground-color: var(
+    --editor-mini-console-foreground-color-dark
+  );
 }
 
-
 @media (prefers-color-scheme: dark) {
-
   :root {
-    --editor-glyphs-search-input-background-color: var(--editor-glyphs-search-input-background-color-dark);
-    --editor-glyphs-search-input-foreground-color: var(--editor-glyphs-search-input-foreground-color-dark);
-    --editor-text-entry-input-background-color: var(--editor-text-entry-input-background-color-dark);
-    --editor-text-entry-input-foreground-color: var(--editor-text-entry-input-foreground-color-dark);
-    --editor-overlay-item-background-color: var(--editor-overlay-item-background-color-dark);
-    --editor-tool-button-hover-background-color: var(--editor-tool-button-hover-background-color-dark);
-    --editor-tool-button-active-background-color: var(--editor-tool-button-active-background-color-dark);
-    --editor-tool-button-selected-background-color: var(--editor-tool-button-selected-background-color-dark);
-    --editor-mini-console-background-color: var(--editor-mini-console-background-color-dark);
-    --editor-mini-console-foreground-color: var(--editor-mini-console-foreground-color-dark);
+    --editor-glyphs-search-input-background-color: var(
+      --editor-glyphs-search-input-background-color-dark
+    );
+    --editor-glyphs-search-input-foreground-color: var(
+      --editor-glyphs-search-input-foreground-color-dark
+    );
+    --editor-text-entry-input-background-color: var(
+      --editor-text-entry-input-background-color-dark
+    );
+    --editor-text-entry-input-foreground-color: var(
+      --editor-text-entry-input-foreground-color-dark
+    );
+    --editor-overlay-item-background-color: var(
+      --editor-overlay-item-background-color-dark
+    );
+    --editor-tool-button-hover-background-color: var(
+      --editor-tool-button-hover-background-color-dark
+    );
+    --editor-tool-button-active-background-color: var(
+      --editor-tool-button-active-background-color-dark
+    );
+    --editor-tool-button-selected-background-color: var(
+      --editor-tool-button-selected-background-color-dark
+    );
+    --editor-mini-console-background-color: var(
+      --editor-mini-console-background-color-dark
+    );
+    --editor-mini-console-foreground-color: var(
+      --editor-mini-console-foreground-color-dark
+    );
   }
 
   :root.light-theme {
-    --editor-glyphs-search-input-background-color: var(--editor-glyphs-search-input-background-color-light);
-    --editor-glyphs-search-input-foreground-color: var(--editor-glyphs-search-input-foreground-color-light);
-    --editor-text-entry-input-background-color: var(--editor-text-entry-input-background-color-light);
-    --editor-text-entry-input-foreground-color: var(--editor-text-entry-input-foreground-color-light);
-    --editor-overlay-item-background-color: var(--editor-overlay-item-background-color-light);
-    --editor-tool-button-hover-background-color: var(--editor-tool-button-hover-background-color-light);
-    --editor-tool-button-active-background-color: var(--editor-tool-button-active-background-color-light);
-    --editor-tool-button-selected-background-color: var(--editor-tool-button-selected-background-color-light);
-    --editor-mini-console-background-color: var(--editor-mini-console-background-color-light);
-    --editor-mini-console-foreground-color: var(--editor-mini-console-foreground-color-light);
+    --editor-glyphs-search-input-background-color: var(
+      --editor-glyphs-search-input-background-color-light
+    );
+    --editor-glyphs-search-input-foreground-color: var(
+      --editor-glyphs-search-input-foreground-color-light
+    );
+    --editor-text-entry-input-background-color: var(
+      --editor-text-entry-input-background-color-light
+    );
+    --editor-text-entry-input-foreground-color: var(
+      --editor-text-entry-input-foreground-color-light
+    );
+    --editor-overlay-item-background-color: var(
+      --editor-overlay-item-background-color-light
+    );
+    --editor-tool-button-hover-background-color: var(
+      --editor-tool-button-hover-background-color-light
+    );
+    --editor-tool-button-active-background-color: var(
+      --editor-tool-button-active-background-color-light
+    );
+    --editor-tool-button-selected-background-color: var(
+      --editor-tool-button-selected-background-color-light
+    );
+    --editor-mini-console-background-color: var(
+      --editor-mini-console-background-color-light
+    );
+    --editor-mini-console-foreground-color: var(
+      --editor-mini-console-foreground-color-light
+    );
   }
-
 }
 
-
 .editor-container {
-  /*display: flex;*/  /* or grid */
+  /*display: flex;*/ /* or grid */
   position: relative;
   width: 100vw;
   height: 100vh;
@@ -118,18 +194,17 @@
   resize: none;
 }
 
-
 .sliders-and-sources {
   display: flex;
   flex-direction: column;
-  padding: 0.5em 1em 0.75em 0.25em;  /* top right bottom left */
+  padding: 0.5em 1em 0.75em 0.25em; /* top right bottom left */
   gap: 1em;
 }
 
 .axis-sliders {
   display: flex;
   flex-direction: column;
-  gap:  0.5em;
+  gap: 0.5em;
   overflow: scroll;
   flex-shrink: 1;
 }
@@ -156,14 +231,14 @@
 }
 
 .canvas-container {
-  position: relative;  /* for the children */
+  position: relative; /* for the children */
   width: 100%;
   height: 100%;
   overflow: hidden;
 }
 
 #edit-canvas {
-  position: absolute;  /* but relative to canvas-container */
+  position: absolute; /* but relative to canvas-container */
   padding: 0;
   margin: 0;
   overscroll-behavior: none;
@@ -188,7 +263,7 @@
   display: flex;
   background-color: var(--editor-overlay-item-background-color);
   border-radius: 0.65em;
-  box-shadow: 1.0px 1.0px 5px #0006;
+  box-shadow: 1px 1px 5px #0006;
   cursor: pointer;
   height: min-content;
   pointer-events: auto;
@@ -200,8 +275,8 @@
   font-size: 1.7rem;
   user-select: none;
   background-color: var(--editor-overlay-item-background-color);
-  width:  2.7rem;
-  height:  1.9rem;
+  width: 2.7rem;
+  height: 1.9rem;
   padding: 0.1rem;
   text-align: center;
   transition: 0.15s;
@@ -214,7 +289,7 @@
 
 .tool-icon:hover {
   position: relative;
-  transform: scale(1.1, 1.1)
+  transform: scale(1.1, 1.1);
 }
 
 .tool-button:hover {
@@ -231,7 +306,7 @@
 }
 
 #mini-console {
-  display: none;  /* will be set to 'inherit' when needed */
+  display: none; /* will be set to 'inherit' when needed */
   z-index: 3;
   position: absolute;
   color: var(--editor-mini-console-foreground-color);

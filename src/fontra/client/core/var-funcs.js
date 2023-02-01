@@ -1,15 +1,17 @@
-import { VariationError } from "./errors.js"
-
+import { VariationError } from './errors.js';
 
 export function addItemwise(a, b) {
   if (typeof a !== typeof b) {
-    throw new VariationError(`incompatible object types: typeof ${a} != typeof ${b}`);
-  } if (typeof a === "string") {
+    throw new VariationError(
+      `incompatible object types: typeof ${a} != typeof ${b}`
+    );
+  }
+  if (typeof a === 'string') {
     if (a !== b) {
       throw new VariationError(`unexpected different strings: ${a} != ${b}`);
     }
     return a;
-  } else if (typeof a === "number") {
+  } else if (typeof a === 'number') {
     return a + b;
   } else if (a === undefined && b === undefined) {
     return undefined;
@@ -21,16 +23,17 @@ export function addItemwise(a, b) {
   return itemwiseFunc(a, b, addItemwise);
 }
 
-
 export function subItemwise(a, b) {
   if (typeof a !== typeof b) {
-    throw new VariationError(`incompatible object types: typeof ${a} != typeof ${b}`);
-  } else if (typeof a === "string") {
+    throw new VariationError(
+      `incompatible object types: typeof ${a} != typeof ${b}`
+    );
+  } else if (typeof a === 'string') {
     if (a !== b) {
       throw new VariationError(`unexpected different strings: ${a} != ${b}`);
     }
     return a;
-  } else if (typeof a === "number") {
+  } else if (typeof a === 'number') {
     return a - b;
   } else if (a === undefined && b === undefined) {
     return undefined;
@@ -42,11 +45,10 @@ export function subItemwise(a, b) {
   return itemwiseFunc(a, b, subItemwise);
 }
 
-
 export function mulScalar(o, scalar) {
-  if (scalar === 1 || typeof o === "string") {
+  if (scalar === 1 || typeof o === 'string') {
     return o;
-  } else if (typeof o === "number") {
+  } else if (typeof o === 'number') {
     return o * scalar;
   } else if (o === undefined) {
     return undefined;
@@ -58,13 +60,14 @@ export function mulScalar(o, scalar) {
   return objectMap(o, scalar, mulScalar);
 }
 
-
 function itemwiseFunc(a, b, func) {
   var result;
   if (Array.isArray(a)) {
     result = new a.constructor(a.length);
     if (a.length != b.length) {
-      throw new VariationError(`arrays have incompatible lengths: ${a.length} != ${b.length}`);
+      throw new VariationError(
+        `arrays have incompatible lengths: ${a.length} != ${b.length}`
+      );
     }
     for (let i = 0; i < a.length; i++) {
       result[i] = func(a[i], b[i]);
@@ -75,13 +78,19 @@ function itemwiseFunc(a, b, func) {
     if (keys.length != Object.keys(b).length) {
       // console.log("--> a", a);
       // console.log("--> b", b);
-      throw new VariationError(`objects have incompatible number of entries: ${keys.length} != ${Object.keys(b).length}`);
+      throw new VariationError(
+        `objects have incompatible number of entries: ${keys.length} != ${
+          Object.keys(b).length
+        }`
+      );
     }
     for (const key of keys) {
       const valueA = a[key];
       const valueB = b[key];
-      if ( (valueA === undefined) !== (valueB === undefined) ) {
-        throw new VariationError(`objects have incompatible key sets: ${keys} != ${Object.keys(b)}`);
+      if ((valueA === undefined) !== (valueB === undefined)) {
+        throw new VariationError(
+          `objects have incompatible key sets: ${keys} != ${Object.keys(b)}`
+        );
       }
       result[key] = func(valueA, valueB);
     }
@@ -89,11 +98,10 @@ function itemwiseFunc(a, b, func) {
   return result;
 }
 
-
 function objectMap(o, argument, func) {
   var result;
   if (Array.isArray(o)) {
-    return o.map(item => func(item, argument));
+    return o.map((item) => func(item, argument));
   } else {
     result = new o.constructor();
     for (const key of Object.keys(o)) {

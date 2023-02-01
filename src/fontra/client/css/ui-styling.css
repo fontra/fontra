@@ -1,9 +1,9 @@
 :root {
   --ui-list-border-color-light: lightgray;
-  --ui-list-row-border-color-light: #DDD;
+  --ui-list-row-border-color-light: #ddd;
   --ui-list-row-foreground-color-light: black;
   --ui-list-row-background-color-light: white;
-  --ui-list-row-selected-background-color-light: #DDD;
+  --ui-list-row-selected-background-color-light: #ddd;
   --ui-form-input-border-color-light: #888;
 
   --ui-list-border-color-dark: darkgray;
@@ -14,38 +14,41 @@
   --ui-form-input-border-color-dark: #222;
 }
 
-
 :root {
   --ui-list-border-color: var(--ui-list-border-color-light);
   --ui-list-row-border-color: var(--ui-list-row-border-color-light);
   --ui-list-row-foreground-color: var(--ui-list-row-foreground-color-light);
   --ui-list-row-background-color: var(--ui-list-row-background-color-light);
-  --ui-list-row-selected-background-color: var(--ui-list-row-selected-background-color-light);
+  --ui-list-row-selected-background-color: var(
+    --ui-list-row-selected-background-color-light
+  );
   --ui-form-input-foreground-color: var(--ui-list-row-foreground-color-light);
   --ui-form-input-background-color: var(--ui-list-row-background-color-light);
   --ui-form-input-border-color: var(--ui-form-input-border-color-light);
 }
-
 
 :root.dark-theme {
   --ui-list-border-color: var(--ui-list-border-color-dark);
   --ui-list-row-border-color: var(--ui-list-row-border-color-dark);
   --ui-list-row-foreground-color: var(--ui-list-row-foreground-color-dark);
   --ui-list-row-background-color: var(--ui-list-row-background-color-dark);
-  --ui-list-row-selected-background-color: var(--ui-list-row-selected-background-color-dark);
+  --ui-list-row-selected-background-color: var(
+    --ui-list-row-selected-background-color-dark
+  );
   --ui-form-input-foreground-color: var(--ui-list-row-foreground-color-dark);
   --ui-form-input-background-color: var(--ui-list-row-background-color-dark);
   --ui-form-input-border-color: var(--ui-form-input-border-color-dark);
 }
 
 @media (prefers-color-scheme: dark) {
-
   :root {
     --ui-list-border-color: var(--ui-list-border-color-dark);
     --ui-list-row-border-color: var(--ui-list-row-border-color-dark);
     --ui-list-row-foreground-color: var(--ui-list-row-foreground-color-dark);
     --ui-list-row-background-color: var(--ui-list-row-background-color-dark);
-    --ui-list-row-selected-background-color: var(--ui-list-row-selected-background-color-dark);
+    --ui-list-row-selected-background-color: var(
+      --ui-list-row-selected-background-color-dark
+    );
     --ui-form-input-foreground-color: var(--ui-list-row-foreground-color-dark);
     --ui-form-input-background-color: var(--ui-list-row-background-color-dark);
     --ui-form-input-border-color: var(--ui-form-input-border-color-dark);
@@ -56,14 +59,14 @@
     --ui-list-row-border-color: var(--ui-list-row-border-color-light);
     --ui-list-row-foreground-color: var(--ui-list-row-foreground-color-light);
     --ui-list-row-background-color: var(--ui-list-row-background-color-light);
-    --ui-list-row-selected-background-color: var(--ui-list-row-selected-background-color-light);
+    --ui-list-row-selected-background-color: var(
+      --ui-list-row-selected-background-color-light
+    );
     --ui-form-input-foreground-color: var(--ui-list-row-foreground-color-light);
     --ui-form-input-background-color: var(--ui-list-row-background-color-light);
     --ui-form-input-border-color: var(--ui-form-input-border-color-light);
   }
-
 }
-
 
 /* ui-list */
 
@@ -73,7 +76,7 @@
 }
 
 .ui-list.empty {
-  display:  none;
+  display: none;
 }
 
 .ui-list > .contents {
@@ -137,21 +140,20 @@
 }
 
 .ui-form-value input {
-  font-family: "fontra-ui-regular";
+  font-family: 'fontra-ui-regular';
   border: solid 1px var(--ui-form-input-border-color);
   background-color: var(--ui-form-input-background-color);
   color: var(--ui-form-input-foreground-color);
   width: 9.5em;
 }
 
-.ui-form-value input[type=number] {
+.ui-form-value input[type='number'] {
   width: 4em;
 }
 
-.ui-form-value input[type=range] {
+.ui-form-value input[type='range'] {
   width: 7em;
 }
-
 
 /* ui-dialog */
 
@@ -180,7 +182,7 @@
   grid-template-columns: 1fr 1fr 1fr;
   gap: 1em;
 
-  outline: none;  /* to catch key events we need to focus, but we don't want a focus border */
+  outline: none; /* to catch key events we need to focus, but we don't want a focus border */
   max-width: 32em;
   overflow-wrap: normal;
   font-size: 1.15em;

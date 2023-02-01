@@ -1,45 +1,63 @@
-const LIST_CHUNK_SIZE = 200;  // the amount of items added to the list at a time
-
+const LIST_CHUNK_SIZE = 200; // the amount of items added to the list at a time
 
 export class List {
-
   constructor(listID, columnDescriptions) {
     this.container = document.querySelector(`#${listID}`);
     if (!this.container) {
       throw new Error(`Expecting an element with id="#${listID}"`);
     }
     if (this.container.children.length != 0) {
-      throw new Error("list container must be empty");
+      throw new Error('list container must be empty');
     }
-    this.container.classList.add("ui-list");
+    this.container.classList.add('ui-list');
 
     if (!columnDescriptions) {
       columnDescriptions = [
         {
-          "key": "default",
-          "get": item => item,
-        }
+          key: 'default',
+          get: (item) => item,
+        },
       ];
     }
-    this.columnDescriptions = columnDescriptions
+    this.columnDescriptions = columnDescriptions;
 
     this.itemEqualFunc = null;
 
-    this.contents = document.createElement("div");
-    this.contents.className = "contents"
+    this.contents = document.createElement('div');
+    this.contents.className = 'contents';
     this.container.appendChild(this.contents);
-    this.contents.addEventListener("click", event => this._clickHandler(event), false);
-    this.contents.addEventListener("dblclick", event => this._dblClickHandler(event), false);
-    this.container.addEventListener("scroll", event => this._scrollHandler(event), false)
-    this.container.addEventListener("keydown", event => this._keyDownHandler(event), false)
-    this.container.addEventListener("keyup", event => this._keyUpHandler(event), false)
+    this.contents.addEventListener(
+      'click',
+      (event) => this._clickHandler(event),
+      false
+    );
+    this.contents.addEventListener(
+      'dblclick',
+      (event) => this._dblClickHandler(event),
+      false
+    );
+    this.container.addEventListener(
+      'scroll',
+      (event) => this._scrollHandler(event),
+      false
+    );
+    this.container.addEventListener(
+      'keydown',
+      (event) => this._keyDownHandler(event),
+      false
+    );
+    this.container.addEventListener(
+      'keyup',
+      (event) => this._keyUpHandler(event),
+      false
+    );
     this.selectedItemIndex = undefined;
-    this.container.classList.add("empty");
+    this.container.classList.add('empty');
   }
 
   setItems(items) {
-    this.container.classList.toggle("empty", !items.length);
-    this.contents.innerHTML = "";
+    this.container.classList.toggle('empty', !items.length);
+    this.contents.innerHTML = '';
     this.items = items;
     this._itemsBackLog = Array.from(items);
     this.selectedItemIndex = undefined;
@@ -81,7 +99,8 @@ export class List {
   _addMoreItemsIfNeeded() {
     while (
       this._itemsBackLog.length > 0 &&
-      this.container.scrollTop + this.container.offsetHeight + 200 > this.contents.offsetHeight
+      this.container.scrollTop + this.container.offsetHeight + 200 >
+        this.contents.offsetHeight
     ) {
       this._addMoreItems();
       if (this.container.offsetHeight === 0) {
@@ -94,16 +113,16 @@ export class List {
     const items = this._itemsBackLog.splice(0, LIST_CHUNK_SIZE);
     let rowIndex = this.contents.childElementCount;
     for (const item of items) {
-      const row = document.createElement("div");
-      row.className = "row";
+      const row = document.createElement('div');
+      row.className = 'row';
       row.dataset.rowIndex = rowIndex;
       if (rowIndex === this.selectedItemIndex) {
-        row.classList.add("selected");
+        row.classList.add('selected');
       }
 
       for (const colDesc of this.columnDescriptions) {
-        const cell = document.createElement("div");
-        cell.className = "text-cell " + colDesc.key;
+        const cell = document.createElement('div');
+        cell.className = 'text-cell ' + colDesc.key;
         if (colDesc.width) {
           cell.style.width = colDesc.width;
         }
@@ -123,7 +142,7 @@ export class List {
 
   _dblClickHandler(event) {
     this.doubleClickedRowIndex = this._getRowIndexFromTarget(event.target);
-    this._dispatchEvent("rowDoubleClicked");
+    this._dispatchEvent('rowDoubleClicked');
   }
 
   _getRowIndexFromTarget(target) {
@@ -146,15 +165,15 @@ export class List {
     }
     if (this.selectedItemIndex !== undefined) {
       const row = this.contents.children[this.selectedItemIndex];
-      row?.classList.remove("selected");
+      row?.classList.remove('selected');
     }
     if (rowIndex !== undefined) {
       const row = this.contents.children[rowIndex];
-      row?.classList.add("selected");
+      row?.classList.add('selected');
     }
     this.selectedItemIndex = rowIndex;
     if (!this._isKeyRepeating && shouldDispatchEvent) {
-      this._dispatchEvent("listSelectionChanged");
+      this._dispatchEvent('listSelectionChanged');
     }
   }
 
@@ -164,18 +183,18 @@ export class List {
 
   _dispatchEvent(eventName) {
     const event = new CustomEvent(eventName, {
-      "bubbles": false,
-      "detail": this,
+      bubbles: false,
+      detail: this,
     });
     this.container.dispatchEvent(event);
   }
 
   _keyDownHandler(event) {
-    if (event.key === "Enter" && this.selectedItemIndex !== undefined) {
-      this._dispatchEvent("rowDoubleClicked");
+    if (event.key === 'Enter' && this.selectedItemIndex !== undefined) {
+      this._dispatchEvent('rowDoubleClicked');
       return;
     }
-    if (event.key !== "ArrowUp" && event.key !== "ArrowDown") {
+    if (event.key !== 'ArrowUp' && event.key !== 'ArrowDown') {
       return;
     }
     event.preventDefault();
@@ -186,13 +205,17 @@ export class List {
     if (rowIndex === undefined) {
       rowIndex = 0;
     } else {
-      rowIndex = event.key === "ArrowUp" ? rowIndex - 1 : rowIndex + 1;
+      rowIndex = event.key === 'ArrowUp' ? rowIndex - 1 : rowIndex + 1;
       rowIndex = Math.min(Math.max(rowIndex, 0), this.items.length - 1);
     }
     this._isKeyRepeating = event.repeat;
     this.setSelectedItemIndex(rowIndex, true);
     const newRow = this.contents.children[rowIndex];
-    newRow?.scrollIntoView({behavior: "auto", block: "nearest", inline: "nearest"});
+    newRow?.scrollIntoView({
+      behavior: 'auto',
+      block: 'nearest',
+      inline: 'nearest',
+    });
   }
 
   _keyUpHandler(event) {
@@ -200,12 +223,11 @@ export class List {
       // When key events repeat, they may fire too fast, so selection-changed
       // events are suppressed. We need to send one after the fact.
       this._isKeyRepeating = false;
-      this._dispatchEvent("listSelectionChanged");
+      this._dispatchEvent('listSelectionChanged');
     }
   }
 
   _scrollHandler(event) {
     this._addMoreItemsIfNeeded();
   }
-
 }

@@ -1,5 +1,4 @@
 export class ChangeCollector {
-
   constructor(parentCollector, path) {
     this._parentCollector = parentCollector;
     this._path = path;
@@ -27,10 +26,20 @@ export class ChangeCollector {
     this._forwardChanges = [];
     if (this._parentCollector) {
       this._parentCollector._ensureForwardChanges();
-      if (equalPath(this._path, lastItem(this._parentCollector._forwardChanges)?.p)) {
-        this._forwardChanges = lastItem(this._parentCollector._forwardChanges).c;
+      if (
+        equalPath(
+          this._path,
+          lastItem(this._parentCollector._forwardChanges)?.p
+        )
+      ) {
+        this._forwardChanges = lastItem(
+          this._parentCollector._forwardChanges
+        ).c;
       } else {
-        this._parentCollector._forwardChanges.push({p: this._path, c: this._forwardChanges});
+        this._parentCollector._forwardChanges.push({
+          p: this._path,
+          c: this._forwardChanges,
+        });
       }
     }
   }
@@ -45,7 +54,10 @@ export class ChangeCollector {
       if (equalPath(this._path, this._parentCollector._rollbackChanges[0]?.p)) {
         this._rollbackChanges = this._parentCollector._rollbackChanges[0].c;
       } else {
-        this._parentCollector._rollbackChanges.splice(0, 0, {p: this._path, c: this._rollbackChanges});
+        this._parentCollector._rollbackChanges.splice(0, 0, {
+          p: this._path,
+          c: this._rollbackChanges,
+        });
       }
     }
   }
@@ -68,12 +80,12 @@ export class ChangeCollector {
 
   addChange(func, ...args) {
     this._ensureForwardChanges();
-    this._forwardChanges.push({f: func, a: args});
+    this._forwardChanges.push({ f: func, a: args });
   }
 
   addRollbackChange(func, ...args) {
     this._ensureRollbackChanges();
-    this._rollbackChanges.splice(0, 0, {f: func, a: args});
+    this._rollbackChanges.splice(0, 0, { f: func, a: args });
   }
 
   subCollector(...path) {
@@ -99,9 +111,7 @@ export class ChangeCollector {
     }
     return ChangeCollector.fromChanges(forwardChanges, rollbackChanges);
   }
-
 }
-
 
 export function consolidateChanges(changes, prefixPath) {
   let change;
@@ -110,14 +120,14 @@ export function consolidateChanges(changes, prefixPath) {
     changes = [changes];
   }
   if (changes.length === 1) {
-    change = {...changes[0]};
+    change = { ...changes[0] };
     path = change.p;
   } else {
     const commonPrefix = findCommonPrefix(changes);
     const numCommonElements = commonPrefix.length;
     if (numCommonElements) {
-      changes = changes.map(change => {
-        const newChange = {...change};
+      changes = changes.map((change) => {
+        const newChange = { ...change };
         newChange.p = change.p.slice(numCommonElements);
         if (!newChange.p.length) {
           delete newChange.p;
@@ -127,20 +137,20 @@ export function consolidateChanges(changes, prefixPath) {
       path = commonPrefix;
     } else {
       // Zap empty p
-      changes = changes.map(change => {
-        const newChange = {...change};
+      changes = changes.map((change) => {
+        const newChange = { ...change };
         if (newChange.p && !newChange.p.length) {
           delete newChange.p;
         }
         return newChange;
       });
     }
-    change = {"c": changes};
+    change = { c: changes };
   }
   if (path?.length) {
-    change["p"] = path;
+    change['p'] = path;
   } else {
-    delete change["p"];
+    delete change['p'];
   }
 
   change = unnestSingleChildren(change);
@@ -152,14 +162,13 @@ export function consolidateChanges(changes, prefixPath) {
   return change;
 }
 
-
 function unnestSingleChildren(change) {
   const children = change.c?.map(unnestSingleChildren).filter(hasChange);
 
   if (!children?.length) {
     if (children?.length === 0) {
       // Remove empty children array
-      change = {...change};
+      change = { ...change };
       delete change.c;
     }
     if (!change.f) {
@@ -170,7 +179,7 @@ function unnestSingleChildren(change) {
   }
   // Recursively unnest and prune
   if (children.length !== 1) {
-    change = {...change};
+    change = { ...change };
     change.c = children;
     return change;
   }
@@ -182,7 +191,7 @@ function unnestSingleChildren(change) {
   } else {
     path = childPath;
   }
-  change = {...child};
+  change = { ...child };
   if (path.length) {
     change.p = path;
   } else {
@@ -191,13 +200,11 @@ function unnestSingleChildren(change) {
   return change;
 }
 
-
 function addPathPrefix(change, prefixPath) {
-  const prefixedChanged = {...change};
+  const prefixedChanged = { ...change };
   prefixedChanged.p = prefixPath.concat(prefixedChanged.p || []);
   return prefixedChanged;
 }
-
 
 function findCommonPrefix(changes) {
   const commonPrefix = [];
@@ -226,26 +233,27 @@ function findCommonPrefix(changes) {
   return commonPrefix;
 }
 
-
 const baseChangeFunctions = {
-  "=": (subject, key, item) => subject[key] = item,
-  "d": (subject, key) => delete subject[key],
-  "-": (subject, index, deleteCount = 1) => subject.splice(index, deleteCount),
-  "+": (subject, index, ...items) => subject.splice(index, 0, ...items),
-  ":": (subject, index, deleteCount, ...items) => subject.splice(index, deleteCount, ...items),
+  '=': (subject, key, item) => (subject[key] = item),
+  d: (subject, key) => delete subject[key],
+  '-': (subject, index, deleteCount = 1) => subject.splice(index, deleteCount),
+  '+': (subject, index, ...items) => subject.splice(index, 0, ...items),
+  ':': (subject, index, deleteCount, ...items) =>
+    subject.splice(index, deleteCount, ...items),
 };
-
 
 // TODO: Refactor. These don't really belong here, and should ideally be registered from outside
 const changeFunctions = {
   ...baseChangeFunctions,
-  "=xy": (path, pointIndex, x, y) => path.setPointPosition(pointIndex, x, y),
-  "insertContour": (path, contourIndex, contour) => path.insertContour(contourIndex, contour),
-  "deleteContour": (path, contourIndex) => path.deleteContour(contourIndex),
-  "deletePoint": (path, contourIndex, contourPointIndex) => path.deletePoint(contourIndex, contourPointIndex),
-  "insertPoint": (path, contourIndex, contourPointIndex, point) => path.insertPoint(contourIndex, contourPointIndex, point),
+  '=xy': (path, pointIndex, x, y) => path.setPointPosition(pointIndex, x, y),
+  insertContour: (path, contourIndex, contour) =>
+    path.insertContour(contourIndex, contour),
+  deleteContour: (path, contourIndex) => path.deleteContour(contourIndex),
+  deletePoint: (path, contourIndex, contourPointIndex) =>
+    path.deletePoint(contourIndex, contourPointIndex),
+  insertPoint: (path, contourIndex, contourPointIndex, point) =>
+    path.insertPoint(contourIndex, contourPointIndex, point),
 };
-
 
 //
 // A "change" object is a simple JS object containing several
@@ -263,11 +271,10 @@ const changeFunctions = {
 // "c": Array of child changes. Optional.
 //
 
-
 export function applyChange(subject, change) {
-  const path = change["p"] || [];
-  const functionName = change["f"];
-  const children = change["c"] || [];
+  const path = change['p'] || [];
+  const functionName = change['f'];
+  const children = change['c'] || [];
 
   for (const pathElement of path) {
     subject = subject[pathElement];
@@ -278,7 +285,7 @@ export function applyChange(subject, change) {
 
   if (functionName) {
     const changeFunc = changeFunctions[functionName];
-    const args = change["a"] || [];
+    const args = change['a'] || [];
     changeFunc(subject, ...args);
   }
 
@@ -287,11 +294,9 @@ export function applyChange(subject, change) {
   }
 }
 
-
 export function matchChangePath(change, matchPath) {
   return matchChangePattern(change, patternFromPath(matchPath));
 }
-
 
 function patternFromPath(matchPath) {
   const pattern = {};
@@ -306,7 +311,6 @@ function patternFromPath(matchPath) {
   }
   return pattern;
 }
-
 
 export function matchChangePattern(change, matchPattern) {
   //
@@ -339,7 +343,6 @@ export function matchChangePattern(change, matchPattern) {
   return false;
 }
 
-
 export function filterChangePattern(change, matchPattern, inverse) {
   //
   // Return a subset of the `change` according to the `matchPattern`, or `None`
@@ -369,13 +372,13 @@ export function filterChangePattern(change, matchPattern, inverse) {
 
   const filteredChildren = [];
   for (let childChange of change.c || []) {
-    childChange = filterChangePattern(childChange, node, inverse)
+    childChange = filterChangePattern(childChange, node, inverse);
     if (childChange !== null) {
       filteredChildren.push(childChange);
     }
   }
 
-  const result = {...change, "c": filteredChildren};
+  const result = { ...change, c: filteredChildren };
   if (!inverse) {
     // We've at most matched one or more children, but not the root change
     delete result.f;
@@ -385,18 +388,17 @@ export function filterChangePattern(change, matchPattern, inverse) {
   return normalizeChange(result);
 }
 
-
 function normalizeChange(change) {
   let result;
   const children = change.c || [];
 
-  if (!("f" in change) && children.length == 1) {
-      // Turn only child into root change
-      result = {...children[0]};
-      // Prefix child path with original root path
-      result["p"] = (change.p || []).concat(result.p || []);
+  if (!('f' in change) && children.length == 1) {
+    // Turn only child into root change
+    result = { ...children[0] };
+    // Prefix child path with original root path
+    result['p'] = (change.p || []).concat(result.p || []);
   } else {
-    result = {...change};
+    result = { ...change };
   }
 
   if (result.p !== undefined && !result.p.length) {
@@ -418,9 +420,8 @@ function normalizeChange(change) {
     result = null;
   }
 
-  return result
+  return result;
 }
-
 
 export function collectChangePaths(change, depth) {
   //
@@ -433,12 +434,10 @@ export function collectChangePaths(change, depth) {
   }
   const paths = [...pathsSet];
   paths.sort();
-  return paths.map(item => JSON.parse(item));
-
+  return paths.map((item) => JSON.parse(item));
 }
 
-
-function *iterateChangePaths(change, depth, prefix) {
+function* iterateChangePaths(change, depth, prefix) {
   if (!prefix) {
     prefix = [];
   }
@@ -454,7 +453,6 @@ function *iterateChangePaths(change, depth, prefix) {
   }
 }
 
-
 function equalPath(p1, p2) {
   if (p1.length !== p2?.length) {
     return false;
@@ -467,13 +465,11 @@ function equalPath(p1, p2) {
   return true;
 }
 
-
 function lastItem(array) {
   if (array.length) {
     return array[array.length - 1];
   }
 }
-
 
 export function hasChange(obj) {
   // This assumes a change object that has passed through consolidateChanges,

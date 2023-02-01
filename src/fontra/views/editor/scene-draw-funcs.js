@@ -1,7 +1,10 @@
-import { isSuperset, union } from "../core/set-ops.js";
-import { makeUPlusStringFromCodePoint, parseSelection, withSavedState } from "../core/utils.js";
-import { subVectors } from "../core/vector.js";
-
+import { isSuperset, union } from '../core/set-ops.js';
+import {
+  makeUPlusStringFromCodePoint,
+  parseSelection,
+  withSavedState,
+} from '../core/utils.js';
+import { subVectors } from '../core/vector.js';
 
 function requireEditingGlyph(func) {
   function wrapper(model, controller) {
@@ -13,7 +16,6 @@ function requireEditingGlyph(func) {
   return wrapper;
 }
 
-
 function requireSelectedGlyph(func) {
   function wrapper(model, controller) {
     if (!model.selectedGlyph || model.selectedGlyphIsEditing) {
@@ -23,7 +25,6 @@ function requireSelectedGlyph(func) {
   }
   return wrapper;
 }
-
 
 function requireHoveredGlyph(func) {
   function wrapper(model, controller) {
@@ -35,26 +36,28 @@ function requireHoveredGlyph(func) {
   return wrapper;
 }
 
-
 function glyphTranslate(func) {
   function wrapper(model, controller) {
     const positionedGlyph = model.getSelectedPositionedGlyph();
     controller.context.translate(positionedGlyph.x, positionedGlyph.y);
-    func(model, controller, controller.context, positionedGlyph.glyph, controller.drawingParameters);
+    func(
+      model,
+      controller,
+      controller.context,
+      positionedGlyph.glyph,
+      controller.drawingParameters
+    );
   }
   return wrapper;
 }
-
 
 export function drawMultiGlyphsLayer(model, controller) {
   _drawMultiGlyphsLayer(model, controller);
 }
 
-
 export function drawMultiGlyphsLayerClean(model, controller) {
   _drawMultiGlyphsLayer(model, controller, false);
 }
-
 
 function _drawMultiGlyphsLayer(model, controller, skipSelected = true) {
   if (!model.positionedLines) {
@@ -65,7 +68,11 @@ function _drawMultiGlyphsLayer(model, controller, skipSelected = true) {
   context.fillStyle = controller.drawingParameters.glyphFillColor;
   for (const glyphLine of model.positionedLines) {
     for (const glyph of glyphLine.glyphs) {
-      if (skipSelected && glyph === selectedGlyph && model.selectedGlyphIsEditing) {
+      if (
+        skipSelected &&
+        glyph === selectedGlyph &&
+        model.selectedGlyphIsEditing
+      ) {
         continue;
       }
       withSavedState(context, () => {
@@ -81,66 +88,88 @@ function _drawMultiGlyphsLayer(model, controller, skipSelected = true) {
   }
 }
 
-
-export const drawCJKDesignFrameLayer = requireEditingGlyph(glyphTranslate(
-(model, controller, context, glyph, drawingParameters) => {
-  const cjkDesignFrameParameters = model.fontController.fontLib["CJKDesignFrameSettings"];
-  if (!cjkDesignFrameParameters) {
-    return;
-  }
-  const [emW, emH] = cjkDesignFrameParameters["em_Dimension"];
-  const characterFace = cjkDesignFrameParameters["characterFace"] / 100;
-  const [shiftX, shiftY] = cjkDesignFrameParameters["shift"] || [0, -120];
-  const [overshootInside, overshootOutside] = cjkDesignFrameParameters["overshoot"];
-  const [faceW, faceH] = [emW * characterFace, emH * characterFace];
-  const [faceX, faceY] = [(emW - faceW) / 2, (emH - faceH) / 2]
-  let horizontalLine = cjkDesignFrameParameters["horizontalLine"];
-  let verticalLine = cjkDesignFrameParameters["verticalLine"];
-  const [overshootInsideW, overshootInsideH] = [faceW - overshootInside * 2, faceH - overshootInside * 2];
-  const [overshootOutsideW, overshootOutsideH] = [faceW + overshootOutside * 2, faceH + overshootOutside * 2];
-
-  context.translate(shiftX, shiftY);
-
-  context.strokeStyle = drawingParameters.cjkFrameStrokeColor;
-  context.lineWidth = drawingParameters.cjkFrameLineWidth;
-  context.strokeRect(0, 0, emW, emH);
-  context.strokeRect(faceX, faceY, faceW, faceH);
-
-  context.strokeStyle = drawingParameters.cjkFrameSecondLineColor;
-  if (cjkDesignFrameParameters["type"] === "han") {
-    horizontalLine /= 100;
-    verticalLine /= 100;
-    const centerX = emW / 2;
-    const centerY = emH / 2;
-    for (const y of [centerY + emH * horizontalLine, centerY - emH * horizontalLine]) {
-      strokeLine(context, 0, y, emW, y);
+export const drawCJKDesignFrameLayer = requireEditingGlyph(
+  glyphTranslate((model, controller, context, glyph, drawingParameters) => {
+    const cjkDesignFrameParameters =
+      model.fontController.fontLib['CJKDesignFrameSettings'];
+    if (!cjkDesignFrameParameters) {
+      return;
     }
-    for (const x of [centerX + emW * verticalLine, centerX - emW * verticalLine]) {
-      strokeLine(context, x, 0, x, emH);
-    }
-  } else {
-    // hangul
-    const stepX = faceW / verticalLine;
-    const stepY = faceH / horizontalLine;
-    for (let i = 1; i < horizontalLine; i++) {
-      const y = faceY + i * stepY;
-      strokeLine(context, faceX, y, faceX + faceW, y);
-    }
-    for (let i = 1; i < verticalLine; i++) {
-      const x = faceX + i * stepX;
-      strokeLine(context, x, faceY, x, faceY + faceH);
-    }
-  }
+    const [emW, emH] = cjkDesignFrameParameters['em_Dimension'];
+    const characterFace = cjkDesignFrameParameters['characterFace'] / 100;
+    const [shiftX, shiftY] = cjkDesignFrameParameters['shift'] || [0, -120];
+    const [overshootInside, overshootOutside] =
+      cjkDesignFrameParameters['overshoot'];
+    const [faceW, faceH] = [emW * characterFace, emH * characterFace];
+    const [faceX, faceY] = [(emW - faceW) / 2, (emH - faceH) / 2];
+    let horizontalLine = cjkDesignFrameParameters['horizontalLine'];
+    let verticalLine = cjkDesignFrameParameters['verticalLine'];
+    const [overshootInsideW, overshootInsideH] = [
+      faceW - overshootInside * 2,
+      faceH - overshootInside * 2,
+    ];
+    const [overshootOutsideW, overshootOutsideH] = [
+      faceW + overshootOutside * 2,
+      faceH + overshootOutside * 2,
+    ];
 
-  // overshoot rect
-  context.fillStyle = drawingParameters.cjkFrameOvershootColor;
-  context.beginPath();
-  context.rect(faceX - overshootOutside, faceY - overshootOutside, overshootOutsideW, overshootOutsideH);
-  context.rect(faceX + overshootInside, faceY + overshootInside, overshootInsideW, overshootInsideH);
-  context.fill("evenodd");
-}
-));
+    context.translate(shiftX, shiftY);
 
+    context.strokeStyle = drawingParameters.cjkFrameStrokeColor;
+    context.lineWidth = drawingParameters.cjkFrameLineWidth;
+    context.strokeRect(0, 0, emW, emH);
+    context.strokeRect(faceX, faceY, faceW, faceH);
+
+    context.strokeStyle = drawingParameters.cjkFrameSecondLineColor;
+    if (cjkDesignFrameParameters['type'] === 'han') {
+      horizontalLine /= 100;
+      verticalLine /= 100;
+      const centerX = emW / 2;
+      const centerY = emH / 2;
+      for (const y of [
+        centerY + emH * horizontalLine,
+        centerY - emH * horizontalLine,
+      ]) {
+        strokeLine(context, 0, y, emW, y);
+      }
+      for (const x of [
+        centerX + emW * verticalLine,
+        centerX - emW * verticalLine,
+      ]) {
+        strokeLine(context, x, 0, x, emH);
+      }
+    } else {
+      // hangul
+      const stepX = faceW / verticalLine;
+      const stepY = faceH / horizontalLine;
+      for (let i = 1; i < horizontalLine; i++) {
+        const y = faceY + i * stepY;
+        strokeLine(context, faceX, y, faceX + faceW, y);
+      }
+      for (let i = 1; i < verticalLine; i++) {
+        const x = faceX + i * stepX;
+        strokeLine(context, x, faceY, x, faceY + faceH);
+      }
+    }
+
+    // overshoot rect
+    context.fillStyle = drawingParameters.cjkFrameOvershootColor;
+    context.beginPath();
+    context.rect(
+      faceX - overshootOutside,
+      faceY - overshootOutside,
+      overshootOutsideW,
+      overshootOutsideH
+    );
+    context.rect(
+      faceX + overshootInside,
+      faceY + overshootInside,
+      overshootInsideW,
+      overshootInsideH
+    );
+    context.fill('evenodd');
+  })
+);
 
 export function drawUndefinedGlyphsLayer(model, controller) {
   if (!model.positionedLines) {
@@ -148,7 +177,7 @@ export function drawUndefinedGlyphsLayer(model, controller) {
   }
   const context = controller.context;
   context.fillStyle = controller.drawingParameters.undefinedFlyphFillColor;
-  context.textAlign = "center";
+  context.textAlign = 'center';
   const lineDistance = 1.2;
   for (const glyphLine of model.positionedLines) {
     for (const glyph of glyphLine.glyphs) {
@@ -161,13 +190,19 @@ export function drawUndefinedGlyphsLayer(model, controller) {
           context.scale(1, -1);
           context.fillText(glyph.glyphName, glyph.glyph.xAdvance / 2, 0);
           if (glyph.character) {
-            const uniStr = makeUPlusStringFromCodePoint(glyph.character.codePointAt(0));
-            context.fillText(uniStr, glyph.glyph.xAdvance / 2, -lineDistance * glyphNameFontSize);
+            const uniStr = makeUPlusStringFromCodePoint(
+              glyph.character.codePointAt(0)
+            );
+            context.fillText(
+              uniStr,
+              glyph.glyph.xAdvance / 2,
+              -lineDistance * glyphNameFontSize
+            );
             context.font = `${placeholderFontSize}px fontra-ui-regular, sans-serif`;
             context.fillText(
               glyph.character,
               glyph.glyph.xAdvance / 2,
-              -lineDistance * glyphNameFontSize - 0.4 * placeholderFontSize,
+              -lineDistance * glyphNameFontSize - 0.4 * placeholderFontSize
             );
           }
         });
@@ -176,50 +211,60 @@ export function drawUndefinedGlyphsLayer(model, controller) {
   }
 }
 
-
-export const drawSelectedBaselineLayer = requireEditingGlyph(glyphTranslate(
-(model, controller, context, glyph, drawingParameters) => {
-  context.strokeStyle = drawingParameters.sidebearingBarColor;
-  context.lineWidth = drawingParameters.pathLineWidth;
-  strokeLine(context, 0, 0, glyph.xAdvance, 0);
-}
-));
-
-
-export const drawSidebearingsLayer = requireEditingGlyph(glyphTranslate(
-(model, controller, context, glyph, drawingParameters) => {
-  context.strokeStyle = drawingParameters.sidebearingBarColor;
-  context.lineWidth = drawingParameters.pathLineWidth;
-  const extent = drawingParameters.sidebearingBarExtent;
-  strokeLine(context, 0, -extent, 0, extent);
-  strokeLine(context, glyph.xAdvance, -extent, glyph.xAdvance, extent);
-  if (extent < glyph.xAdvance / 2) {
-    strokeLine(context, 0, 0, extent, 0);
-    strokeLine(context, glyph.xAdvance, 0, glyph.xAdvance - extent, 0);
-  } else {
+export const drawSelectedBaselineLayer = requireEditingGlyph(
+  glyphTranslate((model, controller, context, glyph, drawingParameters) => {
+    context.strokeStyle = drawingParameters.sidebearingBarColor;
+    context.lineWidth = drawingParameters.pathLineWidth;
     strokeLine(context, 0, 0, glyph.xAdvance, 0);
-  }
-}
-));
+  })
+);
 
+export const drawSidebearingsLayer = requireEditingGlyph(
+  glyphTranslate((model, controller, context, glyph, drawingParameters) => {
+    context.strokeStyle = drawingParameters.sidebearingBarColor;
+    context.lineWidth = drawingParameters.pathLineWidth;
+    const extent = drawingParameters.sidebearingBarExtent;
+    strokeLine(context, 0, -extent, 0, extent);
+    strokeLine(context, glyph.xAdvance, -extent, glyph.xAdvance, extent);
+    if (extent < glyph.xAdvance / 2) {
+      strokeLine(context, 0, 0, extent, 0);
+      strokeLine(context, glyph.xAdvance, 0, glyph.xAdvance - extent, 0);
+    } else {
+      strokeLine(context, 0, 0, glyph.xAdvance, 0);
+    }
+  })
+);
 
 export const drawHoveredEmptyGlyphLayer = requireHoveredGlyph(
-(model, controller) => {
-  _drawSelectedEmptyGlyphLayer(model, controller, model.hoveredGlyph, "hoveredEmptyGlyphColor");
-}
+  (model, controller) => {
+    _drawSelectedEmptyGlyphLayer(
+      model,
+      controller,
+      model.hoveredGlyph,
+      'hoveredEmptyGlyphColor'
+    );
+  }
 );
-
 
 export const drawSelectedEmptyGlyphLayer = requireSelectedGlyph(
-(model, controller) => {
-  _drawSelectedEmptyGlyphLayer(model, controller, model.selectedGlyph, "selectedEmptyGlyphColor");
-}
+  (model, controller) => {
+    _drawSelectedEmptyGlyphLayer(
+      model,
+      controller,
+      model.selectedGlyph,
+      'selectedEmptyGlyphColor'
+    );
+  }
 );
 
-
-function _drawSelectedEmptyGlyphLayer(model, controller, selectedGlyph, emptyGlyphColorName) {
+function _drawSelectedEmptyGlyphLayer(
+  model,
+  controller,
+  selectedGlyph,
+  emptyGlyphColorName
+) {
   const context = controller.context;
-  const [lineIndex, glyphIndex] = selectedGlyph.split("/");
+  const [lineIndex, glyphIndex] = selectedGlyph.split('/');
   const positionedGlyph = model.positionedLines[lineIndex].glyphs[glyphIndex];
 
   if (!positionedGlyph.isEmpty) {
@@ -227,38 +272,55 @@ function _drawSelectedEmptyGlyphLayer(model, controller, selectedGlyph, emptyGly
   }
   const box = positionedGlyph.bounds;
   const fillColor = controller.drawingParameters[emptyGlyphColorName];
-  if (fillColor[0] === "#" && fillColor.length === 7) {
+  if (fillColor[0] === '#' && fillColor.length === 7) {
     const gradient = context.createLinearGradient(0, box.yMin, 0, box.yMax);
-    gradient.addColorStop(0.00, fillColor + "00");
-    gradient.addColorStop(0.20, fillColor + "DD");
-    gradient.addColorStop(0.50, fillColor + "FF");
-    gradient.addColorStop(0.80, fillColor + "DD");
-    gradient.addColorStop(1.00, fillColor + "00");
+    gradient.addColorStop(0.0, fillColor + '00');
+    gradient.addColorStop(0.2, fillColor + 'DD');
+    gradient.addColorStop(0.5, fillColor + 'FF');
+    gradient.addColorStop(0.8, fillColor + 'DD');
+    gradient.addColorStop(1.0, fillColor + '00');
     context.fillStyle = gradient;
   } else {
     context.fillStyle = fillColor;
   }
-  context.fillRect(box.xMin, box.yMin, box.xMax - box.xMin, box.yMax - box.yMin);
+  context.fillRect(
+    box.xMin,
+    box.yMin,
+    box.xMax - box.xMin,
+    box.yMax - box.yMin
+  );
 }
-
 
 export const drawHoveredGlyphLayer = requireHoveredGlyph(
-(model, controller) => {
-  _drawSelectedGlyphLayer(model, controller, model.hoveredGlyph, "hoveredGlyphStrokeColor");
-}
+  (model, controller) => {
+    _drawSelectedGlyphLayer(
+      model,
+      controller,
+      model.hoveredGlyph,
+      'hoveredGlyphStrokeColor'
+    );
+  }
 );
-
 
 export const drawSelectedGlyphLayer = requireSelectedGlyph(
-(model, controller) => {
-  _drawSelectedGlyphLayer(model, controller, model.selectedGlyph, "selectedGlyphStrokeColor");
-}
+  (model, controller) => {
+    _drawSelectedGlyphLayer(
+      model,
+      controller,
+      model.selectedGlyph,
+      'selectedGlyphStrokeColor'
+    );
+  }
 );
 
-
-function _drawSelectedGlyphLayer(model, controller, selectedGlyph, strokeColorName) {
+function _drawSelectedGlyphLayer(
+  model,
+  controller,
+  selectedGlyph,
+  strokeColorName
+) {
   const context = controller.context;
-  const [lineIndex, glyphIndex] = selectedGlyph.split("/");
+  const [lineIndex, glyphIndex] = selectedGlyph.split('/');
   const positionedGlyph = model.positionedLines[lineIndex].glyphs[glyphIndex];
 
   if (positionedGlyph.isEmpty) {
@@ -271,130 +333,145 @@ function _drawSelectedGlyphLayer(model, controller, selectedGlyph, strokeColorNa
     10 * controller.onePixelUnit,
     3 * controller.onePixelUnit,
     controller.drawingParameters[strokeColorName],
-    controller.drawingParameters.glyphFillColor,
-  )
+    controller.drawingParameters.glyphFillColor
+  );
 }
 
+export const drawPathFillLayer = requireEditingGlyph(
+  glyphTranslate((model, controller, context, glyph, drawingParameters) => {
+    context.fillStyle = drawingParameters.pathFillColor;
+    context.fill(glyph.flattenedPath2d);
+  })
+);
 
-export const drawPathFillLayer = requireEditingGlyph(glyphTranslate(
-(model, controller, context, glyph, drawingParameters) => {
-  context.fillStyle = drawingParameters.pathFillColor;
-  context.fill(glyph.flattenedPath2d);
-}
-));
+export const drawPathStrokeLayer = requireEditingGlyph(
+  glyphTranslate((model, controller, context, glyph, drawingParameters) => {
+    context.lineJoin = 'round';
+    context.lineWidth = drawingParameters.pathLineWidth;
+    context.strokeStyle = drawingParameters.pathStrokeColor;
+    context.stroke(glyph.flattenedPath2d);
+  })
+);
 
+export const drawGhostPathLayer = requireEditingGlyph(
+  glyphTranslate((model, controller, context, glyph, drawingParameters) => {
+    if (!model.ghostPath) {
+      return;
+    }
+    context.lineJoin = 'round';
+    context.lineWidth = drawingParameters.pathLineWidth;
+    context.strokeStyle = drawingParameters.ghostPathStrokeColor;
+    context.stroke(model.ghostPath);
+  })
+);
 
-export const drawPathStrokeLayer = requireEditingGlyph(glyphTranslate(
-(model, controller, context, glyph, drawingParameters) => {
-  context.lineJoin = "round";
-  context.lineWidth = drawingParameters.pathLineWidth;
-  context.strokeStyle = drawingParameters.pathStrokeColor;
-  context.stroke(glyph.flattenedPath2d);
-}
-));
-
-
-export const drawGhostPathLayer = requireEditingGlyph(glyphTranslate(
-(model, controller, context, glyph, drawingParameters) => {
-  if (!model.ghostPath) {
-    return;
-  }
-  context.lineJoin = "round";
-  context.lineWidth = drawingParameters.pathLineWidth;
-  context.strokeStyle = drawingParameters.ghostPathStrokeColor;
-  context.stroke(model.ghostPath);
-}
-));
-
-
-export const drawHandlesLayer = requireEditingGlyph(glyphTranslate(
-(model, controller, context, glyph, drawingParameters) => {
-  context.strokeStyle = drawingParameters.handleColor;
-  context.lineWidth = drawingParameters.handleLineWidth;
-  for (const [pt1, pt2] of glyph.path.iterHandles()) {
-    strokeLine(context, pt1.x, pt1.y, pt2.x, pt2.y);
-  }
-}
-));
-
+export const drawHandlesLayer = requireEditingGlyph(
+  glyphTranslate((model, controller, context, glyph, drawingParameters) => {
+    context.strokeStyle = drawingParameters.handleColor;
+    context.lineWidth = drawingParameters.handleLineWidth;
+    for (const [pt1, pt2] of glyph.path.iterHandles()) {
+      strokeLine(context, pt1.x, pt1.y, pt2.x, pt2.y);
+    }
+  })
+);
 
 const START_POINT_ARC_GAP_ANGLE = 0.25 * Math.PI;
 
-
-export const drawStartPointsLayer = requireEditingGlyph(glyphTranslate(
-(model, controller, context, glyph, drawingParameters) => {
-  context.strokeStyle = drawingParameters.startPointIndicatorColor;
-  context.lineWidth = drawingParameters.startPointIndicatorLineWidth;
-  const radius = drawingParameters.startPointIndicatorRadius;
-  let startPointIndex = 0;
-  for (const contourInfo of glyph.path.contourInfo) {
-    const startPoint = glyph.path.getPoint(startPointIndex);
-    let angle;
-    if (startPointIndex < contourInfo.endPoint) {
-      const nextPoint = glyph.path.getPoint(startPointIndex + 1);
-      const direction = subVectors(nextPoint, startPoint);
-      angle = Math.atan2(direction.y, direction.x);
+export const drawStartPointsLayer = requireEditingGlyph(
+  glyphTranslate((model, controller, context, glyph, drawingParameters) => {
+    context.strokeStyle = drawingParameters.startPointIndicatorColor;
+    context.lineWidth = drawingParameters.startPointIndicatorLineWidth;
+    const radius = drawingParameters.startPointIndicatorRadius;
+    let startPointIndex = 0;
+    for (const contourInfo of glyph.path.contourInfo) {
+      const startPoint = glyph.path.getPoint(startPointIndex);
+      let angle;
+      if (startPointIndex < contourInfo.endPoint) {
+        const nextPoint = glyph.path.getPoint(startPointIndex + 1);
+        const direction = subVectors(nextPoint, startPoint);
+        angle = Math.atan2(direction.y, direction.x);
+      }
+      let startAngle = 0;
+      let endAngle = 2 * Math.PI;
+      if (angle !== undefined) {
+        startAngle += angle + START_POINT_ARC_GAP_ANGLE;
+        endAngle += angle - START_POINT_ARC_GAP_ANGLE;
+      }
+      context.beginPath();
+      context.arc(
+        startPoint.x,
+        startPoint.y,
+        radius,
+        startAngle,
+        endAngle,
+        false
+      );
+      context.stroke();
+      startPointIndex = contourInfo.endPoint + 1;
     }
-    let startAngle = 0;
-    let endAngle = 2 * Math.PI;
-    if (angle !== undefined) {
-      startAngle += angle + START_POINT_ARC_GAP_ANGLE;
-      endAngle += angle - START_POINT_ARC_GAP_ANGLE;
+  })
+);
+
+export const drawNodesLayer = requireEditingGlyph(
+  glyphTranslate((model, controller, context, glyph, drawingParameters) => {
+    const cornerNodeSize = drawingParameters.cornerNodeSize;
+    const smoothNodeSize = drawingParameters.smoothNodeSize;
+    const handleNodeSize = drawingParameters.handleNodeSize;
+
+    context.fillStyle = drawingParameters.nodeFillColor;
+    for (const pt of glyph.path.iterPoints()) {
+      fillNode(context, pt, cornerNodeSize, smoothNodeSize, handleNodeSize);
     }
-    context.beginPath();
-    context.arc(startPoint.x, startPoint.y, radius, startAngle, endAngle, false);
-    context.stroke();
-    startPointIndex = contourInfo.endPoint + 1;
-  }
-}
-));
+  })
+);
 
-
-export const drawNodesLayer = requireEditingGlyph(glyphTranslate(
-(model, controller, context, glyph, drawingParameters) => {
-  const cornerNodeSize = drawingParameters.cornerNodeSize;
-  const smoothNodeSize = drawingParameters.smoothNodeSize;
-  const handleNodeSize = drawingParameters.handleNodeSize;
-
-  context.fillStyle = drawingParameters.nodeFillColor;
-  for (const pt of glyph.path.iterPoints()) {
-    fillNode(context, pt, cornerNodeSize, smoothNodeSize, handleNodeSize);
-  }
-}
-));
-
-
-export const drawComponentSelectionLayer = requireEditingGlyph(glyphTranslate(
-  (model, controller, context, glyph, drawingParameters) => {
-    const isHoverSelected = model.selection?.size && isSuperset(model.selection, model.hoverSelection);
-    const {"component": hoveredComponentIndices} = parseSelection(model.hoverSelection);
+export const drawComponentSelectionLayer = requireEditingGlyph(
+  glyphTranslate((model, controller, context, glyph, drawingParameters) => {
+    const isHoverSelected =
+      model.selection?.size &&
+      isSuperset(model.selection, model.hoverSelection);
+    const { component: hoveredComponentIndices } = parseSelection(
+      model.hoverSelection
+    );
     const hoveredComponentIndex = hoveredComponentIndices?.[0];
-    const combinedSelection = lenientUnion(model.selection, model.hoverSelection);
-    const {"component": combinedComponentIndices} = parseSelection(combinedSelection);
+    const combinedSelection = lenientUnion(
+      model.selection,
+      model.hoverSelection
+    );
+    const { component: combinedComponentIndices } =
+      parseSelection(combinedSelection);
 
-    const hoveredComponentStrokeColor = drawingParameters.hoveredComponentStrokeColor;
-    const selectedComponentStrokeColor = drawingParameters.selectedComponentStrokeColor;
-    const hoveredComponentLineWidth = drawingParameters.hoveredComponentLineWidth;
-    const selectedComponentLineWidth = drawingParameters.selectedComponentLineWidth;
+    const hoveredComponentStrokeColor =
+      drawingParameters.hoveredComponentStrokeColor;
+    const selectedComponentStrokeColor =
+      drawingParameters.selectedComponentStrokeColor;
+    const hoveredComponentLineWidth =
+      drawingParameters.hoveredComponentLineWidth;
+    const selectedComponentLineWidth =
+      drawingParameters.selectedComponentLineWidth;
 
     for (const componentIndex of combinedComponentIndices || []) {
-      const drawSelectionFill = isHoverSelected || componentIndex !== hoveredComponentIndex;
+      const drawSelectionFill =
+        isHoverSelected || componentIndex !== hoveredComponentIndex;
       const componentPath = glyph.components[componentIndex].path2d;
       context.save();
-      context.lineJoin = "round";
-      context.lineWidth = drawSelectionFill ? selectedComponentLineWidth : hoveredComponentLineWidth;
-      context.strokeStyle = drawSelectionFill ? selectedComponentStrokeColor : hoveredComponentStrokeColor;
+      context.lineJoin = 'round';
+      context.lineWidth = drawSelectionFill
+        ? selectedComponentLineWidth
+        : hoveredComponentLineWidth;
+      context.strokeStyle = drawSelectionFill
+        ? selectedComponentStrokeColor
+        : hoveredComponentStrokeColor;
       context.stroke(componentPath);
       context.restore();
     }
-  }
-));
+  })
+);
 
-
-export const drawPathSelectionLayer = requireEditingGlyph(glyphTranslate(
-  (model, controller, context, glyph, drawingParameters) => {
-    const {"point": hoveredPointIndices} = parseSelection(model.hoverSelection);
-    const {"point": selectedPointIndices} = parseSelection(model.selection);
+export const drawPathSelectionLayer = requireEditingGlyph(
+  glyphTranslate((model, controller, context, glyph, drawingParameters) => {
+    const { point: hoveredPointIndices } = parseSelection(model.hoverSelection);
+    const { point: selectedPointIndices } = parseSelection(model.selection);
 
     const cornerNodeSize = drawingParameters.cornerNodeSize;
     const smoothNodeSize = drawingParameters.smoothNodeSize;
@@ -402,7 +479,7 @@ export const drawPathSelectionLayer = requireEditingGlyph(glyphTranslate(
 
     context.strokeStyle = drawingParameters.hoveredNodeStrokeColor;
     context.lineWidth = drawingParameters.hoveredNodeLineWidth;
-    const hoverStrokeOffset = 4 * controller.onePixelUnit
+    const hoverStrokeOffset = 4 * controller.onePixelUnit;
     context.fillStyle = drawingParameters.selectedNodeFillColor;
 
     for (const pointIndex of hoveredPointIndices || []) {
@@ -411,7 +488,13 @@ export const drawPathSelectionLayer = requireEditingGlyph(glyphTranslate(
         // Selection is not valid
         continue;
       }
-      strokeNode(context, pt, cornerNodeSize + hoverStrokeOffset, smoothNodeSize + hoverStrokeOffset, handleNodeSize + hoverStrokeOffset);
+      strokeNode(
+        context,
+        pt,
+        cornerNodeSize + hoverStrokeOffset,
+        smoothNodeSize + hoverStrokeOffset,
+        handleNodeSize + hoverStrokeOffset
+      );
     }
     for (const pointIndex of selectedPointIndices || []) {
       const pt = glyph.path.getPoint(pointIndex);
@@ -421,9 +504,8 @@ export const drawPathSelectionLayer = requireEditingGlyph(glyphTranslate(
       }
       fillNode(context, pt, cornerNodeSize, smoothNodeSize, handleNodeSize);
     }
-  }
-));
-
+  })
+);
 
 export function drawRectangleSelectionLayer(model, controller) {
   if (model.selectionRect === undefined) {
@@ -436,13 +518,12 @@ export function drawRectangleSelectionLayer(model, controller) {
   const w = selRect.xMax - x;
   const h = selRect.yMax - y;
   context.lineWidth = controller.drawingParameters.rectSelectLineWidth;
-  context.strokeStyle = "#000";
+  context.strokeStyle = '#000';
   context.strokeRect(x, y, w, h);
-  context.strokeStyle = "#FFF";
+  context.strokeStyle = '#FFF';
   context.setLineDash(controller.drawingParameters.rectSelectLineDash);
   context.strokeRect(x, y, w, h);
 }
-
 
 function fillNode(context, pt, cornerNodeSize, smoothNodeSize, handleNodeSize) {
   if (!pt.type && !pt.smooth) {
@@ -454,8 +535,13 @@ function fillNode(context, pt, cornerNodeSize, smoothNodeSize, handleNodeSize) {
   }
 }
 
-
-function strokeNode(context, pt, cornerNodeSize, smoothNodeSize, handleNodeSize) {
+function strokeNode(
+  context,
+  pt,
+  cornerNodeSize,
+  smoothNodeSize,
+  handleNodeSize
+) {
   if (!pt.type && !pt.smooth) {
     strokeSquareNode(context, pt, cornerNodeSize);
   } else if (!pt.type) {
@@ -464,7 +550,6 @@ function strokeNode(context, pt, cornerNodeSize, smoothNodeSize, handleNodeSize)
     strokeRoundNode(context, pt, handleNodeSize);
   }
 }
-
 
 function fillSquareNode(context, pt, nodeSize) {
   context.fillRect(
@@ -481,7 +566,6 @@ function fillRoundNode(context, pt, nodeSize) {
   context.fill();
 }
 
-
 function strokeSquareNode(context, pt, nodeSize) {
   context.strokeRect(
     pt.x - nodeSize / 2,
@@ -491,13 +575,11 @@ function strokeSquareNode(context, pt, nodeSize) {
   );
 }
 
-
 function strokeRoundNode(context, pt, nodeSize) {
   context.beginPath();
   context.arc(pt.x, pt.y, nodeSize / 2, 0, 2 * Math.PI, false);
   context.stroke();
 }
-
 
 function strokeLine(context, x1, y1, x2, y2) {
   context.beginPath();
@@ -506,11 +588,9 @@ function strokeLine(context, x1, y1, x2, y2) {
   context.stroke();
 }
 
-
 function fillPolygon(context, points, isClosed = true) {
   context.fill(polygonPath(points));
 }
-
 
 function polygonPath(points, isClosed = true) {
   const path = new Path2D();
@@ -526,21 +606,26 @@ function polygonPath(points, isClosed = true) {
   return path;
 }
 
-
-function drawWithDoubleStroke(context, path, outerLineWidth, innerLineWidth, strokeStyle, fillStyle) {
-  context.lineJoin = "round";
+function drawWithDoubleStroke(
+  context,
+  path,
+  outerLineWidth,
+  innerLineWidth,
+  strokeStyle,
+  fillStyle
+) {
+  context.lineJoin = 'round';
   context.lineWidth = outerLineWidth;
   context.strokeStyle = strokeStyle;
   context.stroke(path);
   context.lineWidth = innerLineWidth;
-  context.strokeStyle = "black";
-  context.globalCompositeOperation = "destination-out"
+  context.strokeStyle = 'black';
+  context.globalCompositeOperation = 'destination-out';
   context.stroke(path);
-  context.globalCompositeOperation = "source-over"
+  context.globalCompositeOperation = 'source-over';
   context.fillStyle = fillStyle;
   context.fill(path);
 }
-
 
 function lenientUnion(setA, setB) {
   if (!setA) {

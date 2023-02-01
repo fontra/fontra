@@ -1,8 +1,6 @@
-import { withSavedState } from "./utils.js";
-
+import { withSavedState } from './utils.js';
 
 export class SceneView {
-
   constructor(model, drawFunc) {
     this.model = model;
     this.drawFunc = drawFunc;
@@ -14,7 +12,7 @@ export class SceneView {
     if (!this.visible) {
       return;
     }
-    this.subviews.forEach(view => view.draw(canvasController));
+    this.subviews.forEach((view) => view.draw(canvasController));
     if (this.drawFunc === undefined) {
       return;
     }
@@ -22,5 +20,4 @@ export class SceneView {
       this.drawFunc(this.model, canvasController);
     });
   }
-
 }

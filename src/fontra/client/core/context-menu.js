@@ -1,38 +1,37 @@
-import { reversed } from "./utils.js";
-
+import { reversed } from './utils.js';
 
 export class ContextMenu {
-
   constructor(elementID, menuItems) {
     this.element = document.querySelector(`#${elementID}`);
 
-    this.element.classList.add("visible");
+    this.element.classList.add('visible');
     this.element.focus();
-    this.element.onkeydown = event => this.handleKeyDown(event);
+    this.element.onkeydown = (event) => this.handleKeyDown(event);
 
-    this.element.innerHTML = "";
-    this.element.oncontextmenu = event => event.preventDefault();  // No context menu on our context menu please
+    this.element.innerHTML = '';
+    this.element.oncontextmenu = (event) => event.preventDefault(); // No context menu on our context menu please
 
     for (const item of menuItems) {
-      const el = document.createElement("div");
-      if (item === "-") {
-        const dividerElement = document.createElement("hr");
-        dividerElement.className = "context-menu-item-divider";
+      const el = document.createElement('div');
+      if (item === '-') {
+        const dividerElement = document.createElement('hr');
+        dividerElement.className = 'context-menu-item-divider';
         this.element.appendChild(dividerElement);
       } else {
-        const itemElement = document.createElement("div");
-        itemElement.classList.add("context-menu-item");
-        itemElement.classList.toggle("enabled", !item.disabled);
+        const itemElement = document.createElement('div');
+        itemElement.classList.add('context-menu-item');
+        itemElement.classList.toggle('enabled', !item.disabled);
         itemElement.innerText = item.title;
         if (!item.disabled) {
-          itemElement.onmouseenter = event => this.selectItem(itemElement);
-          itemElement.onmousemove = event => {
-            if (!itemElement.classList.contains("selected")) {
+          itemElement.onmouseenter = (event) => this.selectItem(itemElement);
+          itemElement.onmousemove = (event) => {
+            if (!itemElement.classList.contains('selected')) {
               this.selectItem(itemElement);
             }
-          }
-          itemElement.onmouseleave = event => itemElement.classList.remove("selected");
-          itemElement.onclick = event => {
+          };
+          itemElement.onmouseleave = (event) =>
+            itemElement.classList.remove('selected');
+          itemElement.onclick = (event) => {
             if (item.callback) {
               item.callback(event);
             }
@@ -44,40 +43,45 @@ export class ContextMenu {
     }
 
     const container = this.element.parentElement;
-    let {clientX: mouseX, clientY: mouseY} = event;
+    let { clientX: mouseX, clientY: mouseY } = event;
     mouseX -= container.offsetLeft;
     mouseY -= container.offsetTop;
 
-    const [normalizedX, normalizedY] = normalizedPosition(container, this.element, mouseX, mouseY);
+    const [normalizedX, normalizedY] = normalizedPosition(
+      container,
+      this.element,
+      mouseX,
+      mouseY
+    );
 
     this.element.style.top = `${normalizedY - 1}px`;
     this.element.style.left = `${normalizedX + 1}px`;
   }
 
   dismiss() {
-    this.element.classList.remove("visible");
+    this.element.classList.remove('visible');
   }
 
   selectItem(itemElement) {
     const selectedItem = this.findSelectedItem();
     if (selectedItem && selectedItem !== itemElement) {
-      selectedItem.classList.remove("selected");
+      selectedItem.classList.remove('selected');
     }
-    itemElement.classList.add("selected");
+    itemElement.classList.add('selected');
   }
 
   handleKeyDown(event) {
-    switch(event.key) {
-      case "Escape":
+    switch (event.key) {
+      case 'Escape':
         this.dismiss();
         break;
-      case "ArrowDown":
+      case 'ArrowDown':
         this.selectPrevNext(true);
         break;
-      case "ArrowUp":
+      case 'ArrowUp':
         this.selectPrevNext(false);
         break;
-      case "Enter":
+      case 'Enter':
         const selectedItem = this.findSelectedItem();
         if (selectedItem) {
           selectedItem.onclick(event);
@@ -89,7 +93,7 @@ export class ContextMenu {
   findSelectedItem() {
     let selectedItem;
     for (const item of this.element.children) {
-      if (item.classList.contains("selected")) {
+      if (item.classList.contains('selected')) {
         return item;
       }
     }
@@ -106,9 +110,9 @@ export class ContextMenu {
         sibling = selectedChild.previousElementSibling;
       }
       while (sibling) {
-        if (sibling.classList.contains("enabled")) {
-          sibling.classList.add("selected");
-          selectedChild.classList.remove("selected");
+        if (sibling.classList.contains('enabled')) {
+          sibling.classList.add('selected');
+          selectedChild.classList.remove('selected');
           break;
         }
         if (isNext) {
@@ -118,41 +122,41 @@ export class ContextMenu {
         }
       }
     } else {
-      const f = isNext ? a => a : reversed;
+      const f = isNext ? (a) => a : reversed;
       for (const item of f(this.element.children)) {
-        if (item.classList.contains("enabled")) {
+        if (item.classList.contains('enabled')) {
           this.selectItem(item);
           break;
         }
       }
     }
   }
-
 }
 
-
 function normalizedPosition(container, contextMenu, mouseX, mouseY) {
-  const {
-    left: containerOffsetX,
-    top: containerOffsetY,
-  } = container.getBoundingClientRect();
+  const { left: containerOffsetX, top: containerOffsetY } =
+    container.getBoundingClientRect();
 
   const containerX = mouseX - containerOffsetX;
   const containerY = mouseY - containerOffsetY;
 
-  const outOfBoundsOnX = containerX + contextMenu.clientWidth > container.clientWidth;
+  const outOfBoundsOnX =
+    containerX + contextMenu.clientWidth > container.clientWidth;
 
-  const outOfBoundsOnY = containerY + contextMenu.clientHeight > container.clientHeight;
+  const outOfBoundsOnY =
+    containerY + contextMenu.clientHeight > container.clientHeight;
 
   let normalizedX = mouseX;
   let normalizedY = mouseY;
 
   if (outOfBoundsOnX) {
-    normalizedX = containerOffsetX + container.clientWidth - contextMenu.clientWidth;
+    normalizedX =
+      containerOffsetX + container.clientWidth - contextMenu.clientWidth;
   }
 
   if (outOfBoundsOnY) {
-    normalizedY = containerOffsetY + container.clientHeight - contextMenu.clientHeight;
+    normalizedY =
+      containerOffsetY + container.clientHeight - contextMenu.clientHeight;
   }
 
   return [normalizedX, normalizedY];

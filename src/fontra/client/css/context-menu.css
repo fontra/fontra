@@ -1,5 +1,5 @@
 :root {
-  --context-menu-background-color-light: #F0F0F0;
+  --context-menu-background-color-light: #f0f0f0;
   --context-menu-background-color-dark: #333;
 
   --context-menu-foreground-color-light: black;
@@ -15,36 +15,48 @@
 :root {
   --context-menu-background-color: var(--context-menu-background-color-light);
   --context-menu-foreground-color: var(--context-menu-foreground-color-light);
-  --context-menu-background-active-color: var(--context-menu-background-active-color-light);
-  --context-menu-foreground-active-color: var(--context-menu-foreground-active-color-light);
+  --context-menu-background-active-color: var(
+    --context-menu-background-active-color-light
+  );
+  --context-menu-foreground-active-color: var(
+    --context-menu-foreground-active-color-light
+  );
 }
 
 :root.dark-theme {
   --context-menu-background-color: var(--context-menu-background-color-dark);
   --context-menu-foreground-color: var(--context-menu-foreground-color-dark);
-  --context-menu-background-active-color: var(--context-menu-background-active-color-dark);
-  --context-menu-foreground-active-color: var(--context-menu-foreground-active-color-dark);
+  --context-menu-background-active-color: var(
+    --context-menu-background-active-color-dark
+  );
+  --context-menu-foreground-active-color: var(
+    --context-menu-foreground-active-color-dark
+  );
 }
 
-
 @media (prefers-color-scheme: dark) {
-
   :root {
     --context-menu-background-color: var(--context-menu-background-color-dark);
     --context-menu-foreground-color: var(--context-menu-foreground-color-dark);
-    --context-menu-background-active-color: var(--context-menu-background-active-color-dark);
-    --context-menu-foreground-active-color: var(--context-menu-foreground-active-color-dark);
+    --context-menu-background-active-color: var(
+      --context-menu-background-active-color-dark
+    );
+    --context-menu-foreground-active-color: var(
+      --context-menu-foreground-active-color-dark
+    );
   }
 
   :root.light-theme {
     --context-menu-background-color: var(--context-menu-background-color-light);
     --context-menu-foreground-color: var(--context-menu-foreground-color-light);
-    --context-menu-background-active-color: var(--context-menu-background-active-color-light);
-    --context-menu-foreground-active-color: var(--context-menu-foreground-active-color-light);
+    --context-menu-background-active-color: var(
+      --context-menu-background-active-color-light
+    );
+    --context-menu-foreground-active-color: var(
+      --context-menu-foreground-active-color-light
+    );
   }
-
 }
-
 
 #context-menu {
   display: none;
@@ -75,7 +87,7 @@
 
 .context-menu-item {
   padding: 0.2em 1.5em 0.2em 1em; /* top, right, bottom, left */
-  color: #808080A0;
+  color: #808080a0;
 }
 
 .context-menu-item.enabled {

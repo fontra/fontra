@@ -1,5 +1,4 @@
-import { makeUPlusStringFromCodePoint } from "./utils.js";
-
+import { makeUPlusStringFromCodePoint } from './utils.js';
 
 //
 // A `characterMap` is an object with integer numbers representing unicode code
@@ -21,7 +20,6 @@ import { makeUPlusStringFromCodePoint } from "./utils.js";
 // matching counterpart (`glyphMap` and `characterMap` respectively) up-to-date.
 //
 
-
 export function makeGlyphMapFromCharacterMap(characterMap) {
   // Return a `glyphMap` constructed from `characterMap`
   const glyphMap = {};
@@ -36,7 +34,6 @@ export function makeGlyphMapFromCharacterMap(characterMap) {
   return glyphMap;
 }
 
-
 export function makeCharacterMapFromGlyphMap(glyphMap, strict = true) {
   // Return a `characterMap` constructed from `glyphMap`
   // If the `strict` flag is `true` (default), an Error is thrown when a code
@@ -45,10 +42,11 @@ export function makeCharacterMapFromGlyphMap(glyphMap, strict = true) {
   for (const [glyphName, unicodes] of Object.entries(glyphMap)) {
     for (const codePoint of unicodes) {
       if (codePoint in characterMap) {
-        const message = (
-          "invalid glyph map: duplicate code point " + 
-          `("${glyphName}", "${characterMap[codePoint]}", ${makeUPlusStringFromCodePoint(codePoint)})`
-        );
+        const message =
+          'invalid glyph map: duplicate code point ' +
+          `("${glyphName}", "${
+            characterMap[codePoint]
+          }", ${makeUPlusStringFromCodePoint(codePoint)})`;
         if (strict) {
           throw new Error(message);
         }
@@ -64,7 +62,6 @@ export function makeCharacterMapFromGlyphMap(glyphMap, strict = true) {
   }
   return characterMap;
 }
-
 
 export function getGlyphMapProxy(glyphMap, characterMap) {
   //
@@ -82,12 +79,12 @@ export function getGlyphMapProxy(glyphMap, characterMap) {
   const handler = {
     set(glyphMap, prop, value) {
       if (!Array.isArray(value)) {
-        throw new Error("value expected to be an array of code points");
+        throw new Error('value expected to be an array of code points');
       }
       const existingCodePoints = glyphMap[prop] || [];
       glyphMap[prop] = value;
-      existingCodePoints.forEach(codePoint => delete characterMap[codePoint]);
-      value.forEach(codePoint => characterMap[codePoint] = prop);
+      existingCodePoints.forEach((codePoint) => delete characterMap[codePoint]);
+      value.forEach((codePoint) => (characterMap[codePoint] = prop));
       return true;
     },
 
@@ -98,14 +95,13 @@ export function getGlyphMapProxy(glyphMap, characterMap) {
     deleteProperty(glyphMap, prop) {
       const existingCodePoints = glyphMap[prop] || [];
       delete glyphMap[prop];
-      existingCodePoints.forEach(codePoint => delete characterMap[codePoint]);
+      existingCodePoints.forEach((codePoint) => delete characterMap[codePoint]);
       return true;
-    }
-  }
+    },
+  };
 
   return new Proxy(glyphMap, handler);
 }
-
 
 export function getCharacterMapProxy(characterMap, glyphMap) {
   //
@@ -150,12 +146,11 @@ export function getCharacterMapProxy(characterMap, glyphMap) {
         }
       }
       return true;
-    }
-  }
+    },
+  };
 
   return new Proxy(characterMap, handler);
 }
-
 
 function removeReverseMapping(glyphMap, glyphName, codePoint) {
   //
@@ -173,7 +168,6 @@ function removeReverseMapping(glyphMap, glyphName, codePoint) {
   }
 }
 
-
 function arrayDiscardItem(array, item) {
   // Remove `item` from `array` if present
   const index = array.indexOf(item);
@@ -181,7 +175,6 @@ function arrayDiscardItem(array, item) {
     array.splice(index, 1);
   }
 }
-
 
 function arrayInsertSortedItem(array, item) {
   // Insert integer `item` into the sorted `array`, maintaining the sorted order

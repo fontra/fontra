@@ -1,17 +1,13 @@
 export class BaseTool {
-
   constructor(editor) {
     this.editor = editor;
     this.canvasController = editor.canvasController;
     this.sceneController = editor.sceneController;
     this.sceneModel = this.sceneController.sceneModel;
   }
-
 }
 
-
 const MINIMUM_DRAG_DISTANCE = 2;
-
 
 export async function shouldInitiateDrag(eventStream, initialEvent) {
   // drop events until the pointer moved a minimal distance

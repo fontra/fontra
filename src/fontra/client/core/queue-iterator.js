@@ -1,5 +1,4 @@
 export class QueueIterator {
-
   constructor(maxQueueSize = 10) {
     this._done = false;
     this._queue = [];
@@ -37,21 +36,20 @@ export class QueueIterator {
 
   next() {
     if (this._queue.length) {
-      return Promise.resolve({"value": this._queue.shift(), "done": false})
+      return Promise.resolve({ value: this._queue.shift(), done: false });
     } else if (this._done) {
-      return Promise.resolve({"done": true})
+      return Promise.resolve({ done: true });
     } else {
-      return new Promise(resolve => {
+      return new Promise((resolve) => {
         this._signal = () => {
           if (this._queue.length) {
-            resolve({"value": this._queue.shift(), "done": false});
+            resolve({ value: this._queue.shift(), done: false });
           } else {
-            resolve({"done": true})
+            resolve({ done: true });
           }
           this._signal = null;
-        }
+        };
       });
     }
   }
-
 }

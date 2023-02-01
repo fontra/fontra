@@ -10,30 +10,46 @@
 
   --landing-background-color: var(--landing-background-color-light);
   --landing-foreground-color: var(--landing-foreground-color-light);
-  --landing-project-item-hover-color: var(--landing-project-item-hover-color-light);
-  --landing-project-item-active-color: var(--landing-project-item-active-color-light);
+  --landing-project-item-hover-color: var(
+    --landing-project-item-hover-color-light
+  );
+  --landing-project-item-active-color: var(
+    --landing-project-item-active-color-light
+  );
 }
 
 :root.dark-theme {
   --landing-background-color: var(--landing-background-color-dark);
   --landing-foreground-color: var(--landing-foreground-color-dark);
-  --landing-project-item-hover-color: var(--landing-project-item-hover-color-dark);
-  --landing-project-item-active-color: var(--landing-project-item-active-color-dark);
+  --landing-project-item-hover-color: var(
+    --landing-project-item-hover-color-dark
+  );
+  --landing-project-item-active-color: var(
+    --landing-project-item-active-color-dark
+  );
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --landing-background-color: var(--landing-background-color-dark);
     --landing-foreground-color: var(--landing-foreground-color-dark);
-    --landing-project-item-hover-color: var(--landing-project-item-hover-color-dark);
-    --landing-project-item-active-color: var(--landing-project-item-active-color-dark);
+    --landing-project-item-hover-color: var(
+      --landing-project-item-hover-color-dark
+    );
+    --landing-project-item-active-color: var(
+      --landing-project-item-active-color-dark
+    );
   }
 
   :root.light-theme {
     --landing-background-color: var(--landing-background-color-light);
     --landing-foreground-color: var(--landing-foreground-color-light);
-    --landing-project-item-hover-color: var(--landing-project-item-hover-color-light);
-    --landing-project-item-active-color: var(--landing-project-item-active-color-light);
+    --landing-project-item-hover-color: var(
+      --landing-project-item-hover-color-light
+    );
+    --landing-project-item-active-color: var(
+      --landing-project-item-active-color-light
+    );
   }
 }
 

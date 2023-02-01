@@ -1,13 +1,10 @@
-import chai from "chai";
+import chai from 'chai';
 const expect = chai.expect;
 
+import { QueueIterator } from '../src/fontra/client/core/queue-iterator.js';
 
-import { QueueIterator } from "../src/fontra/client/core/queue-iterator.js";
-
-
-describe("QueueIterator Tests", () => {
-
-  it("immediate item, immediate done", async () => {
+describe('QueueIterator Tests', () => {
+  it('immediate item, immediate done', async () => {
     const queue = new QueueIterator();
     queue.put(111);
     queue.done();
@@ -18,7 +15,7 @@ describe("QueueIterator Tests", () => {
     expect(items).to.deep.equal([111]);
   });
 
-  it("immediate item, delayed done", async () => {
+  it('immediate item, delayed done', async () => {
     const queue = new QueueIterator();
     queue.put(111);
     setTimeout(() => {
@@ -31,7 +28,7 @@ describe("QueueIterator Tests", () => {
     expect(items).to.deep.equal([111]);
   });
 
-  it("delayed item, immediate done", async () => {
+  it('delayed item, immediate done', async () => {
     const queue = new QueueIterator();
     setTimeout(() => {
       queue.put(111);
@@ -44,7 +41,7 @@ describe("QueueIterator Tests", () => {
     expect(items).to.deep.equal([111]);
   });
 
-  it("delayed item, delayed done", async () => {
+  it('delayed item, delayed done', async () => {
     const queue = new QueueIterator();
     setTimeout(() => {
       queue.put(111);
@@ -59,7 +56,7 @@ describe("QueueIterator Tests", () => {
     expect(items).to.deep.equal([111]);
   });
 
-  it("multiple immediate items", async () => {
+  it('multiple immediate items', async () => {
     const queue = new QueueIterator();
     queue.put(111);
     queue.put(112);
@@ -72,7 +69,7 @@ describe("QueueIterator Tests", () => {
     expect(items).to.deep.equal([111, 112, 113]);
   });
 
-  it("multiple delayed items", async () => {
+  it('multiple delayed items', async () => {
     const queue = new QueueIterator();
     setTimeout(() => {
       queue.put(111);
@@ -87,7 +84,7 @@ describe("QueueIterator Tests", () => {
     expect(items).to.deep.equal([111, 112, 113]);
   });
 
-  it("multiple timed delayed items", async () => {
+  it('multiple timed delayed items', async () => {
     const queue = new QueueIterator();
     setTimeout(() => {
       queue.put(111);
@@ -108,16 +105,15 @@ describe("QueueIterator Tests", () => {
     expect(items).to.deep.equal([111, 112, 113]);
   });
 
-  it("queue full error", async () => {
+  it('queue full error', async () => {
     const queue = new QueueIterator(1);
     queue.put(111);
     expect(() => queue.put(112)).to.throw("can't put item: queue is full");
   });
 
-  it("queue done error", async () => {
+  it('queue done error', async () => {
     const queue = new QueueIterator(1);
     queue.done();
     expect(() => queue.put(112)).to.throw("can't put item: queue is done");
   });
-
 });

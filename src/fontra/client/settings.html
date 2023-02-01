@@ -1,75 +1,92 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta charset="utf-8"/>
-  <title>Fontra Settings</title>
-  <link href="/css/core.css" rel="stylesheet">
-  <style type="text/css">
+  <head>
+    <meta charset="utf-8" />
+    <title>Fontra Settings</title>
+    <link href="/css/core.css" rel="stylesheet" />
+    <style type="text/css">
+      body {
+        margin: 1em;
+        padding-left: 5em;
+      }
 
-body {
-  margin: 1em;
-  padding-left: 5em;
-}
+      body > div {
+        font-size: 1.1em;
+      }
 
-body > div {
-  font-size: 1.1em;
-}
+      h1 {
+        font-size: 1.5em;
+      }
 
-h1 {
-  font-size: 1.5em;
-}
+      h2 {
+        font-size: 1em;
+      }
 
-h2 {
-  font-size: 1em;
-}
+      #settings-theme {
+        display: grid;
+        grid-template-columns: min-content min-content;
+      }
+    </style>
+  </head>
+  <body>
+    <a href="/"
+      ><img src="/images/fontra-icon.svg" width="100" height="100"
+    /></a>
+    <div>
+      <h1>Fontra Settings</h1>
+      <h2>Theme</h2>
+      <div id="settings-theme">
+        <input
+          id="theme-automatic"
+          value="automatic"
+          onclick="themeSwitchCallback()"
+          name="theme-settings"
+          type="radio"
+          checked
+        />
+        <label for="theme-automatic">Automatic (use OS setting)</label>
 
-#settings-theme {
-  display: grid;
-  grid-template-columns: min-content min-content;  
-}
+        <input
+          id="theme-light"
+          value="light"
+          onclick="themeSwitchCallback()"
+          name="theme-settings"
+          type="radio"
+        />
+        <label for="theme-light">Light theme</label>
 
-  </style>
-
-</head>
-<body>
-  <a href="/"><img src="/images/fontra-icon.svg" width="100" height="100"></a>
-  <div>
-    <h1>Fontra Settings</h1>
-    <h2>Theme</h2>
-    <div id="settings-theme">
-
-      <input id="theme-automatic" value="automatic" onclick="themeSwitchCallback()" name="theme-settings" type="radio" checked/>
-      <label for="theme-automatic">Automatic (use OS setting)</label>
-
-      <input id="theme-light" value="light" onclick="themeSwitchCallback()" name="theme-settings" type="radio" />
-      <label for="theme-light">Light theme</label>
-
-      <input id="theme-dark" value="dark" onclick="themeSwitchCallback()" name="theme-settings" type="radio" />
-      <label for="theme-dark">Dark theme</label>
-
+        <input
+          id="theme-dark"
+          value="dark"
+          onclick="themeSwitchCallback()"
+          name="theme-settings"
+          type="radio"
+        />
+        <label for="theme-dark">Dark theme</label>
+      </div>
     </div>
-  </div>
-</body>
-<script type="module">
+  </body>
+  <script type="module">
+    import { THEME_KEY, themeSwitch } from './core/utils.js';
 
-import { THEME_KEY, themeSwitch } from "./core/utils.js";
+    function themeSwitchCallback() {
+      const themeValue = document.querySelector(
+        'input[name="theme-settings"]:checked'
+      ).value;
+      themeSwitch(themeValue);
+      localStorage.setItem(THEME_KEY, themeValue);
+    }
 
+    window.themeSwitchCallback = themeSwitchCallback;
 
-function themeSwitchCallback() {
-  const themeValue = document.querySelector('input[name="theme-settings"]:checked').value;
-  themeSwitch(themeValue)
-  localStorage.setItem(THEME_KEY, themeValue);
-}
-
-window.themeSwitchCallback = themeSwitchCallback;
-
-const themeValue = localStorage.getItem("fontra-theme");
-if (themeValue) {
-  for (const element of document.querySelectorAll('input[name="theme-settings"]')) {
-    element.checked = themeValue === element.value;
-  }
-  themeSwitch(themeValue);
-}
-
-</script>
+    const themeValue = localStorage.getItem('fontra-theme');
+    if (themeValue) {
+      for (const element of document.querySelectorAll(
+        'input[name="theme-settings"]'
+      )) {
+        element.checked = themeValue === element.value;
+      }
+      themeSwitch(themeValue);
+    }
+  </script>
 </html>

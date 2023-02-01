@@ -1,7 +1,6 @@
-import { loaderSpinner } from "/core/loader-spinner.js";
-import { getRemoteProxy } from "/core/remote.js";
-import { themeSwitchFromLocalStorage } from "/core/utils.js";
-
+import { loaderSpinner } from '/core/loader-spinner.js';
+import { getRemoteProxy } from '/core/remote.js';
+import { themeSwitchFromLocalStorage } from '/core/utils.js';
 
 export async function startupLandingPage(authenticateFunc) {
   themeSwitchFromLocalStorage();
@@ -11,19 +10,18 @@ export async function startupLandingPage(authenticateFunc) {
       return;
     }
   }
-  const projectList = await loaderSpinner(fetchJSON("/projectlist"));
-  const projectListContainer = document.querySelector("#project-list");
-  projectListContainer.classList.remove("hidden");
+  const projectList = await loaderSpinner(fetchJSON('/projectlist'));
+  const projectListContainer = document.querySelector('#project-list');
+  projectListContainer.classList.remove('hidden');
 
   for (const project of projectList) {
-    const projectElement = document.createElement("a")
-    projectElement.href = "/editor/-/" + project;
-    projectElement.className = "project-item";
+    const projectElement = document.createElement('a');
+    projectElement.href = '/editor/-/' + project;
+    projectElement.className = 'project-item';
     projectElement.append(project);
     projectListContainer.appendChild(projectElement);
   }
 }
-
 
 async function fetchJSON(url) {
   const response = await fetch(url);

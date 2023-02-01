@@ -1,18 +1,16 @@
-import { VarPackedPath } from "./var-path.js";
-
+import { VarPackedPath } from './var-path.js';
 
 export class VariableGlyph {
-
   static fromObject(obj) {
     const glyph = new VariableGlyph();
     glyph.name = obj.name;
     glyph.axes = obj.axes || [];
-    glyph.sources = obj.sources.map(source => Source.fromObject(source));
-    glyph.layers = obj.layers.map(layer => {
+    glyph.sources = obj.sources.map((source) => Source.fromObject(source));
+    glyph.layers = obj.layers.map((layer) => {
       return {
-        "name": layer.name,
-        "glyph": StaticGlyph.fromObject(layer.glyph),
-      }
+        name: layer.name,
+        glyph: StaticGlyph.fromObject(layer.glyph),
+      };
     });
     return glyph;
   }
@@ -34,12 +32,9 @@ export class VariableGlyph {
       }
     }
   }
-
 }
 
-
 class Source {
-
   static fromObject(obj) {
     const source = new Source();
     source.name = obj.name;
@@ -47,12 +42,9 @@ class Source {
     source.layerName = obj.layerName;
     return source;
   }
-
 }
 
-
 export class StaticGlyph {
-
   static fromObject(obj) {
     const source = new StaticGlyph();
     source.xAdvance = obj.xAdvance;
@@ -64,7 +56,6 @@ export class StaticGlyph {
       source.path = new VarPackedPath();
     }
     source.components = obj.components || [];
-    return source
+    return source;
   }
-
 }

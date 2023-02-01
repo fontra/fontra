@@ -1,4 +1,4 @@
-import { Transform } from "./transform.js";
+import { Transform } from './transform.js';
 import {
   VariationModel,
   locationToString,
@@ -6,12 +6,10 @@ import {
   mapBackward,
   normalizeLocation,
   piecewiseLinearMap,
-} from "./var-model.js";
-import { VarPackedPath } from "./var-path.js";
-
+} from './var-model.js';
+import { VarPackedPath } from './var-path.js';
 
 export class VariableGlyphController {
-
   constructor(glyph, globalAxes) {
     this.glyph = glyph;
     this.globalAxes = globalAxes;
@@ -55,11 +53,11 @@ export class VariableGlyphController {
       // Apply user-facing avar mapping: we need "designspace" coordinates here
       const mapFunc = makeAxisMapFunc(globalAxis);
       globalAxis = {
-        "name": globalAxis.name,
-        "minValue": mapFunc(globalAxis.minValue),
-        "defaultValue": mapFunc(globalAxis.defaultValue),
-        "maxValue": mapFunc(globalAxis.maxValue),
-      }
+        name: globalAxis.name,
+        minValue: mapFunc(globalAxis.minValue),
+        defaultValue: mapFunc(globalAxis.defaultValue),
+        maxValue: mapFunc(globalAxis.maxValue),
+      };
       const localAxis = localAxisDict[globalAxis.name];
       if (localAxis) {
         const mapping = [
@@ -67,7 +65,10 @@ export class VariableGlyphController {
           [localAxis.defaultValue, globalAxis.defaultValue],
           [localAxis.maxValue, globalAxis.maxValue],
         ];
-        this._localToGlobalMapping.push({"name": globalAxis.name, "mapping": mapping});
+        this._localToGlobalMapping.push({
+          name: globalAxis.name,
+          mapping: mapping,
+        });
       } else {
         this._combinedAxes.push(globalAxis);
       }
@@ -102,7 +103,10 @@ export class VariableGlyphController {
           continue;
         }
         seen.add(axis.name);
-        const axisDefaultValue = piecewiseLinearMap(axis.defaultValue, Object.fromEntries(axis.mapping || []));
+        const axisDefaultValue = piecewiseLinearMap(
+          axis.defaultValue,
+          Object.fromEntries(axis.mapping || [])
+        );
         let varValue = location[axis.name];
         let sourceValue = source.location[axis.name];
         if (varValue === undefined) {
@@ -150,17 +154,22 @@ export class VariableGlyphController {
 
   get model() {
     if (this._model === undefined) {
-      const locations = this.sources.map(source => source.location);
+      const locations = this.sources.map((source) => source.location);
       this._model = new VariationModel(
-        locations.map(location => sparsifyLocation(normalizeLocation(location, this.combinedAxes))),
-        this.axes.map(axis => axis.name));
+        locations.map((location) =>
+          sparsifyLocation(normalizeLocation(location, this.combinedAxes))
+        ),
+        this.axes.map((axis) => axis.name)
+      );
     }
     return this._model;
   }
 
   get deltas() {
     if (this._deltas === undefined) {
-      const masterValues = this.sources.map(source => this.getLayerGlyph(source.layerName));
+      const masterValues = this.sources.map((source) =>
+        this.getLayerGlyph(source.layerName)
+      );
       this._deltas = this.model.getDeltas(masterValues);
     }
     return this._deltas;
@@ -170,12 +179,18 @@ export class VariableGlyphController {
     try {
       return this.model.interpolateFromDeltas(normalizedLocation, this.deltas);
     } catch (error) {
-      if (error.name !== "VariationError") {
+      if (error.name !== 'VariationError') {
         throw error;
       }
-      const errorMessage = `Interpolation error while instantiating glyph ${this.name} (${error.toString()})`;
+      const errorMessage = `Interpolation error while instantiating glyph ${
+        this.name
+      } (${error.toString()})`;
       console.log(errorMessage);
-      const indexInfo = findClosestSourceIndexFromLocation(this.glyph, normalizedLocation, this.combinedAxes);
+      const indexInfo = findClosestSourceIndexFromLocation(
+        this.glyph,
+        normalizedLocation,
+        this.combinedAxes
+      );
       return this.getLayerGlyph(this.sources[indexInfo.index].layerName);
     }
   }
@@ -188,14 +203,18 @@ export class VariableGlyphController {
     if (sourceIndex !== undefined) {
       instance = this.getLayerGlyph(this.sources[sourceIndex].layerName);
     } else {
-      instance = this.instantiate(normalizeLocation(location, this.combinedAxes));
+      instance = this.instantiate(
+        normalizeLocation(location, this.combinedAxes)
+      );
     }
 
     if (!instance) {
-      throw new Error("assert -- instance is undefined")
+      throw new Error('assert -- instance is undefined');
     }
     const instanceController = new StaticGlyphController(
-      this.name, instance, sourceIndex,
+      this.name,
+      instance,
+      sourceIndex
     );
 
     await instanceController.setupComponents(getGlyphFunc, location);
@@ -221,12 +240,9 @@ export class VariableGlyphController {
     location = mapBackward(location, this.globalAxes);
     return location;
   }
-
 }
 
-
 export class StaticGlyphController {
-
   constructor(name, instance, sourceIndex) {
     this.name = name;
     this.instance = instance;
@@ -268,7 +284,10 @@ export class StaticGlyphController {
 
   get flattenedPath() {
     if (this._flattenedPath === undefined) {
-      this._flattenedPath = joinPaths([this.instance.path, this.componentsPath]);
+      this._flattenedPath = joinPaths([
+        this.instance.path,
+        this.componentsPath,
+      ]);
     }
     return this._flattenedPath;
   }
@@ -295,7 +314,9 @@ export class StaticGlyphController {
 
   get componentsPath() {
     if (this._componentsPath === undefined) {
-      this._componentsPath = joinPaths(this.components.map(compo => compo.path));
+      this._componentsPath = joinPaths(
+        this.components.map((compo) => compo.path)
+      );
     }
     return this._componentsPath;
   }
@@ -321,18 +342,19 @@ export class StaticGlyphController {
     }
     return this._convexHull;
   }
-
 }
 
-
 class ComponentController {
-
   constructor(compo) {
     this.compo = compo;
   }
 
   async setupPath(getGlyphFunc, parentLocation) {
-    this.path = await getComponentPath(this.compo, getGlyphFunc, parentLocation);
+    this.path = await getComponentPath(
+      this.compo,
+      getGlyphFunc,
+      parentLocation
+    );
   }
 
   get path2d() {
@@ -356,9 +378,7 @@ class ComponentController {
     }
     return this._convexHull;
   }
-
 }
-
 
 async function getComponentPath(compo, getGlyphFunc, parentLocation) {
   return flattenComponentPaths(
@@ -366,24 +386,32 @@ async function getComponentPath(compo, getGlyphFunc, parentLocation) {
   );
 }
 
-
-async function getNestedComponentPaths(compo, getGlyphFunc, parentLocation, transformation = null) {
+async function getNestedComponentPaths(
+  compo,
+  getGlyphFunc,
+  parentLocation,
+  transformation = null
+) {
   const compoLocation = mergeLocations(parentLocation, compo.location) || {};
   const glyph = await getGlyphFunc(compo.name);
   if (!glyph) {
-    console.log(`component glyph ${compo.name} was not found`)
+    console.log(`component glyph ${compo.name} was not found`);
     return {};
   }
   let inst;
   try {
-    inst = glyph.instantiate(normalizeLocation(compoLocation, glyph.combinedAxes));
+    inst = glyph.instantiate(
+      normalizeLocation(compoLocation, glyph.combinedAxes)
+    );
   } catch (error) {
-    if (error.name !== "VariationError") {
+    if (error.name !== 'VariationError') {
       throw error;
     }
-    const errorMessage = `Interpolation error while instantiating component ${compo.name} (${error.toString()})`;
+    const errorMessage = `Interpolation error while instantiating component ${
+      compo.name
+    } (${error.toString()})`;
     console.log(errorMessage);
-    return {"error": errorMessage};
+    return { error: errorMessage };
   }
   let t = makeAffineTransform(compo.transformation);
   if (transformation) {
@@ -391,22 +419,37 @@ async function getNestedComponentPaths(compo, getGlyphFunc, parentLocation, tran
   }
   const componentPaths = {};
   if (inst.path.numPoints) {
-    componentPaths["path"] = inst.path.transformed(t);
+    componentPaths['path'] = inst.path.transformed(t);
   }
-  componentPaths["children"] = await getComponentPaths(inst.components, getGlyphFunc, compoLocation, t);
+  componentPaths['children'] = await getComponentPaths(
+    inst.components,
+    getGlyphFunc,
+    compoLocation,
+    t
+  );
   return componentPaths;
 }
 
-
-async function getComponentPaths(components, getGlyphFunc, parentLocation, transformation = null) {
+async function getComponentPaths(
+  components,
+  getGlyphFunc,
+  parentLocation,
+  transformation = null
+) {
   const paths = [];
 
   for (const compo of components || []) {
-    paths.push(await getNestedComponentPaths(compo, getGlyphFunc, parentLocation, transformation));
+    paths.push(
+      await getNestedComponentPaths(
+        compo,
+        getGlyphFunc,
+        parentLocation,
+        transformation
+      )
+    );
   }
   return paths;
 }
-
 
 function flattenComponentPaths(item) {
   const paths = [];
@@ -424,8 +467,12 @@ function flattenComponentPaths(item) {
   return joinPaths(paths);
 }
 
-
-export async function decomposeComponents(components, componentIndices, parentLocation, getGlyphFunc) {
+export async function decomposeComponents(
+  components,
+  componentIndices,
+  parentLocation,
+  getGlyphFunc
+) {
   if (!componentIndices) {
     componentIndices = range(instance.components.length);
   }
@@ -435,34 +482,34 @@ export async function decomposeComponents(components, componentIndices, parentLo
   for (const index of componentIndices) {
     const component = components[index];
     const baseGlyph = await getGlyphFunc(component.name);
-    let location = {...parentLocation, ...component.location};
+    let location = { ...parentLocation, ...component.location };
     const normLocation = baseGlyph.mapLocationGlobalToLocal(location);
-    const compoInstance = baseGlyph.instantiate(normalizeLocation(normLocation, baseGlyph.combinedAxes));
+    const compoInstance = baseGlyph.instantiate(
+      normalizeLocation(normLocation, baseGlyph.combinedAxes)
+    );
     const t = makeAffineTransform(component.transformation);
     newPaths.push(compoInstance.path.transformed(t));
     for (const nestedCompo of compoInstance.components) {
       const nestedT = makeAffineTransform(nestedCompo.transformation);
       const newNestedT = t.transform(nestedT);
       newComponents.push({
-        "name": nestedCompo.name,
-        "transformation": decomposeAffineTransform(newNestedT),
-        "location": {...nestedCompo.location},
+        name: nestedCompo.name,
+        transformation: decomposeAffineTransform(newNestedT),
+        location: { ...nestedCompo.location },
       });
     }
   }
   const newPath = joinPaths(newPaths);
-  return {"path": newPath, "components": newComponents};
+  return { path: newPath, components: newComponents };
 }
-
 
 function makeAxisMapFunc(axis) {
   if (!axis.mapping) {
-    return v => v;
+    return (v) => v;
   }
   const mapping = Object.fromEntries(axis.mapping);
-  return v => piecewiseLinearMap(v, mapping);
+  return (v) => piecewiseLinearMap(v, mapping);
 }
-
 
 function sparsifyLocation(location) {
   // location must be normalized
@@ -475,16 +522,14 @@ function sparsifyLocation(location) {
   return sparseLocation;
 }
 
-
 export function getAxisBaseName(axisName) {
-  return axisName.split("*", 1)[0];
+  return axisName.split('*', 1)[0];
 }
-
 
 function mapLocationExpandNLI(userLocation, axes) {
   const nliAxes = {};
   for (const axis of axes) {
-    const baseName = axis.name.split("*", 1)[0];
+    const baseName = axis.name.split('*', 1)[0];
     if (baseName !== axis.name) {
       if (!(baseName in nliAxes)) {
         nliAxes[baseName] = [];
@@ -501,16 +546,14 @@ function mapLocationExpandNLI(userLocation, axes) {
   return location;
 }
 
-
 function mapLocationFoldNLI(location, axes) {
   const userLocation = {};
   for (const [axisName, axisValue] of Object.entries(location)) {
-    const baseName = axisName.split("*", 1)[0];
+    const baseName = axisName.split('*', 1)[0];
     userLocation[baseName] = axisValue;
   }
   return userLocation;
 }
-
 
 function joinPaths(paths) {
   if (paths.length) {
@@ -519,25 +562,28 @@ function joinPaths(paths) {
   return new VarPackedPath();
 }
 
-
 function mergeLocations(loc1, loc2) {
   if (!loc1) {
     return loc2;
   }
-  return {...loc1, ...loc2};
+  return { ...loc1, ...loc2 };
 }
-
 
 function makeAffineTransform(transformation) {
   let t = new Transform();
-  t = t.translate(transformation.translateX + transformation.tCenterX, transformation.translateY + transformation.tCenterY);
+  t = t.translate(
+    transformation.translateX + transformation.tCenterX,
+    transformation.translateY + transformation.tCenterY
+  );
   t = t.rotate(transformation.rotation * (Math.PI / 180));
   t = t.scale(transformation.scaleX, transformation.scaleY);
-  t = t.skew(-transformation.skewX * (Math.PI / 180), transformation.skewY * (Math.PI / 180));
+  t = t.skew(
+    -transformation.skewX * (Math.PI / 180),
+    transformation.skewY * (Math.PI / 180)
+  );
   t = t.translate(-transformation.tCenterX, -transformation.tCenterY);
   return t;
 }
-
 
 function decomposeAffineTransform(affine) {
   // Decompose a 2x2 transformation matrix into components:
@@ -550,8 +596,10 @@ function decomposeAffineTransform(affine) {
   const delta = a * d - b * c;
 
   let rotation = 0;
-  let scaleX = 0, scaleY = 0;
-  let skewX = 0, skewY = 0;
+  let scaleX = 0,
+    scaleY = 0;
+  let skewX = 0,
+    skewY = 0;
 
   // Apply the QR-like decomposition.
   if (a != 0 || b != 0) {
@@ -563,36 +611,34 @@ function decomposeAffineTransform(affine) {
     const s = Math.sqrt(c * c + d * d);
     rotation = Math.PI / 2 - (d > 0 ? Math.acos(-c / s) : -Math.acos(c / s));
     [scaleX, scaleY] = [delta / s, s];
-    [skewX, skewY] = [0, Math.atan((a * c + b * d) / (s * s))]
+    [skewX, skewY] = [0, Math.atan((a * c + b * d) / (s * s))];
   } else {
     // a = b = c = d = 0
   }
 
   const transformation = {
-    "translateX": affine.dx,
-    "translateY": affine.dy,
-    "rotation": rotation * (180 / Math.PI),
-    "scaleX": scaleX,
-    "scaleY": scaleY,
-    "skewX": -skewX * (180 / Math.PI),
-    "skewY": skewY * (180 / Math.PI),
-    "tCenterX": 0,
-    "tCenterY": 0,
+    translateX: affine.dx,
+    translateY: affine.dy,
+    rotation: rotation * (180 / Math.PI),
+    scaleX: scaleX,
+    scaleY: scaleY,
+    skewX: -skewX * (180 / Math.PI),
+    skewY: skewY * (180 / Math.PI),
+    tCenterX: 0,
+    tCenterY: 0,
   };
   return transformation;
 }
-
 
 function subsetLocation(location, axes) {
   const subsettedLocation = {};
   for (const axis of axes) {
     if (axis.name in location) {
-      subsettedLocation[axis.name] = location[axis.name]
+      subsettedLocation[axis.name] = location[axis.name];
     }
   }
   return subsettedLocation;
 }
-
 
 function findClosestSourceIndexFromLocation(glyph, location, axes) {
   const distances = [];
@@ -605,7 +651,7 @@ function findClosestSourceIndexFromLocation(glyph, location, axes) {
     }
     if (distanceSquared === 0) {
       // exact match, no need to look further
-      return {distance: 0, index: i};
+      return { distance: 0, index: i };
     }
     distances.push([distanceSquared, i]);
   }
@@ -614,5 +660,5 @@ function findClosestSourceIndexFromLocation(glyph, location, axes) {
     const db = b[0];
     return (a > b) - (a < b);
   });
-  return {distance: Math.sqrt(distances[0][0]), index: distances[0][1]}
+  return { distance: Math.sqrt(distances[0][0]), index: distances[0][1] };
 }

@@ -1,33 +1,30 @@
 @font-face {
-  font-family: "fontra-ui-regular";
-  src: url("../fonts/InriaSans-Light.woff2") format("woff2");
+  font-family: 'fontra-ui-regular';
+  src: url('../fonts/InriaSans-Light.woff2') format('woff2');
   font-weight: 400;
 }
 
 @font-face {
-  font-family: "fontra-ui-regular";
-  src: url("../fonts/InriaSans-Medium.woff2") format("woff2");
+  font-family: 'fontra-ui-regular';
+  src: url('../fonts/InriaSans-Medium.woff2') format('woff2');
   font-weight: 700;
 }
 
-
 @font-face {
-  font-family: "fontra-icons";
-  src: url("../fonts/fontra-icons.woff2") format("woff2");
+  font-family: 'fontra-icons';
+  src: url('../fonts/fontra-icons.woff2') format('woff2');
 }
 
-
 @font-face {
-  font-family: "fontra-ui-semibold";
-  src: url("../fonts/InriaSans-Regular.woff2") format("woff2");
+  font-family: 'fontra-ui-semibold';
+  src: url('../fonts/InriaSans-Regular.woff2') format('woff2');
 }
-
 
 :root {
-  --fontra-red-color: #F11759;
+  --fontra-red-color: #f11759;
 
   --foreground-color-light: black;
-  --background-color-light: #F6F6F6;
+  --background-color-light: #f6f6f6;
   --foreground-color-dark: white;
   --background-color-dark: #333;
 
@@ -35,15 +32,12 @@
   --background-color: var(--background-color-light);
 }
 
-
 :root.dark-theme {
   --foreground-color: var(--foreground-color-dark);
   --background-color: var(--background-color-dark);
 }
 
-
 @media (prefers-color-scheme: dark) {
-
   :root {
     --foreground-color: var(--foreground-color-dark);
     --background-color: var(--background-color-dark);
@@ -53,16 +47,15 @@
     --foreground-color: var(--foreground-color-light);
     --background-color: var(--background-color-light);
   }
-
 }
 
-
-html, body {
+html,
+body {
   font-family: fontra-ui-regular, sans-serif;
-  font-feature-settings: "tnum" 1;
+  font-feature-settings: 'tnum' 1;
   font-size: 0.9em;
   padding: 0;
-  margin:  0;
+  margin: 0;
   width: 100%;
   height: 100%;
   overflow: hidden; /* Hide scrollbars */
@@ -74,7 +67,9 @@ html, body {
 }
 
 @keyframes global-loader-spinner {
-  to {transform: rotate(360deg);}
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 #global-loader-spinner {
@@ -88,7 +83,7 @@ html, body {
   margin-left: -5rem;
   box-sizing: border-box;
   border-radius: 50%;
-  border: 0.6rem solid #FFF8;
+  border: 0.6rem solid #fff8;
   border-top-color: #0005;
   border-left-color: #0005;
   animation: global-loader-spinner 0.8s linear infinite;

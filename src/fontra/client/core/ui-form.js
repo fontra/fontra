@@ -1,18 +1,16 @@
-import { QueueIterator } from "./queue-iterator.js";
-import { capitalizeFirstLetter, hyphenatedToCamelCase } from "./utils.js";
-
+import { QueueIterator } from './queue-iterator.js';
+import { capitalizeFirstLetter, hyphenatedToCamelCase } from './utils.js';
 
 export class Form {
-
   constructor(formID, fieldDescriptions) {
     this.container = document.querySelector(`#${formID}`);
     if (!this.container) {
       throw new Error(`Expecting an element with id="#${formID}"`);
     }
     if (this.container.children.length != 0) {
-      throw new Error("Form container must be empty");
+      throw new Error('Form container must be empty');
     }
-    this.container.classList.add("ui-form");
+    this.container.classList.add('ui-form');
     this.setFieldDescriptions(fieldDescriptions);
     this.callQueue = new QueueIterator();
     this._readCallQueue();
@@ -25,38 +23,38 @@ export class Form {
   }
 
   setFieldDescriptions(fieldDescriptions) {
-    this.container.innerHTML = "";
+    this.container.innerHTML = '';
     this._fieldGetters = {};
     this._fieldSetters = {};
     if (!fieldDescriptions) {
       return;
     }
     for (const fieldItem of fieldDescriptions) {
-      if (fieldItem.type === "divider") {
-        const dividerElement = document.createElement("hr");
-        dividerElement.className = "ui-form-divider";
+      if (fieldItem.type === 'divider') {
+        const dividerElement = document.createElement('hr');
+        dividerElement.className = 'ui-form-divider';
         this.container.appendChild(dividerElement);
         continue;
       }
-      const labelElement = document.createElement("div");
-      labelElement.classList.add("ui-form-label", fieldItem.type);
-      const valueElement = document.createElement("div");
-      valueElement.classList.add("ui-form-value", fieldItem.type);
+      const labelElement = document.createElement('div');
+      labelElement.classList.add('ui-form-label', fieldItem.type);
+      const valueElement = document.createElement('div');
+      valueElement.classList.add('ui-form-value', fieldItem.type);
 
-      let label = fieldItem.label || fieldItem.key || "";
-      if (label.length && fieldItem.type !== "header") {
-        label += ":";
-      };
+      let label = fieldItem.label || fieldItem.key || '';
+      if (label.length && fieldItem.type !== 'header') {
+        label += ':';
+      }
       labelElement.innerHTML = label;
       this.container.appendChild(labelElement);
-      if (fieldItem.type === "header") {
+      if (fieldItem.type === 'header') {
         continue;
       }
       this.container.appendChild(valueElement);
 
-      const methodName = hyphenatedToCamelCase("_add-" + fieldItem.type);
+      const methodName = hyphenatedToCamelCase('_add-' + fieldItem.type);
       if (this[methodName] === undefined) {
-          throw new Error(`Unknown field type: ${fieldItem.type}`);
+        throw new Error(`Unknown field type: ${fieldItem.type}`);
       }
       this[methodName](valueElement, fieldItem);
     }
@@ -74,44 +72,49 @@ export class Form {
     if (fieldItem.value !== undefined) {
       valueElement.innerText = fieldItem.value;
       this._fieldGetters[fieldItem.key] = () => valueElement.innerText;
-      this._fieldSetters[fieldItem.key] = value => valueElement.innerText = value;
+      this._fieldSetters[fieldItem.key] = (value) =>
+        (valueElement.innerText = value);
     }
   }
 
   _addEditText(valueElement, fieldItem) {
-    const inputElement = document.createElement("input");
-    inputElement.type = "text";
-    inputElement.value = fieldItem.value || "";
+    const inputElement = document.createElement('input');
+    inputElement.type = 'text';
+    inputElement.value = fieldItem.value || '';
     inputElement.disabled = fieldItem.disabled;
-    inputElement.onchange = event => {
+    inputElement.onchange = (event) => {
       this._fieldChanging(fieldItem.key, inputElement.value, undefined);
     };
     this._fieldGetters[fieldItem.key] = () => inputElement.value;
-    this._fieldSetters[fieldItem.key] = value => inputElement.value = value;
+    this._fieldSetters[fieldItem.key] = (value) => (inputElement.value = value);
     valueElement.appendChild(inputElement);
   }
 
   _addEditNumber(valueElement, fieldItem) {
-    const inputElement = document.createElement("input");
-    inputElement.type = "number";
+    const inputElement = document.createElement('input');
+    inputElement.type = 'number';
     inputElement.value = fieldItem.value;
-    inputElement.step = "any";
+    inputElement.step = 'any';
     inputElement.disabled = fieldItem.disabled;
-    inputElement.onchange = event => {
-      this._fieldChanging(fieldItem.key, parseFloat(inputElement.value), undefined);
+    inputElement.onchange = (event) => {
+      this._fieldChanging(
+        fieldItem.key,
+        parseFloat(inputElement.value),
+        undefined
+      );
     };
     this._fieldGetters[fieldItem.key] = () => inputElement.value;
-    this._fieldSetters[fieldItem.key] = value => inputElement.value = value;
+    this._fieldSetters[fieldItem.key] = (value) => (inputElement.value = value);
     valueElement.appendChild(inputElement);
   }
 
   _addEditNumberSlider(valueElement, fieldItem) {
-    const inputElement = document.createElement("input");
-    const sliderElement = document.createElement("input");
-    inputElement.type = "number";
-    sliderElement.type = "range";
+    const inputElement = document.createElement('input');
+    const sliderElement = document.createElement('input');
+    inputElement.type = 'number';
+    sliderElement.type = 'range';
     for (const el of [inputElement, sliderElement]) {
-      el.step = "any";
+      el.step = 'any';
       el.min = fieldItem.minValue;
       el.max = fieldItem.maxValue;
       el.value = fieldItem.value;
@@ -121,7 +124,7 @@ export class Form {
     {
       // Slider change closure
       let valueStream = undefined;
-      sliderElement.oninput = event => {
+      sliderElement.oninput = (event) => {
         // Continuous changes
         inputElement.value = myRound(sliderElement.value, 3);
         const value = parseFloat(inputElement.value);
@@ -130,17 +133,17 @@ export class Form {
           this._fieldChanging(fieldItem.key, value, valueStream);
         }
         valueStream.put(value);
-        this._dispatchEvent("doChange", {"key": fieldItem.key, "value": value});
+        this._dispatchEvent('doChange', { key: fieldItem.key, value: value });
       };
-      sliderElement.onchange = event => {
+      sliderElement.onchange = (event) => {
         // Single change, or final change after continuous changes
         if (valueStream) {
           valueStream.done();
           valueStream = undefined;
-          this._dispatchEvent("endChange", {"key": fieldItem.key});
+          this._dispatchEvent('endChange', { key: fieldItem.key });
         }
-      }
-      sliderElement.onmouseup = event => {
+      };
+      sliderElement.onmouseup = (event) => {
         // sliderElement.onchange is ONLY triggered when the final slider value
         // is different from the initial value. However, we may have been in
         // a live drag, and we need to handle the end of the slider drag no
@@ -150,16 +153,20 @@ export class Form {
       };
     }
 
-    inputElement.onchange = event => {
+    inputElement.onchange = (event) => {
       sliderElement.value = inputElement.value;
-      inputElement.value = sliderElement.value;  // Use slider's clamping
-      this._fieldChanging(fieldItem.key, parseFloat(inputElement.value), undefined);
+      inputElement.value = sliderElement.value; // Use slider's clamping
+      this._fieldChanging(
+        fieldItem.key,
+        parseFloat(inputElement.value),
+        undefined
+      );
     };
     this._fieldGetters[fieldItem.key] = () => sliderElement.value;
-    this._fieldSetters[fieldItem.key] = value => {
+    this._fieldSetters[fieldItem.key] = (value) => {
       inputElement.value = value;
       sliderElement.value = value;
-    }
+    };
     valueElement.appendChild(inputElement);
     valueElement.appendChild(sliderElement);
   }
@@ -170,11 +177,11 @@ export class Form {
 
   _fieldChanging(fieldKey, value, valueStream) {
     if (valueStream) {
-      this._dispatchEvent("beginChange", {"key": fieldKey});
+      this._dispatchEvent('beginChange', { key: fieldKey });
     } else {
-      this._dispatchEvent("doChange", {"key": fieldKey, "value": value});
+      this._dispatchEvent('doChange', { key: fieldKey, value: value });
     }
-    const handlerName = "onFieldChange";
+    const handlerName = 'onFieldChange';
     if (this[handlerName] !== undefined) {
       this[handlerName](fieldKey, value, valueStream);
     }
@@ -182,8 +189,8 @@ export class Form {
 
   _dispatchEvent(eventName, detail) {
     const event = new CustomEvent(eventName, {
-      "bubbles": false,
-      "detail": detail,
+      bubbles: false,
+      detail: detail,
     });
     this.container.dispatchEvent(event);
   }
@@ -207,9 +214,7 @@ export class Form {
     }
     setter(value);
   }
-
 }
-
 
 function myRound(n, digits) {
   const f = 10 ** digits;

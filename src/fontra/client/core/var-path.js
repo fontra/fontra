@@ -1,16 +1,13 @@
-import VarArray from "./var-array.js"
-import { VariationError } from "./errors.js"
-import { pointInRect } from "./rectangle.js";
-import { convexHull } from "./convex-hull.js";
-import { enumerate } from "./utils.js";
+import VarArray from './var-array.js';
+import { VariationError } from './errors.js';
+import { pointInRect } from './rectangle.js';
+import { convexHull } from './convex-hull.js';
+import { enumerate } from './utils.js';
 
-
-export const POINT_TYPE_OFF_CURVE_QUAD = "quad";
-export const POINT_TYPE_OFF_CURVE_CUBIC = "cubic";
-
+export const POINT_TYPE_OFF_CURVE_QUAD = 'quad';
+export const POINT_TYPE_OFF_CURVE_CUBIC = 'cubic';
 
 export class VarPackedPath {
-
   // point types
   static ON_CURVE = 0x00;
   static OFF_CURVE_QUAD = 0x01;
@@ -81,7 +78,7 @@ export class VarPackedPath {
       xMax = Math.max(x, xMax);
       yMax = Math.max(y, yMax);
     }
-    return {"xMin": xMin, "yMin": yMin, "xMax": xMax, "yMax": yMax};
+    return { xMin: xMin, yMin: yMin, xMax: xMax, yMax: yMax };
   }
 
   getConvexHull() {
@@ -90,7 +87,7 @@ export class VarPackedPath {
     }
     const points = [];
     for (let i = 0; i < this.coordinates.length; i += 2) {
-      points.push({"x": this.coordinates[i], "y": this.coordinates[i + 1]});
+      points.push({ x: this.coordinates[i], y: this.coordinates[i + 1] });
     }
     return convexHull(points);
   }
@@ -103,18 +100,17 @@ export class VarPackedPath {
     let lo = 0;
     let hi = this.contourInfo.length;
     while (lo < hi) {
-      const mid = (lo + hi) >> 1;  // Math.floor((lo + hi) / 2)
+      const mid = (lo + hi) >> 1; // Math.floor((lo + hi) / 2)
       if (pointIndex <= this.contourInfo[mid].endPoint) {
         hi = mid;
-      }
-      else {
+      } else {
         lo = mid + 1;
       }
     }
     if (lo >= this.contourInfo.length) {
       return undefined;
     }
-    return lo
+    return lo;
   }
 
   getContourAndPointIndex(pointIndex) {
@@ -135,8 +131,8 @@ export class VarPackedPath {
   _getUnpackedContour(contourIndex) {
     const contourInfo = this.contourInfo[contourIndex];
     return {
-      "points": Array.from(this._iterPointsOfContour(contourIndex)),
-      "isClosed": contourInfo.isClosed,
+      points: Array.from(this._iterPointsOfContour(contourIndex)),
+      isClosed: contourInfo.isClosed,
     };
   }
 
@@ -153,17 +149,26 @@ export class VarPackedPath {
     const contour = this.contourInfo[contourIndex];
     const startPoint = this._getContourStartPoint(contourIndex);
     return {
-      "coordinates": this.coordinates.slice(startPoint * 2, (contour.endPoint + 1) * 2),
-      "pointTypes": this.pointTypes.slice(startPoint, contour.endPoint + 1),
-      "isClosed": contour.isClosed,
+      coordinates: this.coordinates.slice(
+        startPoint * 2,
+        (contour.endPoint + 1) * 2
+      ),
+      pointTypes: this.pointTypes.slice(startPoint, contour.endPoint + 1),
+      isClosed: contour.isClosed,
     };
   }
 
   setContour(contourIndex, contour) {
     contourIndex = this._normalizeContourIndex(contourIndex);
     const startPoint = this._getContourStartPoint(contourIndex);
-    const numOldPoints = this.contourInfo[contourIndex].endPoint + 1 - startPoint;
-    this._replacePoints(startPoint, numOldPoints, contour.coordinates, contour.pointTypes);
+    const numOldPoints =
+      this.contourInfo[contourIndex].endPoint + 1 - startPoint;
+    this._replacePoints(
+      startPoint,
+      numOldPoints,
+      contour.coordinates,
+      contour.pointTypes
+    );
     this._moveEndPoints(contourIndex, contour.pointTypes.length - numOldPoints);
     this.contourInfo[contourIndex].isClosed = contour.isClosed;
   }
@@ -176,8 +181,11 @@ export class VarPackedPath {
     contourIndex = this._normalizeContourIndex(contourIndex, true);
     const startPoint = this._getContourStartPoint(contourIndex);
     this._replacePoints(startPoint, 0, contour.coordinates, contour.pointTypes);
-    const contourInfo = {"endPoint": startPoint - 1, "isClosed": contour.isClosed};
-    this.contourInfo.splice(contourIndex, 0, contourInfo)
+    const contourInfo = {
+      endPoint: startPoint - 1,
+      isClosed: contour.isClosed,
+    };
+    this.contourInfo.splice(contourIndex, 0, contourInfo);
     this._moveEndPoints(contourIndex, contour.pointTypes.length);
   }
 
@@ -199,17 +207,15 @@ export class VarPackedPath {
     if (point.x === undefined) {
       return undefined;
     }
-    const pointType = this.pointTypes[pointIndex] & VarPackedPath.POINT_TYPE_MASK;
+    const pointType =
+      this.pointTypes[pointIndex] & VarPackedPath.POINT_TYPE_MASK;
     if (pointType) {
-      point["type"] = (
+      point['type'] =
         pointType === VarPackedPath.OFF_CURVE_CUBIC
-        ?
-        POINT_TYPE_OFF_CURVE_CUBIC
-        :
-        POINT_TYPE_OFF_CURVE_QUAD
-      );
+          ? POINT_TYPE_OFF_CURVE_CUBIC
+          : POINT_TYPE_OFF_CURVE_QUAD;
     } else if (this.pointTypes[pointIndex] & VarPackedPath.SMOOTH_FLAG) {
-      point["smooth"] = true;
+      point['smooth'] = true;
     }
     return point;
   }
@@ -220,7 +226,10 @@ export class VarPackedPath {
   }
 
   getPointPosition(pointIndex) {
-    return [this.coordinates[pointIndex * 2], this.coordinates[pointIndex * 2 + 1]];
+    return [
+      this.coordinates[pointIndex * 2],
+      this.coordinates[pointIndex * 2 + 1],
+    ];
   }
 
   setPointPosition(pointIndex, x, y) {
@@ -234,19 +243,31 @@ export class VarPackedPath {
 
   getContourPoint(contourIndex, contourPointIndex) {
     contourIndex = this._normalizeContourIndex(contourIndex);
-    const pointIndex = this.getAbsolutePointIndex(contourIndex, contourPointIndex, false);
+    const pointIndex = this.getAbsolutePointIndex(
+      contourIndex,
+      contourPointIndex,
+      false
+    );
     return this.getPoint(pointIndex);
   }
 
   setContourPoint(contourIndex, contourPointIndex, point) {
     contourIndex = this._normalizeContourIndex(contourIndex);
-    const pointIndex = this.getAbsolutePointIndex(contourIndex, contourPointIndex, false);
+    const pointIndex = this.getAbsolutePointIndex(
+      contourIndex,
+      contourPointIndex,
+      false
+    );
     this.setPoint(pointIndex, point);
   }
 
   insertPoint(contourIndex, contourPointIndex, point) {
     contourIndex = this._normalizeContourIndex(contourIndex);
-    const pointIndex = this.getAbsolutePointIndex(contourIndex, contourPointIndex, true);
+    const pointIndex = this.getAbsolutePointIndex(
+      contourIndex,
+      contourPointIndex,
+      true
+    );
     this._insertPoint(contourIndex, pointIndex, point);
   }
 
@@ -258,7 +279,10 @@ export class VarPackedPath {
 
   deletePoint(contourIndex, contourPointIndex) {
     contourIndex = this._normalizeContourIndex(contourIndex);
-    const pointIndex = this.getAbsolutePointIndex(contourIndex, contourPointIndex);
+    const pointIndex = this.getAbsolutePointIndex(
+      contourIndex,
+      contourPointIndex
+    );
     this.coordinates.splice(pointIndex * 2, 2);
     this.pointTypes.splice(pointIndex, 1);
     this._moveEndPoints(contourIndex, -1);
@@ -302,14 +326,21 @@ export class VarPackedPath {
     if (contourPointIndex < 0) {
       contourPointIndex += numPoints;
     }
-    if (contourPointIndex < 0 || contourPointIndex >= numPoints + (forInsert ? 1 : 0)) {
-      throw new Error(`contourPointIndex out of bounds: ${originalContourPointIndex}`);
+    if (
+      contourPointIndex < 0 ||
+      contourPointIndex >= numPoints + (forInsert ? 1 : 0)
+    ) {
+      throw new Error(
+        `contourPointIndex out of bounds: ${originalContourPointIndex}`
+      );
     }
     return startPoint + contourPointIndex;
   }
 
   _getContourStartPoint(contourIndex) {
-    return contourIndex === 0 ? 0 : this.contourInfo[contourIndex - 1].endPoint + 1;
+    return contourIndex === 0
+      ? 0
+      : this.contourInfo[contourIndex - 1].endPoint + 1;
   }
 
   *iterPoints() {
@@ -345,13 +376,25 @@ export class VarPackedPath {
     for (const contour of this.contourInfo) {
       const endPoint = contour.endPoint;
       let prevIndex = contour.isClosed ? endPoint : startPoint;
-      for (let nextIndex = startPoint + (contour.isClosed ? 0 : 1); nextIndex <= endPoint; nextIndex++) {
-        const prevType = this.pointTypes[prevIndex] & VarPackedPath.POINT_TYPE_MASK;
-        const nextType = this.pointTypes[nextIndex] & VarPackedPath.POINT_TYPE_MASK;
+      for (
+        let nextIndex = startPoint + (contour.isClosed ? 0 : 1);
+        nextIndex <= endPoint;
+        nextIndex++
+      ) {
+        const prevType =
+          this.pointTypes[prevIndex] & VarPackedPath.POINT_TYPE_MASK;
+        const nextType =
+          this.pointTypes[nextIndex] & VarPackedPath.POINT_TYPE_MASK;
         if (prevType != nextType) {
           yield [
-            {x: this.coordinates[prevIndex * 2], y: this.coordinates[prevIndex * 2 + 1]},
-            {x: this.coordinates[nextIndex * 2], y: this.coordinates[nextIndex * 2 + 1]},
+            {
+              x: this.coordinates[prevIndex * 2],
+              y: this.coordinates[prevIndex * 2 + 1],
+            },
+            {
+              x: this.coordinates[nextIndex * 2],
+              y: this.coordinates[nextIndex * 2 + 1],
+            },
           ];
         }
         prevIndex = nextIndex;
@@ -363,7 +406,7 @@ export class VarPackedPath {
   *iterPointsInRect(rect) {
     for (const [pointIndex, point] of enumerate(this.iterPoints())) {
       if (pointInRect(point.x, point.y, rect)) {
-        yield {...point, pointIndex: pointIndex};
+        yield { ...point, pointIndex: pointIndex };
       }
     }
   }
@@ -372,7 +415,9 @@ export class VarPackedPath {
     return new this.constructor(
       this.coordinates.copy(),
       this.pointTypes.slice(),
-      this.contourInfo.map(item => { return {...item} }),
+      this.contourInfo.map((item) => {
+        return { ...item };
+      })
     );
   }
 
@@ -383,7 +428,7 @@ export class VarPackedPath {
   }
 
   moveTo(x, y) {
-    this.appendContour({"coordinates": [], "pointTypes": [], "isClosed": false})
+    this.appendContour({ coordinates: [], pointTypes: [], isClosed: false });
     this._appendPoint(x, y, VarPackedPath.ON_CURVE);
   }
 
@@ -400,7 +445,7 @@ export class VarPackedPath {
   quadraticCurveTo(...args) {
     const numArgs = args.length;
     if (numArgs % 2) {
-      throw new Error("number of arguments to quadraticCurveTo must be even");
+      throw new Error('number of arguments to quadraticCurveTo must be even');
     }
     for (let i = 0; i < numArgs - 2; i += 2) {
       this._appendPoint(args[i], args[i + 1], VarPackedPath.OFF_CURVE_QUAD);
@@ -421,7 +466,11 @@ export class VarPackedPath {
     } else {
       otherCoordinates = other;
     }
-    return new this.constructor(this.coordinates.addItemwise(otherCoordinates), this.pointTypes, this.contourInfo);
+    return new this.constructor(
+      this.coordinates.addItemwise(otherCoordinates),
+      this.pointTypes,
+      this.contourInfo
+    );
   }
 
   subItemwise(other) {
@@ -432,7 +481,11 @@ export class VarPackedPath {
     } else {
       otherCoordinates = other;
     }
-    return new this.constructor(this.coordinates.subItemwise(otherCoordinates), this.pointTypes, this.contourInfo);
+    return new this.constructor(
+      this.coordinates.subItemwise(otherCoordinates),
+      this.pointTypes,
+      this.contourInfo
+    );
   }
 
   _ensureCompatibility(other) {
@@ -440,16 +493,20 @@ export class VarPackedPath {
       !arrayEquals(this.contourInfo, other.contourInfo) ||
       !pointTypesEquals(this.pointTypes, other.pointTypes)
     ) {
-      throw new VariationError("paths are not compatible");
+      throw new VariationError('paths are not compatible');
     }
   }
 
   mulScalar(scalar) {
-    return new this.constructor(this.coordinates.mulScalar(scalar), this.pointTypes, this.contourInfo);
+    return new this.constructor(
+      this.coordinates.mulScalar(scalar),
+      this.pointTypes,
+      this.contourInfo
+    );
   }
 
   drawToPath2d(path) {
-    let startPoint = 0
+    let startPoint = 0;
     const coordinates = this.coordinates;
     const pointTypes = this.pointTypes;
 
@@ -461,24 +518,47 @@ export class VarPackedPath {
 
       // Determine the index of the first on-curve point, if any
       for (let i = 0; i < numPoints; i++) {
-        if ((pointTypes[i + startPoint] & VarPackedPath.POINT_TYPE_MASK) === VarPackedPath.ON_CURVE) {
+        if (
+          (pointTypes[i + startPoint] & VarPackedPath.POINT_TYPE_MASK) ===
+          VarPackedPath.ON_CURVE
+        ) {
           firstOnCurve = i;
           break;
         }
       }
 
       if (firstOnCurve !== null) {
-        drawContourToPath(path, coordinates, pointTypes, startPoint, numPoints, firstOnCurve, contour.isClosed);
+        drawContourToPath(
+          path,
+          coordinates,
+          pointTypes,
+          startPoint,
+          numPoints,
+          firstOnCurve,
+          contour.isClosed
+        );
       } else {
         // draw quad blob
         // create copy of contour points, and insert implied on-curve at front
-        const blobCoordinates = coordinates.slice(startPoint * 2, (endPoint + 1) * 2);
+        const blobCoordinates = coordinates.slice(
+          startPoint * 2,
+          (endPoint + 1) * 2
+        );
         const blobPointTypes = pointTypes.slice(startPoint, endPoint + 1);
         const xMid = (blobCoordinates[0] + blobCoordinates[endPoint * 2]) / 2;
-        const yMid = (blobCoordinates[1] + blobCoordinates[endPoint * 2 + 1]) / 2;
+        const yMid =
+          (blobCoordinates[1] + blobCoordinates[endPoint * 2 + 1]) / 2;
         blobCoordinates.unshift(xMid, yMid);
         blobPointTypes.unshift(VarPackedPath.ON_CURVE);
-        drawContourToPath(path, blobCoordinates, blobPointTypes, 0, numPoints + 1, 0, true);
+        drawContourToPath(
+          path,
+          blobCoordinates,
+          blobPointTypes,
+          0,
+          numPoints + 1,
+          0,
+          true
+        );
       }
 
       startPoint = endPoint + 1;
@@ -490,7 +570,10 @@ export class VarPackedPath {
     for (let i = 0; i < this.coordinates.length; i += 2) {
       const x = this.coordinates[i];
       const y = this.coordinates[i + 1];
-      [coordinates[i], coordinates[i + 1]] = transformation.transformPoint(x, y);
+      [coordinates[i], coordinates[i + 1]] = transformation.transformPoint(
+        x,
+        y
+      );
     }
     return new this.constructor(coordinates, this.pointTypes, this.contourInfo);
   }
@@ -499,7 +582,9 @@ export class VarPackedPath {
     const result = new VarPackedPath();
     result.coordinates = this.coordinates.concat(other.coordinates);
     result.pointTypes = this.pointTypes.concat(other.pointTypes);
-    result.contourInfo = this.contourInfo.concat(other.contourInfo).map(c => { return {...c}; });
+    result.contourInfo = this.contourInfo.concat(other.contourInfo).map((c) => {
+      return { ...c };
+    });
     const endPointOffset = this.numPoints;
     for (let i = this.contourInfo.length; i < result.contourInfo.length; i++) {
       result.contourInfo[i].endPoint += endPointOffset;
@@ -512,31 +597,39 @@ export class VarPackedPath {
     let startPoint = 0;
     for (const contourInfo of this.contourInfo) {
       if (contourInfo.endPoint < startPoint - 1) {
-        console.log("endPoint before start point");
+        console.log('endPoint before start point');
         bad = true;
       }
       startPoint = contourInfo.endPoint + 1;
     }
     if (startPoint !== this.pointTypes.length) {
-      console.log("bad final end point");
+      console.log('bad final end point');
       bad = true;
     }
     if (this.coordinates.length !== this.pointTypes.length * 2) {
-      console.log("coordinates length does not match point types length");
+      console.log('coordinates length does not match point types length');
       bad = true;
     }
     return bad;
   }
-
 }
 
-
-function drawContourToPath(path, coordinates, pointTypes, startPoint, numPoints, firstOnCurve, isClosed) {
+function drawContourToPath(
+  path,
+  coordinates,
+  pointTypes,
+  startPoint,
+  numPoints,
+  firstOnCurve,
+  isClosed
+) {
   let currentSegment = [];
   let segmentFunc = drawLineSegment;
   const lastIndex = isClosed ? numPoints : numPoints - 1 - firstOnCurve;
   for (let i = 0; i <= lastIndex; i++) {
-    const index = isClosed ? (startPoint + (firstOnCurve + i) % numPoints) : (startPoint + firstOnCurve + i);
+    const index = isClosed
+      ? startPoint + ((firstOnCurve + i) % numPoints)
+      : startPoint + firstOnCurve + i;
     const pointType = pointTypes[index] & VarPackedPath.POINT_TYPE_MASK;
     const x = coordinates[index * 2];
     const y = coordinates[index * 2 + 1];
@@ -546,7 +639,7 @@ function drawContourToPath(path, coordinates, pointTypes, startPoint, numPoints,
       currentSegment.push(x, y);
       switch (pointType) {
         case VarPackedPath.ON_CURVE:
-          segmentFunc(path, currentSegment)
+          segmentFunc(path, currentSegment);
           currentSegment = [];
           segmentFunc = drawLineSegment;
           break;
@@ -557,7 +650,7 @@ function drawContourToPath(path, coordinates, pointTypes, startPoint, numPoints,
           segmentFunc = drawCubicSegment;
           break;
         default:
-          throw new Error("illegal point type");
+          throw new Error('illegal point type');
       }
     }
   }
@@ -566,11 +659,9 @@ function drawContourToPath(path, coordinates, pointTypes, startPoint, numPoints,
   }
 }
 
-
 function drawLineSegment(path, segment) {
   path.lineTo(...segment);
 }
-
 
 function drawQuadSegment(path, segment) {
   let [x1, y1] = [segment[0], segment[1]];
@@ -584,7 +675,6 @@ function drawQuadSegment(path, segment) {
   }
   path.quadraticCurveTo(x1, y1, segment[lastIndex], segment[lastIndex + 1]);
 }
-
 
 function drawCubicSegment(path, segment) {
   if (segment.length === 4) {
@@ -602,42 +692,38 @@ function drawCubicSegment(path, segment) {
   }
 }
 
-
 function arrayEquals(a, b) {
   // Oh well
   return JSON.stringify(a) === JSON.stringify(b);
 }
-
 
 function pointTypesEquals(a, b) {
   if (a.length !== b.length) {
     return false;
   }
   for (let i = 0; i < a.length; i++) {
-    if ((a[i] & VarPackedPath.POINT_TYPE_MASK) != (b[i] & VarPackedPath.POINT_TYPE_MASK)) {
+    if (
+      (a[i] & VarPackedPath.POINT_TYPE_MASK) !=
+      (b[i] & VarPackedPath.POINT_TYPE_MASK)
+    ) {
       return false;
     }
   }
   return true;
 }
 
-
 function packPointType(type, smooth) {
   let pointType = VarPackedPath.ON_CURVE;
   if (type) {
-    pointType = (
+    pointType =
       type === POINT_TYPE_OFF_CURVE_CUBIC
-      ?
-      VarPackedPath.OFF_CURVE_CUBIC
-      :
-      VarPackedPath.OFF_CURVE_QUAD
-    );
+        ? VarPackedPath.OFF_CURVE_CUBIC
+        : VarPackedPath.OFF_CURVE_QUAD;
   } else if (smooth) {
     pointType |= VarPackedPath.SMOOTH_FLAG;
   }
   return pointType;
 }
-
 
 export function packContour(unpackedContour) {
   const coordinates = new VarArray(unpackedContour.points.length * 2);
@@ -649,8 +735,8 @@ export function packContour(unpackedContour) {
     pointTypes[i] = packPointType(point.type, point.smooth);
   }
   return {
-    "coordinates": coordinates,
-    "pointTypes": pointTypes,
-    "isClosed": unpackedContour.isClosed,
+    coordinates: coordinates,
+    pointTypes: pointTypes,
+    isClosed: unpackedContour.isClosed,
   };
 }
