@@ -227,13 +227,18 @@ class FontraServer:
         }
         extensions = extensionMapping.get(contentType)
         if extensions is not None:
-            pattern = rf'("[^"]+)(\.({"|".join(extensions)})")'
-            repl = rf"\1.{self.versionToken}\2"
-            if isinstance(data, bytes):
-                data = re.sub(pattern, repl, data.decode("utf-8")).encode("utf-8")
-            else:
-                data = re.sub(pattern, repl, data)
+            data = addVersionTokenToReferences(data, self.versionToken, extensions)
         return data
+
+
+def addVersionTokenToReferences(data, versionToken, extensions):
+    pattern = rf"""((['"])[./][./A-Za-z-]+)(\.({"|".join(extensions)})\2)"""
+    repl = rf"\1.{versionToken}\3"
+    if isinstance(data, bytes):
+        data = re.sub(pattern, repl, data.decode("utf-8")).encode("utf-8")
+    else:
+        data = re.sub(pattern, repl, data)
+    return data
 
 
 def getResourcePath(modulePath, resourceName):
