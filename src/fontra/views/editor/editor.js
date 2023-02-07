@@ -652,8 +652,9 @@ export class EditorController {
       ...glyphInfos
     );
     await this.setGlyphLines(glyphLines);
-    this.sceneController.selectedGlyph = `${selectedGlyphInfo.lineIndex}/${selectedGlyphInfo.glyphIndex + 1
-      }`;
+    this.sceneController.selectedGlyph = `${selectedGlyphInfo.lineIndex}/${
+      selectedGlyphInfo.glyphIndex + 1
+    }`;
     this.updateTextEntryFromGlyphLines();
     await this.updateSlidersAndSources();
     this.setAutoViewBox();
@@ -667,6 +668,9 @@ export class EditorController {
     if (hasShortcutModifierKey(event)) {
       // console.log("shortcut?", event.key);
       let didHandleShortcut = false;
+      if (isTypeableInput(document.activeElement)) {
+        return;
+      }
       switch (event.key.toLowerCase()) {
         case "-":
           this.zoomOut();
@@ -684,22 +688,32 @@ export class EditorController {
         case "z":
           const isRedo = event.shiftKey;
           const undoInfo = this.sceneController.getUndoRedoInfo(isRedo);
-          if (!isTypeableInput(document.activeElement)) {
-            // with the await below, we must immediately stop propagation, or
-            // the undo shortcut will still reach text elements
-            event.preventDefault();
-            event.stopImmediatePropagation();
-            if (undoInfo) {
-              await this.doUndoRedo(isRedo);
-            }
+          // with the await below, we must immediately stop propagation, or
+          // the undo shortcut will still reach text elements
+          event.preventDefault();
+          event.stopImmediatePropagation();
+          if (undoInfo) {
+            await this.doUndoRedo(isRedo);
           }
           break;
         case "a":
           const clearSelection = event.shiftKey;
+          const positionedGlyph =
+            this.sceneController.sceneModel.getSelectedPositionedGlyph();
+
+          if (positionedGlyph) {
+            const glyphPath = positionedGlyph.glyph.path;
+            const allPoints = new Set();
+
+            for (const [pointIndex] of glyphPath.pointTypes.entries()) {
+              allPoints.add(`point/${pointIndex}`);
+            }
+
+            this.sceneController.selection = allPoints;
+          }
+
           if (clearSelection) {
             this.sceneController.selection = new Set();
-          } else {
-            console.log('select all points');
           }
 
           didHandleShortcut = true;
