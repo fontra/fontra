@@ -688,12 +688,23 @@ export class EditorController {
         case "z":
           const isRedo = event.shiftKey;
           const undoInfo = this.sceneController.getUndoRedoInfo(isRedo);
+<<<<<<< HEAD
           // with the await below, we must immediately stop propagation, or
           // the undo shortcut will still reach text elements
           event.preventDefault();
           event.stopImmediatePropagation();
           if (undoInfo) {
             await this.doUndoRedo(isRedo);
+=======
+          if (!isTypeableInput(document.activeElement)) {
+            // with the await below, we must immediately stop propagation, or
+            // the undo shortcut will still reach text elements
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            if (undoInfo) {
+              await this.doUndoRedo(isRedo);
+            }
+>>>>>>> 18f99b5d (Don't propagate command-Z in any case when the canvas has focus.)
           }
           break;
         case "a":
