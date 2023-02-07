@@ -652,9 +652,8 @@ export class EditorController {
       ...glyphInfos
     );
     await this.setGlyphLines(glyphLines);
-    this.sceneController.selectedGlyph = `${selectedGlyphInfo.lineIndex}/${
-      selectedGlyphInfo.glyphIndex + 1
-    }`;
+    this.sceneController.selectedGlyph = `${selectedGlyphInfo.lineIndex}/${selectedGlyphInfo.glyphIndex + 1
+      }`;
     this.updateTextEntryFromGlyphLines();
     await this.updateSlidersAndSources();
     this.setAutoViewBox();
@@ -693,6 +692,17 @@ export class EditorController {
             await this.doUndoRedo(isRedo);
             didHandleShortcut = true;
           }
+          break;
+        case "a":
+          const clearSelection = event.shiftKey;
+          if (clearSelection) {
+            this.sceneController.selection = new Set();
+          } else {
+            console.log('select all points');
+          }
+
+          didHandleShortcut = true;
+
           break;
         default:
           // console.log("unhandled", event);
