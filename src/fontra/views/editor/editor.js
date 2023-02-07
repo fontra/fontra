@@ -684,13 +684,14 @@ export class EditorController {
         case "z":
           const isRedo = event.shiftKey;
           const undoInfo = this.sceneController.getUndoRedoInfo(isRedo);
-          if (undoInfo && !isTypeableInput(document.activeElement)) {
+          if (!isTypeableInput(document.activeElement)) {
             // with the await below, we must immediately stop propagation, or
             // the undo shortcut will still reach text elements
             event.preventDefault();
             event.stopImmediatePropagation();
-            await this.doUndoRedo(isRedo);
-            didHandleShortcut = true;
+            if (undoInfo) {
+              await this.doUndoRedo(isRedo);
+            }
           }
           break;
         case "a":
