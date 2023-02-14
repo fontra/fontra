@@ -1,428 +1,432 @@
 <!DOCTYPE html>
 <html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Fontra</title>
+    <link href="/css/ui-styling.css" rel="stylesheet" />
+    <link href="/css/slider.css" rel="stylesheet" />
+    <link href="/css/context-menu.css" rel="stylesheet" />
+    <link href="/css/core.css" rel="stylesheet" />
+    <link href="/editor/editor.css" rel="stylesheet" />
+    <script type="module" src="/web-components/options-list.js"></script>
+  </head>
 
-<head>
-  <meta charset="utf-8" />
-  <title>Fontra</title>
-  <link href="/css/ui-styling.css" rel="stylesheet" />
-  <link href="/css/slider.css" rel="stylesheet" />
-  <link href="/css/context-menu.css" rel="stylesheet" />
-  <link href="/css/core.css" rel="stylesheet" />
-  <link href="/editor/editor.css" rel="stylesheet" />
-  <script type="module" src="/web-components/options-list.js"></script>
-</head>
+  <style type="text/css">
+    /* TODO: this should move to editor.css */
 
-<style type="text/css">
-  /* TODO: this should move to editor.css */
-
-  html,
-  body {
-    margin: 0;
-    padding: 0;
-    height: 100vh;
-  }
-
-  :root {
-    --sidebar-tab-width: 1.55em;
-    --sidebar-content-width-left: 20em;
-    --sidebar-content-width-right: 22em;
-  }
-
-  .editor-container {
-    display: grid;
-    position: relative;
-    grid-template-columns: auto 1fr auto;
-    grid-template-rows: 100%;
-    height: 100%;
-  }
-
-  .sidebar-container {
-    z-index: 100;
-
-    background-color: var(--editor-overlay-item-background-color);
-    width: 0;
-    height: 100%;
-    transition: 120ms;
-    /* timing should match timer in tabClick() */
-  }
-
-  .sidebar-container.left.visible {
-    width: var(--sidebar-content-width-left);
-  }
-
-  .sidebar-container.right.visible {
-    width: var(--sidebar-content-width-right);
-  }
-
-  .main-container {
-    position: relative;
-    grid-column: 2;
-  }
-
-  .main-content {
-    position: relative;
-    width: 100%;
-    height: 100%;
-  }
-
-  .main-overlay-container {
-    position: absolute;
-    display: grid;
-    grid-template-columns: 3.5em 1fr 3.5em;
-
-    box-sizing: border-box;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-
-    pointer-events: none;
-  }
-
-  .tab-overlay-container {
-    display: grid;
-    gap: 1em;
-    padding-top: 1em;
-    align-content: start;
-  }
-
-  .tab-overlay-container.left {
-    justify-content: start;
-    justify-items: start;
-  }
-
-  .tab-overlay-container.right {
-    justify-content: end;
-    justify-items: end;
-  }
-
-  .sidebar-shadow-box {
-    z-index: 10;
-    position: absolute;
-    display: none;
-
-    box-shadow: 0px 0px 8px #0006;
-    top: 0;
-    width: 50px;
-    /* arbitrary > blur radius */
-    height: 100%;
-  }
-
-  .sidebar-shadow-box.visible {
-    display: inherit;
-  }
-
-  .tab-overlay-container.left>.sidebar-shadow-box {
-    left: -50px;
-  }
-
-  .tab-overlay-container.right>.sidebar-shadow-box {
-    right: -50px;
-  }
-
-  .sidebar-tab {
-    z-index: 0;
-    /* below the shadow box */
-
-    box-sizing: border-box;
-    width: var(--sidebar-tab-width);
-    height: 1.4em;
-    background-color: var(--editor-overlay-item-background-color);
-    box-shadow: 0px 3px 8px #0006;
-
-    padding: 0.25em 0.25em 0.45em 0.25em;
-    font-family: fontra-icons, sans-serif;
-    font-size: 2em;
-    line-height: 0.7em;
-
-    cursor: pointer;
-    pointer-events: auto;
-    user-select: none;
-
-    animation-duration: 120ms;
-    animation-direction: alternate;
-    animation-timing-function: ease-out;
-    animation-iteration-count: 2;
-  }
-
-  .sidebar-tab.selected {
-    z-index: 20;
-    /* elevate it above the shadow box */
-  }
-
-  @keyframes tab-slide-out-animation {
-    100% {
-      width: calc(var(--sidebar-tab-width) + 0.1em);
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100vh;
     }
-  }
 
-  @keyframes tab-slide-in-animation {
-    100% {
-      width: calc(var(--sidebar-tab-width) - 0.1em);
+    :root {
+      --sidebar-tab-width: 1.55em;
+      --sidebar-content-width-left: 20em;
+      --sidebar-content-width-right: 22em;
     }
-  }
 
-  .sidebar-tab:hover {
-    animation-name: tab-slide-out-animation;
-  }
+    .editor-container {
+      display: grid;
+      position: relative;
+      grid-template-columns: auto 1fr auto;
+      grid-template-rows: 100%;
+      height: 100%;
+    }
 
-  .sidebar-tab.selected:hover {
-    animation-name: tab-slide-in-animation;
-  }
+    .sidebar-container {
+      z-index: 100;
 
-  .tab-overlay-container.left>.sidebar-tab {
-    border-radius: 0 0.4em 0.4em 0;
-    text-align: right;
-  }
+      background-color: var(--editor-overlay-item-background-color);
+      width: 0;
+      height: 100%;
+      transition: 120ms;
+      /* timing should match timer in tabClick() */
+    }
 
-  .tab-overlay-container.right>.sidebar-tab {
-    border-radius: 0.4em 0 0 0.4em;
-    text-align: left;
-  }
+    .sidebar-container.left.visible {
+      width: var(--sidebar-content-width-left);
+    }
 
-  .sidebar-content {
-    display: none;
+    .sidebar-container.right.visible {
+      width: var(--sidebar-content-width-right);
+    }
 
-    box-sizing: border-box;
-    height: 100%;
-  }
+    .main-container {
+      position: relative;
+      grid-column: 2;
+    }
 
-  .sidebar-container.left>.sidebar-content {
-    float: right;
-    width: var(--sidebar-content-width-left);
-  }
+    .main-content {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
 
-  .sidebar-container.right>.sidebar-content {
-    float: left;
-    width: var(--sidebar-content-width-right);
-  }
+    .main-overlay-container {
+      position: absolute;
+      display: grid;
+      grid-template-columns: 3.5em 1fr 3.5em;
 
-  .sidebar-container>.sidebar-content.selected {
-    display: inherit;
-  }
+      box-sizing: border-box;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
 
-  /* overlay content styling */
+      pointer-events: none;
+    }
 
-  .tool-overlay-container {
-    display: grid;
-    margin: 0;
-  }
+    .tab-overlay-container {
+      display: grid;
+      gap: 1em;
+      padding-top: 1em;
+      align-content: start;
+    }
 
-  #text-entry-overlay {
-    margin: 1em;
-  }
+    .tab-overlay-container.left {
+      justify-content: start;
+      justify-items: start;
+    }
 
-  /* sidebar content styling */
+    .tab-overlay-container.right {
+      justify-content: end;
+      justify-items: end;
+    }
 
-  .sidebar-text-entry {
-    box-sizing: border-box;
-    height: 100%;
-    display: grid;
-    gap: 0.5em;
-    padding: 1em;
-    grid-template-rows: auto auto 1fr;
-  }
+    .sidebar-shadow-box {
+      z-index: 10;
+      position: absolute;
+      display: none;
 
-  #text-align-menu {
-    display: grid;
-    grid-template-columns: auto auto auto;
-    justify-content: start;
-    gap: 0.5em;
-  }
+      box-shadow: 0px 0px 8px #0006;
+      top: 0;
+      width: 50px;
+      /* arbitrary > blur radius */
+      height: 100%;
+    }
 
-  #text-align-menu>div {
-    position: relative;
-    font-family: fontra-icons;
-    font-size: 1.5em;
-    padding: 0.02em 0.3em 0.2em 0.3em;
-    border-radius: 0.5em;
-    cursor: pointer;
-    user-select: none;
-    transition: 120ms;
-  }
+    .sidebar-shadow-box.visible {
+      display: inherit;
+    }
 
-  #text-align-menu>div:hover {
-    background-color: #c0c0c050;
-  }
+    .tab-overlay-container.left > .sidebar-shadow-box {
+      left: -50px;
+    }
 
-  #text-align-menu>div:active {
-    background-color: #c0c0c080;
-  }
+    .tab-overlay-container.right > .sidebar-shadow-box {
+      right: -50px;
+    }
 
-  #text-align-menu>div.selected {
-    background-color: #c0c0c060;
-  }
+    .sidebar-tab {
+      z-index: 0;
+      /* below the shadow box */
 
-  .sidebar-glyph-search {
-    box-sizing: border-box;
-    height: 100%;
-    display: grid;
-    gap: 1em;
-    padding: 1em;
-    grid-template-rows: auto 1fr;
-  }
+      box-sizing: border-box;
+      width: var(--sidebar-tab-width);
+      height: 1.4em;
+      background-color: var(--editor-overlay-item-background-color);
+      box-shadow: 0px 3px 8px #0006;
 
-  #glyphs-search-input {
-    border-radius: 2em;
-    height: 1.8em;
-    box-sizing: border-box;
-    width: 100%;
-    background-color: var(--editor-glyphs-search-input-background-color);
-    color: var(--editor-glyphs-search-input-foreground-color);
-    border: none;
-    padding-left: 0.8em;
-    padding-right: 0.8em;
-  }
+      padding: 0.25em 0.25em 0.45em 0.25em;
+      font-family: fontra-icons, sans-serif;
+      font-size: 2em;
+      line-height: 0.7em;
 
-  .designspace-sliders {
-    box-sizing: border-box;
-    height: 100%;
-    display: grid;
-    gap: 1em;
-    padding: 1em;
-    grid-template-rows: auto 1fr;
-  }
+      cursor: pointer;
+      pointer-events: auto;
+      user-select: none;
 
-  .sidebar-selection-info {
-    box-sizing: border-box;
-    height: 100%;
-    overflow-x: hidden;
-    overflow-y: scroll;
-    padding: 1em;
-  }
-</style>
+      animation-duration: 120ms;
+      animation-direction: alternate;
+      animation-timing-function: ease-out;
+      animation-iteration-count: 2;
+    }
 
-<body>
-  <div id="ui-dialog-container">
-    <!-- <div id="ui-dialog-content" tabindex="1"></div> -->
-  </div>
+    .sidebar-tab.selected {
+      z-index: 20;
+      /* elevate it above the shadow box */
+    }
 
-  <div id="global-loader-spinner"></div>
+    @keyframes tab-slide-out-animation {
+      100% {
+        width: calc(var(--sidebar-tab-width) + 0.1em);
+      }
+    }
 
-  <div class="editor-container">
-    <div class="sidebar-container left cleanable-overlay">
-      <div class="sidebar-content" data-sidebar-name="text-entry">
-        <div class="sidebar-text-entry">
-          <textarea rows="1" wrap="off" id="text-entry-textarea"></textarea>
-          <div id="text-align-menu">
-            <div>alignleft</div>
-            <div class="selected">aligncenter</div>
-            <div>alignright</div>
-          </div>
-        </div>
-      </div>
+    @keyframes tab-slide-in-animation {
+      100% {
+        width: calc(var(--sidebar-tab-width) - 0.1em);
+      }
+    }
 
-      <div class="sidebar-content" data-sidebar-name="glyph-search">
-        <div class="sidebar-glyph-search">
-          <div class="glyphs-search">
-            <input type="text" class="glyphs-search-input" id="glyphs-search-input" placeholder="Search glyphs"
-              autocomplete="off" oninput="window.editorController.glyphSearchFieldChanged(value)" />
-          </div>
-          <div id="glyphs-list" tabindex="1">
-            <!-- contents will be filled dynamically -->
-          </div>
-        </div>
-      </div>
+    .sidebar-tab:hover {
+      animation-name: tab-slide-out-animation;
+    }
 
-      <div class="sidebar-content" data-sidebar-name="designspace-sliders">
-        <div class="designspace-sliders">
-          <div class="axis-sliders" id="axis-sliders">
-            <!-- contents will be filled dynamically -->
-          </div>
-          <div class="sources-list" id="sources-list" tabindex="1">
-            <!-- contents will be filled dynamically -->
-          </div>
-        </div>
-      </div>
+    .sidebar-tab.selected:hover {
+      animation-name: tab-slide-in-animation;
+    }
 
-      <div class="sidebar-content" data-sidebar-name="layers">
-        <div class="sidebar-layer-preferences">
-          <div class="layer-preferences" id="layer-preferences">
-            <!-- contents will be filled dynamically -->
-          </div>
-        </div>
-      </div>
+    .tab-overlay-container.left > .sidebar-tab {
+      border-radius: 0 0.4em 0.4em 0;
+      text-align: right;
+    }
+
+    .tab-overlay-container.right > .sidebar-tab {
+      border-radius: 0.4em 0 0 0.4em;
+      text-align: left;
+    }
+
+    .sidebar-content {
+      display: none;
+
+      box-sizing: border-box;
+      height: 100%;
+    }
+
+    .sidebar-container.left > .sidebar-content {
+      float: right;
+      width: var(--sidebar-content-width-left);
+    }
+
+    .sidebar-container.right > .sidebar-content {
+      float: left;
+      width: var(--sidebar-content-width-right);
+    }
+
+    .sidebar-container > .sidebar-content.selected {
+      display: inherit;
+    }
+
+    /* overlay content styling */
+
+    .tool-overlay-container {
+      display: grid;
+      margin: 0;
+    }
+
+    #text-entry-overlay {
+      margin: 1em;
+    }
+
+    /* sidebar content styling */
+
+    .sidebar-text-entry {
+      box-sizing: border-box;
+      height: 100%;
+      display: grid;
+      gap: 0.5em;
+      padding: 1em;
+      grid-template-rows: auto auto 1fr;
+    }
+
+    #text-align-menu {
+      display: grid;
+      grid-template-columns: auto auto auto;
+      justify-content: start;
+      gap: 0.5em;
+    }
+
+    #text-align-menu > div {
+      position: relative;
+      font-family: fontra-icons;
+      font-size: 1.5em;
+      padding: 0.02em 0.3em 0.2em 0.3em;
+      border-radius: 0.5em;
+      cursor: pointer;
+      user-select: none;
+      transition: 120ms;
+    }
+
+    #text-align-menu > div:hover {
+      background-color: #c0c0c050;
+    }
+
+    #text-align-menu > div:active {
+      background-color: #c0c0c080;
+    }
+
+    #text-align-menu > div.selected {
+      background-color: #c0c0c060;
+    }
+
+    .sidebar-glyph-search {
+      box-sizing: border-box;
+      height: 100%;
+      display: grid;
+      gap: 1em;
+      padding: 1em;
+      grid-template-rows: auto 1fr;
+    }
+
+    #glyphs-search-input {
+      border-radius: 2em;
+      height: 1.8em;
+      box-sizing: border-box;
+      width: 100%;
+      background-color: var(--editor-glyphs-search-input-background-color);
+      color: var(--editor-glyphs-search-input-foreground-color);
+      border: none;
+      padding-left: 0.8em;
+      padding-right: 0.8em;
+    }
+
+    .designspace-sliders {
+      box-sizing: border-box;
+      height: 100%;
+      display: grid;
+      gap: 1em;
+      padding: 1em;
+      grid-template-rows: auto 1fr;
+    }
+
+    .sidebar-selection-info {
+      box-sizing: border-box;
+      height: 100%;
+      overflow-x: hidden;
+      overflow-y: scroll;
+      padding: 1em;
+    }
+  </style>
+
+  <body>
+    <div id="ui-dialog-container">
+      <!-- <div id="ui-dialog-content" tabindex="1"></div> -->
     </div>
 
-    <div class="main-container">
-      <canvas id="edit-canvas" tabindex="1"></canvas>
+    <div id="global-loader-spinner"></div>
 
-      <div id="mini-console"></div>
-      <div id="context-menu" tabindex="0"></div>
-
-      <div class="main-overlay-container cleanable-overlay">
-        <div class="tab-overlay-container left">
-          <div class="sidebar-shadow-box"></div>
-          <div class="sidebar-tab" data-sidebar-name="text-entry">texttool</div>
-          <div class="sidebar-tab" data-sidebar-name="glyph-search">
-            magnifyingglass
-          </div>
-          <div class="sidebar-tab" data-sidebar-name="designspace-sliders">
-            sliders
-          </div>
-          <div class="sidebar-tab" data-sidebar-name="layers">layers</div>
-          <!-- <div class="sidebar-tab" data-sidebar-name="settings">gear</div> -->
-        </div>
-
-        <div class="tool-overlay-container">
-          <div class="tools-overlay">
-            <div id="edit-tools" class="tools-item">
-              <div class="tool-button selected">
-                <div id="pointer-tool" class="tool-icon">pointer</div>
-              </div>
-              <div class="tool-button">
-                <div id="pen-tool" class="tool-icon">pointeradd</div>
-              </div>
-              <div class="tool-button">
-                <div id="hand-tool" class="tool-icon">hand</div>
-              </div>
-            </div>
-            <div id="zoom-tools" class="tools-item">
-              <div class="tool-button">
-                <div id="zoom-out" class="tool-icon">minus</div>
-              </div>
-              <div class="tool-button">
-                <div id="zoom-in" class="tool-icon">plus</div>
-              </div>
-              <div class="tool-button">
-                <div id="zoom-fit-selection" class="tool-icon">bullseye</div>
-              </div>
+    <div class="editor-container">
+      <div class="sidebar-container left cleanable-overlay">
+        <div class="sidebar-content" data-sidebar-name="text-entry">
+          <div class="sidebar-text-entry">
+            <textarea rows="1" wrap="off" id="text-entry-textarea"></textarea>
+            <div id="text-align-menu">
+              <div>alignleft</div>
+              <div class="selected">aligncenter</div>
+              <div>alignright</div>
             </div>
           </div>
         </div>
-        <!-- tool-overlay-container -->
 
-        <!-- <div></div> --><!-- overlay filler -->
+        <div class="sidebar-content" data-sidebar-name="glyph-search">
+          <div class="sidebar-glyph-search">
+            <div class="glyphs-search">
+              <input
+                type="text"
+                class="glyphs-search-input"
+                id="glyphs-search-input"
+                placeholder="Search glyphs"
+                autocomplete="off"
+                oninput="window.editorController.glyphSearchFieldChanged(value)"
+              />
+            </div>
+            <div id="glyphs-list" tabindex="1">
+              <!-- contents will be filled dynamically -->
+            </div>
+          </div>
+        </div>
 
-        <div class="tab-overlay-container right">
-          <div class="sidebar-shadow-box"></div>
-          <div class="sidebar-tab" data-sidebar-name="sidebar-selection-info">
-            info
+        <div class="sidebar-content" data-sidebar-name="designspace-sliders">
+          <div class="designspace-sliders">
+            <div class="axis-sliders" id="axis-sliders">
+              <!-- contents will be filled dynamically -->
+            </div>
+            <div class="sources-list" id="sources-list" tabindex="1">
+              <!-- contents will be filled dynamically -->
+            </div>
+          </div>
+        </div>
+
+        <div class="sidebar-content" data-sidebar-name="layers">
+          <div class="sidebar-layer-preferences">
+            <div class="layer-preferences" id="layer-preferences">
+              <!-- contents will be filled dynamically -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="main-container">
+        <canvas id="edit-canvas" tabindex="1"></canvas>
+
+        <div id="mini-console"></div>
+        <div id="context-menu" tabindex="0"></div>
+
+        <div class="main-overlay-container cleanable-overlay">
+          <div class="tab-overlay-container left">
+            <div class="sidebar-shadow-box"></div>
+            <div class="sidebar-tab" data-sidebar-name="text-entry">texttool</div>
+            <div class="sidebar-tab" data-sidebar-name="glyph-search">
+              magnifyingglass
+            </div>
+            <div class="sidebar-tab" data-sidebar-name="designspace-sliders">
+              sliders
+            </div>
+            <div class="sidebar-tab" data-sidebar-name="layers">layers</div>
+            <!-- <div class="sidebar-tab" data-sidebar-name="settings">gear</div> -->
+          </div>
+
+          <div class="tool-overlay-container">
+            <div class="tools-overlay">
+              <div id="edit-tools" class="tools-item">
+                <div class="tool-button selected">
+                  <div id="pointer-tool" class="tool-icon">pointer</div>
+                </div>
+                <div class="tool-button">
+                  <div id="pen-tool" class="tool-icon">pointeradd</div>
+                </div>
+                <div class="tool-button">
+                  <div id="hand-tool" class="tool-icon">hand</div>
+                </div>
+              </div>
+              <div id="zoom-tools" class="tools-item">
+                <div class="tool-button">
+                  <div id="zoom-out" class="tool-icon">minus</div>
+                </div>
+                <div class="tool-button">
+                  <div id="zoom-in" class="tool-icon">plus</div>
+                </div>
+                <div class="tool-button">
+                  <div id="zoom-fit-selection" class="tool-icon">bullseye</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- tool-overlay-container -->
+
+          <!-- <div></div> --><!-- overlay filler -->
+
+          <div class="tab-overlay-container right">
+            <div class="sidebar-shadow-box"></div>
+            <div class="sidebar-tab" data-sidebar-name="sidebar-selection-info">
+              info
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sidebar-container right cleanable-overlay">
+        <div class="sidebar-content" data-sidebar-name="sidebar-selection-info">
+          <div class="sidebar-selection-info">
+            <div id="selection-info">
+              <!-- contents will be filled dynamically -->
+            </div>
           </div>
         </div>
       </div>
     </div>
+  </body>
 
-    <div class="sidebar-container right cleanable-overlay">
-      <div class="sidebar-content" data-sidebar-name="sidebar-selection-info">
-        <div class="sidebar-selection-info">
-          <div id="selection-info">
-            <!-- contents will be filled dynamically -->
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</body>
+  <script type="module">
+    import { EditorController } from "/editor/editor.js";
 
-<script type="module">
-  import { EditorController } from "/editor/editor.js";
+    async function startApp() {
+      window.editorController = await EditorController.fromWebSocket();
+    }
 
-  async function startApp() {
-    window.editorController = await EditorController.fromWebSocket();
-  }
-
-  startApp();
-</script>
-
+    startApp();
+  </script>
 </html>
