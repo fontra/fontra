@@ -700,7 +700,6 @@ export class EditorController {
 
   initContextMenuItems() {
     this.basicContextMenuItems = [];
-    const undoTitles = ["Undo", "Redo"];
     for (const isRedo of [0, 1]) {
       this.basicContextMenuItems.push({
         title: () => this.getUndoRedoLabel(isRedo),
