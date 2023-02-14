@@ -354,6 +354,10 @@ export class EditorController {
       },
     ]; // this should come from somewhere dynamically
     optionsList.setAttribute("options", JSON.stringify(layersOptions));
+    optionsList.addEventListener("click", (e) => {
+      console.dir(e.target.options);
+    });
+
     layerPreferencesContainer.appendChild(optionsList);
   }
 

@@ -144,7 +144,6 @@ export class OptionsList extends LitElement {
     });
 
     updatedOptions.isChecked = e.target.checked;
-    console.log(this.options);
   }
 }
 
