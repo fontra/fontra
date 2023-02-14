@@ -744,11 +744,11 @@ export class EditorController {
 
     for (const menuItem of this.basicContextMenuItems) {
       if (menuItem.shortCut) {
-        this.registerShortCut(menuItem.shortCut.keysOrCodes, menuItem.shortCut, () => {
-          if (menuItem.enabled()) {
-            menuItem.callback();
-          }
-        });
+        this.registerShortCut(
+          menuItem.shortCut.keysOrCodes,
+          menuItem.shortCut,
+          menuItem.callback
+        );
       }
     }
   }
