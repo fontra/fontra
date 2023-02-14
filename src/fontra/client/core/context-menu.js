@@ -24,7 +24,6 @@ export class ContextMenu {
         const itemTitle = typeof item.title === "function" ? item.title() : item.title;
         itemElement.classList.add("context-menu-item");
         itemElement.classList.toggle("enabled", !!item.enabled());
-
         itemElement.innerText = itemTitle;
         itemElement.onmouseenter = (event) => this.selectItem(itemElement);
         itemElement.onmousemove = (event) => {
