@@ -321,12 +321,8 @@ registerRepresentationFactory(
   "closedContoursPath2d",
   (glyph) => {
     const closedContoursPath2d = new Path2D();
-    const path = glyph.instance.path;
-    const componentsPath = glyph.componentsPath;
-    const allContoursClosed =
-      path.contourInfo.every((contour) => contour.isClosed) &&
-      componentsPath.contourInfo.every((contour) => contour.isClosed);
-    if (allContoursClosed) {
+    const path = glyph.flattenedPath;
+    if (path.contourInfo.every((contour) => contour.isClosed)) {
       return glyph.flattenedPath2d;
     }
     for (const [i, contour] of enumerate(path.contourInfo)) {
@@ -334,7 +330,6 @@ registerRepresentationFactory(
         path.drawContourToPath2d(closedContoursPath2d, i);
       }
     }
-    glyph.componentsPath.drawToPath2d(closedContoursPath2d);
     return closedContoursPath2d;
   }
 );
