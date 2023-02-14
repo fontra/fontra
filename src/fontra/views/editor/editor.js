@@ -259,7 +259,7 @@ export class EditorController {
     await this.fontController.subscribeChanges(rootSubscriptionPattern, false);
     await this.initGlyphNames();
     await this.initSliders();
-    this.initLayerPreferences();
+    this.initLayers();
     this.initTools();
     this.initSourcesList();
     await this.setupFromWindowLocation();
@@ -331,11 +331,30 @@ export class EditorController {
     );
   }
 
-  initLayerPreferences() {
+  initLayers() {
     const layerPreferencesContainer = document.getElementById("layer-preferences");
-    const preferences = document.createElement("div");
-    preferences.innerHTML = "Preferences";
-    layerPreferencesContainer.append(preferences);
+    const optionsList = document.createElement("options-list");
+    const layersOptions = [
+      {
+        name: "Path Options",
+        defaultOpen: true,
+        items: [
+          { name: "fill", isChecked: true },
+          { name: "stroke", isChecked: false },
+          { name: "metrics", isChecked: true },
+        ],
+      },
+      {
+        name: "Canvas Options",
+        items: [
+          { name: "guidelines", isChecked: true },
+          { name: "measurements", isChecked: true },
+          { name: "grid", isChecked: false },
+        ],
+      },
+    ]; // this should come from somewhere dynamically
+    optionsList.setAttribute("options", JSON.stringify(layersOptions));
+    layerPreferencesContainer.appendChild(optionsList);
   }
 
   initTools() {
