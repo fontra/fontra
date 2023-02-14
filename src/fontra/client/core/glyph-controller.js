@@ -322,6 +322,13 @@ registerRepresentationFactory(
   (glyph) => {
     const closedContoursPath2d = new Path2D();
     const path = glyph.instance.path;
+    const componentsPath = glyph.componentsPath;
+    const allContoursClosed =
+      path.contourInfo.every((contour) => contour.isClosed) &&
+      componentsPath.contourInfo.every((contour) => contour.isClosed);
+    if (allContoursClosed) {
+      return glyph.flattenedPath2d;
+    }
     for (const [i, contour] of enumerate(path.contourInfo)) {
       if (contour.isClosed) {
         path.drawContourToPath2d(closedContoursPath2d, i);
