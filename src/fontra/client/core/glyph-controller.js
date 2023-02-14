@@ -323,6 +323,7 @@ registerRepresentationFactory(
     const closedContoursPath2d = new Path2D();
     const path = glyph.flattenedPath;
     if (path.contourInfo.every((contour) => contour.isClosed)) {
+      // No open contours found, just use flattenedPath2d
       return glyph.flattenedPath2d;
     }
     for (const [i, contour] of enumerate(path.contourInfo)) {
