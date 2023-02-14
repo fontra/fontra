@@ -21,25 +21,22 @@ export class ContextMenu {
         this.element.appendChild(dividerElement);
       } else {
         const itemElement = document.createElement("div");
+        const itemTitle = typeof item.title === "function" ? item.title() : item.title;
         itemElement.classList.add("context-menu-item");
-        itemElement.classList.toggle("enabled", !item.disabled);
-        itemElement.innerText = item.title;
-        if (!item.disabled) {
-          itemElement.onmouseenter = (event) => this.selectItem(itemElement);
-          itemElement.onmousemove = (event) => {
-            if (!itemElement.classList.contains("selected")) {
-              this.selectItem(itemElement);
-            }
-          };
-          itemElement.onmouseleave = (event) =>
-            itemElement.classList.remove("selected");
-          itemElement.onclick = (event) => {
-            if (item.callback) {
-              item.callback(event);
-            }
-            this.dismiss();
-          };
-        }
+        itemElement.classList.toggle("enabled", !!item.enabled());
+
+        itemElement.innerText = itemTitle;
+        itemElement.onmouseenter = (event) => this.selectItem(itemElement);
+        itemElement.onmousemove = (event) => {
+          if (!itemElement.classList.contains("selected")) {
+            this.selectItem(itemElement);
+          }
+        };
+        itemElement.onmouseleave = (event) => itemElement.classList.remove("selected");
+        itemElement.onclick = (event) => {
+          item.callback?.(event);
+          this.dismiss();
+        };
         this.element.appendChild(itemElement);
       }
     }

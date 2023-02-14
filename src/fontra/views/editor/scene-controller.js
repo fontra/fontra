@@ -116,7 +116,8 @@ export class SceneController {
     this._eventElement.dispatchEvent(event);
   }
 
-  getContextMenuItems(event) {
+  updateContextMenuState(event) {
+    this.contextMenuState = {};
     if (!this.selectedGlyphIsEditing) {
       return;
     }
@@ -137,28 +138,34 @@ export class SceneController {
       }
       relevantSelection = this.selection;
     }
-
     const { point: pointSelection, component: componentSelection } =
       parseSelection(relevantSelection);
+    this.contextMenuState.pointSelection = pointSelection;
+    this.contextMenuState.componentSelection = componentSelection;
+  }
+
+  getContextMenuItems(event) {
     const contextMenuItems = [
       {
         title: "Break Contour",
-        disabled: !pointSelection?.length,
+        enabled: () => this.contextMenuState.pointSelection?.length,
         callback: () => this.breakContour(),
       },
       {
         title: "Reverse Contour Direction",
-        disabled: !pointSelection?.length,
+        enabled: () => this.contextMenuState.pointSelection?.length,
         callback: () => this.reverseSelectedContoursDirection(),
       },
       {
         title: "Set Start Point",
-        disabled: !pointSelection?.length,
+        enabled: () => this.contextMenuState.pointSelection?.length,
         callback: () => this.setStartPoint(),
       },
       {
-        title: "Decompose Component" + (componentSelection?.length === 1 ? "" : "s"),
-        disabled: !componentSelection?.length,
+        title: () =>
+          "Decompose Component" +
+          (this.contextMenuState.componentSelection?.length === 1 ? "" : "s"),
+        enabled: () => this.contextMenuState.componentSelection?.length,
         callback: () => this.decomposeSelectedComponents(),
       },
     ];
