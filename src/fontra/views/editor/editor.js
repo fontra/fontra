@@ -700,20 +700,20 @@ export class EditorController {
 
   initContextMenuItems() {
     this.basicContextMenuItems = [];
-    for (const isRedo of [0, 1]) {
+    for (const isRedo of [false, true]) {
       this.basicContextMenuItems.push({
         title: () => this.getUndoRedoLabel(isRedo),
         enabled: () => this.canUndoRedo(isRedo),
         callback: () => this.doUndoRedo(isRedo),
-        shortCut: { keysOrCodes: "z", metaKey: true, shiftKey: !!isRedo },
+        shortCut: { keysOrCodes: "z", metaKey: true, shiftKey: isRedo },
       });
     }
-    for (const selectNone of [0, 1]) {
+    for (const selectNone of [false, true]) {
       this.basicContextMenuItems.push({
-        title: ["Select All", "Select None"][selectNone],
+        title: selectNone ? "Select None" : "Select All",
         enabled: () => this.canSelectAllNone(selectNone),
         callback: () => this.doSelectAllNone(selectNone),
-        shortCut: { keysOrCodes: "a", metaKey: true, shiftKey: !!selectNone },
+        shortCut: { keysOrCodes: "a", metaKey: true, shiftKey: selectNone },
       });
     }
     this.glyphEditContextMenuItems = this.sceneController.getContextMenuItems();
