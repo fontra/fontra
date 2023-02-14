@@ -705,6 +705,7 @@ export class EditorController {
         title: () => this.getUndoRedoLabel(isRedo),
         enabled: () => this.canUndoRedo(isRedo),
         callback: () => this.doUndoRedo(isRedo),
+        shortCut: { keysOrCodes: "z", metaKey: true, shiftKey: !!isRedo },
       });
     }
     for (const selectNone of [0, 1]) {
@@ -712,6 +713,7 @@ export class EditorController {
         title: ["Select All", "Select None"][selectNone],
         enabled: () => this.canSelectAllNone(selectNone),
         callback: () => this.doSelectAllNone(selectNone),
+        shortCut: { keysOrCodes: "a", metaKey: true, shiftKey: !!selectNone },
       });
     }
     this.glyphEditContextMenuItems = this.sceneController.getContextMenuItems();
@@ -740,19 +742,15 @@ export class EditorController {
       }
     });
 
-    this.registerShortCut("a", { metaKey: true, shiftKey: false }, () => {
-      this.doSelectAllNone(false);
-    });
-    this.registerShortCut("a", { metaKey: true, shiftKey: true }, () => {
-      this.doSelectAllNone(true);
-    });
-
-    this.registerShortCut("z", { metaKey: true, shiftKey: false }, () => {
-      this.doUndoRedo(false);
-    });
-    this.registerShortCut("z", { metaKey: true, shiftKey: true }, () => {
-      this.doUndoRedo(true);
-    });
+    for (const menuItem of this.basicContextMenuItems) {
+      if (menuItem.shortCut) {
+        this.registerShortCut(menuItem.shortCut.keysOrCodes, menuItem.shortCut, () => {
+          if (menuItem.enabled()) {
+            menuItem.callback();
+          }
+        });
+      }
+    }
   }
 
   registerShortCut(keysOrCodes, modifiers, callback) {
