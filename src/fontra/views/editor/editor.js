@@ -891,11 +891,7 @@ export class EditorController {
 
   contextMenuHandler(event) {
     event.preventDefault();
-    const menuItems = [
-      ...this.basicContextMenuItems.map((item) => {
-        return { ...item, ...(item.build?.() || {}) };
-      }),
-    ];
+    const menuItems = [...this.basicContextMenuItems];
     if (this.sceneController.selectedGlyphIsEditing) {
       this.sceneController.updateContextMenuState(event);
       menuItems.push(MenuItemDivider);
