@@ -259,6 +259,7 @@ export class EditorController {
     await this.fontController.subscribeChanges(rootSubscriptionPattern, false);
     await this.initGlyphNames();
     await this.initSliders();
+    this.initLayerPreferences();
     this.initTools();
     this.initSourcesList();
     await this.setupFromWindowLocation();
@@ -328,6 +329,13 @@ export class EditorController {
         this.autoViewBox = false;
       })
     );
+  }
+
+  initLayerPreferences() {
+    const layerPreferencesContainer = document.getElementById("layer-preferences");
+    const preferences = document.createElement("div");
+    preferences.innerHTML = "Preferences";
+    layerPreferencesContainer.append(preferences);
   }
 
   initTools() {
