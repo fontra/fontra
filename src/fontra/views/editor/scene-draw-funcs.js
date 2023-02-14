@@ -312,7 +312,7 @@ function _drawSelectedGlyphLayer(model, controller, selectedGlyph, strokeColorNa
 export const drawPathFillLayer = requireEditingGlyph(
   glyphTranslate((model, controller, context, glyph, drawingParameters) => {
     context.fillStyle = drawingParameters.pathFillColor;
-    context.fill(glyph.flattenedPath2d);
+    context.fill(glyph.closedContoursPath2d);
   })
 );
 
