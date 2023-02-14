@@ -41,8 +41,7 @@
       background-color: var(--editor-overlay-item-background-color);
       width: 0;
       height: 100%;
-      transition: 120ms;
-      /* timing should match timer in tabClick() */
+      transition: 120ms; /* timing should match timer in tabClick() */
     }
 
     .sidebar-container.left.visible {
@@ -102,8 +101,7 @@
 
       box-shadow: 0px 0px 8px #0006;
       top: 0;
-      width: 50px;
-      /* arbitrary > blur radius */
+      width: 50px; /* arbitrary > blur radius */
       height: 100%;
     }
 
@@ -120,8 +118,7 @@
     }
 
     .sidebar-tab {
-      z-index: 0;
-      /* below the shadow box */
+      z-index: 0; /* below the shadow box */
 
       box-sizing: border-box;
       width: var(--sidebar-tab-width);
@@ -145,8 +142,7 @@
     }
 
     .sidebar-tab.selected {
-      z-index: 20;
-      /* elevate it above the shadow box */
+      z-index: 20; /* elevate it above the shadow box */
     }
 
     @keyframes tab-slide-out-animation {
