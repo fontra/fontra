@@ -188,7 +188,6 @@ export class EditorController {
     this.canvasController.canvas.addEventListener("contextmenu", (event) =>
       this.contextMenuHandler(event)
     );
-
     window.addEventListener("click", (event) => this.dismissContextMenu(event));
     window.addEventListener("blur", (event) => this.dismissContextMenu(event));
 
