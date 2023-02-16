@@ -2,7 +2,7 @@ import VarArray from "./var-array.js";
 import { VariationError } from "./errors.js";
 import { centeredRect, pointInRect } from "./rectangle.js";
 import { convexHull } from "./convex-hull.js";
-import { enumerate } from "./utils.js";
+import { enumerate, range } from "./utils.js";
 
 export const POINT_TYPE_OFF_CURVE_QUAD = "quad";
 export const POINT_TYPE_OFF_CURVE_CUBIC = "cubic";
@@ -534,6 +534,119 @@ export class VarPackedPath {
       this.pointTypes,
       this.contourInfo
     );
+  }
+
+  getContourSegmentPointIndices(contourIndex) {
+    contourIndex = this._normalizeContourIndex(contourIndex);
+    return this._getContourSegmentPointIndices(contourIndex);
+  }
+
+  _getContourSegmentPointIndices(contourIndex) {
+    const startPoint = this._getContourStartPoint(contourIndex);
+    const contour = this.contourInfo[contourIndex];
+    const segments = [
+      ...this._iterContourSegmentPointIndices(
+        startPoint,
+        contour.endPoint,
+        contour.isClosed
+      ),
+    ];
+    return { isClosed: contour.isClosed, segments: segments };
+  }
+
+  _drawContourToPath2d___(path, startPoint, endPoint, isClosed) {
+    for (const call of this._iterPath2dCalls(startPoint, endPoint, isClosed)) {
+      path[call.method](...call.args);
+    }
+  }
+
+  _drawContourToPath2dXX(path, startPoint, endPoint, isClosed) {
+    let needMoveTo = true;
+    const coordinates = this.coordinates;
+
+    function getPoint(pointIndex) {
+      return { x: coordinates[pointIndex * 2], y: coordinates[pointIndex * 2 + 1] };
+    }
+
+    const decompose = {
+      line: (pointIndices) => [pointIndices.map(getPoint)],
+      quad: (pointIndices) => [pointIndices.map(getPoint)],
+    };
+
+    for (const segment of this._iterContourSegmentPointIndices(
+      startPoint,
+      endPoint,
+      isClosed
+    )) {
+      console.log(segment.segmentType);
+      for (const points of decompose[segment.segmentType](segment.pointIndices)) {
+        //
+        if (needMoveTo) {
+          console.log("points", points);
+          path.moveTo(points[0].x, points[0].y);
+          needMoveTo = false;
+        }
+        switch (segment.segmentType) {
+          case "line":
+            path.lineTo(points[1].x, points[1].y);
+            break;
+        }
+      }
+    }
+  }
+
+  *_iterContourSegmentPointIndices(startPoint, endPoint, isClosed) {
+    const numPoints = endPoint - startPoint + 1;
+    const pointTypes = this.pointTypes;
+    let firstOnCurve = null;
+    // Determine the index of the first on-curve point, if any
+    for (let i = 0; i < numPoints; i++) {
+      if (
+        (pointTypes[i + startPoint] & VarPackedPath.POINT_TYPE_MASK) ===
+        VarPackedPath.ON_CURVE
+      ) {
+        firstOnCurve = i;
+        break;
+      }
+    }
+    if (firstOnCurve === null) {
+      // quad blob
+      // Maybe TODO: cubic blob, see glyf-1 spec
+      yield {
+        segmentType: "quadBlob", // or "cubicBlob"
+        pointIndices: [...range(startPoint, endPoint + 1)],
+      };
+    } else {
+      let currentSegment = [];
+
+      let segmentType = "line";
+      const lastIndex = isClosed ? numPoints : numPoints - 1 - firstOnCurve;
+      for (let i = 0; i <= lastIndex; i++) {
+        const pointIndex = isClosed
+          ? startPoint + ((firstOnCurve + i) % numPoints)
+          : startPoint + firstOnCurve + i;
+        const pointType = pointTypes[pointIndex] & VarPackedPath.POINT_TYPE_MASK;
+        currentSegment.push(pointIndex);
+        if (i === 0) {
+          continue;
+        }
+        switch (pointType) {
+          case VarPackedPath.ON_CURVE:
+            yield { segmentType, pointIndices: currentSegment };
+            currentSegment = [pointIndex];
+            segmentType = "line";
+            break;
+          case VarPackedPath.OFF_CURVE_QUAD:
+            segmentType = "quad";
+            break;
+          case VarPackedPath.OFF_CURVE_CUBIC:
+            segmentType = "cubic";
+            break;
+          default:
+            throw new Error("illegal point type");
+        }
+      }
+    }
   }
 
   drawToPath2d(path) {
