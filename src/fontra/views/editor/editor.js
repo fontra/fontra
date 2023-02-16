@@ -958,7 +958,6 @@ export class EditorController {
         return;
       }
     }
-
     this.contextMenu.dismiss();
     delete this.contextMenu;
   }
