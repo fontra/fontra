@@ -667,7 +667,6 @@ function* iterContourSegmentPointIndices(pointTypes, startPoint, endPoint, isClo
     ];
   } else {
     let currentSegment = [];
-
     let segmentType = "line";
     const lastIndex = isClosed ? numPoints : numPoints - 1 - firstOnCurve;
     for (let i = 0; i <= lastIndex; i++) {
