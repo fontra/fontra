@@ -801,8 +801,8 @@ const decomposeSegmentFuncs = {
     const coordinates = segment.coordinates;
     const pointIndices = segment.pointIndices;
     const lastIndex = coordinates.length - 2;
-    let [x0, y0] = [coordinates[0], coordinates[1]];
-    let [xN, yN] = [coordinates[lastIndex], coordinates[lastIndex + 1]];
+    const [x0, y0] = [coordinates[0], coordinates[1]];
+    const [xN, yN] = [coordinates[lastIndex], coordinates[lastIndex + 1]];
     const mid = [(x0 + xN) / 2, (y0 + yN) / 2];
     yield* this.quad({
       type: "quad",
