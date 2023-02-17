@@ -583,6 +583,21 @@ export class VarPackedPath {
     }
   }
 
+  *iterContourDecomposedSegments(contourIndex) {
+    contourIndex = this._normalizeContourIndex(contourIndex);
+    const startPoint = this._getContourStartPoint(contourIndex);
+    const contour = this.contourInfo[contourIndex];
+    for (const segment of this._iterDecomposedSegments(
+      startPoint,
+      contour.endPoint,
+      contour.isClosed
+    )) {
+      segment.points = coordinatesToPoints(segment.coordinates);
+      delete segment.coordinates;
+      yield segment;
+    }
+  }
+
   *_iterDecomposedSegments(startPoint, endPoint, isClosed, filterCoords = null) {
     const coordinates = this.coordinates;
     let needMoveTo = true;
@@ -844,4 +859,12 @@ export function packContour(unpackedContour) {
     pointTypes: pointTypes,
     isClosed: unpackedContour.isClosed,
   };
+}
+
+function coordinatesToPoints(coordinates) {
+  const points = [];
+  for (let i = 0; i < coordinates.length; i += 2) {
+    points.push({ x: coordinates[i], y: coordinates[i + 1] });
+  }
+  return points;
 }
