@@ -27,7 +27,7 @@ export class PathHitTester {
         }
         const projected = segment.bezier.project(point);
         if (projected.d < margin) {
-          return { contourIndex, segmentIndex, ...projected };
+          return { contourIndex, segmentIndex, ...projected, segment };
         }
       }
     }

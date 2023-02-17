@@ -81,7 +81,18 @@ describe("PathHitTester Tests", () => {
       p.closePath();
       const pcf = new PathHitTester(p);
       const hit = pcf.hitTest(testPoint, margin);
-      expect(hit).to.deep.equal(expectedHit);
+      expect(filterHit(hit)).to.deep.equal(expectedHit);
     });
   }
 });
+
+function filterHit(hit) {
+  const newHit = {};
+  const properties = ["contourIndex", "segmentIndex", "x", "y", "d", "t"];
+  for (const prop of properties) {
+    if (prop in hit) {
+      newHit[prop] = hit[prop];
+    }
+  }
+  return newHit;
+}
