@@ -588,7 +588,6 @@ export class VarPackedPath {
     if (filterCoords === null) {
       filterCoords = (arg) => arg;
     }
-    //
     const coordinates = this.coordinates;
     let needMoveTo = true;
     for (const [segmentType, pointIndices] of iterContourSegmentPointIndices(
