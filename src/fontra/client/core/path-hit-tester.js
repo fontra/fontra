@@ -7,7 +7,10 @@ export class PathHitTester {
     this.path = path;
     this.contours = [];
     for (const i of range(path.numContours)) {
-      this.contours.push({ bounds: path.getControlBoundsForContour(i) });
+      this.contours.push({
+        bounds: path.getControlBoundsForContour(i),
+        isClosed: path.contourInfo[i].isClosed,
+      });
     }
   }
 
@@ -35,60 +38,12 @@ export class PathHitTester {
     if (contour.segments) {
       return;
     }
-    const collector = new ContourCollector();
-    this.path.drawContourToPath2d(collector, contourIndex);
-    if (collector.contours.length > 1) {
-      throw new Error(`invalid number of contours found: ${collector.contours.length}`);
-    }
-    const segments = collector.contours[0];
-    contour.segments = segments
-      ? segments.map((points) => {
-          return { bezier: new Bezier(points), bounds: polyBounds(points) };
-        })
-      : [];
-  }
-}
-
-class ContourCollector {
-  constructor() {
-    this.contours = [];
-  }
-
-  moveTo(x, y) {
-    this.currentContour = [];
-    this.contours.push(this.currentContour);
-    this.currentPoint = { x, y };
-    this.firstPoint = this.currentPoint;
-  }
-
-  lineTo(x, y) {
-    const point = { x, y };
-    this.currentContour.push([this.currentPoint, point]);
-    this.currentPoint = point;
-  }
-
-  bezierCurveTo(x1, y1, x2, y2, x3, y3) {
-    const point1 = { x: x1, y: y1 };
-    const point2 = { x: x2, y: y2 };
-    const point3 = { x: x3, y: y3 };
-    this.currentContour.push([this.currentPoint, point1, point2, point3]);
-    this.currentPoint = point3;
-  }
-
-  quadraticCurveTo(x1, y1, x2, y2) {
-    const point1 = { x: x1, y: y1 };
-    const point2 = { x: x2, y: y2 };
-    this.currentContour.push([this.currentPoint, point1, point2]);
-    this.currentPoint = point2;
-  }
-
-  closePath() {
-    if (
-      this.currentPoint.x !== this.firstPoint.x ||
-      this.currentPoint.y !== this.firstPoint.y
-    ) {
-      this.currentContour.push([this.currentPoint, this.firstPoint]);
-    }
+    const segments = [...this.path.iterContourDecomposedSegments(contourIndex)];
+    segments.forEach((segment) => {
+      segment.bezier = new Bezier(segment.points);
+      segment.bounds = polyBounds(segment.points);
+    });
+    contour.segments = segments;
   }
 }
 
