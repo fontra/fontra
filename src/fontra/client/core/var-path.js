@@ -560,7 +560,6 @@ export class VarPackedPath {
       endPoint,
       isClosed
     )) {
-      //
       if (needMoveTo) {
         path.moveTo(...coordinates.slice(0, 2));
         needMoveTo = false;
