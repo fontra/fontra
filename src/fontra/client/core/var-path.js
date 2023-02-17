@@ -584,9 +584,6 @@ export class VarPackedPath {
   }
 
   *_iterDecomposedSegments(startPoint, endPoint, isClosed, filterCoords = null) {
-    if (filterCoords === null) {
-      filterCoords = (arg) => arg;
-    }
     const coordinates = this.coordinates;
     let needMoveTo = true;
     for (const segment of iterContourSegmentPointIndices(
@@ -595,7 +592,15 @@ export class VarPackedPath {
       endPoint,
       isClosed
     )) {
-      yield* decomposeSegment(this.coordinates, segment, filterCoords);
+      // fill in coordinates
+      const coordinates = this.coordinates;
+      const segmentCoordinates = [];
+      for (const pointIndex of segment.pointIndices) {
+        const pointIndex2 = pointIndex * 2;
+        segmentCoordinates.push(coordinates[pointIndex2], coordinates[pointIndex2 + 1]);
+      }
+      segment.coordinates = segmentCoordinates;
+      yield* decomposeSegment(segment, filterCoords);
     }
   }
 
@@ -702,15 +707,11 @@ function* iterContourSegmentPointIndices(pointTypes, startPoint, endPoint, isClo
   }
 }
 
-function* decomposeSegment(pathCoordinates, parentSegment, filterCoords) {
-  const segmentCoords = [];
-  for (const pointIndex of parentSegment.pointIndices) {
-    const pointIndex2 = pointIndex * 2;
-    segmentCoords.push(pathCoordinates[pointIndex2], pathCoordinates[pointIndex2 + 1]);
-  }
-  parentSegment.coordinates = segmentCoords;
+function* decomposeSegment(parentSegment, filterCoords) {
   for (const segment of decomposeSegmentFuncs[parentSegment.type](parentSegment)) {
-    segment.coordinates = filterCoords(segment.coordinates);
+    if (filterCoords) {
+      segment.coordinates = filterCoords(segment.coordinates);
+    }
     segment.parentPointIndices = parentSegment.pointIndices;
     yield segment;
   }
