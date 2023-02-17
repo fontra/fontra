@@ -555,11 +555,11 @@ export class VarPackedPath {
 
   _drawContourToPath2d(path, startPoint, endPoint, isClosed) {
     let needMoveTo = true;
-    for (const [segmentType, coordinates] of this._iterDecomposedSegments(
-      startPoint,
-      endPoint,
-      isClosed
-    )) {
+    for (const [
+      segmentType,
+      coordinates,
+      segmentPointIndices,
+    ] of this._iterDecomposedSegments(startPoint, endPoint, isClosed)) {
       if (needMoveTo) {
         path.moveTo(...coordinates.slice(0, 2));
         needMoveTo = false;
@@ -708,42 +708,48 @@ function* decomposeSegment(pathCoordinates, segmentType, pointIndices, filterCoo
     const pointIndex2 = pointIndex * 2;
     segmentCoords.push(pathCoordinates[pointIndex2], pathCoordinates[pointIndex2 + 1]);
   }
-  for (const [decSegType, decCoords] of decomposeSegmentFuncs[segmentType](
-    segmentCoords
+  for (const [decSegType, decCoords, pointIndex] of decomposeSegmentFuncs[segmentType](
+    segmentCoords,
+    pointIndices
   )) {
-    yield [decSegType, filterCoords(decCoords)];
+    yield [decSegType, filterCoords(decCoords), pointIndex];
   }
 }
 
 const decomposeSegmentFuncs = {
-  *line(coordinates) {
+  *line(coordinates, pointIndices) {
     if (coordinates.length !== 4) {
       throw new Error(`assert -- wrong coordinates length: ${coordinates.length}`);
     }
-    yield ["line", coordinates];
+    yield ["line", coordinates, pointIndices];
   },
 
-  *cubic(coordinates) {
+  *cubic(coordinates, pointIndices) {
     if (coordinates.length <= 6) {
       // Only one handle, fall back to quad
-      yield* this.quad(coordinates);
+      yield* this.quad(coordinates, pointIndices);
     } else if (coordinates.length === 8) {
-      yield ["cubic", coordinates];
+      yield ["cubic", coordinates, pointIndices];
     } else if (coordinates.length >= 8) {
       // Ignore all but the first and last off curve points
       // Alternatively: Super bezier? Implied on-curve as per glyf-1?
-      yield ["cubic", [...coordinates.slice(0, 4), ...coordinates.slice(-4)]];
+      yield [
+        "cubic",
+        [...coordinates.slice(0, 4), ...coordinates.slice(-4)],
+        [pointIndices[0], pointIndices[1], pointIndices.at(-2), pointIndices.at(-1)],
+      ];
     } else {
       throw new Error("assert -- wrong coordinates length for cubic");
     }
   },
 
-  *quad(coordinates) {
+  *quad(coordinates, pointIndices) {
     if (coordinates.length < 6) {
       throw new Error(
         `assert -- not enough coordinates for quad: ${coordinates.length}`
       );
     }
+    pointIndices = [...pointIndices];
     let [x0, y0] = [coordinates[0], coordinates[1]];
     let [x1, y1] = [coordinates[2], coordinates[3]];
     const lastIndex = coordinates.length - 2;
@@ -751,22 +757,27 @@ const decomposeSegmentFuncs = {
       const [x2, y2] = [coordinates[i], coordinates[i + 1]];
       const xMid = (x1 + x2) / 2;
       const yMid = (y1 + y2) / 2;
-      yield ["quad", [x0, y0, x1, y1, xMid, yMid]];
+      yield ["quad", [x0, y0, x1, y1, xMid, yMid], pointIndices.slice(0, 3)];
+      pointIndices.shift();
       [x0, y0] = [x1, y1];
       [x1, y1] = [x2, y2];
     }
     yield [
       "quad",
       [x0, y0, x1, y1, coordinates[lastIndex], coordinates[lastIndex + 1]],
+      pointIndices.slice(0, 3),
     ];
   },
 
-  *quadBlob(coordinates) {
+  *quadBlob(coordinates, pointIndices) {
     const lastIndex = coordinates.length - 2;
     let [x0, y0] = [coordinates[0], coordinates[1]];
     let [xN, yN] = [coordinates[lastIndex], coordinates[lastIndex + 1]];
     const mid = [(x0 + xN) / 2, (y0 + yN) / 2];
-    yield* this.quad(mid.concat(coordinates, mid));
+    yield* this.quad(
+      [...mid, ...coordinates, ...mid],
+      [pointIndices.at(-1), ...pointIndices, pointIndices[0]]
+    );
   },
 };
 
