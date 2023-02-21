@@ -874,14 +874,18 @@ export class EditorController {
   }
 
   canDelete() {
-    return (
-      this.sceneController.selection.size > 0 ||
-      this.sceneController.sceneModel.getSelectedPositionedGlyph()
-    );
+    if (this.sceneController.sceneModel.getSelectedPositionedGlyph()) {
+      if (
+        this.sceneController.selectedGlyphIsEditing &&
+        !this.sceneController.selection.size > 0
+      )
+        return false;
+      else return true;
+    }
   }
 
-  doDelete() {
-    console.log("delete");
+  async doDelete() {
+    await this.sceneController.doDelete();
   }
 
   canSelectAllNone(selectNone) {
