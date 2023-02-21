@@ -510,7 +510,6 @@ export class SceneController {
 
       const changes = recordChanges(instance, (instance) => {
         const path = instance.path;
-        // const selectedContours = getSelectedContours(path, pointSelection);
 
         let offset = 0;
         for (const point of pointSelection) {
