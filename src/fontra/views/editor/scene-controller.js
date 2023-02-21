@@ -507,50 +507,29 @@ export class SceneController {
   async doDelete() {
     await this.editInstance((sendIncrementalChange, instance) => {
       const { point: pointSelection } = parseSelection(this.selection);
-      // console.log(pointSelection);
-      // console.log(path);
 
       const changes = recordChanges(instance, (instance) => {
         const path = instance.path;
+        // const selectedContours = getSelectedContours(path, pointSelection);
+
+        let offset = 0;
         for (const point of pointSelection) {
           const [contourIndex, contourPointIndex] = path.getContourAndPointIndex(point);
-          console.log(this.selection);
+          const selectedContours = getSelectedContours(path, pointSelection);
           const contour = path.getUnpackedContour(contourIndex);
-          contour.points.reverse();
-
-          console.log(point, contourPointIndex);
-
-          // if (contour.isClosed) {
-          //   const [lastPoint] = contour.points.splice(-1, 1);
-          //   contour.points.splice(0, 0, lastPoint);
-          // }
+          console.log(point);
 
           if (contour.points.length > 1) {
-            path.deletePoint(contourIndex, contourPointIndex);
+            if (selectedContours.length > 1) {
+              path.deleteContour(contourIndex);
+            } else {
+              path.deletePoint(contourIndex, contourPointIndex - offset);
+              offset++;
+            }
           } else {
             path.deleteContour(contourIndex);
           }
         }
-
-        // console.log(point);
-        // for (const contourIndex of selectedContours) {
-        //   const contour = path.getUnpackedContour(contourIndex);
-        //   // instance.path.deletePoint(contourIndex, 0);
-
-        //   console.log(contour);
-        //   // for (const contourPoint in contour.points) {
-        //   //   console.log(contourPoint);
-        //   // }
-        //   //   if (contour.isClosed) {
-        //   //     console.log(contour);
-        //   //     const [lastPoint] = contour.points.splice(-1, 1);
-        //   //     contour.points.splice(0, 0, lastPoint);
-        //   //   }
-        //   // const packedContour = packContour(contour);
-        //   // console.log(packedContour);
-        //   //   instance.path.deleteContour(contourIndex);
-        //   //   // instance.path.insertContour(contourIndex, packedContour);
-        // }
       });
       return {
         changes: changes,
