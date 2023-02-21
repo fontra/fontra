@@ -874,7 +874,10 @@ export class EditorController {
   }
 
   canDelete() {
-    return true;
+    return (
+      this.sceneController.selection.size > 0 ||
+      this.sceneController.sceneModel.getSelectedPositionedGlyph()
+    );
   }
 
   doDelete() {
