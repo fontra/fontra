@@ -1,7 +1,7 @@
 import chai from "chai";
 const expect = chai.expect;
 
-import { SVGPath2D } from "../src/fontra/client/core/svg-glyph.js";
+import { SVGPath2D } from "../src/fontra/client/core/glyph-svg.js";
 
 describe("SVGPath2D tests", () => {
   it("empty path", () => {
