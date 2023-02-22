@@ -32,6 +32,7 @@ import {
   themeSwitchFromLocalStorage,
   throttleCalls,
   reversed,
+  writeToClipboard,
 } from "../core/utils.js";
 import { SceneController } from "./scene-controller.js";
 import * as sceneDraw from "./scene-draw-funcs.js";
@@ -40,6 +41,7 @@ import { HandTool } from "./edit-tools-hand.js";
 import { PenTool } from "./edit-tools-pen.js";
 import { PointerTool } from "./edit-tools-pointer.js";
 import { deleteSelectedPoints } from "../core/path-functions.js";
+import { pathToSVG } from "../core/glyph-svg.js";
 
 const drawingParametersLight = {
   glyphFillColor: "#000",
@@ -852,11 +854,25 @@ export class EditorController {
   }
 
   canCopy() {
-    return true;
+    return this.sceneController.selection.size > 0;
   }
 
   doCopy() {
-    console.log("copy");
+    const positionedGlyph =
+      this.sceneController.sceneModel.getSelectedPositionedGlyph();
+    const glyphController = positionedGlyph?.glyph;
+    const instance = glyphController?.instance;
+    const bounds = glyphController.controlBounds;
+
+    const svgString = pathToSVG(instance, bounds);
+
+    const clipboardObject = {
+      "text/plain": svgString,
+      "text/html": svgString,
+      // "web image/svg+xml": svgString,
+    };
+
+    writeToClipboard(clipboardObject);
   }
 
   canPaste() {
