@@ -2,7 +2,7 @@ import VarArray from "./var-array.js";
 import { VariationError } from "./errors.js";
 import { centeredRect, pointInRect } from "./rectangle.js";
 import { convexHull } from "./convex-hull.js";
-import { enumerate, range } from "./utils.js";
+import { enumerate, range, reversed } from "./utils.js";
 
 export const POINT_TYPE_OFF_CURVE_QUAD = "quad";
 export const POINT_TYPE_OFF_CURVE_CUBIC = "cubic";
@@ -206,6 +206,24 @@ export class VarPackedPath {
     this._replacePoints(startPoint, numPoints, [], []);
     this.contourInfo.splice(contourIndex, 1);
     this._moveEndPoints(contourIndex, -numPoints);
+  }
+
+  deleteSelectedPoints(pointIndices, selectedContours) {
+    for (const pointIndex of reversed(pointIndices)) {
+      const [contourIndex, contourPointIndex] =
+        this.getContourAndPointIndex(pointIndex);
+      const numContourPoints = this.getNumPointsOfContour(contourIndex);
+
+      if (numContourPoints > 1) {
+        if (selectedContours.length > 1) {
+          this.deleteContour(contourIndex);
+        } else {
+          this.deletePoint(contourIndex, contourPointIndex);
+        }
+      } else {
+        this.deleteContour(contourIndex);
+      }
+    }
   }
 
   getPoint(pointIndex) {
