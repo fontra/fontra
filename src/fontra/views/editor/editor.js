@@ -31,6 +31,7 @@ import {
   scheduleCalls,
   themeSwitchFromLocalStorage,
   throttleCalls,
+  reversed,
 } from "../core/utils.js";
 import { SceneController } from "./scene-controller.js";
 import * as sceneDraw from "./scene-draw-funcs.js";
@@ -38,6 +39,7 @@ import { SceneModel } from "./scene-model.js";
 import { HandTool } from "./edit-tools-hand.js";
 import { PenTool } from "./edit-tools-pen.js";
 import { PointerTool } from "./edit-tools-pointer.js";
+import { deleteSelectedPoints } from "../core/path-functions.js";
 
 const drawingParametersLight = {
   glyphFillColor: "#000",
@@ -881,7 +883,31 @@ export class EditorController {
   }
 
   async doDelete() {
-    await this.sceneController.doDelete();
+    await this.sceneController.editInstance((sendIncrementalChange, instance) => {
+      const { point: pointSelection, component: componentSelection } = parseSelection(
+        this.sceneController.selection
+      );
+
+      const changes = recordChanges(instance, (instance) => {
+        const path = instance.path;
+
+        if (pointSelection) {
+          deleteSelectedPoints(path, pointSelection);
+        }
+
+        if (componentSelection) {
+          for (const componentIndex of reversed(componentSelection)) {
+            instance.components.splice(componentIndex, 1);
+          }
+        }
+      });
+      return {
+        changes: changes,
+        selection: new Set(),
+        undoLabel: "Delete Selection",
+        broadcast: true,
+      };
+    });
   }
 
   canSelectAllNone(selectNone) {

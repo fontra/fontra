@@ -127,11 +127,3 @@ export function deleteSelectedPoints(path, pointIndices) {
     }
   }
 }
-
-export function getSelectedContours(path, pointIndices) {
-  const selectedContours = new Set();
-  for (const pointIndex of pointIndices) {
-    selectedContours.add(path.getContourIndex(pointIndex));
-  }
-  return [...selectedContours];
-}

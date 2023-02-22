@@ -2,12 +2,7 @@ import { ChangeCollector, applyChange, hasChange } from "../core/changes.js";
 import { recordChanges } from "../core/change-recorder.js";
 import { decomposeComponents } from "../core/glyph-controller.js";
 import { MouseTracker } from "../core/mouse-tracker.js";
-import {
-  connectContours,
-  splitPathAtPointIndices,
-  getSelectedContours,
-  deleteSelectedPoints,
-} from "../core/path-functions.js";
+import { connectContours, splitPathAtPointIndices } from "../core/path-functions.js";
 import { dialog } from "../core/ui-dialog.js";
 import { normalizeLocation } from "../core/var-model.js";
 import { packContour } from "../core/var-path.js";
@@ -509,34 +504,6 @@ export class SceneController {
     return undoInfo !== undefined;
   }
 
-  async doDelete() {
-    await this.editInstance((sendIncrementalChange, instance) => {
-      const { point: pointSelection, component: componentSelection } = parseSelection(
-        this.selection
-      );
-
-      const changes = recordChanges(instance, (instance) => {
-        const path = instance.path;
-
-        if (pointSelection) {
-          deleteSelectedPoints(path, pointSelection);
-        }
-
-        if (componentSelection) {
-          for (const componentIndex of reversed(componentSelection)) {
-            instance.components.splice(componentIndex, 1);
-          }
-        }
-      });
-      return {
-        changes: changes,
-        selection: new Set(),
-        undoLabel: "Delete Selection",
-        broadcast: true,
-      };
-    });
-  }
-
   async reverseSelectedContoursDirection() {
     await this.editInstance((sendIncrementalChange, instance) => {
       const path = instance.path;
@@ -741,4 +708,12 @@ function reversePointSelection(path, pointSelection) {
   }
   newSelection.sort((a, b) => (a > b) - (a < b));
   return new Set(newSelection);
+}
+
+function getSelectedContours(path, pointSelection) {
+  const selectedContours = new Set();
+  for (const pointIndex of pointSelection) {
+    selectedContours.add(path.getContourIndex(pointIndex));
+  }
+  return [...selectedContours];
 }
