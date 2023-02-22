@@ -61,10 +61,10 @@ export function pathToSVG(instance, bounds) {
   const height = bounds["yMax"] - bounds["yMin"];
 
   const svgString = `<svg xmlns="http://www.w3.org/2000/svg"
-                    width="${width}" height="${height}" 
-                    viewBox="0 0 ${width} ${height}">
-                      <path d="${pathString}"/>
-              </svg>`;
+                          width="${width}" height="${height}" 
+                          viewBox="0 0 ${width} ${height}">
+                            <path d="${pathString}"/>
+                    </svg>`;
 
   return svgString;
 }

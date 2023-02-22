@@ -861,9 +861,10 @@ export class EditorController {
     const positionedGlyph =
       this.sceneController.sceneModel.getSelectedPositionedGlyph();
     const glyphController = positionedGlyph?.glyph;
+    if (!glyphController) return;
+
     const instance = glyphController?.instance;
     const bounds = glyphController.controlBounds;
-
     const svgString = pathToSVG(instance, bounds);
 
     const clipboardObject = {
