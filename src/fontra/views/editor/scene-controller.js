@@ -510,20 +510,19 @@ export class SceneController {
 
       const changes = recordChanges(instance, (instance) => {
         const path = instance.path;
+        const selectedContours = getSelectedContours(path, pointSelection);
 
-        let offset = 0;
-        for (const point of pointSelection) {
-          const [contourIndex, contourPointIndex] = path.getContourAndPointIndex(point);
-          const selectedContours = getSelectedContours(path, pointSelection);
-          const contour = path.getUnpackedContour(contourIndex);
-          console.log(point);
+        for (const pointIndex of reversed(pointSelection)) {
+          const [contourIndex, contourPointIndex] =
+            path.getContourAndPointIndex(pointIndex);
+          const numContourPoints = path.getNumPointsOfContour(contourIndex);
+          console.log(pointIndex);
 
-          if (contour.points.length > 1) {
+          if (numContourPoints > 1) {
             if (selectedContours.length > 1) {
               path.deleteContour(contourIndex);
             } else {
-              path.deletePoint(contourIndex, contourPointIndex - offset);
-              offset++;
+              path.deletePoint(contourIndex, contourPointIndex);
             }
           } else {
             path.deleteContour(contourIndex);
