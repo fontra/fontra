@@ -2,7 +2,12 @@ import { ChangeCollector, applyChange, hasChange } from "../core/changes.js";
 import { recordChanges } from "../core/change-recorder.js";
 import { decomposeComponents } from "../core/glyph-controller.js";
 import { MouseTracker } from "../core/mouse-tracker.js";
-import { connectContours, splitPathAtPointIndices } from "../core/path-functions.js";
+import {
+  connectContours,
+  splitPathAtPointIndices,
+  getSelectedContours,
+  deleteSelectedPoints,
+} from "../core/path-functions.js";
 import { dialog } from "../core/ui-dialog.js";
 import { normalizeLocation } from "../core/var-model.js";
 import { packContour } from "../core/var-path.js";
@@ -510,8 +515,7 @@ export class SceneController {
 
       const changes = recordChanges(instance, (instance) => {
         const path = instance.path;
-        const selectedContours = getSelectedContours(path, pointSelection);
-        path.deleteSelectedPoints(pointSelection, selectedContours);
+        deleteSelectedPoints(path, pointSelection);
       });
       return {
         changes: changes,
@@ -726,12 +730,4 @@ function reversePointSelection(path, pointSelection) {
   }
   newSelection.sort((a, b) => (a > b) - (a < b));
   return new Set(newSelection);
-}
-
-function getSelectedContours(path, pointSelection) {
-  const selectedContours = new Set();
-  for (const pointIndex of pointSelection) {
-    selectedContours.add(path.getContourIndex(pointIndex));
-  }
-  return [...selectedContours];
 }

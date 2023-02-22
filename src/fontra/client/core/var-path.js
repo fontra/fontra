@@ -208,24 +208,6 @@ export class VarPackedPath {
     this._moveEndPoints(contourIndex, -numPoints);
   }
 
-  deleteSelectedPoints(pointIndices, selectedContours) {
-    for (const pointIndex of reversed(pointIndices)) {
-      const [contourIndex, contourPointIndex] =
-        this.getContourAndPointIndex(pointIndex);
-      const numContourPoints = this.getNumPointsOfContour(contourIndex);
-
-      if (numContourPoints > 1) {
-        if (selectedContours.length > 1) {
-          this.deleteContour(contourIndex);
-        } else {
-          this.deletePoint(contourIndex, contourPointIndex);
-        }
-      } else {
-        this.deleteContour(contourIndex);
-      }
-    }
-  }
-
   getPoint(pointIndex) {
     const point = {
       x: this.coordinates[pointIndex * 2],
