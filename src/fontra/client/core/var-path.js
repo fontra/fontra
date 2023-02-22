@@ -2,7 +2,7 @@ import VarArray from "./var-array.js";
 import { VariationError } from "./errors.js";
 import { centeredRect, pointInRect } from "./rectangle.js";
 import { convexHull } from "./convex-hull.js";
-import { enumerate, range, reversed } from "./utils.js";
+import { enumerate, range } from "./utils.js";
 
 export const POINT_TYPE_OFF_CURVE_QUAD = "quad";
 export const POINT_TYPE_OFF_CURVE_CUBIC = "cubic";
