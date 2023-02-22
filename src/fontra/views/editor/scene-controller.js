@@ -511,11 +511,22 @@ export class SceneController {
 
   async doDelete() {
     await this.editInstance((sendIncrementalChange, instance) => {
-      const { point: pointSelection } = parseSelection(this.selection);
+      const { point: pointSelection, component: componentSelection } = parseSelection(
+        this.selection
+      );
 
       const changes = recordChanges(instance, (instance) => {
         const path = instance.path;
-        deleteSelectedPoints(path, pointSelection);
+
+        if (pointSelection) {
+          deleteSelectedPoints(path, pointSelection);
+        }
+
+        if (componentSelection) {
+          for (const componentIndex of reversed(componentSelection)) {
+            instance.components.splice(componentIndex, 1);
+          }
+        }
       });
       return {
         changes: changes,
