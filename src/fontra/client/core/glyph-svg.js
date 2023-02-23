@@ -57,13 +57,15 @@ export function pathToSVG(path, bounds) {
   path.drawToPath2d(svgPath);
   const pathString = svgPath.getPath();
 
-  const width = bounds["xMax"] - bounds["xMin"];
-  const height = bounds["yMax"] - bounds["yMin"];
+  const xMin = Math.floor(bounds.xMin);
+  const yMin = Math.floor(bounds.yMin);
+  const xMax = Math.floor(bounds.xMax);
+  const yMax = Math.floor(bounds.yMax);
+  const width = xMax - xMin;
+  const height = yMax - yMin;
 
   const svgString = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}"
-  viewBox="${Math.floor(bounds["xMin"])} ${Math.floor(bounds["yMin"])} ${Math.ceil(
-    bounds["xMax"]
-  )} ${Math.ceil(bounds["yMax"])}">
+  viewBox="${xMin} ${yMin} ${xMax} ${yMax}">
   <path transform="matrix(1 0 0 -1 0 ${height})" d="${pathString}"/>
 </svg>`;
   return svgString;
