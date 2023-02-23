@@ -65,7 +65,7 @@ export function pathToSVG(path, bounds) {
   const height = yMax - yMin;
 
   const svgString = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}"
-  viewBox="${xMin} 0 ${xMax} ${height}">
+  viewBox="${xMin} 0 ${width} ${height}">
   <path transform="matrix(1 0 0 -1 0 ${yMax})" d="${pathString}"/>
 </svg>`;
   return svgString;
