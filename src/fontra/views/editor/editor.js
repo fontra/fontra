@@ -307,10 +307,11 @@ export class EditorController {
         ],
       },
     ]; // this should come from somewhere dynamically
+
     optionsList.options = layersOptions;
-    optionsList.onChange = () => {
-      console.log(optionsList.options);
-    };
+    optionsList.addEventListener("change", (event) => {
+      console.log(event.detail);
+    });
   }
 
   initTools() {
