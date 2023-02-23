@@ -63,8 +63,8 @@ export function pathToSVG(instance, bounds) {
   const svgString = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}"
   viewBox="${Math.floor(bounds["xMin"])} ${Math.floor(bounds["yMin"])} ${Math.ceil(
     bounds["xMax"]
-  )} ${Math.ceil(
-    bounds["yMax"]
-  )}"> <path transform="matrix(1 0 0 -1 0 ${height})" d="${pathString}"/> </svg>`;
+  )} ${Math.ceil(bounds["yMax"])}">
+  <path transform="matrix(1 0 0 -1 0 ${height})" d="${pathString}"/>
+  </svg>`;
   return svgString;
 }
