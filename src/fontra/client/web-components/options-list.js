@@ -12,6 +12,7 @@ export class OptionsList extends LitElement {
 
   static properties = {
     options: { type: Array },
+    onChange: { type: Function },
   };
 
   constructor() {
@@ -67,6 +68,7 @@ export class OptionsList extends LitElement {
     });
 
     updatedOptions.isChecked = e.target.checked;
+    this.onChange();
   }
 }
 

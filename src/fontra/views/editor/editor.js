@@ -287,8 +287,7 @@ export class EditorController {
   }
 
   initLayers() {
-    const layerPreferencesContainer = document.getElementById("layer-preferences");
-    const optionsList = document.createElement("options-list");
+    const optionsList = document.querySelector(".options-list");
     const layersOptions = [
       {
         name: "Path Options",
@@ -308,12 +307,10 @@ export class EditorController {
         ],
       },
     ]; // this should come from somewhere dynamically
-    optionsList.setAttribute("options", JSON.stringify(layersOptions));
-    optionsList.addEventListener("click", (e) => {
-      console.dir(e.target.options);
-    });
-
-    layerPreferencesContainer.appendChild(optionsList);
+    optionsList.options = layersOptions;
+    optionsList.onChange = () => {
+      console.log(optionsList.options);
+    };
   }
 
   initTools() {
