@@ -854,7 +854,7 @@ export class EditorController {
   }
 
   canCopy() {
-    return this.sceneController.selection.size > 0;
+    return this.sceneController.selectedGlyph;
   }
 
   doCopy() {
