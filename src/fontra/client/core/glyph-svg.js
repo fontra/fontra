@@ -65,6 +65,6 @@ export function pathToSVG(instance, bounds) {
     bounds["xMax"]
   )} ${Math.ceil(
     bounds["yMax"]
-  )}"><path transform="matrix(1 0 0 -1 0 ${height})" d="${pathString}"/></svg>`;
+  )}"> <path transform="matrix(1 0 0 -1 0 ${height})" d="${pathString}"/> </svg>`;
   return svgString;
 }
