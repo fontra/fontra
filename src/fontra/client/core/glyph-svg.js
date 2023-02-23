@@ -60,7 +60,7 @@ export function pathToSVG(path, bounds) {
   const xMin = Math.floor(bounds.xMin);
   const yMin = Math.floor(bounds.yMin);
   const xMax = Math.ceil(bounds.xMax);
-  const yMax = Math.floor(bounds.yMax);
+  const yMax = Math.ceil(bounds.yMax);
   const width = xMax - xMin;
   const height = yMax - yMin;
 
