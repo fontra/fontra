@@ -863,12 +863,18 @@ export class EditorController {
     const glyphController = positionedGlyph?.glyph;
     if (!glyphController) return;
 
-    const instance = glyphController?.instance;
     const bounds = glyphController.controlBounds;
-    const svgString = pathToSVG(instance, bounds);
+    const svgString = pathToSVG(glyphController.flattenedPath, bounds);
+    const svgBlob = new Blob([svgString], { type: "image/svg+xml" });
+
+    const glyphString = `<?xml version="1.0" encoding="utf-8"?>
+    <glyph name="sdsd" format="2"> <advance width="500"/> <outline> <contour> <point x="128" y="570" type="curve"/> <point x="136" y="358" type="line"/> <point x="136" y="358"/> <point x="308" y="189"/> <point x="350" y="378" type="curve"/> <point x="351" y="378"/> <point x="131" y="569"/> </contour> </outline> </glyph>`;
+
     const clipboardObject = {
+      "text/plain": glyphString,
       "text/plain": svgString,
-      "text/html": svgString,
+      // "text/html": svgString,
+      // "image/png": svgBlob,
       // "web image/svg+xml": svgString,
     };
 

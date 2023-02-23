@@ -52,10 +52,10 @@ function formatCoordinate(x, y, numerator, denominator, dx, dy) {
   return `${x},${y}`;
 }
 
-export function pathToSVG(instance, bounds) {
-  const path = new SVGPath2D();
-  instance.path.drawToPath2d(path);
-  const pathString = path.getPath();
+export function pathToSVG(path, bounds) {
+  const svgPath = new SVGPath2D();
+  path.drawToPath2d(svgPath);
+  const pathString = svgPath.getPath();
 
   const width = bounds["xMax"] - bounds["xMin"];
   const height = bounds["yMax"] - bounds["yMin"];
