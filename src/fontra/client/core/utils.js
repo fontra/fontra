@@ -235,16 +235,12 @@ export async function writeToClipboard(clipboardObject) {
   try {
     await navigator.clipboard.write([new ClipboardItem(clipboardItemObject)]);
   } catch {
-    // Write at least the plain/text MIME type to the clipboard
-    if (clipboardObject["text/plain"])
-      try {
-        await navigator.clipboard.writeText(clipboardObject["text/plain"]);
-      } catch {
-        // TODO: Safari complains that this needs to be handled. It's probably right.
-      }
-
     // Write to LocalStorage for internal Fontra use
     writeToLocalStorage(clipboardObject);
+
+    // Write at least the plain/text MIME type to the clipboard
+    if (clipboardObject["text/plain"])
+      await navigator.clipboard.writeText(clipboardObject["text/plain"]);
   }
 }
 
