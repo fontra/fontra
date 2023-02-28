@@ -232,7 +232,9 @@ export async function writeToClipboard(clipboardObject) {
     });
   }
 
-  navigator.clipboard.write([new ClipboardItem(clipboardItemObject)]);
+  navigator.clipboard.write([new ClipboardItem(clipboardItemObject)]).catch((error) => {
+    writeTextToClipboard(clipboardObject);
+  });
 }
 
 export async function readClipboardTypes() {
@@ -254,4 +256,9 @@ export async function readFromClipboard(type) {
     }
   }
   return undefined;
+}
+
+function writeTextToClipboard(clipboardObject) {
+  if (clipboardObject["text/plain"])
+    navigator.clipboard.writeText(clipboardObject["text/plain"]);
 }
