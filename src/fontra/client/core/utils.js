@@ -1,3 +1,5 @@
+import { deepCompare } from "./var-model.js";
+
 export function objectsEqual(obj1, obj2) {
   // Shallow object compare. Arguments may be null or undefined
   if (!obj1 || !obj2) {
@@ -258,7 +260,6 @@ export async function readClipboardTypes() {
 }
 
 export async function readFromClipboard(type) {
-  const clipboardObject = {};
   const clipboardContents = await navigator.clipboard.read();
   for (const item of clipboardContents) {
     if (item.types.includes(type)) {
@@ -280,4 +281,20 @@ function writeToLocalStorage(clipboardObject) {
 
     localStorage.setItem(clipboardName, clipboardItem);
   }
+}
+
+export function deepCompareGlyphPaths(glyphA, glyphB) {
+  if (typeof glyphA !== typeof glyphB && typeof glyphA === "object") {
+    throw new TypeError(
+      `can't compare entities of types: ${typeof glyphA} and ${typeof glyphB}`
+    );
+  }
+
+  const coordinatesCompare = deepCompare(
+    glyphA.path.coordinates,
+    glyphB.path.coordinates
+  );
+  const pointTypesCompare = deepCompare(glyphA.path.pointTypes, glyphB.path.pointTypes);
+
+  return coordinatesCompare === 0 && pointTypesCompare === 0;
 }

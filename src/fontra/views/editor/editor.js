@@ -37,6 +37,7 @@ import {
   readFromClipboard,
   reversed,
   writeToClipboard,
+  deepCompareGlyphPaths,
 } from "../core/utils.js";
 import { SceneController } from "./scene-controller.js";
 import * as sceneDraw from "./scene-draw-funcs.js";
@@ -974,20 +975,29 @@ export class EditorController {
 
   async doPaste() {
     let pastedGlyph;
-    const customJSON =
-      (await readFromClipboard("web fontra/static-glyph")) ||
-      localStorage.getItem("clipboardSelection.glyph");
-    if (customJSON) {
-      pastedGlyph = StaticGlyph.fromObject(JSON.parse(customJSON));
-    } else {
-      const plainText = await readFromClipboard("text/plain");
-      if (plainText) {
-        pastedGlyph = await this.fontController.parseClipboard(plainText);
-      }
+
+    const plainText = await readFromClipboard("text/plain");
+    if (plainText) {
+      pastedGlyph = await this.fontController.parseClipboard(plainText);
     }
+
+    const isTheSameGlyphPath = deepCompareGlyphPaths(
+      pastedGlyph,
+      JSON.parse(localStorage.getItem("clipboardSelection.glyph"))
+    );
+
+    if (isTheSameGlyphPath) {
+      const customJSON =
+        (await readFromClipboard("web fontra/static-glyph")) ||
+        localStorage.getItem("clipboardSelection.glyph");
+
+      pastedGlyph = StaticGlyph.fromObject(JSON.parse(customJSON));
+    }
+
     if (!pastedGlyph) {
       return;
     }
+
     await this.sceneController.editInstance((sendIncrementalChange, instance) => {
       const selection = new Set();
       for (const pointIndex of range(
