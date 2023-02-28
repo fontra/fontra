@@ -237,9 +237,13 @@ export async function writeToClipboard(clipboardObject) {
   } catch {
     // Write at least the plain/text MIME type to the clipboard
     if (clipboardObject["text/plain"])
-      navigator.clipboard.writeText(clipboardObject["text/plain"]);
+      try {
+        await navigator.clipboard.writeText(clipboardObject["text/plain"]);
+      } catch {
+        // TODO: Safari complains that this needs to be handled. It's probably right.
+      }
 
-    // If custom web MIME type is unsupported, write to LocalStorage for internal Fontra use
+    // Write to LocalStorage for internal Fontra use
     writeToLocalStorage(clipboardObject);
   }
 }
@@ -273,6 +277,7 @@ function writeToLocalStorage(clipboardObject) {
 
   for (const [clipboardName, clipboardType] of Object.entries(allowedTypes)) {
     const clipboardItem = clipboardObject[clipboardType];
+
     localStorage.setItem(clipboardName, clipboardItem);
   }
 }

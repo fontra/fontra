@@ -804,7 +804,11 @@ export class EditorController {
     if (callback !== undefined) {
       event.preventDefault();
       event.stopImmediatePropagation();
-      await callback(event);
+      try {
+        await callback(event);
+      } catch {
+        // TODO: Safari complains that this needs to be handled. It's probably right.
+      }
     }
   }
 
