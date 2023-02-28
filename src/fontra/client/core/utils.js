@@ -232,9 +232,16 @@ export async function writeToClipboard(clipboardObject) {
     });
   }
 
-  navigator.clipboard.write([new ClipboardItem(clipboardItemObject)]).catch((error) => {
-    writeTextToClipboard(clipboardObject);
-  });
+  try {
+    await navigator.clipboard.write([new ClipboardItem(clipboardItemObject)]);
+  } catch {
+    // Write at least the plain/text MIME type to the clipboard
+    if (clipboardObject["text/plain"])
+      navigator.clipboard.writeText(clipboardObject["text/plain"]);
+
+    // If custom web MIME type is unsupported, write to LocalStorage for internal Fontra use
+    writeToLocalStorage(clipboardObject);
+  }
 }
 
 export async function readClipboardTypes() {
@@ -258,7 +265,14 @@ export async function readFromClipboard(type) {
   return undefined;
 }
 
-function writeTextToClipboard(clipboardObject) {
-  if (clipboardObject["text/plain"])
-    navigator.clipboard.writeText(clipboardObject["text/plain"]);
+function writeToLocalStorage(clipboardObject) {
+  const allowedTypes = {
+    "clipboardSelection.svg": "web image/svg+xml",
+    "clipboardSelection.glyph": "web fontra/static-glyph",
+  };
+
+  for (const [clipboardName, clipboardType] of Object.entries(allowedTypes)) {
+    const clipboardItem = clipboardObject[clipboardType];
+    localStorage.setItem(clipboardName, clipboardItem);
+  }
 }

@@ -970,7 +970,9 @@ export class EditorController {
 
   async doPaste() {
     let pastedGlyph;
-    const customJSON = await readFromClipboard("web fontra/static-glyph");
+    const customJSON =
+      (await readFromClipboard("web fontra/static-glyph")) ||
+      localStorage.getItem("clipboardSelection.glyph");
     if (customJSON) {
       pastedGlyph = StaticGlyph.fromObject(JSON.parse(customJSON));
     } else {
