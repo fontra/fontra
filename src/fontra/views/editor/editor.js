@@ -37,7 +37,6 @@ import {
   readFromClipboard,
   reversed,
   writeToClipboard,
-  deepCompareGlyphPaths,
 } from "../core/utils.js";
 import { SceneController } from "./scene-controller.js";
 import * as sceneDraw from "./scene-draw-funcs.js";
@@ -981,10 +980,8 @@ export class EditorController {
       pastedGlyph = await this.fontController.parseClipboard(plainText);
     }
 
-    const isTheSameGlyphPath = deepCompareGlyphPaths(
-      pastedGlyph,
-      JSON.parse(localStorage.getItem("clipboardSelection.glyph"))
-    );
+    const isTheSameGlyphPath =
+      JSON.stringify(pastedGlyph) === localStorage.getItem("clipboardSelection.glyph");
 
     if (isTheSameGlyphPath) {
       const customJSON =
