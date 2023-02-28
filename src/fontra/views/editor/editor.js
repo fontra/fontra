@@ -34,8 +34,7 @@ import {
   themeSwitchFromLocalStorage,
   throttleCalls,
   range,
-  readClipboard,
-  readClipboardTypes,
+  readFromClipboard,
   reversed,
   writeToClipboard,
 } from "../core/utils.js";
@@ -971,11 +970,11 @@ export class EditorController {
 
   async doPaste() {
     let pastedGlyph;
-    const customJSON = await readClipboard("web fontra/static-glyph");
+    const customJSON = await readFromClipboard("web fontra/static-glyph");
     if (customJSON) {
       pastedGlyph = StaticGlyph.fromObject(JSON.parse(customJSON));
     } else {
-      const plainText = await readClipboard("text/plain");
+      const plainText = await readFromClipboard("text/plain");
       if (plainText) {
         pastedGlyph = await this.fontController.parseClipboard(plainText);
       }
