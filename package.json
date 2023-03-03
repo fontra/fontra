@@ -1,5 +1,6 @@
 {
   "scripts": {
+    "jsdeps": "python -I scripts/jsdeps.py",
     "test": "mocha test-js --reporter spec"
   },
   "type": "module",

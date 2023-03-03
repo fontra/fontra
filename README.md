@@ -45,6 +45,8 @@ Fontra Pak should also work on Linux and other platforms, but you will have to b
 
   `npm install`
 
+  `npm run jsdeps`
+
 - Install `pre-commit` hooks to run formatters and linters:
 
   `pre-commit install-hooks`
