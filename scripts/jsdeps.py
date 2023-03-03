@@ -3,29 +3,15 @@ import shutil
 from functools import lru_cache
 from pathlib import Path
 
-# TODO: move these settings to external config file
-DEPENDENCIES_DEST_BASE_DIR = "src/fontra/client/third-party/"
-DEPENDENCIES_MAPPINGS = [
-    {
-        "name": "bezier-js",  # node module name
-        "files": [  # list of files to copy: src -> dest
-            {
-                # path relative to the "node_modules/{node_module_name}/"
-                "src": "src/bezier.js",
-                # path relative to "{DEPENDENCIES_DEST_BASE_DIR}/{node_module_name}/"
-                "dest": "bezier.js",
-            },
-            {
-                "src": "src/poly-bezier.js",
-                "dest": "poly-bezier.js",
-            },
-            {
-                "src": "src/utils.js",
-                "dest": "utils.js",
-            },
-        ],
-    },
-]
+import yaml
+
+
+@lru_cache(maxsize=None)
+def load_config():
+    with open("scripts/jsdeps.yml") as config_file:
+        config = yaml.load(config_file, Loader=yaml.Loader)
+        return config
+    return None
 
 
 @lru_cache(maxsize=None)
@@ -39,8 +25,9 @@ def load_package_dependencies():
 
 
 def process_dependencies():
-    shutil.rmtree(DEPENDENCIES_DEST_BASE_DIR)
-    for dependency in DEPENDENCIES_MAPPINGS:
+    config = load_config()
+    shutil.rmtree(config["dest_base_dir"])
+    for dependency in config["mappings"]:
         process_dependency(dependency)
 
 
@@ -63,8 +50,10 @@ def process_dependency_file(name, file):
         src.is_file()
     ), f"Invalid source path: {src!r} file not found, ensure that the path is correct."
 
+    config = load_config()
+    dest_base_dir = config["dest_base_dir"]
     dest = file.get("dest", src.name).lstrip("/")
-    dest = Path(DEPENDENCIES_DEST_BASE_DIR) / name / dest
+    dest = Path(dest_base_dir) / name / dest
     dest.parent.mkdir(parents=True, exist_ok=True)
     assert (
         not dest.is_dir()

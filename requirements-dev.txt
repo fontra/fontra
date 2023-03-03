@@ -1,3 +1,4 @@
 pre-commit==3.1.0
 pytest==7.2.1
 pytest-asyncio==0.20.3
+PyYAML==6.0
