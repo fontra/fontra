@@ -26,7 +26,11 @@ def load_package_dependencies():
 
 def process_dependencies():
     config = load_config()
-    shutil.rmtree(config["dest_base_dir"])
+
+    dest_base_dir = config["dest_base_dir"]
+    if Path(dest_base_dir).is_dir():
+        shutil.rmtree(dest_base_dir)
+
     for dependency in config["mappings"]:
         process_dependency(dependency)
 
