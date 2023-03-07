@@ -385,6 +385,13 @@ export class EditorController {
       // {"key": "sourceIndex", "width": "2em"},
     ];
     this.sourcesList = new List("sources-list", columnDescriptions);
+    // TODO: relocate those to somewhere more appropriate after implementation
+    const addSourceCallback = () => {
+      console.log("add a source");
+    };
+    const removeSourceCallback = () => {
+      console.log("remove a source");
+    };
     this.sourcesList.includeAddRemoveButtons(addSourceCallback, removeSourceCallback);
 
     this.sourcesList.addEventListener("listSelectionChanged", async (event) => {
@@ -395,14 +402,6 @@ export class EditorController {
       this.updateWindowLocationAndSelectionInfo();
       this.autoViewBox = false;
     });
-
-    // TODO: relocate those to somewhere more appropriate after implementation
-    const addSourceCallback = () => {
-      console.log("add a source");
-    };
-    const removeSourceCallback = () => {
-      console.log("remove a source");
-    };
   }
 
   initSidebars() {

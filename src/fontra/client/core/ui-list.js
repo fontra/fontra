@@ -62,6 +62,14 @@ export class List {
 
     addRemoveButtonsElement.addButtonCallback = addButtonCallback;
     addRemoveButtonsElement.removeButtonCallback = removeButtonCallback;
+    addRemoveButtonsElement.disableRemoveButton =
+      !this.selectedItemIndex || this.selectedItemIndex === 0;
+
+    this.container.addEventListener("listSelectionChanged", () => {
+      addRemoveButtonsElement.disableRemoveButton =
+        !this.selectedItemIndex || this.selectedItemIndex === 0;
+    });
+
     this.container.appendChild(addRemoveButtonsElement);
   }
 

@@ -10,7 +10,7 @@ export class addRemoveButtons extends LitElement {
       min-width: 2em;
     }
 
-    button:hover {
+    button:enabled:hover {
       cursor: pointer;
     }
   `;
@@ -18,19 +18,25 @@ export class addRemoveButtons extends LitElement {
   static properties = {
     addButtonCallback: { type: Function },
     removeButtonCallback: { type: Function },
+    disableRemoveButton: { type: String },
   };
   constructor() {
     super();
     this.addButtonCallback = () => {};
     this.removeButtonCallback = () => {};
+    this.disableRemoveButton = false;
   }
 
   render() {
     return html`
       <div class="buttons-container">
         <button name="add-button" @click=${() => this.addButtonCallback()}>+</button>
-        <button name="remove-button" @click=${() => this.removeButtonCallback()}>
-          -
+        <button
+          name="remove-button"
+          .disabled=${this.disableRemoveButton}
+          @click=${() => this.removeButtonCallback()}
+        >
+          –
         </button>
       </div>
     `;
