@@ -66,8 +66,7 @@ export class List {
       !this.selectedItemIndex || this.selectedItemIndex === 0;
 
     this.container.addEventListener("listSelectionChanged", () => {
-      addRemoveButtonsElement.disableRemoveButton =
-        !this.selectedItemIndex || this.selectedItemIndex === 0;
+      addRemoveButtonsElement.disableRemoveButton = this.selectedItemIndex === 0;
     });
 
     this.container.appendChild(addRemoveButtonsElement);

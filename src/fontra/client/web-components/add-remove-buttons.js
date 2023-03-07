@@ -18,7 +18,7 @@ export class addRemoveButtons extends LitElement {
   static properties = {
     addButtonCallback: { type: Function },
     removeButtonCallback: { type: Function },
-    disableRemoveButton: { type: String },
+    disableRemoveButton: { type: Boolean },
   };
   constructor() {
     super();
