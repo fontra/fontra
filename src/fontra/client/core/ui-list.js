@@ -1,3 +1,4 @@
+import { addRemoveButtons } from "../web-components/add-remove-buttons.js";
 const LIST_CHUNK_SIZE = 200; // the amount of items added to the list at a time
 
 export class List {
@@ -26,6 +27,7 @@ export class List {
     this.contents = document.createElement("div");
     this.contents.className = "contents";
     this.container.appendChild(this.contents);
+
     this.contents.addEventListener(
       "click",
       (event) => this._clickHandler(event),
@@ -53,6 +55,14 @@ export class List {
     );
     this.selectedItemIndex = undefined;
     this.container.classList.add("empty");
+  }
+
+  includeAddRemoveButtons(addButtonCallback, removeButtonCallback) {
+    const addRemoveButtonsElement = new addRemoveButtons();
+
+    addRemoveButtonsElement.addButtonCallback = addButtonCallback;
+    addRemoveButtonsElement.removeButtonCallback = removeButtonCallback;
+    this.container.appendChild(addRemoveButtonsElement);
   }
 
   setItems(items) {

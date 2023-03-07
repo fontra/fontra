@@ -291,6 +291,7 @@ export class EditorController {
       },
     ];
     this.glyphNamesList = new List("glyphs-list", columnDescriptions);
+
     this.glyphNamesList.itemEqualFunc = (itemA, itemB) =>
       itemA.glyphName === itemB.glyphName;
     this.glyphNamesList.addEventListener("listSelectionChanged", async (event) => {
@@ -384,6 +385,15 @@ export class EditorController {
       // {"key": "sourceIndex", "width": "2em"},
     ];
     this.sourcesList = new List("sources-list", columnDescriptions);
+
+    const addSourceCallback = () => {
+      console.log("add - coming from ui-list");
+    };
+    const removeSourceCallback = () => {
+      console.log("remove - coming from ui-list");
+    };
+    this.sourcesList.includeAddRemoveButtons(addSourceCallback, removeSourceCallback);
+
     this.sourcesList.addEventListener("listSelectionChanged", async (event) => {
       await this.sceneController.setSelectedSource(
         event.detail.getSelectedItem().sourceIndex
