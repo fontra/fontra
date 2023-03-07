@@ -1,7 +1,19 @@
 import { html, css, LitElement } from "https://cdn.jsdelivr.net/npm/lit@2.6.1/+esm";
 
 export class addRemoveButtons extends LitElement {
-  static styles = css``;
+  static styles = css`
+    .buttons-container {
+      padding: 0.5em;
+    }
+
+    button {
+      min-width: 2em;
+    }
+
+    button:hover {
+      cursor: pointer;
+    }
+  `;
 
   static properties = {
     addButtonCallback: { type: Function },
