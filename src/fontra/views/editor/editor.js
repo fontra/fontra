@@ -1148,10 +1148,10 @@ export class EditorController {
   doAddComponent() {
     const container = document.querySelector("#ui-dialog-container");
     const addComponentDialogElement = new addComponentDialog(container);
-    // console.log(this.glyphNamesList.contents);
     addComponentDialogElement.addComponentCallback = () => {
       console.log("add component");
     };
+    // console.log(this.glyphNamesList.contents);
     // TODO: implementation needed
   }
 

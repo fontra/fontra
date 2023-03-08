@@ -9,6 +9,7 @@ export class addComponentDialog extends LitElement {
   constructor(container) {
     super();
     this.addComponentCallback = () => {};
+    this.glyphList = this.buildGlyphList();
     this.container = container;
     this.container.appendChild(this);
     this.container.classList.add("visible");
@@ -18,7 +19,7 @@ export class addComponentDialog extends LitElement {
     return html`
       <section class="add-component-dialog">
         <div class="search-bar">Search glyphs</div>
-        <div class="glyph-list">Glyph list</div>
+        <div class="ui-list glyph-list">${this.glyphList}</div>
         <div class="buttons">
           <button name="cancel-button" @click=${() => this.dismissDialog()}>
             Cancel
@@ -27,6 +28,10 @@ export class addComponentDialog extends LitElement {
         </div>
       </section>
     `;
+  }
+
+  buildGlyphList() {
+    return ["test list"];
   }
 
   addComponent() {
