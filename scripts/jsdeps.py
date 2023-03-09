@@ -2,6 +2,15 @@ import json
 import shutil
 from pathlib import Path
 
+from hatchling.builders.hooks.plugin.interface import BuildHookInterface
+
+
+class JSDepsBuildHook(BuildHookInterface):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        main()
+
+
 DEST_BASE_DIR = "src/fontra/client/third-party/"
 
 
