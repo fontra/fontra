@@ -76,7 +76,7 @@ source = "vcs"
 
 
 [tool.hatch.build.hooks.custom]
-path = "scripts/jsdeps.py"
+path = "scripts/jsdeps_build_hook.py"
 
 
 [tool.hatch.build.hooks.vcs]
