@@ -27,7 +27,6 @@ export class Sliders {
         this.container.appendChild(divider);
       } else {
         const slider = new RangeSlider();
-        // label.className = "slider-label";
         slider.classList.add("slider");
         slider.name = sliderInfo.name;
         slider.minValue = sliderInfo.minValue;
@@ -35,28 +34,9 @@ export class Sliders {
         slider.defaultValue = sliderInfo.defaultValue;
         slider.step = "any";
         //TODO: make this dynamic also
-        if (sliderInfo.mapping) {
-          slider.tickMarksPositions = sliderInfo.mapping.reduce(
-            (acc, curr) => acc.concat(curr),
-            []
-          );
-        }
-
-        // slider.oninput = (event) => this._dispatchListSelectionChanged();
-
-        // const label = document.createElement("label");
-        // const slider = document.createElement("input");
-        // label.className = "slider-label";
-        // slider.type = "range";
-        // slider.step = "any";
-        // slider.class = "slider";
-        // slider.min = sliderInfo.minValue;
-        // slider.max = sliderInfo.maxValue;
-        // slider.value = sliderInfo.defaultValue;
-        // slider.dataset.name = sliderInfo.name;
-        // slider.oninput = (event) => this._dispatchListSelectionChanged();
-        // label.appendChild(slider);
-        // label.append(sliderInfo.name);
+        slider.tickMarksPositions = [0, 100, 200, 300, 500, 700, 900];
+        slider.onChangeCallback = (event) => this._dispatchListSelectionChanged(); // TODO: not sure if that works
+        this.container.appendChild(slider);
 
         this.container.appendChild(slider);
       }

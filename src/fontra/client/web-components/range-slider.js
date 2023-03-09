@@ -181,6 +181,7 @@ export class RangeSlider extends LitElement {
     defaultValue: { state: true },
     tickMarksPositions: { type: Array },
     step: { type: Number },
+    onChangeCallback: { type: Function },
   };
 
   constructor() {
@@ -192,6 +193,7 @@ export class RangeSlider extends LitElement {
     this.defaultValue = this.midValue;
     this.tickMarksPositions = [];
     this.step = 0.1;
+    this.onChangeCallback = () => {};
   }
 
   render() {
@@ -250,10 +252,12 @@ export class RangeSlider extends LitElement {
       e.target.setAttribute("aria-invalid", !isValid);
       this.defaultValue = this.midValue;
     }
+    this.onChangeCallback(defaultValue);
   }
 
   reset() {
     this.defaultValue = this.midValue;
+    this.onChangeCallback(this.defaultValue);
   }
 
   get midValue() {
