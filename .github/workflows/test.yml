@@ -7,7 +7,7 @@ on:
   pull_request:
     branches: [main]
 
-  jobs:
+jobs:
   build:
     runs-on: ubuntu-latest
 
