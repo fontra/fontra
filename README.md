@@ -17,9 +17,15 @@ Fontra Pak should also work on Linux and other platforms, but you will have to b
 
 ### Install from the source code
 
-- Check out the Fontra repository (the one you are reading this from), cd into the root of the repository
+#### Requirements
 
-- Ensure you have Python >= 3.10 installed, preferably from [python.org](https://www.python.org/downloads/)
+- Ensure you have **Python >= 3.10** installed, preferably from [python.org](https://www.python.org/downloads/)
+
+- Ensure you have **Node.js >= 19** installed, preferably from [nodejs.org](https://nodejs.org/en/download/)
+
+#### Setup
+
+- Check out the Fontra repository (the one you are reading this from), cd into the root of the repository
 
 - Create a Python venv in the root of the repo:
 
@@ -37,25 +43,29 @@ Fontra Pak should also work on Linux and other platforms, but you will have to b
 
   `pip install -r requirements.txt`
 
+  `pip install -r requirements-dev.txt`
+
   `pip install -e .`
+
+#### Testing
+
+The following steps are needed only for contributors:
 
 - Install dependencies to run the automated tests:
 
   `pip install -r requirements-dev.txt`
 
-  `npm install`
-
-  `npm run jsdeps`
-
 - Install `pre-commit` hooks to run formatters and linters:
 
   `pre-commit install-hooks`
 
-- To verify if everything is installed correctly, run both test suites:
+- To verify if everything is working correctly, run both test suites:
 
   `pytest`
 
   `npm test`
+
+#### Running
 
 - Start the fontra server with a path to a folder containing fonts (.designspace, .ufo, .ttf or .otf), using the `filesystem` subcommand:
 
