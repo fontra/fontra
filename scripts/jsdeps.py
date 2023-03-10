@@ -10,9 +10,8 @@ destDir = repoRoot / "src/fontra/client/third-party/"
 def loadPackageDependencies():
     with open("package.json") as packageFile:
         packageInfo = json.load(packageFile)
-        dependencies = packageInfo.get("dependencies", {})
-        return list(dependencies.keys())
-    return []
+    dependencies = packageInfo.get("dependencies", {})
+    return list(dependencies.keys())
 
 
 def processDependencies(dependencies):
