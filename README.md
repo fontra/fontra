@@ -55,8 +55,7 @@ The following steps are needed if you want to run the automated tests and if you
 
 - Install `pre-commit` to run formatters and linters:
 
-  `pre-commit install`
-  `pre-commit install-hooks`
+  `pre-commit install --install-hooks`
 
 - To verify if everything is working correctly, run both test suites:
 
