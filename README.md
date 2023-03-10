@@ -47,7 +47,7 @@ Fontra Pak should also work on Linux and other platforms, but you will have to b
 
 #### Testing
 
-The following steps are needed only for contributors:
+The following steps are needed if you want to run the automated tests and if you want to contribute:
 
 - Install dependencies to run the automated tests:
 
