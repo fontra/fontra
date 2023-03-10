@@ -53,8 +53,9 @@ The following steps are needed if you want to run the automated tests and if you
 
   `pip install -r requirements-dev.txt`
 
-- Install `pre-commit` hooks to run formatters and linters:
+- Install `pre-commit` to run formatters and linters:
 
+  `pre-commit install`
   `pre-commit install-hooks`
 
 - To verify if everything is working correctly, run both test suites:
