@@ -43,8 +43,6 @@ Fontra Pak should also work on Linux and other platforms, but you will have to b
 
   `pip install -r requirements.txt`
 
-  `pip install -r requirements-dev.txt`
-
   `pip install -e .`
 
 #### Testing
