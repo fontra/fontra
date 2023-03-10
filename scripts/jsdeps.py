@@ -2,7 +2,11 @@ import json
 import shutil
 from pathlib import Path
 
-DEST_BASE_DIR = "src/fontra/client/third-party/"
+
+def get_dest_dir():
+    repo_root = Path(__file__).resolve().parent.parent
+    dest_dir = repo_root / "src/fontra/client/third-party/"
+    return dest_dir
 
 
 def load_package_dependencies():
@@ -15,15 +19,17 @@ def load_package_dependencies():
 
 
 def process_dependencies(dependencies):
-    if Path(DEST_BASE_DIR).is_dir():
-        shutil.rmtree(DEST_BASE_DIR)
+    dest_dir = get_dest_dir()
+    if dest_dir.is_dir():
+        shutil.rmtree(dest_dir)
     for dependency in dependencies:
         process_dependency(name=dependency)
 
 
 def process_dependency(name):
     src = Path("node_modules") / name
-    dest = Path(DEST_BASE_DIR) / name
+    dest_dir = get_dest_dir()
+    dest = dest_dir / name
     dest.parent.mkdir(parents=True, exist_ok=True)
     shutil.copytree(src, dest)
     print(f"[{name}] {str(src)!r} -> {str(dest)!r}")
