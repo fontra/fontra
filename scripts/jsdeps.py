@@ -3,15 +3,15 @@ import shutil
 from pathlib import Path
 
 repoRoot = Path(__file__).resolve().parent.parent
+nodeModulesDir = repoRoot / "node_modules"
 destDir = repoRoot / "src/fontra/client/third-party/"
 
 
 def loadPackageDependencies():
     with open("package.json") as packageFile:
         packageInfo = json.load(packageFile)
-        dependencies = packageInfo.get("dependencies")
-        if dependencies:
-            return list(dependencies.keys())
+        dependencies = packageInfo.get("dependencies", {})
+        return list(dependencies.keys())
     return []
 
 
@@ -23,7 +23,7 @@ def processDependencies(dependencies):
 
 
 def processDependency(name):
-    src = Path("node_modules") / name
+    src = nodeModulesDir / name
     dest = destDir / name
     dest.parent.mkdir(parents=True, exist_ok=True)
     shutil.copytree(src, dest)
