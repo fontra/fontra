@@ -1,6 +1,6 @@
 import { html, css, LitElement } from "https://cdn.jsdelivr.net/npm/lit@2.6.1/+esm";
 
-export class addRemoveButtons extends LitElement {
+export class AddRemoveButtons extends LitElement {
   static styles = css`
     .buttons-container {
       padding: 0.5em;
@@ -44,4 +44,4 @@ export class addRemoveButtons extends LitElement {
   }
 }
 
-customElements.define("add-remove-buttons", addRemoveButtons);
+customElements.define("add-remove-buttons", AddRemoveButtons);

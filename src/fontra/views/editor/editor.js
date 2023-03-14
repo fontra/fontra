@@ -50,7 +50,7 @@ import {
 } from "../core/path-functions.js";
 import { staticGlyphToGLIF } from "../core/glyph-glif.js";
 import { pathToSVG } from "../core/glyph-svg.js";
-import { addRemoveButtons } from "../web-components/add-remove-buttons.js";
+import { AddRemoveButtons } from "../web-components/add-remove-buttons.js";
 
 const drawingParametersLight = {
   glyphFillColor: "#000",
@@ -394,11 +394,12 @@ export class EditorController {
       console.log("remove a source");
     };
 
-    this.includeAddRemoveButtons(
-      this.sourcesList,
-      addSourceCallback,
-      removeSourceCallback
-    );
+    const addRemoveButtonsElement = new AddRemoveButtons();
+    addRemoveButtonsElement.addButtonCallback = addSourceCallback;
+    addRemoveButtonsElement.removeButtonCallback = removeSourceCallback;
+    addRemoveButtonsElement.disableRemoveButton =
+      !this.sourcesList.selectedItemIndex || list.selectedItemIndex === 0;
+    this.sourcesList.container.appendChild(addRemoveButtonsElement);
 
     this.sourcesList.addEventListener("listSelectionChanged", async (event) => {
       await this.sceneController.setSelectedSource(
@@ -407,6 +408,8 @@ export class EditorController {
       this.sliders.values = this.sceneController.getLocation();
       this.updateWindowLocationAndSelectionInfo();
       this.autoViewBox = false;
+      addRemoveButtonsElement.disableRemoveButton =
+        this.sourcesList.selectedItemIndex === 0;
     });
   }
 
@@ -453,21 +456,6 @@ export class EditorController {
         this.textAlignValueController.set(el.innerText.slice(5));
       };
     }
-  }
-
-  includeAddRemoveButtons(list, addButtonCallback, removeButtonCallback) {
-    const addRemoveButtonsElement = new addRemoveButtons();
-
-    addRemoveButtonsElement.addButtonCallback = addButtonCallback;
-    addRemoveButtonsElement.removeButtonCallback = removeButtonCallback;
-    addRemoveButtonsElement.disableRemoveButton =
-      !list.selectedItemIndex || list.selectedItemIndex === 0;
-
-    list.addEventListener("listSelectionChanged", () => {
-      addRemoveButtonsElement.disableRemoveButton = list.selectedItemIndex === 0;
-    });
-
-    list.container.appendChild(addRemoveButtonsElement);
   }
 
   tabClick(event, side) {
