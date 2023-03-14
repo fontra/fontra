@@ -45,7 +45,7 @@ export class AddRemoveButtons extends LitElement {
           .disabled=${this.disableRemoveButton}
           @click=${() => this.removeButtonCallback()}
         >
-          –
+          &minus;
         </button>
       </div>
     `;
