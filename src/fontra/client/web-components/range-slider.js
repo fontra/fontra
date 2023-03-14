@@ -26,6 +26,7 @@ export class RangeSlider extends LitElement {
   static styles = css`
     .wrapper {
       display: flex;
+      padding-top: 5px;
     }
 
     .slider-name {
@@ -83,6 +84,23 @@ export class RangeSlider extends LitElement {
     .numeric-input > .slider-input > span > svg {
       width: 1.3em;
       height: 1.3em;
+    }
+
+    .range-container {
+      position: relative;
+    }
+
+    .min-max-values {
+      position: absolute;
+      display: none;
+      justify-content: space-between;
+      width: 100%;
+      top: -10px;
+      font-size: 0.8em;
+    }
+
+    .range-container:hover > .min-max-values {
+      display: flex;
     }
 
     .range-container > input + div {
@@ -219,6 +237,10 @@ export class RangeSlider extends LitElement {
           </section>
         </div>
         <div class="range-container">
+          <div class="min-max-values">
+            <span>${this.minValue}</span>
+            <span>${this.maxValue}</span>
+          </div>
           <input
             type="range"
             @input=${this.changeValue}
