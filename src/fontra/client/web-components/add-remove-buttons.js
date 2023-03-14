@@ -22,6 +22,7 @@ export class AddRemoveButtons extends LitElement {
     disableAddButton: { type: Boolean },
     disableRemoveButton: { type: Boolean },
   };
+
   constructor() {
     super();
     this.addButtonCallback = () => {};
