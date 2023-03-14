@@ -206,7 +206,6 @@
   flex-direction: column;
   gap: 0.5em;
   overflow: scroll;
-  flex-shrink: 1;
 }
 
 .sources-list {
