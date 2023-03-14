@@ -72,6 +72,7 @@
 
 .ui-list {
   overflow: scroll;
+  border: solid 1px var(--ui-list-border-color);
 }
 
 .ui-list.empty {
@@ -81,7 +82,6 @@
 .ui-list > .contents {
   display: flex;
   flex-direction: column;
-  border: solid 1px var(--ui-list-border-color);
 }
 
 .ui-list > .contents > .row {

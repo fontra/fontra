@@ -19,19 +19,27 @@ export class AddRemoveButtons extends LitElement {
   static properties = {
     addButtonCallback: { type: Function },
     removeButtonCallback: { type: Function },
+    disableAddButton: { type: Boolean },
     disableRemoveButton: { type: Boolean },
   };
   constructor() {
     super();
     this.addButtonCallback = () => {};
     this.removeButtonCallback = () => {};
+    this.disableAddButton = false;
     this.disableRemoveButton = false;
   }
 
   render() {
     return html`
       <div class="buttons-container">
-        <button name="add-button" @click=${() => this.addButtonCallback()}>+</button>
+        <button
+          name="add-button"
+          .disabled=${this.disableAddButton}
+          @click=${() => this.addButtonCallback()}
+        >
+          +
+        </button>
         <button
           name="remove-button"
           .disabled=${this.disableRemoveButton}

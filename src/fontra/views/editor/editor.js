@@ -394,12 +394,11 @@ export class EditorController {
       console.log("remove a source");
     };
 
+    const designspaceSliders = document.querySelector(".designspace-sliders");
     const addRemoveButtonsElement = new AddRemoveButtons();
     addRemoveButtonsElement.addButtonCallback = addSourceCallback;
     addRemoveButtonsElement.removeButtonCallback = removeSourceCallback;
-    addRemoveButtonsElement.disableRemoveButton =
-      !this.sourcesList.selectedItemIndex || list.selectedItemIndex === 0;
-    this.sourcesList.container.appendChild(addRemoveButtonsElement);
+    designspaceSliders.appendChild(addRemoveButtonsElement);
 
     this.sourcesList.addEventListener("listSelectionChanged", async (event) => {
       await this.sceneController.setSelectedSource(
@@ -408,8 +407,6 @@ export class EditorController {
       this.sliders.values = this.sceneController.getLocation();
       this.updateWindowLocationAndSelectionInfo();
       this.autoViewBox = false;
-      addRemoveButtonsElement.disableRemoveButton =
-        this.sourcesList.selectedItemIndex === 0;
     });
   }
 
