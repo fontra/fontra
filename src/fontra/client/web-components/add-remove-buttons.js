@@ -4,6 +4,7 @@ export class addRemoveButtons extends LitElement {
   static styles = css`
     .buttons-container {
       padding: 0.5em;
+      padding-left: 0;
     }
 
     button {
