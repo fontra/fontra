@@ -26,7 +26,6 @@ export class List {
     this.contents = document.createElement("div");
     this.contents.className = "contents";
     this.container.appendChild(this.contents);
-
     this.contents.addEventListener(
       "click",
       (event) => this._clickHandler(event),
