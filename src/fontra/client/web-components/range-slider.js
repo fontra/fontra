@@ -1,27 +1,5 @@
 import { html, css, LitElement } from "https://cdn.jsdelivr.net/npm/lit@2.6.1/+esm";
 
-const reset = html` <svg
-  xmlns="http://www.w3.org/2000/svg"
-  enable-background="new 0 0 20 20"
-  height="20px"
-  viewBox="0 0 24 24"
-  width="20px"
-  fill="#000000"
->
-  <title>Replay</title>
-  <g>
-    <rect fill="none" height="20" width="20" />
-    <rect fill="none" height="20" width="20" />
-    <rect fill="none" height="20" width="20" />
-  </g>
-  <g>
-    <g />
-    <path
-      d="M12,5V1L7,6l5,5V7c3.31,0,6,2.69,6,6s-2.69,6-6,6s-6-2.69-6-6H4c0,4.42,3.58,8,8,8s8-3.58,8-8S16.42,5,12,5z"
-    />
-  </g>
-</svg>`;
-
 export class RangeSlider extends LitElement {
   static styles = css`
     .wrapper {
@@ -32,7 +10,6 @@ export class RangeSlider extends LitElement {
     .slider-name {
       margin-left: 0.5em;
       min-width: 5ch;
-      text-align: right;
     }
 
     input {
@@ -40,7 +17,7 @@ export class RangeSlider extends LitElement {
     }
 
     .numeric-input {
-      margin-right: 1.2em;
+      margin-right: 1.5em;
       width: inherit;
       display: flex;
       flex-direction: row;
@@ -72,6 +49,9 @@ export class RangeSlider extends LitElement {
 
     .numeric-input > .slider-input > span {
       position: absolute;
+      top: -0.15em;
+      padding: 0 0.15em;
+      font-size: 1.2em;
       cursor: pointer;
       opacity: 0;
       transition: opacity 0.4s ease-in-out;
@@ -79,11 +59,6 @@ export class RangeSlider extends LitElement {
 
     .numeric-input > .slider-input > span.active {
       opacity: 1;
-    }
-
-    .numeric-input > .slider-input > span > svg {
-      width: 1.3em;
-      height: 1.3em;
     }
 
     .range-container {
@@ -233,7 +208,7 @@ export class RangeSlider extends LitElement {
             <span
               class="${this.currentValue !== this.defaultValue ? "active" : ""}"
               @click=${this.reset}
-              >${reset}</span
+              >↺</span
             >
           </section>
         </div>
