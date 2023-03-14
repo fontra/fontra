@@ -197,6 +197,7 @@ export class RangeSlider extends LitElement {
     minValue: { type: Number },
     maxValue: { type: Number },
     defaultValue: { state: true },
+    currentValue: {},
     tickMarksPositions: { type: Array },
     step: { type: Number },
     onChangeCallback: { type: Function },
@@ -208,7 +209,7 @@ export class RangeSlider extends LitElement {
     this.name = "Slider";
     this.minValue = 0;
     this.maxValue = 100;
-    this.defaultValue = this.midValue;
+    this.currentValue = this.defaultValue || this.minValue;
     this.tickMarksPositions = [];
     this.step = 0.1;
     this.onChangeCallback = () => {};
@@ -227,10 +228,10 @@ export class RangeSlider extends LitElement {
               max=${this.maxValue}
               step=${this.step}
               pattern="[0-9]+"
-              .value=${this.defaultValue}
+              .value=${this.currentValue}
             />
             <span
-              class="${this.defaultValue !== this.midValue ? "active" : ""}"
+              class="${this.currentValue !== this.defaultValue ? "active" : ""}"
               @click=${this.reset}
               >${reset}</span
             >
@@ -248,7 +249,7 @@ export class RangeSlider extends LitElement {
             min=${this.minValue}
             max=${this.maxValue}
             step=${this.step}
-            .value=${this.defaultValue}
+            .value=${this.currentValue}
             list="markers"
           />
           <div class="range-slider-options">
@@ -266,24 +267,20 @@ export class RangeSlider extends LitElement {
   }
 
   changeValue(e) {
-    const defaultValue = e.target.value;
+    const currentValue = e.target.value;
     const isValid = e.target.reportValidity();
     if (isValid) {
-      this.defaultValue = defaultValue;
+      this.currentValue = currentValue;
     } else {
       e.target.setAttribute("aria-invalid", !isValid);
-      this.defaultValue = this.midValue;
+      this.currentValue = this.defaultValue;
     }
-    this.onChangeCallback(defaultValue);
+    this.onChangeCallback(this.currentValue);
   }
 
   reset() {
-    this.defaultValue = this.midValue;
-    this.onChangeCallback(this.defaultValue);
-  }
-
-  get midValue() {
-    return (this.maxValue - Math.abs(this.minValue)) / 2;
+    this.currentValue = this.defaultValue;
+    this.onChangeCallback(this.currentValue);
   }
 
   connectedCallback() {

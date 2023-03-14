@@ -10,7 +10,7 @@ export class Sliders {
     this.container.addEventListener(eventName, handler, options);
   }
 
-  _dispatchListSelectionChanged() {
+  _dispatchSlidersChangedEvent() {
     const event = new CustomEvent("slidersChanged", {
       bubbles: false,
       detail: this,
@@ -35,7 +35,7 @@ export class Sliders {
         slider.step = "any";
         //TODO: make this dynamic also
         slider.tickMarksPositions = [0, 100, 200, 300, 500, 700, 900];
-        slider.onChangeCallback = (event) => this._dispatchListSelectionChanged(); // TODO: not sure if that works
+        slider.onChangeCallback = (event) => this._dispatchSlidersChangedEvent(); // TODO: not sure if that works
         this.container.appendChild(slider);
 
         this.container.appendChild(slider);
