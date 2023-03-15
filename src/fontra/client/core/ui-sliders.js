@@ -35,7 +35,7 @@ export class Sliders {
         slider.step = "any";
         //TODO: make this dynamic also
         slider.tickMarksPositions = [0, 100, 200, 300, 500, 700, 900];
-        slider.onChangeCallback = (event) => this._dispatchSlidersChangedEvent(); // TODO: not sure if that works
+        slider.onChangeCallback = () => this._dispatchSlidersChangedEvent();
         this.container.appendChild(slider);
 
         this.container.appendChild(slider);
@@ -45,24 +45,22 @@ export class Sliders {
 
   get values() {
     const values = {};
-    for (const label of this.container.children) {
-      const slider = label.firstElementChild;
+    for (const slider of this.container.children) {
       if (slider) {
-        values[slider.dataset.name] = Number(slider.value);
+        values[slider.name] = Number(slider.currentValue);
       }
     }
     return values;
   }
 
   set values(values) {
-    for (const label of this.container.children) {
-      const slider = label.firstElementChild;
+    for (const slider of this.container.children) {
       if (!slider) {
         continue;
       }
-      const value = values[slider.dataset.name];
-      if (value !== undefined) {
-        slider.value = values[slider.dataset.name];
+      const currentValue = values[slider.name];
+      if (currentValue !== undefined) {
+        slider.currentValue = values[slider.name];
       }
     }
   }

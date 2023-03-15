@@ -250,7 +250,7 @@ export class RangeSlider extends LitElement {
       e.target.setAttribute("aria-invalid", !isValid);
       this.currentValue = this.defaultValue;
     }
-    this.onChangeCallback(this.currentValue);
+    this.onChangeCallback();
   }
 
   reset() {
