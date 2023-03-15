@@ -1,3 +1,5 @@
+import { RangeSlider } from "/web-components/range-slider.js";
+
 export class Sliders {
   constructor(slidersID, sliderDescriptions) {
     this.container = document.querySelector(`#${slidersID}`);
@@ -24,20 +26,39 @@ export class Sliders {
         divider.className = "slider-divider";
         this.container.appendChild(divider);
       } else {
-        const label = document.createElement("label");
-        const slider = document.createElement("input");
-        label.className = "slider-label";
-        slider.type = "range";
+        const slider = new RangeSlider();
+        // label.className = "slider-label";
+        slider.classList.add("slider");
+        slider.name = sliderInfo.name;
+        slider.minValue = sliderInfo.minValue;
+        slider.maxValue = sliderInfo.maxValue;
+        slider.defaultValue = sliderInfo.defaultValue;
         slider.step = "any";
-        slider.class = "slider";
-        slider.min = sliderInfo.minValue;
-        slider.max = sliderInfo.maxValue;
-        slider.value = sliderInfo.defaultValue;
-        slider.dataset.name = sliderInfo.name;
-        slider.oninput = (event) => this._dispatchListSelectionChanged();
-        label.appendChild(slider);
-        label.append(sliderInfo.name);
-        this.container.appendChild(label);
+        //TODO: make this dynamic also
+        if (sliderInfo.mapping) {
+          slider.tickMarksPositions = sliderInfo.mapping.reduce(
+            (acc, curr) => acc.concat(curr),
+            []
+          );
+        }
+
+        // slider.oninput = (event) => this._dispatchListSelectionChanged();
+
+        // const label = document.createElement("label");
+        // const slider = document.createElement("input");
+        // label.className = "slider-label";
+        // slider.type = "range";
+        // slider.step = "any";
+        // slider.class = "slider";
+        // slider.min = sliderInfo.minValue;
+        // slider.max = sliderInfo.maxValue;
+        // slider.value = sliderInfo.defaultValue;
+        // slider.dataset.name = sliderInfo.name;
+        // slider.oninput = (event) => this._dispatchListSelectionChanged();
+        // label.appendChild(slider);
+        // label.append(sliderInfo.name);
+
+        this.container.appendChild(slider);
       }
     }
   }
