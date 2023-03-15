@@ -5,11 +5,12 @@ export class RangeSlider extends LitElement {
     .wrapper {
       display: flex;
       padding-top: 5px;
+      font-family: fontra-ui-regular, sans-serif;
     }
 
     .slider-name {
-      margin-left: 0.5em;
-      min-width: 5ch;
+      margin-right: 0.5em;
+      min-width: 8ch;
     }
 
     input {
@@ -160,8 +161,10 @@ export class RangeSlider extends LitElement {
 
     .range-slider-options > span {
       display: block;
+      position: relative;
+      left: calc(var(--offset) - 1px);
       width: 2px;
-      height: 3.5px;
+      height: 5.5px;
       opacity: 0.65;
       background: dimgray;
     }
@@ -171,9 +174,9 @@ export class RangeSlider extends LitElement {
     name: { type: String },
     minValue: { type: Number },
     maxValue: { type: Number },
-    defaultValue: { state: true },
-    currentValue: {},
-    tickMarksPositions: { type: Array },
+    defaultValue: { type: Number },
+    value: { type: Number },
+    tickmarksPositions: { type: Array },
     step: { type: Number },
     onChangeCallback: { type: Function },
   };
@@ -184,15 +187,17 @@ export class RangeSlider extends LitElement {
     this.name = "Slider";
     this.minValue = 0;
     this.maxValue = 100;
-    this.currentValue = this.defaultValue || this.minValue;
-    this.tickMarksPositions = [];
-    this.step = 0.1;
+    this.defaultValue = this.minValue;
+    this.value = this.defaultValue;
+    this.tickmarksPositions = [];
+    this.step = "any";
     this.onChangeCallback = () => {};
   }
 
   render() {
     return html`
       <div class="wrapper">
+        <div class="slider-name">${this.name}</div>
         <div class="numeric-input">
           <section class="slider-input">
             <input
@@ -203,10 +208,10 @@ export class RangeSlider extends LitElement {
               max=${this.maxValue}
               step=${this.step}
               pattern="[0-9]+"
-              .value=${this.currentValue}
+              .value=${Number(Math.round(parseFloat(this.value + "e" + 2)) + "e-" + 2)}
             />
             <span
-              class="${this.currentValue !== this.defaultValue ? "active" : ""}"
+              class="${this.value !== this.defaultValue ? "active" : ""}"
               @click=${this.reset}
               >↺</span
             >
@@ -215,6 +220,7 @@ export class RangeSlider extends LitElement {
         <div class="range-container">
           <div class="min-max-values">
             <span>${this.minValue}</span>
+            <span>${this.defaultValue}</span>
             <span>${this.maxValue}</span>
           </div>
           <input
@@ -224,42 +230,51 @@ export class RangeSlider extends LitElement {
             min=${this.minValue}
             max=${this.maxValue}
             step=${this.step}
-            .value=${this.currentValue}
+            .value=${this.value}
             list="markers"
           />
           <div class="range-slider-options">
-            ${this.tickMarksPositions.map(() => html`<span></span>`)}
+            ${this.tickmarksPositions.map((pos) => {
+              const posOffset = (pos / (this.maxValue + this.minValue)) * 100; // not perfect yet
+              return html`<span style="--offset: ${posOffset}%;"></span>`;
+            })}
           </div>
           <datalist id="markers">
-            ${this.tickMarksPositions.map(
+            ${this.tickmarksPositions.map(
               (pos) => html`<option value="${pos}"></option>`
             )}
           </datalist>
         </div>
-        <div class="slider-name">${this.name}</div>
       </div>
     `;
   }
 
   changeValue(e) {
-    const currentValue = e.target.value;
+    const value = e.target.value;
     const isValid = e.target.reportValidity();
     if (isValid) {
-      this.currentValue = currentValue;
+      this.value = value;
     } else {
       e.target.setAttribute("aria-invalid", !isValid);
-      this.currentValue = this.defaultValue;
+      this.value = this.defaultValue;
     }
     this.onChangeCallback();
   }
 
   reset() {
-    this.currentValue = this.defaultValue;
-    this.onChangeCallback(this.currentValue);
+    this.value = this.defaultValue;
+    this.onChangeCallback(this.value);
+  }
+
+  buildTickmarks() {
+    if (this.defaultValue !== this.minValue) {
+      this.tickmarksPositions.push(this.defaultValue);
+    }
   }
 
   connectedCallback() {
     super.connectedCallback();
+    this.buildTickmarks();
     this.reset();
   }
 }

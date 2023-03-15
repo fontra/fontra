@@ -29,15 +29,10 @@ export class Sliders {
         const slider = new RangeSlider();
         slider.classList.add("slider");
         slider.name = sliderInfo.name;
+        slider.defaultValue = 500;
         slider.minValue = sliderInfo.minValue;
         slider.maxValue = sliderInfo.maxValue;
-        slider.defaultValue = sliderInfo.defaultValue;
-        slider.step = "any";
-        //TODO: make this dynamic also
-        slider.tickMarksPositions = [0, 100, 200, 300, 500, 700, 900];
         slider.onChangeCallback = () => this._dispatchSlidersChangedEvent();
-        this.container.appendChild(slider);
-
         this.container.appendChild(slider);
       }
     }
@@ -47,7 +42,7 @@ export class Sliders {
     const values = {};
     for (const slider of this.container.children) {
       if (slider) {
-        values[slider.name] = Number(slider.currentValue);
+        values[slider.name] = Number(slider.value);
       }
     }
     return values;
@@ -58,9 +53,9 @@ export class Sliders {
       if (!slider) {
         continue;
       }
-      const currentValue = values[slider.name];
-      if (currentValue !== undefined) {
-        slider.currentValue = values[slider.name];
+      const value = values[slider.name];
+      if (value !== undefined) {
+        slider.value = values[slider.name];
       }
     }
   }
