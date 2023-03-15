@@ -29,7 +29,6 @@ export class Sliders {
         const slider = new RangeSlider();
         slider.classList.add("slider");
         slider.name = sliderInfo.name;
-        slider.defaultValue = 500;
         slider.minValue = sliderInfo.minValue;
         slider.maxValue = sliderInfo.maxValue;
         slider.onChangeCallback = () => this._dispatchSlidersChangedEvent();
