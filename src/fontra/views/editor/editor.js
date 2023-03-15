@@ -1846,6 +1846,9 @@ function setNestedValue(subject, path, value) {
 }
 
 function isTypeableInput(element) {
+  // Check if the selected element is part of the regular DOM or part of a Web Component's Shadow DOM
+  element = element.shadowRoot ? element.shadowRoot.activeElement : element;
+
   if (element.contentEditable === "true") {
     return true;
   }
