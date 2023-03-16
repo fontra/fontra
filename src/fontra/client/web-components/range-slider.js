@@ -2,6 +2,10 @@ import { html, css, LitElement } from "https://cdn.jsdelivr.net/npm/lit@2.6.1/+e
 
 export class RangeSlider extends LitElement {
   static styles = css`
+    :host {
+      --thumb-width: 20px;
+    }
+
     .wrapper {
       position: relative;
       display: flex;
@@ -74,10 +78,6 @@ export class RangeSlider extends LitElement {
       position: relative;
     }
 
-    .range-container > input + div {
-      margin-top: -11px;
-    }
-
     /* Chrome, Safari, Edge, Opera */
     .slider-default-value::-webkit-outer-spin-button,
     .slider-default-value::-webkit-inner-spin-button {
@@ -102,7 +102,7 @@ export class RangeSlider extends LitElement {
     .slider::-webkit-slider-thumb {
       -webkit-appearance: none;
       height: 12px;
-      width: 20px;
+      width: var(--thumb-width);
       background: #282828;
       border: none;
       border-radius: 7px;
@@ -122,7 +122,7 @@ export class RangeSlider extends LitElement {
     /* Firefox */
     .slider::-moz-range-thumb {
       height: 12px;
-      width: 20px;
+      width: var(--thumb-width);
       background: #282828;
       border: none;
       cursor: pointer;
@@ -136,7 +136,7 @@ export class RangeSlider extends LitElement {
     /* All the same stuff for IE */
     .slider::-ms-thumb {
       height: 12px;
-      width: 20px;
+      width: var(--thumb-width);
       background: #282828;
       border: none;
       cursor: pointer;
@@ -147,17 +147,20 @@ export class RangeSlider extends LitElement {
       background: dimgray;
     }
 
-    .range-slider-options {
-      position: relative;
-      display: flex;
-      justify-content: space-between;
+    .range-container > input + div {
+      margin-top: -11px;
       z-index: -1;
     }
 
-    .range-slider-options > span {
+    .range-container > .range-slider-options {
+      position: relative;
+      padding: 0 10px; // half of var(--thumb-width). Not recognised if referenced by variable
+    }
+
+    .range-container > .range-slider-options > span {
       display: block;
       position: relative;
-      left: calc(var(--offset) - 1px);
+      left: calc(var(--offset));
       width: 2px;
       height: 5.5px;
       opacity: 0.65;
@@ -234,7 +237,8 @@ export class RangeSlider extends LitElement {
           />
           <div class="range-slider-options">
             ${this.tickmarksPositions.map((pos) => {
-              const posOffset = (pos / (this.maxValue + this.minValue)) * 100; // not perfect yet
+              const posOffset =
+                ((pos - this.minValue) / (this.maxValue - this.minValue)) * 100;
               return html`<span style="--offset: ${posOffset}%;"></span>`;
             })}
           </div>
