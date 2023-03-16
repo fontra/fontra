@@ -9,7 +9,6 @@ export class RangeSlider extends LitElement {
     .wrapper {
       position: relative;
       display: flex;
-      padding-top: 5px;
       font-family: fontra-ui-regular, sans-serif;
     }
 
@@ -22,8 +21,11 @@ export class RangeSlider extends LitElement {
       position: absolute;
       display: none;
       top: 1.8em;
+      width: 90%;
       font-size: 1em;
-      background: var(--editor-mini-console-background-color);
+      color: var(--ui-list-row-foreground-color);
+      background: var(--ui-list-row-selected-background-color);
+      border: solid 1px var(--ui-list-border-color);
       border-radius: 5px;
       padding: 0 1em;
       opacity: 0.95;
@@ -39,11 +41,7 @@ export class RangeSlider extends LitElement {
     }
 
     .numeric-input {
-      margin-right: 1.5em;
-      width: inherit;
-      display: flex;
-      flex-direction: row;
-      justify-content: space-between;
+      margin-right: 0.5em;
     }
 
     .numeric-input > div {
