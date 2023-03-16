@@ -31,6 +31,7 @@ export class Sliders {
         slider.name = sliderInfo.name;
         slider.minValue = sliderInfo.minValue;
         slider.maxValue = sliderInfo.maxValue;
+        slider.defaultValue = sliderInfo.defaultValue;
         slider.value = sliderInfo.defaultValue;
         slider.onChangeCallback = () => this._dispatchSlidersChangedEvent();
         this.container.appendChild(slider);

@@ -270,7 +270,7 @@ export class RangeSlider extends LitElement {
   }
 
   buildTickmarks() {
-    if (this.defaultValue !== this.minValue) {
+    if (this.defaultValue > this.minValue && this.defaultValue <= this.maxValue) {
       this.tickmarksPositions.push(this.defaultValue);
     }
   }
