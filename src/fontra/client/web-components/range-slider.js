@@ -23,7 +23,7 @@ export class RangeSlider extends LitElement {
       display: none;
       top: 1.8em;
       font-size: 1em;
-      background: #282828;
+      background: var(--editor-mini-console-background-color);
       border-radius: 5px;
       padding: 0 1em;
       opacity: 0.95;
