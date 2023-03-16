@@ -205,7 +205,8 @@
   display: flex;
   flex-direction: column;
   gap: 0.5em;
-  overflow: scroll;
+  /* overflow: scroll; */
+  overflow: visible;
   padding: 0.25em 0;
 }
 

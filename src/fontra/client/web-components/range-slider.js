@@ -3,6 +3,7 @@ import { html, css, LitElement } from "https://cdn.jsdelivr.net/npm/lit@2.6.1/+e
 export class RangeSlider extends LitElement {
   static styles = css`
     .wrapper {
+      position: relative;
       display: flex;
       padding-top: 5px;
       font-family: fontra-ui-regular, sans-serif;
@@ -10,7 +11,23 @@ export class RangeSlider extends LitElement {
 
     .slider-name {
       margin-right: 0.5em;
-      min-width: 8ch;
+      min-width: 7ch;
+    }
+
+    .tooltip {
+      position: absolute;
+      display: none;
+      top: 1.8em;
+      font-size: 1em;
+      background: #282828;
+      border-radius: 5px;
+      padding: 0 1em;
+      opacity: 0.95;
+      z-index: 100;
+    }
+
+    .slider-name:hover > .tooltip {
+      display: block;
     }
 
     input {
@@ -48,35 +65,13 @@ export class RangeSlider extends LitElement {
       font-size: 0.85em;
     }
 
-    .numeric-input > .slider-input > span {
-      position: absolute;
-      top: -0.15em;
-      padding: 0 0.15em;
-      font-size: 1.2em;
+    .reset {
       cursor: pointer;
-      opacity: 0;
-      transition: opacity 0.4s ease-in-out;
-    }
-
-    .numeric-input > .slider-input > span.active {
       opacity: 1;
     }
 
     .range-container {
       position: relative;
-    }
-
-    .min-max-values {
-      position: absolute;
-      display: none;
-      justify-content: space-between;
-      width: 100%;
-      top: -10px;
-      font-size: 0.8em;
-    }
-
-    .range-container:hover > .min-max-values {
-      display: flex;
     }
 
     .range-container > input + div {
@@ -197,7 +192,21 @@ export class RangeSlider extends LitElement {
   render() {
     return html`
       <div class="wrapper">
-        <div class="slider-name">${this.name}</div>
+        <div class="slider-name">
+          ${this.name}
+          <div class="tooltip">
+            <p>Name: ${this.name}</p>
+            <p>
+              Values:<br />
+              <span>Min: ${this.minValue}</span>&nbsp;
+              <span>Default: ${this.defaultValue}</span>&nbsp;
+              <span>Max: ${this.maxValue}</span>
+            </p>
+            <p>
+              <span class="reset" @click=${this.reset}>Reset to default ↺</span>
+            </p>
+          </div>
+        </div>
         <div class="numeric-input">
           <section class="slider-input">
             <input
@@ -210,19 +219,9 @@ export class RangeSlider extends LitElement {
               pattern="[0-9]+"
               .value=${Number(Math.round(parseFloat(this.value + "e" + 2)) + "e-" + 2)}
             />
-            <span
-              class="${this.value !== this.defaultValue ? "active" : ""}"
-              @click=${this.reset}
-              >↺</span
-            >
           </section>
         </div>
         <div class="range-container">
-          <div class="min-max-values">
-            <span>${this.minValue}</span>
-            <span>${this.defaultValue}</span>
-            <span>${this.maxValue}</span>
-          </div>
           <input
             type="range"
             @input=${this.changeValue}
