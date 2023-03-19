@@ -97,11 +97,13 @@ class FileSystemProjectManager:
         return fontHandler
 
     def _getProjectPath(self, path):
-        projectPath = (
-            pathlib.Path(path).resolve()
-            if self.rootPath is None
-            else self.rootPath.joinpath(*path.split("/"))
-        )
+        if self.rootPath is None:
+            projectPath = pathlib.Path(path)
+            if not projectPath.is_absolute():
+                projectPath = "/" / projectPath
+        else:
+            projectPath = self.rootPath.joinpath(*path.split("/"))
+
         if projectPath.suffix.lower() in self.extensions and projectPath.exists():
             return projectPath
         return None
