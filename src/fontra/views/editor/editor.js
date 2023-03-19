@@ -119,12 +119,10 @@ const drawingParametersDark = {
 
 export class EditorController {
   static async fromWebSocket() {
-    const pathItems = window.location.pathname.split("/");
-    // assert pathItems[0] === ""
-    // assert pathItems[1] === "editor"
-    // assert pathItems[2] === "-"
-    const projectPath = pathItems.slice(3).join("/");
-    document.title = `Fontra — ${projectPath}`;
+    const pathItems = window.location.pathname.split("/").slice(3);
+    const displayPath = makeDisplayPath(pathItems);
+    document.title = `Fontra — ${decodeURI(displayPath)}`;
+    const projectPath = pathItems.join("/");
     const protocol = window.location.protocol === "http:" ? "ws" : "wss";
     const wsURL = `${protocol}://${window.location.host}/websocket/${projectPath}`;
 
@@ -1872,4 +1870,16 @@ function matchEvent(handlerDef, event) {
     }
   }
   return true;
+}
+
+function makeDisplayPath(pathItems) {
+  const displayPathItems = !pathItems[0].includes(":")
+    ? ["", ...pathItems]
+    : [...pathItems];
+  let displayPath = displayPathItems.join("/");
+  while (displayPathItems.length > 2 && displayPath.length > 60) {
+    displayPathItems.splice(1, 1);
+    displayPath = [displayPathItems[0], "...", ...displayPathItems.slice(1)].join("/");
+  }
+  return displayPath;
 }
