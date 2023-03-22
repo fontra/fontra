@@ -76,7 +76,6 @@ export function dialog(headline, message, buttonDefs, autoDismissTimeout) {
 
   /* prevent clicks on the dialog itself to propagate to the container */
   content.onclick = (event) => event.stopImmediatePropagation();
-
   if (autoDismissTimeout) {
     dismissTimeoutID = setTimeout(() => dialogDone(null), autoDismissTimeout);
   }

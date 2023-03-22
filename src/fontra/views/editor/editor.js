@@ -55,6 +55,72 @@ import {
 import { staticGlyphToGLIF } from "../core/glyph-glif.js";
 import { pathToSVG } from "../core/glyph-svg.js";
 import { AddRemoveButtons } from "../web-components/add-remove-buttons.js";
+import { addComponentDialog } from "/web-components/add-component-dialog.js";
+
+const drawingParametersLight = {
+  glyphFillColor: "#000",
+  undefinedFlyphFillColor: "#0006",
+  hoveredGlyphStrokeColor: "#BBB8",
+  selectedGlyphStrokeColor: "#7778",
+  nodeFillColor: "#BBB",
+  selectedNodeFillColor: "#000",
+  hoveredNodeStrokeColor: "#BBB",
+  handleColor: "#BBB",
+  pathStrokeColor: "#000",
+  ghostPathStrokeColor: "#0002",
+  pathFillColor: "#0001",
+  selectedComponentStrokeColor: "#888",
+  hoveredComponentStrokeColor: "#CCC",
+  cjkFrameStrokeColor: "#0004",
+  cjkFrameOvershootColor: "#00BFFF26",
+  cjkFrameSecondLineColor: "#A6296344",
+  sidebearingBarColor: "#0004",
+  startPointIndicatorColor: "#989898A0",
+  connectPointIndicatorColor: "#3080FF80",
+  hoveredEmptyGlyphColor: "#E8E8E8", // Must be six hex digits
+  selectedEmptyGlyphColor: "#D8D8D8", // Must be six hex digits
+  onePixelUnit: 1,
+  cornerNodeSize: 8,
+  smoothNodeSize: 8,
+  handleNodeSize: 6.5,
+  hoveredNodeLineWidth: 1,
+  handleLineWidth: 1,
+  pathLineWidth: 1,
+  rectSelectLineWidth: 1,
+  rectSelectLineDash: [10, 10],
+  cjkFrameLineWidth: 1,
+  selectedComponentLineWidth: 3,
+  hoveredComponentLineWidth: 3,
+  sidebearingBarExtent: 16,
+  startPointIndicatorLineWidth: 2,
+  startPointIndicatorRadius: 9,
+  connectPointIndicatorRadius: 11,
+  insertHandlesIndicatorRadius: 5,
+};
+
+const drawingParametersDark = {
+  ...drawingParametersLight,
+  glyphFillColor: "#FFF",
+  undefinedFlyphFillColor: "#FFF6",
+  hoveredGlyphStrokeColor: "#CCC8",
+  selectedGlyphStrokeColor: "#FFF8",
+  nodeFillColor: "#BBB",
+  selectedNodeFillColor: "#FFF",
+  hoveredNodeStrokeColor: "#BBB",
+  handleColor: "#777",
+  pathStrokeColor: "#FFF",
+  ghostPathStrokeColor: "#FFF4",
+  pathFillColor: "#FFF3",
+  selectedComponentStrokeColor: "#BBB",
+  hoveredComponentStrokeColor: "#777",
+  cjkFrameStrokeColor: "#FFF6",
+  cjkFrameSecondLineColor: "#A62963AA",
+  sidebearingBarColor: "#FFF6",
+  startPointIndicatorColor: "#989898A0",
+  connectPointIndicatorColor: "#50A0FF80",
+  hoveredEmptyGlyphColor: "#484848",
+  selectedEmptyGlyphColor: "#585858",
+};
 
 export class EditorController {
   static async fromWebSocket() {
@@ -686,6 +752,15 @@ export class EditorController {
 
     this.basicContextMenuItems.push(MenuItemDivider);
 
+    this.basicContextMenuItems.push({
+      title: "Add Component",
+      enabled: () => this.canAddComponent(),
+      callback: () => this.doAddComponent(),
+      shortCut: undefined,
+    });
+
+    this.basicContextMenuItems.push(MenuItemDivider);
+
     for (const selectNone of [false, true]) {
       this.basicContextMenuItems.push({
         title: selectNone ? "Select None" : "Select All",
@@ -1064,6 +1139,20 @@ export class EditorController {
       this.sceneController.selection = new Set();
       return "Delete Selection";
     });
+  }
+
+  canAddComponent() {
+    // TODO: implementation needed
+    return true;
+  }
+  doAddComponent() {
+    const container = document.querySelector("#ui-dialog-container");
+    const addComponentDialogElement = new addComponentDialog(container);
+    // console.log(this.glyphNamesList.contents);
+    addComponentDialogElement.addComponentCallback = () => {
+      console.log("add component");
+    };
+    // TODO: implementation needed
   }
 
   canSelectAllNone(selectNone) {
