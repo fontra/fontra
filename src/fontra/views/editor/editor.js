@@ -288,29 +288,28 @@ export class EditorController {
 
   initLayers() {
     const optionsList = document.querySelector(".options-list");
-    const layersOptions = [
-      {
-        name: "Path Options",
-        defaultOpen: true,
-        items: [
-          { name: "fill", isChecked: true },
-          { name: "stroke", isChecked: false },
-          { name: "metrics", isChecked: true },
-        ],
-      },
-      {
-        name: "Canvas Options",
-        items: [
-          { name: "guidelines", isChecked: true },
-          { name: "measurements", isChecked: true },
-          { name: "grid", isChecked: false },
-        ],
-      },
-    ]; // this should come from somewhere dynamically
+    const userSwitchableLayers = this.visualizationLayers.definitions.filter(
+      (layer) => layer.userSwitchable
+    );
 
-    optionsList.options = layersOptions;
+    const glyphDisplayLayersItems = userSwitchableLayers.reduce((array, layer) => {
+      let isChecked = this.visualizationLayersSettings[layer.identifier];
+      array.push({ id: layer.identifier, name: layer.name, isChecked: isChecked });
+      return array;
+    }, []);
+
+    optionsList.options = [
+      {
+        name: "Glyph display layers",
+        defaultOpen: true,
+        items: glyphDisplayLayersItems,
+      },
+    ];
+
     optionsList.addEventListener("change", (event) => {
-      console.log(event.detail);
+      const layerIdentifier = event.detail.id;
+      const layerChecked = event.detail.checked;
+      this.visualizationLayersSettings[layerIdentifier] = layerChecked;
     });
   }
 

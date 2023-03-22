@@ -32,7 +32,7 @@ export class OptionsList extends LitElement {
                 html`<div>
                   <input
                     type="checkbox"
-                    id="${option.name}"
+                    id="${option.id}"
                     name="${option.name}"
                     .checked=${option.isChecked}
                     @change=${(option) => this.updateOptions(option)}
@@ -70,7 +70,7 @@ export class OptionsList extends LitElement {
 
     const event = new CustomEvent("change", {
       bubbles: false,
-      detail: this.options,
+      detail: e.target,
     });
     this.dispatchEvent(event);
   }
