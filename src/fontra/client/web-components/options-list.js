@@ -3,8 +3,20 @@ import { html, css, LitElement } from "../third-party/lit.js";
 export class OptionsList extends LitElement {
   static styles = css`
     ul {
+      padding: 0;
       list-style: none;
     }
+
+    summary {
+      font-size: 1em;
+      font-weight: bold;
+      margin-bottom: 1rem;
+    }
+
+    details > div {
+      padding-left: 0.55rem;
+    }
+
     label {
       text-transform: capitalize;
     }
