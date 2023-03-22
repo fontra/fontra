@@ -9,6 +9,7 @@
     <link href="/css/core.css" rel="stylesheet" />
     <link href="/editor/editor.css" rel="stylesheet" />
     <script type="module" src="/web-components/general-settings.js"></script>
+    <script type="module" src="/web-components/options-list.js"></script>
   </head>
 
   <style type="text/css">
@@ -165,7 +166,7 @@
       animation-name: tab-slide-in-animation;
     }
 
-    .tab-overlay-container.left > .sidebar-tab {
+    <<<<<<< HEAD .tab-overlay-container.left > .sidebar-tab {
       border-radius: 0 0.4em 0.4em 0;
       text-align: right;
     }
@@ -298,6 +299,17 @@
   <body>
     <div id="ui-dialog-container">
       <!-- <div id="ui-dialog-content" tabindex="1"></div> -->
+      =======
+      <div class="sidebar-content" data-sidebar-name="layers">
+        <div class="sidebar-layer-preferences">
+          <div class="layer-preferences" id="layer-preferences">
+            <!-- contents will be filled dynamically -->
+            <options-list id="layer-preferences-list"></options-list>
+          </div>
+        </div>
+      </div>
+      >>>>>>> ad03f492 (render web component on the canvas and dynamically populate it
+      with options)
     </div>
 
     <div id="global-loader-spinner"></div>
@@ -371,7 +383,7 @@
             <div class="sidebar-tab" data-sidebar-name="designspace-sliders">
               sliders
             </div>
-            <!-- <div class="sidebar-tab" data-sidebar-name="layers">layers</div> -->
+            <div class="sidebar-tab" data-sidebar-name="layers">layers</div>
             <div class="sidebar-tab" data-sidebar-name="settings">gear</div>
           </div>
 
