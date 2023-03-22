@@ -49,7 +49,7 @@ export class OptionsList extends LitElement {
                     .checked=${option.isChecked}
                     @change=${(option) => this.updateOptions(option)}
                   />
-                  <label for="${option.name}">${option.name}</label>
+                  <label for="${option.id}">${option.name}</label>
                 </div>`
             )}
           </details>
