@@ -1,6 +1,6 @@
-import { html, css, LitElement } from "https://cdn.jsdelivr.net/npm/lit@2.6.1/+esm";
+import { html, css, LitElement } from "../third-party/lit.js";
 
-export class addComponentDialog extends LitElement {
+export class AddComponentDialog extends LitElement {
   static styles = css`
     * {
       font-family: fontra-ui-regular, sans-serif;
@@ -230,4 +230,4 @@ export class addComponentDialog extends LitElement {
   }
 }
 
-customElements.define("add-component-dialog", addComponentDialog);
+customElements.define("add-component-dialog", AddComponentDialog);
