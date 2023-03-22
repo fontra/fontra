@@ -52,7 +52,7 @@ export class VisualizationLayers {
     if (onOff) {
       this._visibleLayerIds.add(layerID);
     } else {
-      this._visibleLayerIds.remove(layerID);
+      this._visibleLayerIds.delete(layerID);
     }
     this.setNeedsUpdate();
   }
