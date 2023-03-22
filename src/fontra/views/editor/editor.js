@@ -292,11 +292,10 @@ export class EditorController {
       (layer) => layer.userSwitchable
     );
 
-    const glyphDisplayLayersItems = userSwitchableLayers.reduce((array, layer) => {
-      let isChecked = this.visualizationLayersSettings[layer.identifier];
-      array.push({ id: layer.identifier, name: layer.name, isChecked: isChecked });
-      return array;
-    }, []);
+    const glyphDisplayLayersItems = userSwitchableLayers.map((layer) => {
+      let isLayerVisible = this.visualizationLayersSettings[layer.identifier];
+      return { id: layer.identifier, name: layer.name, isChecked: isLayerVisible };
+    });
 
     optionsList.options = [
       {
