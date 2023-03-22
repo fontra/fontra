@@ -55,7 +55,7 @@ import {
 import { staticGlyphToGLIF } from "../core/glyph-glif.js";
 import { pathToSVG } from "../core/glyph-svg.js";
 import { AddRemoveButtons } from "../web-components/add-remove-buttons.js";
-import { addComponentDialog } from "/web-components/add-component-dialog.js";
+import { AddComponentDialog } from "/web-components/add-component-dialog.js";
 
 const drawingParametersLight = {
   glyphFillColor: "#000",
@@ -1147,7 +1147,7 @@ export class EditorController {
   }
   doAddComponent() {
     const container = document.querySelector("#ui-dialog-container");
-    const addComponentDialogElement = new addComponentDialog(container);
+    const addComponentDialogElement = new AddComponentDialog(container);
     addComponentDialogElement.addComponentCallback = () => {
       console.log("add component");
     };
