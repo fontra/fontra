@@ -1,4 +1,4 @@
-import { html, css, LitElement } from "https://cdn.jsdelivr.net/npm/lit@2.6.1/+esm";
+import { html, css, LitElement } from "../third-party/lit.js";
 
 export class OptionsList extends LitElement {
   static styles = css`
