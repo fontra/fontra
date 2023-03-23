@@ -102,6 +102,14 @@ export class EditorController {
       this.visualizationLayers
     );
     this.visualizationLayersSettings.addEventListener("changed", (event) => {
+      const storedLayersSettings =
+        JSON.parse(localStorage.getItem("visualization-layers-settings")) || {};
+      storedLayersSettings[event.key] = event.value;
+      localStorage.setItem(
+        "visualization-layers-settings",
+        JSON.stringify(storedLayersSettings)
+      );
+
       this.visualizationLayers.toggle(event.key, event.value);
       this.canvasController.setNeedsUpdate();
     });
@@ -256,13 +264,8 @@ export class EditorController {
       (layer) => layer.userSwitchable
     );
 
-    const storedLayersSettings =
-      JSON.parse(localStorage.getItem("visualizationLayersSettings")) || {};
-
     const glyphDisplayLayersItems = userSwitchableLayers.map((layer) => {
-      const layerChecked =
-        storedLayersSettings[layer.identifier] ||
-        this.visualizationLayersSettings[layer.identifier];
+      const layerChecked = this.visualizationLayersSettings[layer.identifier];
       return { id: layer.identifier, name: layer.name, isChecked: layerChecked };
     });
 
@@ -278,12 +281,6 @@ export class EditorController {
       const layerIdentifier = event.detail.id;
       const layerChecked = event.detail.checked;
       this.visualizationLayersSettings[layerIdentifier] = layerChecked;
-
-      storedLayersSettings[layerIdentifier] = layerChecked;
-      localStorage.setItem(
-        "visualizationLayersSettings",
-        JSON.stringify(storedLayersSettings)
-      );
     });
   }
 
@@ -1790,10 +1787,17 @@ function makeDisplayPath(pathItems) {
 }
 
 function newVisualizationLayersSettings(visualizationLayers) {
+  const storedLayersSettings =
+    JSON.parse(localStorage.getItem("visualization-layers-settings")) || {};
   const settings = {};
   for (const definition of visualizationLayers.definitions) {
     if (definition.userSwitchable) {
-      settings[definition.identifier] = definition.defaultOn;
+      settings[definition.identifier] =
+        storedLayersSettings[definition.identifier] || definition.defaultOn;
+      visualizationLayers.toggle(
+        definition.identifier,
+        settings[definition.identifier]
+      );
     }
   }
   return newObservableObject(settings);
