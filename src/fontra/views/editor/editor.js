@@ -256,9 +256,14 @@ export class EditorController {
       (layer) => layer.userSwitchable
     );
 
+    const storedLayersSettings =
+      JSON.parse(localStorage.getItem("visualizationLayersSettings")) || {};
+
     const glyphDisplayLayersItems = userSwitchableLayers.map((layer) => {
-      let isLayerVisible = this.visualizationLayersSettings[layer.identifier];
-      return { id: layer.identifier, name: layer.name, isChecked: isLayerVisible };
+      const layerChecked =
+        storedLayersSettings[layer.identifier] ||
+        this.visualizationLayersSettings[layer.identifier];
+      return { id: layer.identifier, name: layer.name, isChecked: layerChecked };
     });
 
     optionsList.options = [
@@ -273,6 +278,12 @@ export class EditorController {
       const layerIdentifier = event.detail.id;
       const layerChecked = event.detail.checked;
       this.visualizationLayersSettings[layerIdentifier] = layerChecked;
+
+      storedLayersSettings[layerIdentifier] = layerChecked;
+      localStorage.setItem(
+        "visualizationLayersSettings",
+        JSON.stringify(storedLayersSettings)
+      );
     });
   }
 
