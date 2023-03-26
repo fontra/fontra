@@ -102,14 +102,10 @@ export class EditorController {
       this.visualizationLayers
     );
     this.visualizationLayersSettings.addEventListener("changed", (event) => {
-      const storedLayersSettings =
-        JSON.parse(localStorage.getItem("visualization-layers-settings")) || {};
-      storedLayersSettings[event.key] = event.value;
       localStorage.setItem(
         "visualization-layers-settings",
-        JSON.stringify(storedLayersSettings)
+        JSON.stringify(this.visualizationLayersSettings)
       );
-
       this.visualizationLayers.toggle(event.key, event.value);
       this.canvasController.setNeedsUpdate();
     });
