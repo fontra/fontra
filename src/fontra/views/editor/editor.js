@@ -1793,7 +1793,9 @@ function newVisualizationLayersSettings(visualizationLayers) {
   for (const definition of visualizationLayers.definitions) {
     if (definition.userSwitchable) {
       settings[definition.identifier] =
-        storedLayersSettings[definition.identifier] || definition.defaultOn;
+        definition.identifier in storedLayersSettings
+          ? storedLayersSettings[definition.identifier]
+          : definition.defaultOn;
       visualizationLayers.toggle(
         definition.identifier,
         settings[definition.identifier]
