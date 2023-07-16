@@ -12,5 +12,5 @@ class RollupBuildHook(BuildHookInterface):
         rootDir = pathlib.Path().resolve()
         thirdPartyPath = rootDir / "src" / "fontra" / "client" / "third-party"
         for path in thirdPartyPath.iterdir():
-            relPath = path.relative_to(rootDir)
-            build_data["artifacts"].append(f"/{relPath}")
+            relPath = "/"+ "/".join(path.relative_to(rootDir).parts)
+            build_data["artifacts"].append(relPath)
