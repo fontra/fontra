@@ -69,11 +69,6 @@ otf = "fontra.backends.opentype:OTFBackend"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/fontra"]
-# Items that are ignored in .gitignore, but are added in a build hook
-# and must be included in the wheel:
-artifacts = [
-  "src/fontra/client/third-party/"
-]
 
 
 [tool.hatch.version]
