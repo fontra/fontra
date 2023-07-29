@@ -322,7 +322,7 @@ function expandPointSelection(path, pointIndices) {
   // that are included in selected segments
   const selectionByContour = getSelectionByContour(path, pointIndices);
   const filteredUnpackedContours = [];
-  const expandedIndices = [];
+  let expandedIndices = [];
   for (const [contourIndex, contourPointIndices] of selectionByContour.entries()) {
     const contour = path.getUnpackedContour(contourIndex);
     const startPoint = path.getAbsolutePointIndex(contourIndex, 0);
@@ -338,6 +338,22 @@ function expandPointSelection(path, pointIndices) {
       [...indexSet].map((i) => i + startPoint)
     );
   }
+
+  const pointIndicesIncludingSmoothCurveHandles = [];
+  for (const pointIndice of expandedIndices) {
+    if (path.pointTypes[pointIndice] === VarPackedPath.SMOOTH_FLAG) {
+      pointIndicesIncludingSmoothCurveHandles.push(
+        pointIndice - 1,
+        pointIndice,
+        pointIndice + 1
+      );
+    } else {
+      pointIndicesIncludingSmoothCurveHandles.push(pointIndice);
+    }
+  }
+
+  expandedIndices = pointIndicesIncludingSmoothCurveHandles;
+
   expandedIndices.sort((a, b) => a - b);
   return expandedIndices;
 }
