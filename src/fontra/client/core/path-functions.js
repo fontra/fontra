@@ -1,4 +1,4 @@
-import { arrayExtend, range, reversed } from "./utils.js";
+import { arrayExtend, range, reversed, enumerate } from "./utils.js";
 import { VarPackedPath } from "./var-path.js";
 import { roundVector } from "./vector.js";
 
@@ -303,6 +303,17 @@ export function connectContours(path, sourcePointIndex, targetPointIndex) {
   return new Set([`point/${selectedPointIndex}`]);
 }
 
+export function findConsecutivePointIndices(pointIndices) {
+  const consecutivePointIndices = [[]];
+  for (const [index, pointIndex] of enumerate(pointIndices)) {
+    if (index > 0 && pointIndex !== pointIndices[index - 1] - 1) {
+      consecutivePointIndices.push([]);
+    }
+    consecutivePointIndices[consecutivePointIndices.length - 1].push(pointIndex);
+  }
+  return consecutivePointIndices;
+}
+
 export function deleteSelectedPoints(path, pointIndices) {
   pointIndices = expandPointSelection(path, pointIndices);
   for (const pointIndex of reversed(pointIndices)) {
@@ -354,7 +365,7 @@ function expandPointSelection(path, pointIndices) {
 
   expandedIndices = pointIndicesIncludingSmoothCurveHandles;
 
-  expandedIndices.sort((a, b) => a - b);
+  expandedIndices.sort((a, b) => b - a);
   return expandedIndices;
 }
 
