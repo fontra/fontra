@@ -353,11 +353,13 @@ function expandPointSelection(path, pointIndices) {
   const pointIndicesIncludingSmoothCurveHandles = [];
   for (const pointIndice of expandedIndices) {
     if (path.pointTypes[pointIndice] === VarPackedPath.SMOOTH_FLAG) {
-      pointIndicesIncludingSmoothCurveHandles.push(
-        pointIndice - 1,
-        pointIndice,
-        pointIndice + 1
-      );
+      if (path.pointTypes[pointIndice - 1] === VarPackedPath.OFF_CURVE_CUBIC) {
+        pointIndicesIncludingSmoothCurveHandles.push(pointIndice - 1);
+      }
+      pointIndicesIncludingSmoothCurveHandles.push(pointIndice);
+      if (path.pointTypes[pointIndice + 1] === VarPackedPath.OFF_CURVE_CUBIC) {
+        pointIndicesIncludingSmoothCurveHandles.push(pointIndice + 1);
+      }
     } else {
       pointIndicesIncludingSmoothCurveHandles.push(pointIndice);
     }
@@ -365,7 +367,7 @@ function expandPointSelection(path, pointIndices) {
 
   expandedIndices = pointIndicesIncludingSmoothCurveHandles;
 
-  expandedIndices.sort((a, b) => b - a);
+  // expandedIndices.sort((a, b) => b - a);
   return expandedIndices;
 }
 
