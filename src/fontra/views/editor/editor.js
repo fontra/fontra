@@ -59,8 +59,14 @@ import {
 import { staticGlyphToGLIF } from "../core/glyph-glif.js";
 import { pathToSVG } from "../core/glyph-svg.js";
 import { parseClipboard } from "../core/server-utils.js";
-import SidebarLeft from "./sidebar-left.js";
-import SidebarRight from "./sidebar-right.js";
+import Sidebar from "./sidebar.js";
+
+import TextEntryPanel from "./panel-text-entry.js";
+import GlyphSearchPanel from "./panel-glyph-search.js";
+import DesignspaceNavigationPanel from "./panel-designspace-navigation.js";
+import UserSettingsPanel from "./panel-user-settings.js";
+import ReferenceFontPanel from "./panel-reference-font.js";
+import SelectionInfoPanel from "./panel-selection-info.js";
 
 export class EditorController {
   static async fromWebSocket() {
@@ -82,8 +88,14 @@ export class EditorController {
 
   constructor(font) {
     const editorContainer = document.querySelector(".editor-container");
-    const sidebarLeft = new SidebarLeft();
-    const sidebarRight = new SidebarRight();
+    const sidebarLeft = new Sidebar("left");
+    sidebarLeft.addPanel(new TextEntryPanel());
+    sidebarLeft.addPanel(new GlyphSearchPanel());
+    sidebarLeft.addPanel(new DesignspaceNavigationPanel());
+    sidebarLeft.addPanel(new UserSettingsPanel());
+    sidebarLeft.addPanel(new ReferenceFontPanel());
+    const sidebarRight = new Sidebar("right");
+    sidebarRight.addPanel(new SelectionInfoPanel());
 
     sidebarLeft.attach(editorContainer);
     sidebarRight.attach(editorContainer);
@@ -467,8 +479,11 @@ export class EditorController {
 
   toggleSidebar(sidebarName, doFocus = false) {
     const sidebar = this.sidebars.find((sidebar) =>
-      sidebar.tabs.find((tab) => tab.name === sidebarName)
+      sidebar.panels.find((tab) => tab.name === sidebarName)
     );
+    if (!sidebar) {
+      return;
+    }
     const onOff = sidebar.toggle(sidebarName);
     localStorage.setItem(
       `fontra-selected-sidebar-${sidebar.identifier}`,
@@ -806,7 +821,7 @@ export class EditorController {
       this.toggleSidebar("glyph-search", true);
     });
     this.registerShortCut("i", { metaKey: true, globalOverride: true }, () => {
-      this.toggleSidebar("sidebar-selection-info", true);
+      this.toggleSidebar("selection-info", true);
     });
 
     for (const menuItem of [
@@ -1545,7 +1560,7 @@ export class EditorController {
     }
   }
 
-  toggleSidebarSelectionInfo(onOff) {
+  toggleSelectionInfo(onOff) {
     if (onOff) {
       this.sidebarSelectionInfo.update();
     }

@@ -1,18 +1,23 @@
 import * as html from "/core/unlit.js";
 import { clamp } from "../../core/utils.js";
+
 const MIN_SIDEBAR_WIDTH = 200;
 const MAX_SIDEBAR_WIDTH = 500;
-export default class Sidebar {
-  // iconPath
-  // identifier
-  constructor() {}
 
-  tabs = [];
+export default class Sidebar {
+  constructor(identifier) {
+    this.identifier = identifier;
+    this.panels = [];
+  }
+
+  addPanel(panel) {
+    this.panels.push(panel);
+  }
 
   toggle(tabName) {
     const container = document.querySelector(`.sidebar-container.${this.identifier}`);
     let toggledTab;
-    for (const tab of this.tabs) {
+    for (const tab of this.panels) {
       const tabElement = document.querySelector(
         `.sidebar-tab[data-sidebar-name="${tab.name}"]`
       );
@@ -49,6 +54,38 @@ export default class Sidebar {
   }
 
   attach(element) {
+    {
+      const to = element.querySelector(`.sidebar-container.${this.identifier} slot`);
+      const fragment = document.createDocumentFragment();
+      for (const panel of this.panels) {
+        fragment.appendChild(
+          html.div(
+            {
+              "class": "sidebar-content",
+              "data-sidebarName": panel.name,
+            },
+            [panel.getContentElement()]
+          )
+        );
+      }
+      to.replaceWith(fragment);
+    }
+
+    {
+      const panelTabs = this.getPanelTabs();
+      const fragment = document.createDocumentFragment();
+      for (const panelTab of panelTabs) {
+        fragment.appendChild(panelTab);
+      }
+      element
+        .querySelector(`.tab-overlay-container.${this.identifier}`)
+        .appendChild(fragment);
+    }
+
+    this.initResizeGutter();
+  }
+
+  initResizeGutter() {
     let initialWidth;
     let initialPointerCoordinateX;
     let sidebarResizing;
@@ -69,10 +106,7 @@ export default class Sidebar {
       }
     };
     const onPointerUp = () => {
-      localStorage.setItem(
-        `fontra-sidebar-width-${growDirection === "left" ? "right" : "left"}`,
-        width
-      );
+      localStorage.setItem(`fontra-sidebar-width-${this.identifier}`, width);
       sidebarResizing.classList.add("animating");
       sidebarResizing = undefined;
       initialWidth = undefined;
@@ -109,42 +143,19 @@ export default class Sidebar {
     }
   }
 
-  getSidebarTabContents() {
-    return [];
-  }
-
-  getContentElement() {
-    return html.div(
-      {
-        class: `sidebar-container cleanable-overlay ${this.identifier}`,
-      },
-      this.getSidebarTabContents()
-    );
-  }
-
-  getSidebarTabs() {
-    return html.div(
-      {
-        class: `tab-overlay-container ${this.identifier}`,
-      },
-      [
-        html.div({
-          class: "sidebar-shadow-box",
-        }),
-        ...this.tabs.map((tab) =>
-          html.div(
-            {
-              "class": "sidebar-tab",
-              "data-sidebarName": tab.name,
-            },
-            [
-              html.createDomElement("inline-svg", {
-                src: tab.icon,
-              }),
-            ]
-          )
-        ),
-      ]
+  getPanelTabs() {
+    return this.panels.map((tab) =>
+      html.div(
+        {
+          "class": "sidebar-tab",
+          "data-sidebarName": tab.name,
+        },
+        [
+          html.createDomElement("inline-svg", {
+            src: tab.icon,
+          }),
+        ]
+      )
     );
   }
 }

@@ -365,7 +365,7 @@ body {
   grid-template-rows: auto 1fr;
 }
 
-.sidebar-selection-info {
+.selection-info {
   box-sizing: border-box;
   height: 100%;
   width: 100%;
