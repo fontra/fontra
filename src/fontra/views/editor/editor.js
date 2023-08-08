@@ -45,11 +45,9 @@ import { PointerTool } from "./edit-tools-pointer.js";
 import { PowerRulerTool } from "./edit-tools-power-ruler.js";
 import { SidebarDesignspace } from "./sidebar-designspace.js";
 import { SidebarSelectionInfo } from "./sidebar-selection-info.js";
-import { SidebarTextEntry } from "./sidebar-text-entry.js";
 import { VisualizationLayers } from "./visualization-layers.js";
 import {
   allGlyphsCleanVisualizationLayerDefinition,
-  registerVisualizationLayerDefinition,
   visualizationLayerDefinitions,
 } from "./visualization-layer-definitions.js";
 import {
