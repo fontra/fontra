@@ -1,5 +1,6 @@
 import * as html from "/core/unlit.js";
 import Panel from "./panel.js";
+import { SidebarTextEntry } from "./sidebar-text-entry.js";
 
 export default class TextEntryPanel extends Panel {
   name = "text-entry";
@@ -37,6 +38,13 @@ export default class TextEntryPanel extends Panel {
           ]
         ),
       ]
+    );
+  }
+
+  init(editorController) {
+    editorController.sidebarTextSettings = new SidebarTextEntry(
+      editorController.sceneController,
+      editorController.sceneSettingsController
     );
   }
 }

@@ -87,27 +87,6 @@ export class EditorController {
   }
 
   constructor(font) {
-    const editorContainer = document.querySelector(".editor-container");
-    const sidebarLeft = new Sidebar("left");
-    sidebarLeft.addPanel(new TextEntryPanel(this));
-    sidebarLeft.addPanel(new GlyphSearchPanel(this));
-    sidebarLeft.addPanel(new DesignspaceNavigationPanel(this));
-    sidebarLeft.addPanel(new UserSettingsPanel(this));
-    sidebarLeft.addPanel(new ReferenceFontPanel(this));
-    const sidebarRight = new Sidebar("right");
-    sidebarRight.addPanel(new SelectionInfoPanel(this));
-
-    sidebarLeft.attach(editorContainer);
-    sidebarRight.attach(editorContainer);
-
-    this.sidebars = [sidebarLeft, sidebarRight];
-
-    for (const sidebar of this.sidebars) {
-      for (const panel of sidebar.panels) {
-        panel.init(this);
-      }
-    }
-
     const canvas = document.querySelector("#edit-canvas");
     canvas.focus();
 
@@ -150,6 +129,27 @@ export class EditorController {
         }
       }
     );
+
+    const editorContainer = document.querySelector(".editor-container");
+    const sidebarLeft = new Sidebar("left");
+    sidebarLeft.addPanel(new TextEntryPanel(this));
+    sidebarLeft.addPanel(new GlyphSearchPanel(this));
+    sidebarLeft.addPanel(new DesignspaceNavigationPanel(this));
+    sidebarLeft.addPanel(new UserSettingsPanel(this));
+    sidebarLeft.addPanel(new ReferenceFontPanel(this));
+    const sidebarRight = new Sidebar("right");
+    sidebarRight.addPanel(new SelectionInfoPanel(this));
+
+    sidebarLeft.attach(editorContainer);
+    sidebarRight.attach(editorContainer);
+
+    this.sidebars = [sidebarLeft, sidebarRight];
+
+    for (const sidebar of this.sidebars) {
+      for (const panel of sidebar.panels) {
+        panel.init(this);
+      }
+    }
 
     this.cjkDesignFrame = new CJKDesignFrame(this);
 
@@ -478,8 +478,6 @@ export class EditorController {
         this.toggleSidebar(sidebarTab.dataset.sidebarName, true);
       });
     }
-
-    this.initSidebarTextEntry();
   }
 
   toggleSidebar(sidebarName, doFocus = false) {
@@ -497,13 +495,6 @@ export class EditorController {
     const methodName = hyphenatedToCamelCase("toggle-" + sidebarName);
     setTimeout(() => this[methodName]?.call(this, onOff, doFocus), 10);
     return onOff;
-  }
-
-  initSidebarTextEntry() {
-    this.sidebarTextSettings = new SidebarTextEntry(
-      this.sceneController,
-      this.sceneSettingsController
-    );
   }
 
   initMiniConsole() {
