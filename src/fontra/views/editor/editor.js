@@ -478,19 +478,19 @@ export class EditorController {
     }
   }
 
-  toggleSidebar(sidebarName, doFocus = false) {
+  toggleSidebar(panelName, doFocus = false) {
     const sidebar = this.sidebars.find((sidebar) =>
-      sidebar.panels.find((tab) => tab.name === sidebarName)
+      sidebar.panels.find((panel) => panel.name === panelName)
     );
     if (!sidebar) {
       return;
     }
-    const onOff = sidebar.toggle(sidebarName);
+    const onOff = sidebar.toggle(panelName);
     localStorage.setItem(
       `fontra-selected-sidebar-${sidebar.identifier}`,
-      onOff ? sidebarName : ""
+      onOff ? panelName : ""
     );
-    const methodName = hyphenatedToCamelCase("toggle-" + sidebarName);
+    const methodName = hyphenatedToCamelCase("toggle-" + panelName);
     setTimeout(() => this[methodName]?.call(this, onOff, doFocus), 10);
     return onOff;
   }
