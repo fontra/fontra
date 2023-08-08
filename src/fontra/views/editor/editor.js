@@ -89,18 +89,24 @@ export class EditorController {
   constructor(font) {
     const editorContainer = document.querySelector(".editor-container");
     const sidebarLeft = new Sidebar("left");
-    sidebarLeft.addPanel(new TextEntryPanel());
-    sidebarLeft.addPanel(new GlyphSearchPanel());
-    sidebarLeft.addPanel(new DesignspaceNavigationPanel());
-    sidebarLeft.addPanel(new UserSettingsPanel());
-    sidebarLeft.addPanel(new ReferenceFontPanel());
+    sidebarLeft.addPanel(new TextEntryPanel(this));
+    sidebarLeft.addPanel(new GlyphSearchPanel(this));
+    sidebarLeft.addPanel(new DesignspaceNavigationPanel(this));
+    sidebarLeft.addPanel(new UserSettingsPanel(this));
+    sidebarLeft.addPanel(new ReferenceFontPanel(this));
     const sidebarRight = new Sidebar("right");
-    sidebarRight.addPanel(new SelectionInfoPanel());
+    sidebarRight.addPanel(new SelectionInfoPanel(this));
 
     sidebarLeft.attach(editorContainer);
     sidebarRight.attach(editorContainer);
 
     this.sidebars = [sidebarLeft, sidebarRight];
+
+    for (const sidebar of this.sidebars) {
+      for (const panel of sidebar.panels) {
+        panel.init(this);
+      }
+    }
 
     const canvas = document.querySelector("#edit-canvas");
     canvas.focus();
@@ -145,7 +151,6 @@ export class EditorController {
       }
     );
 
-    this.initSidebarReferenceFont();
     this.cjkDesignFrame = new CJKDesignFrame(this);
 
     this.visualizationLayers = new VisualizationLayers(
@@ -499,61 +504,6 @@ export class EditorController {
       this.sceneController,
       this.sceneSettingsController
     );
-  }
-
-  initSidebarReferenceFont() {
-    const referenceFontElement = document.querySelector("#reference-font");
-    referenceFontElement.controller.addKeyListener("referenceFontName", (event) => {
-      if (event.newValue) {
-        this.visualizationLayersSettings.model["fontra.reference.font"] = true;
-      }
-      this.canvasController.requestUpdate();
-    });
-    let charOverride;
-    referenceFontElement.controller.addKeyListener("charOverride", (event) => {
-      charOverride = event.newValue;
-      this.canvasController.requestUpdate();
-    });
-    const referenceFontModel = referenceFontElement.model;
-
-    registerVisualizationLayerDefinition({
-      identifier: "fontra.reference.font",
-      name: "Reference font",
-      selectionMode: "editing",
-      userSwitchable: true,
-      defaultOn: true,
-      zIndex: 100,
-      screenParameters: { strokeWidth: 1 },
-      colors: { fillColor: "#AAA6" },
-      // colorsDarkMode: { strokeColor: "red" },
-      draw: (context, positionedGlyph, parameters, model, controller) => {
-        if (!referenceFontModel.referenceFontName) {
-          return;
-        }
-        let text = charOverride || positionedGlyph.character;
-        if (!text && positionedGlyph.glyphName.includes(".")) {
-          const baseGlyphName = positionedGlyph.glyphName.split(".")[0];
-          const codePoint = (this.fontController.glyphMap[baseGlyphName] || [])[0];
-          if (codePoint) {
-            text = String.fromCodePoint(codePoint);
-          }
-        }
-        if (!text) {
-          return;
-        }
-        context.lineWidth = parameters.strokeWidth;
-        context.font = `${model.fontController.unitsPerEm}px ${referenceFontModel.referenceFontName}, AdobeBlank`;
-        context.scale(1, -1);
-        if (parameters.fillColor) {
-          context.fillStyle = parameters.fillColor;
-          context.fillText(text, 0, 0);
-        }
-        if (parameters.strokeColor) {
-          context.strokeStyle = parameters.strokeColor;
-          context.strokeText(text, 0, 0);
-        }
-      },
-    });
   }
 
   initMiniConsole() {
