@@ -128,27 +128,6 @@ export class EditorController {
       }
     );
 
-    const editorContainer = document.querySelector(".editor-container");
-    const sidebarLeft = new Sidebar("left");
-    sidebarLeft.addPanel(new TextEntryPanel(this));
-    sidebarLeft.addPanel(new GlyphSearchPanel(this));
-    sidebarLeft.addPanel(new DesignspaceNavigationPanel(this));
-    sidebarLeft.addPanel(new UserSettingsPanel(this));
-    sidebarLeft.addPanel(new ReferenceFontPanel(this));
-    const sidebarRight = new Sidebar("right");
-    sidebarRight.addPanel(new SelectionInfoPanel(this));
-
-    sidebarLeft.attach(editorContainer);
-    sidebarRight.attach(editorContainer);
-
-    this.sidebars = [sidebarLeft, sidebarRight];
-
-    for (const sidebar of this.sidebars) {
-      for (const panel of sidebar.panels) {
-        panel.init(this);
-      }
-    }
-
     this.cjkDesignFrame = new CJKDesignFrame(this);
 
     this.visualizationLayers = new VisualizationLayers(
@@ -446,6 +425,27 @@ export class EditorController {
   }
 
   initSidebars() {
+    const editorContainer = document.querySelector(".editor-container");
+    const sidebarLeft = new Sidebar("left");
+    sidebarLeft.addPanel(new TextEntryPanel(this));
+    sidebarLeft.addPanel(new GlyphSearchPanel(this));
+    sidebarLeft.addPanel(new DesignspaceNavigationPanel(this));
+    sidebarLeft.addPanel(new UserSettingsPanel(this));
+    sidebarLeft.addPanel(new ReferenceFontPanel(this));
+    sidebarLeft.attach(editorContainer);
+
+    const sidebarRight = new Sidebar("right");
+    sidebarRight.addPanel(new SelectionInfoPanel(this));
+    sidebarRight.attach(editorContainer);
+
+    this.sidebars = [sidebarLeft, sidebarRight];
+
+    for (const sidebar of this.sidebars) {
+      for (const panel of sidebar.panels) {
+        panel.init(this);
+      }
+    }
+
     // Upon reload, the "animating" class may still be set (why?), so remove it
     for (const sidebarContainer of document.querySelectorAll(".sidebar-container")) {
       sidebarContainer.classList.remove("animating");
