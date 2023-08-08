@@ -60,6 +60,8 @@ import { staticGlyphToGLIF } from "../core/glyph-glif.js";
 import { pathToSVG } from "../core/glyph-svg.js";
 import { clamp } from "../../core/utils.js";
 import { parseClipboard } from "../core/server-utils.js";
+import SidebarLeft from "./sidebar-left.js";
+import SidebarRight from "./sidebar-right.js";
 
 const MIN_SIDEBAR_WIDTH = 200;
 const MAX_SIDEBAR_WIDTH = 500;
@@ -83,6 +85,16 @@ export class EditorController {
   }
 
   constructor(font) {
+    const editorContainer = document.querySelector(".editor-container");
+    const sidebarLeft = new SidebarLeft(this);
+    const sidebarRight = new SidebarRight(this);
+    // this.addSidebar(sidebarLeft);
+
+    sidebarLeft.attach(editorContainer);
+    sidebarRight.attach(editorContainer);
+
+    this.sidebars = [sidebarLeft, sidebarRight];
+
     const canvas = document.querySelector("#edit-canvas");
     canvas.focus();
 
@@ -522,51 +534,14 @@ export class EditorController {
   }
 
   toggleSidebar(sidebarName, doFocus = false) {
-    const toggledTab = document.querySelector(
-      `.sidebar-tab[data-sidebar-name="${sidebarName}"]`
+    const sidebar = this.sidebars.find((sidebar) =>
+      sidebar.tabs.find((tab) => tab.name === sidebarName)
     );
-    const side = toggledTab.parentElement.classList.contains("left") ? "left" : "right";
-    const sidebarContainer = document.querySelector(`.sidebar-container.${side}`);
-    const sidebars = {};
-    for (const sideBarContent of document.querySelectorAll(
-      `.sidebar-container.${side} > .sidebar-content`
-    )) {
-      sidebars[sideBarContent.dataset.sidebarName] = sideBarContent;
-    }
-
-    for (const item of document.querySelectorAll(
-      `.tab-overlay-container.${side} > .sidebar-tab`
-    )) {
-      const sidebarContent = sidebars[item.dataset.sidebarName];
-      if (item === toggledTab) {
-        const isSelected = item.classList.contains("selected");
-
-        item.classList.toggle("selected", !isSelected);
-        sidebarContainer.classList.toggle("visible", !isSelected);
-        const shadowBox = document.querySelector(
-          `.tab-overlay-container.${side} > .sidebar-shadow-box`
-        );
-        if (isSelected) {
-          sidebarContainer.addEventListener(
-            "transitionend",
-            () => {
-              sidebarContent?.classList.remove("selected");
-              shadowBox?.classList.remove("visible");
-            },
-            { once: true }
-          );
-        } else {
-          sidebarContent?.classList.add("selected");
-          shadowBox?.classList.add("visible");
-        }
-      } else {
-        item.classList.remove("selected");
-        sidebarContent?.classList.remove("selected");
-      }
-    }
-
-    const onOff = toggledTab.classList.contains("selected");
-    localStorage.setItem(`fontra-selected-sidebar-${side}`, onOff ? sidebarName : "");
+    const onOff = sidebar.toggle(sidebarName);
+    localStorage.setItem(
+      `fontra-selected-sidebar-${sidebar.identifier}`,
+      onOff ? sidebarName : ""
+    );
     const methodName = hyphenatedToCamelCase("toggle-" + sidebarName);
     setTimeout(() => this[methodName]?.call(this, onOff, doFocus), 10);
     return onOff;

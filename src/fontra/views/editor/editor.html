@@ -25,78 +25,12 @@
     <div id="global-loader-spinner"></div>
 
     <div class="editor-container">
-      <div class="sidebar-container left cleanable-overlay">
-        <div class="sidebar-content" data-sidebar-name="text-entry">
-          <div class="sidebar-text-entry">
-            <textarea rows="1" wrap="off" id="text-entry-textarea"></textarea>
-
-            <div id="text-align-menu">
-              <inline-svg data-align="left" src="/images/alignleft.svg"></inline-svg>
-              <inline-svg
-                data-align="center"
-                class="selected"
-                src="/images/aligncenter.svg"
-              ></inline-svg>
-              <inline-svg data-align="right" src="/images/alignright.svg"></inline-svg>
-            </div>
-          </div>
-        </div>
-
-        <div class="sidebar-content" data-sidebar-name="glyph-search">
-          <div class="sidebar-glyph-search">
-            <glyphs-search id="glyphs-search"></glyphs-search>
-          </div>
-        </div>
-
-        <div class="sidebar-content" data-sidebar-name="designspace-navigation">
-          <div id="designspace-navigation">
-            <designspace-location id="designspace-location"></designspace-location>
-            <ui-list id="sources-list"></ui-list>
-            <add-remove-buttons
-              id="sources-list-add-remove-buttons"
-            ></add-remove-buttons>
-          </div>
-        </div>
-
-        <div class="sidebar-content" data-sidebar-name="user-settings">
-          <div class="sidebar-settings">
-            <grouped-settings id="user-settings"></grouped-settings>
-          </div>
-        </div>
-
-        <div class="sidebar-content" data-sidebar-name="reference-font">
-          <div id="sidebar-reference-font">
-            <reference-font id="reference-font"></reference-font>
-          </div>
-        </div>
-        <div class="sidebar-resize-gutter" data-grow-direction="right"></div>
-      </div>
-
       <div class="main-container">
         <canvas id="edit-canvas" tabindex="1"></canvas>
 
         <div id="mini-console"></div>
 
         <div class="main-overlay-container cleanable-overlay">
-          <div class="tab-overlay-container left">
-            <div class="sidebar-shadow-box"></div>
-            <div class="sidebar-tab" data-sidebar-name="text-entry">
-              <inline-svg src="/images/texttool.svg"></inline-svg>
-            </div>
-            <div class="sidebar-tab" data-sidebar-name="glyph-search">
-              <inline-svg src="/images/magnifyingglass.svg"></inline-svg>
-            </div>
-            <div class="sidebar-tab" data-sidebar-name="designspace-navigation">
-              <inline-svg src="/images/sliders.svg"></inline-svg>
-            </div>
-            <div class="sidebar-tab" data-sidebar-name="user-settings">
-              <inline-svg src="/images/gear.svg"></inline-svg>
-            </div>
-            <div class="sidebar-tab" data-sidebar-name="reference-font">
-              <inline-svg src="/images/reference.svg"></inline-svg>
-            </div>
-          </div>
-
           <div class="tool-overlay-container">
             <div class="tools-overlay">
               <div id="edit-tools" class="tools-item">
@@ -118,24 +52,6 @@
           <!-- tool-overlay-container -->
 
           <!-- <div></div> --><!-- overlay filler -->
-
-          <div class="tab-overlay-container right">
-            <div class="sidebar-shadow-box"></div>
-            <div class="sidebar-tab" data-sidebar-name="sidebar-selection-info">
-              <inline-svg src="/images/info.svg"></inline-svg>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="sidebar-container right cleanable-overlay">
-        <div class="sidebar-resize-gutter" data-grow-direction="left"></div>
-        <div class="sidebar-content" data-sidebar-name="sidebar-selection-info">
-          <div class="sidebar-selection-info">
-            <div id="selection-info">
-              <!-- contents will be filled dynamically -->
-            </div>
-          </div>
         </div>
       </div>
     </div>
