@@ -54,7 +54,9 @@ export default class Sidebar {
   }
 
   attach(element) {
-    const to = element.querySelector(`.sidebar-container.${this.identifier} slot`);
+    const sidebarSlot = element.querySelector(
+      `.sidebar-container.${this.identifier} slot`
+    );
     const panelsFragment = document.createDocumentFragment();
     for (const panel of this.panels) {
       panelsFragment.appendChild(
@@ -67,7 +69,7 @@ export default class Sidebar {
         )
       );
     }
-    to.replaceWith(panelsFragment);
+    sidebarSlot.replaceWith(panelsFragment);
 
     const panelTabs = this.getPanelTabs();
     const panelTabsFragment = document.createDocumentFragment();
