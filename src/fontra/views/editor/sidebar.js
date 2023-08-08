@@ -54,33 +54,29 @@ export default class Sidebar {
   }
 
   attach(element) {
-    {
-      const to = element.querySelector(`.sidebar-container.${this.identifier} slot`);
-      const fragment = document.createDocumentFragment();
-      for (const panel of this.panels) {
-        fragment.appendChild(
-          html.div(
-            {
-              "class": "sidebar-content",
-              "data-sidebarName": panel.name,
-            },
-            [panel.getContentElement()]
-          )
-        );
-      }
-      to.replaceWith(fragment);
+    const to = element.querySelector(`.sidebar-container.${this.identifier} slot`);
+    const panelsFragment = document.createDocumentFragment();
+    for (const panel of this.panels) {
+      panelsFragment.appendChild(
+        html.div(
+          {
+            "class": "sidebar-content",
+            "data-sidebarName": panel.name,
+          },
+          [panel.getContentElement()]
+        )
+      );
     }
+    to.replaceWith(panelsFragment);
 
-    {
-      const panelTabs = this.getPanelTabs();
-      const fragment = document.createDocumentFragment();
-      for (const panelTab of panelTabs) {
-        fragment.appendChild(panelTab);
-      }
-      element
-        .querySelector(`.tab-overlay-container.${this.identifier}`)
-        .appendChild(fragment);
+    const panelTabs = this.getPanelTabs();
+    const panelTabsFragment = document.createDocumentFragment();
+    for (const panelTab of panelTabs) {
+      panelTabsFragment.appendChild(panelTab);
     }
+    element
+      .querySelector(`.tab-overlay-container.${this.identifier}`)
+      .appendChild(panelTabsFragment);
 
     this.initResizeGutter();
   }
