@@ -6,6 +6,7 @@ export default class SidebarRight extends Sidebar {
   attach(element) {
     element.appendChild(this.getContentElement());
     element.querySelector(".main-overlay-container").append(this.getSidebarTabs());
+    super.attach(element);
   }
   tabs = [{ name: "sidebar-selection-info", icon: "/images/info.svg" }];
   getSidebarTabContents() {

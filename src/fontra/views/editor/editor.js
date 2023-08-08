@@ -58,13 +58,9 @@ import {
 } from "../core/path-functions.js";
 import { staticGlyphToGLIF } from "../core/glyph-glif.js";
 import { pathToSVG } from "../core/glyph-svg.js";
-import { clamp } from "../../core/utils.js";
 import { parseClipboard } from "../core/server-utils.js";
 import SidebarLeft from "./sidebar-left.js";
 import SidebarRight from "./sidebar-right.js";
-
-const MIN_SIDEBAR_WIDTH = 200;
-const MAX_SIDEBAR_WIDTH = 500;
 
 export class EditorController {
   static async fromWebSocket() {
@@ -86,9 +82,8 @@ export class EditorController {
 
   constructor(font) {
     const editorContainer = document.querySelector(".editor-container");
-    const sidebarLeft = new SidebarLeft(this);
-    const sidebarRight = new SidebarRight(this);
-    // this.addSidebar(sidebarLeft);
+    const sidebarLeft = new SidebarLeft();
+    const sidebarRight = new SidebarRight();
 
     sidebarLeft.attach(editorContainer);
     sidebarRight.attach(editorContainer);
@@ -446,22 +441,7 @@ export class EditorController {
     // ensure we postpone just enough.)
     setTimeout(() => {
       for (const side of ["left", "right"]) {
-        const sidebarWidth = localStorage.getItem(`fontra-sidebar-width-${side}`);
         const selectedSidebar = localStorage.getItem(`fontra-selected-sidebar-${side}`);
-        if (sidebarWidth) {
-          let width = clamp(
-            parseInt(sidebarWidth),
-            MIN_SIDEBAR_WIDTH,
-            MAX_SIDEBAR_WIDTH
-          );
-          if (isNaN(width)) {
-            width = MIN_SIDEBAR_WIDTH;
-          }
-          document.documentElement.style.setProperty(
-            `--sidebar-content-width-${side}`,
-            `${width}px`
-          );
-        }
         if (selectedSidebar) {
           this.toggleSidebar(selectedSidebar, false);
         }
@@ -483,55 +463,55 @@ export class EditorController {
     }
 
     this.initSidebarTextEntry();
-    this.initSidebarGutters();
+    // this.initSidebarGutters();
   }
 
-  initSidebarGutters() {
-    let initialWidth;
-    let initialPointerCoordinateX;
-    let sidebarResizing;
-    let growDirection;
-    let width;
-    const onPointerMove = (event) => {
-      if (sidebarResizing) {
-        let cssProperty;
-        if (growDirection === "left") {
-          width = initialWidth + (initialPointerCoordinateX - event.clientX);
-          cssProperty = "--sidebar-content-width-right";
-        } else {
-          width = initialWidth + (event.clientX - initialPointerCoordinateX);
-          cssProperty = "--sidebar-content-width-left";
-        }
-        width = clamp(width, MIN_SIDEBAR_WIDTH, MAX_SIDEBAR_WIDTH);
-        document.documentElement.style.setProperty(cssProperty, `${width}px`);
-      }
-    };
-    const onPointerUp = () => {
-      localStorage.setItem(
-        `fontra-sidebar-width-${growDirection === "left" ? "right" : "left"}`,
-        width
-      );
-      sidebarResizing.classList.add("animating");
-      sidebarResizing = undefined;
-      initialWidth = undefined;
-      growDirection = undefined;
-      initialPointerCoordinateX = undefined;
-      document.documentElement.classList.remove("sidebar-resizing");
-      document.removeEventListener("pointermove", onPointerMove);
-    };
-    for (const gutter of document.querySelectorAll(".sidebar-resize-gutter")) {
-      gutter.addEventListener("pointerdown", (event) => {
-        sidebarResizing = gutter.parentElement;
-        initialWidth = sidebarResizing.getBoundingClientRect().width;
-        initialPointerCoordinateX = event.clientX;
-        sidebarResizing.classList.remove("animating");
-        growDirection = gutter.dataset.growDirection;
-        document.documentElement.classList.add("sidebar-resizing");
-        document.addEventListener("pointermove", onPointerMove);
-        document.addEventListener("pointerup", onPointerUp, { once: true });
-      });
-    }
-  }
+  // initSidebarGutters() {
+  //   let initialWidth;
+  //   let initialPointerCoordinateX;
+  //   let sidebarResizing;
+  //   let growDirection;
+  //   let width;
+  //   const onPointerMove = (event) => {
+  //     if (sidebarResizing) {
+  //       let cssProperty;
+  //       if (growDirection === "left") {
+  //         width = initialWidth + (initialPointerCoordinateX - event.clientX);
+  //         cssProperty = "--sidebar-content-width-right";
+  //       } else {
+  //         width = initialWidth + (event.clientX - initialPointerCoordinateX);
+  //         cssProperty = "--sidebar-content-width-left";
+  //       }
+  //       width = clamp(width, MIN_SIDEBAR_WIDTH, MAX_SIDEBAR_WIDTH);
+  //       document.documentElement.style.setProperty(cssProperty, `${width}px`);
+  //     }
+  //   };
+  //   const onPointerUp = () => {
+  //     localStorage.setItem(
+  //       `fontra-sidebar-width-${growDirection === "left" ? "right" : "left"}`,
+  //       width
+  //     );
+  //     sidebarResizing.classList.add("animating");
+  //     sidebarResizing = undefined;
+  //     initialWidth = undefined;
+  //     growDirection = undefined;
+  //     initialPointerCoordinateX = undefined;
+  //     document.documentElement.classList.remove("sidebar-resizing");
+  //     document.removeEventListener("pointermove", onPointerMove);
+  //   };
+  //   for (const gutter of document.querySelectorAll(".sidebar-resize-gutter")) {
+  //     gutter.addEventListener("pointerdown", (event) => {
+  //       sidebarResizing = gutter.parentElement;
+  //       initialWidth = sidebarResizing.getBoundingClientRect().width;
+  //       initialPointerCoordinateX = event.clientX;
+  //       sidebarResizing.classList.remove("animating");
+  //       growDirection = gutter.dataset.growDirection;
+  //       document.documentElement.classList.add("sidebar-resizing");
+  //       document.addEventListener("pointermove", onPointerMove);
+  //       document.addEventListener("pointerup", onPointerUp, { once: true });
+  //     });
+  //   }
+  // }
 
   toggleSidebar(sidebarName, doFocus = false) {
     const sidebar = this.sidebars.find((sidebar) =>

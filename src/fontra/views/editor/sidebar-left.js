@@ -6,6 +6,7 @@ export default class SidebarLeft extends Sidebar {
   attach(element) {
     element.prepend(this.getContentElement());
     element.querySelector(".main-overlay-container").prepend(this.getSidebarTabs());
+    super.attach();
   }
   tabs = [
     {

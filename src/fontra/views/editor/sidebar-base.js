@@ -1,10 +1,11 @@
 import * as html from "/core/unlit.js";
+import { clamp } from "../../core/utils.js";
+const MIN_SIDEBAR_WIDTH = 200;
+const MAX_SIDEBAR_WIDTH = 500;
 export default class Sidebar {
   // iconPath
   // identifier
-  constructor(editorController) {
-    this.editorController = editorController;
-  }
+  constructor() {}
 
   tabs = [];
 
@@ -47,7 +48,66 @@ export default class Sidebar {
     return toggledTab.classList.contains("selected");
   }
 
-  attach(element) {}
+  attach(element) {
+    let initialWidth;
+    let initialPointerCoordinateX;
+    let sidebarResizing;
+    let growDirection;
+    let width;
+    const onPointerMove = (event) => {
+      if (sidebarResizing) {
+        let cssProperty;
+        if (growDirection === "left") {
+          width = initialWidth + (initialPointerCoordinateX - event.clientX);
+          cssProperty = "--sidebar-content-width-right";
+        } else {
+          width = initialWidth + (event.clientX - initialPointerCoordinateX);
+          cssProperty = "--sidebar-content-width-left";
+        }
+        width = clamp(width, MIN_SIDEBAR_WIDTH, MAX_SIDEBAR_WIDTH);
+        document.documentElement.style.setProperty(cssProperty, `${width}px`);
+      }
+    };
+    const onPointerUp = () => {
+      localStorage.setItem(
+        `fontra-sidebar-width-${growDirection === "left" ? "right" : "left"}`,
+        width
+      );
+      sidebarResizing.classList.add("animating");
+      sidebarResizing = undefined;
+      initialWidth = undefined;
+      growDirection = undefined;
+      initialPointerCoordinateX = undefined;
+      document.documentElement.classList.remove("sidebar-resizing");
+      document.removeEventListener("pointermove", onPointerMove);
+    };
+    const gutter = document.querySelector(
+      `.sidebar-container.${this.identifier} .sidebar-resize-gutter`
+    );
+    gutter.addEventListener("pointerdown", (event) => {
+      sidebarResizing = gutter.parentElement;
+      initialWidth = sidebarResizing.getBoundingClientRect().width;
+      initialPointerCoordinateX = event.clientX;
+      sidebarResizing.classList.remove("animating");
+      growDirection = gutter.dataset.growDirection;
+      document.documentElement.classList.add("sidebar-resizing");
+      document.addEventListener("pointermove", onPointerMove);
+      document.addEventListener("pointerup", onPointerUp, { once: true });
+    });
+    const sidebarWidth = localStorage.getItem(
+      `fontra-sidebar-width-${this.identifier}`
+    );
+    if (sidebarWidth) {
+      let width = clamp(parseInt(sidebarWidth), MIN_SIDEBAR_WIDTH, MAX_SIDEBAR_WIDTH);
+      if (isNaN(width)) {
+        width = MIN_SIDEBAR_WIDTH;
+      }
+      document.documentElement.style.setProperty(
+        `--sidebar-content-width-${this.identifier}`,
+        `${width}px`
+      );
+    }
+  }
 
   getSidebarTabContents() {
     return [];
