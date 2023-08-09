@@ -41,7 +41,7 @@ export default class TextEntryPanel extends Panel {
     );
   }
 
-  init(editorController) {
+  attach(editorController) {
     editorController.sidebarTextSettings = new SidebarTextEntry(
       editorController.sceneController,
       editorController.sceneSettingsController

@@ -426,23 +426,23 @@ export class EditorController {
 
   initSidebars() {
     const editorContainer = document.querySelector(".editor-container");
-    const sidebarLeft = new Sidebar("left");
-    sidebarLeft.addPanel(new TextEntryPanel(this));
-    sidebarLeft.addPanel(new GlyphSearchPanel(this));
-    sidebarLeft.addPanel(new DesignspaceNavigationPanel(this));
-    sidebarLeft.addPanel(new UserSettingsPanel(this));
-    sidebarLeft.addPanel(new ReferenceFontPanel(this));
-    sidebarLeft.attach(editorContainer);
+    const sidebars = [new Sidebar("left"), new Sidebar("right")];
+    this.sidebars = sidebars;
 
-    const sidebarRight = new Sidebar("right");
-    sidebarRight.addPanel(new SelectionInfoPanel(this));
-    sidebarRight.attach(editorContainer);
+    this.addSidebarPanel(new TextEntryPanel(), "left");
+    this.addSidebarPanel(new GlyphSearchPanel(), "left");
+    this.addSidebarPanel(new DesignspaceNavigationPanel(), "left");
+    this.addSidebarPanel(new UserSettingsPanel(), "left");
+    this.addSidebarPanel(new ReferenceFontPanel(), "left");
+    this.addSidebarPanel(new SelectionInfoPanel(), "right");
 
-    this.sidebars = [sidebarLeft, sidebarRight];
+    for (const sidebar of sidebars) {
+      sidebar.attach(editorContainer);
+    }
 
-    for (const sidebar of this.sidebars) {
+    for (const sidebar of sidebars) {
       for (const panel of sidebar.panels) {
-        panel.init(this);
+        panel.attach(this);
       }
     }
 
@@ -476,6 +476,11 @@ export class EditorController {
         this.toggleSidebar(sidebarTab.dataset.sidebarName, true);
       });
     }
+  }
+
+  addSidebarPanel(panelInstance, sidebarName) {
+    const sidebar = this.sidebars.find((sidebar) => sidebar.identifier === sidebarName);
+    sidebar.addPanel(panelInstance);
   }
 
   toggleSidebar(panelName, doFocus = false) {

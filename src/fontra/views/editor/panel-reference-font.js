@@ -20,7 +20,7 @@ export default class ReferenceFontPanel extends Panel {
     );
   }
 
-  init(editorController) {
+  attach(editorController) {
     const referenceFontElement = document.querySelector("#reference-font");
     referenceFontElement.controller.addKeyListener("referenceFontName", (event) => {
       if (event.newValue) {

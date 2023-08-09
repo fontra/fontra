@@ -1,9 +1,7 @@
 export default class Panel {
-  constructor(editorController) {
-    this.editorController = editorController;
-  }
+  constructor() {}
 
   getContentElement() {}
 
-  init(editorController) {}
+  attach(editorController) {}
 }
