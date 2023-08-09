@@ -33,7 +33,7 @@ export default class ReferenceFontPanel extends Panel {
     let charOverride;
     referenceFontElement.controller.addKeyListener("charOverride", (event) => {
       charOverride = event.newValue;
-      this.canvasController.requestUpdate();
+      editorController.canvasController.requestUpdate();
     });
     const referenceFontModel = referenceFontElement.model;
 
