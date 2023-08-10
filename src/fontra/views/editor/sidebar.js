@@ -7,11 +7,45 @@ const MAX_SIDEBAR_WIDTH = 500;
 export default class Sidebar {
   constructor(identifier) {
     this.identifier = identifier;
+    this.container = null;
     this.panels = [];
   }
 
   addPanel(panel) {
+    if (!this.container) {
+      throw new Error("Sidebar needs to be attached to a container element.");
+    }
+
     this.panels.push(panel);
+
+    const sidebarContainer = this.container.querySelector(
+      `.sidebar-container.${this.identifier}`
+    );
+
+    const panelContent = html.div(
+      { "class": "sidebar-content", "data-sidebarName": panel.name },
+      [panel.getContentElement()]
+    );
+
+    sidebarContainer.append(panelContent);
+
+    const tabOverlayContainer = this.container.querySelector(
+      `.tab-overlay-container.${this.identifier}`
+    );
+
+    tabOverlayContainer.appendChild(
+      html.div(
+        {
+          "class": "sidebar-tab",
+          "data-sidebarName": panel.name,
+        },
+        [
+          html.createDomElement("inline-svg", {
+            src: panel.icon,
+          }),
+        ]
+      )
+    );
   }
 
   toggle(tabName) {
@@ -54,32 +88,7 @@ export default class Sidebar {
   }
 
   attach(element) {
-    const sidebarSlot = element.querySelector(
-      `.sidebar-container.${this.identifier} slot`
-    );
-    const panelsFragment = document.createDocumentFragment();
-    for (const panel of this.panels) {
-      panelsFragment.appendChild(
-        html.div(
-          {
-            "class": "sidebar-content",
-            "data-sidebarName": panel.name,
-          },
-          [panel.getContentElement()]
-        )
-      );
-    }
-    sidebarSlot.replaceWith(panelsFragment);
-
-    const panelTabs = this.getPanelTabs();
-    const panelTabsFragment = document.createDocumentFragment();
-    for (const panelTab of panelTabs) {
-      panelTabsFragment.appendChild(panelTab);
-    }
-    element
-      .querySelector(`.tab-overlay-container.${this.identifier}`)
-      .appendChild(panelTabsFragment);
-
+    this.container = element;
     this.initResizeGutter();
   }
 
@@ -139,21 +148,5 @@ export default class Sidebar {
         `${width}px`
       );
     }
-  }
-
-  getPanelTabs() {
-    return this.panels.map((tab) =>
-      html.div(
-        {
-          "class": "sidebar-tab",
-          "data-sidebarName": tab.name,
-        },
-        [
-          html.createDomElement("inline-svg", {
-            src: tab.icon,
-          }),
-        ]
-      )
-    );
   }
 }

@@ -44,7 +44,6 @@ import { PenTool } from "./edit-tools-pen.js";
 import { PointerTool } from "./edit-tools-pointer.js";
 import { PowerRulerTool } from "./edit-tools-power-ruler.js";
 import { SidebarDesignspace } from "./sidebar-designspace.js";
-import { SidebarSelectionInfo } from "./sidebar-selection-info.js";
 import { VisualizationLayers } from "./visualization-layers.js";
 import {
   allGlyphsCleanVisualizationLayerDefinition,
@@ -167,14 +166,16 @@ export class EditorController {
       this.showDialogGlyphEditLocationNotAtSource();
     });
 
+    this.sidebars = [];
+
     this.initSidebars();
     this.initContextMenuItems();
     this.initShortCuts();
     this.initMiniConsole();
-    this.sidebarSelectionInfo = new SidebarSelectionInfo(
-      this.sceneController,
-      this.fontController
-    );
+    // this.sidebarSelectionInfo = new SidebarSelectionInfo(
+    //   this.sceneController,
+    //   this.fontController
+    // );
 
     window
       .matchMedia("(prefers-color-scheme: dark)")
@@ -425,26 +426,14 @@ export class EditorController {
   }
 
   initSidebars() {
-    const editorContainer = document.querySelector(".editor-container");
-    const sidebars = [new Sidebar("left"), new Sidebar("right")];
-    this.sidebars = sidebars;
-
+    this.addSidebar(new Sidebar("left"));
+    this.addSidebar(new Sidebar("right"));
     this.addSidebarPanel(new TextEntryPanel(), "left");
     this.addSidebarPanel(new GlyphSearchPanel(), "left");
     this.addSidebarPanel(new DesignspaceNavigationPanel(), "left");
     this.addSidebarPanel(new UserSettingsPanel(), "left");
     this.addSidebarPanel(new ReferenceFontPanel(), "left");
     this.addSidebarPanel(new SelectionInfoPanel(), "right");
-
-    for (const sidebar of sidebars) {
-      sidebar.attach(editorContainer);
-    }
-
-    for (const sidebar of sidebars) {
-      for (const panel of sidebar.panels) {
-        panel.attach(this);
-      }
-    }
 
     // Upon reload, the "animating" class may still be set (why?), so remove it
     for (const sidebarContainer of document.querySelectorAll(".sidebar-container")) {
@@ -478,9 +467,16 @@ export class EditorController {
     }
   }
 
+  addSidebar(sidebar) {
+    const editorContainer = document.querySelector(".editor-container");
+    sidebar.attach(editorContainer);
+    this.sidebars.push(sidebar);
+  }
+
   addSidebarPanel(panelInstance, sidebarName) {
     const sidebar = this.sidebars.find((sidebar) => sidebar.identifier === sidebarName);
     sidebar.addPanel(panelInstance);
+    panelInstance.attach(this);
   }
 
   toggleSidebar(panelName, doFocus = false) {

@@ -1,5 +1,6 @@
 import * as html from "/core/unlit.js";
 import Panel from "./panel.js";
+import { SidebarSelectionInfo } from "./sidebar-selection-info.js";
 
 export default class SelectionInfoPanel extends Panel {
   name = "selection-info";
@@ -18,6 +19,13 @@ export default class SelectionInfoPanel extends Panel {
           []
         ),
       ]
+    );
+  }
+
+  attach(editorController) {
+    editorController.sidebarSelectionInfo = new SidebarSelectionInfo(
+      editorController.sceneController,
+      editorController.fontController
     );
   }
 }
