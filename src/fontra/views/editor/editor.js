@@ -172,10 +172,6 @@ export class EditorController {
     this.initContextMenuItems();
     this.initShortCuts();
     this.initMiniConsole();
-    // this.sidebarSelectionInfo = new SidebarSelectionInfo(
-    //   this.sceneController,
-    //   this.fontController
-    // );
 
     window
       .matchMedia("(prefers-color-scheme: dark)")
