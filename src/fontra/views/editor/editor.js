@@ -475,6 +475,16 @@ export class EditorController {
     panelInstance.attach(this);
   }
 
+  getSidebarPanel(panelName) {
+    for (const sidebar of this.sidebars) {
+      for (const panel of sidebar.panels) {
+        if (panel.name === panelName) {
+          return panel;
+        }
+      }
+    }
+  }
+
   toggleSidebar(panelName, doFocus = false) {
     const sidebar = this.sidebars.find((sidebar) =>
       sidebar.panels.find((panel) => panel.name === panelName)
@@ -1492,7 +1502,7 @@ export class EditorController {
 
   toggleTextEntry(onOff, doFocus) {
     if (onOff && doFocus) {
-      this.sidebarTextSettings.focusTextEntry();
+      this.getSidebarPanel("text-entry").focusTextEntry();
     }
   }
 
