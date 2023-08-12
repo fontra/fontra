@@ -1508,7 +1508,7 @@ export class EditorController {
 
   toggleSelectionInfo(onOff) {
     if (onOff) {
-      this.sidebarSelectionInfo.update();
+      this.getSidebarPanel("selection-info").update();
     }
   }
 
