@@ -534,3 +534,13 @@ body {
 #text-entry-textarea {
   overflow-x: scroll;
 }
+
+.plugins {
+  padding: 1em;
+}
+
+.plugin-list-buttons {
+  display: flex;
+  gap: 0.5em;
+  margin-top: 0.5em;
+}
