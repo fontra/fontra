@@ -4,4 +4,6 @@ export default class Panel {
   getContentElement() {}
 
   attach(editorController) {}
+
+  detach() {}
 }
