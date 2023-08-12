@@ -43,7 +43,6 @@ import { HandTool } from "./edit-tools-hand.js";
 import { PenTool } from "./edit-tools-pen.js";
 import { PointerTool } from "./edit-tools-pointer.js";
 import { PowerRulerTool } from "./edit-tools-power-ruler.js";
-import { SidebarDesignspace } from "./sidebar-designspace.js";
 import { VisualizationLayers } from "./visualization-layers.js";
 import {
   allGlyphsCleanVisualizationLayerDefinition,
@@ -359,7 +358,7 @@ export class EditorController {
     );
     switch (result) {
       case "createNewSource":
-        this.sidebarDesignspace.addSource();
+        this.getSidebarPanel("designspace-navigation").addSource();
         break;
       case "goToNearestSource":
         const glyphController =
@@ -418,7 +417,7 @@ export class EditorController {
   }
 
   async initSidebarDesignspace() {
-    this.sidebarDesignspace = new SidebarDesignspace(this);
+    this.getSidebarPanel("designspace-navigation").setup();
   }
 
   initSidebars() {
