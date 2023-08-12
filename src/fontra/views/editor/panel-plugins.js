@@ -1,3 +1,4 @@
+import { dialogSetup } from "/web-components/modal-dialog.js";
 import * as html from "/core/unlit.js";
 import Panel from "./panel.js";
 
@@ -17,7 +18,13 @@ export default class PluginsPanel extends Panel {
             class: "plugin-list-buttons",
           },
           [
-            html.createDomElement("button", {}, ["Add plugin"]),
+            html.createDomElement(
+              "button",
+              {
+                id: "add-plugin-button",
+              },
+              ["Add plugin"]
+            ),
             html.createDomElement(
               "button",
               { disabled: true, style: "margin-left: auto;" },
@@ -48,6 +55,22 @@ export default class PluginsPanel extends Panel {
         name: "extrude",
       },
     ]);
+
+    const addPluginButton = document.querySelector("#add-plugin-button");
+    addPluginButton.addEventListener("click", (event) => {
+      event.preventDefault();
+      const dialog = dialogSetup("Add a plugin", null, [
+        { title: "Cancel", resultValue: "no", isCancelButton: true },
+        { title: "Create", resultValue: "ok", isDefaultButton: true },
+      ])
+        .then((dialog) => {
+          dialog.setContent(html.div({}, "content"));
+          return dialog.run();
+        })
+        .then((result) => {
+          console.log(result);
+        });
+    });
   }
 }
 
