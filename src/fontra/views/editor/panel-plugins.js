@@ -1,10 +1,20 @@
 import { dialogSetup } from "/web-components/modal-dialog.js";
 import * as html from "/core/unlit.js";
 import Panel from "./panel.js";
+import { ObservableController } from "../core/observable-object.js";
 
 export default class PluginsPanel extends Panel {
   name = "plugins";
   icon = "/images/gear.svg";
+
+  constructor() {
+    super();
+    this.plugins = new ObservableController([]);
+  }
+
+  detach() {
+    throw new Error("default panels cannot be detached.");
+  }
 
   getContentElement() {
     return html.div(
@@ -36,7 +46,33 @@ export default class PluginsPanel extends Panel {
     );
   }
 
+  async initPlugin(name) {
+    let content;
+    try {
+      content = await fetch(`https://cdn.jsdelivr.net/gh/${name}/start.js`);
+    } catch (e) {
+      console.log("Plugin not found.");
+    }
+    if (content !== undefined) {
+      const text = await content.text();
+      const plugin = eval(`(${text})`); // a sandboxed javascript may run instead
+      const pluginInstance = new plugin();
+      pluginInstance.main({
+        addSidebarPanel: (panel, sidebarName) => {
+          this.editorController.addSidebarPanel(panel, sidebarName);
+        },
+      });
+    }
+  }
+
   attach(editorController) {
+    this.editorController = editorController;
+    this.plugins.addListener(({ oldValue, newValue }) => {
+      if (oldValue === undefined && newValue !== undefined) {
+        this.initPlugin(newValue.name);
+      }
+    });
+
     const pluginList = document.querySelector("#plugin-list");
     this.pluginList = pluginList;
     pluginList.showHeader = true;
@@ -49,26 +85,30 @@ export default class PluginsPanel extends Panel {
       },
       { key: "name", title: "Plugin name", width: "12em" },
     ];
-    pluginList.setItems([
-      {
-        active: true,
-        name: "extrude",
-      },
-    ]);
+    this.plugins.addListener(() => {
+      pluginList.setItems(this.plugins.model);
+    });
 
     const addPluginButton = document.querySelector("#add-plugin-button");
     addPluginButton.addEventListener("click", (event) => {
       event.preventDefault();
+
+      const pluginNameInput = html.createDomElement("input", { id: "plugin-name" });
       const dialog = dialogSetup("Add a plugin", null, [
         { title: "Cancel", resultValue: "no", isCancelButton: true },
         { title: "Create", resultValue: "ok", isDefaultButton: true },
       ])
         .then((dialog) => {
-          dialog.setContent(html.div({}, "content"));
+          dialog.setContent(
+            html.div({}, ["Plugin github handle/repository name", pluginNameInput])
+          );
           return dialog.run();
         })
         .then((result) => {
-          console.log(result);
+          this.plugins.model.push({
+            active: true,
+            name: pluginNameInput.value,
+          });
         });
     });
   }
