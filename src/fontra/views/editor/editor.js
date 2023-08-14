@@ -454,12 +454,6 @@ export class EditorController {
         sidebarContainer.classList.add("animating");
       }
     }, 100);
-
-    for (const sidebarTab of document.querySelectorAll(".sidebar-tab")) {
-      sidebarTab.addEventListener("click", (event) => {
-        this.toggleSidebar(sidebarTab.dataset.sidebarName, true);
-      });
-    }
   }
 
   addSidebar(sidebar) {
@@ -472,6 +466,12 @@ export class EditorController {
     const sidebar = this.sidebars.find((sidebar) => sidebar.identifier === sidebarName);
     sidebar.addPanel(panelInstance);
     panelInstance.attach(this);
+    const tabElement = document.querySelector(
+      `.sidebar-tab[data-sidebar-name="${panelInstance.name}"]`
+    );
+    tabElement.addEventListener("click", () => {
+      this.toggleSidebar(panelInstance.name, true);
+    });
   }
 
   getSidebarPanel(panelName) {
