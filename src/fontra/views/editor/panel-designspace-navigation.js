@@ -21,6 +21,7 @@ import {
 import { showMenu } from "/web-components/menu-panel.js";
 import { dialogSetup } from "/web-components/modal-dialog.js";
 import { IconButton } from "/web-components/icon-button.js";
+import { Tooltip } from "/web-components/tooltip.js";
 import { NumberFormatter } from "/web-components/ui-list.js";
 import Panel from "./panel.js";
 
@@ -83,12 +84,20 @@ export default class DesignspaceNavigationPanel extends Panel {
           []
         ),
         html.div({ class: "axis-buttons-container" }, [
+          html.createDomElement("tool-tip", {
+            text: "Reset all axes",
+            showFor: "#reset-axes-button",
+          }),
           html.createDomElement("icon-button", {
             id: "reset-axes-button",
             src: "/tabler-icons/refresh.svg",
             onclick: (event) => this.resetAllAxesToDefault(event),
             disabled: false,
             hidden: true,
+          }),
+          html.createDomElement("tool-tip", {
+            text: "Edit local axes",
+            showFor: "#edit-local-axes-button",
           }),
           html.createDomElement("icon-button", {
             id: "edit-local-axes-button",
