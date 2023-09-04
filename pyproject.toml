@@ -46,6 +46,7 @@ Source = "https://github.com/googlefonts/fontra"
 
 [project.scripts]
 fontra = "fontra.__main__:main"
+fontra-copy = "fontra.backends.copy:main"
 
 
 [project.entry-points."fontra.views"]
