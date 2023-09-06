@@ -53,6 +53,9 @@ import { PointerTool } from "./edit-tools-pointer.js";
 import { PowerRulerTool } from "./edit-tools-power-ruler.js";
 import { SceneController } from "./scene-controller.js";
 import { MIN_SIDEBAR_WIDTH, Sidebar } from "./sidebar.js";
+import { ShapeTool } from "./edit-tools-shape.js";
+import { VisualizationLayers } from "./visualization-layers.js";
+
 import {
   allGlyphsCleanVisualizationLayerDefinition,
   visualizationLayerDefinitions,
@@ -609,7 +612,7 @@ export class EditorController {
 
   initTools() {
     this.tools = {};
-    const editToolClasses = [PointerTool, PenTool, PowerRulerTool, HandTool];
+    const editToolClasses = [PointerTool, PenTool, ShapeTool, PowerRulerTool, HandTool];
     for (const editToolClass of editToolClasses) {
       this.addEditTool(new editToolClass(this));
     }
