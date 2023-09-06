@@ -75,7 +75,7 @@ export class PointerTool extends BaseTool {
     if (initialEvent.detail == 2 || initialEvent.myTapCount == 2) {
       initialEvent.preventDefault(); // don't let our dbl click propagate to other elements
       eventStream.done();
-      await this.handleDoubleCick(selection, point);
+      await this.handleDoubleClick(selection, point);
       return;
     }
 
@@ -139,7 +139,7 @@ export class PointerTool extends BaseTool {
     }
   }
 
-  async handleDoubleCick(selection, point) {
+  async handleDoubleClick(selection, point) {
     const sceneController = this.sceneController;
     if (!sceneController.hoverPathHit && (!selection || !selection.size)) {
       const selectedGlyph = this.sceneModel.glyphAtPoint(point);
