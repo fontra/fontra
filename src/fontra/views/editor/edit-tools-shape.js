@@ -4,38 +4,60 @@ export class ShapeTool extends BaseTool {
   iconPath = "/tabler-icons/shape.svg";
   identifier = "shape-tool";
 
+  handleHover(event) {}
+
+  setCursor() {
+    if (this.sceneModel.selectedGlyph?.isEditing) {
+      this.canvasController.canvas.style.cursor = "crosshair";
+    }
+  }
+
   handleHover(event) {
-    // console.log("handleHover");
-    // if (!this.sceneModel.selectedGlyph?.isEditing) {
-    //   this.editor.tools["shape-tool"].handleHover(event);
-    //   return;
-    // }
-    // this.setCursor();
-    // const { insertHandles, targetPoint } = this._getPathConnectTargetPoint(event);
-    // const prevInsertHandles = this.sceneModel.pathInsertHandles;
-    // const prevTargetPoint = this.sceneModel.pathConnectTargetPoint;
-    // if (
-    //   !handlesEqual(insertHandles, prevInsertHandles) ||
-    //   !pointsEqual(targetPoint, prevTargetPoint)
-    // ) {
-    //   this.sceneModel.pathInsertHandles = insertHandles;
-    //   this.sceneModel.pathConnectTargetPoint = targetPoint;
-    //   this.canvasController.requestUpdate();
-    // }
+    if (!this.sceneModel.selectedGlyph?.isEditing) {
+      this.editor.tools["pointer-tool"].handleHover(event);
+      return;
+    }
+    this.setCursor();
+  }
+
+  async handleDrag(eventStream, initialEvent) {
+    if (!this.sceneModel.selectedGlyph?.isEditing) {
+      await this.editor.tools["pointer-tool"].handleDrag(eventStream, initialEvent);
+      return;
+    }
+    // console.log(initialEvent);
+    const initialX = initialEvent.x;
+    const initialY = initialEvent.y;
+    let eventX;
+    let eventY;
+    let minX = initialX;
+    let minY = initialY;
+    let maxX = initialX;
+    let maxY = initialY;
+
+    for await (const event of eventStream) {
+      eventX = event.x;
+      eventY = event.y;
+      if (eventX === undefined) {
+        // We can receive non-pointer events like keyboard events: ignore
+        continue;
+      }
+      // console.log(event);
+      // compute selection bounding box
+      minX = Math.min(minX, eventX);
+      minY = Math.min(minY, eventY);
+      maxX = Math.max(maxX, eventX);
+      maxY = Math.max(maxY, eventY);
+      // console.log(minX, minY, maxX, maxY);
+
+      if (Math.abs(maxX - minX) < 1.0 || Math.abs(maxY - minY) < 1.0) {
+        // skip drawing
+      }
+      // this.canvasController.requestUpdate();
+    }
   }
 
   deactivate() {
-    // delete this.sceneModel.pathInsertHandles;
-    // delete this.sceneModel.pathConnectTargetPoint;
     this.canvasController.requestUpdate();
-  }
-
-  setCursor() {
-    if (!this.sceneModel.selectedGlyph?.isEditing) {
-      this.editor.tools["shape-tool"].setCursor();
-    }
-    // else {
-    //   // this.canvasController.canvas.style.cursor = "crosshair";
-    // }
   }
 }
