@@ -126,4 +126,6 @@ export const label = createDomElement.bind(null, "label");
 export const span = createDomElement.bind(null, "span");
 export const hr = createDomElement.bind(null, "hr");
 export const link = createDomElement.bind(null, "link");
+export const select = createDomElement.bind(null, "select");
+export const option = createDomElement.bind(null, "option");
 // Let's add more once needed
