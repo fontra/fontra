@@ -1,11 +1,51 @@
 import { ObservableController } from "/core/observable-object.js";
-import { UnlitElement, div, input, label, span } from "/core/unlit.js";
+import { UnlitElement, div, input, label, select, option } from "/core/unlit.js";
 import { fileNameExtension, withTimeout } from "/core/utils.js";
 import { themeColorCSS } from "./theme-support.js";
 import { UIList } from "./ui-list.js";
 import { dialog } from "/web-components/modal-dialog.js";
 
 const fontFileExtensions = new Set(["ttf", "otf", "woff", "woff2"]);
+
+const COUNTRY_CODE_NAMES = [
+  ["ar-SA", "Arabic Saudi Arabia"],
+  ["cs-CZ", "Czech Czech Republic"],
+  ["da-DK", "Danish Denmark"],
+  ["de-DE", "German Germany"],
+  ["el-GR", "Modern Greek Greece"],
+  ["en-AU", "English Australia"],
+  ["en-GB", "English United Kingdom"],
+  ["en-IE", "English Ireland"],
+  ["en-US", "English United States"],
+  ["en-ZA", "English South Africa"],
+  ["es-ES", "Spanish Spain"],
+  ["es-MX", "Spanish Mexico"],
+  ["fi-FI", "Finnish Finland"],
+  ["fr-CA", "French Canada"],
+  ["fr-FR", "French France"],
+  ["he-IL", "Hebrew Israel"],
+  ["hi-IN", "Hindi India"],
+  ["hu-HU", "Hungarian Hungary"],
+  ["id-ID", "Indonesian Indonesia"],
+  ["it-IT", "Italian Italy"],
+  ["ja-JP", "Japanese Japan"],
+  ["ko-KR", "Korean Republic of Korea"],
+  ["nl-BE", "Dutch Belgium"],
+  ["nl-NL", "Dutch Netherlands"],
+  ["no-NO", "Norwegian Norway"],
+  ["pl-PL", "Polish Poland"],
+  ["pt-BR", "Portuguese Brazil"],
+  ["pt-PT", "Portuguese Portugal"],
+  ["ro-RO", "Romanian Romania"],
+  ["ru-RU", "Russian Russian Federation"],
+  ["sk-SK", "Slovak Slovakia"],
+  ["sv-SE", "Swedish Sweden"],
+  ["th-TH", "Thai Thailand"],
+  ["tr-TR", "Turkish Turkey"],
+  ["zh-CN", "Chinese China"],
+  ["zh-HK", "Chinese Hong Kong"],
+  ["zh-TW", "Chinese Taiwan"],
+];
 
 export class ReferenceFont extends UnlitElement {
   static styles = `
@@ -110,14 +150,19 @@ export class ReferenceFont extends UnlitElement {
             oninput: (event) => (this.model.charOverride = event.target.value),
           }),
           label({ for: "language-code" }, "Language code:"),
-          input({
-            type: "text",
-            id: "language-code",
-            value: this.model.languageCode,
-            oninput: (event) => {
-              this.model.languageCode = event.target.value;
+          select(
+            {
+              id: "language-code",
+              onchange: (event) => {
+                this.model.languageCode = event.target.value;
+              },
             },
-          }),
+            COUNTRY_CODE_NAMES.map(([code, name]) =>
+              option({ value: code, selected: this.model.languageCode === code }, [
+                name,
+              ])
+            )
+          ),
         ]
       ),
     ];
