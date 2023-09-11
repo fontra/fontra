@@ -1,8 +1,8 @@
 import * as html from "/core/unlit.js";
 import { clamp } from "../../core/utils.js";
 
-const MIN_SIDEBAR_WIDTH = 200;
-const MAX_SIDEBAR_WIDTH = 500;
+const MIN_SIDEBAR_WIDTH = 20;
+const MAX_SIDEBAR_WIDTH = 40;
 
 export default class Sidebar {
   constructor(identifier) {
@@ -108,8 +108,10 @@ export default class Sidebar {
           width = initialWidth + (event.clientX - initialPointerCoordinateX);
           cssProperty = "--sidebar-content-width-left";
         }
+        const vw1 = window.innerWidth / 100;
+        width = width / vw1;
         width = clamp(width, MIN_SIDEBAR_WIDTH, MAX_SIDEBAR_WIDTH);
-        document.documentElement.style.setProperty(cssProperty, `${width}px`);
+        document.documentElement.style.setProperty(cssProperty, `${width}vw`);
       }
     };
     const onPointerUp = () => {
@@ -145,7 +147,7 @@ export default class Sidebar {
       }
       document.documentElement.style.setProperty(
         `--sidebar-content-width-${this.identifier}`,
-        `${width}px`
+        `${width}vw`
       );
     }
   }
