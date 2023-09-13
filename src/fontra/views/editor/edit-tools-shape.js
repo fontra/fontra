@@ -30,10 +30,10 @@ export class ShapeTool extends BaseTool {
     const initialY = initialEvent.y;
     let eventX;
     let eventY;
-    let minX = initialX;
-    let minY = initialY;
-    let maxX = initialX;
-    let maxY = initialY;
+    let minX,
+      maxX = initialX;
+    let minY,
+      maxY = initialY;
 
     for await (const event of eventStream) {
       eventX = event.x;
