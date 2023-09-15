@@ -8,6 +8,8 @@ import { fileNameExtension, withTimeout } from "/core/utils.js";
 import { UIList } from "/web-components/ui-list.js";
 import { dialog } from "/web-components/modal-dialog.js";
 
+import { Font } from "/third-party/lib-font.js";
+
 import { registerVisualizationLayerDefinition } from "./visualization-layer-definitions.js";
 
 let referenceFontModel;
@@ -367,6 +369,7 @@ export default class ReferenceFontPanel extends Panel {
   }
 
   getContentElement() {
+    console.log(Font);
     this.controller = new ObservableController({
       languageCode: "",
       selectedFontIndex: -1,
