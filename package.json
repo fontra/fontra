@@ -10,7 +10,7 @@
     "chai": "^4.3.8",
     "mocha": "^10.2.0",
     "prettier-plugin-organize-imports": "^3.2.3",
-    "rollup": "^3.29.1"
+    "rollup": "^3.29.2"
   },
   "dependencies": {
     "bezier-js": "^6.1.4",
