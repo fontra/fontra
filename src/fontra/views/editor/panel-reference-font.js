@@ -1,11 +1,10 @@
 import * as html from "/core/unlit.js";
 import { css } from "../third-party/lit.js";
 import Panel from "./panel.js";
-import { LANGUAGE_MAPPING } from "./language-mapping.js";
 
 import { ObservableController } from "/core/observable-object.js";
 import { div, input, label, select, option } from "/core/unlit.js";
-import { fileNameExtension, withTimeout } from "/core/utils.js";
+import { fileNameExtension, withTimeout, fetchJSON } from "/core/utils.js";
 import { UIList } from "/web-components/ui-list.js";
 import { dialog } from "/web-components/modal-dialog.js";
 
@@ -344,9 +343,9 @@ export default class ReferenceFontPanel extends Panel {
       const gsubLangs = getLangs(font.opentype.tables.GSUB);
       const gposLangs = getLangs(font.opentype.tables.GPOS);
       const allLangs = new Set([...gsubLangs, ...gposLangs]);
-      this.model.supportedLanguages = LANGUAGE_MAPPING.filter((l) =>
-        allLangs.has(l.ot)
-      );
+      this.model.supportedLanguages = [...allLangs]
+        .filter((lang) => this.languageMapping[lang])
+        .map((lang) => this.languageMapping[lang]);
     };
 
     const reader = new FileReader();
@@ -401,6 +400,7 @@ export default class ReferenceFontPanel extends Panel {
   }
 
   getContentElement() {
+    this.languageMapping = {};
     this.controller = new ObservableController({
       languageCode: "",
       supportedLanguages: [],
@@ -415,11 +415,16 @@ export default class ReferenceFontPanel extends Panel {
     );
     this.controller.addKeyListener("supportedLanguages", () => {
       this.languageCodeInput.innerHTML = "";
-      for (const language of this.model.supportedLanguages) {
-        const option = document.createElement("option");
-        option.setAttribute("value", language.html);
-        option.innerHTML = language.name;
-        this.languageCodeInput.appendChild(option);
+      this.languageCodeInput.appendChild(option({ value: "" }, ["Select a language"]));
+      for (const [name, code] of this.model.supportedLanguages) {
+        this.languageCodeInput.appendChild(
+          option(
+            {
+              value: code,
+            },
+            [name]
+          )
+        );
       }
     });
     garbageCollectUnusedFiles(this.model.fontList);
@@ -456,6 +461,7 @@ export default class ReferenceFontPanel extends Panel {
     this.languageCodeInput = select(
       {
         id: "language-code",
+        style: "width: 100%;",
         onchange: (event) => {
           this.model.languageCode = event.target.value;
         },
@@ -506,6 +512,10 @@ export default class ReferenceFontPanel extends Panel {
   }
 
   attach() {
+    fetchJSON("/editor/language-mapping.json").then((languageMapping) => {
+      this.languageMapping = languageMapping;
+    });
+
     this.controller.addKeyListener("referenceFontName", (event) => {
       if (event.newValue) {
         this.editorController.visualizationLayersSettings.model[
