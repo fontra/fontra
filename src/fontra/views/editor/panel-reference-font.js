@@ -61,6 +61,7 @@ function cleanFontItems(fontItems) {
     return {
       uplodadedFileName: fontItem.uplodadedFileName,
       fontIdentifier: fontItem.fontIdentifier,
+      supportedLanguages: fontItem.supportedLanguages,
     };
   });
 }
@@ -163,6 +164,45 @@ async function writeFontFileToOPFSInWorker(fileName, file) {
     }),
     5000
   );
+}
+
+async function readSupportedLanguages(fontItem, file, languageMapping) {
+  return new Promise((resolve, reject) => {
+    const font = new Font(fontItem.fontIdentifier);
+    font.onerror = (event) => {
+      console.error(event);
+      resolve([]);
+    };
+    font.onload = (event) => {
+      const font = event.detail.font;
+      const getLangs = (table) => {
+        if (table) {
+          return table
+            .getSupportedScripts()
+            .reduce((acc, script) => {
+              const scriptTable = table.getScriptTable(script);
+              return acc.concat(table.getSupportedLangSys(scriptTable));
+            }, [])
+            .map((lang) => lang.trim());
+        } else {
+          return [];
+        }
+      };
+      const gsubLangs = getLangs(font.opentype.tables.GSUB);
+      const gposLangs = getLangs(font.opentype.tables.GPOS);
+      const allLangs = new Set([...gsubLangs, ...gposLangs]);
+      resolve(
+        [...allLangs]
+          .filter((lang) => languageMapping[lang])
+          .map((lang) => languageMapping[lang])
+      );
+    };
+    const reader = new FileReader();
+    reader.addEventListener("load", () => {
+      font.fromDataBuffer(reader.result);
+    });
+    reader.readAsArrayBuffer(file);
+  });
 }
 
 export default class ReferenceFontPanel extends Panel {
@@ -300,6 +340,7 @@ export default class ReferenceFontPanel extends Panel {
     if (!fontItem) {
       this.model.referenceFontName = "";
       this.model.selectedFontIndex = -1;
+      this.model.selectedLanguages = [];
       return;
     }
     const selectedFontIndex = this.filesUIList.getSelectedItemIndex();
@@ -308,9 +349,8 @@ export default class ReferenceFontPanel extends Panel {
 
     if (!fontItem.fontFace) {
       if (!fontItem.objectURL) {
-        fontItem.objectURL = URL.createObjectURL(
-          await readFontFileFromOPFS(fontItem.fontIdentifier)
-        );
+        const file = await readFontFileFromOPFS(fontItem.fontIdentifier);
+        fontItem.objectURL = URL.createObjectURL(file);
       }
       fontItem.fontFace = new FontFace(
         fontItem.fontIdentifier,
@@ -320,39 +360,16 @@ export default class ReferenceFontPanel extends Panel {
       document.fonts.add(fontItem.fontFace);
       await fontItem.fontFace.load();
     }
+    if (!fontItem.supportedLanguages) {
+      const file = await fetch(fontItem.objectURL).then((b) => b.blob());
+      fontItem.supportedLanguages = await readSupportedLanguages(
+        fontItem,
+        file,
+        this.languageMapping
+      );
+    }
     this.model.referenceFontName = fontItem.fontIdentifier;
-
-    const font = new Font(fontItem.fontIdentifier);
-
-    font.onerror = (evt) => console.error(evt);
-    font.onload = (evt) => {
-      const font = evt.detail.font;
-      const getLangs = (table) => {
-        if (table) {
-          return table
-            .getSupportedScripts()
-            .reduce((acc, script) => {
-              const scriptTable = table.getScriptTable(script);
-              return acc.concat(table.getSupportedLangSys(scriptTable));
-            }, [])
-            .map((lang) => lang.trim());
-        } else {
-          return [];
-        }
-      };
-      const gsubLangs = getLangs(font.opentype.tables.GSUB);
-      const gposLangs = getLangs(font.opentype.tables.GPOS);
-      const allLangs = new Set([...gsubLangs, ...gposLangs]);
-      this.model.supportedLanguages = [...allLangs]
-        .filter((lang) => this.languageMapping[lang])
-        .map((lang) => this.languageMapping[lang]);
-    };
-
-    const reader = new FileReader();
-    reader.addEventListener("load", () => {
-      font.fromDataBuffer(reader.result);
-    });
-    reader.readAsArrayBuffer(await readFontFileFromOPFS(fontItem.fontIdentifier));
+    this.model.supportedLanguages = fontItem.supportedLanguages;
   }
 
   async _deleteSelectedItemHandler() {
@@ -415,6 +432,10 @@ export default class ReferenceFontPanel extends Panel {
     );
     this.controller.addKeyListener("supportedLanguages", () => {
       this.languageCodeInput.innerHTML = "";
+      const supportedLanguages = this.model.supportedLanguages;
+      if (!supportedLanguages) {
+        return;
+      }
       this.languageCodeInput.appendChild(option({ value: "" }, ["Select a language"]));
       for (const [name, code] of this.model.supportedLanguages) {
         this.languageCodeInput.appendChild(
