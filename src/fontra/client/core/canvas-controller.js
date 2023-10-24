@@ -111,9 +111,17 @@ export class CanvasController {
     event.preventDefault();
     if (event.ctrlKey) {
       // Note: this is *also* how zoom gestures on an Apple trackpad are received
-      this._doPinchMagnify(event, 1 - event.deltaY / 100);
+      this._doPinchMagnify(event, 1 - event.deltaY / 200);
     } else if (event.altKey) {
       this._doPinchMagnify(event, 1 - event.deltaY / 200);
+    } else if (event.shiftKey) {
+      if (Math.abs(event.deltaX) > Math.abs(event.deltaY)) {
+        this.origin.x -= event.deltaX;
+      } else {
+        this.origin.x -= event.deltaY;
+      }
+      this.requestUpdate();
+      this._dispatchEvent("viewBoxChanged", "origin");
     } else {
       if (Math.abs(event.deltaX) > Math.abs(event.deltaY)) {
         this.origin.x -= event.deltaX;
