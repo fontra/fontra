@@ -7,7 +7,7 @@
   "devDependencies": {
     "@rollup/plugin-commonjs": "^25.0.7",
     "@rollup/plugin-node-resolve": "^15.2.3",
-    "chai": "^4.3.10",
+    "chai": "^5.0.0",
     "mocha": "^10.2.0",
     "prettier-plugin-organize-imports": "^3.2.4",
     "rollup": "^4.9.1"
