@@ -45,6 +45,7 @@ import { addItemwise, mulScalar, subItemwise } from "../core/var-funcs.js";
 import { StaticGlyph, VariableGlyph, copyComponent } from "../core/var-glyph.js";
 import { locationToString, makeSparseLocation } from "../core/var-model.js";
 import { VarPackedPath, joinPaths } from "../core/var-path.js";
+import { makeDisplayPath } from "../core/view-tools.js";
 import { CJKDesignFrame } from "./cjk-design-frame.js";
 import { HandTool } from "./edit-tools-hand.js";
 import { PenTool } from "./edit-tools-pen.js";
@@ -2171,18 +2172,6 @@ function matchEvent(handlerDef, event) {
     }
   }
   return true;
-}
-
-function makeDisplayPath(pathItems) {
-  const displayPathItems = !pathItems[0].includes(":")
-    ? ["", ...pathItems]
-    : [...pathItems];
-  let displayPath = displayPathItems.join("/");
-  while (displayPathItems.length > 2 && displayPath.length > 60) {
-    displayPathItems.splice(1, 1);
-    displayPath = [displayPathItems[0], "...", ...displayPathItems.slice(1)].join("/");
-  }
-  return displayPath;
 }
 
 function newVisualizationLayersSettings(visualizationLayers) {
