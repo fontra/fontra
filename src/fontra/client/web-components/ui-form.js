@@ -196,7 +196,7 @@ export class Form extends SimpleElement {
       onchange: () => {
         let value = parseFloat(inputElement.value);
         this._fieldChanging(fieldItem.key, value);
-        rotaryControl.value = value;
+        rotaryControl.value = -1 * value;
       },
     });
     const rotaryControl = html.createDomElement("rotary-control", {
