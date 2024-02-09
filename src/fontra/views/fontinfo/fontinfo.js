@@ -30,7 +30,7 @@ export class FontInfoController {
     console.log("axes?", this.fontController.globalAxes);
 
     const url = new URL(window.location);
-    const selectedPanel = url.hash ? url.hash.slice(1) : "names-panel";
+    const selectedPanel = url.hash ? url.hash.slice(1) : "family-info-panel";
 
     const panelContainer = document.querySelector("#panel-container");
     const headerContainer = document.querySelector("#header-container");
@@ -103,8 +103,8 @@ class BaseInfoPanel {
 }
 
 class NamesPanel extends BaseInfoPanel {
-  static title = "Names";
-  static id = "names-panel";
+  static title = "Family info";
+  static id = "family-info-panel";
 }
 
 class AxesPanel extends BaseInfoPanel {
