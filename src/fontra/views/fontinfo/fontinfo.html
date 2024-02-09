@@ -8,19 +8,35 @@
       body {
         display: grid;
         grid-template-columns: 10em auto;
-        margin: 2em;
+        padding: 0em;
+        box-sizing: border-box;
+        gap: 0em;
       }
 
-      .chapters {
+      #header-container {
         display: grid;
         align-content: start;
         gap: 1em;
+        background-color: #eee;
+        padding: 2em 1em 2em 2em;
       }
 
       .header {
         cursor: pointer;
         font-size: 1.25em;
         font-weight: bold;
+      }
+
+      .header:hover {
+        text-decoration: underline gray;
+      }
+
+      #panel-container {
+        background-color: white;
+      }
+
+      .font-info-panel {
+        padding: 2em 2em 2em 1em;
       }
     </style>
   </head>
