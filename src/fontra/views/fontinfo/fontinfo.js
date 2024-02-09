@@ -24,7 +24,41 @@ export class FontInfoController {
   }
 
   async start() {
+    this.panels = {
+      "names-panel": new NamesPanel(this),
+      "axes-panel": new AxesPanel(this),
+      "sources-panel": new SourcesPanel(this),
+    };
+
+    for (const el of document.querySelectorAll(".header")) {
+      el.onclick = (event) => {
+        const showID = event.target.getAttribute("for");
+        for (const el of document.querySelectorAll(".content-item")) {
+          el.hidden = el.id != showID;
+        }
+      };
+    }
+
     this.axes = await this.font.getGlobalAxes();
+    const contentContainer = document.querySelector("#content-container");
+
+    const observer = new IntersectionObserver(
+      (entries, observer) => {
+        entries.forEach((entry) => {
+          const panel = this.panels[entry.target.id];
+          panel?.visibilityChanged(entry.isIntersecting);
+        });
+      },
+      {
+        root: contentContainer,
+      }
+    );
+
+    for (const contentItem of document.querySelectorAll(
+      "#content-container .content-item"
+    )) {
+      observer.observe(contentItem);
+    }
   }
 
   handleRemoteClose(event) {
@@ -33,5 +67,48 @@ export class FontInfoController {
 
   handleRemoteError(event) {
     //
+  }
+}
+
+class BaseInfoPanel {
+  constructor(fontInfoController) {
+    this.fontInfoController = fontInfoController;
+  }
+
+  visibilityChanged(onOff) {
+    this.visible = onOff;
+    if (onOff && !this.initialized) {
+      this.setupUI();
+      this.initialized = true;
+    }
+  }
+
+  setupUI() {
+    // override
+    console.log("setupUI", this.constructor.id);
+  }
+}
+
+class NamesPanel extends BaseInfoPanel {
+  static id = "names-panel";
+
+  constructor(fontInfoController) {
+    super(fontInfoController);
+  }
+}
+
+class AxesPanel extends BaseInfoPanel {
+  static id = "axes-panel";
+
+  constructor(fontInfoController) {
+    super(fontInfoController);
+  }
+}
+
+class SourcesPanel extends BaseInfoPanel {
+  static id = "sources-panel";
+
+  constructor(fontInfoController) {
+    super(fontInfoController);
   }
 }

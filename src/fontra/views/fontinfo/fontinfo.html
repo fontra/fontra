@@ -7,25 +7,33 @@
     <style>
       body {
         display: grid;
-        grid-template-columns: 25% auto;
+        grid-template-columns: 10em auto;
         margin: 2em;
+      }
+
+      .chapters {
+        display: grid;
+        align-content: start;
+        gap: 1em;
       }
 
       .header {
         cursor: pointer;
+        font-size: 1.25em;
+        font-weight: bold;
       }
     </style>
   </head>
   <body>
-    <div>
-      <div class="header" for="names-content">Names</div>
-      <div class="header" for="axes-content">Axes</div>
-      <div class="header" for="sources-content">Sources</div>
+    <div class="chapters">
+      <div class="header" for="names-panel">Names</div>
+      <div class="header" for="axes-panel">Axes</div>
+      <div class="header" for="sources-panel">Sources</div>
     </div>
-    <div>
-      <div class="content" id="names-content" hidden>Names Content</div>
-      <div class="content" id="axes-content" hidden>Axes Content</div>
-      <div class="content" id="sources-content" hidden>Sources Content</div>
+    <div id="content-container">
+      <div class="content-item" id="names-panel" hidden>Names Content</div>
+      <div class="content-item" id="axes-panel" hidden>Axes Content</div>
+      <div class="content-item" id="sources-panel" hidden>Sources Content</div>
     </div>
   </body>
   <script type="module">
@@ -33,17 +41,6 @@
 
     async function startApp() {
       window.fontInfoController = await FontInfoController.fromWebSocket();
-    }
-
-    function headerClick(event) {
-      const showID = event.target.getAttribute("for");
-      for (const el of document.querySelectorAll(".content")) {
-        el.hidden = el.id != showID;
-      }
-    }
-
-    for (const el of document.querySelectorAll(".header")) {
-      el.onclick = headerClick;
     }
 
     startApp();
