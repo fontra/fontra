@@ -52,7 +52,11 @@ export class FontInfoController {
       headerContainer.appendChild(headerElement);
 
       const panelElement = html.div(
-        { class: "font-info-panel", id: panelClass.id, hidden: true },
+        {
+          class: "font-info-panel",
+          id: panelClass.id,
+          hidden: panelClass.id != "names-panel",
+        },
         [`panel ${panelClass.id}`]
       );
       panelContainer.appendChild(panelElement);
@@ -72,8 +76,9 @@ export class FontInfoController {
 }
 
 class BaseInfoPanel {
-  constructor(fontInfoController) {
+  constructor(fontInfoController, panelElement) {
     this.fontInfoController = fontInfoController;
+    this.panelElement = panelElement;
   }
 
   visibilityChanged(onOff) {
@@ -86,7 +91,7 @@ class BaseInfoPanel {
 
   setupUI() {
     // override
-    console.log("setupUI", this.constructor.id);
+    console.log("setupUI", this.constructor.id, this.panelElement);
   }
 }
 
