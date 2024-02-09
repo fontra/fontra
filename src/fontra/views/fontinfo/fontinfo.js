@@ -1,4 +1,5 @@
 import { FontController } from "../core/font-controller.js";
+import * as html from "../core/html-utils.js";
 import { getRemoteProxy } from "../core/remote.js";
 import { makeDisplayPath } from "../core/view-tools.js";
 
@@ -28,39 +29,36 @@ export class FontInfoController {
     await this.fontController.initialize();
     console.log("axes?", this.fontController.globalAxes);
 
-    this.panels = {
-      "names-panel": new NamesPanel(this),
-      "axes-panel": new AxesPanel(this),
-      "sources-panel": new SourcesPanel(this),
-    };
+    const panelContainer = document.querySelector("#panel-container");
+    const headerContainer = document.querySelector("#header-container");
 
-    for (const el of document.querySelectorAll(".header")) {
-      el.onclick = (event) => {
-        const showID = event.target.getAttribute("for");
-        for (const el of document.querySelectorAll(".content-item")) {
-          el.hidden = el.id != showID;
-        }
-      };
-    }
+    this.panels = {};
+    const observer = setupIntersectionObserver(panelContainer, this.panels);
 
-    const contentContainer = document.querySelector("#content-container");
+    for (const panelClass of [NamesPanel, AxesPanel, SourcesPanel]) {
+      const headerElement = html.div(
+        {
+          class: "header",
+          onclick: (event) => {
+            const showID = event.target.getAttribute("for");
+            for (const el of document.querySelectorAll(".font-info-panel")) {
+              el.hidden = el.id != showID;
+            }
+          },
+        },
+        [panelClass.title]
+      );
+      headerElement.setAttribute("for", panelClass.id);
+      headerContainer.appendChild(headerElement);
 
-    const observer = new IntersectionObserver(
-      (entries, observer) => {
-        entries.forEach((entry) => {
-          const panel = this.panels[entry.target.id];
-          panel?.visibilityChanged(entry.isIntersecting);
-        });
-      },
-      {
-        root: contentContainer,
-      }
-    );
+      const panelElement = html.div(
+        { class: "font-info-panel", id: panelClass.id, hidden: true },
+        [`panel ${panelClass.id}`]
+      );
+      panelContainer.appendChild(panelElement);
 
-    for (const contentItem of document.querySelectorAll(
-      "#content-container .content-item"
-    )) {
-      observer.observe(contentItem);
+      this.panels[panelClass.id] = new panelClass(this, panelElement);
+      observer.observe(panelElement);
     }
   }
 
@@ -93,13 +91,35 @@ class BaseInfoPanel {
 }
 
 class NamesPanel extends BaseInfoPanel {
+  static title = "Names";
   static id = "names-panel";
 }
 
 class AxesPanel extends BaseInfoPanel {
+  static title = "Axes";
   static id = "axes-panel";
 }
 
 class SourcesPanel extends BaseInfoPanel {
+  static title = "Sources";
   static id = "sources-panel";
+}
+
+function setupIntersectionObserver(panelContainer, panels) {
+  return new IntersectionObserver(
+    (entries, observer) => {
+      entries.forEach((entry) => {
+        const panel = panels[entry.target.id];
+        if (!panel) {
+          return;
+        }
+        if (panel.visible !== entry.isIntersecting) {
+          panel.visibilityChanged(entry.isIntersecting);
+        }
+      });
+    },
+    {
+      root: panelContainer,
+    }
+  );
 }
