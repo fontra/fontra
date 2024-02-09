@@ -29,6 +29,9 @@ export class FontInfoController {
     await this.fontController.initialize();
     console.log("axes?", this.fontController.globalAxes);
 
+    const url = new URL(window.location);
+    const selectedPanel = url.hash ? url.hash.slice(1) : "names-panel";
+
     const panelContainer = document.querySelector("#panel-container");
     const headerContainer = document.querySelector("#header-container");
 
@@ -40,10 +43,14 @@ export class FontInfoController {
         {
           class: "header",
           onclick: (event) => {
-            const showID = event.target.getAttribute("for");
+            const selectedPanel = event.target.getAttribute("for");
             for (const el of document.querySelectorAll(".font-info-panel")) {
-              el.hidden = el.id != showID;
+              el.hidden = el.id != selectedPanel;
             }
+
+            const url = new URL(window.location);
+            url.hash = `#${selectedPanel}`;
+            window.history.replaceState({}, "", url);
           },
         },
         [panelClass.title]
@@ -55,7 +62,7 @@ export class FontInfoController {
         {
           class: "font-info-panel",
           id: panelClass.id,
-          hidden: panelClass.id != "names-panel",
+          hidden: panelClass.id != selectedPanel,
         },
         [`panel ${panelClass.id}`]
       );
