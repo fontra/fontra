@@ -1,3 +1,4 @@
+import { FontController } from "../core/font-controller.js";
 import { getRemoteProxy } from "../core/remote.js";
 import { makeDisplayPath } from "../core/view-tools.js";
 
@@ -20,10 +21,13 @@ export class FontInfoController {
   }
 
   constructor(font) {
-    this.font = font;
+    this.fontController = new FontController(font);
   }
 
   async start() {
+    await this.fontController.initialize();
+    console.log("axes?", this.fontController.globalAxes);
+
     this.panels = {
       "names-panel": new NamesPanel(this),
       "axes-panel": new AxesPanel(this),
@@ -39,7 +43,6 @@ export class FontInfoController {
       };
     }
 
-    this.axes = await this.font.getGlobalAxes();
     const contentContainer = document.querySelector("#content-container");
 
     const observer = new IntersectionObserver(
@@ -91,24 +94,12 @@ class BaseInfoPanel {
 
 class NamesPanel extends BaseInfoPanel {
   static id = "names-panel";
-
-  constructor(fontInfoController) {
-    super(fontInfoController);
-  }
 }
 
 class AxesPanel extends BaseInfoPanel {
   static id = "axes-panel";
-
-  constructor(fontInfoController) {
-    super(fontInfoController);
-  }
 }
 
 class SourcesPanel extends BaseInfoPanel {
   static id = "sources-panel";
-
-  constructor(fontInfoController) {
-    super(fontInfoController);
-  }
 }
