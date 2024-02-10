@@ -25,9 +25,7 @@ export class SimpleElement extends HTMLElement {
   }
 
   _appendStyle(cssText) {
-    const styleElement = document.createElement("style");
-    styleElement.textContent = cssText;
-    this.shadowRoot.appendChild(styleElement);
+    addStyleSheet(cssText, this.shadowRoot);
   }
 
   appendStyle(cssText) {
