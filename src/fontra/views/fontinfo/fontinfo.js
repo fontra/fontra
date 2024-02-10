@@ -117,9 +117,37 @@ class AxesPanel extends BaseInfoPanel {
 
   setupUI() {
     const fontController = this.fontInfoController.fontController;
-    const axisContainer = html.div({ style: "display: grid; gap: 0.5em" });
+    const axisContainer = html.div({
+      style: "display: grid; gap: 0.5em;",
+      ondragover: (event) => {
+        event.preventDefault();
+        const draggingItem = axisContainer.querySelector(".dragging");
+
+        // Getting all items except currently dragging and making array of them
+        let siblings = [
+          ...axisContainer.querySelectorAll("font-info-axis-box:not(.dragging)"),
+        ];
+
+        // Finding the sibling after which the dragging item should be placed
+        let nextSibling = siblings.find((sibling) => {
+          return event.clientY <= sibling.offsetTop + sibling.offsetHeight / 2;
+        });
+
+        // Inserting the dragging item before the found sibling
+        axisContainer.insertBefore(draggingItem, nextSibling);
+      },
+      ondragenter: (event) => event.preventDefault(),
+    });
     for (const axis of fontController.globalAxes) {
-      const axisBox = html.createDomElement("font-info-axis-box", { draggable: true });
+      const axisBox = html.createDomElement("font-info-axis-box", {
+        draggable: true,
+        ondragstart: () => {
+          setTimeout(() => axisBox.classList.add("dragging"), 0);
+        },
+        ondragend: () => {
+          axisBox.classList.remove("dragging");
+        },
+      });
       axisBox.axis = axis;
       axisContainer.appendChild(axisBox);
     }
