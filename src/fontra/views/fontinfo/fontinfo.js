@@ -164,6 +164,7 @@ class AxisBox extends html.UnlitElement {
     background-color: #FFF;
     border-radius: 0.5em;
     padding: 1em;
+    cursor: pointer;
   }
   `;
 
