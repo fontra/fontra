@@ -137,6 +137,15 @@ export function htmlToElements(html) {
   return template.content.childNodes;
 }
 
+export function addStyleSheet(cssText, element = null) {
+  if (!element) {
+    element = document.querySelector("head");
+  }
+  const styleElement = document.createElement("style");
+  styleElement.textContent = cssText;
+  element.appendChild(styleElement);
+}
+
 // Convenience shortcuts
 export const br = createDomElement.bind(null, "br");
 export const button = createDomElement.bind(null, "button");

@@ -1,14 +1,12 @@
+import { addStyleSheet } from "./html-utils.js";
 const containerClassName = "ui-sortable-list-container";
 const draggingClassName = "ui-sortable-list-dragging";
 
-const headElement = document.querySelector("head");
-const styleElement = document.createElement("style");
-styleElement.textContent = `
+addStyleSheet(`
 .${draggingClassName} {
   opacity: 0.3;
 }
-`;
-headElement.appendChild(styleElement);
+`);
 
 export function setupSortableList(listContainer) {
   listContainer.classList.add("ui-sortable-list-container");
