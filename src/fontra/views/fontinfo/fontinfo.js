@@ -27,7 +27,6 @@ export class FontInfoController {
 
   async start() {
     await this.fontController.initialize();
-    console.log("axes?", this.fontController.globalAxes);
 
     const url = new URL(window.location);
     const selectedPanel = url.hash ? url.hash.slice(1) : "family-info-panel";
@@ -64,14 +63,11 @@ export class FontInfoController {
       headerElement.setAttribute("for", panelClass.id);
       headerContainer.appendChild(headerElement);
 
-      const panelElement = html.div(
-        {
-          class: "font-info-panel",
-          id: panelClass.id,
-          hidden: panelClass.id != selectedPanel,
-        },
-        [`panel ${panelClass.id}`]
-      );
+      const panelElement = html.div({
+        class: "font-info-panel",
+        id: panelClass.id,
+        hidden: panelClass.id != selectedPanel,
+      });
       panelContainer.appendChild(panelElement);
 
       this.panels[panelClass.id] = new panelClass(this, panelElement);
@@ -104,7 +100,9 @@ class BaseInfoPanel {
 
   setupUI() {
     // override
-    console.log("setupUI", this.constructor.id, this.panelElement);
+    this.panelElement.appendChild(
+      html.div({}, [`panel placeholder ${this.constructor.id}`])
+    );
   }
 }
 
@@ -116,6 +114,14 @@ class NamesPanel extends BaseInfoPanel {
 class AxesPanel extends BaseInfoPanel {
   static title = "Axes";
   static id = "axes-panel";
+
+  setupUI() {
+    const fontController = this.fontInfoController.fontController;
+    for (const axis of fontController.globalAxes) {
+      const axisBox = html.div({}, [axis.name]);
+      this.panelElement.appendChild(axisBox);
+    }
+  }
 }
 
 class SourcesPanel extends BaseInfoPanel {
