@@ -117,12 +117,40 @@ class AxesPanel extends BaseInfoPanel {
 
   setupUI() {
     const fontController = this.fontInfoController.fontController;
+    const axisContainer = html.div({ style: "display: grid; gap: 0.5em" });
     for (const axis of fontController.globalAxes) {
-      const axisBox = html.div({}, [axis.name]);
-      this.panelElement.appendChild(axisBox);
+      const axisBox = html.createDomElement("font-info-axis-box", { draggable: true });
+      axisBox.axis = axis;
+      axisContainer.appendChild(axisBox);
     }
+    this.panelElement.appendChild(axisContainer);
   }
 }
+
+class AxisBox extends html.UnlitElement {
+  static styles = `
+  .axis-box {
+    background-color: #EEE;
+    border-radius: 0.5em;
+    padding: 1em;
+  }
+  `;
+
+  static properties = {
+    axis: {},
+  };
+
+  render() {
+    if (!this.axis) {
+      return;
+    }
+    return html.div({ class: "axis-box" }, [
+      `${this.axis.name}, ${this.axis.label}, ${this.axis.tag}`,
+    ]);
+  }
+}
+
+customElements.define("font-info-axis-box", AxisBox);
 
 class SourcesPanel extends BaseInfoPanel {
   static title = "Sources";
