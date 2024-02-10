@@ -38,7 +38,9 @@ export function setupSortableList(listContainer) {
   listContainer.addEventListener("dragenter", (event) => event.preventDefault());
 
   listContainer.addEventListener("dragstart", (event) => {
-    event.target.classList.add(draggingClassName);
+    setTimeout(() => {
+      event.target.classList.add(draggingClassName);
+    }, 0);
     originalItems = [
       ...listContainer.querySelectorAll(`.${containerClassName} > [draggable="true"]`),
     ];

@@ -1,5 +1,6 @@
 import { FontController } from "../core/font-controller.js";
 import * as html from "../core/html-utils.js";
+import { addStyleSheet } from "../core/html-utils.js";
 import { getRemoteProxy } from "../core/remote.js";
 import { setupSortableList } from "../core/ui-utils.js";
 import { makeDisplayPath } from "../core/view-tools.js";
@@ -124,11 +125,7 @@ class AxesPanel extends BaseInfoPanel {
     });
 
     for (const axis of fontController.globalAxes) {
-      const axisBox = html.createDomElement("font-info-axis-box", {
-        draggable: true,
-      });
-      axisBox.axis = axis;
-      axisContainer.appendChild(axisBox);
+      axisContainer.appendChild(makeAxisBox(axis));
     }
 
     setupSortableList(axisContainer);
@@ -141,31 +138,21 @@ class AxesPanel extends BaseInfoPanel {
   }
 }
 
-class AxisBox extends html.UnlitElement {
-  static styles = `
-  .axis-box {
-    background-color: #FFF;
-    border-radius: 0.5em;
-    padding: 1em;
-    cursor: pointer;
-  }
-  `;
-
-  static properties = {
-    axis: {},
-  };
-
-  render() {
-    if (!this.axis) {
-      return;
-    }
-    return html.div({ class: "axis-box" }, [
-      `${this.axis.name}, ${this.axis.label}, ${this.axis.tag}`,
-    ]);
-  }
+addStyleSheet(`
+.fontra-ui-font-info-axes-panel-axis-box {
+  background-color: #FFF;
+  border-radius: 0.5em;
+  padding: 1em;
+  cursor: pointer;
 }
+`);
 
-customElements.define("font-info-axis-box", AxisBox);
+function makeAxisBox(axis) {
+  return html.div(
+    { class: "fontra-ui-font-info-axes-panel-axis-box", draggable: true },
+    [`${axis.name}, ${axis.label}, ${axis.tag}`]
+  );
+}
 
 class SourcesPanel extends BaseInfoPanel {
   static title = "Sources";
