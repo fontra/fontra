@@ -1,7 +1,7 @@
 import { addStyleSheet } from "./html-utils.js";
 import { zip } from "./utils.js";
-const containerClassName = "ui-sortable-list-container";
-const draggingClassName = "ui-sortable-list-dragging";
+const containerClassName = "fontra-ui-sortable-list-container";
+const draggingClassName = "fontra-ui-sortable-list-dragging";
 
 addStyleSheet(`
 .${draggingClassName} {
@@ -10,7 +10,7 @@ addStyleSheet(`
 `);
 
 export function setupSortableList(listContainer) {
-  listContainer.classList.add("ui-sortable-list-container");
+  listContainer.classList.add(containerClassName);
   let originalItems;
 
   listContainer.addEventListener("dragover", (event) => {
