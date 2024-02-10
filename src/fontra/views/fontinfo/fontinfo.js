@@ -1,6 +1,7 @@
 import { FontController } from "../core/font-controller.js";
 import * as html from "../core/html-utils.js";
 import { getRemoteProxy } from "../core/remote.js";
+import { setupSortableList } from "../core/ui-utils.js";
 import { makeDisplayPath } from "../core/view-tools.js";
 
 export class FontInfoController {
@@ -120,39 +121,18 @@ class AxesPanel extends BaseInfoPanel {
 
     const axisContainer = html.div({
       style: "display: grid; gap: 0.5em;",
-      ondragover: (event) => {
-        event.preventDefault();
-        const draggingItem = axisContainer.querySelector(".dragging");
-
-        // Getting all items except currently dragging and making array of them
-        let siblings = [
-          ...axisContainer.querySelectorAll("font-info-axis-box:not(.dragging)"),
-        ];
-
-        // Finding the sibling after which the dragging item should be placed
-        let nextSibling = siblings.find((sibling) => {
-          return event.clientY <= sibling.offsetTop + sibling.offsetHeight / 2;
-        });
-
-        // Inserting the dragging item before the found sibling
-        axisContainer.insertBefore(draggingItem, nextSibling);
-      },
-      ondragenter: (event) => event.preventDefault(),
     });
 
     for (const axis of fontController.globalAxes) {
       const axisBox = html.createDomElement("font-info-axis-box", {
         draggable: true,
-        ondragstart: () => {
-          setTimeout(() => axisBox.classList.add("dragging"), 0);
-        },
-        ondragend: () => {
-          axisBox.classList.remove("dragging");
-        },
+        class: "ui-sortable-list-item",
       });
       axisBox.axis = axis;
       axisContainer.appendChild(axisBox);
     }
+
+    setupSortableList(axisContainer);
 
     this.panelElement.appendChild(axisContainer);
   }
