@@ -133,6 +133,10 @@ class AxesPanel extends BaseInfoPanel {
 
     setupSortableList(axisContainer);
 
+    axisContainer.addEventListener("reordered", (event) =>
+      console.log("list reordered")
+    );
+
     this.panelElement.appendChild(axisContainer);
   }
 }

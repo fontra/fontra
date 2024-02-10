@@ -1,4 +1,5 @@
 import { addStyleSheet } from "./html-utils.js";
+import { zip } from "./utils.js";
 const containerClassName = "ui-sortable-list-container";
 const draggingClassName = "ui-sortable-list-dragging";
 
@@ -10,6 +11,8 @@ addStyleSheet(`
 
 export function setupSortableList(listContainer) {
   listContainer.classList.add("ui-sortable-list-container");
+  let originalItems;
+
   listContainer.addEventListener("dragover", (event) => {
     event.preventDefault();
     const draggingItem = listContainer.querySelector(
@@ -33,13 +36,40 @@ export function setupSortableList(listContainer) {
   });
 
   listContainer.addEventListener("dragenter", (event) => event.preventDefault());
-  listContainer.addEventListener("dragstart", (event) =>
-    event.target.classList.add(draggingClassName)
-  );
+
+  listContainer.addEventListener("dragstart", (event) => {
+    event.target.classList.add(draggingClassName);
+    originalItems = [
+      ...listContainer.querySelectorAll(`.${containerClassName} > [draggable="true"]`),
+    ];
+  });
+
   listContainer.addEventListener("dragend", (event) => {
     const draggingItem = listContainer.querySelector(
       `.${containerClassName} > .${draggingClassName}`
     );
     draggingItem.classList.remove(draggingClassName);
+
+    const currentItems = [
+      ...listContainer.querySelectorAll(`.${containerClassName} > [draggable="true"]`),
+    ];
+    if (didReorder(originalItems, currentItems)) {
+      const event = new CustomEvent("reordered", {
+        bubbles: false,
+        detail: listContainer,
+      });
+      listContainer.dispatchEvent(event);
+    }
+
+    originalItems = undefined;
   });
+}
+
+function didReorder(a, b) {
+  for (const [itemA, itemB] of zip(a, b)) {
+    if (itemA !== itemB) {
+      return true;
+    }
+  }
+  return false;
 }
