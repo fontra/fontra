@@ -1,8 +1,8 @@
-const draggingClass = "ui-sortable-list-dragging";
+const draggingClassName = "ui-sortable-list-dragging";
 const headElement = document.querySelector("head");
 const styleElement = document.createElement("style");
 styleElement.textContent = `
-.${draggingClass} {
+.${draggingClassName} {
   opacity: 0;
 }
 `;
@@ -11,11 +11,13 @@ headElement.appendChild(styleElement);
 export function setupSortableList(listContainer) {
   listContainer.addEventListener("dragover", (event) => {
     event.preventDefault();
-    const draggingItem = listContainer.querySelector(`.${draggingClass}`);
+    const draggingItem = listContainer.querySelector(`.${draggingClassName}`);
 
     // Getting all items except currently dragging and making array of them
     let siblings = [
-      ...listContainer.querySelectorAll(`[draggable="true"]:not(.${draggingClass})`),
+      ...listContainer.querySelectorAll(
+        `[draggable="true"]:not(.${draggingClassName})`
+      ),
     ];
 
     // Finding the sibling after which the dragging item should be placed
@@ -31,11 +33,11 @@ export function setupSortableList(listContainer) {
 
   for (const listItem of listContainer.querySelectorAll(`[draggable="true"]`)) {
     listItem.addEventListener("dragstart", () => {
-      setTimeout(() => listItem.classList.add(draggingClass), 0);
+      setTimeout(() => listItem.classList.add(draggingClassName), 0);
     });
 
     listItem.addEventListener("dragend", () => {
-      listItem.classList.remove(draggingClass);
+      listItem.classList.remove(draggingClassName);
     });
   }
 }
