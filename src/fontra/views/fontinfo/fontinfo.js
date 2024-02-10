@@ -130,7 +130,7 @@ class AxesPanel extends BaseInfoPanel {
 class AxisBox extends html.UnlitElement {
   static styles = `
   .axis-box {
-    background-color: #EEE;
+    background-color: #FFF;
     border-radius: 0.5em;
     padding: 1em;
   }
