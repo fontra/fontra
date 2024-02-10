@@ -117,6 +117,7 @@ class AxesPanel extends BaseInfoPanel {
 
   setupUI() {
     const fontController = this.fontInfoController.fontController;
+
     const axisContainer = html.div({
       style: "display: grid; gap: 0.5em;",
       ondragover: (event) => {
@@ -138,6 +139,7 @@ class AxesPanel extends BaseInfoPanel {
       },
       ondragenter: (event) => event.preventDefault(),
     });
+
     for (const axis of fontController.globalAxes) {
       const axisBox = html.createDomElement("font-info-axis-box", {
         draggable: true,
@@ -151,6 +153,7 @@ class AxesPanel extends BaseInfoPanel {
       axisBox.axis = axis;
       axisContainer.appendChild(axisBox);
     }
+
     this.panelElement.appendChild(axisContainer);
   }
 }
