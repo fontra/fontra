@@ -126,7 +126,6 @@ class AxesPanel extends BaseInfoPanel {
     for (const axis of fontController.globalAxes) {
       const axisBox = html.createDomElement("font-info-axis-box", {
         draggable: true,
-        class: "ui-sortable-list-item",
       });
       axisBox.axis = axis;
       axisContainer.appendChild(axisBox);
