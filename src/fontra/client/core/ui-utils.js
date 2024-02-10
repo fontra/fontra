@@ -1,22 +1,27 @@
+const containerClassName = "ui-sortable-list-container";
 const draggingClassName = "ui-sortable-list-dragging";
+
 const headElement = document.querySelector("head");
 const styleElement = document.createElement("style");
 styleElement.textContent = `
 .${draggingClassName} {
-  opacity: 0;
+  opacity: 0.3;
 }
 `;
 headElement.appendChild(styleElement);
 
 export function setupSortableList(listContainer) {
+  listContainer.classList.add("ui-sortable-list-container");
   listContainer.addEventListener("dragover", (event) => {
     event.preventDefault();
-    const draggingItem = listContainer.querySelector(`.${draggingClassName}`);
+    const draggingItem = listContainer.querySelector(
+      `.${containerClassName} > .${draggingClassName}`
+    );
 
     // Getting all items except currently dragging and making array of them
     let siblings = [
       ...listContainer.querySelectorAll(
-        `[draggable="true"]:not(.${draggingClassName})`
+        `.${containerClassName} > [draggable="true"]:not(.${draggingClassName})`
       ),
     ];
 
@@ -30,14 +35,13 @@ export function setupSortableList(listContainer) {
   });
 
   listContainer.addEventListener("dragenter", (event) => event.preventDefault());
-
-  for (const listItem of listContainer.querySelectorAll(`[draggable="true"]`)) {
-    listItem.addEventListener("dragstart", () => {
-      setTimeout(() => listItem.classList.add(draggingClassName), 0);
-    });
-
-    listItem.addEventListener("dragend", () => {
-      listItem.classList.remove(draggingClassName);
-    });
-  }
+  listContainer.addEventListener("dragstart", (event) =>
+    event.target.classList.add(draggingClassName)
+  );
+  listContainer.addEventListener("dragend", (event) => {
+    const draggingItem = listContainer.querySelector(
+      `.${containerClassName} > .${draggingClassName}`
+    );
+    draggingItem.classList.remove(draggingClassName);
+  });
 }
