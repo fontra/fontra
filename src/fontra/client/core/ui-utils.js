@@ -17,14 +17,14 @@ export function setupSortableList(listContainer) {
     );
 
     // Getting all items except currently dragging and making array of them
-    let siblings = [
+    const siblings = [
       ...listContainer.querySelectorAll(
         `.${containerClassName} > [draggable="true"]:not(.${draggingClassName})`
       ),
     ];
 
     // Finding the sibling after which the dragging item should be placed
-    let nextSibling = siblings.find((sibling) => {
+    const nextSibling = siblings.find((sibling) => {
       return event.clientY <= sibling.offsetTop + sibling.offsetHeight / 2;
     });
 
