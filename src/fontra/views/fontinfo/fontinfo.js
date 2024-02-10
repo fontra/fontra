@@ -43,7 +43,10 @@ export class FontInfoController {
         {
           class: "header",
           onclick: (event) => {
-            const selectedPanel = event.target.getAttribute("for");
+            document.querySelector(".header.selected")?.classList.remove("selected");
+            const clickedHeader = event.target;
+            clickedHeader.classList.add("selected");
+            const selectedPanel = clickedHeader.getAttribute("for");
             for (const el of document.querySelectorAll(".font-info-panel")) {
               el.hidden = el.id != selectedPanel;
             }
@@ -55,6 +58,9 @@ export class FontInfoController {
         },
         [panelClass.title]
       );
+      if (panelClass.id === selectedPanel) {
+        headerElement.classList.add("selected");
+      }
       headerElement.setAttribute("for", panelClass.id);
       headerContainer.appendChild(headerElement);
 

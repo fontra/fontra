@@ -25,11 +25,16 @@
         cursor: pointer;
         font-size: 1.25em;
         font-weight: bold;
+        text-underline-offset: 0.15em;
       }
 
       .header:hover {
+        text-decoration: underline dotted;
+      }
+
+      .header.selected {
         text-decoration: underline;
-        text-underline-offset: 0.15em;
+        text-decoration: underline;
       }
 
       #panel-container {
