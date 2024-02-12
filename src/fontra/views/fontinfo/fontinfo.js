@@ -154,8 +154,10 @@ addStyleSheet(`
 .fontra-ui-font-info-axes-panel-axis-box-values,
 .fontra-ui-font-info-axes-panel-axis-box-names {
   display: grid;
-  grid-template-columns: max-content max-content;
+  grid-template-columns: minmax(4.5em, max-content) max-content;
   gap: 0.5em;
+  align-items: start;
+  align-content: start;
 }
 
 .fontra-ui-font-info-axes-panel-axis-box-delete {
@@ -165,7 +167,21 @@ addStyleSheet(`
 `);
 
 function makeAxisBox(axis) {
-  const controller = new ObservableController(axis);
+  const axisModel = { ...axis };
+  const axisItems = !axisModel.values
+    ? [
+        ["Minimum", "minValue"],
+        ["Default", "defaultValue"],
+        ["Maximum", "maxValue"],
+      ]
+    : [
+        ["Values", "valuesString"],
+        ["Default", "defaultValue"],
+      ];
+  if (axisModel.values) {
+    axisModel.valuesString = axisModel.values.join(" ");
+  }
+  const controller = new ObservableController(axisModel);
   return html.div(
     { class: "fontra-ui-font-info-axes-panel-axis-box", draggable: true },
     [
@@ -183,13 +199,11 @@ function makeAxisBox(axis) {
       ),
       html.div(
         { class: "fontra-ui-font-info-axes-panel-axis-box-values" },
-        [
-          ["Minimum", "minValue"],
-          ["Default", "defaultValue"],
-          ["Maximum", "maxValue"],
-        ]
+        axisItems
           .map(([labelName, keyName]) =>
-            labeledTextInput(labelName, controller, keyName, { type: "number" })
+            labeledTextInput(labelName, controller, keyName, {
+              type: keyName === "valuesString" ? "text" : "number",
+            })
           )
           .flat()
       ),
