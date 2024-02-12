@@ -43,7 +43,6 @@ export class Form extends SimpleElement {
 
     input {
       box-sizing: border-box;
-      background-color: red;
       background-color: var(--text-input-background-color);
       color: var(--text-input-foreground-color);
       border-radius: 0.25em;
