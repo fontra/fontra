@@ -822,7 +822,10 @@ export default class DesignspaceNavigationPanel extends Panel {
     ]);
     dialog.setContent(contentElement);
 
-    setTimeout(() => contentElement.querySelector(`#sourceName`)?.focus(), 0);
+    setTimeout(
+      () => contentElement.querySelector("#source-name-text-input")?.focus(),
+      0
+    );
 
     validateInput();
 
@@ -889,6 +892,7 @@ export default class DesignspaceNavigationPanel extends Panel {
       [
         ...labeledTextInput("Source name:", nameController, "sourceName", {
           placeholderKey: "suggestedSourceName",
+          id: "source-name-text-input",
         }),
         ...labeledTextInput("Layer:", nameController, "layerName", {
           placeholderKey: "suggestedLayerName",
