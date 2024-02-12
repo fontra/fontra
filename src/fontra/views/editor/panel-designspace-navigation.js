@@ -28,7 +28,7 @@ import { showMenu } from "/web-components/menu-panel.js";
 import { dialog, dialogSetup, message } from "/web-components/modal-dialog.js";
 
 import Panel from "./panel.js";
-import { NumberFormatter } from "/web-components/ui-list.js";
+import { NumberFormatter } from "/core/ui-utils.js";
 
 const FONTRA_STATUS_KEY = "fontra.development.status";
 const FONTRA_STATUS_DEFINITIONS_KEY = "fontra.sourceStatusFieldDefinitions";

@@ -1,6 +1,7 @@
 import { themeColorCSS } from "./theme-support.js";
 import * as html from "/core/html-utils.js";
 import { UnlitElement } from "/core/html-utils.js";
+import { DefaultFormatter } from "/core/ui-utils.js";
 
 const LIST_CHUNK_SIZE = 200; // the amount of items added to the list at a time
 
@@ -531,26 +532,5 @@ export class UIList extends UnlitElement {
     this._addMoreItemsIfNeeded();
   }
 }
-
-const DefaultFormatter = {
-  toString: (value) => (value !== undefined ? value.toString() : ""),
-  fromString: (value) => {
-    return {
-      value: value,
-    };
-  },
-};
-
-export const NumberFormatter = {
-  toString: (value) => value.toString(),
-  fromString: (value) => {
-    const number = Number(value);
-    if (isNaN(number)) {
-      return { error: "not a number" };
-    } else {
-      return { value: number };
-    }
-  },
-};
 
 customElements.define("ui-list", UIList);

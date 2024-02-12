@@ -141,3 +141,24 @@ let _uniqueID = 1;
 function uniqueID() {
   return _uniqueID++;
 }
+
+export const DefaultFormatter = {
+  toString: (value) => (value !== undefined ? value.toString() : ""),
+  fromString: (value) => {
+    return {
+      value: value,
+    };
+  },
+};
+
+export const NumberFormatter = {
+  toString: (value) => value.toString(),
+  fromString: (value) => {
+    const number = Number(value);
+    if (isNaN(number)) {
+      return { error: "not a number" };
+    } else {
+      return { value: number };
+    }
+  },
+};
