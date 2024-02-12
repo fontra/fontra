@@ -4,7 +4,7 @@ import { addStyleSheet } from "../core/html-utils.js";
 import { ObservableController } from "../core/observable-object.js";
 import { getRemoteProxy } from "../core/remote.js";
 import { labeledTextInput, setupSortableList } from "../core/ui-utils.js";
-import { makeDisplayPath } from "../core/view-tools.js";
+import { makeDisplayPath } from "../core/view-utils.js";
 import { IconButton } from "../web-components/icon-button.js";
 
 export class FontInfoController {
