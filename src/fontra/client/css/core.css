@@ -119,3 +119,16 @@ body {
   border-left-color: #0005;
   animation: global-loader-spinner 0.8s linear infinite;
 }
+
+input[type="text"],
+input[type="number"] {
+  box-sizing: border-box;
+  background-color: red;
+  background-color: var(--text-input-background-color);
+  color: var(--text-input-foreground-color);
+  border-radius: 0.25em;
+  border: none;
+  outline: none;
+  padding: 0.1em 0.3em;
+  font-family: "fontra-ui-regular";
+}
