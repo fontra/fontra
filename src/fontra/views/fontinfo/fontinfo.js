@@ -1,8 +1,9 @@
 import { FontController } from "../core/font-controller.js";
 import * as html from "../core/html-utils.js";
 import { addStyleSheet } from "../core/html-utils.js";
+import { ObservableController } from "../core/observable-object.js";
 import { getRemoteProxy } from "../core/remote.js";
-import { setupSortableList } from "../core/ui-utils.js";
+import { labeledTextInput, setupSortableList } from "../core/ui-utils.js";
 import { makeDisplayPath } from "../core/view-tools.js";
 
 export class FontInfoController {
@@ -144,13 +145,49 @@ addStyleSheet(`
   border-radius: 0.5em;
   padding: 1em;
   cursor: pointer;
+  display: grid;
+  grid-template-columns: max-content max-content auto;
+  gap: 0.5em;
+}
+
+.fontra-ui-font-info-axes-panel-axis-box-values,
+.fontra-ui-font-info-axes-panel-axis-box-names {
+  display: grid;
+  grid-template-columns: max-content max-content;
+  gap: 0.5em;
 }
 `);
 
 function makeAxisBox(axis) {
+  const controller = new ObservableController(axis);
   return html.div(
     { class: "fontra-ui-font-info-axes-panel-axis-box", draggable: true },
-    [`${axis.name}, ${axis.label}, ${axis.tag}`]
+    [
+      html.div(
+        { class: "fontra-ui-font-info-axes-panel-axis-box-names" },
+        [
+          ["Label", "label"],
+          ["Name", "name"],
+          ["OT Tag", "tag"],
+        ]
+          .map(([labelName, keyName]) =>
+            labeledTextInput(labelName, controller, keyName)
+          )
+          .flat()
+      ),
+      html.div(
+        { class: "fontra-ui-font-info-axes-panel-axis-box-values" },
+        [
+          ["Minimum", "minValue"],
+          ["Default", "defaultValue"],
+          ["Maximum", "maxValue"],
+        ]
+          .map(([labelName, keyName]) =>
+            labeledTextInput(labelName, controller, keyName, { type: "number" })
+          )
+          .flat()
+      ),
+    ]
   );
 }
 
