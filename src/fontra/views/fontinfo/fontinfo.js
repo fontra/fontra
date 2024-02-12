@@ -5,6 +5,7 @@ import { ObservableController } from "../core/observable-object.js";
 import { getRemoteProxy } from "../core/remote.js";
 import { labeledTextInput, setupSortableList } from "../core/ui-utils.js";
 import { makeDisplayPath } from "../core/view-tools.js";
+import { IconButton } from "../web-components/icon-button.js";
 
 export class FontInfoController {
   static async fromWebSocket() {
@@ -156,6 +157,11 @@ addStyleSheet(`
   grid-template-columns: max-content max-content;
   gap: 0.5em;
 }
+
+.fontra-ui-font-info-axes-panel-axis-box-delete {
+  justify-self: end;
+  align-self: start;
+}
 `);
 
 function makeAxisBox(axis) {
@@ -166,9 +172,9 @@ function makeAxisBox(axis) {
       html.div(
         { class: "fontra-ui-font-info-axes-panel-axis-box-names" },
         [
-          ["Label", "label"],
           ["Name", "name"],
           ["OT Tag", "tag"],
+          ["UI Name", "label"],
         ]
           .map(([labelName, keyName]) =>
             labeledTextInput(labelName, controller, keyName)
@@ -187,6 +193,11 @@ function makeAxisBox(axis) {
           )
           .flat()
       ),
+      html.createDomElement("icon-button", {
+        class: "fontra-ui-font-info-axes-panel-axis-box-delete",
+        src: "/tabler-icons/trash.svg",
+        onclick: (event) => console.log("delete axis"),
+      }),
     ]
   );
 }
