@@ -2,6 +2,7 @@ import { getAxisBaseName } from "/core/glyph-controller.js";
 import * as html from "/core/html-utils.js";
 import { htmlToElement } from "/core/html-utils.js";
 import { controllerKey, ObservableController } from "/core/observable-object.js";
+import { labeledTextInput } from "/core/ui-utils.js";
 import {
   boolInt,
   enumerate,
@@ -1054,41 +1055,6 @@ function mapAxesFromUserSpaceToDesignspace(axes) {
     }
     return newAxis;
   });
-}
-
-function* labeledTextInput(label, controller, key, options) {
-  yield html.label({ for: key, style: "text-align: right;" }, [label]);
-
-  const choices = options?.choices;
-  const choicesID = `${key}-choices`;
-
-  const inputElement = htmlToElement(`<input ${choices ? `list="${choicesID}"` : ""}>`);
-  inputElement.type = "text";
-  inputElement.id = key;
-  inputElement.value = controller.model[key];
-  inputElement.oninput = () => (controller.model[key] = inputElement.value);
-
-  controller.addKeyListener(key, (event) => {
-    inputElement.value = event.newValue;
-  });
-
-  if (options && options.placeholderKey) {
-    inputElement.placeholder = controller.model[options.placeholderKey];
-    controller.addKeyListener(
-      options.placeholderKey,
-      (event) => (inputElement.placeholder = event.newValue)
-    );
-  }
-
-  yield inputElement;
-
-  if (choices) {
-    yield html.createDomElement(
-      "datalist",
-      { id: choicesID },
-      choices.map((item) => html.createDomElement("option", { value: item }))
-    );
-  }
 }
 
 function roundComponentOrigins(components) {
