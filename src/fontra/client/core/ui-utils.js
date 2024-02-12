@@ -103,7 +103,12 @@ export function labeledTextInput(label, controller, key, options) {
     `<input ${choices ? `list="${choicesID}"` : ""}>`
   );
   inputElement.type = options?.type || "text";
-  inputElement.id = key;
+  if (options?.class) {
+    inputElement.className = options.class;
+  }
+  if (options?.id) {
+    inputElement.id = options.id;
+  }
   inputElement.value = controller.model[key];
   inputElement.oninput = () => (controller.model[key] = inputElement.value);
 
