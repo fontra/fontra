@@ -95,6 +95,8 @@ function didReorder(a, b) {
 export function labeledTextInput(label, controller, key, options) {
   const items = [];
   const inputID = options?.id || `input-${uniqueID()}-${key}`;
+  const formatter = options?.formatter || DefaultFormatter;
+
   items.push(html.label({ for: inputID, style: "text-align: right;" }, [label]));
 
   const choices = options?.choices;
@@ -108,11 +110,16 @@ export function labeledTextInput(label, controller, key, options) {
   if (options?.class) {
     inputElement.className = options.class;
   }
-  inputElement.value = controller.model[key];
-  inputElement.oninput = () => (controller.model[key] = inputElement.value);
+  inputElement.value = formatter.toString(controller.model[key]);
+  inputElement.oninput = () => {
+    const { value, error } = formatter.fromString(inputElement.value);
+    if (!error) {
+      controller.model[key] = inputElement.value;
+    }
+  };
 
   controller.addKeyListener(key, (event) => {
-    inputElement.value = event.newValue;
+    inputElement.value = formatter.toString(event.newValue);
   });
 
   if (options?.placeholderKey) {
