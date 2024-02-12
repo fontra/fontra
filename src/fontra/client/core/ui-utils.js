@@ -12,6 +12,10 @@ addStyleSheet(`
 export function setupSortableList(listContainer) {
   listContainer.classList.add(containerClassName);
   let originalItems;
+  // We need to compare the vertical middle of the dragged item with the sibling,
+  // independently of where the user grabbed the item, so on dragstart we calculate
+  // the difference between the middle of the dragged item and clientY
+  let clientYOffset;
 
   listContainer.addEventListener("dragover", (event) => {
     event.preventDefault();
@@ -28,7 +32,9 @@ export function setupSortableList(listContainer) {
 
     // Finding the sibling after which the dragging item should be placed
     const nextSibling = siblings.find((sibling) => {
-      return event.clientY <= sibling.offsetTop + sibling.offsetHeight / 2;
+      return (
+        event.clientY + clientYOffset <= sibling.offsetTop + sibling.offsetHeight / 2
+      );
     });
 
     // Inserting the dragging item before the found sibling
@@ -44,6 +50,9 @@ export function setupSortableList(listContainer) {
     originalItems = [
       ...listContainer.querySelectorAll(`.${containerClassName} > [draggable="true"]`),
     ];
+    // Calculate the difference between the middle of the dragged item and clientY
+    clientYOffset =
+      event.target.offsetTop + event.target.offsetHeight / 2 - event.clientY;
   });
 
   listContainer.addEventListener("dragend", (event) => {
