@@ -1,9 +1,10 @@
-import { addStyleSheet } from "./html-utils.js";
+import * as html from "./html-utils.js";
 import { zip } from "./utils.js";
+
 const containerClassName = "fontra-ui-sortable-list-container";
 const draggingClassName = "fontra-ui-sortable-list-dragging";
 
-addStyleSheet(`
+html.addStyleSheet(`
 .${draggingClassName} {
   opacity: 0.3;
 }
@@ -44,6 +45,12 @@ export function setupSortableList(listContainer) {
   listContainer.addEventListener("dragenter", (event) => event.preventDefault());
 
   listContainer.addEventListener("dragstart", (event) => {
+    if (listContainer.contains(document.activeElement)) {
+      // Don't allow dragging on the active element (for example a text input)
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      return;
+    }
     setTimeout(() => {
       event.target.classList.add(draggingClassName);
     }, 0);
@@ -83,4 +90,45 @@ function didReorder(a, b) {
     }
   }
   return false;
+}
+
+export function labeledTextInput(label, controller, key, options) {
+  const items = [];
+  items.push(html.label({ for: key, style: "text-align: right;" }, [label]));
+
+  const choices = options?.choices;
+  const choicesID = `${key}-choices`;
+
+  const inputElement = html.htmlToElement(
+    `<input ${choices ? `list="${choicesID}"` : ""}>`
+  );
+  inputElement.type = "text";
+  inputElement.id = key;
+  inputElement.value = controller.model[key];
+  inputElement.oninput = () => (controller.model[key] = inputElement.value);
+
+  controller.addKeyListener(key, (event) => {
+    inputElement.value = event.newValue;
+  });
+
+  if (options?.placeholderKey) {
+    inputElement.placeholder = controller.model[options.placeholderKey];
+    controller.addKeyListener(
+      options.placeholderKey,
+      (event) => (inputElement.placeholder = event.newValue)
+    );
+  }
+
+  items.push(inputElement);
+
+  if (choices) {
+    items.push(
+      html.createDomElement(
+        "datalist",
+        { id: choicesID },
+        choices.map((item) => html.createDomElement("option", { value: item }))
+      )
+    );
+  }
+  return items;
 }
