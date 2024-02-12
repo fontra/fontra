@@ -94,20 +94,19 @@ function didReorder(a, b) {
 
 export function labeledTextInput(label, controller, key, options) {
   const items = [];
-  items.push(html.label({ for: key, style: "text-align: right;" }, [label]));
+  const inputID = options?.id || `input-${uniqueID()}-${key}`;
+  items.push(html.label({ for: inputID, style: "text-align: right;" }, [label]));
 
   const choices = options?.choices;
-  const choicesID = `${key}-choices`;
+  const choicesID = `${inputID}-choices`;
 
   const inputElement = html.htmlToElement(
     `<input ${choices ? `list="${choicesID}"` : ""}>`
   );
   inputElement.type = options?.type || "text";
+  inputElement.id = inputID;
   if (options?.class) {
     inputElement.className = options.class;
-  }
-  if (options?.id) {
-    inputElement.id = options.id;
   }
   inputElement.value = controller.model[key];
   inputElement.oninput = () => (controller.model[key] = inputElement.value);
@@ -136,4 +135,9 @@ export function labeledTextInput(label, controller, key, options) {
     );
   }
   return items;
+}
+
+let _uniqueID = 1;
+function uniqueID() {
+  return _uniqueID++;
 }
