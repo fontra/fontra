@@ -5,6 +5,7 @@ import { ObservableController } from "../core/observable-object.js";
 import { getRemoteProxy } from "../core/remote.js";
 import { labeledTextInput, setupSortableList } from "../core/ui-utils.js";
 import { zip } from "../core/utils.js";
+import { piecewiseLinearMap } from "../core/var-model.js";
 import { makeDisplayPath } from "../core/view-utils.js";
 import { IconButton } from "../web-components/icon-button.js";
 
@@ -238,6 +239,23 @@ function buildMappingGraph(axis) {
   const yMax = Math.max(...ys);
   const graphX = xs.map((x) => (graphSize * (x - xMin)) / (xMax - xMin));
   const graphY = ys.map((y) => (graphSize * (y - yMin)) / (yMax - yMin));
+
+  let defaultLinesString = "";
+  if (axis.defaultValue != axis.minValue && axis.defaultValue != axis.maxValue) {
+    const defaultX = (graphSize * (axis.defaultValue - xMin)) / (xMax - xMin);
+    const mappedDefault = piecewiseLinearMap(
+      axis.defaultValue,
+      Object.fromEntries(axis.mapping || [])
+    );
+    const defaultY = (graphSize * (mappedDefault - yMin)) / (yMax - yMin);
+
+    defaultLinesString = `
+      <line class="grid-lines"
+       x1="${defaultX}" y1="0" x2="${defaultX}" y2="${graphSize}" />
+      <line class="grid-lines"
+       x1="0" y1="${defaultY}" x2="${graphSize}" y2="${defaultY}" />
+       `;
+  }
   const pointsString = [...zip(graphX, graphY)].flat().join(" ");
   const nodeString = [...zip(xs, ys, graphX, graphY)]
     .map(
@@ -247,12 +265,16 @@ function buildMappingGraph(axis) {
   const svgString = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}"
   viewBox="0 0 ${width} ${height}">
   <style>
+  .grid-lines {
+    fill: none;
+    stroke: #8886;
+  }
   text {
     font-size: 0.8em;
   }
   .node {
     r: 3.5px;
-    transition: 200ms;
+    transition: 100ms;
   }
   .node:hover {
     r: 5px;
@@ -261,8 +283,8 @@ function buildMappingGraph(axis) {
   <rect x="0" y="0" width="${width}" height="${height}" fill="#F8F8F8" />
   <g transform="translate(0, ${height}) scale(1, -1)">
     <g transform="translate(${marginLeft}, ${marginBottom})">
-      <rect x="0" y="0" width="${graphSize}" height="${graphSize}"
-       fill="none" stroke="#8886"/>
+      ${defaultLinesString}
+      <rect class="grid-lines" x="0" y="0" width="${graphSize}" height="${graphSize}" />
       <polyline points="${pointsString}" stroke="gray" fill="none"
        stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5px"/>
       ${nodeString}
