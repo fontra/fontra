@@ -219,13 +219,14 @@ function makeAxisBox(axis) {
 }
 
 function buildMappingGraph(axis) {
-  if (!axis.mapping.length) {
-    return html.div(); // filler
-  }
-  const marginLeft = 4;
+  // if (!axis.mapping.length) {
+  //   return html.div(); // filler
+  // }
+  const marginLeft = 16;
   const marginRight = 16;
-  const marginTop = 4;
+  const marginTop = 16;
   const marginBottom = 16;
+  const labelOffset = -13;
   const graphSize = 100;
   const width = graphSize + marginLeft + marginRight;
   const height = graphSize + marginTop + marginBottom;
@@ -250,11 +251,11 @@ function buildMappingGraph(axis) {
     font-size: 0.8em;
   }
   .node {
-    r: 4px;
+    r: 3.5px;
     transition: 200ms;
   }
   .node:hover {
-    r: 6px;
+    r: 5px;
   }
   </style>
   <rect x="0" y="0" width="${width}" height="${height}" fill="#F8F8F8" />
@@ -263,19 +264,21 @@ function buildMappingGraph(axis) {
       <rect x="0" y="0" width="${graphSize}" height="${graphSize}"
        fill="none" stroke="#8886"/>
       <polyline points="${pointsString}" stroke="gray" fill="none"
-       stroke-linecap="round" stroke-linejoin="round" stroke-width="2px"/>
+       stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5px"/>
       ${nodeString}
-      <text x="0" y="10" transform="scale(1, -1)">${xMin}</text>
-      <text x="${
-        graphSize / 2
-      }" y="10" text-anchor="middle" transform="scale(1, -1)">user</text>
-      <text x="${graphSize}" y="10" text-anchor="end" transform="scale(1, -1)">${xMax}</text>
-      <g transform="translate(${graphSize}) rotate(90)">
-        <text x="0" y="10" transform="scale(1, -1)">${yMin}</text>
+      <g transform="translate(0, ${labelOffset})">
+        <text x="0" y="0" transform="scale(1, -1)">${xMin}</text>
         <text x="${
           graphSize / 2
-        }" y="10" text-anchor="middle" transform="scale(1, -1)">source</text>
-        <text x="${graphSize}" y="10" text-anchor="end" transform="scale(1, -1)">${yMax}</text>
+        }" y="0" text-anchor="middle" transform="scale(1, -1)">user</text>
+        <text x="${graphSize}" y="0" text-anchor="end" transform="scale(1, -1)">${xMax}</text>
+      </g>
+      <g transform="translate(${graphSize}) rotate(90) translate(0, ${labelOffset})">
+        <text x="0" y="0" transform="scale(1, -1)">${yMin}</text>
+        <text x="${
+          graphSize / 2
+        }" y="0" text-anchor="middle" transform="scale(1, -1)">source</text>
+        <text x="${graphSize}" y="0" text-anchor="end" transform="scale(1, -1)">${yMax}</text>
       </g>
     </g>
   </g>
