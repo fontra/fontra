@@ -355,6 +355,9 @@ function buildMappingGraph(axis) {
   return svg.svg({ width, height, viewBox: svg.viewBox(0, 0, width, height) }, [
     svg.style({}, [
       `
+        .background {
+          fill: #FBFBFB;
+        }
         .grid {
           fill: none;
           stroke: #0002;
@@ -390,7 +393,7 @@ function buildMappingGraph(axis) {
         }
       `,
     ]),
-    svg.rect({ x: 0, y: 0, width, height, fill: "#F8F8F8" }),
+    svg.rect({ class: "background", x: 0, y: 0, width, height }),
     svg.g({ transform: svg.translate(0, height).scale(1, -1) }, [
       svg.g({ transform: svg.translate(marginLeft, marginBottom) }, [
         ...defaultLines,
