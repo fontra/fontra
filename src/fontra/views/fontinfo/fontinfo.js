@@ -287,6 +287,14 @@ function buildMappingGraph(axis) {
     ];
   };
 
+  const nodes = graphPoints.map(({ x, y }) =>
+    svg.circle({
+      class: "node",
+      cx: x,
+      cy: y,
+    })
+  );
+
   return svg.svg({ width, height, viewBox: svg.viewBox(0, 0, width, height) }, [
     svg.style({}, [
       `
@@ -316,7 +324,7 @@ function buildMappingGraph(axis) {
         ...defaultLines,
         svg.rect({ class: "grid", x: 0, y: 0, width: graphSize, height: graphSize }),
         svg.polyline({ class: "graph", points: svg.points(graphPoints) }),
-        ...graphPoints.map(({ x, y }) => svg.circle({ class: "node", cx: x, cy: y })),
+        ...nodes,
         svg.g(
           { transform: svg.translate(0, labelOffset) },
           graphLabels(xMin, "user", xMax)
