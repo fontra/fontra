@@ -6,7 +6,7 @@ import { getRemoteProxy } from "../core/remote.js";
 import * as svg from "../core/svg-utils.js";
 import { Transform } from "../core/transform.js";
 import { labeledTextInput, setupSortableList } from "../core/ui-utils.js";
-import { zip } from "../core/utils.js";
+import { enumerate, range, zip } from "../core/utils.js";
 import { piecewiseLinearMap } from "../core/var-model.js";
 import { makeDisplayPath } from "../core/view-utils.js";
 import { IconButton } from "../web-components/icon-button.js";
@@ -287,27 +287,75 @@ function buildMappingGraph(axis) {
     ];
   };
 
-  const nodes = graphPoints.map(({ x, y }) =>
-    svg.circle({
-      class: "node",
-      cx: x,
-      cy: y,
-    })
-  );
+  const graphElement = svg.polyline({
+    class: "graph",
+    points: svg.points(graphPoints),
+  });
+
+  const nodes = [];
+  for (const [i, { x, y }] of enumerate(graphPoints)) {
+    nodes.push(
+      svg.circle({
+        class: "node",
+        cx: x,
+        cy: y,
+        onmouseenter: (event) => {
+          nodeCoordinates[i].classList.add("visible");
+          nodes.map((node) => {
+            if (node !== event.target) {
+              node.classList.add("faded");
+            }
+            defaultLines.map((element) => element.classList.add("faded"));
+          });
+        },
+        onmouseleave: (event) => {
+          nodeCoordinates[i].classList.remove("visible");
+          nodes.map((node) => node.classList.remove("faded"));
+          defaultLines.map((element) => element.classList.remove("faded"));
+        },
+      })
+    );
+  }
+
+  const nodeCoordinates = [];
+  for (const i of range(graphPoints.length)) {
+    const coordString = `${xs[i]} → ${ys[i]}`;
+    const { x, y } = graphPoints[i];
+    const textAnchor =
+      x < graphSize / 4 ? "start" : x < (3 * graphSize) / 4 ? "middle" : "end";
+    nodeCoordinates.push(
+      svg.g({ class: "node-coords-group" }, [
+        svg.line({ class: "grid", x1: x, y1: 0, x2: x, y2: graphSize }),
+        svg.line({ class: "grid", x1: 0, y1: y, x2: graphSize, y2: y }),
+        svg.text(
+          {
+            x,
+            "y": -y - 6,
+            "transform": svg.scale(1, -1),
+            "text-anchor": textAnchor,
+          },
+          [coordString]
+        ),
+      ])
+    );
+  }
 
   return svg.svg({ width, height, viewBox: svg.viewBox(0, 0, width, height) }, [
     svg.style({}, [
       `
         .grid {
           fill: none;
-          stroke: #8886;
+          stroke: #0002;
         }
         .graph {
-          stroke: gray;
+          stroke: #AAA;
           fill: none;
         }
         text {
           font-size: 0.8em;
+        }
+        .faded {
+          opacity: 10%;
         }
         .node {
           r: 3.5px;
@@ -316,6 +364,15 @@ function buildMappingGraph(axis) {
         .node:hover {
           r: 5px;
         }
+        .node-coords-group {
+          opacity: 0%;
+          transition: 400ms;
+          pointer-events: none;
+        }
+        .node-coords-group.visible {
+          opacity: 100%;
+          text-shadow: 0 0 2px #DDD;
+        }
       `,
     ]),
     svg.rect({ x: 0, y: 0, width, height, fill: "#F8F8F8" }),
@@ -323,8 +380,9 @@ function buildMappingGraph(axis) {
       svg.g({ transform: svg.translate(marginLeft, marginBottom) }, [
         ...defaultLines,
         svg.rect({ class: "grid", x: 0, y: 0, width: graphSize, height: graphSize }),
-        svg.polyline({ class: "graph", points: svg.points(graphPoints) }),
+        graphElement,
         ...nodes,
+        ...nodeCoordinates,
         svg.g(
           { transform: svg.translate(0, labelOffset) },
           graphLabels(xMin, "user", xMax)
