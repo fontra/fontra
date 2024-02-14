@@ -3,6 +3,8 @@ import * as html from "../core/html-utils.js";
 import { addStyleSheet } from "../core/html-utils.js";
 import { ObservableController } from "../core/observable-object.js";
 import { getRemoteProxy } from "../core/remote.js";
+import * as svg from "../core/svg-utils.js";
+import { Transform } from "../core/transform.js";
 import { labeledTextInput, setupSortableList } from "../core/ui-utils.js";
 import { zip } from "../core/utils.js";
 import { piecewiseLinearMap } from "../core/var-model.js";
@@ -239,9 +241,15 @@ function buildMappingGraph(axis) {
   const yMax = Math.max(...ys);
   const graphX = xs.map((x) => (graphSize * (x - xMin)) / (xMax - xMin));
   const graphY = ys.map((y) => (graphSize * (y - yMin)) / (yMax - yMin));
-
-  let defaultLinesString = "";
-  if (axis.defaultValue != axis.minValue && axis.defaultValue != axis.maxValue) {
+  const graphPoints = [...zip(graphX, graphY)].map(([x, y]) => {
+    return { x, y };
+  });
+  let defaultLines = [];
+  if (
+    axis.mapping.length &&
+    axis.defaultValue != axis.minValue &&
+    axis.defaultValue != axis.maxValue
+  ) {
     const defaultX = (graphSize * (axis.defaultValue - xMin)) / (xMax - xMin);
     const mappedDefault = piecewiseLinearMap(
       axis.defaultValue,
@@ -249,63 +257,79 @@ function buildMappingGraph(axis) {
     );
     const defaultY = (graphSize * (mappedDefault - yMin)) / (yMax - yMin);
 
-    defaultLinesString = `
-      <line class="grid-lines"
-       x1="${defaultX}" y1="0" x2="${defaultX}" y2="${graphSize}" />
-      <line class="grid-lines"
-       x1="0" y1="${defaultY}" x2="${graphSize}" y2="${defaultY}" />
-       `;
+    defaultLines = [
+      svg.line({ class: "grid", x1: defaultX, y1: 0, x2: defaultX, y2: graphSize }),
+      svg.line({ class: "grid", x1: 0, y1: defaultY, x2: graphSize, y2: defaultY }),
+    ];
   }
-  const pointsString = [...zip(graphX, graphY)].flat().join(" ");
-  const nodeString = [...zip(xs, ys, graphX, graphY)]
-    .map(
-      ([x, y, gx, gy]) => `<circle class="node" cx="${gx}" cy="${gy}" fill="black" />`
-    )
-    .join("\n");
-  const svgString = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}"
-  viewBox="0 0 ${width} ${height}">
-  <style>
-  .grid-lines {
-    fill: none;
-    stroke: #8886;
-  }
-  text {
-    font-size: 0.8em;
-  }
-  .node {
-    r: 3.5px;
-    transition: 100ms;
-  }
-  .node:hover {
-    r: 5px;
-  }
-  </style>
-  <rect x="0" y="0" width="${width}" height="${height}" fill="#F8F8F8" />
-  <g transform="translate(0, ${height}) scale(1, -1)">
-    <g transform="translate(${marginLeft}, ${marginBottom})">
-      ${defaultLinesString}
-      <rect class="grid-lines" x="0" y="0" width="${graphSize}" height="${graphSize}" />
-      <polyline points="${pointsString}" stroke="gray" fill="none"
-       stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5px"/>
-      ${nodeString}
-      <g transform="translate(0, ${labelOffset})">
-        <text x="0" y="0" transform="scale(1, -1)">${xMin}</text>
-        <text x="${
-          graphSize / 2
-        }" y="0" text-anchor="middle" transform="scale(1, -1)">user</text>
-        <text x="${graphSize}" y="0" text-anchor="end" transform="scale(1, -1)">${xMax}</text>
-      </g>
-      <g transform="translate(${graphSize}) rotate(90) translate(0, ${labelOffset})">
-        <text x="0" y="0" transform="scale(1, -1)">${yMin}</text>
-        <text x="${
-          graphSize / 2
-        }" y="0" text-anchor="middle" transform="scale(1, -1)">source</text>
-        <text x="${graphSize}" y="0" text-anchor="end" transform="scale(1, -1)">${yMax}</text>
-      </g>
-    </g>
-  </g>
-</svg>`;
-  return html.htmlToElement(svgString);
+
+  const graphLabels = (v1, v2, v3) => {
+    return [
+      svg.text({ x: 0, y: 0, transform: svg.scale(1, -1) }, [v1]),
+      svg.text(
+        {
+          "x": graphSize / 2,
+          "y": 0,
+          "transform": svg.scale(1, -1),
+          "text-anchor": "middle",
+        },
+        [v2]
+      ),
+      svg.text(
+        {
+          "x": graphSize,
+          "y": 0,
+          "transform": svg.scale(1, -1),
+          "text-anchor": "end",
+        },
+        [v3]
+      ),
+    ];
+  };
+
+  return svg.svg({ width, height, viewBox: svg.viewBox(0, 0, width, height) }, [
+    svg.style({}, [
+      `
+        .grid {
+          fill: none;
+          stroke: #8886;
+        }
+        .graph {
+          stroke: gray;
+          fill: none;
+        }
+        text {
+          font-size: 0.8em;
+        }
+        .node {
+          r: 3.5px;
+          transition: 100ms;
+        }
+        .node:hover {
+          r: 5px;
+        }
+      `,
+    ]),
+    svg.rect({ x: 0, y: 0, width, height, fill: "#F8F8F8" }),
+    svg.g({ transform: svg.translate(0, height).scale(1, -1) }, [
+      svg.g({ transform: svg.translate(marginLeft, marginBottom) }, [
+        ...defaultLines,
+        svg.rect({ class: "grid", x: 0, y: 0, width: graphSize, height: graphSize }),
+        svg.polyline({ class: "graph", points: svg.points(graphPoints) }),
+        ...graphPoints.map(({ x, y }) => svg.circle({ class: "node", cx: x, cy: y })),
+        svg.g(
+          { transform: svg.translate(0, labelOffset) },
+          graphLabels(xMin, "user", xMax)
+        ),
+        svg.g(
+          {
+            transform: svg.translate(graphSize, 0).rotate(90).translate(0, labelOffset),
+          },
+          graphLabels(yMin, "source", yMax)
+        ),
+      ]),
+    ]),
+  ]);
 }
 
 class SourcesPanel extends BaseInfoPanel {
