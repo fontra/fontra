@@ -137,10 +137,9 @@ export function htmlToElements(html) {
 
 export function addStyleSheet(cssText, element = null) {
   if (!element) {
-    element = document.querySelector("head");
+    element = document.head;
   }
-  const styleElement = document.createElement("style");
-  styleElement.textContent = cssText;
+  const styleElement = style({}, [cssText]);
   element.appendChild(styleElement);
 }
 
@@ -156,4 +155,5 @@ export const hr = createDomElement.bind(null, "hr");
 export const link = createDomElement.bind(null, "link");
 export const select = createDomElement.bind(null, "select");
 export const option = createDomElement.bind(null, "option");
+export const style = createDomElement.bind(null, "style");
 // Let's add more once needed
