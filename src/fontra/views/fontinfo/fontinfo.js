@@ -352,9 +352,17 @@ function buildMappingGraph(axis) {
     );
   }
 
-  return svg.svg({ width, height, viewBox: svg.viewBox(0, 0, width, height) }, [
-    svg.style({}, [
-      `
+  return svg.svg(
+    {
+      width,
+      height,
+      viewBox: svg.viewBox(0, 0, width, height),
+      tabindex: 0,
+      style: "outline: none;",
+    },
+    [
+      svg.style({}, [
+        `
         .background {
           fill: #FBFBFB;
         }
@@ -392,28 +400,32 @@ function buildMappingGraph(axis) {
           text-shadow: 0 0 2px #DDD;
         }
       `,
-    ]),
-    svg.rect({ class: "background", x: 0, y: 0, width, height }),
-    svg.g({ transform: svg.translate(0, height).scale(1, -1) }, [
-      svg.g({ transform: svg.translate(marginLeft, marginBottom) }, [
-        ...defaultLines,
-        svg.rect({ class: "grid", x: 0, y: 0, width: graphSize, height: graphSize }),
-        graphElement,
-        ...nodes,
-        ...nodeCoordinates,
-        svg.g(
-          { transform: svg.translate(0, labelOffset) },
-          graphLabels(xMin, "user", xMax)
-        ),
-        svg.g(
-          {
-            transform: svg.translate(graphSize, 0).rotate(90).translate(0, labelOffset),
-          },
-          graphLabels(yMin, "source", yMax)
-        ),
       ]),
-    ]),
-  ]);
+      svg.rect({ class: "background", x: 0, y: 0, width, height }),
+      svg.g({ transform: svg.translate(0, height).scale(1, -1) }, [
+        svg.g({ transform: svg.translate(marginLeft, marginBottom) }, [
+          ...defaultLines,
+          svg.rect({ class: "grid", x: 0, y: 0, width: graphSize, height: graphSize }),
+          graphElement,
+          ...nodes,
+          ...nodeCoordinates,
+          svg.g(
+            { transform: svg.translate(0, labelOffset) },
+            graphLabels(xMin, "user", xMax)
+          ),
+          svg.g(
+            {
+              transform: svg
+                .translate(graphSize, 0)
+                .rotate(90)
+                .translate(0, labelOffset),
+            },
+            graphLabels(yMin, "source", yMax)
+          ),
+        ]),
+      ]),
+    ]
+  );
 }
 
 class SourcesPanel extends BaseInfoPanel {
