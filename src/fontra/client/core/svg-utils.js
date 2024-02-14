@@ -3,7 +3,11 @@ import { Transform } from "./transform.js";
 export function createElement(tagName, attributes, children) {
   const element = document.createElementNS("http://www.w3.org/2000/svg", tagName);
   for (const [key, value] of Object.entries(attributes || {})) {
-    element.setAttribute(key, value);
+    if (key.slice(0, 2) === "on") {
+      element[key] = value;
+    } else {
+      element.setAttribute(key, value);
+    }
   }
   element.append(...(children || []));
   return element;
