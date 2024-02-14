@@ -318,12 +318,14 @@ function buildMappingGraph(axis) {
               node.classList.add("faded");
             }
             defaultLines.map((element) => element.classList.add("faded"));
+            graphElement.classList.add("faded");
           });
         },
         onmouseleave: (event) => {
           nodeCoordinates[i].classList.remove("visible");
           nodes.map((node) => node.classList.remove("faded"));
           defaultLines.map((element) => element.classList.remove("faded"));
+          graphElement.classList.remove("faded");
         },
       })
     );
@@ -373,7 +375,11 @@ function buildMappingGraph(axis) {
         }
         .graph {
           stroke: #AAA;
+          stroke-width: 1.5px;
           fill: none;
+        }
+        .graph.faded {
+          opacity: 60%;
         }
         .default-line {
           transition: 200ms;
