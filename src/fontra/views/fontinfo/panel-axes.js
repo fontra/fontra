@@ -102,9 +102,10 @@ function makeAxisBox(axis) {
       ),
       buildMappingGraph(axis),
       html.createDomElement("icon-button", {
-        class: "fontra-ui-font-info-axes-panel-axis-box-delete",
-        src: "/tabler-icons/trash.svg",
-        onclick: (event) => console.log("delete axis"),
+        "class": "fontra-ui-font-info-axes-panel-axis-box-delete",
+        "src": "/tabler-icons/trash.svg",
+        "onclick": (event) => console.log("delete axis"),
+        "data-tooltip": "Delete axis",
       }),
     ]
   );
