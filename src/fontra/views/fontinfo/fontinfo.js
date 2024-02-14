@@ -365,6 +365,7 @@ function buildMappingGraph(axis) {
         `
         .background {
           fill: #FBFBFB;
+          cursor: initial;
         }
         .grid {
           fill: none;
