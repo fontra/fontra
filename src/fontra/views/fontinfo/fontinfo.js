@@ -258,8 +258,20 @@ function buildMappingGraph(axis) {
     const defaultY = (graphSize * (mappedDefault - yMin)) / (yMax - yMin);
 
     defaultLines = [
-      svg.line({ class: "grid", x1: defaultX, y1: 0, x2: defaultX, y2: graphSize }),
-      svg.line({ class: "grid", x1: 0, y1: defaultY, x2: graphSize, y2: defaultY }),
+      svg.line({
+        class: "grid default-line",
+        x1: defaultX,
+        y1: 0,
+        x2: defaultX,
+        y2: graphSize,
+      }),
+      svg.line({
+        class: "grid default-line",
+        x1: 0,
+        y1: defaultY,
+        x2: graphSize,
+        y2: defaultY,
+      }),
     ];
   }
 
@@ -351,6 +363,9 @@ function buildMappingGraph(axis) {
           stroke: #AAA;
           fill: none;
         }
+        .default-line {
+          transition: 200ms;
+        }
         text {
           font-size: 0.8em;
         }
@@ -359,14 +374,14 @@ function buildMappingGraph(axis) {
         }
         .node {
           r: 3.5px;
-          transition: 100ms;
+          transition: 200ms;
         }
         .node:hover {
           r: 5px;
         }
         .node-coords-group {
           opacity: 0%;
-          transition: 400ms;
+          transition: 200ms;
           pointer-events: none;
         }
         .node-coords-group.visible {
