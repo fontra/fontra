@@ -230,7 +230,7 @@ function buildMappingGraph(axis) {
   const marginTop = 16;
   const marginBottom = 16;
   const labelOffset = -13;
-  const graphSize = 100;
+  const graphSize = 120;
   const width = graphSize + marginLeft + marginRight;
   const height = graphSize + marginTop + marginBottom;
   const xs = axis.mapping.map(([x, y]) => x);
@@ -385,10 +385,10 @@ function buildMappingGraph(axis) {
         }
         .node {
           r: 3.5px;
-          transition: 200ms;
+          transition: 150ms;
         }
         .node:hover {
-          r: 5px;
+          r: 4.5px;
         }
         .node-coords-group {
           opacity: 0%;
