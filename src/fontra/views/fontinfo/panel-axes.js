@@ -284,12 +284,12 @@ function buildMappingGraph(axis) {
       svg.style({}, [
         `
         .background {
-          fill: #FBFBFB;
+          fill: #BBB2;
           cursor: initial;
         }
         .grid {
           fill: none;
-          stroke: #0002;
+          stroke: #9995;
         }
         .graph {
           stroke: #AAA;
