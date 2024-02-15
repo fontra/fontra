@@ -6,6 +6,7 @@ import { labeledTextInput, setupSortableList } from "../core/ui-utils.js";
 import { enumerate, range, zip } from "../core/utils.js";
 import { piecewiseLinearMap } from "../core/var-model.js";
 import { IconButton } from "../web-components/icon-button.js"; // for <icon-button>
+import { UIList } from "../web-components/ui-list.js";
 import { BaseInfoPanel } from "./panel-base.js";
 
 export class AxesPanel extends BaseInfoPanel {
@@ -40,7 +41,7 @@ addStyleSheet(`
   padding: 1em;
   cursor: pointer;
   display: grid;
-  grid-template-columns: max-content max-content max-content auto;
+  grid-template-columns: max-content max-content max-content max-content auto;
   gap: 0.5em;
 }
 
@@ -53,10 +54,16 @@ addStyleSheet(`
   align-content: start;
 }
 
+.fontra-ui-font-info-axes-panel-axis-box-mapping-list {
+  width: 10em;
+  max-height: 13em;
+}
+
 .fontra-ui-font-info-axes-panel-axis-box-delete {
   justify-self: end;
   align-self: start;
 }
+
 `);
 
 function makeAxisBox(axis) {
@@ -101,6 +108,7 @@ function makeAxisBox(axis) {
           .flat()
       ),
       buildMappingGraph(axis),
+      buildMappingList(axis),
       html.createDomElement("icon-button", {
         "class": "fontra-ui-font-info-axes-panel-axis-box-delete",
         "src": "/tabler-icons/trash.svg",
@@ -109,6 +117,26 @@ function makeAxisBox(axis) {
       }),
     ]
   );
+}
+
+function buildMappingList(axis) {
+  const items = axis.mapping.map(([user, source]) => {
+    return { user, source };
+  });
+  const mappingList = new UIList();
+  mappingList.classList.add("fontra-ui-font-info-axes-panel-axis-box-mapping-list");
+  mappingList.columnDescriptions = [
+    {
+      key: "user",
+      title: "User",
+      width: "3em",
+    },
+    { key: "source", title: "Source", width: "3em" },
+  ];
+  mappingList.showHeader = true;
+  mappingList.minHeight = "5em";
+  mappingList.setItems(items);
+  return mappingList;
 }
 
 function buildMappingGraph(axis) {
