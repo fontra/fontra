@@ -1,3 +1,5 @@
+import * as html from "../core/html-utils.js";
+
 export class BaseInfoPanel {
   constructor(fontInfoController, panelElement) {
     this.fontInfoController = fontInfoController;
