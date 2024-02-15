@@ -36,7 +36,7 @@ export class AxesPanel extends BaseInfoPanel {
 
 addStyleSheet(`
 .fontra-ui-font-info-axes-panel-axis-box {
-  background-color: #FFF;
+  background-color: var(--ui-element-background-color);
   border-radius: 0.5em;
   padding: 1em;
   cursor: pointer;
