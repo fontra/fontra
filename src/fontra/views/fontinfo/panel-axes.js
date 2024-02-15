@@ -63,7 +63,6 @@ addStyleSheet(`
   justify-self: end;
   align-self: start;
 }
-
 `);
 
 class AxisBox {
