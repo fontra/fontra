@@ -21,7 +21,7 @@ export class AxesPanel extends BaseInfoPanel {
     });
 
     for (const axis of fontController.globalAxes) {
-      axisContainer.appendChild(makeAxisBox(axis));
+      axisContainer.appendChild(new AxisBox(axis));
     }
 
     setupSortableList(axisContainer);
@@ -66,80 +66,67 @@ addStyleSheet(`
 
 `);
 
-function makeAxisBox(axis) {
-  const axisModel = { ...axis };
-  const axisItems = !axisModel.values
-    ? [
-        ["Minimum", "minValue"],
-        ["Default", "defaultValue"],
-        ["Maximum", "maxValue"],
-      ]
-    : [
-        ["Values", "valuesString"],
-        ["Default", "defaultValue"],
-      ];
-  if (axisModel.values) {
-    axisModel.valuesString = axisModel.values.join(" ");
-  }
-  const controller = new ObservableController(axisModel);
-  return html.div(
-    { class: "fontra-ui-font-info-axes-panel-axis-box", draggable: true },
-    [
-      html.div(
-        { class: "fontra-ui-font-info-axes-panel-axis-box-names" },
-        [
-          ["Name", "name"],
-          ["OT Tag", "tag"],
-          ["UI Name", "label"],
+class AxisBox {
+  constructor(axis) {
+    const axisModel = { ...axis };
+    const axisItems = !axisModel.values
+      ? [
+          ["Minimum", "minValue"],
+          ["Default", "defaultValue"],
+          ["Maximum", "maxValue"],
         ]
-          .map(([labelName, keyName]) =>
-            labeledTextInput(labelName, controller, keyName)
-          )
-          .flat()
-      ),
-      html.div(
-        { class: "fontra-ui-font-info-axes-panel-axis-box-values" },
-        axisItems
-          .map(([labelName, keyName]) =>
-            labeledTextInput(labelName, controller, keyName, {
-              type: keyName === "valuesString" ? "text" : "number",
-            })
-          )
-          .flat()
-      ),
-      buildMappingGraph(axis),
-      buildMappingList(axis),
-      html.createDomElement("icon-button", {
-        "class": "fontra-ui-font-info-axes-panel-axis-box-delete",
-        "src": "/tabler-icons/trash.svg",
-        "onclick": (event) => console.log("delete axis"),
-        "data-tooltip": "Delete axis",
-      }),
-    ]
-  );
+      : [
+          ["Values", "valuesString"],
+          ["Default", "defaultValue"],
+        ];
+    if (axisModel.values) {
+      axisModel.valuesString = axisModel.values.join(" ");
+    }
+    this.axisController = new ObservableController(axisModel);
+
+    this.mappingGraph = buildMappingGraph(this.axisController);
+    this.mappingList = buildMappingList(this.axisController);
+
+    return html.div(
+      { class: "fontra-ui-font-info-axes-panel-axis-box", draggable: true },
+      [
+        html.div(
+          { class: "fontra-ui-font-info-axes-panel-axis-box-names" },
+          [
+            ["Name", "name"],
+            ["OT Tag", "tag"],
+            ["UI Name", "label"],
+          ]
+            .map(([labelName, keyName]) =>
+              labeledTextInput(labelName, this.axisController, keyName)
+            )
+            .flat()
+        ),
+        html.div(
+          { class: "fontra-ui-font-info-axes-panel-axis-box-values" },
+          axisItems
+            .map(([labelName, keyName]) =>
+              labeledTextInput(labelName, this.axisController, keyName, {
+                type: keyName === "valuesString" ? "text" : "number",
+              })
+            )
+            .flat()
+        ),
+        this.mappingGraph,
+        this.mappingList,
+        html.createDomElement("icon-button", {
+          "class": "fontra-ui-font-info-axes-panel-axis-box-delete",
+          "src": "/tabler-icons/trash.svg",
+          "onclick": (event) => console.log("delete axis"),
+          "data-tooltip": "Delete axis",
+        }),
+      ]
+    );
+  }
 }
 
-function buildMappingList(axis) {
-  const items = axis.mapping.map(([user, source]) => {
-    return { user, source };
-  });
-  const mappingList = new UIList();
-  mappingList.classList.add("fontra-ui-font-info-axes-panel-axis-box-mapping-list");
-  mappingList.columnDescriptions = [
-    {
-      key: "user",
-      title: "User",
-      width: "3em",
-    },
-    { key: "source", title: "Source", width: "3em" },
-  ];
-  mappingList.showHeader = true;
-  mappingList.minHeight = "5em";
-  mappingList.setItems(items);
-  return mappingList;
-}
-
-function buildMappingGraph(axis) {
+function buildMappingGraph(axisController) {
+  const axis = axisController.model;
   // if (!axis.mapping.length) {
   //   return html.div(); // filler
   // }
@@ -245,6 +232,9 @@ function buildMappingGraph(axis) {
           defaultLines.map((element) => element.classList.remove("faded"));
           graphElement.classList.remove("faded");
         },
+        onclick: (event) => {
+          console.log("click");
+        },
       })
     );
   }
@@ -330,7 +320,13 @@ function buildMappingGraph(axis) {
       svg.g({ transform: svg.translate(0, height).scale(1, -1) }, [
         svg.g({ transform: svg.translate(marginLeft, marginBottom) }, [
           ...defaultLines,
-          svg.rect({ class: "grid", x: 0, y: 0, width: graphSize, height: graphSize }),
+          svg.rect({
+            class: "grid",
+            x: 0,
+            y: 0,
+            width: graphSize,
+            height: graphSize,
+          }),
           graphElement,
           ...nodes,
           ...nodeCoordinates,
@@ -351,4 +347,25 @@ function buildMappingGraph(axis) {
       ]),
     ]
   );
+}
+function buildMappingList(axisController) {
+  const axis = axisController.model;
+
+  const items = axis.mapping.map(([user, source]) => {
+    return { user, source };
+  });
+  const mappingList = new UIList();
+  mappingList.classList.add("fontra-ui-font-info-axes-panel-axis-box-mapping-list");
+  mappingList.columnDescriptions = [
+    {
+      key: "user",
+      title: "User",
+      width: "3em",
+    },
+    { key: "source", title: "Source", width: "3em" },
+  ];
+  mappingList.showHeader = true;
+  mappingList.minHeight = "5em";
+  mappingList.setItems(items);
+  return mappingList;
 }
