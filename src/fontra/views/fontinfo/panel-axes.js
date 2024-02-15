@@ -42,7 +42,7 @@ addStyleSheet(`
   cursor: pointer;
   display: grid;
   grid-template-columns: max-content max-content max-content max-content auto;
-  gap: 0.5em;
+  gap: 1em;
 }
 
 .fontra-ui-font-info-axes-panel-axis-box-values,
