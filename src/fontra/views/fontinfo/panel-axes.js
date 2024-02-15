@@ -55,7 +55,7 @@ addStyleSheet(`
 }
 
 .fontra-ui-font-info-axes-panel-axis-box-mapping-list {
-  width: 10em;
+  width: 8em;
   max-height: 12em;
 }
 
