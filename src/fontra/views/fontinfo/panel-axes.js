@@ -118,6 +118,7 @@ class AxisBox {
           "src": "/tabler-icons/trash.svg",
           "onclick": (event) => console.log("delete axis"),
           "data-tooltip": "Delete axis",
+          "data-tooltipposition": "left",
         }),
       ]
     );
