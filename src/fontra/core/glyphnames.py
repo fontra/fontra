@@ -30,7 +30,8 @@ def getUnicodeFromGlyphName(glyphName: str) -> int | None:
 
     codePoint = None
     if info is not None:
-        codePoint = int(info["unicode"], 16)
+        if "unicode" in info:
+            codePoint = int(info["unicode"], 16)
     elif glyphName.startswith("uni"):
         uniStr = glyphName[3:]
         if 4 <= len(uniStr) <= 5 and uniStr.upper() == uniStr:

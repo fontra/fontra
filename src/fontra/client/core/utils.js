@@ -452,8 +452,13 @@ export function* iter(iterable) {
   }
 }
 
-export function splitGlyphNameExtension(glyphName) {
-  const periodIndex = glyphName.indexOf(".");
+export function splitGlyphNameExtension(glyphName, splitGlyph = ".") {
+  if (glyphName.charAt(0) == splitGlyph) {
+    /* The glyph name starts with the splitGlyph,
+    it is mostlikely a .notef or .null or a component */
+    return [glyphName, ""];
+  }
+  const periodIndex = glyphName.indexOf(splitGlyph);
   const baseGlyphName = periodIndex >= 1 ? glyphName.slice(0, periodIndex) : glyphName;
   const extension = periodIndex >= 1 ? glyphName.slice(periodIndex) : "";
   return [baseGlyphName, extension];
