@@ -55,7 +55,6 @@ async function glyphNamesFromText(text, characterMap, glyphMap) {
             // The base glyph name is a single character, let's see if there's
             // a glyph name associated with that character
             let properBaseGlyphName = characterMap[baseCharCode];
-            console.log("properBaseGlyphName", properBaseGlyphName);
             if (!properBaseGlyphName) {
               properBaseGlyphName = await getSuggestedGlyphName(baseCharCode);
             }
