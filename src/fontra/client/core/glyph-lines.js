@@ -51,26 +51,18 @@ async function glyphNamesFromText(text, characterMap, glyphMap) {
           const [baseGlyphName, extension] = splitGlyphNameExtension(glyphName);
           const baseCharCode = baseGlyphName.codePointAt(0);
           const charString = String.fromCodePoint(baseCharCode);
-          if (baseGlyphName === charString) {
+          if (baseGlyphName === charString && !isPlainLatinLetter(baseGlyphName)) {
             // The base glyph name is a single character, let's see if there's
             // a glyph name associated with that character
-            if (baseGlyphName.search(/[^a-zA-Z]+/) === -1) {
-              /* check if character is A-Z or a-z
-              eg. for double encoded H, but want to add h.ss01
-              see: https://github.com/googlefonts/fontra/issues/1093
-              */
-              glyphName = glyphName;
-            } else {
-              let properBaseGlyphName = characterMap[baseCharCode];
-              console.log("properBaseGlyphName", properBaseGlyphName);
-              if (!properBaseGlyphName) {
-                properBaseGlyphName = await getSuggestedGlyphName(baseCharCode);
-              }
-              if (properBaseGlyphName) {
-                glyphName = properBaseGlyphName + extension;
-                if (!extension) {
-                  char = charString;
-                }
+            let properBaseGlyphName = characterMap[baseCharCode];
+            console.log("properBaseGlyphName", properBaseGlyphName);
+            if (!properBaseGlyphName) {
+              properBaseGlyphName = await getSuggestedGlyphName(baseCharCode);
+            }
+            if (properBaseGlyphName) {
+              glyphName = properBaseGlyphName + extension;
+              if (!extension) {
+                char = charString;
               }
             }
           } else {
@@ -127,4 +119,8 @@ export function textFromGlyphLines(glyphLines) {
     textLines.push(textLine);
   }
   return textLines.join("\n");
+}
+
+function isPlainLatinLetter(glyphName) {
+  return glyphName.match(/^[A-Za-z]$/);
 }
