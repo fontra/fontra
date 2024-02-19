@@ -69,7 +69,7 @@ export class GlyphsSearch extends UnlitElement {
       { key: "glyphName", title: "glyph name", width: "10em", isIdentifierKey: true },
       {
         key: "unicode",
-        width: "5em",
+        width: "fit-content",
         get: (item) => makeUPlusStringFromCodePoints(item.unicodes),
       },
     ];

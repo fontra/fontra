@@ -294,8 +294,11 @@ describe("makeUPlusStringFromCodePoints", () => {
   it("should not throw an exception for a falsy value", () => {
     expect(() => makeUPlusStringFromCodePoints("")).to.not.throw();
   });
-  it("make a number unicode hex", () => {
-    expect(makeUPlusStringFromCodePoints(97, 65)).equals("U+0061,U+0041"); // a,A
+  it("make an array unicode hex", () => {
+    expect(makeUPlusStringFromCodePoints([97, 65])).equals("U+0061,U+0041"); // a,A
+  });
+  it("make an array unicode hex", () => {
+    expect(makeUPlusStringFromCodePoints(97)).equals("U+0061"); // a
   });
 });
 
