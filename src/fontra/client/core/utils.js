@@ -239,6 +239,10 @@ export function makeUPlusStringFromCodePoint(codePoint) {
     : "";
 }
 
+export function makeUPlusStringFromCodePoints(codePoint) {
+  return makeUPlusStringFromCodePoint(codePoint);
+}
+
 export async function writeToClipboard(clipboardObject) {
   if (!clipboardObject) return;
 
