@@ -40,6 +40,9 @@ def test_getSuggestedGlyphName(codePoint, expectedGlyphName):
         ("u10FFFF", 0x10FFFF),
         ("u10ffff", None),
         ("u110000", None),
+        (".notdef", None),
+        (".null", None),
+        ("h.ss01", None),
     ],
 )
 def test_getUnicodeFromGlyphName(glyphName, expectedCodePoint):

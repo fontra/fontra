@@ -50,30 +50,27 @@ async function glyphNamesFromText(text, characterMap, glyphMap) {
           // text entry field.
           const [baseGlyphName, extension] = splitGlyphNameExtension(glyphName);
           const baseCharCode = baseGlyphName.codePointAt(0);
-          console.log("baseGlyphName", baseGlyphName);
-          console.log("baseCharCode", baseCharCode);
           const charString = String.fromCodePoint(baseCharCode);
-          console.log("charString", charString);
-          /*
-          if (baseGlyphName && baseGlyphName.normalize("NFD").length === baseGlyphName.length) {
-            glyphName = glyphName;
-            char = charString;
-            console.log("glyphName", glyphName);
-            console.log("char", char);
-          } else
-          */
           if (baseGlyphName === charString) {
             // The base glyph name is a single character, let's see if there's
             // a glyph name associated with that character
-            let properBaseGlyphName = characterMap[baseCharCode];
-            console.log("properBaseGlyphName", properBaseGlyphName);
-            if (!properBaseGlyphName) {
-              properBaseGlyphName = await getSuggestedGlyphName(baseCharCode);
-            }
-            if (properBaseGlyphName) {
-              glyphName = properBaseGlyphName + extension;
-              if (!extension) {
-                char = charString;
+            if (baseGlyphName.search(/[^a-zA-Z]+/) === -1) {
+              /* check if character is A-Z or a-z
+              eg. for double encoded H, but want to add h.ss01
+              see: https://github.com/googlefonts/fontra/issues/1093
+              */
+              glyphName = glyphName;
+            } else {
+              let properBaseGlyphName = characterMap[baseCharCode];
+              console.log("properBaseGlyphName", properBaseGlyphName);
+              if (!properBaseGlyphName) {
+                properBaseGlyphName = await getSuggestedGlyphName(baseCharCode);
+              }
+              if (properBaseGlyphName) {
+                glyphName = properBaseGlyphName + extension;
+                if (!extension) {
+                  char = charString;
+                }
               }
             }
           } else {
