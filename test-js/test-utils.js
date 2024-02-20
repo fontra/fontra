@@ -14,7 +14,6 @@ import {
   hyphenatedToCamelCase,
   loadURLFragment,
   makeUPlusStringFromCodePoint,
-  makeUPlusStringFromCodePoints,
   memoize,
   modulo,
   objectsEqual,
