@@ -119,12 +119,17 @@ describe("var-glyph Tests", () => {
     ]);
   });
 
+  it("modify StaticGlyph leftMargin check components translateX", () => {
+    dummyStaticGlyph.leftMargin += 10;
+    expect(dummyStaticGlyph.components[0].transformation.translateX).to.equal(10);
+  });
+
   it("modify StaticGlyph rightMargin check xAdvance", () => {
     dummyStaticGlyph.rightMargin += 10;
     expect(dummyStaticGlyph.xAdvance).to.equal(180);
   });
 
-  it("modify StaticGlyph rightMargin check leftMargin", () => {
+  it("modify StaticGlyph rightMargin check rightMargin", () => {
     dummyStaticGlyph.rightMargin += 10;
     expect(dummyStaticGlyph.rightMargin).to.equal(70);
   });
@@ -134,6 +139,11 @@ describe("var-glyph Tests", () => {
     expect(dummyStaticGlyph.path.coordinates).to.equal([
       60, 0, 110, 0, 110, 120, 60, 120,
     ]);
+  });
+
+  it("modify StaticGlyph rightMargin check components translateX", () => {
+    dummyStaticGlyph.rightMargin += 10;
+    expect(dummyStaticGlyph.components[0].transformation.translateX).to.equal(0);
   });
 
   const modifierFuncs = [
