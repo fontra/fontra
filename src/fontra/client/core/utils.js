@@ -239,19 +239,6 @@ export function makeUPlusStringFromCodePoint(codePoint) {
     : "";
 }
 
-export function makeUPlusStringFromCodePoints(codePoints) {
-  if (!codePoints) {
-    return "";
-  }
-  if (Array.isArray(codePoints)) {
-    return codePoints.map(makeUPlusStringFromCodePoint).join(",");
-  }
-  if (typeof codePoints == "number") {
-    return makeUPlusStringFromCodePoint(codePoints);
-  }
-  throw new Error("codePoints argument must be an array or number");
-}
-
 export async function writeToClipboard(clipboardObject) {
   if (!clipboardObject) return;
 

@@ -287,21 +287,6 @@ describe("makeUPlusStringFromCodePoint", () => {
   });
 });
 
-describe("makeUPlusStringFromCodePoints", () => {
-  it("throws an exception when an invalid parameter is given", () => {
-    expect(() => makeUPlusStringFromCodePoints("not-a-number")).to.throw();
-  });
-  it("should not throw an exception for a falsy value", () => {
-    expect(() => makeUPlusStringFromCodePoints("")).to.not.throw();
-  });
-  it("make an array unicode hex", () => {
-    expect(makeUPlusStringFromCodePoints([97, 65])).equals("U+0061,U+0041"); // a,A
-  });
-  it("make an array unicode hex", () => {
-    expect(makeUPlusStringFromCodePoints(97)).equals("U+0061"); // a
-  });
-});
-
 describe("parseSelection", () => {
   it("should parse given selection info, return in order", () => {
     expect(parseSelection(["point/2", "point/3", "point/4"])).deep.equal({

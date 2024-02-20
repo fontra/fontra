@@ -6,7 +6,6 @@ import {
   getCharFromUnicode,
   guessCharFromGlyphName,
   makeUPlusStringFromCodePoint,
-  makeUPlusStringFromCodePoints,
 } from "/core/utils.js";
 
 const colors = {
@@ -70,7 +69,7 @@ export class GlyphsSearch extends UnlitElement {
       {
         key: "unicode",
         width: "fit-content",
-        get: (item) => makeUPlusStringFromCodePoints(item.unicodes),
+        get: (item) => item.unicodes?.map(makeUPlusStringFromCodePoint).join(","),
       },
     ];
     this.glyphNamesList = new UIList();
