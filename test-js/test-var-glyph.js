@@ -22,6 +22,8 @@ function makeTestGlyphObject() {
           xAdvance: 500,
           yAdvance: 1000,
           verticalOrigin: 800,
+          leftMargin: 0,
+          rightMargin: 0,
           path: { contourInfo: [], coordinates: [], pointTypes: [] },
           components: [
             {
@@ -58,6 +60,8 @@ describe("var-glyph Tests", () => {
   it("new densify StaticGlyph", () => {
     const sparseObject = {
       xAdvance: 500,
+      leftMargin: 0,
+      rightMargin: 0,
       components: [
         {
           name: "test",
@@ -89,6 +93,8 @@ describe("var-glyph Tests", () => {
       },
       verticalOrigin: undefined,
       xAdvance: 500,
+      leftMargin: 0,
+      rightMargin: 0,
       yAdvance: undefined,
     };
     const glyph = StaticGlyph.fromObject(sparseObject);
