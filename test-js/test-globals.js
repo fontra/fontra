@@ -1,14 +1,35 @@
+import VarArray from "../src/fontra/client/core/var-array.js";
 import { StaticGlyph, VariableGlyph } from "../src/fontra/client/core/var-glyph.js";
+import { VarPackedPath } from "../src/fontra/client/core/var-path.js";
+
+/*
+{
+    contourInfo: [{ endPoint: 3, isClosed: true }],
+    coordinates: [60, 0, 110, 0, 110, 120, 60, 120],
+    pointTypes: [0, 0, 0, 0],
+  },
+*/
+function simpleTestPath(isClosed = true) {
+  return new VarPackedPath(
+    new VarArray(0, 0, 0, 100, 100, 100, 100, 0),
+    [
+      VarPackedPath.ON_CURVE,
+      VarPackedPath.ON_CURVE,
+      VarPackedPath.ON_CURVE,
+      VarPackedPath.ON_CURVE,
+    ],
+    [{ endPoint: 3, isClosed: isClosed }]
+  );
+}
 
 const sparseObject = {
   xAdvance: 170,
-  leftMargin: 60,
-  rightMargin: 60,
   path: {
     contourInfo: [{ endPoint: 3, isClosed: true }],
     coordinates: [60, 0, 110, 0, 110, 120, 60, 120],
     pointTypes: [0, 0, 0, 0],
   },
+  /*
   components: [
     {
       name: "test",
@@ -26,6 +47,7 @@ const sparseObject = {
       },
     },
   ],
+  */
 };
 
 export const dummyStaticGlyph = StaticGlyph.fromObject(sparseObject);

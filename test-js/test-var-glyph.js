@@ -2,7 +2,34 @@ import { expect } from "chai";
 
 import { enumerate } from "../src/fontra/client/core/utils.js";
 import { StaticGlyph, VariableGlyph } from "../src/fontra/client/core/var-glyph.js";
-import { dummyStaticGlyph } from "./test-globals.js";
+
+const sparseObject = {
+  xAdvance: 170,
+  path: {
+    contourInfo: [{ endPoint: 3, isClosed: true }],
+    coordinates: [60, 0, 110, 0, 110, 120, 60, 120],
+    pointTypes: [0, 0, 0, 0],
+  },
+  components: [
+    {
+      name: "test",
+      location: { a: 0.5 },
+      transformation: {
+        translateX: 0,
+        translateY: 0,
+        rotation: 0,
+        scaleX: 1,
+        scaleY: 1,
+        skewX: 0,
+        skewY: 0,
+        tCenterX: 0,
+        tCenterY: 0,
+      },
+    },
+  ],
+};
+
+const glyph = StaticGlyph.fromObject(sparseObject);
 
 function makeTestGlyphObject() {
   return {
@@ -61,8 +88,6 @@ describe("var-glyph Tests", () => {
   it("new densify StaticGlyph", () => {
     const sparseObject = {
       xAdvance: 500,
-      leftMargin: 0,
-      rightMargin: 0,
       components: [
         {
           name: "test",
@@ -94,56 +119,68 @@ describe("var-glyph Tests", () => {
       },
       verticalOrigin: undefined,
       xAdvance: 500,
-      leftMargin: 0,
-      rightMargin: 0,
       yAdvance: undefined,
     };
     const glyph = StaticGlyph.fromObject(sparseObject);
     expect(glyph).to.deep.equal(denseObject);
   });
 
+  it("get StaticGlyph leftMargin", () => {
+    const glyph = StaticGlyph.fromObject(sparseObject);
+    expect(glyph.leftMargin).to.deep.equal(60);
+  });
+
   it("modify StaticGlyph leftMargin check xAdvance", () => {
-    dummyStaticGlyph.leftMargin += 10;
-    expect(dummyStaticGlyph.xAdvance).to.equal(180);
+    const glyph = StaticGlyph.fromObject(sparseObject);
+    glyph.leftMargin = 70;
+    expect(glyph.xAdvance).to.deep.equal(180);
   });
 
   it("modify StaticGlyph leftMargin check leftMargin", () => {
-    dummyStaticGlyph.leftMargin += 10;
-    expect(dummyStaticGlyph.leftMargin).to.equal(70);
+    const glyph = StaticGlyph.fromObject(sparseObject);
+    glyph.leftMargin = 70;
+    expect(glyph.leftMargin).to.deep.equal(70);
   });
 
   it("modify StaticGlyph leftMargin check coordinates", () => {
-    dummyStaticGlyph.leftMargin += 10;
-    expect(dummyStaticGlyph.path.coordinates).to.equal([
-      70, 0, 120, 0, 120, 120, 70, 120,
-    ]);
+    const glyph = StaticGlyph.fromObject(sparseObject);
+    glyph.leftMargin = 70;
+    expect(glyph.path.coordinates).to.deep.equal([70, 0, 120, 0, 120, 120, 70, 120]);
   });
 
   it("modify StaticGlyph leftMargin check components translateX", () => {
-    dummyStaticGlyph.leftMargin += 10;
-    expect(dummyStaticGlyph.components[0].transformation.translateX).to.equal(10);
+    const glyph = StaticGlyph.fromObject(sparseObject);
+    glyph.leftMargin = 70;
+    expect(glyph.components[0].transformation.translateX).to.deep.equal(10);
+  });
+
+  it("get StaticGlyph rightMargin", () => {
+    const glyph = StaticGlyph.fromObject(sparseObject);
+    expect(glyph.rightMargin).to.deep.equal(60);
   });
 
   it("modify StaticGlyph rightMargin check xAdvance", () => {
-    dummyStaticGlyph.rightMargin += 10;
-    expect(dummyStaticGlyph.xAdvance).to.equal(180);
+    const glyph = StaticGlyph.fromObject(sparseObject);
+    glyph.rightMargin = 70;
+    expect(glyph.xAdvance).to.deep.equal(180);
   });
 
   it("modify StaticGlyph rightMargin check rightMargin", () => {
-    dummyStaticGlyph.rightMargin += 10;
-    expect(dummyStaticGlyph.rightMargin).to.equal(70);
+    const glyph = StaticGlyph.fromObject(sparseObject);
+    glyph.rightMargin = 70;
+    expect(glyph.rightMargin).to.deep.equal(70);
   });
 
   it("modify StaticGlyph rightMargin check coordinates", () => {
-    dummyStaticGlyph.rightMargin += 10;
-    expect(dummyStaticGlyph.path.coordinates).to.equal([
-      60, 0, 110, 0, 110, 120, 60, 120,
-    ]);
+    const glyph = StaticGlyph.fromObject(sparseObject);
+    glyph.rightMargin = 70;
+    expect(glyph.path.coordinates).to.deep.equal([60, 0, 110, 0, 110, 120, 60, 120]);
   });
 
   it("modify StaticGlyph rightMargin check components translateX", () => {
-    dummyStaticGlyph.rightMargin += 10;
-    expect(dummyStaticGlyph.components[0].transformation.translateX).to.equal(0);
+    const glyph = StaticGlyph.fromObject(sparseObject);
+    glyph.rightMargin = 70;
+    expect(glyph.components[0].transformation.translateX).to.deep.equal(0);
   });
 
   const modifierFuncs = [
