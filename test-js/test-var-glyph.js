@@ -101,6 +101,28 @@ describe("var-glyph Tests", () => {
     expect(glyph).to.deep.equal(denseObject);
   });
 
+  it("modify StaticGlyph leftMargin", () => {
+    const sparseObject = {
+      xAdvance: 500,
+      leftMargin: 0,
+      rightMargin: 0,
+    };
+    const glyph = StaticGlyph.fromObject(sparseObject);
+    glyph.leftMargin = 10;
+    expect(glyph.xAdvance).to.equal(510);
+  });
+
+  it("modify StaticGlyph rightMargin", () => {
+    const sparseObject = {
+      xAdvance: 500,
+      leftMargin: 0,
+      rightMargin: 0,
+    };
+    const glyph = StaticGlyph.fromObject(sparseObject);
+    glyph.rightMargin = 10;
+    expect(glyph.xAdvance).to.equal(510);
+  });
+
   const modifierFuncs = [
     (vg) => vg.axes.push({ name: "wght" }),
     (vg) => (vg.axes = [{ name: "wght" }]),
