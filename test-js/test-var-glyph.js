@@ -103,24 +103,37 @@ describe("var-glyph Tests", () => {
 
   it("modify StaticGlyph leftMargin", () => {
     const sparseObject = {
-      xAdvance: 500,
-      leftMargin: 0,
-      rightMargin: 0,
+      xAdvance: 170,
+      leftMargin: 60,
+      rightMargin: 60,
+      path: {
+        contourInfo: [{ endPoint: 3, isClosed: true }],
+        coordinates: [60, 0, 110, 0, 110, 120, 60, 120],
+        pointTypes: [0, 0, 0, 0],
+      },
     };
     const glyph = StaticGlyph.fromObject(sparseObject);
-    glyph.leftMargin = 10;
-    expect(glyph.xAdvance).to.equal(510);
+    glyph.leftMargin += 10;
+    expect(glyph.xAdvance).to.equal(180);
+    expect(glyph.leftMargin).to.equal(70);
+    expect(glyph.coordinates).to.equal([70, 0, 120, 0, 120, 120, 70, 120]);
   });
 
   it("modify StaticGlyph rightMargin", () => {
     const sparseObject = {
-      xAdvance: 500,
-      leftMargin: 0,
-      rightMargin: 0,
+      xAdvance: 170,
+      leftMargin: 60,
+      rightMargin: 60,
+      path: {
+        contourInfo: [{ endPoint: 3, isClosed: true }],
+        coordinates: [60, 0, 110, 0, 110, 120, 60, 120],
+        pointTypes: [0, 0, 0, 0],
+      },
     };
     const glyph = StaticGlyph.fromObject(sparseObject);
-    glyph.rightMargin = 10;
-    expect(glyph.xAdvance).to.equal(510);
+    glyph.rightMargin += 10;
+    expect(glyph.xAdvance).to.equal(180);
+    expect(glyph.rightMargin).to.equal(70);
   });
 
   const modifierFuncs = [
