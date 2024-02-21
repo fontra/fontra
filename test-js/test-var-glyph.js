@@ -50,8 +50,6 @@ function makeTestGlyphObject() {
           xAdvance: 500,
           yAdvance: 1000,
           verticalOrigin: 800,
-          leftMargin: 0,
-          rightMargin: 0,
           path: { contourInfo: [], coordinates: [], pointTypes: [] },
           components: [
             {

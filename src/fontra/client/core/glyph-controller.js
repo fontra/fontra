@@ -556,6 +556,14 @@ export class StaticGlyphController {
     return this.instance.yAdvance;
   }
 
+  get leftMargin() {
+    return this.flattenedPath.bounds.xMin;
+  }
+
+  get rightMargin() {
+    return this.xAdvance - this.flattenedPath.bounds.xMax;
+  }
+
   get verticalOrigin() {
     return this.instance.verticalOrigin;
   }
