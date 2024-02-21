@@ -537,7 +537,27 @@ export default class SelectionInfoPanel extends Panel {
           broadcast: true,
         };
       }, senderInfo);
+
+      if (["xAdvance", "leftMargin", "rightMargin"].includes(changePath[0])) {
+        this._updateGlyphMetrics(glyphName, changePath[0]);
+      }
     };
+  }
+
+  async _updateGlyphMetrics(glyphName, changedKey) {
+    const keyMap = {
+      xAdvance: "rightMargin",
+      leftMargin: "xAdvance",
+      rightMargin: "xAdvance",
+    };
+    const glyphController = await this.sceneController.sceneModel.getGlyphInstance(
+      glyphName,
+      this.sceneController.sceneSettings.editLayerName
+    );
+
+    const keyToUpdata = keyMap[changedKey];
+    const fieldKey = JSON.stringify([keyToUpdata]);
+    this.infoForm.setValue(fieldKey, glyphController[keyToUpdata]);
   }
 }
 
