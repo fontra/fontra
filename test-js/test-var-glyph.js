@@ -123,64 +123,6 @@ describe("var-glyph Tests", () => {
     expect(glyph).to.deep.equal(denseObject);
   });
 
-  it("get StaticGlyph leftMargin", () => {
-    const glyph = StaticGlyph.fromObject(sparseObject);
-    expect(glyph.leftMargin).to.deep.equal(60);
-  });
-
-  it("modify StaticGlyph leftMargin check xAdvance", () => {
-    const glyph = StaticGlyph.fromObject(sparseObject);
-    glyph.leftMargin = 70;
-    expect(glyph.xAdvance).to.deep.equal(180);
-  });
-
-  it("modify StaticGlyph leftMargin check leftMargin", () => {
-    const glyph = StaticGlyph.fromObject(sparseObject);
-    glyph.leftMargin = 70;
-    expect(glyph.leftMargin).to.deep.equal(70);
-  });
-
-  it("modify StaticGlyph leftMargin check coordinates", () => {
-    const glyph = StaticGlyph.fromObject(sparseObject);
-    glyph.leftMargin = 70;
-    expect(glyph.path.coordinates).to.deep.equal([70, 0, 120, 0, 120, 120, 70, 120]);
-  });
-
-  it("modify StaticGlyph leftMargin check components translateX", () => {
-    const glyph = StaticGlyph.fromObject(sparseObject);
-    glyph.leftMargin = 70;
-    expect(glyph.components[0].transformation.translateX).to.deep.equal(10);
-  });
-
-  it("get StaticGlyph rightMargin", () => {
-    const glyph = StaticGlyph.fromObject(sparseObject);
-    expect(glyph.rightMargin).to.deep.equal(60);
-  });
-
-  it("modify StaticGlyph rightMargin check xAdvance", () => {
-    const glyph = StaticGlyph.fromObject(sparseObject);
-    glyph.rightMargin = 70;
-    expect(glyph.xAdvance).to.deep.equal(180);
-  });
-
-  it("modify StaticGlyph rightMargin check rightMargin", () => {
-    const glyph = StaticGlyph.fromObject(sparseObject);
-    glyph.rightMargin = 70;
-    expect(glyph.rightMargin).to.deep.equal(70);
-  });
-
-  it("modify StaticGlyph rightMargin check coordinates", () => {
-    const glyph = StaticGlyph.fromObject(sparseObject);
-    glyph.rightMargin = 70;
-    expect(glyph.path.coordinates).to.deep.equal([60, 0, 110, 0, 110, 120, 60, 120]);
-  });
-
-  it("modify StaticGlyph rightMargin check components translateX", () => {
-    const glyph = StaticGlyph.fromObject(sparseObject);
-    glyph.rightMargin = 70;
-    expect(glyph.components[0].transformation.translateX).to.deep.equal(0);
-  });
-
   const modifierFuncs = [
     (vg) => vg.axes.push({ name: "wght" }),
     (vg) => (vg.axes = [{ name: "wght" }]),

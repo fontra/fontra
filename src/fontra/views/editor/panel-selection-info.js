@@ -6,6 +6,7 @@ import {
   getCharFromUnicode,
   makeUPlusStringFromCodePoint,
   parseSelection,
+  range,
   round,
   splitGlyphNameExtension,
   throttleCalls,
@@ -184,8 +185,24 @@ export default class SelectionInfoPanel extends Panel {
           label: "Advance width",
           value: instance.xAdvance,
           minValue: 0,
+          getValue: (layerGlyph, layerName, fieldItem) => {
+            return layerGlyph.xAdvance;
+          },
+          setValue: async (layerGlyph, layerName, fieldItem, value) => {
+            const glyphController =
+              await this.sceneController.sceneModel.getGlyphInstance(
+                glyphName,
+                layerName
+              );
+
+            //const translationX = value - glyphController.rightMargin;
+            //layerGlyph.rightMargin = layerGlyph.rightMargin + translationX;
+            console.log("heyyy!", layerName, value);
+            layerGlyph.xAdvance = value;
+          },
         });
       }
+
       if (instance) {
         formContents.push({
           type: "edit-number-x-y",
@@ -193,11 +210,51 @@ export default class SelectionInfoPanel extends Panel {
           label: "Sidebearings",
           fieldX: {
             key: '["leftMargin"]',
-            value: instance.leftMargin,
+            value: glyphController.leftMargin,
+            getValue: (layerGlyph, layerName, fieldItem) => {
+              return layerGlyph.leftMargin;
+            },
+            setValue: async (layerGlyph, layerName, fieldItem, value) => {
+              const glyphController =
+                await this.sceneController.sceneModel.getGlyphInstance(
+                  glyphName,
+                  layerName
+                );
+
+              const translationX = value - glyphController.leftMargin;
+
+              console.log("heyyy!", layerName, translationX);
+              if (layerGlyph.path) {
+                for (const i in range(0, layerGlyph.path.coordinates.length, 2)) {
+                  layerGlyph.path.coordinates[i] += translationX;
+                }
+              }
+
+              if (layerGlyph.components) {
+                for (let i = 0; i < layerGlyph.components.length; i++) {
+                  layerGlyph.components[i].transformation.translateX += translationX;
+                }
+              }
+
+              layerGlyph.xAdvance = glyphController.xAdvance + translationX;
+            },
           },
           fieldY: {
             key: '["rightMargin"]',
-            value: instance.rightMargin,
+            value: glyphController.rightMargin,
+            getValue: (layerGlyph, layerName, fieldItem) => {
+              return layerGlyph.rightMargin;
+            },
+            setValue: async (layerGlyph, layerName, fieldItem, value) => {
+              const glyphController =
+                await this.sceneController.sceneModel.getGlyphInstance(
+                  glyphName,
+                  layerName
+                );
+
+              const translationX = value - glyphController.rightMargin;
+              layerGlyph.xAdvance = layerGlyph.xAdvance + translationX;
+            },
           },
         });
       }

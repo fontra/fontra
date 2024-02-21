@@ -62,38 +62,6 @@ export class StaticGlyph {
   copy() {
     return StaticGlyph.fromObject(this);
   }
-
-  get leftMargin() {
-    return this.path.getBounds().xMin;
-  }
-
-  set leftMargin(value) {
-    const translateX = value - this.leftMargin;
-    this.xAdvance = this.xAdvance + translateX;
-
-    if (this.path) {
-      for (let i = 0; i < this.path.coordinates.length; i++) {
-        if (i % 2 === 0) {
-          this.path.coordinates[i] += translateX;
-        }
-      }
-    }
-
-    if (this.components) {
-      for (let i = 0; i < this.components.length; i++) {
-        this.components[i].transformation.translateX += translateX;
-      }
-    }
-  }
-
-  get rightMargin() {
-    return this.xAdvance - this.path.getBounds().xMax;
-  }
-
-  set rightMargin(value) {
-    const translateX = value - this.rightMargin;
-    this.xAdvance = this.xAdvance + translateX;
-  }
 }
 
 const identityTransformation = {
