@@ -187,9 +187,6 @@ export default class SelectionInfoPanel extends Panel {
           value: instance.xAdvance,
           minValue: 0,
         });
-      }
-
-      if (instance) {
         formContents.push({
           type: "edit-number-x-y",
           key: '["sidebearings"]',
