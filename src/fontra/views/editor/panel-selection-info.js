@@ -396,12 +396,6 @@ export default class SelectionInfoPanel extends Panel {
     return formContents;
   }
 
-  async updateInfoForm(key, value) {
-    if (this.infoForm.hasKey(key)) {
-      this.infoForm.setValue(key, value);
-    }
-  }
-
   async updateDimensions() {
     const glyphController =
       await this.sceneController.sceneModel.getSelectedStaticGlyphController();
