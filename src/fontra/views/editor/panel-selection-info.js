@@ -189,15 +189,11 @@ export default class SelectionInfoPanel extends Panel {
             return layerGlyph.xAdvance;
           },
           setValue: async (layerGlyph, layerName, fieldItem, value) => {
-            const glyphController =
-              await this.sceneController.sceneModel.getGlyphInstance(
-                glyphName,
-                layerName
-              );
-
-            //const translationX = value - glyphController.rightMargin;
-            //layerGlyph.rightMargin = layerGlyph.rightMargin + translationX;
-            console.log("heyyy!", layerName, value);
+            const translationX = value - layerGlyph.xAdvance;
+            await this.updateInfoForm(
+              '["rightMargin"]',
+              parseInt(this.infoForm.getValue('["rightMargin"]')) + translationX
+            );
             layerGlyph.xAdvance = value;
           },
         });
@@ -215,11 +211,13 @@ export default class SelectionInfoPanel extends Panel {
               return layerGlyph.leftMargin;
             },
             setValue: async (layerGlyph, layerName, fieldItem, value) => {
+              /*
               const glyphController =
                 await this.sceneController.sceneModel.getGlyphInstance(
                   glyphName,
                   layerName
                 );
+              */
 
               const translationX = value - glyphController.leftMargin;
 
@@ -253,7 +251,14 @@ export default class SelectionInfoPanel extends Panel {
                 );
 
               const translationX = value - glyphController.rightMargin;
-              layerGlyph.xAdvance = layerGlyph.xAdvance + translationX;
+              //const translationX = value - parseInt(this.infoForm.getValue('["rightMargin"]'));
+              console.log("heyyy!", layerName, translationX);
+              console.log("heyyy!", value, glyphController.rightMargin);
+              await this.updateInfoForm(
+                '["xAdvance"]',
+                parseInt(this.infoForm.getValue('["xAdvance"]')) + translationX
+              );
+              //layerGlyph.xAdvance = layerGlyph.xAdvance + translationX;
             },
           },
         });
@@ -431,6 +436,12 @@ export default class SelectionInfoPanel extends Panel {
       });
     }
     return formContents;
+  }
+
+  async updateInfoForm(key, value) {
+    if (this.infoForm.hasKey(key)) {
+      this.infoForm.setValue(key, value);
+    }
   }
 
   async updateDimensions() {
