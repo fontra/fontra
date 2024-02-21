@@ -3,6 +3,7 @@ import { recordChanges } from "/core/change-recorder.js";
 import * as html from "/core/html-utils.js";
 import { rectFromPoints, rectSize, unionRect } from "/core/rectangle.js";
 import {
+  enumerate,
   getCharFromUnicode,
   makeUPlusStringFromCodePoint,
   parseSelection,
@@ -185,23 +186,6 @@ export default class SelectionInfoPanel extends Panel {
           label: "Advance width",
           value: instance.xAdvance,
           minValue: 0,
-          getValue: (layerGlyph, layerName, fieldItem) => {
-            return layerGlyph.xAdvance;
-          },
-          setValue: async (layerGlyph, layerName, fieldItem, value) => {
-            const glyphController =
-              await this.sceneController.sceneModel.getGlyphInstance(
-                glyphName,
-                layerName
-              );
-
-            const translationX = value - layerGlyph.xAdvance;
-            await this.updateInfoForm(
-              '["rightMargin"]',
-              parseInt(this.infoForm.getValue('["rightMargin"]')) + translationX
-            );
-            layerGlyph.xAdvance = value;
-          },
         });
       }
 
@@ -213,60 +197,29 @@ export default class SelectionInfoPanel extends Panel {
           fieldX: {
             key: '["leftMargin"]',
             value: glyphController.leftMargin,
-            getValue: (layerGlyph, layerName, fieldItem) => {
-              return layerGlyph.leftMargin;
+            getValue: (layerGlyph, layerGlyphController, fieldItem) => {
+              return layerGlyphController.leftMargin;
             },
-            setValue: async (layerGlyph, layerName, fieldItem, value) => {
-              /*
-              const glyphController =
-                await this.sceneController.sceneModel.getGlyphInstance(
-                  glyphName,
-                  layerName
-                );
-              */
-
-              const translationX = value - glyphController.leftMargin;
-
-              console.log("heyyy!", layerName, translationX);
-              if (layerGlyph.path) {
-                for (const i in range(0, layerGlyph.path.coordinates.length, 2)) {
-                  layerGlyph.path.coordinates[i] += translationX;
-                }
+            setValue: (layerGlyph, layerGlyphController, fieldItem, value) => {
+              const translationX = value - layerGlyphController.leftMargin;
+              for (const i of range(0, layerGlyph.path.coordinates.length, 2)) {
+                layerGlyph.path.coordinates[i] += translationX;
               }
-
-              if (layerGlyph.components) {
-                for (let i = 0; i < layerGlyph.components.length; i++) {
-                  layerGlyph.components[i].transformation.translateX += translationX;
-                }
+              for (const compo of layerGlyph.components) {
+                compo.transformation.translateX += translationX;
               }
-
-              layerGlyph.xAdvance = glyphController.xAdvance + translationX;
+              layerGlyph.xAdvance += translationX;
             },
           },
           fieldY: {
             key: '["rightMargin"]',
             value: glyphController.rightMargin,
-            getValue: (layerGlyph, layerName, fieldItem) => {
-              return layerGlyph.rightMargin;
+            getValue: (layerGlyph, layerGlyphController, fieldItem) => {
+              return layerGlyphController.rightMargin;
             },
-            setValue: async (layerGlyph, layerName, fieldItem, value) => {
-              /*
-              const glyphController =
-                await this.sceneController.sceneModel.getGlyphInstance(
-                  glyphName,
-                  layerName
-                );
-              */
-
-              const translationX = value - glyphController.rightMargin;
-              //const translationX = value - parseInt(this.infoForm.getValue('["rightMargin"]'));
-              console.log("heyyy!", layerName, translationX);
-              console.log("heyyy!", value, glyphController.rightMargin);
-              await this.updateInfoForm(
-                '["xAdvance"]',
-                parseInt(this.infoForm.getValue('["xAdvance"]')) + translationX
-              );
-              //layerGlyph.xAdvance = layerGlyph.xAdvance + translationX;
+            setValue: (layerGlyph, layerGlyphController, fieldItem, value) => {
+              const translationX = value - layerGlyphController.rightMargin;
+              layerGlyph.xAdvance += translationX;
             },
           },
         });
@@ -512,6 +465,12 @@ export default class SelectionInfoPanel extends Panel {
   }
 
   async _setupSelectionInfoHandlers(glyphName) {
+    const varGlyph = await this.fontController.getGlyph(glyphName);
+    const sourceIndices = {};
+    for (const [i, source] of enumerate(varGlyph.sources)) {
+      sourceIndices[source.layerName] = i;
+    }
+
     this.infoForm.onFieldChange = async (fieldItem, value, valueStream) => {
       const changePath = JSON.parse(fieldItem.key);
       const senderInfo = { senderID: this, fieldKeyPath: changePath };
@@ -521,26 +480,34 @@ export default class SelectionInfoPanel extends Panel {
       const deleteFieldValue = fieldItem.deleteValue || defaultDeleteFieldValue;
 
       await this.sceneController.editGlyph(async (sendIncrementalChange, glyph) => {
-        const layerInfo = Object.entries(
+        const layerInfo = [];
+        for (const [layerName, layerGlyph] of Object.entries(
           this.sceneController.getEditingLayerFromGlyphLayers(glyph.layers)
-        ).map(([layerName, layerGlyph]) => {
-          return {
+        )) {
+          const layerGlyphController =
+            await this.fontController.getLayerGlyphController(
+              glyphName,
+              layerName,
+              sourceIndices[layerName]
+            );
+          layerInfo.push({
             layerName,
             layerGlyph,
-            orgValue: getFieldValue(layerGlyph, layerName, fieldItem),
-          };
-        });
+            layerGlyphController,
+            orgValue: getFieldValue(layerGlyph, layerGlyphController, fieldItem),
+          });
+        }
 
         let changes;
 
         if (valueStream) {
           // Continuous changes (eg. slider drag)
           for await (const value of valueStream) {
-            for (const { layerName, layerGlyph, orgValue } of layerInfo) {
+            for (const { layerGlyph, layerGlyphController, orgValue } of layerInfo) {
               if (orgValue !== undefined) {
-                setFieldValue(layerGlyph, layerName, fieldItem, orgValue); // Ensure getting the correct undo change
+                setFieldValue(layerGlyph, layerGlyphController, fieldItem, orgValue); // Ensure getting the correct undo change
               } else {
-                deleteFieldValue(layerGlyph, layerName, fieldItem);
+                deleteFieldValue(layerGlyph, layerGlyphController, fieldItem);
               }
             }
             changes = applyNewValue(
@@ -577,19 +544,19 @@ export default class SelectionInfoPanel extends Panel {
   }
 }
 
-function defaultGetFieldValue(subject, layerName, fieldItem) {
+function defaultGetFieldValue(glyph, glyphController, fieldItem) {
   const changePath = JSON.parse(fieldItem.key);
-  return getNestedValue(subject, changePath);
+  return getNestedValue(glyph, changePath);
 }
 
-function defaultSetFieldValue(subject, layerName, fieldItem, value) {
+function defaultSetFieldValue(glyph, glyphController, fieldItem, value) {
   const changePath = JSON.parse(fieldItem.key);
-  return setNestedValue(subject, changePath, value);
+  return setNestedValue(glyph, changePath, value);
 }
 
-function defaultDeleteFieldValue(subject, layerName, fieldItem) {
+function defaultDeleteFieldValue(glyph, glyphController, fieldItem) {
   const changePath = JSON.parse(fieldItem.key);
-  return deleteNestedValue(subject, changePath);
+  return deleteNestedValue(glyph, changePath);
 }
 
 function getNestedValue(subject, path) {
@@ -624,13 +591,13 @@ function applyNewValue(glyph, layerInfo, value, fieldItem, absolute) {
   const delta = isNumber && !absolute ? value - primaryOrgValue : null;
   return recordChanges(glyph, (glyph) => {
     const layers = glyph.layers;
-    for (const { layerName, orgValue } of layerInfo) {
+    for (const { layerName, layerGlyphController, orgValue } of layerInfo) {
       let newValue =
         delta === null || orgValue === undefined ? value : orgValue + delta;
       if (isNumber) {
         newValue = maybeClampValue(newValue, fieldItem.minValue, fieldItem.maxValue);
       }
-      setFieldValue(layers[layerName].glyph, layerName, fieldItem, newValue);
+      setFieldValue(layers[layerName].glyph, layerGlyphController, fieldItem, newValue);
     }
   });
 }
