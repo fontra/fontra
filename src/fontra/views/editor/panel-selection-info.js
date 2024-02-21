@@ -186,6 +186,21 @@ export default class SelectionInfoPanel extends Panel {
           minValue: 0,
         });
       }
+      if (instance) {
+        formContents.push({
+          type: "edit-number-x-y",
+          key: '["sidebearings"]',
+          label: "Sidebearings",
+          fieldX: {
+            key: '["leftMargin"]',
+            value: instance.leftMargin,
+          },
+          fieldY: {
+            key: '["rightMargin"]',
+            value: instance.rightMargin,
+          },
+        });
+      }
     }
 
     const { pointIndices, componentIndices } = this._getSelection();

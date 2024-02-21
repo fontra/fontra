@@ -126,6 +126,7 @@ describe("glyph-controller Tests", () => {
       staticGlyph,
       undefined
     );
+
     expect(staticGlyphController.bounds).to.deep.equal({
       xMin: 60,
       yMin: 0,
