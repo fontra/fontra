@@ -189,6 +189,12 @@ export default class SelectionInfoPanel extends Panel {
             return layerGlyph.xAdvance;
           },
           setValue: async (layerGlyph, layerName, fieldItem, value) => {
+            const glyphController =
+              await this.sceneController.sceneModel.getGlyphInstance(
+                glyphName,
+                layerName
+              );
+
             const translationX = value - layerGlyph.xAdvance;
             await this.updateInfoForm(
               '["rightMargin"]',
@@ -244,11 +250,13 @@ export default class SelectionInfoPanel extends Panel {
               return layerGlyph.rightMargin;
             },
             setValue: async (layerGlyph, layerName, fieldItem, value) => {
+              /*
               const glyphController =
                 await this.sceneController.sceneModel.getGlyphInstance(
                   glyphName,
                   layerName
                 );
+              */
 
               const translationX = value - glyphController.rightMargin;
               //const translationX = value - parseInt(this.infoForm.getValue('["rightMargin"]'));
