@@ -134,20 +134,29 @@ describe("glyph-controller Tests", () => {
     });
   });
 
-  /*
   it("get StaticGlyphController leftMargin", () => {
-    const dummyGlyph = StaticGlyph.fromObject(makeTestGlyphObject);
-    const glyph = new StaticGlyphController("<dummy>", dummyGlyph, undefined);
-    expect(glyph.leftMargin).to.deep.equal(60);
+    const sgObj = makeTestStaticGlyphObject();
+    const staticGlyph = StaticGlyph.fromObject(sgObj);
+    const staticGlyphController = new StaticGlyphController(
+      "dummy",
+      staticGlyph,
+      undefined
+    );
+    expect(staticGlyphController.leftMargin).to.deep.equal(60);
   });
-  */
+
+  it("get StaticGlyphController rightMargin", () => {
+    const sgObj = makeTestStaticGlyphObject();
+    const staticGlyph = StaticGlyph.fromObject(sgObj);
+    const staticGlyphController = new StaticGlyphController(
+      "dummy",
+      staticGlyph,
+      undefined
+    );
+    expect(staticGlyphController.rightMargin).to.deep.equal(60);
+  });
 
   /*
-  it("get StaticGlyph leftMargin", () => {
-    const glyph = StaticGlyph.fromObject(sparseObject);
-    expect(glyph.leftMargin).to.deep.equal(60);
-  });
-
   it("modify StaticGlyph leftMargin check xAdvance", () => {
     const glyph = StaticGlyph.fromObject(sparseObject);
     glyph.leftMargin = 70;
@@ -170,11 +179,6 @@ describe("glyph-controller Tests", () => {
     const glyph = StaticGlyph.fromObject(sparseObject);
     glyph.leftMargin = 70;
     expect(glyph.components[0].transformation.translateX).to.deep.equal(10);
-  });
-
-  it("get StaticGlyph rightMargin", () => {
-    const glyph = StaticGlyph.fromObject(sparseObject);
-    expect(glyph.rightMargin).to.deep.equal(60);
   });
 
   it("modify StaticGlyph rightMargin check xAdvance", () => {
