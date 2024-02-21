@@ -557,11 +557,11 @@ export class StaticGlyphController {
   }
 
   get leftMargin() {
-    return getRepresentation(this, "leftMargin");
+    return this.bounds.xMin;
   }
 
   get rightMargin() {
-    return getRepresentation(this, "rightMargin");
+    return this.instance.xAdvance - this.bounds.xMax;
   }
 
   get verticalOrigin() {
@@ -616,14 +616,6 @@ export class StaticGlyphController {
     return getRepresentation(this, "flattenedPathHitTester");
   }
 }
-
-registerRepresentationFactory(StaticGlyphController, "leftMargin", (glyph) => {
-  return glyph.flattenedPath.getBounds().xMin;
-});
-
-registerRepresentationFactory(StaticGlyphController, "rightMargin", (glyph) => {
-  return glyph.instance.xAdvance - glyph.flattenedPath.getBounds().xMax;
-});
 
 registerRepresentationFactory(StaticGlyphController, "flattenedPath", (glyph) => {
   return joinPaths([glyph.instance.path, glyph.componentsPath]);
