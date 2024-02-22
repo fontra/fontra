@@ -183,7 +183,7 @@ export class Form extends SimpleElement {
     inputElement.onchange = (event) => {
       let value = parseFloat(inputElement.value);
       if (isNaN(value)) {
-        message("Wrong input type", `Entered value is not a number: ${value}`);
+        message("Invalid number input", `Entered value is not a number: ${value}.`);
         return;
       }
 
