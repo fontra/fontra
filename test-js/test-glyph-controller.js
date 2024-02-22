@@ -53,7 +53,7 @@ describe("glyph-controller Tests", () => {
       staticGlyph,
       undefined
     );
-    expect(staticGlyphController.name).to.deep.equal("dummy");
+    expect(staticGlyphController.name).to.equal("dummy");
   });
 
   it("get StaticGlyphController xAdvance", () => {
@@ -64,7 +64,7 @@ describe("glyph-controller Tests", () => {
       staticGlyph,
       undefined
     );
-    expect(staticGlyphController.xAdvance).to.deep.equal(170);
+    expect(staticGlyphController.xAdvance).to.equal(170);
   });
 
   it("get StaticGlyphController path", () => {
@@ -108,7 +108,7 @@ describe("glyph-controller Tests", () => {
       staticGlyph,
       undefined
     );
-    expect(staticGlyphController.leftMargin).to.deep.equal(60);
+    expect(staticGlyphController.leftMargin).to.equal(60);
   });
 
   it("get StaticGlyphController rightMargin", () => {
@@ -119,7 +119,7 @@ describe("glyph-controller Tests", () => {
       staticGlyph,
       undefined
     );
-    expect(staticGlyphController.rightMargin).to.deep.equal(60);
+    expect(staticGlyphController.rightMargin).to.equal(60);
   });
 
   it("modify leftMargin check leftMargin", () => {
@@ -138,7 +138,7 @@ describe("glyph-controller Tests", () => {
       staticGlyph,
       undefined
     );
-    expect(staticGlyphController2.leftMargin).to.deep.equal(70);
+    expect(staticGlyphController2.leftMargin).to.equal(70);
   });
 
   it("modify StaticGlyphController xAdvance check rightMargin", () => {
@@ -150,10 +150,6 @@ describe("glyph-controller Tests", () => {
       undefined
     );
     staticGlyph.xAdvance += 10;
-    expect(staticGlyphController.rightMargin).to.deep.equal(70);
+    expect(staticGlyphController.rightMargin).to.equal(70);
   });
 });
-
-function copyObject(obj) {
-  return JSON.parse(JSON.stringify(obj));
-}
