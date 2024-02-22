@@ -2,6 +2,7 @@ import * as html from "../core/html-utils.js";
 import { SimpleElement } from "../core/html-utils.js";
 import { QueueIterator } from "../core/queue-iterator.js";
 import { hyphenatedToCamelCase } from "../core/utils.js";
+import { dialog, dialogSetup, message } from "/web-components/modal-dialog.js";
 import { RangeSlider } from "/web-components/range-slider.js";
 import "/web-components/rotary-control.js";
 
@@ -181,6 +182,11 @@ export class Form extends SimpleElement {
     };
     inputElement.onchange = (event) => {
       let value = parseFloat(inputElement.value);
+      if (isNaN(value)) {
+        message("Wrong input type", `Entered value is not a number: ${value}`);
+        return;
+      }
+
       if (!inputElement.reportValidity()) {
         if (inputElement.min != undefined) {
           value = Math.max(value, inputElement.min);
