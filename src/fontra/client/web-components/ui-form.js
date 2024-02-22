@@ -184,7 +184,13 @@ export class Form extends SimpleElement {
       let value = parseFloat(inputElement.value);
       if (isNaN(value)) {
         message("Invalid number input", `Entered value is not a number: ${value}.`);
-        return;
+        const initialValue = fieldItem.initialValue;
+        if (initialValue !== undefined) {
+          inputElement.value = initialValue;
+          value = parseFloat(inputElement.value);
+        } else {
+          return;
+        }
       }
 
       if (!inputElement.reportValidity()) {
