@@ -217,6 +217,16 @@ export class Form extends SimpleElement {
       disabled: fieldItem.disabled,
       onchange: () => {
         let value = parseFloat(inputElement.value);
+        if (isNaN(value)) {
+          message("Invalid number input", `Entered value is not a number: ${value}.`);
+          const initialValue = fieldItem.initialValue;
+          if (initialValue !== undefined) {
+            inputElement.value = initialValue;
+            value = parseFloat(inputElement.value);
+          } else {
+            return;
+          }
+        }
         this._fieldChanging(fieldItem, value);
         rotaryControl.value = -value;
       },
