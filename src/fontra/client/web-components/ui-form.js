@@ -2,7 +2,6 @@ import * as html from "../core/html-utils.js";
 import { SimpleElement } from "../core/html-utils.js";
 import { QueueIterator } from "../core/queue-iterator.js";
 import { hyphenatedToCamelCase } from "../core/utils.js";
-import { dialog, dialogSetup, message } from "/web-components/modal-dialog.js";
 import { RangeSlider } from "/web-components/range-slider.js";
 import "/web-components/rotary-control.js";
 
