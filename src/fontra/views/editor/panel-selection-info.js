@@ -192,7 +192,6 @@ export default class SelectionInfoPanel extends Panel {
           key: '["sidebearings"]',
           label: "Sidebearings",
           fieldX: {
-            type: "edit-number",
             key: '["leftMargin"]',
             value: glyphController.leftMargin,
             getValue: (layerGlyph, layerGlyphController, fieldItem) => {
@@ -210,7 +209,6 @@ export default class SelectionInfoPanel extends Panel {
             },
           },
           fieldY: {
-            type: "edit-number",
             key: '["rightMargin"]',
             value: glyphController.rightMargin,
             getValue: (layerGlyph, layerGlyphController, fieldItem) => {
