@@ -163,14 +163,12 @@ export default class SelectionInfoPanel extends Panel {
         key: "glyphName",
         type: "text",
         label: "Glyph name",
-        initialValue: glyphName,
         value: glyphName,
       });
       formContents.push({
         key: "unicodes",
         type: "text",
         label: "Unicode",
-        initialValue: unicodesStr,
         value: unicodesStr,
       });
       if (baseUnicodesStr) {
@@ -178,7 +176,6 @@ export default class SelectionInfoPanel extends Panel {
           key: "baseUnicodes",
           type: "text",
           label: "Base unicode",
-          initialValue: baseUnicodesStr,
           value: baseUnicodesStr,
         });
       }
@@ -187,7 +184,6 @@ export default class SelectionInfoPanel extends Panel {
           type: "edit-number",
           key: '["xAdvance"]',
           label: "Advance width",
-          initialValue: instance.xAdvance,
           value: instance.xAdvance,
           minValue: 0,
         });
@@ -198,7 +194,6 @@ export default class SelectionInfoPanel extends Panel {
           fieldX: {
             type: "edit-number",
             key: '["leftMargin"]',
-            initialValue: glyphController.leftMargin,
             value: glyphController.leftMargin,
             getValue: (layerGlyph, layerGlyphController, fieldItem) => {
               return layerGlyphController.leftMargin;
@@ -217,7 +212,6 @@ export default class SelectionInfoPanel extends Panel {
           fieldY: {
             type: "edit-number",
             key: '["rightMargin"]',
-            initialValue: glyphController.rightMargin,
             value: glyphController.rightMargin,
             getValue: (layerGlyph, layerGlyphController, fieldItem) => {
               return layerGlyphController.rightMargin;
@@ -256,7 +250,6 @@ export default class SelectionInfoPanel extends Panel {
         type: "edit-text",
         key: componentKey("name"),
         label: "Base glyph",
-        initialValue: component.name,
         value: component.name,
       });
       formContents.push({ type: "header", label: "Transformation" });
@@ -266,12 +259,10 @@ export default class SelectionInfoPanel extends Panel {
         label: "translate",
         fieldX: {
           key: componentKey("transformation", "translateX"),
-          initialValue: component.transformation.translateX,
           value: component.transformation.translateX,
         },
         fieldY: {
           key: componentKey("transformation", "translateY"),
-          initialValue: component.transformation.translateY,
           value: component.transformation.translateY,
         },
       });
@@ -280,7 +271,6 @@ export default class SelectionInfoPanel extends Panel {
         type: "edit-angle",
         key: componentKey("transformation", "rotation"),
         label: "rotation",
-        initialValue: component.transformation.rotation,
         value: component.transformation.rotation,
       });
 
@@ -289,12 +279,10 @@ export default class SelectionInfoPanel extends Panel {
         label: "scale",
         fieldX: {
           key: componentKey("transformation", "scaleX"),
-          initialValue: component.transformation.scaleX,
           value: component.transformation.scaleX,
         },
         fieldY: {
           key: componentKey("transformation", "scaleY"),
-          initialValue: component.transformation.scaleY,
           value: component.transformation.scaleY,
         },
       });
@@ -304,12 +292,10 @@ export default class SelectionInfoPanel extends Panel {
         label: "skew",
         fieldX: {
           key: componentKey("transformation", "skewX"),
-          initialValue: component.transformation.skewX,
           value: component.transformation.skewX,
         },
         fieldY: {
           key: componentKey("transformation", "skewY"),
-          initialValue: component.transformation.skewY,
           value: component.transformation.skewY,
         },
       });
@@ -319,12 +305,10 @@ export default class SelectionInfoPanel extends Panel {
         label: "center",
         fieldX: {
           key: componentKey("transformation", "tCenterX"),
-          initialValue: component.transformation.tCenterX,
           value: component.transformation.tCenterX,
         },
         fieldY: {
           key: componentKey("transformation", "tCenterY"),
-          initialValue: component.transformation.tCenterY,
           value: component.transformation.tCenterY,
         },
       });
@@ -364,7 +348,6 @@ export default class SelectionInfoPanel extends Panel {
             type: "edit-number-slider",
             key: componentKey("location", axis.name),
             label: axis.name,
-            initialValue: value,
             value: value,
             minValue: axis.minValue,
             defaultValue: axis.defaultValue,
@@ -482,7 +465,6 @@ export default class SelectionInfoPanel extends Panel {
     }
 
     this.infoForm.onFieldChange = async (fieldItem, value, valueStream) => {
-      fieldItem.initialValue = value;
       const changePath = JSON.parse(fieldItem.key);
       const senderInfo = { senderID: this, fieldKeyPath: changePath };
 
