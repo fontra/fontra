@@ -31,6 +31,8 @@ export class FontInfoController {
   async start() {
     await this.fontController.initialize();
 
+    await this.fontController.subscribeChanges({ axes: null }, false);
+
     const url = new URL(window.location);
     const selectedPanel = url.hash ? url.hash.slice(1) : "family-info-panel";
 
@@ -76,6 +78,12 @@ export class FontInfoController {
       this.panels[panelClass.id] = new panelClass(this, panelElement);
       observer.observe(panelElement);
     }
+  }
+
+  async externalChange(change, isLiveChange) {
+    console.log("incoming external change", change);
+    await this.fontController.applyChange(change, true);
+    this.fontController.notifyChangeListeners(change, isLiveChange);
   }
 
   handleRemoteClose(event) {
