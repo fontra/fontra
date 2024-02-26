@@ -14,22 +14,44 @@ export class AxesPanel extends BaseInfoPanel {
   static id = "axes-panel";
 
   setupUI() {
-    const fontController = this.fontInfoController.fontController;
+    this.fontController = this.fontInfoController.fontController;
 
     const axisContainer = html.div({
       style: "display: grid; gap: 0.5em;",
     });
 
-    for (const axis of fontController.globalAxes) {
-      const axisBox = new AxisBox(axis);
-      axisContainer.appendChild(axisBox.getContentElement());
+    for (const axis of this.fontController.globalAxes) {
+      axisContainer.appendChild(new AxisBox(axis));
     }
 
     setupSortableList(axisContainer);
 
-    axisContainer.addEventListener("reordered", (event) =>
-      console.log("list reordered")
-    );
+    axisContainer.addEventListener("reordered", async (event) => {
+      const currentAxes = [...this.fontController.globalAxes];
+      const reorderedAxes = [];
+      for (const el of axisContainer.children) {
+        reorderedAxes.push(el.axis);
+      }
+      const change = {
+        p: [],
+        f: "=",
+        a: ["axes", reorderedAxes],
+      };
+      const rollbackChange = {
+        p: [],
+        f: "=",
+        a: ["axes", currentAxes],
+      };
+
+      const error = await this.fontController.editFinal(
+        change,
+        rollbackChange,
+        "Reorder axes",
+        true
+      );
+      // TODO handle error
+      this.fontController.notifyEditListeners("editFinal", this);
+    });
 
     this.panelElement.appendChild(axisContainer);
   }
@@ -70,20 +92,17 @@ select {
 }
 `);
 
-class AxisBox {
+class AxisBox extends HTMLElement {
   constructor(axis) {
-    this.contentElement = html.div({
-      class: "fontra-ui-font-info-axes-panel-axis-box",
-      draggable: true,
-    });
-    this._updateContents(axis);
+    super();
+    this.classList.add("fontra-ui-font-info-axes-panel-axis-box");
+    this.draggable = true;
+    this.axis = axis;
+    this._updateContents();
   }
 
-  getContentElement() {
-    return this.contentElement;
-  }
-
-  _updateContents(axis) {
+  _updateContents() {
+    const axis = this.axis;
     const isDiscreteAxis = !!axis.values;
     const axisModel = { ...axis };
     if (axisModel.values) {
@@ -115,9 +134,9 @@ class AxisBox {
           ["Default", "defaultValue"],
         ];
 
-    this.contentElement.innerHTML = "";
+    this.innerHTML = "";
 
-    this.contentElement.append(
+    this.append(
       html.div(
         { class: "fontra-ui-font-info-axes-panel-axis-box-names" },
         [
@@ -159,6 +178,8 @@ class AxisBox {
     );
   }
 }
+
+customElements.define("axis-box", AxisBox);
 
 function buildMappingGraph(axisController) {
   const axis = axisController.model;
