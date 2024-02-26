@@ -1854,7 +1854,7 @@ export class EditorController {
 
   async externalChange(change, isLiveChange) {
     await this.fontController.applyChange(change, true);
-    this.fontController.notifyChangeListeners(change, isLiveChange);
+    this.fontController.notifyChangeListeners(change, isLiveChange, true);
 
     // Force sync between location and selectedSourceIndex, as the glyph's
     // source list may have changed

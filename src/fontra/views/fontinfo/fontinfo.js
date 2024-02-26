@@ -81,9 +81,8 @@ export class FontInfoController {
   }
 
   async externalChange(change, isLiveChange) {
-    console.log("incoming external change", change);
     await this.fontController.applyChange(change, true);
-    this.fontController.notifyChangeListeners(change, isLiveChange);
+    this.fontController.notifyChangeListeners(change, isLiveChange, true);
   }
 
   handleRemoteClose(event) {

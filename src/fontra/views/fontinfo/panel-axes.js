@@ -20,12 +20,17 @@ export class AxesPanel extends BaseInfoPanel {
 
     this.fontController.addChangeListener(
       { axes: null },
-      (event) => {
-        console.log("axes changed", event);
+      (change, isExternalChange) => {
+        if (isExternalChange) {
+          this.setupAxisBoxes();
+        }
       },
       false
     );
+    this.setupAxisBoxes();
+  }
 
+  setupAxisBoxes() {
     const axisContainer = html.div({
       style: "display: grid; gap: 0.5em;",
     });
@@ -44,6 +49,7 @@ export class AxesPanel extends BaseInfoPanel {
       this.notifyAxesChanged(reorderedAxes, "Reorder axes");
     });
 
+    this.panelElement.innerHTML = "";
     this.panelElement.appendChild(axisContainer);
   }
 

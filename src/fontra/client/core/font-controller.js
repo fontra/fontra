@@ -418,13 +418,13 @@ export class FontController {
     }
   }
 
-  notifyChangeListeners(change, isLiveChange) {
+  notifyChangeListeners(change, isLiveChange, isExternalChange = false) {
     const listeners = isLiveChange
       ? this._changeListenersLive
       : chain(this._changeListenersLive, this._changeListeners);
     for (const listenerInfo of listeners) {
       if (matchChangePattern(change, listenerInfo.matchPattern)) {
-        setTimeout(() => listenerInfo.listener(change), 0);
+        setTimeout(() => listenerInfo.listener(change, isExternalChange), 0);
       }
     }
   }
