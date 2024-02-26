@@ -18,6 +18,14 @@ export class AxesPanel extends BaseInfoPanel {
     this.fontController = this.fontInfoController.fontController;
     this.undoStack = new UndoStack();
 
+    this.fontController.addChangeListener(
+      { axes: null },
+      (event) => {
+        console.log("axes changed", event);
+      },
+      false
+    );
+
     const axisContainer = html.div({
       style: "display: grid; gap: 0.5em;",
     });
@@ -42,14 +50,14 @@ export class AxesPanel extends BaseInfoPanel {
   async notifyAxesChanged(updatedAxes, undoLabel) {
     const currentAxes = [...this.fontController.globalAxes];
     const change = {
-      p: [],
-      f: "=",
-      a: ["axes", updatedAxes],
+      p: ["axes"],
+      f: ":",
+      a: [0, currentAxes.length, ...updatedAxes],
     };
     const rollbackChange = {
-      p: [],
-      f: "=",
-      a: ["axes", currentAxes],
+      p: ["axes"],
+      f: ":",
+      a: [0, updatedAxes.length, ...currentAxes],
     };
 
     const undoRecord = {
