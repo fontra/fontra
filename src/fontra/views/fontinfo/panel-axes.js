@@ -86,16 +86,6 @@ class AxisBox {
   _updateContents(axis) {
     const isDiscreteAxis = !!axis.values;
     const axisModel = { ...axis };
-    const axisItems = !isDiscreteAxis
-      ? [
-          ["Minimum", "minValue"],
-          ["Default", "defaultValue"],
-          ["Maximum", "maxValue"],
-        ]
-      : [
-          ["Values", "valuesString"],
-          ["Default", "defaultValue"],
-        ];
     if (axisModel.values) {
       axisModel.valuesString = axisModel.values.join(" ");
     }
@@ -114,6 +104,16 @@ class AxisBox {
         html.option({ value: "discrete", selected: isDiscreteAxis }, ["Discrete"]),
       ]
     );
+    const axisItems = !isDiscreteAxis
+      ? [
+          ["Minimum", "minValue"],
+          ["Default", "defaultValue"],
+          ["Maximum", "maxValue"],
+        ]
+      : [
+          ["Values", "valuesString"],
+          ["Default", "defaultValue"],
+        ];
 
     this.contentElement.innerHTML = "";
 
