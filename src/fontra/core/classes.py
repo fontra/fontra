@@ -65,7 +65,7 @@ class HorizontalGuideline:
 
 @dataclass(kw_only=True)
 class VerticalGuideline:
-    name: str | None
+    name: Optional[str]
     x: float
     customData: CustomData = field(default_factory=dict)
 
@@ -215,7 +215,8 @@ def makeSchema(*classes, schema=None):
             elif tp.__name__ == "list":
                 [subtype] = get_args(tp)
                 if get_origin(subtype) == Union:
-                    subtype = get_args(subtype)[0]  # just take the first for now
+                    for sub in get_args(subtype):
+                        makeSchema(sub, schema=schema)
                 fieldDef["subtype"] = subtype
                 if is_dataclass(subtype):
                     makeSchema(subtype, schema=schema)
@@ -321,30 +322,36 @@ atomicTypes = [str, int, float, bool, Any]
 
 def makeCastFuncs(schema):
     castFuncs = {}
+
     for cls, fields in schema.items():
         castFuncs[cls] = partial(structure, cls=cls)
         for fieldName, fieldInfo in fields.items():
             fieldType = fieldInfo["type"]
-            if fieldType in atomicTypes or fieldType in schema:
-                continue
-            itemType = get_args(fieldType)[-1]
-            if itemType in atomicTypes:
-                continue
-            castFuncs[fieldType] = partial(structure, cls=fieldType)
+            if fieldType not in atomicTypes and fieldType not in schema:
+                itemType = get_args(fieldType)[-1]
+                if itemType not in atomicTypes:
+                    castFuncs[fieldType] = partial(structure, cls=fieldType)
+            subType = fieldInfo.get("subtype")
+            if subType not in atomicTypes and subType not in schema:
+                castFuncs[subType] = partial(structure, cls=subType)
+
     return castFuncs
 
 
 def classesToStrings(schema):
     return {
         cls.__name__: {
-            fieldName: {
-                k: v.__name__ if hasattr(v, "__name__") else v
-                for k, v in fieldDef.items()
-            }
+            fieldName: {k: classToString(v) for k, v in fieldDef.items()}
             for fieldName, fieldDef in classFields.items()
         }
         for cls, classFields in schema.items()
     }
+
+
+def classToString(cls):
+    if get_origin(cls) == Union:
+        cls = get_args(cls)[0]  # take the first; for now that's good enough
+    return cls.__name__ if hasattr(cls, "__name__") else cls
 
 
 classSchema = makeSchema(Font)

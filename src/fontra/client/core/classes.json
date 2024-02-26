@@ -217,6 +217,32 @@
       "subtype": "Any"
     }
   },
+  "HorizontalGuideline": {
+    "name": {
+      "type": "str",
+      "optional": true
+    },
+    "y": {
+      "type": "float"
+    },
+    "customData": {
+      "type": "dict",
+      "subtype": "Any"
+    }
+  },
+  "VerticalGuideline": {
+    "name": {
+      "type": "str",
+      "optional": true
+    },
+    "x": {
+      "type": "float"
+    },
+    "customData": {
+      "type": "dict",
+      "subtype": "Any"
+    }
+  },
   "GlobalAxis": {
     "name": {
       "type": "str"
@@ -234,6 +260,31 @@
       "type": "float"
     },
     "maxValue": {
+      "type": "float"
+    },
+    "mapping": {
+      "type": "list",
+      "subtype": "list"
+    },
+    "hidden": {
+      "type": "bool"
+    }
+  },
+  "GlobalDiscreteAxis": {
+    "name": {
+      "type": "str"
+    },
+    "label": {
+      "type": "str"
+    },
+    "tag": {
+      "type": "str"
+    },
+    "values": {
+      "type": "list",
+      "subtype": "float"
+    },
+    "defaultValue": {
       "type": "float"
     },
     "mapping": {
