@@ -72,6 +72,18 @@ select {
 
 class AxisBox {
   constructor(axis) {
+    this.contentElement = html.div({
+      class: "fontra-ui-font-info-axes-panel-axis-box",
+      draggable: true,
+    });
+    this._updateContents(axis);
+  }
+
+  getContentElement() {
+    return this.contentElement;
+  }
+
+  _updateContents(axis) {
     const isDiscreteAxis = !!axis.values;
     const axisModel = { ...axis };
     const axisItems = !isDiscreteAxis
@@ -103,53 +115,48 @@ class AxisBox {
       ]
     );
 
-    this.contentElement = html.div(
-      { class: "fontra-ui-font-info-axes-panel-axis-box", draggable: true },
-      [
-        html.div(
-          { class: "fontra-ui-font-info-axes-panel-axis-box-names" },
-          [
-            ["Name", "name"],
-            ["OT Tag", "tag"],
-            ["UI Name", "label"],
-          ]
-            .map(([labelName, keyName]) =>
-              labeledTextInput(labelName, this.axisController, keyName)
-            )
-            .flat()
-        ),
-        html.div({ class: "fontra-ui-font-info-axes-panel-axis-box-values" }, [
-          html.label(
-            {
-              for: "fontra-ui-font-info-axes-panel-axis-box-axis-type",
-              style: "text-align: right",
-            },
-            ["Axis type"]
-          ),
-          axisTypeSelect,
-          ...axisItems
-            .map(([labelName, keyName]) =>
-              labeledTextInput(labelName, this.axisController, keyName, {
-                type: keyName === "valuesString" ? "text" : "number",
-              })
-            )
-            .flat(),
-        ]),
-        this.mappingGraph,
-        this.mappingList,
-        html.createDomElement("icon-button", {
-          "class": "fontra-ui-font-info-axes-panel-axis-box-delete",
-          "src": "/tabler-icons/trash.svg",
-          "onclick": (event) => console.log("delete axis"),
-          "data-tooltip": "Delete axis",
-          "data-tooltipposition": "left",
-        }),
-      ]
-    );
-  }
+    this.contentElement.innerHTML = "";
 
-  getContentElement() {
-    return this.contentElement;
+    this.contentElement.append(
+      html.div(
+        { class: "fontra-ui-font-info-axes-panel-axis-box-names" },
+        [
+          ["Name", "name"],
+          ["OT Tag", "tag"],
+          ["UI Name", "label"],
+        ]
+          .map(([labelName, keyName]) =>
+            labeledTextInput(labelName, this.axisController, keyName)
+          )
+          .flat()
+      ),
+      html.div({ class: "fontra-ui-font-info-axes-panel-axis-box-values" }, [
+        html.label(
+          {
+            for: "fontra-ui-font-info-axes-panel-axis-box-axis-type",
+            style: "text-align: right",
+          },
+          ["Axis type"]
+        ),
+        axisTypeSelect,
+        ...axisItems
+          .map(([labelName, keyName]) =>
+            labeledTextInput(labelName, this.axisController, keyName, {
+              type: keyName === "valuesString" ? "text" : "number",
+            })
+          )
+          .flat(),
+      ]),
+      this.mappingGraph,
+      this.mappingList,
+      html.createDomElement("icon-button", {
+        "class": "fontra-ui-font-info-axes-panel-axis-box-delete",
+        "src": "/tabler-icons/trash.svg",
+        "onclick": (event) => console.log("delete axis"),
+        "data-tooltip": "Delete axis",
+        "data-tooltipposition": "left",
+      })
+    );
   }
 }
 
