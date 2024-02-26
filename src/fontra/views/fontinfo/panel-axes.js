@@ -1,3 +1,4 @@
+import { UndoStack } from "../core/font-controller.js";
 import * as html from "../core/html-utils.js";
 import { addStyleSheet } from "../core/html-utils.js";
 import { ObservableController } from "../core/observable-object.js";
@@ -15,6 +16,7 @@ export class AxesPanel extends BaseInfoPanel {
 
   setupUI() {
     this.fontController = this.fontInfoController.fontController;
+    this.undoStack = new UndoStack();
 
     const axisContainer = html.div({
       style: "display: grid; gap: 0.5em;",
@@ -26,34 +28,48 @@ export class AxesPanel extends BaseInfoPanel {
 
     setupSortableList(axisContainer);
 
-    axisContainer.addEventListener("reordered", async (event) => {
-      const currentAxes = [...this.fontController.globalAxes];
+    axisContainer.addEventListener("reordered", (event) => {
       const reorderedAxes = [];
       for (const el of axisContainer.children) {
         reorderedAxes.push(el.axis);
       }
-      const change = {
-        p: [],
-        f: "=",
-        a: ["axes", reorderedAxes],
-      };
-      const rollbackChange = {
-        p: [],
-        f: "=",
-        a: ["axes", currentAxes],
-      };
-
-      const error = await this.fontController.editFinal(
-        change,
-        rollbackChange,
-        "Reorder axes",
-        true
-      );
-      // TODO handle error
-      this.fontController.notifyEditListeners("editFinal", this);
+      this.notifyAxesChanged(reorderedAxes, "Reorder axes");
     });
 
     this.panelElement.appendChild(axisContainer);
+  }
+
+  async notifyAxesChanged(updatedAxes, undoLabel) {
+    const currentAxes = [...this.fontController.globalAxes];
+    const change = {
+      p: [],
+      f: "=",
+      a: ["axes", updatedAxes],
+    };
+    const rollbackChange = {
+      p: [],
+      f: "=",
+      a: ["axes", currentAxes],
+    };
+
+    const undoRecord = {
+      change: change,
+      rollbackChange: rollbackChange,
+      info: {
+        label: undoLabel,
+      },
+    };
+
+    this.undoStack.pushUndoRecord(undoRecord);
+
+    const error = await this.fontController.editFinal(
+      change,
+      rollbackChange,
+      undoLabel,
+      true
+    );
+    // TODO handle error
+    this.fontController.notifyEditListeners("editFinal", this);
   }
 }
 
