@@ -655,7 +655,7 @@ export class FontController {
   }
 }
 
-function reverseUndoRecord(undoRecord) {
+export function reverseUndoRecord(undoRecord) {
   return {
     change: undoRecord.rollbackChange,
     rollbackChange: undoRecord.change,
@@ -731,7 +731,7 @@ class GlyphEditContext {
   }
 }
 
-class UndoStack {
+export class UndoStack {
   constructor() {
     this.undoStack = [];
     this.redoStack = [];
