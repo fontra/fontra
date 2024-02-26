@@ -63,12 +63,17 @@ addStyleSheet(`
   justify-self: end;
   align-self: start;
 }
+
+select {
+  font-family: "fontra-ui-regular";
+}
 `);
 
 class AxisBox {
   constructor(axis) {
+    const isDiscreteAxis = !!axis.values;
     const axisModel = { ...axis };
-    const axisItems = !axisModel.values
+    const axisItems = !isDiscreteAxis
       ? [
           ["Minimum", "minValue"],
           ["Default", "defaultValue"],
@@ -86,6 +91,16 @@ class AxisBox {
     this.mappingGraph = buildMappingGraph(this.axisController);
     this.mappingList = buildMappingList(this.axisController);
 
+    const axisTypeSelect = html.select(
+      {
+        onchange: (event) => console.log("chch", event.target.value),
+      },
+      [
+        html.option({ value: "continuous", selected: !isDiscreteAxis }, ["Continuous"]),
+        html.option({ value: "discrete", selected: isDiscreteAxis }, ["Discrete"]),
+      ]
+    );
+
     return html.div(
       { class: "fontra-ui-font-info-axes-panel-axis-box", draggable: true },
       [
@@ -101,16 +116,17 @@ class AxisBox {
             )
             .flat()
         ),
-        html.div(
-          { class: "fontra-ui-font-info-axes-panel-axis-box-values" },
-          axisItems
+        html.div({ class: "fontra-ui-font-info-axes-panel-axis-box-values" }, [
+          html.div({ style: "text-align: right" }, ["Axis type"]),
+          axisTypeSelect,
+          ...axisItems
             .map(([labelName, keyName]) =>
               labeledTextInput(labelName, this.axisController, keyName, {
                 type: keyName === "valuesString" ? "text" : "number",
               })
             )
-            .flat()
-        ),
+            .flat(),
+        ]),
         this.mappingGraph,
         this.mappingList,
         html.createDomElement("icon-button", {
