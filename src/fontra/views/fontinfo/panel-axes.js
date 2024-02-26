@@ -21,7 +21,8 @@ export class AxesPanel extends BaseInfoPanel {
     });
 
     for (const axis of fontController.globalAxes) {
-      axisContainer.appendChild(new AxisBox(axis));
+      const axisBox = new AxisBox(axis);
+      axisContainer.appendChild(axisBox.getContentElement());
     }
 
     setupSortableList(axisContainer);
@@ -93,6 +94,7 @@ class AxisBox {
 
     const axisTypeSelect = html.select(
       {
+        id: "fontra-ui-font-info-axes-panel-axis-box-axis-type",
         onchange: (event) => console.log("chch", event.target.value),
       },
       [
@@ -101,7 +103,7 @@ class AxisBox {
       ]
     );
 
-    return html.div(
+    this.contentElement = html.div(
       { class: "fontra-ui-font-info-axes-panel-axis-box", draggable: true },
       [
         html.div(
@@ -117,7 +119,13 @@ class AxisBox {
             .flat()
         ),
         html.div({ class: "fontra-ui-font-info-axes-panel-axis-box-values" }, [
-          html.div({ style: "text-align: right" }, ["Axis type"]),
+          html.label(
+            {
+              for: "fontra-ui-font-info-axes-panel-axis-box-axis-type",
+              style: "text-align: right",
+            },
+            ["Axis type"]
+          ),
           axisTypeSelect,
           ...axisItems
             .map(([labelName, keyName]) =>
@@ -138,6 +146,10 @@ class AxisBox {
         }),
       ]
     );
+  }
+
+  getContentElement() {
+    return this.contentElement;
   }
 }
 
