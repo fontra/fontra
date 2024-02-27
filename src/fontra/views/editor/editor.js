@@ -1897,7 +1897,6 @@ export class EditorController {
     }
     await this.fontController.reloadGlyphs(glyphNames);
     await this.sceneModel.updateScene();
-    const selectedGlyphName = this.sceneSettings.selectedGlyphName;
     this.canvasController.requestUpdate();
   }
 
