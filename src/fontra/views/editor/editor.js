@@ -497,6 +497,14 @@ export class EditorController {
     document.fonts.add(blankFont);
     await blankFont.load();
 
+    this.fontController.addChangeListener(
+      { axes: null },
+      async (change, isExternalChange) => {
+        await this.sceneModel.updateScene();
+        this.canvasController.requestUpdate();
+      }
+    );
+
     // Delay a tiny amount to account for a delay in the sidebars being set up,
     // which affects the available viewBox
     setTimeout(() => this.setupFromWindowLocation(), 20);

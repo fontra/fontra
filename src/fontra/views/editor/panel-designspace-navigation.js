@@ -362,6 +362,13 @@ export default class DesignspaceNavigationPanel extends Panel {
       this.editSourceProperties(event.detail.doubleClickedRowIndex);
     });
 
+    this.fontController.addChangeListener(
+      { axes: null },
+      (change, isExternalChange) => {
+        this._updateAxes();
+      }
+    );
+
     this._updateAxes();
     this._updateSources();
   }

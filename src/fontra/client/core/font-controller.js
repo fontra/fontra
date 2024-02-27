@@ -47,6 +47,9 @@ export class FontController {
     this._rootClassDef = (await getClassSchema())["Font"];
     this.backendInfo = await this.font.getBackEndInfo();
     this.readOnly = await this.font.isReadOnly();
+    this.addChangeListener({ axes: null }, (change, isExternalChange) =>
+      this._purgeInstanceCacheAndVarGlyphAttributeCache()
+    );
     this._resolveInitialized();
   }
 
@@ -585,6 +588,14 @@ export class FontController {
       this._glyphInstancePromiseCache.delete(instanceCacheKey);
     }
     delete this._glyphInstancePromiseCacheKeys[glyphName];
+  }
+
+  async _purgeInstanceCacheAndVarGlyphAttributeCache() {
+    this._glyphInstancePromiseCache.clear();
+    for (const varGlyphPromise of this._glyphsPromiseCache.values()) {
+      const varGlyph = await varGlyphPromise;
+      varGlyph.clearCaches();
+    }
   }
 
   async reloadGlyphs(glyphNames) {
