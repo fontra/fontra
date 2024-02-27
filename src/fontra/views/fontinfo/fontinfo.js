@@ -85,6 +85,10 @@ export class FontInfoController {
     this.fontController.notifyChangeListeners(change, isLiveChange, true);
   }
 
+  async reloadData(reloadPattern) {
+    // if ("axes" in reloadPattern) -> reload axes panel
+  }
+
   handleRemoteClose(event) {
     //
   }
