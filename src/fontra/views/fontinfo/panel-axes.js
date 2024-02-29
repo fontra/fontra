@@ -208,7 +208,10 @@ class AxisBox extends HTMLElement {
           )
           .flat(),
       ]),
-      this.mappingGraph,
+      html.div({ style: `display: grid; gap: 0.5em;` }, [
+        "Axis mapping",
+        this.mappingGraph,
+      ]),
       this.mappingList,
       html.createDomElement("icon-button", {
         "class": "fontra-ui-font-info-axes-panel-axis-box-delete",
@@ -233,7 +236,7 @@ function buildMappingGraph(axisController) {
   const marginTop = 16;
   const marginBottom = 16;
   const labelOffset = -13;
-  const graphSize = 120;
+  const graphSize = 100;
   const width = graphSize + marginLeft + marginRight;
   const height = graphSize + marginTop + marginBottom;
   const xs = axis.mapping.map(([x, y]) => x);
