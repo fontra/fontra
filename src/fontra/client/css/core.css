@@ -142,7 +142,7 @@ icon-button {
 
 input[type="button"] {
   cursor: pointer;
-  background-color: #eee;
+  background-color: #ddd;
 
   border-radius: 1em;
   padding: 0.35em 2em 0.35em 2em;
@@ -155,9 +155,9 @@ input[type="button"] {
 }
 
 input[type="button"]:hover {
-  background-color: #ddd;
+  background-color: #ccc;
 }
 
 input[type="button"]:active {
-  background-color: #ccc;
+  background-color: #bbb;
 }
