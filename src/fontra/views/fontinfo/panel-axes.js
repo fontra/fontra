@@ -104,6 +104,10 @@ export class AxesPanel extends BaseInfoPanel {
 }
 
 addStyleSheet(`
+:root {
+  --fontra-ui-font-info-axes-panel-max-list-height: 12em;
+}
+
 .fontra-ui-font-info-axes-panel-axis-box {
   background-color: var(--ui-element-background-color);
   border-radius: 0.5em;
@@ -127,7 +131,11 @@ addStyleSheet(`
 
 .fontra-ui-font-info-axes-panel-axis-box-mapping-list {
   width: 8em;
-  max-height: 12em;
+  max-height: var(--fontra-ui-font-info-axes-panel-max-list-height);
+}
+
+.fontra-ui-font-info-axes-panel-axis-box-label-list {
+  max-height: var(--fontra-ui-font-info-axes-panel-max-list-height);
 }
 
 .fontra-ui-font-info-axes-panel-axis-box-delete {
