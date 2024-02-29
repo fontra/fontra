@@ -363,9 +363,6 @@ function buildMappingGraph(axisController) {
           defaultLines.map((element) => element.classList.remove("faded"));
           graphElement.classList.remove("faded");
         },
-        onclick: (event) => {
-          console.log("click");
-        },
       })
     );
   }
