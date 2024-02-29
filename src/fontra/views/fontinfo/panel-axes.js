@@ -50,6 +50,18 @@ export class AxesPanel extends BaseInfoPanel {
     });
 
     this.panelElement.innerHTML = "";
+    this.panelElement.style = `
+    display: grid;
+    justify-items: start;
+    gap: 1em;
+    `;
+    this.panelElement.appendChild(
+      html.input({
+        type: "button",
+        value: "New axis...",
+        onclick: (event) => console.log("new axis..."),
+      })
+    );
     this.panelElement.appendChild(axisContainer);
   }
 
