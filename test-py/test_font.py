@@ -5,7 +5,13 @@ from dataclasses import asdict
 import pytest
 
 from fontra.backends import getFileSystemBackend
-from fontra.core.classes import GlobalAxis, GlobalDiscreteAxis, VariableGlyph, structure
+from fontra.core.classes import (
+    AxisValueLabel,
+    GlobalAxis,
+    GlobalDiscreteAxis,
+    VariableGlyph,
+    structure,
+)
 
 dataDir = pathlib.Path(__file__).resolve().parent / "data"
 
@@ -999,6 +1005,18 @@ getGlobalAxesTestData = [
                 defaultValue=0.0,
                 mapping=[],
                 hidden=False,
+                valueLabels=[
+                    AxisValueLabel(
+                        name="Upright",
+                        value=0.0,
+                        linkedValue=1.0,
+                        elidable=True,
+                    ),
+                    AxisValueLabel(
+                        name="Italic",
+                        value=1.0,
+                    ),
+                ],
             ),
         ],
     ),

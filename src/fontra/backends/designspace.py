@@ -28,6 +28,7 @@ from fontTools.ufoLib.glifLib import GlyphSet
 
 from ..core.changes import applyChange
 from ..core.classes import (
+    AxisValueLabel,
     Component,
     GlobalAxis,
     GlobalDiscreteAxis,
@@ -713,6 +714,7 @@ def unpackDSAxis(dsAxis: AxisDescriptor):
         name=dsAxis.name,
         tag=dsAxis.tag,
         hidden=dsAxis.hidden,
+        valueLabels=unpackAxisLabels(dsAxis.axisLabels),
     )
     if dsAxis.map:
         axis.mapping = [[a, b] for a, b in dsAxis.map]
@@ -729,10 +731,28 @@ def _(dsAxis: DiscreteAxisDescriptor):
         name=dsAxis.name,
         tag=dsAxis.tag,
         hidden=dsAxis.hidden,
+        valueLabels=unpackAxisLabels(dsAxis.axisLabels),
     )
     if dsAxis.map:
         axis.mapping = [[a, b] for a, b in dsAxis.map]
     return axis, dsAxis.values
+
+
+def unpackAxisLabels(labels):
+    valueLabels = []
+    for dsAxisLabel in labels:
+        valueLabels.append(
+            AxisValueLabel(
+                name=dsAxisLabel.name,
+                value=dsAxisLabel.userValue,
+                minValue=dsAxisLabel.userMinimum,
+                maxValue=dsAxisLabel.userMaximum,
+                linkedValue=dsAxisLabel.linkedUserValue,
+                elidable=dsAxisLabel.elidable,
+                olderSibling=dsAxisLabel.olderSibling,
+            )
+        )
+    return valueLabels
 
 
 def makeGlyphMapChange(glyphMapUpdates):
