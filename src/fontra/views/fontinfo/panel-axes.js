@@ -540,12 +540,12 @@ function buildValueLabelList(axisController) {
     {
       key: "elidable",
       title: "Elidable",
-      width: "5em",
+      width: "3.5em",
       cellFactory: checkboxListCell,
     },
     // {
     //   key: "olderSibling",
-    //   title: "O. sibl.",
+    //   title: "Older sibling",
     //   width: "3em",
     // },
   ];
