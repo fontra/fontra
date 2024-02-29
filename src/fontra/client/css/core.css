@@ -139,3 +139,25 @@ inline-svg {
 icon-button {
   width: 1.25em;
 }
+
+input[type="button"] {
+  cursor: pointer;
+  background-color: #eee;
+
+  border-radius: 1em;
+  padding: 0.35em 2em 0.35em 2em;
+
+  border: none;
+  font-family: fontra-ui-regular, sans-serif;
+  font-size: 1em;
+  text-align: center;
+  transition: 100ms;
+}
+
+input[type="button"]:hover {
+  background-color: #ddd;
+}
+
+input[type="button"]:active {
+  background-color: #ccc;
+}
