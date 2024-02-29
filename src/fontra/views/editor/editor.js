@@ -341,6 +341,24 @@ export class EditorController {
         },
       },
       {
+        title: "Font",
+        enabled: () => true,
+        getItems: () => {
+          return [
+            {
+              title: "Font info",
+              enabled: () => true,
+              callback: () => {
+                const url = new URL(window.location);
+                url.pathname = url.pathname.replace("editor", "fontinfo");
+                url.hash = "#axes-panel";
+                window.open(url.toString());
+              },
+            },
+          ];
+        },
+      },
+      {
         title: "Glyph",
         enabled: () => true,
         getItems: () => {
