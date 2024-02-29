@@ -56,7 +56,6 @@ export class AxesPanel extends BaseInfoPanel {
     this.panelElement.innerHTML = "";
     this.panelElement.style = `
     display: grid;
-    // justify-items: start;
     gap: 1em;
     `;
     this.panelElement.appendChild(
@@ -111,8 +110,10 @@ addStyleSheet(`
   padding: 1em;
   cursor: pointer;
   display: grid;
+  grid-template-rows: auto auto;
   grid-template-columns: max-content max-content max-content max-content auto auto;
-  gap: 1em;
+  grid-row-gap: 0.1em;
+  grid-column-gap: 1em;
 }
 
 .fontra-ui-font-info-axes-panel-axis-box-values,
@@ -136,6 +137,10 @@ addStyleSheet(`
 
 select {
   font-family: "fontra-ui-regular";
+}
+
+.fontra-ui-font-info-axes-panel-axis-box-header {
+  font-weight: bold;
 }
 `);
 
@@ -185,6 +190,26 @@ class AxisBox extends HTMLElement {
     this.innerHTML = "";
 
     this.append(
+      html.div({ class: "fontra-ui-font-info-axes-panel-axis-box-header" }, ["Names"]),
+      html.div({ class: "fontra-ui-font-info-axes-panel-axis-box-header" }, ["Range"]),
+      html.div({ class: "fontra-ui-font-info-axes-panel-axis-box-header" }, [
+        "Mapping graph",
+      ]),
+      html.div({ class: "fontra-ui-font-info-axes-panel-axis-box-header" }, [
+        "Mapping list",
+      ]),
+      html.div({ class: "fontra-ui-font-info-axes-panel-axis-box-header" }, [
+        "Axis Values",
+      ]),
+      html.createDomElement("icon-button", {
+        "class": "fontra-ui-font-info-axes-panel-axis-box-delete",
+        "src": "/tabler-icons/trash.svg",
+        "onclick": (event) => console.log("delete axis"),
+        "data-tooltip": "Delete axis",
+        "data-tooltipposition": "left",
+      }),
+
+      // html.div({ class: "fontra-ui-font-info-axes-panel-axis-box-header" }, ["x"]),
       html.div(
         { class: "fontra-ui-font-info-axes-panel-axis-box-names" },
         [
@@ -214,19 +239,9 @@ class AxisBox extends HTMLElement {
           )
           .flat(),
       ]),
-      html.div({ style: `display: grid; gap: 0.5em;` }, [
-        "Axis mapping",
-        this.mappingGraph,
-      ]),
+      this.mappingGraph,
       this.mappingList,
-      this.labelList,
-      html.createDomElement("icon-button", {
-        "class": "fontra-ui-font-info-axes-panel-axis-box-delete",
-        "src": "/tabler-icons/trash.svg",
-        "onclick": (event) => console.log("delete axis"),
-        "data-tooltip": "Delete axis",
-        "data-tooltipposition": "left",
-      })
+      this.labelList
     );
   }
 }
