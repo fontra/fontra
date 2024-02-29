@@ -506,8 +506,6 @@ function buildMappingList(axisController) {
 function buildValueLabelList(axisController) {
   const axis = axisController.model;
 
-  console.log(axis);
-
   const items =
     axis.valueLabels?.map((label) => {
       return { ...label };
