@@ -17,7 +17,7 @@ export class BaseInfoPanel {
   setupUI() {
     // override
     this.panelElement.appendChild(
-      html.div({}, [`panel placeholder ${this.constructor.id}`])
+      html.div({}, [`⚠️ under construction: placeholder for ${this.constructor.id}`])
     );
   }
 }
