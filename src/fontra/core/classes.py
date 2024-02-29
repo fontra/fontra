@@ -71,6 +71,17 @@ class VerticalGuideline:
 
 
 @dataclass(kw_only=True)
+class AxisValueLabel:
+    name: str
+    value: float
+    minValue: Optional[float] = None
+    maxValue: Optional[float] = None
+    linkedValue: Optional[float] = None
+    elidable: bool = False
+    oldersibling: bool = False
+
+
+@dataclass(kw_only=True)
 class GlobalAxis:
     name: str  # this identifies the axis
     label: str  # a user friendly label
@@ -79,6 +90,7 @@ class GlobalAxis:
     defaultValue: float
     maxValue: float
     mapping: list[list[float]] = field(default_factory=list)
+    valueLabels: list[AxisValueLabel] = field(default_factory=list)
     hidden: bool = False
 
 
@@ -90,6 +102,7 @@ class GlobalDiscreteAxis:
     values: list[float]
     defaultValue: float
     mapping: list[list[float]] = field(default_factory=list)
+    valueLabels: list[AxisValueLabel] = field(default_factory=list)
     hidden: bool = False
 
 
@@ -307,6 +320,9 @@ registerOmitDefaultHook(Layer)
 registerOmitDefaultHook(VariableGlyph)
 registerOmitDefaultHook(Path)
 registerOmitDefaultHook(PackedPath)
+registerOmitDefaultHook(GlobalAxis)
+registerOmitDefaultHook(GlobalDiscreteAxis)
+registerOmitDefaultHook(AxisValueLabel)
 
 
 def structure(obj, cls):

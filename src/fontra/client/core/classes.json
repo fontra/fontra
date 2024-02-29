@@ -266,7 +266,37 @@
       "type": "list",
       "subtype": "list"
     },
+    "valueLabels": {
+      "type": "list",
+      "subtype": "AxisValueLabel"
+    },
     "hidden": {
+      "type": "bool"
+    }
+  },
+  "AxisValueLabel": {
+    "name": {
+      "type": "str"
+    },
+    "value": {
+      "type": "float"
+    },
+    "minValue": {
+      "type": "float",
+      "optional": true
+    },
+    "maxValue": {
+      "type": "float",
+      "optional": true
+    },
+    "linkedValue": {
+      "type": "float",
+      "optional": true
+    },
+    "elidable": {
+      "type": "bool"
+    },
+    "oldersibling": {
       "type": "bool"
     }
   },
@@ -290,6 +320,10 @@
     "mapping": {
       "type": "list",
       "subtype": "list"
+    },
+    "valueLabels": {
+      "type": "list",
+      "subtype": "AxisValueLabel"
     },
     "hidden": {
       "type": "bool"
