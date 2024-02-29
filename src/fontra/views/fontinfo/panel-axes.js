@@ -164,7 +164,7 @@ class AxisBox extends HTMLElement {
 
     this.mappingGraph = buildMappingGraph(this.axisController);
     this.mappingList = buildMappingList(this.axisController);
-    this.labelList = buildLabelList(this.axisController);
+    this.valueLabelList = buildValueLabelList(this.axisController);
 
     const axisTypeSelect = html.select(
       {
@@ -241,7 +241,7 @@ class AxisBox extends HTMLElement {
       ]),
       this.mappingGraph,
       this.mappingList,
-      this.labelList
+      this.valueLabelList
     );
   }
 }
@@ -261,8 +261,8 @@ function buildMappingGraph(axisController) {
   const graphSize = 100;
   const width = graphSize + marginLeft + marginRight;
   const height = graphSize + marginTop + marginBottom;
-  const xs = axis.mapping.map(([x, y]) => x);
-  const ys = axis.mapping.map(([x, y]) => y);
+  const xs = axis.mapping?.map(([x, y]) => x) || [];
+  const ys = axis.mapping?.map(([x, y]) => y) || [];
   const xMin = Math.min(...xs);
   const xMax = Math.max(...xs);
   const yMin = Math.min(...ys);
@@ -274,7 +274,7 @@ function buildMappingGraph(axisController) {
   });
   let defaultLines = [];
   if (
-    axis.mapping.length &&
+    axis.mapping?.length &&
     axis.defaultValue != axis.minValue &&
     axis.defaultValue != axis.maxValue
   ) {
@@ -475,9 +475,10 @@ function buildMappingGraph(axisController) {
 function buildMappingList(axisController) {
   const axis = axisController.model;
 
-  const items = axis.mapping.map(([user, source]) => {
-    return { user, source };
-  });
+  const items =
+    axis.mapping?.map(([user, source]) => {
+      return { user, source };
+    }) || [];
   const mappingList = new UIList();
   mappingList.classList.add("fontra-ui-font-info-axes-panel-axis-box-mapping-list");
   mappingList.columnDescriptions = [
@@ -494,13 +495,16 @@ function buildMappingList(axisController) {
   return mappingList;
 }
 
-function buildLabelList(axisController) {
+function buildValueLabelList(axisController) {
   const axis = axisController.model;
 
-  const items = [{ name: "Bold", value: 700 }];
-  // axis.mapping.map(([user, source]) => {
-  //   return { user, source };
-  // });
+  console.log(axis);
+
+  const items =
+    axis.valueLabels?.map((label) => {
+      return { ...label };
+    }) || [];
+
   const labelList = new UIList();
   labelList.classList.add("fontra-ui-font-info-axes-panel-axis-box-label-list");
   labelList.style = `min-width: 9em;`;
