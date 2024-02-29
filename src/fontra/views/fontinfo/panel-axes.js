@@ -135,7 +135,7 @@ addStyleSheet(`
 }
 
 .fontra-ui-font-info-axes-panel-axis-box-label-list {
-  width: max-content;
+  max-width: max-content;
   max-height: var(--fontra-ui-font-info-axes-panel-max-list-height);
 }
 
