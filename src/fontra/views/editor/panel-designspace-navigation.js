@@ -147,6 +147,7 @@ export default class DesignspaceNavigationPanel extends Panel {
           id: "sources-list",
         }),
         html.createDomElement("add-remove-buttons", {
+          style: "padding: 0.5em 0 0 0;",
           id: "sources-list-add-remove-buttons",
         }),
         html.createDomElement("div", {
@@ -996,7 +997,10 @@ export default class DesignspaceNavigationPanel extends Panel {
         axisList.getSelectedItemIndex() === undefined;
     });
 
-    const contentElement = html.div({}, [axisList, addRemoveAxisButtons]);
+    const contentElement = html.div({ style: "display: grid; grid-gap: 0.5em;" }, [
+      axisList,
+      addRemoveAxisButtons,
+    ]);
 
     dialog.setContent(contentElement);
     if (!(await dialog.run())) {

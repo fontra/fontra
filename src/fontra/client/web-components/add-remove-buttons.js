@@ -16,8 +16,6 @@ class AddRemoveButtons extends html.UnlitElement {
     ${themeColorCSS(colors)}
 
     .buttons-container {
-      padding: 0.5em;
-      padding-left: 0;
       display: grid;
       grid-template-columns: auto auto;
       justify-content: start;
