@@ -17,6 +17,7 @@ from typing import Any, AsyncGenerator, Callable
 import watchfiles
 from fontTools.designspaceLib import (
     AxisDescriptor,
+    AxisLabelDescriptor,
     DesignSpaceDocument,
     DiscreteAxisDescriptor,
 )
@@ -555,6 +556,7 @@ class DesignspaceBackend:
                 tag=axis.tag,
                 default=axis.defaultValue,
                 map=deepcopy(axis.mapping) if axis.mapping else None,
+                axisLabels=packAxisLabels(axis.valueLabels),
             )
             if isinstance(axis, GlobalAxis):
                 axisParameters["minimum"] = axis.minValue
@@ -753,6 +755,23 @@ def unpackAxisLabels(dsLabels):
             )
         )
     return valueLabels
+
+
+def packAxisLabels(valueLabels):
+    dsLabels = []
+    for label in valueLabels:
+        dsLabels.append(
+            AxisLabelDescriptor(
+                name=label.name,
+                userValue=label.value,
+                userMinimum=label.minValue,
+                userMaximum=label.maxValue,
+                linkedUserValue=label.linkedValue,
+                elidable=label.elidable,
+                olderSibling=label.olderSibling,
+            )
+        )
+    return dsLabels
 
 
 def makeGlyphMapChange(glyphMapUpdates):
