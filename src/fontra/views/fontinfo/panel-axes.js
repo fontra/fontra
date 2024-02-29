@@ -55,7 +55,6 @@ export class AxesPanel extends BaseInfoPanel {
 
     this.panelElement.innerHTML = "";
     this.panelElement.style = `
-    display: grid;
     gap: 1em;
     `;
     this.panelElement.appendChild(
