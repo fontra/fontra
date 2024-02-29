@@ -78,7 +78,7 @@ class AxisValueLabel:
     maxValue: Optional[float] = None
     linkedValue: Optional[float] = None
     elidable: bool = False
-    oldersibling: bool = False
+    olderSibling: bool = False
 
 
 @dataclass(kw_only=True)

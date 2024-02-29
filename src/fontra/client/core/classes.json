@@ -296,7 +296,7 @@
     "elidable": {
       "type": "bool"
     },
-    "oldersibling": {
+    "olderSibling": {
       "type": "bool"
     }
   },
