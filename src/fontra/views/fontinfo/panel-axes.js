@@ -509,6 +509,8 @@ function buildMappingList(axisController) {
     disableRemoveButton: true,
   });
 
+  updateRemoveButton(mappingList, addRemoveButton);
+
   return html.div({ style: "display: grid; grid-gap: 0.3em;" }, [
     mappingList,
     addRemoveButton,
@@ -578,8 +580,16 @@ function buildValueLabelList(axisController) {
     disableRemoveButton: true,
   });
 
+  updateRemoveButton(labelList, addRemoveButton);
+
   return html.div({ style: "display: grid; grid-gap: 0.3em;" }, [
     labelList,
     addRemoveButton,
   ]);
+}
+
+function updateRemoveButton(list, buttons) {
+  list.addEventListener("listSelectionChanged", (event) => {
+    buttons.disableRemoveButton = list.getSelectedItemIndex() === undefined;
+  });
 }
