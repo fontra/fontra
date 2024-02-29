@@ -350,7 +350,7 @@ export class EditorController {
               enabled: () => true,
               callback: () => {
                 const url = new URL(window.location);
-                url.pathname = url.pathname.replace("editor", "fontinfo");
+                url.pathname = url.pathname.replace("/editor/", "/fontinfo/");
                 url.hash = "#axes-panel";
                 window.open(url.toString());
               },
