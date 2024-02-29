@@ -537,22 +537,22 @@ function buildValueLabelList(axisController) {
     {
       key: "value",
       title: "Value",
-      width: "4em",
+      width: "3em",
     },
     {
       key: "minValue",
       title: "Min",
-      width: "4em",
+      width: "3em",
     },
     {
       key: "maxValue",
       title: "Max",
-      width: "4em",
+      width: "3em",
     },
     {
       key: "linkedValue",
       title: "Linked",
-      width: "4em",
+      width: "3em",
     },
     {
       key: "elidable",
