@@ -169,3 +169,19 @@ export const NumberFormatter = {
     }
   },
 };
+
+export function checkboxListCell(item, colDesc) {
+  const value = item[colDesc.key];
+  return html.input({
+    type: "checkbox",
+    style: `width: auto; margin: 0; padding: 0; outline: none;`,
+    checked: value,
+    onclick: (event) => {
+      item[colDesc.key] = event.target.checked;
+      event.stopImmediatePropagation();
+    },
+    ondblclick: (event) => {
+      event.stopImmediatePropagation();
+    },
+  });
+}

@@ -3,7 +3,11 @@ import * as html from "../core/html-utils.js";
 import { addStyleSheet } from "../core/html-utils.js";
 import { ObservableController } from "../core/observable-object.js";
 import * as svg from "../core/svg-utils.js";
-import { labeledTextInput, setupSortableList } from "../core/ui-utils.js";
+import {
+  checkboxListCell,
+  labeledTextInput,
+  setupSortableList,
+} from "../core/ui-utils.js";
 import { enumerate, range, zip } from "../core/utils.js";
 import { piecewiseLinearMap } from "../core/var-model.js";
 import { IconButton } from "../web-components/icon-button.js"; // for <icon-button>
@@ -52,12 +56,13 @@ export class AxesPanel extends BaseInfoPanel {
     this.panelElement.innerHTML = "";
     this.panelElement.style = `
     display: grid;
-    justify-items: start;
+    // justify-items: start;
     gap: 1em;
     `;
     this.panelElement.appendChild(
       html.input({
         type: "button",
+        style: `justify-self: start;`,
         value: "New axis...",
         onclick: (event) => console.log("new axis..."),
       })
@@ -106,7 +111,7 @@ addStyleSheet(`
   padding: 1em;
   cursor: pointer;
   display: grid;
-  grid-template-columns: max-content max-content max-content max-content auto;
+  grid-template-columns: max-content max-content max-content max-content auto auto;
   gap: 1em;
 }
 
@@ -154,6 +159,7 @@ class AxisBox extends HTMLElement {
 
     this.mappingGraph = buildMappingGraph(this.axisController);
     this.mappingList = buildMappingList(this.axisController);
+    this.labelList = buildLabelList(this.axisController);
 
     const axisTypeSelect = html.select(
       {
@@ -213,6 +219,7 @@ class AxisBox extends HTMLElement {
         this.mappingGraph,
       ]),
       this.mappingList,
+      this.labelList,
       html.createDomElement("icon-button", {
         "class": "fontra-ui-font-info-axes-panel-axis-box-delete",
         "src": "/tabler-icons/trash.svg",
@@ -470,4 +477,58 @@ function buildMappingList(axisController) {
   mappingList.minHeight = "5em";
   mappingList.setItems(items);
   return mappingList;
+}
+
+function buildLabelList(axisController) {
+  const axis = axisController.model;
+
+  const items = [{ name: "Bold", value: 700 }];
+  // axis.mapping.map(([user, source]) => {
+  //   return { user, source };
+  // });
+  const labelList = new UIList();
+  labelList.classList.add("fontra-ui-font-info-axes-panel-axis-box-label-list");
+  labelList.style = `min-width: 9em;`;
+  labelList.columnDescriptions = [
+    {
+      key: "name",
+      title: "Name",
+      width: "5em",
+    },
+    {
+      key: "value",
+      title: "Value",
+      width: "4em",
+    },
+    {
+      key: "minValue",
+      title: "Min",
+      width: "4em",
+    },
+    {
+      key: "maxValue",
+      title: "Max",
+      width: "4em",
+    },
+    {
+      key: "linkedValue",
+      title: "Linked",
+      width: "4em",
+    },
+    {
+      key: "elidable",
+      title: "Elidable",
+      width: "5em",
+      cellFactory: checkboxListCell,
+    },
+    // {
+    //   key: "olderSibling",
+    //   title: "O. sibl.",
+    //   width: "3em",
+    // },
+  ];
+  labelList.showHeader = true;
+  labelList.minHeight = "5em";
+  labelList.setItems(items);
+  return labelList;
 }
