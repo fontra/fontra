@@ -449,6 +449,7 @@ function buildMappingGraph(axisController) {
     ]
   );
 }
+
 function buildMappingList(axisController) {
   const axis = axisController.model;
 
