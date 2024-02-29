@@ -150,7 +150,7 @@ function uniqueID() {
 }
 
 export const DefaultFormatter = {
-  toString: (value) => (value !== undefined ? value.toString() : ""),
+  toString: (value) => (value !== undefined && value !== null ? value.toString() : ""),
   fromString: (value) => {
     return {
       value: value,
