@@ -738,9 +738,9 @@ def _(dsAxis: DiscreteAxisDescriptor):
     return axis, dsAxis.values
 
 
-def unpackAxisLabels(labels):
+def unpackAxisLabels(dsLabels):
     valueLabels = []
-    for dsAxisLabel in labels:
+    for dsAxisLabel in dsLabels:
         valueLabels.append(
             AxisValueLabel(
                 name=dsAxisLabel.name,
