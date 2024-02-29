@@ -8,9 +8,7 @@
 "tag": "wdth",
 "minValue": 0.0,
 "defaultValue": 0.0,
-"maxValue": 1100.0,
-"mapping": [],
-"hidden": false
+"maxValue": 1100.0
 },
 {
 "name": "weight",
@@ -18,9 +16,7 @@
 "tag": "wght",
 "minValue": 50.0,
 "defaultValue": 100.0,
-"maxValue": 950.0,
-"mapping": [],
-"hidden": false
+"maxValue": 950.0
 },
 {
 "name": "italic",
@@ -30,9 +26,7 @@
 0.0,
 1.0
 ],
-"defaultValue": 0.0,
-"mapping": [],
-"hidden": false
+"defaultValue": 0.0
 }
 ],
 "sources": []
