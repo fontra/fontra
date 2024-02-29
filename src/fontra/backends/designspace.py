@@ -740,31 +740,40 @@ def _(dsAxis: DiscreteAxisDescriptor):
     return axis, dsAxis.values
 
 
+_fontraToDSAxisLabelFields = {
+    "name": "name",
+    "value": "userValue",
+    "minValue": "userMinimum",
+    "maxValue": "userMaximum",
+    "linkedValue": "linkedUserValue",
+    "elidable": "elidable",
+    "olderSibling": "olderSibling",
+}
+
+_dsToFontraAxisLabelFields = {v: k for k, v in _fontraToDSAxisLabelFields.items()}
+
+
 def unpackAxisLabels(dsLabels):
+    # designspace -> fontra
     return [
         AxisValueLabel(
-            name=dsAxisLabel.name,
-            value=dsAxisLabel.userValue,
-            minValue=dsAxisLabel.userMinimum,
-            maxValue=dsAxisLabel.userMaximum,
-            linkedValue=dsAxisLabel.linkedUserValue,
-            elidable=dsAxisLabel.elidable,
-            olderSibling=dsAxisLabel.olderSibling,
+            **{
+                fName: getattr(dsAxisLabel, dsName)
+                for fName, dsName in _fontraToDSAxisLabelFields.items()
+            }
         )
         for dsAxisLabel in dsLabels
     ]
 
 
 def packAxisLabels(valueLabels):
+    # fontra -> designspace
     return [
         AxisLabelDescriptor(
-            name=label.name,
-            userValue=label.value,
-            userMinimum=label.minValue,
-            userMaximum=label.maxValue,
-            linkedUserValue=label.linkedValue,
-            elidable=label.elidable,
-            olderSibling=label.olderSibling,
+            **{
+                dsName: getattr(label, fName)
+                for dsName, fName in _dsToFontraAxisLabelFields.items()
+            }
         )
         for label in valueLabels
     ]
