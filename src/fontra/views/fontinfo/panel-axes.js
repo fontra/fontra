@@ -13,6 +13,7 @@ import { piecewiseLinearMap } from "../core/var-model.js";
 import { IconButton } from "../web-components/icon-button.js"; // for <icon-button>
 import { UIList } from "../web-components/ui-list.js";
 import { BaseInfoPanel } from "./panel-base.js";
+import "/web-components/add-remove-buttons.js";
 
 export class AxesPanel extends BaseInfoPanel {
   static title = "Axes";
@@ -497,7 +498,21 @@ function buildMappingList(axisController) {
   mappingList.showHeader = true;
   mappingList.minHeight = "5em";
   mappingList.setItems(items);
-  return mappingList;
+
+  const addRemoveButton = html.createDomElement("add-remove-buttons", {
+    addButtonCallback: () => {
+      console.log("add");
+    },
+    removeButtonCallback: () => {
+      console.log("remove");
+    },
+    disableRemoveButton: true,
+  });
+
+  return html.div({ style: "display: grid; grid-gap: 0.3em;" }, [
+    mappingList,
+    addRemoveButton,
+  ]);
 }
 
 function buildValueLabelList(axisController) {
@@ -552,5 +567,19 @@ function buildValueLabelList(axisController) {
   labelList.showHeader = true;
   labelList.minHeight = "5em";
   labelList.setItems(items);
-  return labelList;
+
+  const addRemoveButton = html.createDomElement("add-remove-buttons", {
+    addButtonCallback: () => {
+      console.log("add");
+    },
+    removeButtonCallback: () => {
+      console.log("remove");
+    },
+    disableRemoveButton: true,
+  });
+
+  return html.div({ style: "display: grid; grid-gap: 0.3em;" }, [
+    labelList,
+    addRemoveButton,
+  ]);
 }
