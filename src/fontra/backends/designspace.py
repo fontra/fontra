@@ -741,37 +741,33 @@ def _(dsAxis: DiscreteAxisDescriptor):
 
 
 def unpackAxisLabels(dsLabels):
-    valueLabels = []
-    for dsAxisLabel in dsLabels:
-        valueLabels.append(
-            AxisValueLabel(
-                name=dsAxisLabel.name,
-                value=dsAxisLabel.userValue,
-                minValue=dsAxisLabel.userMinimum,
-                maxValue=dsAxisLabel.userMaximum,
-                linkedValue=dsAxisLabel.linkedUserValue,
-                elidable=dsAxisLabel.elidable,
-                olderSibling=dsAxisLabel.olderSibling,
-            )
+    return [
+        AxisValueLabel(
+            name=dsAxisLabel.name,
+            value=dsAxisLabel.userValue,
+            minValue=dsAxisLabel.userMinimum,
+            maxValue=dsAxisLabel.userMaximum,
+            linkedValue=dsAxisLabel.linkedUserValue,
+            elidable=dsAxisLabel.elidable,
+            olderSibling=dsAxisLabel.olderSibling,
         )
-    return valueLabels
+        for dsAxisLabel in dsLabels
+    ]
 
 
 def packAxisLabels(valueLabels):
-    dsLabels = []
-    for label in valueLabels:
-        dsLabels.append(
-            AxisLabelDescriptor(
-                name=label.name,
-                userValue=label.value,
-                userMinimum=label.minValue,
-                userMaximum=label.maxValue,
-                linkedUserValue=label.linkedValue,
-                elidable=label.elidable,
-                olderSibling=label.olderSibling,
-            )
+    return [
+        AxisLabelDescriptor(
+            name=label.name,
+            userValue=label.value,
+            userMinimum=label.minValue,
+            userMaximum=label.maxValue,
+            linkedUserValue=label.linkedValue,
+            elidable=label.elidable,
+            olderSibling=label.olderSibling,
         )
-    return dsLabels
+        for label in valueLabels
+    ]
 
 
 def makeGlyphMapChange(glyphMapUpdates):
