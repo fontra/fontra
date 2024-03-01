@@ -747,16 +747,15 @@ function buildMappingGraph(axisController) {
 function buildMappingList(axisController) {
   const axis = axisController.model;
 
-  let items =
+  const items =
     axis.mapping?.map(([user, source]) => {
       const item = new ObservableController({ user, source });
       item.addListener((event) => {
-        const sortedItems = [...items];
+        const sortedItems = [...mappingList.items];
         sortedItems.sort((a, b) => a.user - b.user);
 
-        if (!arraysEqual(items, sortedItems)) {
+        if (!arraysEqual(mappingList.items, sortedItems)) {
           mappingList.setItems(sortedItems);
-          items = sortedItems;
         }
 
         const newMapping = sortedItems.map(({ user, source }) => [user, source]);
@@ -812,16 +811,15 @@ function buildMappingList(axisController) {
 function buildValueLabelList(axisController) {
   const axis = axisController.model;
 
-  let items =
+  const items =
     axis.valueLabels?.map((label) => {
       const item = new ObservableController({ ...label });
       item.addListener((event) => {
-        const sortedItems = [...items];
+        const sortedItems = [...labelList.items];
         sortedItems.sort((a, b) => a.value - b.value);
 
-        if (!arraysEqual(items, sortedItems)) {
+        if (!arraysEqual(labelList.items, sortedItems)) {
           labelList.setItems(sortedItems);
-          items = sortedItems;
         }
 
         const newValueLabels = sortedItems.map((valueLabel) => {
