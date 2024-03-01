@@ -93,6 +93,7 @@ function didReorder(a, b) {
 }
 
 export function labeledTextInput(label, controller, key, options) {
+  options = { continuous: true, ...options };
   const items = [];
   const inputID = options?.id || `input-${uniqueID()}-${key}`;
   const formatter = options?.formatter || DefaultFormatter;
@@ -111,7 +112,7 @@ export function labeledTextInput(label, controller, key, options) {
     inputElement.className = options.class;
   }
   inputElement.value = formatter.toString(controller.model[key]);
-  inputElement.oninput = () => {
+  inputElement[options.continuous ? "oninput" : "onchange"] = () => {
     const { value, error } = formatter.fromString(inputElement.value);
     if (!error) {
       controller.model[key] = inputElement.value;
