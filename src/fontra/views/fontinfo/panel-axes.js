@@ -810,7 +810,12 @@ function buildValueLabelList(axisController) {
   const items =
     axis.valueLabels?.map((label) => {
       const item = new ObservableController({ ...label });
-      item.addListener((event) => console.log(event));
+      item.addListener((event) => {
+        const sortedItems = [...items];
+        sortedItems.sort((a, b) => a.value - b.value);
+        labelList.setItems(sortedItems);
+        axis.valueLabels = sortedItems;
+      });
       return item.model;
     }) || [];
 
