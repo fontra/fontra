@@ -759,6 +759,7 @@ function buildMappingList(axisController) {
       });
       return item.model;
     }) || [];
+
   const mappingList = new UIList();
   mappingList.classList.add("fontra-ui-font-info-axes-panel-axis-box-mapping-list");
   mappingList.columnDescriptions = [
