@@ -790,13 +790,24 @@ function buildMappingList(axisController) {
   mappingList.minHeight = "5em";
   mappingList.setItems(items);
 
+  const deleteSelectedItem = () => {
+    const index = mappingList.getSelectedItemIndex();
+    if (index === undefined) {
+      return;
+    }
+    const items = [...mappingList.items];
+    items.splice(index, 1);
+    mappingList.setItems(items);
+    const newMapping = items.map(({ user, source }) => [user, source]);
+    axis.mapping = newMapping;
+    // addRemoveButton.disableRemoveButton = true;  // this messes with the focus??
+  };
+
   const addRemoveButton = html.createDomElement("add-remove-buttons", {
     addButtonCallback: () => {
       console.log("add");
     },
-    removeButtonCallback: () => {
-      console.log("remove");
-    },
+    removeButtonCallback: deleteSelectedItem,
     disableRemoveButton: true,
   });
 
@@ -898,13 +909,26 @@ function buildValueLabelList(axisController) {
   labelList.minHeight = "5em";
   labelList.setItems(items);
 
+  const deleteSelectedItem = () => {
+    const index = labelList.getSelectedItemIndex();
+    if (index === undefined) {
+      return;
+    }
+    const items = [...labelList.items];
+    items.splice(index, 1);
+    labelList.setItems(items);
+    const newValueLabels = items.map((valueLabel) => {
+      return { ...valueLabel };
+    });
+    axis.valueLabels = newValueLabels;
+    // addRemoveButton.disableRemoveButton = true;  // this messes with the focus??
+  };
+
   const addRemoveButton = html.createDomElement("add-remove-buttons", {
     addButtonCallback: () => {
       console.log("add");
     },
-    removeButtonCallback: () => {
-      console.log("remove");
-    },
+    removeButtonCallback: deleteSelectedItem,
     disableRemoveButton: true,
   });
 
