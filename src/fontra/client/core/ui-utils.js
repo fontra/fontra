@@ -171,6 +171,21 @@ export const NumberFormatter = {
   },
 };
 
+export const OptionalNumberFormatter = {
+  toString: (value) => (value != undefined ? value.toString() : ""),
+  fromString: (value) => {
+    if (!value) {
+      return { value: null };
+    }
+    const number = Number(value);
+    if (isNaN(number)) {
+      return { error: "not a number" };
+    } else {
+      return { value: number };
+    }
+  },
+};
+
 export function checkboxListCell(item, colDesc) {
   const value = item[colDesc.key];
   return html.input({
