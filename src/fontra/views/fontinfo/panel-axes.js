@@ -1,3 +1,4 @@
+import { recordChanges } from "../core/change-recorder.js";
 import { UndoStack } from "../core/font-controller.js";
 import * as html from "../core/html-utils.js";
 import { addStyleSheet } from "../core/html-utils.js";
@@ -42,7 +43,7 @@ export class AxesPanel extends BaseInfoPanel {
 
     const axes = this.fontController.globalAxes;
     for (const index of range(axes.length)) {
-      axisContainer.appendChild(new AxisBox(axes, index));
+      axisContainer.appendChild(new AxisBox(axes, index, this.postChange.bind(this)));
     }
 
     setupSortableList(axisContainer);
@@ -160,17 +161,27 @@ select {
 `);
 
 class AxisBox extends HTMLElement {
-  constructor(axes, axisIndex) {
+  constructor(axes, axisIndex, postChange) {
     super();
     this.classList.add("fontra-ui-font-info-axes-panel-axis-box");
     this.draggable = true;
     this.axes = axes;
     this.axisIndex = axisIndex;
+    this.postChange = postChange;
     this._updateContents();
   }
 
   get axis() {
     return this.axes[this.axisIndex];
+  }
+
+  editAxis(editFunc) {
+    let undoLabel;
+    const root = { axes: this.axes };
+    const changes = recordChanges(root, (root) => {
+      undoLabel = editFunc(root.axes[this.axisIndex]);
+    });
+    this.postChange(changes.change, changes.rollbackChange, undoLabel);
   }
 
   _updateContents() {
@@ -181,6 +192,14 @@ class AxisBox extends HTMLElement {
       axisModel.valuesString = axisModel.values.join(" ");
     }
     this.axisController = new ObservableController(axisModel);
+    this.axisController.addListener((event) => {
+      if (event.key !== "valueString") {
+        this.editAxis((axis) => {
+          axis[event.key] = event.newValue;
+          return `edit axis ${event.key}`;
+        });
+      }
+    });
 
     this.mappingGraph = buildMappingGraph(this.axisController);
     this.mappingList = buildMappingList(this.axisController);
