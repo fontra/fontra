@@ -182,7 +182,19 @@ class AxisBox extends HTMLElement {
     const changes = recordChanges(root, (root) => {
       undoLabel = editFunc(root.axes[this.axisIndex]);
     });
-    this.postChange(changes.change, changes.rollbackChange, undoLabel);
+    if (changes.hasChange) {
+      this.postChange(changes.change, changes.rollbackChange, undoLabel);
+    }
+  }
+
+  replaceAxis(newAxis, undoLabel) {
+    const root = { axes: this.axes };
+    const changes = recordChanges(root, (root) => {
+      root.axes[this.axisIndex] = newAxis;
+    });
+    if (changes.hasChange) {
+      this.postChange(changes.change, changes.rollbackChange, undoLabel);
+    }
   }
 
   _updateContents() {
@@ -209,7 +221,9 @@ class AxisBox extends HTMLElement {
     const axisTypeSelect = html.select(
       {
         id: "fontra-ui-font-info-axes-panel-axis-box-axis-type",
-        onchange: (event) => console.log("chch", event.target.value),
+        onchange: (event) => {
+          this.convertAxis(event.target.value);
+        },
       },
       [
         html.option({ value: "continuous", selected: !isDiscreteAxis }, ["Continuous"]),
@@ -287,6 +301,25 @@ class AxisBox extends HTMLElement {
       this.mappingList,
       this.valueLabelList
     );
+  }
+
+  convertAxis(type) {
+    const newAxis = { ...this.axis };
+    if (type === "discrete") {
+      const values = [
+        ...new Set([newAxis.minValue, newAxis.defaultValue, newAxis.maxValue]),
+      ];
+      values.sort((a, b) => a - b);
+      delete newAxis.minValue;
+      delete newAxis.maxValue;
+      newAxis.values = values;
+    } else {
+      newAxis.minValue = Math.min(...newAxis.values);
+      newAxis.maxValue = Math.max(...newAxis.values);
+      delete newAxis.values;
+    }
+    this.replaceAxis(newAxis, `convert to ${type}`);
+    this._updateContents();
   }
 }
 
