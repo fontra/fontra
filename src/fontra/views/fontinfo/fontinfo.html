@@ -5,8 +5,9 @@
     <link href="/css/core.css" rel="stylesheet" />
     <link href="/css/tooltip.css" rel="stylesheet" />
     <title>Fontra Font Info</title>
+    <script type="module" src="/web-components/modal-dialog.js"></script>
     <style>
-      body {
+      .main-container {
         display: grid;
         grid-template-columns: 13em auto;
         padding: 0em;
@@ -52,8 +53,11 @@
     </style>
   </head>
   <body>
-    <div id="header-container"></div>
-    <div id="panel-container"></div>
+    <modal-dialog></modal-dialog>
+    <div class="main-container">
+      <div id="header-container"></div>
+      <div id="panel-container"></div>
+    </div>
   </body>
   <script type="module">
     import { FontInfoController } from "/fontinfo/fontinfo.js";
