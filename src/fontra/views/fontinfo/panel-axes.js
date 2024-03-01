@@ -225,7 +225,21 @@ export class AxesPanel extends BaseInfoPanel {
       return;
     }
 
-    const newAxis = { ...controller.model };
+    const presetAxis = presetAxesByTag[controller.model.tag] || {
+      minValue: 0,
+      defaultValue: 0,
+      maxValue: 100,
+    };
+
+    const newAxis = {
+      name: controller.model.name,
+      tag: controller.model.tag,
+      label: controller.model.label,
+      minValue: presetAxis.minValue,
+      defaultValue: presetAxis.defaultValue,
+      maxValue: presetAxis.maxValue,
+    };
+
     const undoLabel = `add axis '${newAxis.name}'`;
     const root = { axes: this.fontController.globalAxes };
     const changes = recordChanges(root, (root) => {
