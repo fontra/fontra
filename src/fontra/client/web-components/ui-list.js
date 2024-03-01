@@ -322,20 +322,9 @@ export class UIList extends UnlitElement {
   _makeCellEditor(cell, colDesc, item) {
     const initialValue = item[colDesc.key];
     let formattingError;
+    const isContinuous = colDesc.continuous === undefined || colDesc.continuous;
 
-    cell.onblur = (event) => {
-      cell.contentEditable = false;
-      cell.classList.remove("editing");
-      cell.scrollTop = 0;
-      cell.scrollLeft = 0;
-      this.contents.focus();
-      if (formattingError) {
-        const formatter = colDesc.formatter || DefaultFormatter;
-        cell.textContent = formatter.toString(initialValue);
-      }
-    };
-
-    cell.oninput = (event) => {
+    const onchange = (event) => {
       const formatter = colDesc.formatter || DefaultFormatter;
       const { value, error } = formatter.fromString(cell.innerText);
       if (!error) {
@@ -343,6 +332,25 @@ export class UIList extends UnlitElement {
       }
       formattingError = error;
     };
+
+    cell.onblur = (event) => {
+      cell.contentEditable = false;
+      cell.classList.remove("editing");
+      cell.scrollTop = 0;
+      cell.scrollLeft = 0;
+      this.contents.focus();
+      if (!isContinuous) {
+        onchange(event);
+      }
+      if (formattingError) {
+        const formatter = colDesc.formatter || DefaultFormatter;
+        cell.textContent = formatter.toString(initialValue);
+      }
+    };
+
+    if (isContinuous) {
+      cell.oninput = onchange;
+    }
 
     cell.onkeydown = (event) => {
       if (!cell.contentEditable) {
