@@ -86,6 +86,7 @@ export class AxesPanel extends BaseInfoPanel {
       a: [0, updatedAxes.length, ...currentAxes],
     };
 
+    this.fontController.applyChange(change);
     await this.postChange(change, rollbackChange, undoLabel);
   }
 
