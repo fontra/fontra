@@ -17,6 +17,54 @@ import { IconButton } from "../web-components/icon-button.js"; // for <icon-butt
 import { UIList } from "../web-components/ui-list.js";
 import { BaseInfoPanel } from "./panel-base.js";
 import "/web-components/add-remove-buttons.js";
+import { dialogSetup } from "/web-components/modal-dialog.js";
+
+const presetAxes = [
+  {
+    label: "Weight",
+    name: "weight",
+    tag: "wght",
+    minValue: 100,
+    defaultValue: 400,
+    maxValue: 900,
+  },
+  {
+    label: "Width",
+    name: "width",
+    tag: "wdth",
+    minValue: 50,
+    defaultValue: 100,
+    maxValue: 200,
+  },
+  {
+    label: "Optical Size",
+    name: "optical",
+    tag: "opsz",
+    minValue: 8,
+    defaultValue: 14,
+    maxValue: 144,
+  },
+  {
+    label: "Italic",
+    name: "italic",
+    tag: "ital",
+    minValue: 0,
+    defaultValue: 0,
+    maxValue: 1,
+  },
+  {
+    label: "Slant",
+    name: "slant",
+    tag: "slnt",
+    minValue: -20,
+    defaultValue: 0,
+    maxValue: 20,
+  },
+];
+
+const presetAxesByTag = Object.fromEntries(
+  presetAxes.map((presetAxis) => [presetAxis.tag, presetAxis])
+);
 
 export class AxesPanel extends BaseInfoPanel {
   static title = "Axes";
@@ -104,11 +152,89 @@ export class AxesPanel extends BaseInfoPanel {
         type: "button",
         style: `justify-self: start;`,
         value: "New axis...",
-        onclick: (event) => console.log("new axis..."),
+        onclick: (event) => this.newAxis(),
       })
     );
     this.panelElement.appendChild(axisContainer);
     this.panelElement.focus();
+  }
+
+  async newAxis() {
+    const dialog = await dialogSetup("New Axis", "", [
+      { title: "Cancel", isCancelButton: true },
+      { title: "Add new axis", resultValue: "ok", isDefaultButton: true },
+    ]);
+
+    const radioGroup = [html.div({}, "Axis presets:")];
+    const selected = "wght";
+
+    const controller = new ObservableController({ ...presetAxesByTag[selected] });
+    controller.addKeyListener(["name", "tag", "label"], (event) => {
+      if (event.senderInfo !== "radiogroup") {
+        radioGroup.forEach((el) => (el.checked = false));
+      }
+    });
+
+    for (const presetAxis of presetAxes) {
+      const identifier = `preset-axis-${presetAxis.tag}`;
+      radioGroup.push(
+        html.input({
+          type: "radio",
+          id: identifier,
+          value: identifier,
+          name: identifier,
+          checked: presetAxis.tag === selected,
+          onchange: (event) => {
+            radioGroup.forEach((el) => (el.checked = event.target === el));
+            controller.setItem("name", presetAxis.name, "radiogroup");
+            controller.setItem("tag", presetAxis.tag, "radiogroup");
+            controller.setItem("label", presetAxis.label, "radiogroup");
+          },
+        }),
+        html.label({ for: identifier }, [
+          `${presetAxis.label} (${presetAxis.name}, ${presetAxis.tag})`,
+        ]),
+        html.br()
+      );
+    }
+
+    radioGroup.push(html.br());
+
+    const customFields = html.div(
+      {
+        style: `
+          display: grid;
+          grid-template-columns: auto auto;
+          justify-content: start;
+          align-items: center;
+          grid-gap: 0.5em;
+        `,
+      },
+      [
+        ...labeledTextInput("Name", controller, "name"),
+        ...labeledTextInput("OT Tag", controller, "tag"),
+        ...labeledTextInput("UI Name", controller, "label"),
+      ]
+    );
+
+    const dialogContents = html.div({}, [...radioGroup, customFields]);
+
+    dialog.setContent(dialogContents);
+    const result = await dialog.run();
+    if (!result) {
+      return;
+    }
+
+    const newAxis = { ...controller.model };
+    const undoLabel = `add axis '${newAxis.name}'`;
+    const root = { axes: this.fontController.globalAxes };
+    const changes = recordChanges(root, (root) => {
+      root.axes.push(newAxis);
+    });
+    if (changes.hasChange) {
+      this.postChange(changes.change, changes.rollbackChange, undoLabel);
+      this.setupAxisBoxes();
+    }
   }
 
   async replaceAxes(updatedAxes, undoLabel) {
