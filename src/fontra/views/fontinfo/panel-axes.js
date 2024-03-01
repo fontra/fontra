@@ -55,7 +55,7 @@ export class AxesPanel extends BaseInfoPanel {
         reorderedAxes.push(axisBox.axis);
         axisBox.axisIndex = index;
       }
-      this.notifyAxesChanged(reorderedAxes, "Reorder axes");
+      this.replaceAxes(reorderedAxes, "Reorder axes");
     });
 
     this.panelElement.innerHTML = "";
@@ -73,7 +73,7 @@ export class AxesPanel extends BaseInfoPanel {
     this.panelElement.appendChild(axisContainer);
   }
 
-  async notifyAxesChanged(updatedAxes, undoLabel) {
+  async replaceAxes(updatedAxes, undoLabel) {
     const currentAxes = [...this.fontController.globalAxes];
     const change = {
       p: ["axes"],
