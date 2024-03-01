@@ -53,6 +53,9 @@ export class FontInfoController {
             const selectedPanel = clickedHeader.getAttribute("for");
             for (const el of document.querySelectorAll(".font-info-panel")) {
               el.hidden = el.id != selectedPanel;
+              if (el.id == selectedPanel) {
+                el.focus(); // So it can receive key eventas
+              }
             }
 
             const url = new URL(window.location);
@@ -70,6 +73,7 @@ export class FontInfoController {
 
       const panelElement = html.div({
         class: "font-info-panel",
+        tabindex: 1,
         id: panelClass.id,
         hidden: panelClass.id != selectedPanel,
       });
