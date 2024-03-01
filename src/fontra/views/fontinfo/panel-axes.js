@@ -6,6 +6,7 @@ import { ObservableController } from "../core/observable-object.js";
 import * as svg from "../core/svg-utils.js";
 import {
   NumberFormatter,
+  OptionalNumberFormatter,
   checkboxListCell,
   labeledTextInput,
   setupSortableList,
@@ -608,8 +609,16 @@ function buildMappingList(axisController) {
       key: "user",
       title: "User",
       width: "3em",
+      editable: true,
+      formatter: NumberFormatter,
     },
-    { key: "source", title: "Source", width: "3em" },
+    {
+      key: "source",
+      title: "Source",
+      width: "3em",
+      editable: true,
+      formatter: NumberFormatter,
+    },
   ];
   mappingList.showHeader = true;
   mappingList.minHeight = "5em";
@@ -649,26 +658,35 @@ function buildValueLabelList(axisController) {
       key: "name",
       title: "Name",
       width: "5em",
+      editable: true,
     },
     {
       key: "value",
       title: "Value",
       width: "3em",
+      editable: true,
+      formatter: NumberFormatter,
     },
     {
       key: "minValue",
       title: "Min",
       width: "3em",
+      editable: true,
+      formatter: OptionalNumberFormatter,
     },
     {
       key: "maxValue",
       title: "Max",
       width: "3em",
+      editable: true,
+      formatter: OptionalNumberFormatter,
     },
     {
       key: "linkedValue",
       title: "Linked",
       width: "3em",
+      editable: true,
+      formatter: OptionalNumberFormatter,
     },
     {
       key: "elidable",
