@@ -5,6 +5,7 @@ import { addStyleSheet } from "../core/html-utils.js";
 import { ObservableController } from "../core/observable-object.js";
 import * as svg from "../core/svg-utils.js";
 import {
+  NumberFormatter,
   checkboxListCell,
   labeledTextInput,
   setupSortableList,
@@ -277,6 +278,7 @@ class AxisBox extends HTMLElement {
             labeledTextInput(labelName, this.axisController, keyName, {
               type: keyName === "valuesString" ? "text" : "number",
               continuous: false,
+              formatter: NumberFormatter,
             })
           )
           .flat(),
