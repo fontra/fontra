@@ -888,12 +888,6 @@ function buildValueLabelList(axisController) {
       width: "3.5em",
       cellFactory: checkboxListCell,
     },
-    {
-      key: "hidden",
-      title: "Hidden",
-      width: "3.5em",
-      cellFactory: checkboxListCell,
-    },
     // {
     //   key: "olderSibling",
     //   title: "Older sibling",
