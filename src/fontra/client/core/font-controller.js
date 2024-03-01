@@ -744,6 +744,10 @@ class GlyphEditContext {
 
 export class UndoStack {
   constructor() {
+    this.clear();
+  }
+
+  clear() {
     this.undoStack = [];
     this.redoStack = [];
   }
