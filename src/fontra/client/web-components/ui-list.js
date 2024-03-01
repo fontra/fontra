@@ -94,6 +94,11 @@ export class UIList extends UnlitElement {
       padding: 0 0.2em 0 0.1em;
     }
 
+    .list-cell.editing,
+    .text-cell.editing {
+      text-overflow: clip;
+    }
+
     .text-cell.left, .text-cell-header.left {
       text-align: left;
     }
@@ -320,6 +325,9 @@ export class UIList extends UnlitElement {
 
     cell.onblur = (event) => {
       cell.contentEditable = false;
+      cell.classList.remove("editing");
+      cell.scrollTop = 0;
+      cell.scrollLeft = 0;
       this.contents.focus();
       if (formattingError) {
         const formatter = colDesc.formatter || DefaultFormatter;
@@ -367,6 +375,7 @@ export class UIList extends UnlitElement {
 
     return (event) => {
       cell.contentEditable = true;
+      cell.classList.add("editing");
       const range = document.createRange();
       range.selectNodeContents(cell);
       const selection = window.getSelection();
