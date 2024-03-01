@@ -44,7 +44,9 @@ export class AxesPanel extends BaseInfoPanel {
 
     const axes = this.fontController.globalAxes;
     for (const index of range(axes.length)) {
-      axisContainer.appendChild(new AxisBox(axes, index, this.postChange.bind(this)));
+      axisContainer.appendChild(
+        new AxisBox(axes, index, this.postChange.bind(this), this.deleteAxis.bind(this))
+      );
     }
 
     setupSortableList(axisContainer);
@@ -74,20 +76,23 @@ export class AxesPanel extends BaseInfoPanel {
   }
 
   async replaceAxes(updatedAxes, undoLabel) {
-    const currentAxes = [...this.fontController.globalAxes];
-    const change = {
-      p: ["axes"],
-      f: ":",
-      a: [0, currentAxes.length, ...updatedAxes],
-    };
-    const rollbackChange = {
-      p: ["axes"],
-      f: ":",
-      a: [0, updatedAxes.length, ...currentAxes],
-    };
+    const root = { axes: this.fontController.globalAxes };
+    const changes = recordChanges(root, (root) => {
+      root.axes.splice(0, root.axes.length, ...updatedAxes);
+    });
+    await this.postChange(changes.change, changes.rollbackChange, undoLabel);
+  }
 
-    this.fontController.applyChange(change);
-    await this.postChange(change, rollbackChange, undoLabel);
+  async deleteAxis(axisIndex) {
+    const undoLabel = `delete axis '${this.fontController.globalAxes[axisIndex].name}'`;
+    const root = { axes: this.fontController.globalAxes };
+    const changes = recordChanges(root, (root) => {
+      root.axes.splice(axisIndex, 1);
+    });
+    if (changes.hasChange) {
+      this.postChange(changes.change, changes.rollbackChange, undoLabel);
+      this.setupAxisBoxes();
+    }
   }
 
   async postChange(change, rollbackChange, undoLabel) {
@@ -163,13 +168,14 @@ select {
 `);
 
 class AxisBox extends HTMLElement {
-  constructor(axes, axisIndex, postChange) {
+  constructor(axes, axisIndex, postChange, deleteAxis) {
     super();
     this.classList.add("fontra-ui-font-info-axes-panel-axis-box");
     this.draggable = true;
     this.axes = axes;
     this.axisIndex = axisIndex;
     this.postChange = postChange;
+    this.deleteAxis = deleteAxis;
     this._updateContents();
   }
 
@@ -265,7 +271,7 @@ class AxisBox extends HTMLElement {
       html.createDomElement("icon-button", {
         "class": "fontra-ui-font-info-axes-panel-axis-box-delete",
         "src": "/tabler-icons/trash.svg",
-        "onclick": (event) => console.log("delete axis"),
+        "onclick": (event) => this.deleteAxis(this.axisIndex),
         "data-tooltip": "Delete axis",
         "data-tooltipposition": "left",
       }),
