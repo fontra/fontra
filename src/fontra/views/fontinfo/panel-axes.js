@@ -745,7 +745,13 @@ function buildMappingList(axisController) {
   const items =
     axis.mapping?.map(([user, source]) => {
       const item = new ObservableController({ user, source });
-      item.addListener((event) => console.log(event));
+      item.addListener((event) => {
+        const sortedItems = [...items];
+        sortedItems.sort((a, b) => a.user - b.user);
+        mappingList.setItems(sortedItems);
+        const newMapping = sortedItems.map(({ user, source }) => [user, source]);
+        axis.mapping = newMapping;
+      });
       return item.model;
     }) || [];
   const mappingList = new UIList();
