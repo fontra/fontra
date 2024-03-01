@@ -747,13 +747,18 @@ function buildMappingGraph(axisController) {
 function buildMappingList(axisController) {
   const axis = axisController.model;
 
-  const items =
+  let items =
     axis.mapping?.map(([user, source]) => {
       const item = new ObservableController({ user, source });
       item.addListener((event) => {
         const sortedItems = [...items];
         sortedItems.sort((a, b) => a.user - b.user);
-        mappingList.setItems(sortedItems);
+
+        if (!arraysEqual(items, sortedItems)) {
+          mappingList.setItems(sortedItems);
+          items = sortedItems;
+        }
+
         const newMapping = sortedItems.map(({ user, source }) => [user, source]);
         axis.mapping = newMapping;
       });
@@ -807,14 +812,22 @@ function buildMappingList(axisController) {
 function buildValueLabelList(axisController) {
   const axis = axisController.model;
 
-  const items =
+  let items =
     axis.valueLabels?.map((label) => {
       const item = new ObservableController({ ...label });
       item.addListener((event) => {
         const sortedItems = [...items];
         sortedItems.sort((a, b) => a.value - b.value);
-        labelList.setItems(sortedItems);
-        axis.valueLabels = sortedItems;
+
+        if (!arraysEqual(items, sortedItems)) {
+          labelList.setItems(sortedItems);
+          items = sortedItems;
+        }
+
+        const newValueLabels = sortedItems.map((valueLabel) => {
+          return { ...valueLabel };
+        });
+        axis.valueLabels = newValueLabels;
       });
       return item.model;
     }) || [];
@@ -915,4 +928,16 @@ function updateRemoveButton(list, buttons) {
   list.addEventListener("listSelectionChanged", (event) => {
     buttons.disableRemoveButton = list.getSelectedItemIndex() === undefined;
   });
+}
+
+function arraysEqual(arrayA, arrayB) {
+  if (arrayA.length !== arrayB.length) {
+    return false;
+  }
+  for (const [itemA, itemB] of zip(arrayA, arrayB)) {
+    if (itemA !== itemB) {
+      return false;
+    }
+  }
+  return true;
 }
