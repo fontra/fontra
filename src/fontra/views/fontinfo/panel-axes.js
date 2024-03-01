@@ -207,12 +207,13 @@ class AxisBox extends HTMLElement {
     this.axisController = new ObservableController(axisModel);
     this.axisController.addListener((event) => {
       if (event.key === "valuesString") {
-        this.axisController.model.values = event.newValue
+        const newValues = event.newValue
           .split(/[ ]+/)
           .map(Number)
           .filter((n) => !isNaN(n));
-        this.axisController.model.valuesString =
-          this.axisController.model.values.join(" ");
+        newValues.sort((a, b) => a - b);
+        this.axisController.model.values = newValues;
+        this.axisController.model.valuesString = newValues.join(" ");
       } else {
         this.editAxis((axis) => {
           axis[event.key] = event.newValue;
