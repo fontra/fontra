@@ -376,9 +376,6 @@ customElements.define("axis-box", AxisBox);
 
 function buildMappingGraph(axisController) {
   const axis = axisController.model;
-  // if (!axis.mapping.length) {
-  //   return html.div(); // filler
-  // }
   const marginLeft = 16;
   const marginRight = 16;
   const marginTop = 16;
@@ -387,6 +384,13 @@ function buildMappingGraph(axisController) {
   const graphSize = 100;
   const width = graphSize + marginLeft + marginRight;
   const height = graphSize + marginTop + marginBottom;
+
+  if (!axis.mapping?.length || axis.mapping.length < 2) {
+    return html.div({
+      style: `width: ${width}px; height: ${height}px;background-color: #AAA1;`,
+    }); // filler for non-graphable mapping
+  }
+
   const xs = axis.mapping?.map(([x, y]) => x) || [];
   const ys = axis.mapping?.map(([x, y]) => y) || [];
   const xMin = Math.min(...xs);
