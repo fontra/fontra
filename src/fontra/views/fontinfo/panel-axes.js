@@ -206,7 +206,14 @@ class AxisBox extends HTMLElement {
     }
     this.axisController = new ObservableController(axisModel);
     this.axisController.addListener((event) => {
-      if (event.key !== "valueString") {
+      if (event.key === "valuesString") {
+        this.axisController.model.values = event.newValue
+          .split(/[ ]+/)
+          .map(Number)
+          .filter((n) => !isNaN(n));
+        this.axisController.model.valuesString =
+          this.axisController.model.values.join(" ");
+      } else {
         this.editAxis((axis) => {
           axis[event.key] = event.newValue;
           return `edit axis ${event.key}`;
@@ -292,7 +299,7 @@ class AxisBox extends HTMLElement {
             labeledTextInput(labelName, this.axisController, keyName, {
               type: keyName === "valuesString" ? "text" : "number",
               continuous: false,
-              formatter: NumberFormatter,
+              formatter: keyName !== "valuesString" ? NumberFormatter : undefined,
             })
           )
           .flat(),
