@@ -351,11 +351,11 @@ export class UIList extends UnlitElement {
           event.stopImmediatePropagation();
           const cells = [...cell.parentElement.children];
           const direction = event.shiftKey ? -1 : 1;
-          let sibling;
+          let sibling = cell;
           do {
             sibling = event.shiftKey
-              ? cell.previousElementSibling
-              : cell.nextElementSibling;
+              ? sibling.previousElementSibling
+              : sibling.nextElementSibling;
           } while (sibling && !sibling.ondblclick);
           if (sibling) {
             cell.blur();
