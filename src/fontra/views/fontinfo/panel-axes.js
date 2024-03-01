@@ -744,7 +744,9 @@ function buildMappingList(axisController) {
 
   const items =
     axis.mapping?.map(([user, source]) => {
-      return { user, source };
+      const item = new ObservableController({ user, source });
+      item.addListener((event) => console.log(event));
+      return item.model;
     }) || [];
   const mappingList = new UIList();
   mappingList.classList.add("fontra-ui-font-info-axes-panel-axis-box-mapping-list");
@@ -756,6 +758,7 @@ function buildMappingList(axisController) {
       align: "right",
       editable: true,
       formatter: NumberFormatter,
+      continuous: false,
     },
     {
       key: "source",
@@ -764,6 +767,7 @@ function buildMappingList(axisController) {
       align: "right",
       editable: true,
       formatter: NumberFormatter,
+      continuous: false,
     },
   ];
   mappingList.showHeader = true;
@@ -793,7 +797,9 @@ function buildValueLabelList(axisController) {
 
   const items =
     axis.valueLabels?.map((label) => {
-      return { ...label };
+      const item = new ObservableController({ ...label });
+      item.addListener((event) => console.log(event));
+      return item.model;
     }) || [];
 
   const labelList = new UIList();
@@ -805,6 +811,7 @@ function buildValueLabelList(axisController) {
       title: "Name",
       width: "5em",
       editable: true,
+      continuous: false,
     },
     {
       key: "value",
@@ -813,6 +820,7 @@ function buildValueLabelList(axisController) {
       align: "right",
       editable: true,
       formatter: NumberFormatter,
+      continuous: false,
     },
     {
       key: "minValue",
@@ -821,6 +829,7 @@ function buildValueLabelList(axisController) {
       align: "right",
       editable: true,
       formatter: OptionalNumberFormatter,
+      continuous: false,
     },
     {
       key: "maxValue",
@@ -829,6 +838,7 @@ function buildValueLabelList(axisController) {
       align: "right",
       editable: true,
       formatter: OptionalNumberFormatter,
+      continuous: false,
     },
     {
       key: "linkedValue",
@@ -837,6 +847,7 @@ function buildValueLabelList(axisController) {
       align: "right",
       editable: true,
       formatter: OptionalNumberFormatter,
+      continuous: false,
     },
     {
       key: "dummy",
@@ -846,6 +857,12 @@ function buildValueLabelList(axisController) {
     {
       key: "elidable",
       title: "Elidable",
+      width: "3.5em",
+      cellFactory: checkboxListCell,
+    },
+    {
+      key: "hidden",
+      title: "Hidden",
       width: "3.5em",
       cellFactory: checkboxListCell,
     },
