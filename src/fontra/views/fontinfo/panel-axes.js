@@ -40,16 +40,18 @@ export class AxesPanel extends BaseInfoPanel {
       style: "display: grid; gap: 0.5em;",
     });
 
-    for (const axis of this.fontController.globalAxes) {
-      axisContainer.appendChild(new AxisBox(axis));
+    const axes = this.fontController.globalAxes;
+    for (const index of range(axes.length)) {
+      axisContainer.appendChild(new AxisBox(axes, index));
     }
 
     setupSortableList(axisContainer);
 
     axisContainer.addEventListener("reordered", (event) => {
       const reorderedAxes = [];
-      for (const el of axisContainer.children) {
-        reorderedAxes.push(el.axis);
+      for (const [index, axisBox] of enumerate(axisContainer.children)) {
+        reorderedAxes.push(axisBox.axis);
+        axisBox.axisIndex = index;
       }
       this.notifyAxesChanged(reorderedAxes, "Reorder axes");
     });
@@ -154,12 +156,17 @@ select {
 `);
 
 class AxisBox extends HTMLElement {
-  constructor(axis) {
+  constructor(axes, axisIndex) {
     super();
     this.classList.add("fontra-ui-font-info-axes-panel-axis-box");
     this.draggable = true;
-    this.axis = axis;
+    this.axes = axes;
+    this.axisIndex = axisIndex;
     this._updateContents();
+  }
+
+  get axis() {
+    return this.axes[this.axisIndex];
   }
 
   _updateContents() {
@@ -227,7 +234,9 @@ class AxisBox extends HTMLElement {
           ["UI Name", "label"],
         ]
           .map(([labelName, keyName]) =>
-            labeledTextInput(labelName, this.axisController, keyName)
+            labeledTextInput(labelName, this.axisController, keyName, {
+              continuous: false,
+            })
           )
           .flat()
       ),
@@ -244,6 +253,7 @@ class AxisBox extends HTMLElement {
           .map(([labelName, keyName]) =>
             labeledTextInput(labelName, this.axisController, keyName, {
               type: keyName === "valuesString" ? "text" : "number",
+              continuous: false,
             })
           )
           .flat(),
