@@ -163,7 +163,7 @@ export const NumberFormatter = {
   toString: (value) => value.toString(),
   fromString: (value) => {
     const number = Number(value);
-    if (isNaN(number)) {
+    if (isNaN(number) || !value) {
       return { error: "not a number" };
     } else {
       return { value: number };
