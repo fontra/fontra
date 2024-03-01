@@ -176,11 +176,10 @@ class AxisBox extends HTMLElement {
     return this.axes[this.axisIndex];
   }
 
-  editAxis(editFunc) {
-    let undoLabel;
+  editAxis(editFunc, undoLabel) {
     const root = { axes: this.axes };
     const changes = recordChanges(root, (root) => {
-      undoLabel = editFunc(root.axes[this.axisIndex]);
+      editFunc(root.axes[this.axisIndex]);
     });
     if (changes.hasChange) {
       this.postChange(changes.change, changes.rollbackChange, undoLabel);
@@ -217,8 +216,7 @@ class AxisBox extends HTMLElement {
       } else {
         this.editAxis((axis) => {
           axis[event.key] = event.newValue;
-          return `edit axis ${event.key}`;
-        });
+        }, `edit axis ${event.key}`);
       }
     });
 
