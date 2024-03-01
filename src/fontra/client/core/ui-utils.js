@@ -115,7 +115,7 @@ export function labeledTextInput(label, controller, key, options) {
   inputElement[options.continuous ? "oninput" : "onchange"] = () => {
     const { value, error } = formatter.fromString(inputElement.value);
     if (!error) {
-      controller.model[key] = inputElement.value;
+      controller.model[key] = value;
     }
   };
 
