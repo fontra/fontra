@@ -402,6 +402,11 @@ class AxisBox extends HTMLElement {
         }, `edit axis ${event.key}`);
       }
     });
+    this.axisController.addKeyListener("mapping", (event) => {
+      const newGraph = buildMappingGraph(this.axisController);
+      this.mappingGraph.replaceWith(newGraph);
+      this.mappingGraph = newGraph;
+    });
 
     this.mappingGraph = buildMappingGraph(this.axisController);
     this.mappingList = buildMappingList(this.axisController);
