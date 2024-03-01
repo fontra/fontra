@@ -84,6 +84,10 @@ export class AxesPanel extends BaseInfoPanel {
       a: [0, updatedAxes.length, ...currentAxes],
     };
 
+    await this.postChange(change, rollbackChange, undoLabel);
+  }
+
+  async postChange(change, rollbackChange, undoLabel) {
     const undoRecord = {
       change: change,
       rollbackChange: rollbackChange,
