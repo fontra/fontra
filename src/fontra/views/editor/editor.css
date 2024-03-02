@@ -144,7 +144,7 @@ body {
 }
 
 .sidebar-container {
-  z-index: 100;
+  z-index: 200;
   background-color: var(--ui-element-background-color);
   height: 100%;
   width: 0;
