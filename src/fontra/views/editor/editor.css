@@ -131,7 +131,6 @@ body {
   grid-row-end: 2;
   grid-column-start: 1;
   grid-column-end: 4;
-  z-index: 200;
   height: var(--editor-top-bar-height);
   background: var(--editor-top-bar-background-color);
   border-bottom: 1px solid var(--editor-top-bar-border-color);
