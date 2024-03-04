@@ -222,7 +222,7 @@ body {
   position: absolute;
   display: none;
 
-  box-shadow: 0px 0px 8px #0006;
+  box-shadow: 0px 8px 8px #0006;
   top: 0;
   width: 50px; /* arbitrary > blur radius */
   height: 100%;
