@@ -1,5 +1,12 @@
+import VarArray from "../core/var-array.js";
+import {
+  POINT_TYPE_OFF_CURVE_CUBIC,
+  POINT_TYPE_OFF_CURVE_QUAD,
+  VarPackedPath,
+  joinPaths,
+  joinPathsAsync,
+} from "../core/var-path.js";
 import { BaseTool, shouldInitiateDrag } from "./edit-tools-base.js";
-import { insertContourAndSetupAnchorPoint } from "./edit-tools-pen.js";
 
 export class ShapeTool extends BaseTool {
   iconPath = "/tabler-icons/shape.svg";
@@ -55,8 +62,25 @@ export class ShapeTool extends BaseTool {
         // skip drawing
       }
 
-      let path2d = new Path2D();
-      path2d.rect(initialX, initialY, maxX, maxY);
+      let glyphController = this.sceneModel.getSelectedPositionedGlyph().glyph;
+      if (!glyphController.canEdit) {
+        return {};
+      }
+      const path = glyphController.instance.path;
+      console.log("path: ", path);
+
+      let pt0 = { x: initialX, y: initialY };
+      let pt1 = { x: initialX, y: eventY };
+      let pt2 = { x: eventX, y: eventY };
+      let pt3 = { x: eventX, y: initialY };
+
+      let pathNew = getVarPackedPath(pt0, pt1, pt2, pt3);
+
+      glyphController.instance.path.appendPath(pathNew); //pasteGlyph.path);
+
+      //this.canvasController.requestUpdate();
+
+      //const ctx = this.canvasController.ctx;
       //ctx.stroke(path2d);
       //this.sceneController
 
@@ -67,4 +91,17 @@ export class ShapeTool extends BaseTool {
   deactivate() {
     this.canvasController.requestUpdate();
   }
+}
+
+function getVarPackedPath(pt0, pt1, pt2, pt3) {
+  return new VarPackedPath(
+    new VarArray(pt0.x, pt0.y, pt1.x, pt1.y, pt2.x, pt2.y, pt3.x, pt3.y),
+    [
+      VarPackedPath.ON_CURVE,
+      VarPackedPath.ON_CURVE,
+      VarPackedPath.ON_CURVE,
+      VarPackedPath.ON_CURVE,
+    ],
+    [{ endPoint: 3, isClosed: true }]
+  );
 }
