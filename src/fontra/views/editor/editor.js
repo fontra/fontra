@@ -51,10 +51,9 @@ import { HandTool } from "./edit-tools-hand.js";
 import { PenTool } from "./edit-tools-pen.js";
 import { PointerTool } from "./edit-tools-pointer.js";
 import { PowerRulerTool } from "./edit-tools-power-ruler.js";
+import { ShapeTool } from "./edit-tools-shape.js";
 import { SceneController } from "./scene-controller.js";
 import { MIN_SIDEBAR_WIDTH, Sidebar } from "./sidebar.js";
-import { ShapeTool } from "./edit-tools-shape.js";
-import { VisualizationLayers } from "./visualization-layers.js";
 
 import {
   allGlyphsCleanVisualizationLayerDefinition,
