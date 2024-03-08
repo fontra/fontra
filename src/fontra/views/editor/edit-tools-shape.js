@@ -80,13 +80,39 @@ export class ShapeTool extends BaseTool {
 
       // this.canvasController.requestUpdate();
     }
-    noDrag(pt0, pt1, pt2, pt3);
+    //noDrag(pt0, pt1, pt2, pt3);
     /*
     this.noDrag(this.sceneController.localPoint(pt0),
                 this.sceneController.localPoint(pt1),
                 this.sceneController.localPoint(pt2),
                 this.sceneController.localPoint(pt3));
     */
+
+    this._handleAddPath(pt0, pt1, pt2, pt3);
+  }
+
+  async _handleAddPath(pt0, pt1, pt2, pt3) {
+    let pathNew = getRectPath(pt0, pt1, pt2, pt3);
+
+    await this.sceneController.editGlyphAndRecordChanges(
+      (glyph) => {
+        const editLayerGlyphs = this.sceneController.getEditingLayerFromGlyphLayers(
+          glyph.layers
+        );
+
+        const firstLayerGlyph = Object.values(editLayerGlyphs)[0];
+        const selection = new Set();
+        selection.add(`point/${firstLayerGlyph.path.numPoints}`);
+
+        for (const [layerName, layerGlyph] of Object.entries(editLayerGlyphs)) {
+          layerGlyph.path.appendPath(pathNew);
+        }
+        this.sceneController.selection = selection;
+        return "New shape added to glyph";
+      },
+      undefined,
+      true
+    );
   }
 
   setupDrag(path, event) {
@@ -102,7 +128,7 @@ export class ShapeTool extends BaseTool {
     }
     let pathNew = getRectPath(pt0, pt1, pt2, pt3);
 
-    glyphController.instance.path.appendPath(pathNew); //pasteGlyph.path);
+    //glyphController.instance.path.appendPath(pathNew); //pasteGlyph.path);
     //this.behaviorFuncs.noDrag?.(this.context, path);
     //this.canvasController.requestUpdate();
   }
