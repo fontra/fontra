@@ -108,7 +108,7 @@ export class ShapeTool extends BaseTool {
           layerGlyph.path.appendPath(pathNew);
         }
         this.sceneController.selection = selection;
-        return "New shape added to glyph";
+        return "add shape";
       },
       undefined,
       true
