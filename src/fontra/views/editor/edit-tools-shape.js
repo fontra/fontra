@@ -43,6 +43,11 @@ export class ShapeTool extends BaseTool {
     let maxX = initialX;
     let maxY = initialY;
 
+    let pt0 = { x: initialX, y: initialY };
+    let pt1 = { x: initialX, y: eventY };
+    let pt2 = { x: eventX, y: eventY };
+    let pt3 = { x: eventX, y: initialY };
+
     for await (const event of eventStream) {
       eventX = event.x;
       eventY = event.y;
@@ -62,23 +67,10 @@ export class ShapeTool extends BaseTool {
         // skip drawing
       }
 
-      let glyphController = this.sceneModel.getSelectedPositionedGlyph().glyph;
-      if (!glyphController.canEdit) {
-        return {};
-      }
-      const path = glyphController.instance.path;
-      console.log("path: ", path);
-
-      let pt0 = { x: initialX, y: initialY };
-      let pt1 = { x: initialX, y: eventY };
-      let pt2 = { x: eventX, y: eventY };
-      let pt3 = { x: eventX, y: initialY };
-
-      let pathNew = getVarPackedPath(pt0, pt1, pt2, pt3);
-
-      glyphController.instance.path.appendPath(pathNew); //pasteGlyph.path);
-
-      //this.canvasController.requestUpdate();
+      pt0 = { x: initialX, y: initialY };
+      pt1 = { x: initialX, y: eventY };
+      pt2 = { x: eventX, y: eventY };
+      pt3 = { x: eventX, y: initialY };
 
       //const ctx = this.canvasController.ctx;
       //ctx.stroke(path2d);
@@ -86,9 +78,23 @@ export class ShapeTool extends BaseTool {
 
       // this.canvasController.requestUpdate();
     }
+
+    this.noDrag(pt0, pt1, pt2, pt3);
   }
 
   deactivate() {
+    this.canvasController.requestUpdate();
+  }
+
+  noDrag(pt0, pt1, pt2, pt3) {
+    let glyphController = this.sceneModel.getSelectedPositionedGlyph().glyph;
+    if (!glyphController.canEdit) {
+      return {};
+    }
+    let pathNew = getVarPackedPath(pt0, pt1, pt2, pt3);
+
+    glyphController.instance.path.appendPath(pathNew); //pasteGlyph.path);
+    //this.behaviorFuncs.noDrag?.(this.context, path);
     this.canvasController.requestUpdate();
   }
 }
