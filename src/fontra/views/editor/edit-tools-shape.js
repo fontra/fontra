@@ -88,7 +88,12 @@ export class ShapeTool extends BaseTool {
                 this.sceneController.localPoint(pt3));
     */
 
-    this._handleAddPath(pt0, pt1, pt2, pt3);
+    this._handleAddPath(
+      this.sceneController.selectedGlyphPoint(pt0),
+      this.sceneController.selectedGlyphPoint(pt1),
+      this.sceneController.selectedGlyphPoint(pt2),
+      this.sceneController.selectedGlyphPoint(pt3)
+    );
   }
 
   async _handleAddPath(pt0, pt1, pt2, pt3) {
