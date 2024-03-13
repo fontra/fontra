@@ -8,6 +8,27 @@ import {
 } from "../core/var-path.js";
 import { BaseTool, shouldInitiateDrag } from "./edit-tools-base.js";
 
+class MockPath2D {
+  constructor() {
+    this.items = [];
+  }
+  moveTo(x, y) {
+    this.items.push({ op: "moveTo", args: [x, y] });
+  }
+  lineTo(x, y) {
+    this.items.push({ op: "lineTo", args: [x, y] });
+  }
+  bezierCurveTo(x1, y1, x2, y2, x3, y3) {
+    this.items.push({ op: "bezierCurveTo", args: [x1, y1, x2, y2, x3, y3] });
+  }
+  quadraticCurveTo(x1, y1, x2, y2) {
+    this.items.push({ op: "quadraticCurveTo", args: [x1, y1, x2, y2] });
+  }
+  closePath() {
+    this.items.push({ op: "closePath", args: [] });
+  }
+}
+
 export class ShapeTool extends BaseTool {
   iconPath = "/tabler-icons/shape.svg";
   identifier = "shape-tool";
@@ -49,6 +70,16 @@ export class ShapeTool extends BaseTool {
     let pt2 = { x: eventX, y: eventY };
     let pt3 = { x: eventX, y: initialY };
 
+    let pathNew = getRectPath(
+      this.sceneController.selectedGlyphPoint(pt0),
+      this.sceneController.selectedGlyphPoint(pt1),
+      this.sceneController.selectedGlyphPoint(pt2),
+      this.sceneController.selectedGlyphPoint(pt3)
+    );
+
+    //const glyphController = this.sceneModel.getSelectedPositionedGlyph().glyph;
+    //let len_path = glyphController.instance.path.numContours;
+
     for await (const event of eventStream) {
       //const point = this.sceneController.localPoint(event);
       eventX = event.x;
@@ -74,8 +105,33 @@ export class ShapeTool extends BaseTool {
       pt2 = { x: maxX, y: maxY };
       pt3 = { x: minX, y: maxY };
 
-      //const ctx = this.canvasController.ctx;
-      //ctx.stroke(path2d);
+      pathNew = getRectPath(
+        this.sceneController.selectedGlyphPoint(pt0),
+        this.sceneController.selectedGlyphPoint(pt1),
+        this.sceneController.selectedGlyphPoint(pt2),
+        this.sceneController.selectedGlyphPoint(pt3)
+      );
+
+      //glyphController.instance.path.appendPath(pathNew)
+      //this.sceneController.ghostPath = pathNew.drawToPath2d;
+
+      //this.sceneModel.ghostPath = pathNew.drawToPath2d;
+      //this.sceneController.ghostPath = pathNew.drawToPath2d;
+      //console.log(this.sceneModel.ghostPath);
+      //await this.sceneModel.updateScene();
+      //this.canvasController.requestUpdate();
+
+      //glyphController.instance.path.deleteContour(len_path);
+
+      //this.sceneModel.updateScene();
+      //this.canvasController.requestUpdate();
+
+      //this.context.lineJoin = "round";
+      //this.context.fillStyle = "#AAA6";
+      console.log("this.context: ", this.context);
+      //context.beginPath();
+      //this.context.roundRect(pathNew.drawToPath2d);
+      //this.context.fill("#AAA6");
       //this.sceneController
 
       // this.canvasController.requestUpdate();
@@ -88,16 +144,19 @@ export class ShapeTool extends BaseTool {
                 this.sceneController.localPoint(pt3));
     */
 
-    this._handleAddPath(
-      this.sceneController.selectedGlyphPoint(pt0),
-      this.sceneController.selectedGlyphPoint(pt1),
-      this.sceneController.selectedGlyphPoint(pt2),
-      this.sceneController.selectedGlyphPoint(pt3)
-    );
+    this._handleAddPath(pathNew);
   }
 
-  async _handleAddPath(pt0, pt1, pt2, pt3) {
-    let pathNew = getRectPath(pt0, pt1, pt2, pt3);
+  async _handleAddPath(pathNew) {
+    //let pathNew = getRectPath(pt0, pt1, pt2, pt3);
+
+    let bbox = pathNew.getBounds();
+    let width = bbox.xMax - bbox.xMin;
+    let height = bbox.yMax - bbox.yMin;
+    if (width < 1 && height < 1) {
+      // don't add a shape if it's too small
+      return;
+    }
 
     await this.sceneController.editGlyphAndRecordChanges(
       (glyph) => {
@@ -120,6 +179,7 @@ export class ShapeTool extends BaseTool {
     );
   }
 
+  /*
   setupDrag(path, event) {
     const point = this.getPointFromEvent(event);
     this.behaviorFuncs.setupDrag?.(this.context, path, point, event.shiftKey);
@@ -137,6 +197,7 @@ export class ShapeTool extends BaseTool {
     //this.behaviorFuncs.noDrag?.(this.context, path);
     //this.canvasController.requestUpdate();
   }
+  */
 
   deactivate() {
     this.canvasController.requestUpdate();
