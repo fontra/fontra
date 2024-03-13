@@ -646,6 +646,14 @@ export class EditorController {
   }
 
   addEditTool(tool) {
+    if (Array.isArray(tool.iconPath)) {
+      for (const iconPath of tool.iconPath) {
+        tool.iconPath = iconPath;
+        this.addEditTool(tool);
+      }
+      return;
+    }
+
     this.tools[tool.identifier] = tool;
 
     const editToolsElement = document.querySelector("#edit-tools");
