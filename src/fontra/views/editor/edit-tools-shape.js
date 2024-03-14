@@ -5,7 +5,7 @@ import { BaseTool, shouldInitiateDrag } from "./edit-tools-base.js";
 import { registerVisualizationLayerDefinition } from "./visualization-layer-definitions.js";
 
 export class ShapeTool extends BaseTool {
-  iconPath = ["/tabler-icons/shape.svg", "/tabler-icons/shape.svg"];
+  iconPath = "/tabler-icons/shape.svg";
   identifier = "shape-tool";
 
   handleHover(event) {}
