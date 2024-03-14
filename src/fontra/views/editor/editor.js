@@ -51,6 +51,7 @@ import { HandTool } from "./edit-tools-hand.js";
 import { PenTool } from "./edit-tools-pen.js";
 import { PointerTool } from "./edit-tools-pointer.js";
 import { PowerRulerTool } from "./edit-tools-power-ruler.js";
+import { ShapeToolEllipse } from "./edit-tools-shape-ellipse.js";
 import { ShapeTool } from "./edit-tools-shape.js";
 import { SceneController } from "./scene-controller.js";
 import { MIN_SIDEBAR_WIDTH, Sidebar } from "./sidebar.js";
@@ -610,9 +611,27 @@ export class EditorController {
 
   initTools() {
     this.tools = {};
-    const editToolClasses = [PointerTool, PenTool, ShapeTool, PowerRulerTool, HandTool];
+    const editToolClasses = [
+      PointerTool,
+      PenTool,
+      [ShapeTool, ShapeToolEllipse],
+      PowerRulerTool,
+      HandTool,
+    ];
+    let multiWrapperIndex = 0;
     for (const editToolClass of editToolClasses) {
-      this.addEditTool(new editToolClass(this));
+      if (Array.isArray(editToolClass)) {
+        const editToolsElement = document.querySelector("#edit-tools");
+        const wrapper_id = `edit-tools-multi-wrapper-${multiWrapperIndex++}`;
+        editToolsElement.appendChild(
+          html.div({ id: wrapper_id, class: "tool-button" })
+        );
+        for (const subClass of editToolClass) {
+          this.addEditTool(new subClass(this), wrapper_id);
+        }
+      } else {
+        this.addEditTool(new editToolClass(this));
+      }
     }
     this.setSelectedTool("pointer-tool");
 
@@ -644,13 +663,14 @@ export class EditorController {
     });
   }
 
-  addEditTool(tool) {
+  addEditTool(tool, wrapper_id = "edit-tools") {
     this.tools[tool.identifier] = tool;
 
-    const editToolsElement = document.querySelector("#edit-tools");
+    const editToolsElement = document.querySelector("#" + wrapper_id);
     const toolButton = html.div(
       {
-        "class": "tool-button selected",
+        "class":
+          wrapper_id === "edit-tools" ? "tool-button selected" : "subtool-button",
         "data-tool": tool.identifier,
         "data-tooltip": hyphenatedToLabel(tool.identifier),
         "data-tooltipposition": "bottom",

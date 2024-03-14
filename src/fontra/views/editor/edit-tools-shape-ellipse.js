@@ -1,13 +1,14 @@
 import * as rectangle from "../core/rectangle.js";
 import { range } from "../core/utils.js";
 import { VarPackedPath } from "../core/var-path.js";
-import { BaseTool, shouldInitiateDrag } from "./edit-tools-base.js";
+import { shouldInitiateDrag } from "./edit-tools-base.js";
+import { ShapeTool } from "./edit-tools-shape.js";
 import { registerVisualizationLayerDefinition } from "./visualization-layer-definitions.js";
 
-export class ShapeTool extends BaseTool {
-  iconPath = "/tabler-icons/square-plus-2.svg";
-  identifier = "shape-tool-rectangle";
-
+export class ShapeToolEllipse extends ShapeTool {
+  iconPath = "/tabler-icons/circle-plus-2.svg";
+  identifier = "shape-tool-ellipse";
+  /*
   handleHover(event) {}
 
   setCursor() {
@@ -23,7 +24,7 @@ export class ShapeTool extends BaseTool {
     }
     this.setCursor();
   }
-
+  */
   async handleDrag(eventStream, initialEvent) {
     if (!this.sceneModel.selectedGlyph?.isEditing) {
       await this.editor.tools["pointer-tool"].handleDrag(eventStream, initialEvent);
@@ -65,7 +66,7 @@ export class ShapeTool extends BaseTool {
     drawRectPath(pathNew, shapeRect);
     this.addShapePath(pathNew);
   }
-
+  /*
   async addShapePath(pathNew) {
     await this.sceneController.editGlyphAndRecordChanges(
       (glyph) => {
@@ -97,6 +98,7 @@ export class ShapeTool extends BaseTool {
   deactivate() {
     this.canvasController.requestUpdate();
   }
+  */
 }
 
 function drawRectPath(path, rect) {
@@ -107,6 +109,15 @@ function drawRectPath(path, rect) {
   path.closePath();
 }
 
+function drawEllipsePath(path, rect) {
+  path.moveTo(rect.xMin, rect.yMin);
+  path.lineTo(rect.xMax, rect.yMin);
+  path.lineTo(rect.xMax, rect.yMax);
+  path.lineTo(rect.xMin, rect.yMax);
+  path.closePath();
+}
+
+/*
 registerVisualizationLayerDefinition({
   identifier: "fontra.shapetool.shape",
   name: "Shape tool shape",
@@ -126,3 +137,4 @@ registerVisualizationLayerDefinition({
     context.stroke(shape);
   },
 });
+*/

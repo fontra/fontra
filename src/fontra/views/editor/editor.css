@@ -407,7 +407,7 @@ body {
 }
 
 .tool-button {
-  display: flex;
+  /*display: flex;*/
   justify-content: center;
   align-items: center;
   user-select: none;
@@ -417,6 +417,7 @@ body {
   height: 1.9rem;
   padding: 0.1rem;
   transition: 0.15s;
+  display: inline-grid;
 }
 
 .tool-button:first-child {
@@ -425,6 +426,20 @@ body {
 
 .tool-button:last-child {
   border-radius: 0 0.65em 0.65em 0;
+}
+
+.subtool-button {
+  /*display: flex;*/
+  justify-content: center;
+  align-items: center;
+  user-select: none;
+  background-color: var(--ui-element-background-color);
+  fill: var(--foreground-color);
+  width: 2.7rem;
+  height: 1.9rem;
+  padding: 0.1rem;
+  transition: 0.15s;
+  display: inline-grid;
 }
 
 .tool-icon {
@@ -447,14 +462,17 @@ body {
   stroke-width: 1.7px;
 }
 
+.subtool-button:hover,
 .tool-button:hover {
   background-color: var(--editor-tool-button-hover-background-color);
 }
 
+.subtool-button:active,
 .tool-button:active {
   background-color: var(--editor-tool-button-active-background-color);
 }
 
+.subtool-button.selected,
 .tool-button.selected {
   background-color: var(--editor-tool-button-selected-background-color);
   fill: var(--background-color);
