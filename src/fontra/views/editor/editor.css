@@ -458,7 +458,6 @@ body {
 .tool-button.selected {
   background-color: var(--editor-tool-button-selected-background-color);
   fill: var(--background-color);
-  color: var(--background-color);
 }
 
 #mini-console {

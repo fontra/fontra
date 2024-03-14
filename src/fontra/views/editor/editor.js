@@ -54,7 +54,6 @@ import { PowerRulerTool } from "./edit-tools-power-ruler.js";
 import { ShapeTool } from "./edit-tools-shape.js";
 import { SceneController } from "./scene-controller.js";
 import { MIN_SIDEBAR_WIDTH, Sidebar } from "./sidebar.js";
-
 import {
   allGlyphsCleanVisualizationLayerDefinition,
   visualizationLayerDefinitions,
@@ -646,14 +645,6 @@ export class EditorController {
   }
 
   addEditTool(tool) {
-    if (Array.isArray(tool.iconPath)) {
-      for (const iconPath of tool.iconPath) {
-        tool.iconPath = iconPath;
-        this.addEditTool(tool);
-      }
-      return;
-    }
-
     this.tools[tool.identifier] = tool;
 
     const editToolsElement = document.querySelector("#edit-tools");
