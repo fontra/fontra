@@ -12,8 +12,8 @@ export class ShapeToolEllipse extends ShapeToolRect {
     console.log("drawShapePath", path, rect);
     const x = rect.xMin;
     const y = rect.yMin;
-    const radiusX = (rect.xMax - rect.xMin) / 8;
-    const radiusY = (rect.yMax - rect.yMin) / 8;
+    const radiusX = rect.xMax - rect.xMin;
+    const radiusY = rect.yMax - rect.yMin;
     drawEllipse(path, x, y, radiusX, radiusY, bezierArcMagic);
   }
 }
