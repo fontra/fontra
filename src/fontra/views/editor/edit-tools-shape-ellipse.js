@@ -14,27 +14,34 @@ export class ShapeToolEllipse extends ShapeToolRect {
     const y = rect.yMin;
     const radiusX = rect.xMax - rect.xMin;
     const radiusY = rect.yMax - rect.yMin;
-    drawEllipse(path, x, y, radiusX, radiusY, bezierArcMagic);
+    drawEllipse(path, x, y, radiusX / 2, radiusY / 2, bezierArcMagic);
   }
 }
 
-function drawEllipse(path, cx, cy, rx, ry, tension) {
+function drawEllipse(path, cx, cy, rx, ry, tension, centered = false) {
   // to reverse contour, just use negative rx or ry
+  const shiftX = rx,
+    shiftY = ry;
+  if (centered) {
+    (shiftX = 0), (shiftY = 0);
+  }
+
   let h1x = 1,
     h1y = tension;
   let h2x = tension,
     h2y = 1;
   let x = 0,
     y = 1;
-  path.moveTo(cx + rx, cy);
+  path.moveTo(cx + rx + shiftX, cy + shiftY);
+
   for (let i = 0; i < 4; i++) {
     path.bezierCurveTo(
-      cx + rx * h1x,
-      cy + ry * h1y,
-      cx + rx * h2x,
-      cy + ry * h2y,
-      cx + rx * x,
-      cy + ry * y
+      Math.round(cx + rx * h1x + shiftX),
+      Math.round(cy + ry * h1y + shiftY),
+      Math.round(cx + rx * h2x + shiftX),
+      Math.round(cy + ry * h2y + shiftY),
+      Math.round(cx + rx * x + shiftX),
+      Math.round(cy + ry * y + shiftY)
     );
     let tempH1x = h1x,
       tempH1y = h1y;

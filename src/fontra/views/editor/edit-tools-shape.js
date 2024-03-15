@@ -45,7 +45,12 @@ export class ShapeToolRect extends BaseTool {
         // We can receive non-pointer events like keyboard events: ignore
         continue;
       }
-      shapeRect = rectangle.rectRound(rectangle.rectFromPoints([initialPoint, point]));
+      shapeRect = rectangle.rectRound({
+        xMin: initialPoint.x,
+        yMin: initialPoint.y,
+        xMax: point.x,
+        yMax: point.y,
+      });
 
       const rectPath = new Path2D();
       this.drawShapePath(rectPath, shapeRect);
