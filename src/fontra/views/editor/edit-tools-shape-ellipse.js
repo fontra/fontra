@@ -8,19 +8,38 @@ export class ShapeToolEllipse extends ShapeToolRect {
   iconPath = "/tabler-icons/circle-plus-2.svg";
   identifier = "shape-tool-ellipse";
 
-  drawShapePath(path, rect) {
-    console.log("drawShapePath", path, rect);
+  drawShapePath(path, rect, event) {
     const x = rect.xMin;
     const y = rect.yMin;
-    const radiusX = rect.xMax - rect.xMin;
-    const radiusY = rect.yMax - rect.yMin;
-    drawEllipse(path, x, y, radiusX / 2, radiusY / 2, bezierArcMagic);
+    let radiusX = rect.xMax - rect.xMin;
+    let radiusY = rect.yMax - rect.yMin;
+
+    if (event.shiftKey) {
+      // make circle, not ellipse
+      if ((radiusX > 0 && radiusY > 0) || (radiusX < 0 && radiusY < 0)) {
+        radiusY = radiusX;
+      } else {
+        radiusY = -radiusX;
+      }
+    }
+
+    if (event.ctrlKey) {
+      // reversed ellipse
+      radiusX = radiusX * -1;
+    }
+
+    if (event.altKey) {
+      // positon at center
+      drawEllipse(path, x, y, radiusX, radiusY, bezierArcMagic, true);
+    } else {
+      drawEllipse(path, x, y, radiusX / 2, radiusY / 2, bezierArcMagic);
+    }
   }
 }
 
 function drawEllipse(path, cx, cy, rx, ry, tension, centered = false) {
   // to reverse contour, just use negative rx or ry
-  const shiftX = rx,
+  let shiftX = rx,
     shiftY = ry;
   if (centered) {
     (shiftX = 0), (shiftY = 0);

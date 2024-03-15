@@ -38,8 +38,9 @@ export class ShapeToolRect extends BaseTool {
     }
 
     let shapeRect;
-
+    let eventTemp;
     for await (const event of eventStream) {
+      eventTemp = event;
       const point = this.sceneController.selectedGlyphPoint(event);
       if (point.x === undefined) {
         // We can receive non-pointer events like keyboard events: ignore
@@ -53,7 +54,7 @@ export class ShapeToolRect extends BaseTool {
       });
 
       const rectPath = new Path2D();
-      this.drawShapePath(rectPath, shapeRect);
+      this.drawShapePath(rectPath, shapeRect, event);
       this.sceneModel.shapeToolShapePath = rectPath;
       this.canvasController.requestUpdate();
     }
@@ -67,7 +68,7 @@ export class ShapeToolRect extends BaseTool {
     }
 
     const pathNew = new VarPackedPath();
-    this.drawShapePath(pathNew, shapeRect);
+    this.drawShapePath(pathNew, shapeRect, eventTemp);
     this.addShapePath(pathNew);
   }
 
@@ -103,7 +104,7 @@ export class ShapeToolRect extends BaseTool {
     this.canvasController.requestUpdate();
   }
 
-  drawShapePath(path, rect) {
+  drawShapePath(path, rect, event) {
     path.moveTo(rect.xMin, rect.yMin);
     path.lineTo(rect.xMax, rect.yMin);
     path.lineTo(rect.xMax, rect.yMax);
