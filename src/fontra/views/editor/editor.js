@@ -52,7 +52,7 @@ import { PenTool } from "./edit-tools-pen.js";
 import { PointerTool } from "./edit-tools-pointer.js";
 import { PowerRulerTool } from "./edit-tools-power-ruler.js";
 import { ShapeToolEllipse } from "./edit-tools-shape-ellipse.js";
-import { ShapeTool } from "./edit-tools-shape.js";
+import { ShapeToolRect } from "./edit-tools-shape.js";
 import { SceneController } from "./scene-controller.js";
 import { MIN_SIDEBAR_WIDTH, Sidebar } from "./sidebar.js";
 import {
@@ -614,24 +614,30 @@ export class EditorController {
     const editToolClasses = [
       PointerTool,
       PenTool,
-      [ShapeTool, ShapeToolEllipse],
+      [ShapeToolRect, ShapeToolEllipse],
       PowerRulerTool,
       HandTool,
     ];
-    let multiWrapperIndex = 0;
+    let toolIndex = 0;
     for (const editToolClass of editToolClasses) {
       if (Array.isArray(editToolClass)) {
         const editToolsElement = document.querySelector("#edit-tools");
-        const wrapper_id = `edit-tools-multi-wrapper-${multiWrapperIndex++}`;
+        const wrapper_id = `edit-tools-multi-wrapper-${toolIndex}`;
         editToolsElement.appendChild(
-          html.div({ id: wrapper_id, class: "tool-button" })
+          html.div({
+            id: wrapper_id,
+            class: "tool-button",
+            /*onmousedown: "mouseDown()",*/
+          })
         );
+        let subtoolIndex = 0;
         for (const subClass of editToolClass) {
-          this.addEditTool(new subClass(this), wrapper_id);
+          this.addEditTool(new subClass(this), wrapper_id, subtoolIndex++);
         }
       } else {
         this.addEditTool(new editToolClass(this));
       }
+      toolIndex++;
     }
     this.setSelectedTool("pointer-tool");
 
@@ -663,7 +669,7 @@ export class EditorController {
     });
   }
 
-  addEditTool(tool, wrapper_id = "edit-tools") {
+  addEditTool(tool, wrapper_id = "edit-tools", subtoolIndex = 0) {
     this.tools[tool.identifier] = tool;
 
     const editToolsElement = document.querySelector("#" + wrapper_id);
@@ -671,6 +677,7 @@ export class EditorController {
       {
         "class":
           wrapper_id === "edit-tools" ? "tool-button selected" : "subtool-button",
+        /*"style": subtoolIndex > 0 ? 'display: none' : "",*/
         "data-tool": tool.identifier,
         "data-tooltip": hyphenatedToLabel(tool.identifier),
         "data-tooltipposition": "bottom",

@@ -4,7 +4,7 @@ import { VarPackedPath } from "../core/var-path.js";
 import { BaseTool, shouldInitiateDrag } from "./edit-tools-base.js";
 import { registerVisualizationLayerDefinition } from "./visualization-layer-definitions.js";
 
-export class ShapeTool extends BaseTool {
+export class ShapeToolRect extends BaseTool {
   iconPath = "/tabler-icons/square-plus-2.svg";
   identifier = "shape-tool-rectangle";
 
@@ -48,7 +48,7 @@ export class ShapeTool extends BaseTool {
       shapeRect = rectangle.rectRound(rectangle.rectFromPoints([initialPoint, point]));
 
       const rectPath = new Path2D();
-      drawRectPath(rectPath, shapeRect);
+      this.drawShapePath(rectPath, shapeRect);
       this.sceneModel.shapeToolShapePath = rectPath;
       this.canvasController.requestUpdate();
     }
@@ -62,7 +62,7 @@ export class ShapeTool extends BaseTool {
     }
 
     const pathNew = new VarPackedPath();
-    drawRectPath(pathNew, shapeRect);
+    this.drawShapePath(pathNew, shapeRect);
     this.addShapePath(pathNew);
   }
 
@@ -97,14 +97,14 @@ export class ShapeTool extends BaseTool {
   deactivate() {
     this.canvasController.requestUpdate();
   }
-}
 
-function drawRectPath(path, rect) {
-  path.moveTo(rect.xMin, rect.yMin);
-  path.lineTo(rect.xMax, rect.yMin);
-  path.lineTo(rect.xMax, rect.yMax);
-  path.lineTo(rect.xMin, rect.yMax);
-  path.closePath();
+  drawShapePath(path, rect) {
+    path.moveTo(rect.xMin, rect.yMin);
+    path.lineTo(rect.xMax, rect.yMin);
+    path.lineTo(rect.xMax, rect.yMax);
+    path.lineTo(rect.xMin, rect.yMax);
+    path.closePath();
+  }
 }
 
 registerVisualizationLayerDefinition({

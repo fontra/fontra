@@ -1,140 +1,84 @@
 import * as rectangle from "../core/rectangle.js";
 import { range } from "../core/utils.js";
-import { VarPackedPath } from "../core/var-path.js";
-import { shouldInitiateDrag } from "./edit-tools-base.js";
-import { ShapeTool } from "./edit-tools-shape.js";
-import { registerVisualizationLayerDefinition } from "./visualization-layer-definitions.js";
+import { ShapeToolRect } from "./edit-tools-shape.js";
 
-export class ShapeToolEllipse extends ShapeTool {
+const bezierArcMagic = 0.5522847498; // constant for drawing circular arcs w/ Beziers
+
+export class ShapeToolEllipse extends ShapeToolRect {
   iconPath = "/tabler-icons/circle-plus-2.svg";
   identifier = "shape-tool-ellipse";
-  /*
-  handleHover(event) {}
 
-  setCursor() {
-    if (this.sceneModel.selectedGlyph?.isEditing) {
-      this.canvasController.canvas.style.cursor = "crosshair";
-    }
+  drawShapePath(path, rect) {
+    console.log("drawShapePath", path, rect);
+    const x = rect.xMin;
+    const y = rect.yMin;
+    const radiusX = (rect.xMax - rect.xMin) / 8;
+    const radiusY = (rect.yMax - rect.yMin) / 8;
+    drawEllipse(path, x, y, radiusX, radiusY, bezierArcMagic);
   }
+}
 
-  handleHover(event) {
-    if (!this.sceneModel.selectedGlyph?.isEditing) {
-      this.editor.tools["pointer-tool"].handleHover(event);
-      return;
-    }
-    this.setCursor();
-  }
-  */
-  async handleDrag(eventStream, initialEvent) {
-    if (!this.sceneModel.selectedGlyph?.isEditing) {
-      await this.editor.tools["pointer-tool"].handleDrag(eventStream, initialEvent);
-      return;
-    }
-
-    const initialPoint = this.sceneController.selectedGlyphPoint(initialEvent);
-
-    if (!(await shouldInitiateDrag(eventStream, initialEvent))) {
-      // TODO: open dialog for numeric size input
-      return;
-    }
-
-    let shapeRect;
-
-    for await (const event of eventStream) {
-      const point = this.sceneController.selectedGlyphPoint(event);
-      if (point.x === undefined) {
-        // We can receive non-pointer events like keyboard events: ignore
-        continue;
-      }
-      shapeRect = rectangle.rectRound(rectangle.rectFromPoints([initialPoint, point]));
-
-      const rectPath = new Path2D();
-      drawRectPath(rectPath, shapeRect);
-      this.sceneModel.shapeToolShapePath = rectPath;
-      this.canvasController.requestUpdate();
-    }
-
-    delete this.sceneModel.shapeToolShapePath;
-    this.canvasController.requestUpdate();
-
-    // rectsize return when too small
-    if (!shapeRect) {
-      return;
-    }
-
-    const pathNew = new VarPackedPath();
-    drawRectPath(pathNew, shapeRect);
-    this.addShapePath(pathNew);
-  }
-  /*
-  async addShapePath(pathNew) {
-    await this.sceneController.editGlyphAndRecordChanges(
-      (glyph) => {
-        const editLayerGlyphs = this.sceneController.getEditingLayerFromGlyphLayers(
-          glyph.layers
-        );
-
-        const firstLayerGlyph = Object.values(editLayerGlyphs)[0];
-        const selection = new Set();
-        const firstIndex = firstLayerGlyph.path.numPoints;
-        for (const index of range(pathNew.numPoints)) {
-          const point = pathNew.getPoint(index);
-          if (!point.type) {
-            selection.add(`point/${firstIndex + index}`);
-          }
-        }
-        this.sceneController.selection = selection;
-
-        for (const [layerName, layerGlyph] of Object.entries(editLayerGlyphs)) {
-          layerGlyph.path.appendPath(pathNew);
-        }
-        return "add shape";
-      },
-      undefined,
-      true
+function drawEllipse(path, cx, cy, rx, ry, tension) {
+  // to reverse contour, just use negative rx or ry
+  let h1x = 1,
+    h1y = tension;
+  let h2x = tension,
+    h2y = 1;
+  let x = 0,
+    y = 1;
+  path.moveTo(cx + rx, cy);
+  for (let i = 0; i < 4; i++) {
+    path.bezierCurveTo(
+      cx + rx * h1x,
+      cy + ry * h1y,
+      cx + rx * h2x,
+      cy + ry * h2y,
+      cx + rx * x,
+      cy + ry * y
     );
+    let tempH1x = h1x,
+      tempH1y = h1y;
+    h1x = -h1y;
+    h1y = tempH1x;
+    let tempH2x = h2x,
+      tempH2y = h2y;
+    h2x = -h2y;
+    h2y = tempH2x;
+    let tempX = x,
+      tempY = y;
+    x = -y;
+    y = tempX;
   }
-
-  deactivate() {
-    this.canvasController.requestUpdate();
-  }
-  */
-}
-
-function drawRectPath(path, rect) {
-  path.moveTo(rect.xMin, rect.yMin);
-  path.lineTo(rect.xMax, rect.yMin);
-  path.lineTo(rect.xMax, rect.yMax);
-  path.lineTo(rect.xMin, rect.yMax);
-  path.closePath();
-}
-
-function drawEllipsePath(path, rect) {
-  path.moveTo(rect.xMin, rect.yMin);
-  path.lineTo(rect.xMax, rect.yMin);
-  path.lineTo(rect.xMax, rect.yMax);
-  path.lineTo(rect.xMin, rect.yMax);
   path.closePath();
 }
 
 /*
-registerVisualizationLayerDefinition({
-  identifier: "fontra.shapetool.shape",
-  name: "Shape tool shape",
-  selectionMode: "editing",
-  zIndex: 500,
-  screenParameters: { strokeWidth: 1 },
-  colors: { strokeColor: "#000" },
-  colorsDarkMode: { strokeColor: "#fff" },
-  draw: (context, positionedGlyph, parameters, model, controller) => {
-    const shape = model.shapeToolShapePath;
-    if (!shape) {
-      return;
-    }
+// constant for drawing circular arcs w/ quadratic Beziers
+const quadBezierArcMagic = 0.414213562373
 
-    context.strokeStyle = parameters.strokeColor;
-    context.lineWidth = parameters.strokeWidth;
-    context.stroke(shape);
-  },
-});
+export function drawEllipseQuadratic(pen, cx, cy, rx, ry, tension=quadBezierArcMagic):
+    // to reverse contour, just use negative rx or ry
+    x = rx * tension
+    y = ry * tension
+    pen.qCurveTo((cx+x, cy+ry), (cx+rx, cy+y),
+                 (cx+rx, cy-y), (cx+x, cy-ry),
+                 (cx-x, cy-ry), (cx-rx, cy-y),
+                 (cx-rx, cy+y), (cx-x, cy+ry), None)
+    pen.closePath()
+
+
+// Two convenience functions
+
+export function drawCircle(pen, cx, cy, radius, reverse=False):
+    rx = ry = radius
+    if reverse:
+        ry = -ry
+    drawEllipse(pen, cx, cy, rx, ry)
+
+
+export function drawCircleQuadratic(pen, cx, cy, radius, reverse=False):
+    rx = ry = radius
+    if reverse:
+        ry = -ry
+    drawEllipseQuadratic(pen, cx, cy, rx, ry)
 */

@@ -437,7 +437,7 @@ body {
   fill: var(--foreground-color);
   width: 2.7rem;
   height: 1.9rem;
-  padding: 0.1rem;
+  /*padding: 0.1rem;*/
   transition: 0.15s;
   display: inline-grid;
 }

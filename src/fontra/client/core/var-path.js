@@ -546,7 +546,7 @@ export class VarPackedPath {
     this._appendPoint(x, y, VarPackedPath.ON_CURVE);
   }
 
-  cubicCurveTo(x1, y1, x2, y2, x3, y3) {
+  bezierCurveTo(x1, y1, x2, y2, x3, y3) {
     this._appendPoint(x1, y1, VarPackedPath.OFF_CURVE_CUBIC);
     this._appendPoint(x2, y2, VarPackedPath.OFF_CURVE_CUBIC);
     this._appendPoint(x3, y3, VarPackedPath.ON_CURVE);
