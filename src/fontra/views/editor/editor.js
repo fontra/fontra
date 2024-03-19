@@ -615,7 +615,6 @@ export class EditorController {
       PointerTool,
       PenTool,
       [ShapeToolRect, ShapeToolEllipse],
-      [ShapeToolRect, ShapeToolEllipse, ShapeToolRect, ShapeToolEllipse],
       PowerRulerTool,
       HandTool,
     ];
