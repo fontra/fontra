@@ -406,8 +406,8 @@ body {
   pointer-events: auto;
 }
 
-.tool-button {
-  /*display: flex;*/
+.tool-button,
+.subtool-button {
   justify-content: center;
   align-items: center;
   user-select: none;
@@ -429,17 +429,7 @@ body {
 }
 
 .subtool-button {
-  /*display: flex;*/
-  justify-content: center;
-  align-items: center;
-  user-select: none;
-  background-color: var(--ui-element-background-color);
-  fill: var(--foreground-color);
-  width: 2.7rem;
-  height: 1.9rem;
-  /*padding: 0.1rem;*/
-  transition: 0.15s;
-  display: inline-grid;
+  padding: unset;
 }
 
 .subtool-button:last-child {
