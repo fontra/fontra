@@ -690,6 +690,7 @@ export class EditorController {
       toolButton.onmouseup = () => {
         this.setSelectedTool(tool.identifier);
         this.canvasController.canvas.focus();
+        editToolsElement.prepend(toolButton);
       };
     }
 
