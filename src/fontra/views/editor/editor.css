@@ -451,10 +451,15 @@ body {
   transition-duration: 100ms;
 }
 
-.subtool-button:first-child:hover ~ .subtool-button,
+.subtool-button:first-child:hover ~ .subtool-button {
+  visibility: visible;
+  transition-duration: 100ms;
+}
+
+.subtool-button:hover ~ .subtool-button,
 .subtool-button:hover {
   visibility: visible;
-  transition-duration: 10ms;
+  transition-duration: 100ms;
 }
 
 .tool-icon {

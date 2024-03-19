@@ -624,11 +624,7 @@ export class EditorController {
         const editToolsElement = document.querySelector("#edit-tools");
         const wrapper_id = `edit-tools-multi-wrapper-${toolIndex}`;
         editToolsElement.appendChild(
-          html.div({
-            id: wrapper_id,
-            class: "tool-button",
-            /*onmousedown: "mouseDown()",*/
-          })
+          html.div({ id: wrapper_id, class: "tool-button" })
         );
         let subtoolIndex = 0;
         for (const subClass of editToolClass) {

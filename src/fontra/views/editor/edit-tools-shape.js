@@ -37,7 +37,7 @@ export class ShapeToolRect extends BaseTool {
       return;
     }
 
-    let shapeRect;
+    let mouseRect;
     let eventTemp;
     for await (const event of eventStream) {
       eventTemp = event;
@@ -46,29 +46,31 @@ export class ShapeToolRect extends BaseTool {
         // We can receive non-pointer events like keyboard events: ignore
         continue;
       }
-      shapeRect = rectangle.rectRound({
+      mouseRect = rectangle.rectRound({
         xMin: initialPoint.x,
         yMin: initialPoint.y,
         xMax: point.x,
         yMax: point.y,
       });
 
-      const rectPath = new Path2D();
-      this.drawShapePath(rectPath, shapeRect, event);
-      this.sceneModel.shapeToolShapePath = rectPath;
+      const drawPath = new Path2D();
+      this.drawShapeWithKeys(drawPath, mouseRect, event);
+      this.sceneModel.shapeToolShapePath = drawPath;
+      this.sceneModel.event = event;
       this.canvasController.requestUpdate();
     }
 
     delete this.sceneModel.shapeToolShapePath;
+    delete this.sceneModel.event;
     this.canvasController.requestUpdate();
 
     // rectsize return when too small
-    if (!shapeRect) {
+    if (!mouseRect) {
       return;
     }
 
     const pathNew = new VarPackedPath();
-    this.drawShapePath(pathNew, shapeRect, eventTemp);
+    this.drawShapeWithKeys(pathNew, mouseRect, eventTemp);
     this.addShapePath(pathNew);
   }
 
@@ -104,13 +106,62 @@ export class ShapeToolRect extends BaseTool {
     this.canvasController.requestUpdate();
   }
 
-  drawShapePath(path, rect, event) {
-    path.moveTo(rect.xMin, rect.yMin);
-    path.lineTo(rect.xMax, rect.yMin);
-    path.lineTo(rect.xMax, rect.yMax);
-    path.lineTo(rect.xMin, rect.yMax);
-    path.closePath();
+  drawShapeWithKeys(path, mouseRect, event) {
+    let x = mouseRect.xMin;
+    let y = mouseRect.yMin;
+    let width = mouseRect.yMax - mouseRect.yMin;
+    let height = mouseRect.xMax - mouseRect.xMin;
+    /*     let width = mouseRect.xMax - mouseRect.xMin;
+    let height = mouseRect.yMax - mouseRect.yMin; */
+
+    if (event.shiftKey) {
+      // make square, not rectangle
+      if ((width > 0 && height > 0) || (width < 0 && height < 0)) {
+        height = width;
+      } else {
+        height = -width;
+      }
+    }
+
+    let revesed = event.ctrlKey ? true : false; // reversed contour direction
+    let centered = event.altKey ? true : false; // positon at center
+
+    this.drawShapePath(path, x, y, width, height, revesed, centered);
   }
+
+  drawShapePath(path, x, y, width, height, revesed, centered) {
+    if (centered) {
+      // positon at center
+      x = x - height / 2;
+      y = y - width / 2;
+    }
+
+    drawRect(path, x, y, width, height, revesed);
+  }
+}
+
+function drawRect(path, x, y, width, height, revesed = false) {
+  if (revesed) {
+    drawRectReversed(path, x, y, width, height);
+  } else {
+    drawRectNormal(path, x, y, width, height);
+  }
+}
+
+function drawRectNormal(path, x, y, width, height) {
+  path.moveTo(x, y);
+  path.lineTo(x, y + width);
+  path.lineTo(x + height, y + width);
+  path.lineTo(x + height, y);
+  path.closePath();
+}
+
+function drawRectReversed(path, x, y, width, height) {
+  path.moveTo(x, y);
+  path.lineTo(x + height, y);
+  path.lineTo(x + height, y + width);
+  path.lineTo(x, y + width);
+  path.closePath();
 }
 
 registerVisualizationLayerDefinition({
@@ -119,12 +170,17 @@ registerVisualizationLayerDefinition({
   selectionMode: "editing",
   zIndex: 500,
   screenParameters: { strokeWidth: 1 },
-  colors: { strokeColor: "#000" },
-  colorsDarkMode: { strokeColor: "#fff" },
+  colors: { boxColor: "#FFFB", color: "#000" },
+  colorsDarkMode: { boxColor: "#1118", color: "#FFF" },
   draw: (context, positionedGlyph, parameters, model, controller) => {
     const shape = model.shapeToolShapePath;
     if (!shape) {
       return;
+    }
+
+    if (model.event.ctrlKey) {
+      context.fillStyle = parameters.boxColor;
+      context.fill(shape);
     }
 
     context.strokeStyle = parameters.strokeColor;

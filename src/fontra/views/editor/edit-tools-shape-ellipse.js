@@ -8,41 +8,39 @@ export class ShapeToolEllipse extends ShapeToolRect {
   iconPath = "/tabler-icons/circle-plus-2.svg";
   identifier = "shape-tool-ellipse";
 
-  drawShapePath(path, rect, event) {
-    const x = rect.xMin;
-    const y = rect.yMin;
-    let radiusX = rect.xMax - rect.xMin;
-    let radiusY = rect.yMax - rect.yMin;
+  drawShapePath(path, x, y, width, height, revesed, centered) {
+    let radiusX = height * -1;
+    let radiusY = width;
 
-    if (event.shiftKey) {
-      // make circle, not ellipse
-      if ((radiusX > 0 && radiusY > 0) || (radiusX < 0 && radiusY < 0)) {
-        radiusY = radiusX;
-      } else {
-        radiusY = -radiusX;
-      }
-    }
-
-    if (event.ctrlKey) {
-      // reversed ellipse
-      radiusX = radiusX * -1;
-    }
-
-    if (event.altKey) {
-      // positon at center
-      drawEllipse(path, x, y, radiusX, radiusY, bezierArcMagic, true);
-    } else {
-      drawEllipse(path, x, y, radiusX / 2, radiusY / 2, bezierArcMagic);
-    }
+    drawEllipse(
+      path,
+      x,
+      y,
+      radiusX / 2,
+      radiusY / 2,
+      bezierArcMagic,
+      revesed,
+      centered
+    );
   }
 }
 
-function drawEllipse(path, cx, cy, rx, ry, tension, centered = false) {
+function drawEllipse(path, cx, cy, rx, ry, tension, revesed = false, centered = false) {
   // to reverse contour, just use negative rx or ry
   let shiftX = rx,
     shiftY = ry;
+
+  if (revesed) {
+    rx = rx * -1;
+    shiftX = rx;
+  } else {
+    shiftX = -rx;
+  }
+
   if (centered) {
     (shiftX = 0), (shiftY = 0);
+    rx = rx * 2;
+    ry = ry * 2;
   }
 
   let h1x = 1,
@@ -77,34 +75,3 @@ function drawEllipse(path, cx, cy, rx, ry, tension, centered = false) {
   }
   path.closePath();
 }
-
-/*
-// constant for drawing circular arcs w/ quadratic Beziers
-const quadBezierArcMagic = 0.414213562373
-
-export function drawEllipseQuadratic(pen, cx, cy, rx, ry, tension=quadBezierArcMagic):
-    // to reverse contour, just use negative rx or ry
-    x = rx * tension
-    y = ry * tension
-    pen.qCurveTo((cx+x, cy+ry), (cx+rx, cy+y),
-                 (cx+rx, cy-y), (cx+x, cy-ry),
-                 (cx-x, cy-ry), (cx-rx, cy-y),
-                 (cx-rx, cy+y), (cx-x, cy+ry), None)
-    pen.closePath()
-
-
-// Two convenience functions
-
-export function drawCircle(pen, cx, cy, radius, reverse=False):
-    rx = ry = radius
-    if reverse:
-        ry = -ry
-    drawEllipse(pen, cx, cy, rx, ry)
-
-
-export function drawCircleQuadratic(pen, cx, cy, radius, reverse=False):
-    rx = ry = radius
-    if reverse:
-        ry = -ry
-    drawEllipseQuadratic(pen, cx, cy, rx, ry)
-*/
