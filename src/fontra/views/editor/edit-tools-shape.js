@@ -111,8 +111,6 @@ export class ShapeToolRect extends BaseTool {
     let y = mouseRect.yMin;
     let width = mouseRect.yMax - mouseRect.yMin;
     let height = mouseRect.xMax - mouseRect.xMin;
-    /*     let width = mouseRect.xMax - mouseRect.xMin;
-    let height = mouseRect.yMax - mouseRect.yMin; */
 
     if (event.shiftKey) {
       // make square, not rectangle

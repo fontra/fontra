@@ -615,6 +615,7 @@ export class EditorController {
       PointerTool,
       PenTool,
       [ShapeToolRect, ShapeToolEllipse],
+      [ShapeToolRect, ShapeToolEllipse, ShapeToolRect, ShapeToolEllipse],
       PowerRulerTool,
       HandTool,
     ];
@@ -680,10 +681,17 @@ export class EditorController {
       [html.createDomElement("inline-svg", { class: "tool-icon", src: tool.iconPath })]
     );
 
-    toolButton.onclick = () => {
-      this.setSelectedTool(tool.identifier);
-      this.canvasController.canvas.focus();
-    };
+    if (wrapper_id === "edit-tools") {
+      toolButton.onclick = () => {
+        this.setSelectedTool(tool.identifier);
+        this.canvasController.canvas.focus();
+      };
+    } else {
+      toolButton.onmouseup = () => {
+        this.setSelectedTool(tool.identifier);
+        this.canvasController.canvas.focus();
+      };
+    }
 
     editToolsElement.appendChild(toolButton);
   }
