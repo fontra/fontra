@@ -568,12 +568,6 @@ export class VarPackedPath {
     this.contourInfo[this.contourInfo.length - 1].isClosed = true;
   }
 
-  reverse() {
-    this.coordinates.reverse();
-    this.pointTypes.reverse();
-    this.contourInfo.reverse();
-  }
-
   addItemwise(other) {
     this._ensureCompatibility(other);
     return new this.constructor(

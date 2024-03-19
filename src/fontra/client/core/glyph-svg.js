@@ -44,10 +44,6 @@ export class SVGPath2D {
   closePath() {
     this.items.push("Z");
   }
-
-  reverse() {
-    this.items.reverse();
-  }
 }
 
 function formatCoordinate(x, y, numerator, denominator, dx, dy) {
