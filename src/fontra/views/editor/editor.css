@@ -442,6 +442,21 @@ body {
   display: inline-grid;
 }
 
+.subtool-button:last-child {
+  border-radius: 0 0 0.65em 0.65em;
+}
+
+.subtool-button:not(:first-child) {
+  visibility: hidden;
+  transition-duration: 100ms;
+}
+
+.subtool-button:first-child:hover ~ .subtool-button,
+.subtool-button:hover {
+  visibility: visible;
+  transition-duration: 10ms;
+}
+
 .tool-icon {
   width: 1.75rem;
   height: 1.75rem;

@@ -677,10 +677,9 @@ export class EditorController {
       {
         "class":
           wrapper_id === "edit-tools" ? "tool-button selected" : "subtool-button",
-        /*"style": subtoolIndex > 0 ? 'display: none' : "",*/
         "data-tool": tool.identifier,
         "data-tooltip": hyphenatedToLabel(tool.identifier),
-        "data-tooltipposition": "bottom",
+        "data-tooltipposition": wrapper_id === "edit-tools" ? "bottom" : "right",
       },
       [html.createDomElement("inline-svg", { class: "tool-icon", src: tool.iconPath })]
     );

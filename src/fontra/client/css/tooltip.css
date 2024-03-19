@@ -38,7 +38,7 @@
   color: var(--tooltip-foreground-color);
   background: var(--tooltip-background-color);
   z-index: 1;
-  opacity: 0;
+  visibility: hidden;
   animation-name: disappear;
   animation-delay: var(--tooltip-delay);
   animation-duration: var(--tooltip-duration);
@@ -57,7 +57,7 @@
   border-color: var(--tooltip-background-color) transparent transparent transparent;
   border-width: var(--tooltip-arrow-size) var(--tooltip-arrow-size) 0;
   z-index: 1;
-  opacity: 0;
+  visibility: hidden;
   animation-name: disappear;
   animation-delay: var(--tooltip-delay);
   animation-duration: var(--tooltip-duration);
@@ -161,13 +161,13 @@
 
 @keyframes disappear {
   0% {
-    opacity: 1;
+    visibility: visible;
   }
   95% {
-    opacity: 1;
+    visibility: visible;
   }
   100% {
-    opacity: 0;
+    visibility: hidden;
   }
 }
 
