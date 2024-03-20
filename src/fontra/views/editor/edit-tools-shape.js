@@ -1,6 +1,6 @@
 import * as rectangle from "../core/rectangle.js";
 import { range } from "../core/utils.js";
-import { VarPackedPath } from "../core/var-path.js";
+import { VarPackedPath, packContour } from "../core/var-path.js";
 import { BaseTool, shouldInitiateDrag } from "./edit-tools-base.js";
 import { registerVisualizationLayerDefinition } from "./visualization-layer-definitions.js";
 
@@ -141,26 +141,15 @@ export class ShapeToolRect extends BaseTool {
   }
 
   reversePath(path) {
-    let x_values = path.coordinates
-      .filter(function (value, index, Arr) {
-        return index % 2 == 0;
-      })
-      .reverse();
-
-    path.coordinates.shift(); // remove first element, to get every y value
-    let y_values = path.coordinates
-      .filter(function (value, index, Arr) {
-        return index % 2 == 0;
-      })
-      .reverse();
-
-    let reversed_coordinates = [];
-    for (let i = 0; i < x_values.length; i++) {
-      reversed_coordinates.push(x_values[i]);
-      reversed_coordinates.push(y_values[i]);
+    const contour = path.getUnpackedContour(0);
+    contour.points.reverse();
+    if (contour.isClosed) {
+      const [lastPoint] = contour.points.splice(-1, 1);
+      contour.points.splice(0, 0, lastPoint);
     }
-    path.coordinates = reversed_coordinates;
-    path.pointTypes.reverse();
+    const packedContour = packContour(contour);
+    console.log(packedContour);
+    path.setContour(0, packedContour);
   }
 }
 
