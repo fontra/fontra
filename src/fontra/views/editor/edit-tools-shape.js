@@ -52,9 +52,8 @@ export class ShapeToolRect extends BaseTool {
         xMax: point.x,
         yMax: point.y,
       });
-
       const drawPath = new Path2D();
-      this.drawShapeWithKeys(drawPath, mouseRect, event);
+      this.drawShapePath2D(drawPath, mouseRect, event);
       this.sceneModel.shapeToolShapePath = drawPath;
       this.sceneModel.event = event;
       this.canvasController.requestUpdate();
@@ -69,8 +68,7 @@ export class ShapeToolRect extends BaseTool {
       return;
     }
 
-    const pathNew = new VarPackedPath();
-    this.drawShapeWithKeys(pathNew, mouseRect, eventTemp);
+    const pathNew = this.drawShapeVarPackedPath(mouseRect, eventTemp);
     // reversed contour direction
     if (eventTemp.ctrlKey) {
       this.reversePath(pathNew);
@@ -110,7 +108,13 @@ export class ShapeToolRect extends BaseTool {
     this.canvasController.requestUpdate();
   }
 
-  drawShapeWithKeys(path, mouseRect, event) {
+  drawShapePath2D(path2d, mouseRect, event) {
+    const path = this.drawShapeVarPackedPath(mouseRect, event);
+
+    return path.drawToPath2d(path2d);
+  }
+
+  drawShapeVarPackedPath(mouseRect, event) {
     let x = mouseRect.xMin;
     let y = mouseRect.yMin;
     let width = mouseRect.xMax - mouseRect.xMin;
@@ -133,11 +137,16 @@ export class ShapeToolRect extends BaseTool {
       y = y - height / 2;
     }
 
-    this.drawShapePath(path, x, y, width, height);
+    const unpackedContours = this.getUnpackedContour(x, y, width, height);
+    const packedContour = packContour(unpackedContours[0]);
+
+    const path = new VarPackedPath();
+    path.appendContour(packedContour);
+    return path;
   }
 
-  drawShapePath(path, x, y, width, height) {
-    drawRect(path, x, y, width, height);
+  getUnpackedContour(x, y, width, height) {
+    return getUnpackedContourRect(x, y, width, height);
   }
 
   reversePath(path) {
@@ -153,12 +162,20 @@ export class ShapeToolRect extends BaseTool {
   }
 }
 
-function drawRect(path, x, y, width, height) {
-  path.moveTo(x, y);
-  path.lineTo(x, y + height);
-  path.lineTo(x + width, y + height);
-  path.lineTo(x + width, y);
-  path.closePath();
+function getUnpackedContourRect(x, y, width, height, contourType = "cubic") {
+  const unpackedContour = [
+    {
+      points: [
+        { x: x, y: y },
+        { x: x, y: y + height },
+        { x: x + width, y: y + height },
+        { x: x + width, y: y },
+      ],
+      isClosed: true,
+    },
+  ];
+
+  return unpackedContour;
 }
 
 registerVisualizationLayerDefinition({
