@@ -71,6 +71,10 @@ export class ShapeToolRect extends BaseTool {
 
     const pathNew = new VarPackedPath();
     this.drawShapeWithKeys(pathNew, mouseRect, eventTemp);
+    // reversed contour direction
+    if (eventTemp.ctrlKey) {
+      this.reversePath(pathNew);
+    }
     this.addShapePath(pathNew);
   }
 
@@ -109,11 +113,11 @@ export class ShapeToolRect extends BaseTool {
   drawShapeWithKeys(path, mouseRect, event) {
     let x = mouseRect.xMin;
     let y = mouseRect.yMin;
-    let width = mouseRect.yMax - mouseRect.yMin;
-    let height = mouseRect.xMax - mouseRect.xMin;
+    let width = mouseRect.xMax - mouseRect.xMin;
+    let height = mouseRect.yMax - mouseRect.yMin;
 
+    // make square, not rectangle
     if (event.shiftKey) {
-      // make square, not rectangle
       if ((width > 0 && height > 0) || (width < 0 && height < 0)) {
         height = width;
       } else {
@@ -121,44 +125,50 @@ export class ShapeToolRect extends BaseTool {
       }
     }
 
-    let reversed = event.ctrlKey ? true : false; // reversed contour direction
-    let centered = event.altKey ? true : false; // positon at center
-
-    this.drawShapePath(path, x, y, width, height, reversed, centered);
-  }
-
-  drawShapePath(path, x, y, width, height, reversed, centered) {
-    if (centered) {
-      // positon at center
-      x = x - height / 2;
-      y = y - width / 2;
+    // positon at center
+    if (event.altKey) {
+      width = width * 2;
+      height = height * 2;
+      x = x - width / 2;
+      y = y - height / 2;
     }
 
-    drawRect(path, x, y, width, height, reversed);
+    this.drawShapePath(path, x, y, width, height);
+  }
+
+  drawShapePath(path, x, y, width, height) {
+    drawRect(path, x, y, width, height);
+  }
+
+  reversePath(path) {
+    let x_values = path.coordinates
+      .filter(function (value, index, Arr) {
+        return index % 2 == 0;
+      })
+      .reverse();
+
+    path.coordinates.shift(); // remvoe first element, to get every y value
+    let y_values = path.coordinates
+      .filter(function (value, index, Arr) {
+        return index % 2 == 0;
+      })
+      .reverse();
+
+    let reversed_coordinates = [];
+    for (let i = 0; i < x_values.length; i++) {
+      reversed_coordinates.push(x_values[i]);
+      reversed_coordinates.push(y_values[i]);
+    }
+    path.coordinates = reversed_coordinates;
+    path.pointTypes.reverse();
   }
 }
 
-function drawRect(path, x, y, width, height, reversed = false) {
-  if (reversed) {
-    drawRectReversed(path, x, y, width, height);
-  } else {
-    drawRectNormal(path, x, y, width, height);
-  }
-}
-
-function drawRectNormal(path, x, y, width, height) {
+function drawRect(path, x, y, width, height) {
   path.moveTo(x, y);
-  path.lineTo(x, y + width);
-  path.lineTo(x + height, y + width);
-  path.lineTo(x + height, y);
-  path.closePath();
-}
-
-function drawRectReversed(path, x, y, width, height) {
-  path.moveTo(x, y);
-  path.lineTo(x + height, y);
-  path.lineTo(x + height, y + width);
-  path.lineTo(x, y + width);
+  path.lineTo(x, y + height);
+  path.lineTo(x + width, y + height);
+  path.lineTo(x + width, y);
   path.closePath();
 }
 

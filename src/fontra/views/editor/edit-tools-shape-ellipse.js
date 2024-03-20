@@ -8,69 +8,26 @@ export class ShapeToolEllipse extends ShapeToolRect {
   iconPath = "/tabler-icons/circle-plus-2.svg";
   identifier = "shape-tool-ellipse";
 
-  drawShapePath(path, x, y, width, height, reversed, centered) {
-    let radiusX = height * -1;
-    let radiusY = width;
+  drawShapePath(path, x, y, width, height) {
+    let cx = x + width / 2;
+    let cy = y + height / 2;
 
-    drawEllipse(
-      path,
-      x,
-      y,
-      radiusX / 2,
-      radiusY / 2,
-      bezierArcMagic,
-      reversed,
-      centered
-    );
+    drawEllipse(path, cx, cy, width / 2, height / 2);
   }
 }
 
-function drawEllipse(
-  path,
-  cx,
-  cy,
-  rx,
-  ry,
-  tension,
-  reversed = false,
-  centered = false
-) {
-  // to reverse contour, just use negative rx or ry
-  let shiftX = rx,
-    shiftY = ry;
-
-  if (reversed) {
-    rx = rx * -1;
-    shiftX = rx;
-  } else {
-    shiftX = -rx;
-  }
-
-  if (centered) {
-    (shiftX = 0), (shiftY = 0);
-    rx = rx * 2;
-    ry = ry * 2;
-  }
-
-  let h1x = 1,
-    h1y = tension;
-  let h2x = tension,
-    h2y = 1;
-  let x = 0,
-    y = 1;
-  path.moveTo(cx + rx + shiftX, cy + shiftY);
-
+function drawEllipse(path, cx, cy, rx, ry, t = bezierArcMagic) {
+  let [x, y] = [1, 0];
+  path.moveTo(cx + rx * x, cy + ry * y);
   for (let i = 0; i < 4; i++) {
     path.bezierCurveTo(
-      Math.round(cx + rx * h1x + shiftX),
-      Math.round(cy + ry * h1y + shiftY),
-      Math.round(cx + rx * h2x + shiftX),
-      Math.round(cy + ry * h2y + shiftY),
-      Math.round(cx + rx * x + shiftX),
-      Math.round(cy + ry * y + shiftY)
+      cx + rx * (x - y * t),
+      cy + ry * (x * t + y),
+      cx + rx * (x * t - y),
+      cy + ry * (x + y * t),
+      cx + rx * -y,
+      cy + ry * x
     );
-    [h1x, h1y] = [-h1y, h1x];
-    [h2x, h2y] = [-h2y, h2x];
     [x, y] = [-y, x];
   }
   path.closePath();
