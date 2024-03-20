@@ -147,7 +147,7 @@ export class ShapeToolRect extends BaseTool {
       })
       .reverse();
 
-    path.coordinates.shift(); // remvoe first element, to get every y value
+    path.coordinates.shift(); // remove first element, to get every y value
     let y_values = path.coordinates
       .filter(function (value, index, Arr) {
         return index % 2 == 0;
