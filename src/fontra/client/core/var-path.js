@@ -573,15 +573,6 @@ export class VarPackedPath {
     this.contourInfo[this.contourInfo.length - 1].isClosed = true;
   }
 
-  reverse() {
-    this.coordinates.reverse();
-    this.pointTypes.reverse();
-    this.contourInfo.reverse();
-    for (const contour of this.contourInfo) {
-      contour.endPoint = this.pointTypes.length - 1 - contour.endPoint;
-    }
-  }
-
   addItemwise(other) {
     this._ensureCompatibility(other);
     return new this.constructor(
