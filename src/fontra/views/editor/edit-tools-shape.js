@@ -75,7 +75,6 @@ export class ShapeToolRect extends BaseTool {
     if (eventTemp.ctrlKey) {
       this.reversePath(pathNew);
     }
-    this.fixPath(pathNew);
     this.addShapePath(pathNew);
   }
 
@@ -150,18 +149,6 @@ export class ShapeToolRect extends BaseTool {
     }
     const packedContour = packContour(contour);
     console.log(packedContour);
-    path.setContour(0, packedContour);
-  }
-
-  fixPath(path) {
-    // remove last point if it's the same as the first
-    const contour = path.getUnpackedContour(0);
-    const firstPoint = contour.points[0];
-    const lastPoint = contour.points[contour.points.length - 1];
-    if (firstPoint.x === lastPoint.x && firstPoint.y === lastPoint.y) {
-      contour.points.pop();
-    }
-    const packedContour = packContour(contour);
     path.setContour(0, packedContour);
   }
 }
