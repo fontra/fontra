@@ -148,7 +148,6 @@ export class ShapeToolRect extends BaseTool {
       contour.points.splice(0, 0, lastPoint);
     }
     const packedContour = packContour(contour);
-    console.log(packedContour);
     path.setContour(0, packedContour);
   }
 }
