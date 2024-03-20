@@ -71,11 +71,11 @@ export class ShapeToolRect extends BaseTool {
 
     const pathNew = new VarPackedPath();
     this.drawShapeWithKeys(pathNew, mouseRect, eventTemp);
+    this.fixPath(pathNew);
     // reversed contour direction
     if (eventTemp.ctrlKey) {
       this.reversePath(pathNew);
     }
-    this.fixPath(pathNew);
     this.addShapePath(pathNew);
   }
 
