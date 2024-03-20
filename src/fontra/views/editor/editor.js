@@ -626,9 +626,8 @@ export class EditorController {
         editToolsElement.appendChild(
           html.div({ id: wrapper_id, class: "tool-button" })
         );
-        let subtoolIndex = 0;
         for (const subClass of editToolClass) {
-          this.addEditTool(new subClass(this), wrapper_id, subtoolIndex++);
+          this.addEditTool(new subClass(this), wrapper_id);
         }
       } else {
         this.addEditTool(new editToolClass(this));
@@ -665,7 +664,7 @@ export class EditorController {
     });
   }
 
-  addEditTool(tool, wrapper_id = "edit-tools", subtoolIndex = 0) {
+  addEditTool(tool, wrapper_id = "edit-tools") {
     this.tools[tool.identifier] = tool;
 
     const editToolsElement = document.querySelector("#" + wrapper_id);
