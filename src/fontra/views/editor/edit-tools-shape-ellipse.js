@@ -8,7 +8,7 @@ export class ShapeToolEllipse extends ShapeToolRect {
   iconPath = "/tabler-icons/circle-plus-2.svg";
   identifier = "shape-tool-ellipse";
 
-  drawShapePath(path, x, y, width, height, revesed, centered) {
+  drawShapePath(path, x, y, width, height, reversed, centered) {
     let radiusX = height * -1;
     let radiusY = width;
 
@@ -19,18 +19,27 @@ export class ShapeToolEllipse extends ShapeToolRect {
       radiusX / 2,
       radiusY / 2,
       bezierArcMagic,
-      revesed,
+      reversed,
       centered
     );
   }
 }
 
-function drawEllipse(path, cx, cy, rx, ry, tension, revesed = false, centered = false) {
+function drawEllipse(
+  path,
+  cx,
+  cy,
+  rx,
+  ry,
+  tension,
+  reversed = false,
+  centered = false
+) {
   // to reverse contour, just use negative rx or ry
   let shiftX = rx,
     shiftY = ry;
 
-  if (revesed) {
+  if (reversed) {
     rx = rx * -1;
     shiftX = rx;
   } else {

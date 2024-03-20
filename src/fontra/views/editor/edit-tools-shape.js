@@ -121,25 +121,25 @@ export class ShapeToolRect extends BaseTool {
       }
     }
 
-    let revesed = event.ctrlKey ? true : false; // reversed contour direction
+    let reversed = event.ctrlKey ? true : false; // reversed contour direction
     let centered = event.altKey ? true : false; // positon at center
 
-    this.drawShapePath(path, x, y, width, height, revesed, centered);
+    this.drawShapePath(path, x, y, width, height, reversed, centered);
   }
 
-  drawShapePath(path, x, y, width, height, revesed, centered) {
+  drawShapePath(path, x, y, width, height, reversed, centered) {
     if (centered) {
       // positon at center
       x = x - height / 2;
       y = y - width / 2;
     }
 
-    drawRect(path, x, y, width, height, revesed);
+    drawRect(path, x, y, width, height, reversed);
   }
 }
 
-function drawRect(path, x, y, width, height, revesed = false) {
-  if (revesed) {
+function drawRect(path, x, y, width, height, reversed = false) {
+  if (reversed) {
     drawRectReversed(path, x, y, width, height);
   } else {
     drawRectNormal(path, x, y, width, height);
