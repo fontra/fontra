@@ -1,5 +1,3 @@
-import * as rectangle from "../core/rectangle.js";
-import { range } from "../core/utils.js";
 import { VarPackedPath } from "../core/var-path.js";
 import { ShapeToolRect } from "./edit-tools-shape.js";
 
