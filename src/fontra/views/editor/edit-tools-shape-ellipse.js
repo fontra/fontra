@@ -69,18 +69,9 @@ function drawEllipse(
       Math.round(cx + rx * x + shiftX),
       Math.round(cy + ry * y + shiftY)
     );
-    let tempH1x = h1x,
-      tempH1y = h1y;
-    h1x = -h1y;
-    h1y = tempH1x;
-    let tempH2x = h2x,
-      tempH2y = h2y;
-    h2x = -h2y;
-    h2y = tempH2x;
-    let tempX = x,
-      tempY = y;
-    x = -y;
-    y = tempX;
+    [h1x, h1y] = [-h1y, h1x];
+    [h2x, h2y] = [-h2y, h2x];
+    [x, y] = [-y, x];
   }
   path.closePath();
 }
