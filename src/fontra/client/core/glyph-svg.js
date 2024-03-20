@@ -31,7 +31,12 @@ export class SVGPath2D {
     this.items.push("L" + this._format(x, y));
   }
 
+  // compatibility method for Path2D
   bezierCurveTo(x1, y1, x2, y2, x3, y3) {
+    this.cubicCurveTo(x1, y1, x2, y2, x3, y3);
+  }
+
+  cubicCurveTo(x1, y1, x2, y2, x3, y3) {
     this.items.push(
       `C${this._format(x1, y1)} ${this._format(x2, y2)} ${this._format(x3, y3)}`
     );
