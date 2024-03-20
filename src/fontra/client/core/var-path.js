@@ -537,24 +537,24 @@ export class VarPackedPath {
     this.pointTypes.push(pointType);
   }
 
-  moveTo(x, y) {
+  moveTo(x, y, onCurveType = VarPackedPath.ON_CURVE) {
     this.appendContour({ coordinates: [], pointTypes: [], isClosed: false });
-    this._appendPoint(x, y, VarPackedPath.ON_CURVE);
+    this._appendPoint(x, y, onCurveType);
   }
 
-  lineTo(x, y) {
-    this._appendPoint(x, y, VarPackedPath.ON_CURVE);
+  lineTo(x, y, onCurveType = VarPackedPath.ON_CURVE) {
+    this._appendPoint(x, y, onCurveType);
   }
 
   // compatibility method for Path2D
-  bezierCurveTo(x1, y1, x2, y2, x3, y3) {
-    this.cubicCurveTo(x1, y1, x2, y2, x3, y3);
+  bezierCurveTo(x1, y1, x2, y2, x3, y3, onCurveType = VarPackedPath.ON_CURVE) {
+    this.cubicCurveTo(x1, y1, x2, y2, x3, y3, onCurveType);
   }
 
-  cubicCurveTo(x1, y1, x2, y2, x3, y3) {
+  cubicCurveTo(x1, y1, x2, y2, x3, y3, onCurveType = VarPackedPath.ON_CURVE) {
     this._appendPoint(x1, y1, VarPackedPath.OFF_CURVE_CUBIC);
     this._appendPoint(x2, y2, VarPackedPath.OFF_CURVE_CUBIC);
-    this._appendPoint(x3, y3, VarPackedPath.ON_CURVE);
+    this._appendPoint(x3, y3, onCurveType);
   }
 
   quadraticCurveTo(...args) {
