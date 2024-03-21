@@ -51,7 +51,9 @@ import { HandTool } from "./edit-tools-hand.js";
 import { PenTool } from "./edit-tools-pen.js";
 import { PointerTool } from "./edit-tools-pointer.js";
 import { PowerRulerTool } from "./edit-tools-power-ruler.js";
+import { ShapeToolBox } from "./edit-tools-shape-box.js";
 import { ShapeToolEllipse } from "./edit-tools-shape-ellipse.js";
+import { ShapeToolRing } from "./edit-tools-shape-ring.js";
 import { ShapeToolRect } from "./edit-tools-shape.js";
 import { SceneController } from "./scene-controller.js";
 import { MIN_SIDEBAR_WIDTH, Sidebar } from "./sidebar.js";
@@ -614,7 +616,7 @@ export class EditorController {
     const editToolClasses = [
       PointerTool,
       PenTool,
-      [ShapeToolRect, ShapeToolEllipse],
+      [ShapeToolRect, ShapeToolEllipse, ShapeToolBox, ShapeToolRing],
       PowerRulerTool,
       HandTool,
     ];

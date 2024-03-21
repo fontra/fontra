@@ -138,10 +138,12 @@ export class ShapeToolRect extends BaseTool {
     }
 
     const unpackedContours = this.getUnpackedContour(x, y, width, height);
-    const packedContour = packContour(unpackedContours[0]);
 
     const path = new VarPackedPath();
-    path.appendContour(packedContour);
+    for (const i in unpackedContours) {
+      const packedContour = packContour(unpackedContours[i]);
+      path.appendContour(packedContour);
+    }
     return path;
   }
 
@@ -150,19 +152,24 @@ export class ShapeToolRect extends BaseTool {
   }
 
   reversePath(path) {
-    const contour = path.getUnpackedContour(0);
+    for (let i = 0; i < path.contourInfo.length; i++) {
+      const contour = path.getUnpackedContour(i);
+      const packedContour = this.reversePackedContour(contour);
+      path.setContour(i, packContour(packedContour));
+    }
+  }
+
+  reversePackedContour(contour) {
     contour.points.reverse();
     if (contour.isClosed) {
       const [lastPoint] = contour.points.splice(-1, 1);
       contour.points.splice(0, 0, lastPoint);
     }
-    const packedContour = packContour(contour);
-    console.log(packedContour);
-    path.setContour(0, packedContour);
+    return contour;
   }
 }
 
-function getUnpackedContourRect(x, y, width, height, contourType = "cubic") {
+export function getUnpackedContourRect(x, y, width, height, contourType = "cubic") {
   const unpackedContour = [
     {
       points: [

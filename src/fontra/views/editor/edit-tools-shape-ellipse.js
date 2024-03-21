@@ -16,7 +16,7 @@ export class ShapeToolEllipse extends ShapeToolRect {
   }
 }
 
-function getUnpackedContourEllipse(cx, cy, rx, ry, t = bezierArcMagic) {
+export function getUnpackedContourEllipse(cx, cy, rx, ry, t = bezierArcMagic) {
   let points = [];
   let [x, y] = [1, 0];
   points.push({ x: cx + rx * x, y: cy + ry * y, smooth: true });
