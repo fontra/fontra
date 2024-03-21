@@ -8,27 +8,24 @@ export class ShapeToolEllipse extends ShapeToolRect {
   iconPath = "/tabler-icons/circle-plus-2.svg";
   identifier = "shape-tool-ellipse";
 
-  drawShapePath(path, x, y, width, height) {
+  getUnpackedContour(x, y, width, height) {
     let cx = x + width / 2;
     let cy = y + height / 2;
 
-    drawEllipse(path, cx, cy, width / 2, height / 2);
+    return getUnpackedContourEllipse(cx, cy, width / 2, height / 2);
   }
 }
 
-function drawEllipse(path, cx, cy, rx, ry, t = bezierArcMagic) {
+function getUnpackedContourEllipse(cx, cy, rx, ry, t = bezierArcMagic) {
+  let points = [];
   let [x, y] = [1, 0];
-  path.moveTo(cx + rx * x, cy + ry * y);
+  points.push({ x: cx + rx * x, y: cy + ry * y, smooth: true });
   for (let i = 0; i < 4; i++) {
-    path.bezierCurveTo(
-      cx + rx * (x - y * t),
-      cy + ry * (x * t + y),
-      cx + rx * (x * t - y),
-      cy + ry * (x + y * t),
-      cx + rx * -y,
-      cy + ry * x
-    );
+    points.push({ x: cx + rx * (x - y * t), y: cy + ry * (x * t + y), type: "cubic" });
+    points.push({ x: cx + rx * (x * t - y), y: cy + ry * (x + y * t), type: "cubic" });
+    points.push({ x: cx + rx * -y, y: cy + ry * x, smooth: true });
     [x, y] = [-y, x];
   }
-  path.closePath();
+  points.pop(); // remove last point
+  return [{ points: points, isClosed: true }];
 }
