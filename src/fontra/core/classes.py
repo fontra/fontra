@@ -165,6 +165,7 @@ class VariableGlyph:
     axes: list[GlyphAxis] = field(default_factory=list)
     sources: list[GlyphSource] = field(default_factory=list)
     layers: dict[str, Layer] = field(default_factory=dict)
+    locked: Optional[bool] = None
     customData: CustomData = field(default_factory=dict)
 
     def convertToPackedPaths(self):
@@ -201,6 +202,8 @@ class StaticGlyph:
     guidelines: list[Union[Guideline, HorizontalGuideline, VerticalGuideline]] = field(
         default_factory=list
     )
+    locked: Optional[bool] = None
+    # customData: CustomData = field(default_factory=dict)
 
     def convertToPackedPaths(self):
         return replace(self, path=self.path.asPackedPath())

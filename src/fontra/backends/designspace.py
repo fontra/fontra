@@ -58,6 +58,7 @@ VARIABLE_COMPONENTS_LIB_KEY = "com.black-foundry.variable-components"
 GLYPH_DESIGNSPACE_LIB_KEY = "com.black-foundry.glyph-designspace"
 SOURCE_NAME_MAPPING_LIB_KEY = "xyz.fontra.source-names"
 LAYER_NAME_MAPPING_LIB_KEY = "xyz.fontra.layer-names"
+LOCKED_LIB_KEY = "locked"  # "xyz.fontra.locked"
 
 
 defaultUFOInfoAttrs = {
@@ -287,6 +288,8 @@ class DesignspaceBackend:
         layers = {}
         sourceNameMapping = {}
         layerNameMapping = {}
+        lockedMapping = []
+        customData = {}
 
         for ufoLayer in self.ufoLayers:
             if glyphName not in ufoLayer.glyphSet:
@@ -301,6 +304,7 @@ class DesignspaceBackend:
                     )
                 sourceNameMapping = ufoGlyph.lib.get(SOURCE_NAME_MAPPING_LIB_KEY, {})
                 layerNameMapping = ufoGlyph.lib.get(LAYER_NAME_MAPPING_LIB_KEY, {})
+            lockedMapping.append(ufoGlyph.locked)
             layers[ufoLayer.fontraLayerName] = Layer(glyph=staticGlyph)
 
         # When a glyph has axes with names that also exist as global axes, we need
@@ -334,8 +338,15 @@ class DesignspaceBackend:
         if sourceNameMapping:
             for source in sources:
                 source.name = sourceNameMapping.get(source.name, source.name)
-
-        return VariableGlyph(name=glyphName, axes=axes, sources=sources, layers=layers)
+        print("lockedMapping: ", lockedMapping)
+        return VariableGlyph(
+            name=glyphName,
+            axes=axes,
+            sources=sources,
+            layers=layers,
+            locked=True if all(lockedMapping) else False,
+            customData=customData,
+        )
 
     def _unpackLocalDesignSpace(self, dsDict, defaultLayerName):
         axes = [
@@ -384,6 +395,7 @@ class DesignspaceBackend:
         assert isinstance(codePoints, list)
         assert all(isinstance(cp, int) for cp in codePoints)
         self.glyphMap[glyphName] = codePoints
+        print("putGlyph: ", glyph.locked)
 
         if self._glyphDependencies is not None:
             self._glyphDependencies.update(glyphName, componentNamesFromGlyph(glyph))
@@ -438,6 +450,7 @@ class DesignspaceBackend:
                 if ufoLayer.fontraLayerName != layerName:
                     layerNameMapping[ufoLayer.fontraLayerName] = layerName
                 layerName = ufoLayer.fontraLayerName
+
             layers.append((layer, ufoLayer))
             usedLayers.add(layerName)
 
@@ -459,6 +472,7 @@ class DesignspaceBackend:
             drawPointsFunc = populateUFOLayerGlyph(
                 layerGlyph, layer.glyph, hasVariableComponents
             )
+            print("layerGlyph: ", layerGlyph.locked)
             glyphSet.writeGlyph(glyphName, layerGlyph, drawPointsFunc=drawPointsFunc)
             if writeGlyphSetContents:
                 # FIXME: this is inefficient if we write many glyphs
@@ -1040,6 +1054,7 @@ class UFOGlyph:
     width: float | None = 0
     height: float | None = None
     anchors: list = []
+    locked: bool = None
     lib: dict
 
 
@@ -1151,6 +1166,7 @@ def ufoLayerToStaticGlyph(glyphSet, glyphName, penClass=PackedPathPointPen):
         components=components,
         xAdvance=glyph.width,
         anchors=unpackAnchors(glyph.anchors),
+        locked=glyph.locked,  # lib.get(LOCKED_LIB_KEY),
     )
 
     # TODO: yAdvance, verticalOrigin
@@ -1217,6 +1233,9 @@ def populateUFOLayerGlyph(
             )
 
     storeInLib(layerGlyph, VARIABLE_COMPONENTS_LIB_KEY, variableComponents)
+    print("staticGlyph.locked: ", staticGlyph.locked)
+    layerGlyph.locked = staticGlyph.locked
+    print("layerGlyph.locked: ", layerGlyph.locked)
 
     return pen.replay
 

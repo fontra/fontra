@@ -186,6 +186,10 @@
     "guidelines": {
       "type": "list",
       "subtype": "Guideline"
+    },
+    "locked": {
+      "type": "bool",
+      "optional": true
     }
   },
   "PackedPath": {
