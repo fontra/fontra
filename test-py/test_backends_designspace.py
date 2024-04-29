@@ -386,6 +386,19 @@ async def test_findGlyphsThatUseGlyph(writableTestFont):
         ] == await writableTestFont.findGlyphsThatUseGlyph("A")
 
 
+async def test_addGlyphCustomData_locked(writableTestFont):
+    glyphName = "E"
+    glyphMap = await writableTestFont.getGlyphMap()
+    glyph = await writableTestFont.getGlyph(glyphName)
+    glyph.customData = {"locked": True}
+
+    await writableTestFont.putGlyph(glyphName, glyph, glyphMap[glyphName])
+
+    savedGlyph = await writableTestFont.getGlyph(glyphName)
+
+    assert glyph.customData["locked"] == savedGlyph.customData["locked"]
+
+
 getSourcesTestData = [
     {
         "location": {"italic": 0.0, "weight": 150.0, "width": 0.0},
