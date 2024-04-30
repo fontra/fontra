@@ -203,7 +203,6 @@ class StaticGlyph:
         default_factory=list
     )
     locked: Optional[bool] = None
-    # customData: CustomData = field(default_factory=dict)
 
     def convertToPackedPaths(self):
         return replace(self, path=self.path.asPackedPath())

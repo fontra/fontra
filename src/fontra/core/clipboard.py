@@ -9,7 +9,8 @@ from fontTools.svgLib import SVGPath
 from fontTools.ufoLib.errors import GlifLibError
 from fontTools.ufoLib.glifLib import readGlyphFromString, writeGlyphToString
 
-from ..backends.designspace import (  # LOCKED_LIB_KEY,
+from ..backends.designspace import (
+    LOCKED_LIB_KEY,
     UFOGlyph,
     populateUFOLayerGlyph,
     readGlyphOrCreate,
@@ -73,7 +74,7 @@ def parseGLIF(data: str) -> StaticGlyph | None:
         components=pen.components,
         xAdvance=ufoGlyph.width,
         anchors=unpackAnchors(ufoGlyph.anchors),
-        locked=ufoGlyph.locked,  # lib.get(LOCKED_LIB_KEY, False),
+        locked=ufoGlyph.lib.get(LOCKED_LIB_KEY),  # locked,
     )
 
 

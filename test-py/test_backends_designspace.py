@@ -411,26 +411,19 @@ async def test_add_glyph_with_locked_layer(writableTestFont):
     glyph = await writableTestFont.getGlyph(glyphName)
 
     layerName = "test"
-    glyph.layers[layerName] = Layer(glyph=StaticGlyph(xAdvance=0))
+    glyph.layers[layerName] = Layer(glyph=StaticGlyph(xAdvance=111))
     glyph.layers[layerName].glyph.locked = True
 
     await writableTestFont.putGlyph(glyphName, glyph, glyphMap[glyphName])
 
     savedGlyph = await writableTestFont.getGlyph(glyphName)
-    print(
-        "savedGlyph.layers[layerName].glyph.locked: ",
-        savedGlyph.layers[layerName].glyph.locked,
-    )
-    print(
-        "glyph.layers[layerName].glyph.locked: ", glyph.layers[layerName].glyph.locked
-    )
     assert (
         glyph.layers[layerName].glyph.locked
         == savedGlyph.layers[layerName].glyph.locked
     )
 
 
-""" async def test_add_glyph_with_all_layers_locked(writableTestFont):
+async def test_add_glyph_with_all_layers_locked(writableTestFont):
     glyphName = "E"
     glyphMap = await writableTestFont.getGlyphMap()
     glyph = await writableTestFont.getGlyph(glyphName)
@@ -443,8 +436,6 @@ async def test_add_glyph_with_locked_layer(writableTestFont):
     await writableTestFont.putGlyph(glyphName, glyph, glyphMap[glyphName])
 
     savedGlyph = await writableTestFont.getGlyph(glyphName)
-    print('savedGlyph.locked: ', savedGlyph.locked)
-    print('glyph.locked: ', glyph.locked)
     assert savedGlyph.locked is True
 
 
@@ -457,13 +448,11 @@ async def test_add_glyph_set_locked(writableTestFont):
     await writableTestFont.putGlyph(glyphName, glyph, glyphMap[glyphName])
 
     savedGlyph = await writableTestFont.getGlyph(glyphName)
-    print('savedGlyph.locked: ', savedGlyph.locked)
-    print('glyph.locked: ', glyph.locked)
-    assert glyph.locked == savedGlyph.locked
 
+    # if glyph is locked, all layers should be locked
     for layer in savedGlyph.layers:
         assert layer.glyph.locked is True
- """
+
 
 getSourcesTestData = [
     {
