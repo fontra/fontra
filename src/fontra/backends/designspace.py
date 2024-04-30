@@ -293,6 +293,7 @@ class DesignspaceBackend:
         for ufoLayer in self.ufoLayers:
             if glyphName not in ufoLayer.glyphSet:
                 continue
+
             staticGlyph, ufoGlyph = ufoLayerToStaticGlyph(ufoLayer.glyphSet, glyphName)
             if ufoLayer == self.defaultUFOLayer:
                 localDS = ufoGlyph.lib.get(GLYPH_DESIGNSPACE_LIB_KEY)
@@ -445,7 +446,6 @@ class DesignspaceBackend:
                 if ufoLayer.fontraLayerName != layerName:
                     layerNameMapping[ufoLayer.fontraLayerName] = layerName
                 layerName = ufoLayer.fontraLayerName
-
             layers.append((layer, ufoLayer))
             usedLayers.add(layerName)
 
@@ -467,7 +467,6 @@ class DesignspaceBackend:
             drawPointsFunc = populateUFOLayerGlyph(
                 layerGlyph, layer.glyph, hasVariableComponents
             )
-            print("layerGlyph: ", layerGlyph.locked)
             glyphSet.writeGlyph(glyphName, layerGlyph, drawPointsFunc=drawPointsFunc)
             if writeGlyphSetContents:
                 # FIXME: this is inefficient if we write many glyphs

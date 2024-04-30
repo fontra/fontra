@@ -74,7 +74,7 @@ def parseGLIF(data: str) -> StaticGlyph | None:
         components=pen.components,
         xAdvance=ufoGlyph.width,
         anchors=unpackAnchors(ufoGlyph.anchors),
-        locked=ufoGlyph.lib.get(LOCKED_LIB_KEY),  # locked,
+        locked=ufoGlyph.lib.get(LOCKED_LIB_KEY),
     )
 
 
