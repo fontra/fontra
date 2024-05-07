@@ -1,9 +1,5 @@
 import { difference, isSuperset, union } from "../core/set-ops.js";
 import { subVectors } from "../core/vector.js";
-import {
-  FONTRA_STATUS_DEFINITIONS_KEY,
-  FONTRA_STATUS_KEY,
-} from "./panel-designspace-navigation.js";
 import { decomposedToTransform } from "/core/transform.js";
 import {
   chain,
@@ -1034,7 +1030,7 @@ registerVisualizationLayerDefinition({
   zIndex: 100,
   draw: (context, positionedGlyph, parameters, model, controller) => {
     const statusFieldDefinitions =
-      model.fontController.customData[FONTRA_STATUS_DEFINITIONS_KEY];
+      model.fontController.customData["fontra.sourceStatusFieldDefinitions"];
     if (!statusFieldDefinitions) {
       return;
     }
@@ -1045,7 +1041,9 @@ registerVisualizationLayerDefinition({
     }
 
     const status =
-      positionedGlyph.varGlyph.sources[sourceIndex].customData[FONTRA_STATUS_KEY];
+      positionedGlyph.varGlyph.sources[sourceIndex].customData[
+        "fontra.development.status"
+      ];
     if (status === undefined) {
       return;
     }
