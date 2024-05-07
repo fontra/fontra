@@ -30,8 +30,8 @@ import { dialog, dialogSetup, message } from "/web-components/modal-dialog.js";
 import Panel from "./panel.js";
 import { NumberFormatter } from "/core/ui-utils.js";
 
-const FONTRA_STATUS_KEY = "fontra.development.status";
-const FONTRA_STATUS_DEFINITIONS_KEY = "fontra.sourceStatusFieldDefinitions";
+export const FONTRA_STATUS_KEY = "fontra.development.status";
+export const FONTRA_STATUS_DEFINITIONS_KEY = "fontra.sourceStatusFieldDefinitions";
 
 export default class DesignspaceNavigationPanel extends Panel {
   identifier = "designspace-navigation";
