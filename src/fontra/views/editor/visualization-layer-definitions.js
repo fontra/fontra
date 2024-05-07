@@ -1,11 +1,16 @@
 import { difference, isSuperset, union } from "../core/set-ops.js";
 import { subVectors } from "../core/vector.js";
+import {
+  FONTRA_STATUS_DEFINITIONS_KEY,
+  FONTRA_STATUS_KEY,
+} from "./panel-designspace-navigation.js";
 import { decomposedToTransform } from "/core/transform.js";
 import {
   chain,
   enumerate,
   makeUPlusStringFromCodePoint,
   parseSelection,
+  rgbaToCSS,
   round,
   unionIndexSets,
   withSavedState,
@@ -1017,6 +1022,43 @@ registerVisualizationLayerDefinition({
         2 * parameters.canDragOffCurveIndicatorRadius
       );
     }
+  },
+});
+
+registerVisualizationLayerDefinition({
+  identifier: "fontra.status.color",
+  name: "Status color",
+  selectionMode: "all",
+  userSwitchable: true,
+  defaultOn: false,
+  zIndex: 100,
+  draw: (context, positionedGlyph, parameters, model, controller) => {
+    const statusFieldDefinitions =
+      model.fontController.customData[FONTRA_STATUS_DEFINITIONS_KEY];
+    if (!statusFieldDefinitions) {
+      return;
+    }
+
+    const sourceIndex = positionedGlyph.glyph.sourceIndex;
+    if (sourceIndex === undefined) {
+      return;
+    }
+
+    const status =
+      positionedGlyph.varGlyph.sources[sourceIndex].customData[FONTRA_STATUS_KEY];
+    if (status === undefined) {
+      return;
+    }
+
+    context.fillStyle = rgbaToCSS(statusFieldDefinitions[status].color);
+    context.beginPath();
+    context.rect(
+      0,
+      (-150 * model.fontController.unitsPerEm) / 1000,
+      positionedGlyph.glyph.xAdvance,
+      50
+    );
+    context.fill();
   },
 });
 
