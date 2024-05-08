@@ -1054,7 +1054,7 @@ registerVisualizationLayerDefinition({
       0,
       -0.150 * model.fontController.unitsPerEm,
       positionedGlyph.glyph.xAdvance,
-      50
+      0.05 * model.fontController.unitsPerEm
     );
     context.fill();
   },
