@@ -3,10 +3,11 @@ import { subVectors } from "../core/vector.js";
 import { decomposedToTransform } from "/core/transform.js";
 import {
   chain,
+  clamp,
   enumerate,
   makeUPlusStringFromCodePoint,
   parseSelection,
-  rgbaToCSS,
+  rgbaToFillStyle,
   round,
   unionIndexSets,
   withSavedState,
@@ -1024,41 +1025,56 @@ registerVisualizationLayerDefinition({
 registerVisualizationLayerDefinition({
   identifier: "fontra.status.color",
   name: "Status color",
-  selectionMode: "all",
+  selectionMode: "editing",
   userSwitchable: true,
   defaultOn: false,
   zIndex: 100,
-  draw: (context, positionedGlyph, parameters, model, controller) => {
-    const statusFieldDefinitions =
-      model.fontController.customData["fontra.sourceStatusFieldDefinitions"];
-    if (!statusFieldDefinitions) {
-      return;
-    }
-
-    const sourceIndex = positionedGlyph.glyph.sourceIndex;
-    if (sourceIndex === undefined) {
-      return;
-    }
-
-    const status =
-      positionedGlyph.varGlyph.sources[sourceIndex].customData[
-        "fontra.development.status"
-      ];
-    if (status === undefined) {
-      return;
-    }
-
-    context.fillStyle = rgbaToCSS(statusFieldDefinitions[status].color);
-    context.beginPath();
-    context.rect(
-      0,
-      -0.150 * model.fontController.unitsPerEm,
-      positionedGlyph.glyph.xAdvance,
-      0.05 * model.fontController.unitsPerEm
-    );
-    context.fill();
-  },
+  screenParameters: { thickness: 20 },
+  colors: { opacity: 0.5 },
+  draw: _drawStatusColor,
 });
+
+registerVisualizationLayerDefinition({
+  identifier: "fontra.status.color.non-editing",
+  name: "Status color for non-editing glyphs",
+  selectionMode: "notediting",
+  userSwitchable: true,
+  defaultOn: false,
+  zIndex: 100,
+  screenParameters: { thickness: 20 },
+  colors: { opacity: 1.0 },
+  draw: _drawStatusColor,
+});
+
+function _drawStatusColor(context, positionedGlyph, parameters, model, controller) {
+  parameters.opacity;
+  const statusFieldDefinitions =
+    model.fontController.customData["fontra.sourceStatusFieldDefinitions"];
+  if (!statusFieldDefinitions) {
+    return;
+  }
+
+  const sourceIndex = positionedGlyph.glyph.sourceIndex;
+  if (sourceIndex === undefined) {
+    return;
+  }
+
+  const status =
+    positionedGlyph.varGlyph.sources[sourceIndex].customData[
+      "fontra.development.status"
+    ];
+  if (status === undefined) {
+    return;
+  }
+
+  const thickness = clamp(parameters.thickness, 20, 150);
+  let color = statusFieldDefinitions[status].color;
+  color[3] = parameters.opacity;
+  context.fillStyle = rgbaToFillStyle(color);
+  context.beginPath();
+  context.rect(0, -100 - thickness, positionedGlyph.glyph.xAdvance, thickness);
+  context.fill();
+}
 
 registerVisualizationLayerDefinition({
   identifier: "fontra.edit.background.layers",
