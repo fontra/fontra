@@ -3,6 +3,7 @@ import { subVectors } from "../core/vector.js";
 import { decomposedToTransform } from "/core/transform.js";
 import {
   chain,
+  clamp,
   enumerate,
   makeUPlusStringFromCodePoint,
   parseSelection,
@@ -1028,6 +1029,10 @@ registerVisualizationLayerDefinition({
   userSwitchable: true,
   defaultOn: false,
   zIndex: 100,
+  screenParameters: {
+    minThickness: 3,
+    maxThickness: 15,
+  },
   draw: (context, positionedGlyph, parameters, model, controller) => {
     const statusFieldDefinitions =
       model.fontController.customData["fontra.sourceStatusFieldDefinitions"];
@@ -1050,18 +1055,18 @@ registerVisualizationLayerDefinition({
 
     const color = [...statusFieldDefinitions[status].color];
     if (positionedGlyph.isEditing) {
-      // make opacity 50% when in editing mode
+      // in editing mode make opacity 50%
       color[3] = color[3] * 0.5;
     }
 
+    const thickness = clamp(
+      0.05 * model.fontController.unitsPerEm,
+      parameters.minThickness,
+      parameters.maxThickness
+    );
     context.fillStyle = rgbaToCSS(color);
     context.beginPath();
-    context.rect(
-      0,
-      -0.15 * model.fontController.unitsPerEm,
-      positionedGlyph.glyph.xAdvance,
-      0.05 * model.fontController.unitsPerEm
-    );
+    context.rect(0, -100 - thickness, positionedGlyph.glyph.xAdvance, thickness);
     context.fill();
   },
 });
