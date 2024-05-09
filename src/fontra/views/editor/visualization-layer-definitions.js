@@ -1048,11 +1048,17 @@ registerVisualizationLayerDefinition({
       return;
     }
 
-    context.fillStyle = rgbaToCSS(statusFieldDefinitions[status].color);
+    const color = [...statusFieldDefinitions[status].color];
+    if (positionedGlyph.isEditing) {
+      // make opacity 50% when in editing mode
+      color[3] = color[3] * 0.5;
+    }
+
+    context.fillStyle = rgbaToCSS(color);
     context.beginPath();
     context.rect(
       0,
-      -0.150 * model.fontController.unitsPerEm,
+      -0.15 * model.fontController.unitsPerEm,
       positionedGlyph.glyph.xAdvance,
       0.05 * model.fontController.unitsPerEm
     );
