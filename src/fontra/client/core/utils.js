@@ -345,9 +345,10 @@ export function arrayExtend(thisArray, itemsArray) {
 }
 
 export function rgbaToCSS(rgba) {
-  const channels = rgba.map((channel) => Math.round(channel * 255));
-  if (channels[3] == 255) {
-    channels.pop();
+  const channels = rgba.slice(0, 3).map((channel) => Math.round(channel * 255));
+  const alpha = rgba.length === 4 ? rgba[3] : undefined;
+  if (alpha !== undefined && 0 <= alpha && alpha < 1) {
+    channels.push(alpha);
   }
   return `${channels.length === 4 ? "rgba" : "rgb"}(${channels.join(",")})`;
 }
