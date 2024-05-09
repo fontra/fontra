@@ -353,22 +353,6 @@ export function rgbaToCSS(rgba) {
   return `${channels.length === 4 ? "rgba" : "rgb"}(${channels.join(",")})`;
 }
 
-// according to the documentation, the alpha value must be a value
-// between 0.0 and 1.0, why it's not possible to use rgbaToCSS
-// more: https://doc.qt.io/qt-5/qml-qtquick-context2d.html#fillStyle-prop
-export function rgbaToFillStyle(rgba) {
-  let alpha = undefined;
-  if (rgba.length === 4) {
-    alpha = rgba[3];
-    rgba.pop();
-  }
-  const channels = rgba.map((channel) => Math.round(channel * 255));
-  if (alpha !== undefined && alpha != 1) {
-    channels.push(alpha);
-  }
-  return `${channels.length === 4 ? "rgba" : "rgb"}(${channels.join(",")})`;
-}
-
 export function clamp(number, min, max) {
   return Math.max(Math.min(number, max), min);
 }

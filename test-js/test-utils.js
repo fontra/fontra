@@ -25,7 +25,6 @@ import {
   reversed,
   reversedEnumerate,
   rgbaToCSS,
-  rgbaToFillStyle,
   round,
   scheduleCalls,
   splitGlyphNameExtension,
@@ -369,22 +368,6 @@ describe("rgbaToCSS", () => {
   });
   it("should always create rgb if the opacity is 1", () => {
     expect(rgbaToCSS([0, 0, 0, 1])).to.be.equal("rgb(0,0,0)");
-  });
-});
-
-describe("rgbaToFillStyle", () => {
-  it("should convert an array of decimals to rgb string", () => {
-    expect(rgbaToFillStyle([0, 0, 0])).to.be.equal("rgb(0,0,0)");
-    expect(rgbaToFillStyle([0, 1, 0])).to.be.equal("rgb(0,255,0)");
-    expect(rgbaToFillStyle([1, 0, 0, 1])).to.be.equal("rgb(255,0,0)");
-  });
-  it("should convert an array of decimals to rgba string", () => {
-    expect(rgbaToFillStyle([0, 0, 0, 0])).to.be.equal("rgba(0,0,0,0)");
-    expect(rgbaToFillStyle([0, 0, 0, 0.2])).to.be.equal("rgba(0,0,0,0.2)");
-  });
-  it("should always create rgb if the opacity is 1", () => {
-    expect(rgbaToFillStyle([0, 0, 0, 1])).to.be.equal("rgb(0,0,0)");
-    expect(rgbaToFillStyle([0, 0, 0, 1.0])).to.be.equal("rgb(0,0,0)");
   });
 });
 
