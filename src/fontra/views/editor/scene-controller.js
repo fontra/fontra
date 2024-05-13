@@ -155,9 +155,14 @@ export class SceneController {
     this.sceneSettingsController.addKeyListener(
       ["selectedGlyph", "glyphLines"],
       (event) => {
+        const lines = this.sceneModel.positionedLines.map((line) => {
+          return line.glyphs.map((g) => ({
+            glyphName: g.glyphName,
+          }));
+        });
         this.sceneSettings.selectedGlyphName = getSelectedGlyphName(
           this.sceneSettings.selectedGlyph,
-          this.sceneSettings.glyphLines
+          lines
         );
       },
       true
@@ -330,6 +335,7 @@ export class SceneController {
       case "editBegin":
         {
           const glyphController = this.sceneModel.getSelectedPositionedGlyph().glyph;
+
           this.sceneModel.ghostPath = glyphController.flattenedPath2d;
         }
         break;
@@ -829,6 +835,7 @@ export class SceneController {
       return;
     }
     const glyphName = this.sceneModel.getSelectedGlyphName();
+
     const varGlyph = await this.fontController.getGlyph(glyphName);
     const baseChangePath = ["glyphs", glyphName];
 

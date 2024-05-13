@@ -91,17 +91,32 @@ export class SceneModel {
     if (!glyphSelection) {
       return undefined;
     }
+
     return this.positionedLines[glyphSelection.lineIndex]?.glyphs[
       glyphSelection.glyphIndex
     ];
   }
 
   getSelectedGlyphInfo() {
-    return getSelectedGlyphInfo(this.selectedGlyph, this.glyphLines);
+    const lines = this.positionedLines.map((line) => {
+      return line.glyphs.map((glyph) => ({
+        character: glyph.character,
+        glyphName: glyph.glyphName,
+        isUndefined: glyph.isUndefined,
+      }));
+    });
+    return getSelectedGlyphInfo(this.selectedGlyph, lines);
   }
 
   getSelectedGlyphName() {
-    return getSelectedGlyphName(this.selectedGlyph, this.glyphLines);
+    const lines = this.positionedLines.map((line) => {
+      return line.glyphs.map((glyph) => ({
+        character: glyph.character,
+        glyphName: glyph.glyphName,
+        isUndefined: glyph.isUndefined,
+      }));
+    });
+    return getSelectedGlyphName(this.selectedGlyph, lines);
   }
 
   isSelectedGlyphLocked() {
@@ -349,7 +364,7 @@ export class SceneModel {
       glyphIndex: selectedGlyphIndex,
       isEditing: selectedGlyphIsEditing,
     } = this.selectedGlyph || {};
-    console.log(selectedLineIndex);
+
     const editLayerName = this.sceneSettings.editLayerName;
 
     let y = 0;
@@ -407,7 +422,6 @@ export class SceneModel {
             glyphInfo.glyphName
           );
         }
-        console.log(x + glyphInstance.xAdvance, maxLineLength);
         if (x + glyphInstance.xAdvance > maxLineLength) {
           stack.push(glyphLine.slice(glyphIndex));
           break;
