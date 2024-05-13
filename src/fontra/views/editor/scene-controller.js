@@ -156,8 +156,10 @@ export class SceneController {
       ["selectedGlyph", "glyphLines"],
       (event) => {
         const lines = this.sceneModel.positionedLines.map((line) => {
-          return line.glyphs.map((g) => ({
-            glyphName: g.glyphName,
+          return line.glyphs.map((glyph) => ({
+            character: glyph.character,
+            glyphName: glyph.glyphName,
+            isUndefined: glyph.isUndefined,
           }));
         });
         this.sceneSettings.selectedGlyphName = getSelectedGlyphName(
