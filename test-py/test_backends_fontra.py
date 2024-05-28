@@ -36,6 +36,11 @@ def newFontraFont(tmpdir):
     return newFileSystemBackend(tmpdir / "newfont.fontra")
 
 
+@pytest.fixture
+def newDSFont(tmpdir):
+    return newFileSystemBackend(tmpdir / "newfont.designspace")
+
+
 async def test_copy_to_fontra(testDSFont, newFontraFont):
     async with aclosing(newFontraFont):
         await copyFont(testDSFont, newFontraFont)
@@ -115,10 +120,7 @@ async def test_features(writableFontraFont):
     assert await reopenedFont.getFeatures() == OpenTypeFeatures()
 
 
-async def test_statusFieldDefinitions(writableFontraFont):
-    customData = await writableFontraFont.getCustomData()
-    assert {} == customData
-
+def newStatusDefinitionsTestData():
     statusTestData = {
         "fontra.sourceStatusFieldDefinitions": [
             {
@@ -133,6 +135,45 @@ async def test_statusFieldDefinitions(writableFontraFont):
             {"color": [0, 1, 0.5, 1], "label": "Validated", "value": 4},
         ]
     }
+    return statusTestData.copy()
+
+
+async def test_statusFieldDefinitions(writableFontraFont):
+    customData = await writableFontraFont.getCustomData()
+    assert {} == customData
+
+    statusTestData = newStatusDefinitionsTestData()
     await writableFontraFont.putCustomData(statusTestData)
 
     assert statusTestData == await writableFontraFont.getCustomData()
+
+
+async def test_copy_to_fontra_check_status_definitions(testDSFont, newFontraFont):
+    async with aclosing(newFontraFont):
+        await copyFont(testDSFont, newFontraFont)
+
+    fontraFont = getFileSystemBackend(newFontraFont.path)
+
+    testDSFontCustomData = await testDSFont.getCustomData()
+    fontraFontCustomData = await fontraFont.getCustomData()
+
+    assert (
+        testDSFontCustomData["fontra.sourceStatusFieldDefinitions"]
+        == fontraFontCustomData["fontra.sourceStatusFieldDefinitions"]
+    )
+
+
+async def test_copy_to_designspace_check_status_definitions(testFontraFont, newDSFont):
+    statusTestData = newStatusDefinitionsTestData()
+    await testFontraFont.putCustomData(statusTestData)
+
+    async with aclosing(newDSFont):
+        await copyFont(testFontraFont, newDSFont)
+
+    testDSFontCustomData = await newDSFont.getCustomData()
+    fontraFontCustomData = await testFontraFont.getCustomData()
+
+    assert (
+        testDSFontCustomData["fontra.sourceStatusFieldDefinitions"]
+        == fontraFontCustomData["fontra.sourceStatusFieldDefinitions"]
+    )
