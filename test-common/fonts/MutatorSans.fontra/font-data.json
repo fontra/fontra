@@ -38,5 +38,60 @@
 "defaultValue": 0
 }
 ]
+},
+"customData": {
+"fontra.sourceStatusFieldDefinitions": [
+{
+"color": [
+1,
+0,
+0,
+1
+],
+"isDefault": true,
+"label": "In progress",
+"value": 0
+},
+{
+"color": [
+1,
+0.5,
+0,
+1
+],
+"label": "Checking-1",
+"value": 1
+},
+{
+"color": [
+1,
+1,
+0,
+1
+],
+"label": "Checking-2",
+"value": 2
+},
+{
+"color": [
+0,
+0.5,
+1,
+1
+],
+"label": "Checking-3",
+"value": 3
+},
+{
+"color": [
+0,
+1,
+0.5,
+1
+],
+"label": "Validated",
+"value": 4
+}
+]
 }
 }
