@@ -163,15 +163,17 @@ async def test_copy_to_fontra_check_status_definitions(testDSFont, newFontraFont
     )
 
 
-async def test_copy_to_designspace_check_status_definitions(testFontraFont, newDSFont):
+async def test_copy_to_designspace_check_status_definitions(
+    writableFontraFont, newDSFont
+):
     statusTestData = newStatusDefinitionsTestData()
-    await testFontraFont.putCustomData(statusTestData)
+    await writableFontraFont.putCustomData(statusTestData)
 
     async with aclosing(newDSFont):
-        await copyFont(testFontraFont, newDSFont)
+        await copyFont(writableFontraFont, newDSFont)
 
     testDSFontCustomData = await newDSFont.getCustomData()
-    fontraFontCustomData = await testFontraFont.getCustomData()
+    fontraFontCustomData = await writableFontraFont.getCustomData()
 
     assert (
         testDSFontCustomData["fontra.sourceStatusFieldDefinitions"]
