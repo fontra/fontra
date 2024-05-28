@@ -1051,7 +1051,7 @@ async def test_getAxes(testFontName, expectedGlobalAxes):
 
 
 getLibTestData = [
-    ("designspace", 0),
+    ("designspace", 1),
     ("ufo", 0),
 ]
 
