@@ -1,3 +1,4 @@
+import { recordChanges } from "../core/change-recorder.js";
 import * as html from "../core/html-utils.js";
 import { addStyleSheet } from "../core/html-utils.js";
 import { ObservableController } from "../core/observable-object.js";
@@ -117,14 +118,14 @@ select {
 `);
 
 class SourceBox extends HTMLElement {
-  constructor(sources, sourceIdentifier, postChange, deleteSource) {
+  constructor(sources, sourceIdentifier, postChange, setupUI) {
     super();
     this.classList.add("fontra-ui-font-info-sources-panel-source-box");
     this.draggable = true;
     this.sources = sources;
     this.sourceIdentifier = sourceIdentifier;
     this.postChange = postChange;
-    this.deleteSource = deleteSource;
+    this.setupUI = setupUI;
     this.controller = {};
     this._updateContents();
   }
@@ -161,6 +162,18 @@ class SourceBox extends HTMLElement {
     });
     if (changes.hasChange) {
       this.postChange(changes.change, changes.rollbackChange, undoLabel);
+    }
+  }
+
+  deleteSource(sourceIdentifier) {
+    const undoLabel = `delete source '${this.source.name}'`;
+    const root = { sources: this.sources };
+    const changes = recordChanges(root, (root) => {
+      delete root.sources[sourceIdentifier];
+    });
+    if (changes.hasChange) {
+      this.postChange(changes.change, changes.rollbackChange, undoLabel);
+      this.setupUI();
     }
   }
 
