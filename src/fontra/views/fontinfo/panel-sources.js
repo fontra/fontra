@@ -136,10 +136,12 @@ class SourceBox extends HTMLElement {
   get model() {
     const source = this.source;
     return {
-      general: { name: source.name },
-      location: source.location,
-      verticalMetrics: source.verticalMetrics,
+      General: { name: source.name },
+      Location: source.location,
+      Metrics: source.verticalMetrics,
     };
+    // NOTE: Font guidlines could be read/write here,
+    // but makes more sense directly in the glyph editing window.
   }
 
   editSource(editFunc, undoLabel) {
@@ -176,10 +178,11 @@ class SourceBox extends HTMLElement {
 
     this.innerHTML = "";
 
+    for (const key in model) {
+      this.append(html.div({ class: "fontra-ui-font-info-header" }, [translate(key)]));
+    }
+
     this.append(
-      html.div({ class: "fontra-ui-font-info-header" }, [translate("General")]),
-      html.div({ class: "fontra-ui-font-info-header" }, [translate("Location")]),
-      html.div({ class: "fontra-ui-font-info-header" }, [translate("Metrics")]),
       html.createDomElement("icon-button", {
         "class": "fontra-ui-font-info-delete",
         "src": "/tabler-icons/trash.svg",
@@ -187,10 +190,8 @@ class SourceBox extends HTMLElement {
         "data-tooltip": translate("sources.delete-source"),
         "data-tooltipposition": "left",
       })
-
-      // NOTE: Font guidlines could be read/write here,
-      // but makes more sense directly in the glyph editing window.
     );
+
     for (const key in model) {
       this.append(buildElement(this.controller[key]));
     }
