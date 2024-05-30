@@ -92,6 +92,7 @@ class FontSource:
 @dataclass(kw_only=True)
 class FontMetric:
     value: float
+    zone: int = 0
     customData: CustomData = field(default_factory=dict)
 
 
