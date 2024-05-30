@@ -384,7 +384,7 @@ export class EditorController {
           const menuItems = [
             ["Font Info", "#font-info-panel", true],
             ["Axes", "#axes-panel", true],
-            ["Sources", "#sources-panel", false],
+            ["Sources", "#sources-panel", true],
             ["Status definitions", "#development-status-definitions-panel", true],
           ];
           return menuItems.map(([title, panelID, enabled]) => ({
