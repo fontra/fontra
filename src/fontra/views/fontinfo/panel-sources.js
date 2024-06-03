@@ -12,7 +12,15 @@ import {
 } from "../core/ui-utils.js";
 import { BaseInfoPanel } from "./panel-base.js";
 import { translate } from "/core/localization.js";
+import {
+  isLocationAtDefault,
+  locationToString,
+  makeSparseLocation,
+  mapAxesFromUserSpaceToSourceSpace,
+  piecewiseLinearMap,
+} from "/core/var-model.js";
 import "/web-components/add-remove-buttons.js";
+import { dialogSetup } from "/web-components/modal-dialog.js";
 
 export class SourcesPanel extends BaseInfoPanel {
   static title = "sources.title";
@@ -56,17 +64,181 @@ export class SourcesPanel extends BaseInfoPanel {
   }
 
   async newSource() {
-    // open a dialog to create a new source
-    console.log("Adding new font source");
-    const newSource = {
-      name: "New Source",
-      location: { wght: 400, wdth: 100, ital: 0 },
-      verticalMetrics: {},
-      guidelines: [],
-      customData: {},
+    const location = {};
+    const newSource = await this._sourcePropertiesRunDialog(
+      "Add font source",
+      "Add",
+      this.fontController,
+      location
+    );
+    if (!newSource) {
+      return;
+    }
+    console.log("newSource: ", newSource);
+
+    const undoLabel = `add source '${newSource.name}'`;
+    const root = { fontController: this.fontController };
+    const changes = recordChanges(root, (root) => {
+      root.fontController.putSource(newSource);
+    });
+    if (changes.hasChange) {
+      this.postChange(changes.change, changes.rollbackChange, undoLabel);
+      this.setupUI();
+    }
+  }
+
+  async _sourcePropertiesRunDialog(title, okButtonTitle, fontController, location) {
+    const sources = await getSources(this.fontController);
+    const validateInput = () => {
+      const warnings = [];
+      const editedSourceName =
+        nameController.model.sourceName || nameController.model.suggestedSourceName;
+      if (!editedSourceName.length) {
+        warnings.push("⚠️ The source name must not be empty");
+      } else if (
+        Object.keys(sources)
+          .map(function (source) {
+            if (source.name === editedSourceName) return true;
+          })
+          .includes(true)
+      ) {
+        warnings.push("⚠️ The source name should be unique");
+      }
+      const locStr = locationToString(
+        makeSparseLocation(locationController.model, locationAxes)
+      );
+      if (sourceLocations.has(locStr)) {
+        warnings.push("⚠️ The source location must be unique");
+      }
+      warningElement.innerText = warnings.length ? warnings.join("\n") : "";
+      dialog.defaultButton.classList.toggle("disabled", warnings.length);
     };
-    //this.fontController.putSources({'sourceIdentyfier': newSource});
-    this.setupUI();
+
+    const locationAxes = fontController.axes.axes; //this._sourcePropertiesLocationAxes(glyph);
+    const locationController = new ObservableController({ ...location });
+    const suggestedSourceName = "New source name";
+
+    const nameController = new ObservableController({
+      sourceName: suggestedSourceName,
+      sourceItalicAngle: 0,
+      suggestedSourceName: suggestedSourceName,
+      suggestedSourceItalicAngle: 0,
+    });
+
+    nameController.addKeyListener("sourceName", (event) => {
+      validateInput();
+    });
+
+    console.log("locationAxes: ", locationAxes);
+
+    const sourceLocations = new Set(
+      Object.keys(sources).map((key) =>
+        locationToString(makeSparseLocation(sources[key].location, locationAxes))
+      )
+    );
+    console.log("sourceLocations: ", sourceLocations);
+    // if (sourceName.length) {
+    //   sourceLocations.delete(
+    //     locationToString(makeSparseLocation(location, locationAxes))
+    //   );
+    // }
+
+    locationController.addListener((event) => {
+      const suggestedSourceName = suggestedSourceNameFromLocation(
+        makeSparseLocation(locationController.model, locationAxes)
+      );
+      if (nameController.model.sourceName == nameController.model.suggestedSourceName) {
+        nameController.model.sourceName = suggestedSourceName;
+      }
+      if (nameController.model.layerName == nameController.model.suggestedSourceName) {
+        nameController.model.layerName = suggestedSourceName;
+      }
+      nameController.model.suggestedSourceName = suggestedSourceName;
+      nameController.model.suggestedLayerName =
+        nameController.model.sourceName || suggestedSourceName;
+      validateInput();
+    });
+
+    const { contentElement, warningElement } = this._sourcePropertiesContentElement(
+      locationAxes,
+      nameController,
+      locationController
+    );
+
+    const disable = nameController.model.sourceName ? false : true;
+
+    const dialog = await dialogSetup(title, null, [
+      { title: "Cancel", isCancelButton: true },
+      { title: okButtonTitle, isDefaultButton: true, disabled: disable },
+    ]);
+    dialog.setContent(contentElement);
+
+    setTimeout(
+      () => contentElement.querySelector("#font-source-name-text-input")?.focus(),
+      0
+    );
+
+    validateInput();
+
+    if (!(await dialog.run())) {
+      // User cancelled
+      return {};
+    }
+
+    const newLocation = makeSparseLocation(locationController.model, locationAxes);
+
+    const newSource = {
+      name: nameController.model.sourceName || nameController.model.suggestedSourceName,
+      italicAngle:
+        nameController.model.sourceItalicAngle ||
+        nameController.model.suggestedSourceItalicAngle,
+      location: newLocation,
+      verticalMetrics: {},
+    };
+
+    return newSource;
+  }
+
+  _sourcePropertiesContentElement(locationAxes, nameController, locationController) {
+    const locationElement = html.createDomElement("designspace-location", {
+      style: `grid-column: 1 / -1;
+        min-height: 0;
+        overflow: auto;
+        height: 100%;
+      `,
+    });
+    const warningElement = html.div({
+      id: "warning-text",
+      style: `grid-column: 1 / -1; min-height: 1.5em;`,
+    });
+    locationElement.axes = locationAxes;
+    locationElement.controller = locationController;
+    const contentElement = html.div(
+      {
+        style: `overflow: hidden;
+          white-space: nowrap;
+          display: grid;
+          gap: 0.5em;
+          grid-template-columns: max-content auto;
+          align-items: center;
+          height: 100%;
+          min-height: 0;
+        `,
+      },
+      [
+        ...labeledTextInput("Source name:", nameController, "sourceName", {
+          placeholderKey: "suggestedSourceName",
+        }),
+        ...labeledTextInput("Italic Angle:", nameController, "sourceItalicAngle", {
+          placeholderKey: "suggestedSourceItalicAngele",
+        }),
+        html.br(),
+        locationElement,
+        // TODO: verticalMetricsElement,
+        warningElement,
+      ]
+    );
+    return { contentElement, warningElement };
   }
 }
 
@@ -236,10 +408,7 @@ class SourceBox extends HTMLElement {
         continue;
       }
       if (key == "verticalMetrics") {
-        const htmlElement = buildElementVerticalMetrics(
-          this.controller[key],
-          this.fontController.axes.axes
-        );
+        const htmlElement = buildElementVerticalMetrics(this.controller[key]);
         this.append(htmlElement);
         console.log("htmlElement: ", htmlElement);
         continue;
