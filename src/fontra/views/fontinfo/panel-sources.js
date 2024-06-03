@@ -20,6 +20,7 @@ import {
   piecewiseLinearMap,
 } from "/core/var-model.js";
 import "/web-components/add-remove-buttons.js";
+import "/web-components/designspace-location.js";
 import { dialogSetup } from "/web-components/modal-dialog.js";
 
 export class SourcesPanel extends BaseInfoPanel {
