@@ -9,6 +9,13 @@ import {
   labeledTextInput,
   setupSortableList,
 } from "../core/ui-utils.js";
+import {
+  isLocationAtDefault,
+  locationToString,
+  makeSparseLocation,
+  mapAxesFromUserSpaceToSourceSpace,
+  piecewiseLinearMap,
+} from "../core/var-model.js";
 import { BaseInfoPanel } from "./panel-base.js";
 import { translate } from "/core/localization.js";
 
@@ -44,7 +51,7 @@ export class SourcesPanel extends BaseInfoPanel {
       html.input({
         type: "button",
         style: `justify-self: start;`,
-        value: "New source...",
+        value: "New font source...",
         onclick: (event) => this.newSource(),
       })
     );
@@ -54,7 +61,7 @@ export class SourcesPanel extends BaseInfoPanel {
 
   async newSource() {
     // open a dialog to create a new source
-    console.log("Adding new source");
+    console.log("Adding new font source");
     const newSource = {
       name: "New Source",
       location: { wght: 400, wdth: 100, ital: 0 },
@@ -137,7 +144,10 @@ class SourceBox extends HTMLElement {
   get model() {
     const source = this.source;
     return {
-      General: { name: source.name },
+      General: {
+        name: source.name,
+        italicAgnle: source.italicAngle ? source.italicAngle : 0,
+      },
       Location: source.location,
       Metrics: source.verticalMetrics,
     };
@@ -206,6 +216,10 @@ class SourceBox extends HTMLElement {
     );
 
     for (const key in model) {
+      if (key == "Location") {
+        this.append(buildElementLocation(this.controller[key]));
+        continue;
+      }
       this.append(buildElement(this.controller[key]));
     }
   }
@@ -241,6 +255,36 @@ function buildElement(controller, options = {}) {
       )
       .flat()
   );
+}
+
+// _sourcePropertiesLocationAxes(glyph) {
+//   const glyphAxisNames = glyph.axes.map((axis) => axis.name);
+//   const fontAxes = mapAxesFromUserSpaceToSourceSpace(
+//     // Don't include font axes that also exist as glyph axes
+//     this.fontController.fontAxes.filter((axis) => !glyphAxisNames.includes(axis.name))
+//   );
+//   return [
+//     ...fontAxes,
+//     ...(fontAxes.length && glyph.axes.length ? [{ isDivider: true }] : []),
+//     ...glyph.axes,
+//   ];
+// }
+
+function buildElementLocation(controller, options = {}) {
+  const locationAxes = this._sourcePropertiesLocationAxes(glyph);
+  const locationElement = html.createDomElement("designspace-location", {
+    style: `grid-column: 1 / -1;
+      min-height: 0;
+      overflow: auto;
+      height: 100%;
+    `,
+  });
+  console.log("controller: ", controller);
+  console.log("controller.model: ", controller.model);
+  locationElement.axes = controller.model;
+  locationElement.controller = controller;
+  console.log("locationElement: ", locationElement);
+  return locationElement;
 }
 
 async function getSources(fontController) {
