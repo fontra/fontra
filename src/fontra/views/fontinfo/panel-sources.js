@@ -7,17 +7,12 @@ import {
   OptionalNumberFormatter,
   checkboxListCell,
   labeledTextInput,
+  labeledTextInputMultiValues,
   setupSortableList,
 } from "../core/ui-utils.js";
-import {
-  isLocationAtDefault,
-  locationToString,
-  makeSparseLocation,
-  mapAxesFromUserSpaceToSourceSpace,
-  piecewiseLinearMap,
-} from "../core/var-model.js";
 import { BaseInfoPanel } from "./panel-base.js";
 import { translate } from "/core/localization.js";
+import "/web-components/add-remove-buttons.js";
 
 export class SourcesPanel extends BaseInfoPanel {
   static title = "sources.title";
@@ -35,6 +30,7 @@ export class SourcesPanel extends BaseInfoPanel {
     for (const [identifier, source] of Object.entries(sources)) {
       container.appendChild(
         new SourceBox(
+          this.fontController,
           sources,
           identifier,
           this.postChange.bind(this),
@@ -100,6 +96,14 @@ addStyleSheet(`
   align-content: start;
 }
 
+.fontra-ui-font-info-vertical-metrics {
+  display: grid;
+  grid-template-columns: minmax(4.5em, max-content) 4em 4em;
+  gap: 0.5em;
+  align-items: start;
+  align-content: start;
+}
+
 .fontra-ui-font-info-sources-panel-source-box-mapping-list {
   width: 9em;
   max-height: var(--fontra-ui-font-info-sources-panel-max-list-height);
@@ -125,10 +129,11 @@ select {
 `);
 
 class SourceBox extends HTMLElement {
-  constructor(sources, sourceIdentifier, postChange, setupUI) {
+  constructor(fontController, sources, sourceIdentifier, postChange, setupUI) {
     super();
     this.classList.add("fontra-ui-font-info-sources-panel-source-box");
     this.draggable = true;
+    this.fontController = fontController;
     this.sources = sources;
     this.sourceIdentifier = sourceIdentifier;
     this.postChange = postChange;
@@ -146,10 +151,10 @@ class SourceBox extends HTMLElement {
     return {
       General: {
         name: source.name,
-        italicAgnle: source.italicAngle ? source.italicAngle : 0,
+        italicAngle: source.italicAngle ? source.italicAngle : 0,
       },
-      Location: source.location,
-      Metrics: source.verticalMetrics,
+      location: source.location,
+      verticalMetrics: source.verticalMetrics,
     };
     // NOTE: Font guidlines could be read/write here,
     // but makes more sense directly in the glyph editing window.
@@ -193,8 +198,13 @@ class SourceBox extends HTMLElement {
     for (const key in model) {
       this.controller[key] = new ObservableController(model[key]);
       this.controller[key].addListener((event) => {
+        console.log("event: ", event);
         this.editSource((source) => {
-          source[event.key] = event.newValue;
+          if (key == "General") {
+            source[event.key] = event.newValue;
+          } else {
+            source[key][event.key] = event.newValue;
+          }
         }, `edit source ${key} ${event.key}`);
       });
     }
@@ -216,8 +226,22 @@ class SourceBox extends HTMLElement {
     );
 
     for (const key in model) {
-      if (key == "Location") {
-        this.append(buildElementLocation(this.controller[key]));
+      if (key == "location") {
+        const htmlElement = buildElementLocations(
+          this.controller[key],
+          this.fontController.axes.axes
+        );
+        this.append(htmlElement);
+        console.log("htmlElement: ", htmlElement);
+        continue;
+      }
+      if (key == "verticalMetrics") {
+        const htmlElement = buildElementVerticalMetrics(
+          this.controller[key],
+          this.fontController.axes.axes
+        );
+        this.append(htmlElement);
+        console.log("htmlElement: ", htmlElement);
         continue;
       }
       this.append(buildElement(this.controller[key]));
@@ -235,14 +259,7 @@ function buildElement(controller, options = {}) {
 
   let items = [];
   for (const [key, value] of itemsArray) {
-    if (key != "italicAngle") {
-      items.push([translate(key), key]);
-    }
-  }
-  // Add italic angle last
-  // this is a very bad hack, but it works for now.
-  if (controller.model.italicAngle) {
-    items.push([translate("italicAngle"), "italicAngle"]);
+    items.push([translate(key), key]);
   }
 
   return html.div(
@@ -257,33 +274,35 @@ function buildElement(controller, options = {}) {
   );
 }
 
-// _sourcePropertiesLocationAxes(glyph) {
-//   const glyphAxisNames = glyph.axes.map((axis) => axis.name);
-//   const fontAxes = mapAxesFromUserSpaceToSourceSpace(
-//     // Don't include font axes that also exist as glyph axes
-//     this.fontController.fontAxes.filter((axis) => !glyphAxisNames.includes(axis.name))
-//   );
-//   return [
-//     ...fontAxes,
-//     ...(fontAxes.length && glyph.axes.length ? [{ isDivider: true }] : []),
-//     ...glyph.axes,
-//   ];
-// }
-
-function buildElementLocation(controller, options = {}) {
-  const locationAxes = this._sourcePropertiesLocationAxes(glyph);
-  const locationElement = html.createDomElement("designspace-location", {
-    style: `grid-column: 1 / -1;
-      min-height: 0;
-      overflow: auto;
-      height: 100%;
-    `,
-  });
-  console.log("controller: ", controller);
+function buildElementVerticalMetrics(controller, options = {}) {
   console.log("controller.model: ", controller.model);
-  locationElement.axes = controller.model;
+  let itemsArray = Object.keys(controller.model).map(function (key) {
+    return [key, controller.model[key]];
+  });
+  itemsArray.sort((a, b) => b[1].value - a[1].value);
+
+  let items = [];
+  for (const [key, value] of itemsArray) {
+    items.push([translate(key), key]);
+  }
+
+  return html.div(
+    { class: "fontra-ui-font-info-vertical-metrics" },
+    items
+      .map(([labelName, keyName]) =>
+        labeledTextInputMultiValues(labelName, controller, keyName, {
+          continuous: false,
+          valueKeys: ["value", "zone"],
+        })
+      )
+      .flat()
+  );
+}
+
+function buildElementLocations(controller, fontAxes) {
+  const locationElement = html.createDomElement("designspace-location", {});
+  locationElement.axes = fontAxes;
   locationElement.controller = controller;
-  console.log("locationElement: ", locationElement);
   return locationElement;
 }
 
