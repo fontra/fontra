@@ -3,6 +3,7 @@ import { fetchJSON } from "./utils.js";
 
 const debugTranslation = false;
 let localizationData = {};
+const localizationDataDefault = fetchJSON(`/lang/en.json`);
 
 export const languageController = new ObservableController({ language: "en" });
 languageController.synchronizeWithLocalStorage("fontra-language-");
@@ -40,7 +41,11 @@ function formatString(template, ...args) {
  * @returns {string} The translated value
  */
 export function translate(key, ...args) {
-  const translation = localizationData[key];
+  let translation = localizationData[key];
+
+  if (translation === undefined) {
+    translation = localizationDataDefault[key];
+  }
 
   if (typeof key !== "string" || translation === undefined || debugTranslation) {
     return key;
