@@ -1,6 +1,7 @@
 import { recordChanges } from "../core/change-recorder.js";
 import * as html from "../core/html-utils.js";
 import { addStyleSheet } from "../core/html-utils.js";
+import { translate } from "../core/localization.js";
 import { ObservableController } from "../core/observable-object.js";
 import {
   OptionalNumberFormatter,
@@ -638,18 +639,18 @@ function getVerticalMetricsRounded(verticalMetrics) {
 
 function getLabelFromKey(key) {
   // TODO: this may use translate in future
-  const keyLabelMap = {
-    name: "Name",
-    italicAngle: "Italic Angle",
-    isSparse: "Is Sparse",
-    ascender: "Ascender",
-    capHeight: "Cap Height",
-    xHeight: "x-Height",
-    baseline: "Baseline",
-    descender: "Descender",
-    general: "General",
-    location: "Location",
-    verticalMetrics: "Vertical metrics",
+  const keyMap = {
+    name: "font.source.name",
+    italicAngle: "font.source.italicAngle",
+    isSparse: "font.source.isSparse",
+    ascender: "font.source.ascender",
+    capHeight: "font.source.capHeight",
+    xHeight: "font.source.xHeight",
+    baseline: "font.source.baseline",
+    descender: "font.source.descender",
+    general: "font.source.general",
+    location: "font.source.location",
+    verticalMetrics: "font.source.verticalMetrics",
   };
-  return keyLabelMap[key] || key;
+  return translate(keyMap[key]) || key;
 }

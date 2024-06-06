@@ -3,10 +3,17 @@ import { fetchJSON } from "./utils.js";
 
 const debugTranslation = false;
 let localizationData = {};
-const localizationDataDefault = fetchJSON(`/lang/en.json`);
+let localizationDataDefault = {};
 
 export const languageController = new ObservableController({ language: "en" });
 languageController.synchronizeWithLocalStorage("fontra-language-");
+
+function getDefaultLanguage(locale) {
+  fetchJSON(`/lang/${locale}.json`).then((data) => {
+    localizationDataDefault = data;
+  });
+}
+getDefaultLanguage("en");
 
 function languageChanged(locale) {
   fetchJSON(`/lang/${locale}.json`).then((data) => {
