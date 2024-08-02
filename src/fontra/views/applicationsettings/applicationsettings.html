@@ -2,13 +2,74 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link href="/css/core.css" rel="stylesheet" />
-    <link href="/css/plugins.css" rel="stylesheet" />
-    <script type="module" src="/web-components/plugin-manager.js"></script>
-    <title>Fontra Plugins</title>
+    <link href="/css/tooltip.css" rel="stylesheet" />
+    <title>Fontra Application Settings</title>
+    <script type="module" src="/web-components/modal-dialog.js"></script>
+    <style>
+      body {
+        overflow: scroll;
+      }
+      .main-container {
+        display: grid;
+        grid-template-columns: 13em auto;
+        padding: 0em;
+        box-sizing: border-box;
+        gap: 0em;
+      }
+
+      #header-container {
+        display: grid;
+        align-content: start;
+        gap: 1em;
+        padding: 2em 1em 2em 2em;
+      }
+
+      .header {
+        cursor: pointer;
+        font-size: 1.25em;
+        font-weight: bold;
+        text-underline-offset: 0.15em;
+      }
+
+      .header:hover {
+        text-decoration: underline dotted;
+      }
+
+      .header.selected {
+        text-decoration: underline;
+      }
+
+      .font-info-panel {
+        display: grid;
+        padding: 2em 2em 2em 1em;
+        outline: none;
+      }
+
+      .font-info-panel[hidden] {
+        display: none;
+      }
+
+      #panel-container {
+        /* overflow: scroll; */
+      }
+    </style>
   </head>
   <body>
-    Application Settings
+    <modal-dialog></modal-dialog>
+    <div class="main-container">
+      <div id="header-container"></div>
+      <div id="panel-container"></div>
+    </div>
   </body>
+  <script type="module">
+    import { ApplicationSettingsController } from "/applicationsettings/applicationsettings.js";
+
+    async function startApp() {
+      window.applicationSettingsController =
+        await ApplicationSettingsController.fromWebSocket();
+    }
+
+    startApp();
+  </script>
 </html>
