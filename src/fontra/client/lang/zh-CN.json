@@ -86,6 +86,8 @@
   "menubar.file.open": "打开……",
   "menubar.font": "字体",
   "menubar.font.edit": "编辑字体信息、参数轴和源",
+  "menubar.fontra": "字挼 (zìruá)",
+  "menubar.fontra.application-settings": "Application Settings",
   "menubar.glyph": "字符形",
   "menubar.glyph.add": "添加源……",
   "menubar.glyph.delete": "删除源……",
