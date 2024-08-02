@@ -1266,7 +1266,6 @@ export class EditorController {
     this.registerShortCut(["Space"], { metaKey: false, repeat: false }, () => {
       this.spaceKeyDownHandler();
     });
-
     this.registerShortCut("-", { metaKey: true, globalOverride: true }, () => {
       this.zoomOut();
     });
@@ -1276,12 +1275,26 @@ export class EditorController {
     this.registerShortCut("0", { metaKey: true, globalOverride: true }, () => {
       this.zoomFit();
     });
-    this.registerShortCut("123456789", { metaKey: false }, (event) => {
-      const toolIndex = parseInt(event.key) - 1;
-      const toolIdentifiers = Object.keys(this.topLevelTools);
-      if (toolIndex < toolIdentifiers.length) {
-        this.setSelectedTool(toolIdentifiers[toolIndex]);
-      }
+    this.registerShortCut("v", { metaKey: false, globalOverride: true }, () => {
+      this.setSelectedTool("pointer-tool");
+    });
+    this.registerShortCut("p", { metaKey: false, globalOverride: true }, () => {
+      this.setSelectedTool("pen-tool");
+    });
+    this.registerShortCut("s", { metaKey: false, globalOverride: true }, () => {
+      this.setSelectedTool("knife-tool");
+    });
+    this.registerShortCut("r", { metaKey: false, globalOverride: true }, () => {
+      this.setSelectedTool("shape-tool-rectangle");
+    });
+    this.registerShortCut("o", { metaKey: false, globalOverride: true }, () => {
+      this.setSelectedTool("shape-tool-ellipse");
+    });
+    this.registerShortCut("m", { metaKey: false, globalOverride: true }, () => {
+      this.setSelectedTool("power-ruler-tool");
+    });
+    this.registerShortCut("h", { metaKey: false, globalOverride: true }, () => {
+      this.setSelectedTool("hand-tool");
     });
     this.registerShortCut("f", { metaKey: true, globalOverride: true }, () => {
       this.toggleSidebar("glyph-search", true);
