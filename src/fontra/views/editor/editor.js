@@ -771,8 +771,6 @@ export class EditorController {
           handleEvent: (event) => {
             if (event.type != "keydown" || event.key == "Escape") {
               this.collapseSubTools(editToolsElement);
-              window.addEventListener("mousedown", globalListener, false);
-              window.addEventListener("keydown", globalListener, false);
             }
           },
         };
