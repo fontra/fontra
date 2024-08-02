@@ -305,6 +305,8 @@ export class EditorController {
 
   initTopBar() {
     const menuBar = new MenuBar([
+      // TODO: The following 'menubar.fontra' is in preparation for the future.
+      // This is for testing only, will be commented out.
       {
         title: translate("menubar.fontra"),
         class: "menu-item menu-item-bold",
@@ -312,9 +314,10 @@ export class EditorController {
           return [
             {
               title: translate("menubar.fontra.application-settings"),
-              enabled: () => false,
-              callback: () => {},
-              shortCut: undefined,
+              enabled: () => true,
+              callback: () => {
+                window.open("/applicationsettings/applicationsettings.html");
+              },
             },
           ];
         },
