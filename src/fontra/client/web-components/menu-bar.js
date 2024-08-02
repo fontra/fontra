@@ -12,6 +12,10 @@ export class MenuBar extends SimpleElement {
     padding: 0 0.5rem;
   }
 
+  .menu-item-bold {
+    font-weight: bold;
+  }
+
   .menu-item {
     padding: 0.4rem 0.6rem;
     cursor: default;
@@ -179,7 +183,7 @@ export class MenuBar extends SimpleElement {
       fragment.appendChild(
         html.div(
           {
-            class: "menu-item",
+            class: item.class ? item.class : "menu-item",
             onmousedown: (event) => {
               const currentSelection = this.contentElement.querySelector(".current");
               if (currentSelection === event.target) {

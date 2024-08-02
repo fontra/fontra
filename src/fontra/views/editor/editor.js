@@ -306,6 +306,20 @@ export class EditorController {
   initTopBar() {
     const menuBar = new MenuBar([
       {
+        title: translate("menubar.fontra"),
+        class: "menu-item menu-item-bold",
+        getItems() {
+          return [
+            {
+              title: translate("menubar.fontra.application-settings"),
+              enabled: () => false,
+              callback: () => {},
+              shortCut: undefined,
+            },
+          ];
+        },
+      },
+      {
         title: translate("menubar.file"),
         getItems() {
           return [
