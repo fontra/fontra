@@ -2,6 +2,7 @@
 import * as html from "../core/html-utils.js";
 // import { getRemoteProxy } from "../core/remote.js";
 // import { makeDisplayPath } from "../core/view-utils.js";
+import { ServerInfoPanel } from "./panel-server-info.js";
 import { ShortcutsPanel, ensureShortcutsHasLoaded } from "./panel-shortcuts.js";
 import { ensureLanguageHasLoaded, translate } from "/core/localization.js";
 import { message } from "/web-components/modal-dialog.js";
@@ -49,10 +50,10 @@ export class ApplicationSettingsController {
 
     for (const panelClass of [
       ShortcutsPanel,
+      ServerInfoPanel,
       // TODO: Add more panels here:
       // EditorAppearancePanel,
       // ExtensionsPanel,
-      // ServerInfoPanel,
     ]) {
       // panelClass.fontAttributes.forEach((fontAttr) => {
       //   subscribePattern[fontAttr] = null;

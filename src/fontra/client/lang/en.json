@@ -105,6 +105,7 @@
   "menubar.view.select.part.next": "next",
   "menubar.view.select.part.previous": "previous",
   "selection.none": "(No selection)",
+  "server-info.title": "Server Info",
   "shortcuts.edit": "Edit",
   "shortcuts.panels": "Panels",
   "shortcuts.title": "Shortcuts",
