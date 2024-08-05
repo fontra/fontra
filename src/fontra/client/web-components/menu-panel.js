@@ -373,17 +373,24 @@ export const shortCutKeyMap = {
   Delete: "⌫",
 };
 
-function buildShortCutString(shortCutDefinition) {
+// TODO: Maybe move to utils
+export function buildShortCutString(shortCutDefinition) {
   let shorcutCommand = "";
 
   if (shortCutDefinition) {
     const isMac = navigator.platform.toLowerCase().indexOf("mac") >= 0;
 
+    if (shortCutDefinition.ctrlKey) {
+      shorcutCommand += isMac ? "ctrl+" : "Ctrl+"; // ctrl or Ctrl
+    }
+    if (shortCutDefinition.altKey) {
+      shorcutCommand += isMac ? "\u2325" : "Alt+"; // ⌥ or Alt
+    }
     if (shortCutDefinition.shiftKey) {
       shorcutCommand += isMac ? "\u21e7" : "Shift+"; // ⇧ or Shift
     }
     if (shortCutDefinition.metaKey) {
-      shorcutCommand += isMac ? "\u2318" : "Ctrl+"; // ⌘ or Ctrl
+      shorcutCommand += isMac ? "\u2318" : "\u229E"; // ⌘ or ⊞
     }
     if (shortCutDefinition.keysOrCodes) {
       // If the definition specifies multiple keys, e.g ["Delete", "Backspace"],
