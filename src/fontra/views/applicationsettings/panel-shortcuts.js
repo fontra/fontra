@@ -88,10 +88,8 @@ const shortcutsGrouped = {
     "action.add-guideline",
   ],
 };
-// NOTE: Shortcuts from editor.js are included, but the following area not:
-// ...this.basicContextMenuItems,
-// ...this.glyphEditContextMenuItems,
-// ...this.glyphSelectedContextMenuItems,
+// TODO: Shortcuts from editor.js are included as examples,
+// must be extended with all shortcuts.
 
 addStyleSheet(`
 .fontra-ui-shortcuts-panel {
@@ -142,3 +140,6 @@ export class ShortcutsPanel extends BaseInfoPanel {
     }
   }
 }
+
+// TODO: How to handle custom editing of the shortcuts. How to save it back?
+// Maybe a button to reset to default?
