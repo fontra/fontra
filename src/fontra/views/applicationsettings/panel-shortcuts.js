@@ -33,6 +33,7 @@ function createShortcutsData() {
   if (isMac) {
     // skip, because is equal to default
   } else if (isWin) {
+    // TODO: indead of having a new file for windows, maybe use commandKeyProperty() and reaplce metaKey with ctrlKey?
     fetchJSON(`./data/shortcuts-win.json`).then((data) => {
       shortcutsData = { ...shortcutsData, ...data };
     });
@@ -50,10 +51,47 @@ function createShortcutsData() {
 createShortcutsData();
 
 const shortcutsGrouped = {
-  "shortcuts.tools": ["editor.pointer-tool", "editor.pen-tool"],
-  "shortcuts.views": ["zoom-in", "zoom-out"],
-  "shortcuts.edit": ["action.delete-glyph", "action.decompose-component"],
+  "shortcuts.tools": [
+    "editor.pointer-tool",
+    "editor.pen-tool",
+    "editor.knife-tool",
+    "editor.shape-tool-rectangle",
+    "editor.shape-tool-ellipse",
+    "editor.power-ruler-tool",
+    "editor.hand-tool",
+  ],
+  "shortcuts.views": [
+    "zoom-in",
+    "zoom-out",
+    "zoom-fit-selection",
+    "menubar.view.select.part.next",
+    "menubar.view.select.part.previous",
+  ],
+  "shortcuts.panels": [
+    "sidebar.glyph-search",
+    "sidebar.selection-info",
+    "sidebar.designspace-navigation",
+  ],
+  "shortcuts.edit": [
+    "action.undo",
+    "action.redo",
+    "action.cut",
+    "action.copy",
+    "action.paste",
+    "action.select-all",
+    "action.select-none",
+    "action.delete-glyph",
+    "action.add-component",
+    "action.decompose-component",
+    "action.join-contours",
+    "action.add-anchor",
+    "action.add-guideline",
+  ],
 };
+// NOTE: Shortcuts from editor.js are included, but the following area not:
+// ...this.basicContextMenuItems,
+// ...this.glyphEditContextMenuItems,
+// ...this.glyphSelectedContextMenuItems,
 
 addStyleSheet(`
 .fontra-ui-shortcuts-panel {

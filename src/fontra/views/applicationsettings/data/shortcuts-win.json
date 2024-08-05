@@ -5,5 +5,8 @@
     "keysOrCodes": "d",
     "ctrlKey": true,
     "shiftKey": true
-  }
+  },
+  "action.join-contours": { "keysOrCodes": "j", "ctrlKey": true },
+  "action.undo": { "keysOrCodes": "z", "ctrlKey": true },
+  "action.redo": { "keysOrCodes": "z", "ctrlKey": true, "shiftKey": true }
 }

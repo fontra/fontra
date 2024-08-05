@@ -8,8 +8,45 @@
   },
   "editor.pointer-tool": { "keysOrCodes": "v", "globalOverride": true },
   "editor.pen-tool": { "keysOrCodes": "p", "globalOverride": true },
+  "editor.knife-tool": { "keysOrCodes": "s", "globalOverride": true },
+  "editor.shape-tool-rectangle": { "keysOrCodes": "r", "globalOverride": true },
+  "editor.shape-tool-ellipse": { "keysOrCodes": "o", "globalOverride": true },
+  "editor.power-ruler-tool": { "keysOrCodes": "m", "globalOverride": true },
+  "editor.hand-tool": { "keysOrCodes": "h", "globalOverride": true },
   "action.delete-glyph": {
     "keysOrCodes": ["Delete", "Backspace"],
+    "globalOverride": true
+  },
+  "zoom-fit-selection": { "keysOrCodes": "0", "metaKey": true, "globalOverride": true },
+  "action.join-contours": { "keysOrCodes": "j", "metaKey": true },
+  "action.undo": { "keysOrCodes": "z", "metaKey": true },
+  "action.redo": { "keysOrCodes": "z", "metaKey": true, "shiftKey": true },
+  "action.cut": { "keysOrCodes": "x", "metaKey": true },
+  "action.copy": { "keysOrCodes": "c", "metaKey": true },
+  "action.paste": { "keysOrCodes": "v", "metaKey": true },
+  "action.select-all": { "keysOrCodes": "a", "metaKey": true },
+  "action.select-none": { "keysOrCodes": "a", "metaKey": true, "shiftKey": true },
+  "action.add-component": null,
+  "action.add-anchor": null,
+  "action.add-guideline": null,
+  "menubar.view.select.part.next": { "keysOrCodes": ["ArrowUp"], "metaKey": true },
+  "menubar.view.select.part.previous": {
+    "keysOrCodes": ["ArrowDown"],
+    "metaKey": true
+  },
+  "sidebar.glyph-search": {
+    "keysOrCodes": "f",
+    "metaKey": true,
+    "globalOverride": true
+  },
+  "sidebar.selection-info": {
+    "keysOrCodes": "i",
+    "metaKey": true,
+    "globalOverride": true
+  },
+  "sidebar.designspace-navigation": {
+    "keysOrCodes": "e",
+    "metaKey": true,
     "globalOverride": true
   }
 }
