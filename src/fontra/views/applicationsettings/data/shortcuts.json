@@ -1,6 +1,15 @@
 {
+  "zoom-in": { "keysOrCodes": "+=", "metaKey": true, "globalOverride": true },
+  "zoom-out": { "keysOrCodes": "-", "metaKey": true, "globalOverride": true },
+  "action.decompose-component": {
+    "keysOrCodes": "d",
+    "metaKey": true,
+    "shiftKey": true
+  },
   "editor.pointer-tool": { "keysOrCodes": "v", "globalOverride": true },
   "editor.pen-tool": { "keysOrCodes": "p", "globalOverride": true },
-  "zoom-in": { "keysOrCodes": "+=", "metaKey": true, "globalOverride": true },
-  "zoom-out": { "keysOrCodes": "-", "metaKey": true, "globalOverride": true }
+  "action.delete-glyph": {
+    "keysOrCodes": ["Delete", "Backspace"],
+    "globalOverride": true
+  }
 }

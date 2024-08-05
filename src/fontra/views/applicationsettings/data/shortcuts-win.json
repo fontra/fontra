@@ -1,0 +1,9 @@
+{
+  "zoom-in": { "keysOrCodes": "+=", "ctrlKey": true, "globalOverride": true },
+  "zoom-out": { "keysOrCodes": "-", "ctrlKey": true, "globalOverride": true },
+  "action.decompose-component": {
+    "keysOrCodes": "d",
+    "ctrlKey": true,
+    "shiftKey": true
+  }
+}
