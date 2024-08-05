@@ -1,0 +1,6 @@
+{
+  "editor.pointer-tool": { "keysOrCodes": "v", "globalOverride": true },
+  "editor.pen-tool": { "keysOrCodes": "p", "globalOverride": true },
+  "zoom-in": { "keysOrCodes": "+=", "metaKey": true, "globalOverride": true },
+  "zoom-out": { "keysOrCodes": "-", "metaKey": true, "globalOverride": true }
+}
