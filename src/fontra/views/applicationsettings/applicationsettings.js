@@ -2,8 +2,8 @@
 import * as html from "../core/html-utils.js";
 // import { getRemoteProxy } from "../core/remote.js";
 // import { makeDisplayPath } from "../core/view-utils.js";
-import { ShortcutsPanel } from "./panel-shortcuts.js";
-import { translate } from "/core/localization.js";
+import { ShortcutsPanel, ensureShortcutsHasLoaded } from "./panel-shortcuts.js";
+import { ensureLanguageHasLoaded, translate } from "/core/localization.js";
 import { message } from "/web-components/modal-dialog.js";
 
 export class ApplicationSettingsController {
@@ -21,6 +21,9 @@ export class ApplicationSettingsController {
     // remoteFontEngine.receiver = applicationSettingsController;
     // remoteFontEngine.onclose = (event) => applicationSettingsController.handleRemoteClose(event);
     // remoteFontEngine.onerror = (event) => applicationSettingsController.handleRemoteError(event);
+
+    await ensureLanguageHasLoaded;
+
     const applicationSettingsController = new ApplicationSettingsController();
     await applicationSettingsController.start();
     return applicationSettingsController;
@@ -63,7 +66,7 @@ export class ApplicationSettingsController {
             const clickedHeader = event.target;
             clickedHeader.classList.add("selected");
             this.selectedPanel = clickedHeader.getAttribute("for");
-            for (const el of document.querySelectorAll(".font-info-panel")) {
+            for (const el of document.querySelectorAll(".application-settings-panel")) {
               el.hidden = el.id != this.selectedPanel;
               if (el.id == this.selectedPanel) {
                 el.focus(); // So it can receive key events
@@ -84,7 +87,7 @@ export class ApplicationSettingsController {
       headerContainer.appendChild(headerElement);
 
       const panelElement = html.div({
-        class: "font-info-panel",
+        class: "application-settings-panel",
         tabindex: 1,
         id: panelClass.id,
         hidden: panelClass.id != this.selectedPanel,
