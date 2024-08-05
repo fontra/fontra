@@ -367,19 +367,21 @@ export class MenuPanel extends SimpleElement {
 
 customElements.define("menu-panel", MenuPanel);
 
+// TODO: Maybe move to utils
+let userAgent = window.navigator.userAgent;
+const isMac = userAgent.indexOf("Mac") != -1;
+const isWin = userAgent.indexOf("Win") != -1;
+
 export const shortCutKeyMap = {
   ArrowUp: "↑",
   ArrowDown: "↓",
   Delete: "⌫",
 };
 
-// TODO: Maybe move to utils
 export function buildShortCutString(shortCutDefinition) {
   let shorcutCommand = "";
 
   if (shortCutDefinition) {
-    const isMac = navigator.platform.toLowerCase().indexOf("mac") >= 0;
-
     if (shortCutDefinition.ctrlKey) {
       shorcutCommand += isMac ? "ctrl+" : "Ctrl+"; // ctrl or Ctrl
     }
@@ -387,10 +389,10 @@ export function buildShortCutString(shortCutDefinition) {
       shorcutCommand += isMac ? "\u2325" : "Alt+"; // ⌥ or Alt
     }
     if (shortCutDefinition.shiftKey) {
-      shorcutCommand += isMac ? "\u21e7" : "Shift+"; // ⇧ or Shift
+      shorcutCommand += isMac || isWin ? "\u21e7" : "Shift+"; // ⇧ or Shift
     }
     if (shortCutDefinition.metaKey) {
-      shorcutCommand += isMac ? "\u2318" : "\u229E"; // ⌘ or ⊞
+      shorcutCommand += isMac ? "\u2318" : isWin ? "\u229E" : "Meta+"; // ⌘ or ⊞ or Meta
     }
     if (shortCutDefinition.keysOrCodes) {
       // If the definition specifies multiple keys, e.g ["Delete", "Backspace"],
