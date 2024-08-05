@@ -223,6 +223,9 @@ export class Form extends SimpleElement {
     inputElement.type = "text";
     inputElement.value = fieldItem.value || "";
     inputElement.disabled = fieldItem.disabled;
+    if (fieldItem.style) {
+      inputElement.style = fieldItem.style;
+    }
     inputElement.onchange = (event) => {
       this._fieldChanging(fieldItem, inputElement.value, undefined);
     };
