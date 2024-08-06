@@ -372,27 +372,54 @@ let userAgent = window.navigator.userAgent;
 const isMac = userAgent.indexOf("Mac") != -1;
 const isWin = userAgent.indexOf("Win") != -1;
 
+const shortCutKeyMapMac = {
+  Meta: "⌘", // "\u2318"
+  Shift: "⇧", // "\u21e7"
+  Ctrl: "⌃",
+  Alt: "⌥", // "\u2325"
+};
+
+const shortCutKeyMapWin = {
+  Meta: "⊞", // "\u229E"
+};
+
 export const shortCutKeyMap = {
   ArrowUp: "↑",
   ArrowDown: "↓",
   Delete: "⌫",
 };
 
+let keyMap = {};
+const keyMapOS = isMac ? shortCutKeyMapMac : isWin ? shortCutKeyMapWin : {};
+keyMap = { ...keyMapOS, ...shortCutKeyMap };
+
+export function getKeyMap() {
+  return { ...keyMap };
+}
+
+export function getKeyMapSwapped() {
+  return Object.fromEntries(Object.entries(keyMap).map((a) => a.reverse()));
+}
+
+export function getNiceKey(key) {
+  return keyMap[key] || `${key}+`;
+}
+
 export function buildShortCutString(shortCutDefinition) {
   let shorcutCommand = "";
 
   if (shortCutDefinition) {
     if (shortCutDefinition.ctrlKey) {
-      shorcutCommand += isMac ? "ctrl+" : "Ctrl+"; // ctrl or Ctrl
+      shorcutCommand += getNiceKey("Ctrl");
     }
     if (shortCutDefinition.altKey) {
-      shorcutCommand += isMac ? "\u2325" : "Alt+"; // ⌥ or Alt
+      shorcutCommand += getNiceKey("Alt");
     }
     if (shortCutDefinition.shiftKey) {
-      shorcutCommand += isMac || isWin ? "\u21e7" : "Shift+"; // ⇧ or Shift
+      shorcutCommand += getNiceKey("Shift");
     }
     if (shortCutDefinition.metaKey) {
-      shorcutCommand += isMac ? "\u2318" : isWin ? "\u229E" : "Meta+"; // ⌘ or ⊞ or Meta
+      shorcutCommand += getNiceKey("Meta");
     }
     if (shortCutDefinition.keysOrCodes) {
       // If the definition specifies multiple keys, e.g ["Delete", "Backspace"],
