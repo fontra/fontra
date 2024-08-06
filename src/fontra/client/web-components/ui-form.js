@@ -82,6 +82,11 @@ export class Form extends SimpleElement {
       width: 4em;
     }
 
+    .ui-form-value input[type="checkbox"] {
+      width: 4em;
+      height: unset;
+    }
+
     .ui-form-value.text {
       white-space: normal;
     }
@@ -231,6 +236,25 @@ export class Form extends SimpleElement {
     };
     this._fieldGetters[fieldItem.key] = () => inputElement.value;
     this._fieldSetters[fieldItem.key] = (value) => (inputElement.value = value);
+    valueElement.appendChild(inputElement);
+  }
+
+  _addCheckbox(valueElement, fieldItem) {
+    const inputElement = document.createElement("input");
+    if (fieldItem["data-tooltip"]) {
+      inputElement.setAttribute("title", fieldItem["data-tooltip"]);
+    }
+
+    inputElement.type = "checkbox";
+    inputElement.checked = fieldItem.value;
+    if (fieldItem.style) {
+      inputElement.style = fieldItem.style;
+    }
+    inputElement.onchange = (event) => {
+      this._fieldChanging(fieldItem, inputElement.checked, undefined);
+    };
+    this._fieldGetters[fieldItem.key] = () => inputElement.checked;
+    this._fieldSetters[fieldItem.key] = (value) => (inputElement.checked = value);
     valueElement.appendChild(inputElement);
   }
 
