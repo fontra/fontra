@@ -373,19 +373,23 @@ const isMac = userAgent.indexOf("Mac") != -1;
 const isWin = userAgent.indexOf("Win") != -1;
 
 const shortCutKeyMapMac = {
-  Meta: "⌘", // "\u2318"
-  Shift: "⇧", // "\u21e7"
-  Ctrl: "⌃",
-  Alt: "⌥", // "\u2325"
+  metaKey: "⌘", // "\u2318"
+  shiftKey: "⇧", // "\u21e7"
+  ctrlKey: "⌃",
+  altKey: "⌥", // "\u2325"
 };
 
 const shortCutKeyMapWin = {
-  Meta: "⊞", // "\u229E"
+  metaKey: "⊞", // "\u229E"
 };
 
+// Nice reference: https://www.toptal.com/developers/keycode
 export const shortCutKeyMap = {
   ArrowUp: "↑",
   ArrowDown: "↓",
+  ArrowLeft: "←",
+  ArrowRight: "→",
+  Tab: "⇥",
   Delete: "⌫",
 };
 
@@ -405,28 +409,23 @@ export function getNiceKey(key) {
   return keyMap[key] || `${key}+`;
 }
 
+const eventKeys = ["metaKey", "ctrlKey", "altKey", "shiftKey"];
 export function buildShortCutString(shortCutDefinition) {
   let shorcutCommand = "";
+  if (!shortCutDefinition) {
+    return shorcutCommand;
+  }
 
-  if (shortCutDefinition) {
-    if (shortCutDefinition.ctrlKey) {
-      shorcutCommand += getNiceKey("Ctrl");
+  for (const key of eventKeys) {
+    if (shortCutDefinition[key]) {
+      shorcutCommand += getNiceKey(key);
     }
-    if (shortCutDefinition.altKey) {
-      shorcutCommand += getNiceKey("Alt");
-    }
-    if (shortCutDefinition.shiftKey) {
-      shorcutCommand += getNiceKey("Shift");
-    }
-    if (shortCutDefinition.metaKey) {
-      shorcutCommand += getNiceKey("Meta");
-    }
-    if (shortCutDefinition.keysOrCodes) {
-      // If the definition specifies multiple keys, e.g ["Delete", "Backspace"],
-      // we are taking the first key for comparison with the map
-      const key = shortCutDefinition.keysOrCodes[0];
-      shorcutCommand += shortCutKeyMap[key] || capitalizeFirstLetter(key);
-    }
+  }
+  if (shortCutDefinition.keysOrCodes) {
+    // If the definition specifies multiple keys, e.g ["Delete", "Backspace"],
+    // we are taking the first key for comparison with the map
+    const key = shortCutDefinition.keysOrCodes[0];
+    shorcutCommand += shortCutKeyMap[key] || capitalizeFirstLetter(key);
   }
 
   return shorcutCommand;

@@ -138,10 +138,11 @@ export class ShortcutsPanel extends BaseInfoPanel {
             key: ["label", key],
             auxiliaryElement: html.createDomElement("div", {
               "class": "ui-form-label universal-row",
+              "style": `cursor: pointer;`,
               "innerHTML": translate(key, ""),
               "data-tooltip": "click for editing",
               "data-tooltipposition": "top",
-              "ondblclick": (event) => this.doEditShortcut(key),
+              "onclick": (event) => this.doEditShortcut(key),
             }),
           },
           field2: {
@@ -232,17 +233,17 @@ function parseShortCutString(key, value, globalOverride) {
 
   function setShortCutDefinitionByKey(key, value, definition) {
     if (value.includes(getNiceKey(key))) {
-      definition[`${key.toLowerCase()}Key`] = true;
+      definition[key] = true;
       const keyStr = getNiceKey(key);
       const index = value.indexOf(keyStr);
       value = value.slice(0, index) + value.slice(index + keyStr.length);
     }
     return value;
   }
-  value = setShortCutDefinitionByKey("Meta", value, definition);
-  value = setShortCutDefinitionByKey("Shift", value, definition);
-  value = setShortCutDefinitionByKey("Ctrl", value, definition);
-  value = setShortCutDefinitionByKey("Alt", value, definition);
+  value = setShortCutDefinitionByKey("metaKey", value, definition);
+  value = setShortCutDefinitionByKey("shiftKey", value, definition);
+  value = setShortCutDefinitionByKey("ctrlKey", value, definition);
+  value = setShortCutDefinitionByKey("altKey", value, definition);
   const keysOrCodes = swappedKeyMap[value]
     ? [swappedKeyMap[value]]
     : value.length === 1
