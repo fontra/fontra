@@ -409,14 +409,14 @@ export function getNiceKey(key) {
   return keyMap[key] || `${key}+`;
 }
 
-const eventKeys = ["metaKey", "ctrlKey", "altKey", "shiftKey"];
+const eventMainKeys = ["metaKey", "ctrlKey", "altKey", "shiftKey"];
 export function buildShortCutString(shortCutDefinition) {
   let shorcutCommand = "";
   if (!shortCutDefinition) {
     return shorcutCommand;
   }
 
-  for (const key of eventKeys) {
+  for (const key of eventMainKeys) {
     if (shortCutDefinition[key]) {
       shorcutCommand += getNiceKey(key);
     }
