@@ -166,11 +166,6 @@ export class ShortcutsPanel extends BaseInfoPanel {
             type: "edit-text",
             key: [key],
             value: buildShortCutString(shortCutDefinition),
-            shortCutDefinition: buildShortCutString(shortCutDefinition),
-            globalOverride: shortCutDefinition
-              ? shortCutDefinition.globalOverride || false
-              : false,
-            shortcutKey: key,
             allowEmptyField: true,
             style: `width: 6em; text-align: center;`,
           },
@@ -180,11 +175,6 @@ export class ShortcutsPanel extends BaseInfoPanel {
             "value": shortCutDefinition
               ? shortCutDefinition.globalOverride || false
               : false,
-            "shortCutDefinition": buildShortCutString(shortCutDefinition),
-            "globalOverride": shortCutDefinition
-              ? shortCutDefinition.globalOverride || false
-              : false,
-            "shortcutKey": key,
             "data-tooltip": "Global Override",
             "data-tooltipposition": "top",
           },
@@ -194,26 +184,26 @@ export class ShortcutsPanel extends BaseInfoPanel {
       this.infoForm.setFieldDescriptions(formContents);
 
       this.infoForm.onFieldChange = async (fieldItem, value, valueStream) => {
-        const shortCutDef =
-          fieldItem.key[0] === "globalOverride" ? fieldItem.shortCutDefinition : value;
-        const globalOverrideDef =
-          fieldItem.key[0] === "globalOverride" ? value : fieldItem.globalOverride;
+        const isGlobalButton = fieldItem.key[0] === "globalOverride";
+        const shortcutKey = isGlobalButton ? fieldItem.key[1] : fieldItem.key[0];
 
-        const shortCutDefinition = parseShortCutString(
-          fieldItem.shortcutKey,
-          shortCutDef,
-          globalOverrideDef
-        );
+        const globalOverrideDef = isGlobalButton
+          ? value
+          : shortcutsData[shortcutKey] === null
+          ? false
+          : shortcutsData[shortcutKey].globalOverride || false;
+        const shortCutDefinition =
+          isGlobalButton && shortcutsData[shortcutKey] === null
+            ? null
+            : isGlobalButton
+            ? { ...shortcutsData[shortcutKey], globalOverride: globalOverrideDef }
+            : parseShortCutString(shortcutKey, value, globalOverrideDef);
+
         if (shortCutDefinition === undefined) {
           this.setupUI();
           return;
         }
-
-        fieldItem.shortCutDefinition = buildShortCutString(shortCutDefinition);
-        fieldItem.globalOverride = shortCutDefinition
-          ? shortCutDefinition.globalOverride
-          : false;
-        this.saveShortcut(fieldItem.shortcutKey, shortCutDefinition);
+        this.saveShortcut(shortcutKey, shortCutDefinition);
       };
 
       this.panelElement.appendChild(this.infoForm);
@@ -236,6 +226,7 @@ export class ShortcutsPanel extends BaseInfoPanel {
     //TODO: Would it make sense to write to a custom json file somehow?
     // Currently saved to localStorage:
     localStorage.setItem("shortcuts-custom", JSON.stringify(shortcutsDataCustom));
+    this.setupUI();
   }
 
   async resetToDefault() {
