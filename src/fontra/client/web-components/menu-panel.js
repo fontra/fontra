@@ -385,28 +385,55 @@ const shortCutKeyMapWin = {
 
 // Nice reference: https://www.toptal.com/developers/keycode
 export const shortCutKeyMap = {
+  metaKey: "Meta+",
+  shiftKey: "Shift+",
+  ctrlKey: "Ctrl+",
+  altKey: "Alt+",
   ArrowUp: "↑",
   ArrowDown: "↓",
   ArrowLeft: "←",
   ArrowRight: "→",
   Tab: "⇥",
   Delete: "⌫",
+  Backspace: "⌫",
+  NumpadMultiply: "×",
+  NumpadDivide: "÷",
+  NumpadAdd: "+",
+  NumpadSubtract: "-",
+  Enter: "↵",
 };
+// add A-Z keys
+for (const key of new Array(26).fill(1).map((_, i) => String.fromCharCode(65 + i))) {
+  shortCutKeyMap[`Key${key}`] = key;
+}
+// add 0-9 keys
+for (let i = 0; i <= 9; i++) {
+  shortCutKeyMap[`Digit${i}`] = `${i}`;
+  shortCutKeyMap[`Numpad${i}`] = `${i}`;
+}
 
-let keyMap = {};
 const keyMapOS = isMac ? shortCutKeyMapMac : isWin ? shortCutKeyMapWin : {};
-keyMap = { ...keyMapOS, ...shortCutKeyMap };
+const keyMap = { ...shortCutKeyMap, ...keyMapOS };
 
-export function getKeyMap() {
-  return { ...keyMap };
+export function getKeyMap(key = undefined) {
+  if (key === undefined) {
+    return { ...keyMap };
+  }
+  return keyMap[key] || key;
 }
 
-export function getKeyMapSwapped() {
-  return Object.fromEntries(Object.entries(keyMap).map((a) => a.reverse()));
+const keyMapSwapped = Object.fromEntries(
+  Object.entries(keyMap).map((a) => a.reverse())
+);
+export function getKeyMapSwapped(key = undefined) {
+  if (key === undefined) {
+    return keyMapSwapped;
+  }
+  return keyMapSwapped[key] || key;
 }
 
-export function getNiceKey(key) {
-  return keyMap[key] || `${key}+`;
+export function getNiceKey(key, returnKey = key) {
+  return keyMap[key] || returnKey;
 }
 
 const eventMainKeys = ["metaKey", "ctrlKey", "altKey", "shiftKey"];

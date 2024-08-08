@@ -1,5 +1,5 @@
 {
-  "zoom-in": { "keysOrCodes": "+=", "metaKey": true, "globalOverride": true },
+  "zoom-in": { "keysOrCodes": ["+", "="], "metaKey": true, "globalOverride": true },
   "zoom-out": { "keysOrCodes": "-", "metaKey": true, "globalOverride": true },
   "action.decompose-component": {
     "keysOrCodes": "d",
