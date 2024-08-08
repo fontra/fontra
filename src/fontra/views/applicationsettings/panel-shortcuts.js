@@ -17,23 +17,23 @@ import { dialog, dialogSetup, message } from "/web-components/modal-dialog.js";
 import { Form } from "/web-components/ui-form.js";
 
 // TODOs:
-// How do we want to save custom edited shortcuts? Please see: saveShortcut() function.
-// Does it make sense at all to have a custom json file for shortcuts or is it stored on the localStorage?
+// How do we want to save custom edited shortCuts? Please see: saveShortCut() function.
+// Does it make sense at all to have a custom json file for shortCuts or is it stored on the localStorage?
 // Do we need a reset to default button?
 // There are general information like isMac – do we want to stored them in a better way and if so, where/how?
 
 // For details please see https://tecadmin.net/javascript-detect-os/
 const isMac = window.navigator.userAgent.indexOf("Mac") != -1;
 
-let shortcutsData = {};
-let shortcutsDataCustom = {};
-let resolveShortcutsHasLoaded;
+let shortCutsData = {};
+let shortCutsDataCustom = {};
+let resolveShortCutsHasLoaded;
 
-export const ensureShortcutsHasLoaded = new Promise((resolve) => {
-  resolveShortcutsHasLoaded = resolve;
+export const ensureShortCutsHasLoaded = new Promise((resolve) => {
+  resolveShortCutsHasLoaded = resolve;
 });
 
-function createShortcutsData() {
+function createShortCutsData() {
   // first load default data:
   fetchJSON(`./data/shortcuts.json`).then((data) => {
     if (!isMac) {
@@ -47,24 +47,24 @@ function createShortcutsData() {
       }
     }
 
-    const storedCustomData = localStorage.getItem("shortcuts-custom");
+    const storedCustomData = localStorage.getItem("shortCuts-custom");
     const customData = storedCustomData ? JSON.parse(storedCustomData) : {};
-    shortcutsData = { ...data, ...customData };
-    resolveShortcutsHasLoaded();
+    shortCutsData = { ...data, ...customData };
+    resolveShortCutsHasLoaded();
   });
 
   // // then load custom data:
-  // fetchJSON(`./data/shortcuts-custom.json`).then((data) => {
-  //   shortcutsData = { ...shortcutsData, ...data };
-  //   shortcutsDataCustom = data;
-  //   resolveShortcutsHasLoaded();
+  // fetchJSON(`./data/shortCuts-custom.json`).then((data) => {
+  //   shortCutsData = { ...shortCutsData, ...data };
+  //   shortCutsDataCustom = data;
+  //   resolveShortCutsHasLoaded();
   // });
 }
 
-createShortcutsData();
+createShortCutsData();
 
 // With this grouping we have control over the order of the shortcuts.
-const shortcutsGrouped = {
+const shortCutsGrouped = {
   "shortcuts.tools": [
     "editor.pointer-tool",
     "editor.pen-tool",
@@ -114,12 +114,12 @@ addStyleSheet(`
 }
 `);
 
-export class ShortcutsPanel extends BaseInfoPanel {
+export class ShortCutsPanel extends BaseInfoPanel {
   static title = "shortcuts.title";
   static id = "shortcuts-panel";
 
   async setupUI() {
-    await ensureShortcutsHasLoaded;
+    await ensureShortCutsHasLoaded;
 
     this.panelElement.innerHTML = "";
 
@@ -133,7 +133,7 @@ export class ShortcutsPanel extends BaseInfoPanel {
       })
     );
 
-    for (const [categoryKey, shortcuts] of Object.entries(shortcutsGrouped)) {
+    for (const [categoryKey, shortCuts] of Object.entries(shortCutsGrouped)) {
       this.infoForm = new Form();
       this.infoForm.className = "fontra-ui-shortcuts-panel";
       this.infoForm.labelWidth = "20%";
@@ -145,8 +145,8 @@ export class ShortcutsPanel extends BaseInfoPanel {
         label: translate(categoryKey),
       });
 
-      for (const key of shortcuts) {
-        const shortCutDefinition = shortcutsData[key];
+      for (const key of shortCuts) {
+        const shortCutDefinition = shortCutsData[key];
 
         formContents.push({
           type: "universal-row",
@@ -159,11 +159,11 @@ export class ShortcutsPanel extends BaseInfoPanel {
               "innerHTML": translate(key, ""),
               "data-tooltip": "click for editing",
               "data-tooltipposition": "top",
-              "onclick": (event) => this.doEditShortcut(key),
+              "onclick": (event) => this.doEditShortCut(key),
             }),
           },
           field2: {
-            type: "edit-text",
+            type: "edit-text-shortcut",
             key: [key],
             value: buildShortCutString(shortCutDefinition),
             allowEmptyField: true,
@@ -182,57 +182,64 @@ export class ShortcutsPanel extends BaseInfoPanel {
       }
 
       this.infoForm.setFieldDescriptions(formContents);
-
       this.infoForm.onFieldChange = async (fieldItem, value, valueStream) => {
         const isGlobalButton = fieldItem.key[0] === "globalOverride";
-        const shortcutKey = isGlobalButton ? fieldItem.key[1] : fieldItem.key[0];
+        const shortCutKey = isGlobalButton ? fieldItem.key[1] : fieldItem.key[0];
 
         const globalOverrideDef = isGlobalButton
           ? value
-          : shortcutsData[shortcutKey] === null
+          : shortCutsData[shortCutKey] === null
           ? false
-          : shortcutsData[shortcutKey].globalOverride || false;
+          : shortCutsData[shortCutKey].globalOverride || false;
         const shortCutDefinition =
-          isGlobalButton && shortcutsData[shortcutKey] === null
+          isGlobalButton && shortCutsData[shortCutKey] === null
             ? null
             : isGlobalButton
-            ? { ...shortcutsData[shortcutKey], globalOverride: globalOverrideDef }
-            : parseShortCutString(shortcutKey, value, globalOverrideDef);
+            ? { ...shortCutsData[shortCutKey], globalOverride: globalOverrideDef }
+            : parseShortCutString(value, globalOverrideDef);
 
-        if (shortCutDefinition === undefined) {
+        const warnings = validateShortCutDefinition(shortCutKey, shortCutDefinition);
+        if (warnings.length > 0) {
+          message(
+            `Invalid ShortCut "${buildShortCutString(
+              shortCutDefinition
+            )}" for "${translate(shortCutKey, "")}":`,
+            warnings.join("\n")
+          );
           this.setupUI();
           return;
         }
-        this.saveShortcut(shortcutKey, shortCutDefinition);
+        this.saveShortCut(shortCutKey, shortCutDefinition);
       };
 
       this.panelElement.appendChild(this.infoForm);
     }
   }
 
-  async doEditShortcut(key) {
-    const newShortcutDefinition = await doEditShortcutDialog(key);
-    if (newShortcutDefinition === undefined) {
+  async doEditShortCut(key) {
+    const shortCutDefinition = await doEditShortCutDialog(key);
+    const newShortCutDefinition = _shortCutDefinitionNormalized(shortCutDefinition);
+    if (newShortCutDefinition === undefined) {
       // User cancelled, do nothing.
       return;
     }
-    this.saveShortcut(key, newShortcutDefinition);
+    this.saveShortCut(key, newShortCutDefinition);
   }
 
-  saveShortcut(key, newShortcutDefinition) {
-    shortcutsData[key] = newShortcutDefinition;
-    shortcutsDataCustom[key] = newShortcutDefinition;
+  saveShortCut(key, newShortCutDefinition) {
+    shortCutsData[key] = newShortCutDefinition;
+    shortCutsDataCustom[key] = newShortCutDefinition;
 
     //TODO: Would it make sense to write to a custom json file somehow?
     // Currently saved to localStorage:
-    localStorage.setItem("shortcuts-custom", JSON.stringify(shortcutsDataCustom));
+    localStorage.setItem("shortCuts-custom", JSON.stringify(shortCutsDataCustom));
     this.setupUI();
   }
 
   async resetToDefault() {
     const result = await dialog(
-      "Reset shortcuts to default settings",
-      "Are you sure you want to reset all shortcuts to their default values?",
+      "Reset shortCuts to default settings",
+      "Are you sure you want to reset all shortCuts to their default values?",
       [
         { title: translate("dialog.cancel"), isCancelButton: true },
         { title: "Okay", isDefaultButton: true },
@@ -241,20 +248,19 @@ export class ShortcutsPanel extends BaseInfoPanel {
     if (!result) {
       return;
     }
-    localStorage.removeItem("shortcuts-custom");
+    localStorage.removeItem("shortCuts-custom");
     location.reload();
   }
 }
 
 const swappedKeyMap = getKeyMapSwapped();
-function parseShortCutString(key, value, globalOverride) {
+function parseShortCutString(value, globalOverride) {
   if (value === "") {
-    // Shortcut has been removed, therefore return null,
+    // ShortCut has been removed, therefore return null,
     // which is valid for json and different to undefined.
-    // 'null' is a valid shortcut with no keys or codes.
+    // 'null' is a valid shortCut with no keys or codes.
     return null;
   }
-  const valueCopy = `${value}`;
   const definition = {};
 
   function setShortCutDefinitionByKey(key, value, definition) {
@@ -270,32 +276,16 @@ function parseShortCutString(key, value, globalOverride) {
   value = setShortCutDefinitionByKey("shiftKey", value, definition);
   value = setShortCutDefinitionByKey("ctrlKey", value, definition);
   value = setShortCutDefinitionByKey("altKey", value, definition);
-  const keysOrCodes = swappedKeyMap[value]
-    ? [swappedKeyMap[value]]
-    : value.length === 1
+
+  const codePoint = value.codePointAt(0);
+  const isAtoZor0to9 =
+    (codePoint >= 65 && codePoint <= 90) || (codePoint >= 48 && codePoint <= 57);
+  definition.keysOrCodes = isAtoZor0to9
     ? value.toLowerCase()
-    : undefined;
-
-  if (keysOrCodes === undefined) {
-    message("Invalid shortcut:", `“${valueCopy}”`);
-    return undefined;
-  }
-  definition.keysOrCodes = keysOrCodes;
+    : swappedKeyMap[value]
+    ? [swappedKeyMap[value]]
+    : value;
   definition.globalOverride = globalOverride;
-
-  //check if definition exists already:
-  for (const otherKey in shortcutsData) {
-    if (key === otherKey) {
-      // skip self
-      continue;
-    }
-    if (isDifferentShortCutDefinition(shortcutsData[otherKey], definition)) {
-      continue;
-    }
-    message("Shortcut exists for: ", translate(otherKey, ""));
-    return undefined;
-  }
-
   return definition;
 }
 
@@ -303,10 +293,33 @@ function isDifferentShortCutDefinition(a, b) {
   const defA = _shortCutDefinitionNormalized(a);
   const defB = _shortCutDefinitionNormalized(b);
 
-  return JSON.stringify(defA).toLowerCase() != JSON.stringify(defB).toLowerCase();
+  if (defA === null || defB === null) {
+    return defA != defB;
+  }
+
+  if (Object.keys(defA).length !== Object.keys(defB).length) {
+    return true;
+  }
+
+  for (const key in defA) {
+    if (key === "keysOrCodes") {
+      // Case why this detailed comparison is needed:
+      // ['Delete', 'Backspace'] vs 'Backspace'
+      const array1 = Array.isArray(defA[key]) ? defA[key] : [defA[key]];
+      const array2 = Array.isArray(defB[key]) ? defB[key] : [defB[key]];
+      const intersection = array1.filter(Set.prototype.has, new Set(array2));
+      if (intersection.length === 0) {
+        // No intersection: they are different.
+        return true;
+      }
+    } else if (defA[key] !== defB[key]) {
+      return true;
+    }
+  }
+  return false;
 }
 
-const shortcutDefinitionKeys = [
+const shortCutDefinitionKeys = [
   "ctrlKey",
   "altKey",
   "shiftKey",
@@ -318,42 +331,83 @@ function _shortCutDefinitionNormalized(shortCutDefinition) {
   if (shortCutDefinition === null) {
     return null;
   }
+  if (shortCutDefinition === undefined) {
+    return undefined;
+  }
+  if (!shortCutDefinition["keysOrCodes"]) {
+    return null;
+  }
   const definition = {};
-  for (const key of shortcutDefinitionKeys) {
+  for (const key of shortCutDefinitionKeys) {
     if (shortCutDefinition[key]) {
+      if (key === "keysOrCodes") {
+        if (shortCutDefinition[key] === "") {
+          return null;
+        }
+        if (
+          shortCutDefinition[key].length > 1 &&
+          shortCutDefinition[key].includes(",")
+        ) {
+          // it's a list of keys
+          shortCutDefinition[key] = shortCutDefinition[key].split(",");
+        }
+      }
       definition[key] = shortCutDefinition[key];
     }
   }
   return definition;
 }
 
-async function doEditShortcutDialog(key) {
-  const shortCutDefinition = shortcutsData[key];
-  const title = "Edit Shortcut: " + translate(key, "");
+function validateShortCutDefinition(key, definition) {
+  if (definition === null) {
+    return [];
+  }
+  const warnings = [];
+  for (const otherKey in shortCutsData) {
+    if (key === otherKey) {
+      // skip self
+      continue;
+    }
+    if (isDifferentShortCutDefinition(shortCutsData[otherKey], definition)) {
+      continue;
+    }
+    warnings.push("⚠️ ShortCut exists for: " + translate(otherKey, ""));
+    break;
+  }
+
+  let keysOrCodes = [];
+  if (Array.isArray(definition.keysOrCodes)) {
+    keysOrCodes = definition.keysOrCodes;
+  } else {
+    if (definition.keysOrCodes && definition.keysOrCodes.length > 1) {
+      if (definition.keysOrCodes.includes(",")) {
+        // check if it's a valid key combination
+        definition.keysOrCodes.split(",").forEach((key) => {
+          keysOrCodes.push(key);
+        });
+      } else {
+        keysOrCodes.push(definition.keysOrCodes);
+      }
+    }
+  }
+
+  for (const charStr of keysOrCodes) {
+    if (charStr.length > 1 && !getKeyMap()[charStr]) {
+      warnings.push(`⚠️ Invalid key: ${charStr}`);
+    }
+  }
+  return warnings;
+}
+
+async function doEditShortCutDialog(key) {
+  const shortCutDefinition = shortCutsData[key];
+  const title = "Edit ShortCut: " + translate(key, "");
 
   const validateInput = () => {
-    const tempDefinition = _shortCutDefinitionNormalized(controller.model);
-
-    const warnings = [];
-    for (const otherKey in shortcutsData) {
-      if (key === otherKey) {
-        // skip self
-        continue;
-      }
-      if (isDifferentShortCutDefinition(shortcutsData[otherKey], tempDefinition)) {
-        continue;
-      }
-      warnings.push("⚠️ Shortcut exists for: " + translate(otherKey, ""));
-      break;
-    }
-
-    if (tempDefinition.keysOrCodes === undefined) {
-      warnings.push("⚠️ Missing shortcut");
-    }
-
-    if (tempDefinition.keysOrCodes && tempDefinition.keysOrCodes.length >= 2) {
-      warnings.push("⚠️ Only one key allowed");
-    }
+    const warnings = validateShortCutDefinition(
+      key,
+      _shortCutDefinitionNormalized(controller.model)
+    );
 
     warningElement.innerText = warnings.length ? warnings.join("\n") : "";
     dialog.defaultButton.classList.toggle("disabled", warnings.length);
@@ -389,7 +443,7 @@ async function doEditShortcutDialog(key) {
 
   const disable = controller.model.keysOrCodes != "" ? false : true;
   const { contentElement, warningElement } =
-    _shortcutPropertiesContentElement(controller);
+    _shortCutPropertiesContentElement(controller);
   const dialog = await dialogSetup(title, null, [
     { title: "Cancel", isCancelButton: true },
     { title: "Edit", isDefaultButton: true, disabled: disable },
@@ -398,7 +452,7 @@ async function doEditShortcutDialog(key) {
   dialog.setContent(contentElement);
 
   setTimeout(() => {
-    const inputNameElement = contentElement.querySelector("#shortcut-text-input");
+    const inputNameElement = contentElement.querySelector("#shortCut-text-input");
     inputNameElement.focus();
     inputNameElement.select();
   }, 0);
@@ -413,7 +467,7 @@ async function doEditShortcutDialog(key) {
   return _shortCutDefinitionNormalized(controller.model);
 }
 
-function _shortcutPropertiesContentElement(controller) {
+function _shortCutPropertiesContentElement(controller) {
   const warningElement = html.div({
     id: "warning-text-anchor-name",
     style: `grid-column: 1 / -1; min-height: 1.5em;`,
@@ -432,7 +486,8 @@ function _shortcutPropertiesContentElement(controller) {
     },
     [
       ...labeledTextInput("Keys or codes:", controller, "keysOrCodes", {
-        id: "shortcut-text-input",
+        id: "shortCut-text-input",
+        style: "text-transform: uppercase;",
       }),
       html.div(),
       labeledCheckbox(`Meta (${getNiceKey("metaKey")})`, controller, "metaKey", {}),

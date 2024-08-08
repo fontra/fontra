@@ -1,6 +1,6 @@
 import * as html from "../core/html-utils.js";
 import { ServerInfoPanel } from "./panel-server-info.js";
-import { ShortcutsPanel } from "./panel-shortcuts.js";
+import { ShortCutsPanel } from "./panel-shortcuts.js";
 import { ensureLanguageHasLoaded, translate } from "/core/localization.js";
 import { message } from "/web-components/modal-dialog.js";
 
@@ -28,7 +28,7 @@ export class ApplicationSettingsController {
     const observer = setupIntersectionObserver(panelContainer, this.panels);
 
     for (const panelClass of [
-      ShortcutsPanel,
+      ShortCutsPanel,
       ServerInfoPanel,
       // TODO: Add more panels here:
       // EditorAppearancePanel,

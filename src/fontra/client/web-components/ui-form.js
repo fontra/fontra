@@ -2,6 +2,7 @@ import * as html from "../core/html-utils.js";
 import { SimpleElement } from "../core/html-utils.js";
 import { QueueIterator } from "../core/queue-iterator.js";
 import { enumerate, hyphenatedToCamelCase, round } from "../core/utils.js";
+import { getNiceKey } from "/web-components/menu-panel.js";
 import { RangeSlider } from "/web-components/range-slider.js";
 import "/web-components/rotary-control.js";
 
@@ -233,6 +234,42 @@ export class Form extends SimpleElement {
     }
     inputElement.onchange = (event) => {
       this._fieldChanging(fieldItem, inputElement.value, undefined);
+    };
+    this._fieldGetters[fieldItem.key] = () => inputElement.value;
+    this._fieldSetters[fieldItem.key] = (value) => (inputElement.value = value);
+    valueElement.appendChild(inputElement);
+  }
+
+  _addEditTextShortcut(valueElement, fieldItem) {
+    const inputElement = document.createElement("input");
+    inputElement.type = "text";
+    inputElement.value = fieldItem.value || "";
+    inputElement.disabled = fieldItem.disabled;
+    if (fieldItem.style) {
+      inputElement.style = fieldItem.style;
+    }
+    let shorcutCommand = "";
+    inputElement.onkeydown = (event) => {
+      event.preventDefault();
+      // Record shortcut within 1.5 seconds, reset after 1.6 seconds.
+      setTimeout(() => {
+        shorcutCommand = "";
+      }, 1600);
+      const mainkey = `${event.key.toLowerCase()}Key`;
+      if (event[mainkey]) {
+        shorcutCommand += getNiceKey(mainkey);
+      } else if (getNiceKey(event.code, false)) {
+        shorcutCommand += getNiceKey(event.code);
+      } else {
+        shorcutCommand += event.key;
+      }
+      setTimeout(() => {
+        if (!shorcutCommand.length) {
+          return;
+        }
+        this._fieldChanging(fieldItem, shorcutCommand, undefined);
+        inputElement.focus();
+      }, 1500);
     };
     this._fieldGetters[fieldItem.key] = () => inputElement.value;
     this._fieldSetters[fieldItem.key] = (value) => (inputElement.value = value);
