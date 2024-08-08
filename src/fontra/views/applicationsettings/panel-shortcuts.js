@@ -18,7 +18,7 @@ import { Form } from "/web-components/ui-form.js";
 
 // TODOs:
 // How do we want to save custom edited shortcuts? Please see: saveShortcut() function.
-// Does it make sense at all to have a custom json file for shortcuts or is it stored on the cache at the end?
+// Does it make sense at all to have a custom json file for shortcuts or is it stored on the localStorage?
 // Do we need a reset to default button?
 // Shortcuts from editor.js are included (as examples), but it must be extended with all shortcuts.
 // There are general information like isMac – do we want to stored them in a better way and if so, where/how?
@@ -47,19 +47,24 @@ function createShortcutsData() {
         }
       }
     }
-    shortcutsData = { ...shortcutsData, ...data };
-  });
 
-  // then load custom data:
-  fetchJSON(`./data/shortcuts-custom.json`).then((data) => {
-    shortcutsData = { ...shortcutsData, ...data };
-    shortcutsDataCustom = data;
+    const storedCustomData = localStorage.getItem("shortcuts-custom");
+    const customData = storedCustomData ? JSON.parse(storedCustomData) : {};
+    shortcutsData = { ...data, ...customData };
     resolveShortcutsHasLoaded();
   });
+
+  // // then load custom data:
+  // fetchJSON(`./data/shortcuts-custom.json`).then((data) => {
+  //   shortcutsData = { ...shortcutsData, ...data };
+  //   shortcutsDataCustom = data;
+  //   resolveShortcutsHasLoaded();
+  // });
 }
 
 createShortcutsData();
 
+// With this grouping we have control over the order of the shortcuts.
 const shortcutsGrouped = {
   "shortcuts.tools": [
     "editor.pointer-tool",
@@ -216,10 +221,12 @@ export class ShortcutsPanel extends BaseInfoPanel {
   }
 
   async saveShortcut(key, newShortcutDefinition) {
-    //TODO: Need to be written to custom json file somehow or save in cache.
     shortcutsData[key] = newShortcutDefinition;
     shortcutsDataCustom[key] = newShortcutDefinition;
-    this.setupUI(); // reload UI
+
+    //TODO: Would it make sense to write to a custom json file somehow?
+    // Currently saved to localStorage:
+    localStorage.setItem("shortcuts-custom", JSON.stringify(shortcutsDataCustom));
   }
 }
 
