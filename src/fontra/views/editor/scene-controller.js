@@ -680,16 +680,19 @@ export class SceneController {
         title: translate("action.break-contour"),
         enabled: () => this.contextMenuState.pointSelection?.length,
         callback: () => this.doBreakSelectedContours(),
+        shortCut: undefined,
       },
       {
         title: translate("action.reverse-contour"),
         enabled: () => this.contextMenuState.pointSelection?.length,
         callback: () => this.doReverseSelectedContours(),
+        shortCut: undefined,
       },
       {
         title: translate("action.set-contour-start"),
         enabled: () => this.contextMenuState.pointSelection?.length,
         callback: () => this.doSetStartPoint(),
+        shortCut: undefined,
       },
       {
         title: () =>
