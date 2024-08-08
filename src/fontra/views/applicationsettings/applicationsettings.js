@@ -1,28 +1,12 @@
-// import { FontController } from "../core/font-controller.js";
 import * as html from "../core/html-utils.js";
-// import { getRemoteProxy } from "../core/remote.js";
-// import { makeDisplayPath } from "../core/view-utils.js";
 import { ServerInfoPanel } from "./panel-server-info.js";
-import { ShortcutsPanel, ensureShortcutsHasLoaded } from "./panel-shortcuts.js";
+import { ShortcutsPanel } from "./panel-shortcuts.js";
 import { ensureLanguageHasLoaded, translate } from "/core/localization.js";
 import { message } from "/web-components/modal-dialog.js";
 
 export class ApplicationSettingsController {
   static async fromWebSocket() {
     document.title = `Fontra Application Settings`;
-    // const pathItems = window.location.pathname.split("/").slice(3);
-    // const displayPath = makeDisplayPath(pathItems);
-    // document.title = `Fontra Application Settings — ${decodeURI(displayPath)}`;
-    // const projectPath = pathItems.join("/");
-    // const protocol = window.location.protocol === "http:" ? "ws" : "wss";
-    // const wsURL = `${protocol}://${window.location.host}/websocket/${projectPath}`;
-
-    // const remoteFontEngine = await getRemoteProxy(wsURL);
-    // const applicationSettingsController = new ApplicationSettingsController(remoteFontEngine);
-    // remoteFontEngine.receiver = applicationSettingsController;
-    // remoteFontEngine.onclose = (event) => applicationSettingsController.handleRemoteClose(event);
-    // remoteFontEngine.onerror = (event) => applicationSettingsController.handleRemoteError(event);
-
     await ensureLanguageHasLoaded;
 
     const applicationSettingsController = new ApplicationSettingsController();
@@ -30,13 +14,10 @@ export class ApplicationSettingsController {
     return applicationSettingsController;
   }
 
-  // constructor(font) {
-  //   this.fontController = new FontController(font);
+  // constructor() {
   // }
 
   async start() {
-    //await this.fontController.initialize();
-
     const url = new URL(window.location);
     this.selectedPanel = url.hash ? url.hash.slice(1) : "shortcuts-panel";
 
@@ -46,8 +27,6 @@ export class ApplicationSettingsController {
     this.panels = {};
     const observer = setupIntersectionObserver(panelContainer, this.panels);
 
-    const subscribePattern = {};
-
     for (const panelClass of [
       ShortcutsPanel,
       ServerInfoPanel,
@@ -55,10 +34,6 @@ export class ApplicationSettingsController {
       // EditorAppearancePanel,
       // ExtensionsPanel,
     ]) {
-      // panelClass.fontAttributes.forEach((fontAttr) => {
-      //   subscribePattern[fontAttr] = null;
-      // });
-
       const headerElement = html.div(
         {
           class: "header",
@@ -99,27 +74,12 @@ export class ApplicationSettingsController {
       observer.observe(panelElement);
     }
 
-    //await this.fontController.subscribeChanges(subscribePattern, false);
-
     window.addEventListener("keydown", (event) => this.handleKeyDown(event));
   }
 
   handleKeyDown(event) {
     const panel = this.panels[this.selectedPanel];
     panel?.handleKeyDown?.(event);
-  }
-
-  async externalChange(change, isLiveChange) {
-    await this.fontController.applyChange(change, true);
-    this.fontController.notifyChangeListeners(change, isLiveChange, true);
-  }
-
-  async reloadData(reloadPattern) {
-    // We have currently no way to refine update behavior based on the
-    // reloadPattern.
-    //
-    // reloadEverything() will trigger the appropriate listeners
-    this.fontController.reloadEverything();
   }
 
   async messageFromServer(headline, msg) {
