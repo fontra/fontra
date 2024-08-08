@@ -29,6 +29,9 @@
   "action.add-component": null,
   "action.add-anchor": null,
   "action.add-guideline": null,
+  "action.break-contour": null,
+  "action.reverse-contour": null,
+  "action.set-contour-start": null,
   "menubar.view.select.part.next": { "keysOrCodes": ["ArrowUp"], "metaKey": true },
   "menubar.view.select.part.previous": {
     "keysOrCodes": ["ArrowDown"],

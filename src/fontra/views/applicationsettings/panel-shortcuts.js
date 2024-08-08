@@ -96,6 +96,9 @@ const shortcutsGrouped = {
     "action.join-contours",
     "action.add-anchor",
     "action.add-guideline",
+    "action.break-contour",
+    "action.reverse-contour",
+    "action.set-contour-start",
   ],
 };
 
@@ -223,9 +226,9 @@ export class ShortcutsPanel extends BaseInfoPanel {
 const swappedKeyMap = getKeyMapSwapped();
 function parseShortCutString(key, value, globalOverride) {
   if (value === "") {
-    // Shortcut has been removed,
-    // therefore return null, which is valid for json and different to undefined,
-    // which is a valid shortcut with no keys or codes.
+    // Shortcut has been removed, therefore return null,
+    // which is valid for json and different to undefined.
+    // 'null' is a valid shortcut with no keys or codes.
     return null;
   }
   const valueCopy = `${value}`;
