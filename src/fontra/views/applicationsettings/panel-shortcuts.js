@@ -20,7 +20,6 @@ import { Form } from "/web-components/ui-form.js";
 // How do we want to save custom edited shortcuts? Please see: saveShortcut() function.
 // Does it make sense at all to have a custom json file for shortcuts or is it stored on the localStorage?
 // Do we need a reset to default button?
-// Shortcuts from editor.js are included (as examples), but it must be extended with all shortcuts.
 // There are general information like isMac – do we want to stored them in a better way and if so, where/how?
 
 // For details please see https://tecadmin.net/javascript-detect-os/
@@ -112,7 +111,6 @@ addStyleSheet(`
   background-color: var(--ui-element-background-color);
   border-radius: 0.5em;
   padding: 1em;
-  margin-bottom: 1em;
 }
 `);
 
@@ -124,6 +122,17 @@ export class ShortcutsPanel extends BaseInfoPanel {
     await ensureShortcutsHasLoaded;
 
     this.panelElement.innerHTML = "";
+
+    this.panelElement.style = "gap: 1em;";
+    this.panelElement.appendChild(
+      html.input({
+        type: "button",
+        style: `justify-self: start;`,
+        value: "Reset to default",
+        onclick: (event) => this.resetToDefault(),
+      })
+    );
+
     for (const [categoryKey, shortcuts] of Object.entries(shortcutsGrouped)) {
       this.infoForm = new Form();
       this.infoForm.className = "fontra-ui-shortcuts-panel";
@@ -220,13 +229,29 @@ export class ShortcutsPanel extends BaseInfoPanel {
     this.saveShortcut(key, newShortcutDefinition);
   }
 
-  async saveShortcut(key, newShortcutDefinition) {
+  saveShortcut(key, newShortcutDefinition) {
     shortcutsData[key] = newShortcutDefinition;
     shortcutsDataCustom[key] = newShortcutDefinition;
 
     //TODO: Would it make sense to write to a custom json file somehow?
     // Currently saved to localStorage:
     localStorage.setItem("shortcuts-custom", JSON.stringify(shortcutsDataCustom));
+  }
+
+  async resetToDefault() {
+    const result = await dialog(
+      "Reset shortcuts to default settings",
+      "Are you sure you want to reset all shortcuts to their default values?",
+      [
+        { title: translate("dialog.cancel"), isCancelButton: true },
+        { title: "Okay", isDefaultButton: true },
+      ]
+    );
+    if (!result) {
+      return;
+    }
+    localStorage.removeItem("shortcuts-custom");
+    location.reload();
   }
 }
 
