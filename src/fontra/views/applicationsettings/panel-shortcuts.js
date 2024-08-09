@@ -28,7 +28,7 @@ export const ensureShortCutsHasLoaded = new Promise((resolve) => {
 });
 
 function createShortCutsData() {
-  fetchJSON(`./data/shortcuts.json`).then((data) => {
+  fetchJSON(`/core/data/shortcuts.json`).then((data) => {
     if (!isMac) {
       // If not Mac (Windows or Linux) then
       // replace metaKey with ctrlKey
@@ -48,6 +48,10 @@ function createShortCutsData() {
 }
 
 createShortCutsData();
+
+export function getShortCut(key) {
+  return shortCutsData[key];
+}
 
 // With this grouping we have control over the order of the shortcuts.
 const shortCutsGrouped = {

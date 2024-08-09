@@ -70,6 +70,10 @@ import { MenuItemDivider, showMenu } from "/web-components/menu-panel.js";
 import { dialog, dialogSetup, message } from "/web-components/modal-dialog.js";
 import { parsePluginBasePath } from "/web-components/plugin-manager.js";
 
+import {
+  ensureShortCutsHasLoaded,
+  getShortCut,
+} from "../applicationsettings/panel-shortcuts.js";
 import DesignspaceNavigationPanel from "./panel-designspace-navigation.js";
 import GlyphNotePanel from "./panel-glyph-note.js";
 import GlyphSearchPanel from "./panel-glyph-search.js";
@@ -101,6 +105,7 @@ export class EditorController {
     const wsURL = `${protocol}://${window.location.host}/websocket/${projectPath}`;
 
     await ensureLanguageHasLoaded;
+    await ensureShortCutsHasLoaded;
 
     const remoteFontEngine = await getRemoteProxy(wsURL);
     const editorController = new EditorController(remoteFontEngine);
@@ -1268,46 +1273,49 @@ export class EditorController {
   initShortCuts() {
     this.shortCutHandlers = {};
 
-    this.registerShortCut(["Space"], { metaKey: false, repeat: false }, () => {
-      this.spaceKeyDownHandler();
-    });
-    this.registerShortCut("-", { metaKey: true, globalOverride: true }, () => {
+    this.registerShortCut(
+      { keysOrCodes: ["Space"], metaKey: false, repeat: false },
+      () => {
+        this.spaceKeyDownHandler();
+      }
+    );
+    this.registerShortCut(getShortCut("zoom-out"), () => {
       this.zoomOut();
     });
-    this.registerShortCut("+=", { metaKey: true, globalOverride: true }, () => {
+    this.registerShortCut(getShortCut("zoom-in"), () => {
       this.zoomIn();
     });
-    this.registerShortCut("0", { metaKey: true, globalOverride: true }, () => {
+    this.registerShortCut(getShortCut("zoom-fit-selection"), () => {
       this.zoomFit();
     });
-    this.registerShortCut("v", { metaKey: false, globalOverride: true }, () => {
+    this.registerShortCut(getShortCut("editor.pointer-tool"), () => {
       this.setSelectedTool("pointer-tool");
     });
-    this.registerShortCut("p", { metaKey: false, globalOverride: true }, () => {
+    this.registerShortCut(getShortCut("editor.pen-tool"), () => {
       this.setSelectedTool("pen-tool");
     });
-    this.registerShortCut("s", { metaKey: false, globalOverride: true }, () => {
+    this.registerShortCut(getShortCut("editor.knife-tool"), () => {
       this.setSelectedTool("knife-tool");
     });
-    this.registerShortCut("r", { metaKey: false, globalOverride: true }, () => {
+    this.registerShortCut(getShortCut("editor.shape-tool-rectangle"), () => {
       this.setSelectedTool("shape-tool-rectangle", true);
     });
-    this.registerShortCut("o", { metaKey: false, globalOverride: true }, () => {
+    this.registerShortCut(getShortCut("editor.shape-tool-ellipse"), () => {
       this.setSelectedTool("shape-tool-ellipse", true);
     });
-    this.registerShortCut("m", { metaKey: false, globalOverride: true }, () => {
+    this.registerShortCut(getShortCut("editor.power-ruler-tool"), () => {
       this.setSelectedTool("power-ruler-tool");
     });
-    this.registerShortCut("h", { metaKey: false, globalOverride: true }, () => {
+    this.registerShortCut(getShortCut("editor.hand-tool"), () => {
       this.setSelectedTool("hand-tool");
     });
-    this.registerShortCut("f", { metaKey: true, globalOverride: true }, () => {
+    this.registerShortCut(getShortCut("sidebar.glyph-search"), () => {
       this.toggleSidebar("glyph-search", true);
     });
-    this.registerShortCut("i", { metaKey: true, globalOverride: true }, () => {
+    this.registerShortCut(getShortCut("sidebar.selection-info"), () => {
       this.toggleSidebar("selection-info", true);
     });
-    this.registerShortCut("e", { metaKey: true, globalOverride: true }, () => {
+    this.registerShortCut(getShortCut("sidebar.designspace-navigation"), () => {
       this.getSidebarPanel("designspace-navigation").onEditHeaderClick();
     });
 
@@ -1318,8 +1326,7 @@ export class EditorController {
     ]) {
       if (menuItem.shortCut) {
         this.registerShortCut(
-          menuItem.shortCut.keysOrCodes,
-          menuItem.shortCut,
+          { keysOrCodes: menuItem.shortCut.keysOrCodes, ...menuItem.shortCut },
           menuItem.callback,
           menuItem.enabled
         );
@@ -1350,7 +1357,7 @@ export class EditorController {
     });
   }
 
-  registerShortCut(keysOrCodes, modifiers, callback, enabled = null) {
+  registerShortCut(shortCutDefinition, callback, enabled = null) {
     //
     // Register a shortcut handler
     //
@@ -1369,6 +1376,10 @@ export class EditorController {
     // enabled. If `enabled()` returns false, `callback` will not be called.
     // If `enabled` is not given, `callback` will be called unconditionally.
     //
+
+    const keysOrCodes = shortCutDefinition.keysOrCodes;
+    delete shortCutDefinition["keysOrCodes"];
+    const modifiers = shortCutDefinition;
 
     for (const keyOrCode of keysOrCodes) {
       const handlerDef = { ...modifiers, callback, enabled };
