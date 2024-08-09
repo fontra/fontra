@@ -16,12 +16,6 @@ import {
 import { dialog, dialogSetup, message } from "/web-components/modal-dialog.js";
 import { Form } from "/web-components/ui-form.js";
 
-// TODOs:
-// How do we want to save custom edited shortCuts? Please see: saveShortCut() function.
-// Does it make sense at all to have a custom json file for shortCuts or is it stored on the localStorage?
-// Do we need a reset to default button?
-// There are general information like isMac – do we want to stored them in a better way and if so, where/how?
-
 // For details please see https://tecadmin.net/javascript-detect-os/
 const isMac = window.navigator.userAgent.indexOf("Mac") != -1;
 
@@ -34,7 +28,6 @@ export const ensureShortCutsHasLoaded = new Promise((resolve) => {
 });
 
 function createShortCutsData() {
-  // first load default data:
   fetchJSON(`./data/shortcuts.json`).then((data) => {
     if (!isMac) {
       // If not Mac (Windows or Linux) then
@@ -52,13 +45,6 @@ function createShortCutsData() {
     shortCutsData = { ...data, ...customData };
     resolveShortCutsHasLoaded();
   });
-
-  // // then load custom data:
-  // fetchJSON(`./data/shortCuts-custom.json`).then((data) => {
-  //   shortCutsData = { ...shortCutsData, ...data };
-  //   shortCutsDataCustom = data;
-  //   resolveShortCutsHasLoaded();
-  // });
 }
 
 createShortCutsData();
@@ -230,16 +216,14 @@ export class ShortCutsPanel extends BaseInfoPanel {
     shortCutsData[key] = newShortCutDefinition;
     shortCutsDataCustom[key] = newShortCutDefinition;
 
-    //TODO: Would it make sense to write to a custom json file somehow?
-    // Currently saved to localStorage:
     localStorage.setItem("shortCuts-custom", JSON.stringify(shortCutsDataCustom));
     this.setupUI();
   }
 
   async resetToDefault() {
     const result = await dialog(
-      "Reset shortCuts to default settings",
-      "Are you sure you want to reset all shortCuts to their default values?",
+      "Reset to default",
+      "Are you sure you want to reset all shortcuts to their default settings?",
       [
         { title: translate("dialog.cancel"), isCancelButton: true },
         { title: "Okay", isDefaultButton: true },
@@ -256,9 +240,9 @@ export class ShortCutsPanel extends BaseInfoPanel {
 const swappedKeyMap = getKeyMapSwapped();
 function parseShortCutString(value, globalOverride) {
   if (value === "") {
-    // ShortCut has been removed, therefore return null,
+    // Shortcut has been removed, therefore return null,
     // which is valid for json and different to undefined.
-    // 'null' is a valid shortCut with no keys or codes.
+    // 'null' is a valid shortcut with no keys or codes.
     return null;
   }
   const definition = {};
@@ -290,6 +274,8 @@ function parseShortCutString(value, globalOverride) {
 }
 
 function isDifferentShortCutDefinition(a, b) {
+  // Why isDifferent and not isEqual?
+  // Because it is a faster return if something is different.
   const defA = _shortCutDefinitionNormalized(a);
   const defB = _shortCutDefinitionNormalized(b);
 
@@ -303,7 +289,7 @@ function isDifferentShortCutDefinition(a, b) {
 
   for (const key in defA) {
     if (key === "keysOrCodes") {
-      // Case why this detailed comparison is needed:
+      // This is required, because of cases like this:
       // ['Delete', 'Backspace'] vs 'Backspace'
       const array1 = Array.isArray(defA[key]) ? defA[key] : [defA[key]];
       const array2 = Array.isArray(defB[key]) ? defB[key] : [defB[key]];
@@ -335,6 +321,9 @@ function _shortCutDefinitionNormalized(shortCutDefinition) {
     return undefined;
   }
   if (!shortCutDefinition["keysOrCodes"]) {
+    // No keys or codes, is not valid,
+    // therefore return null.
+    // INFO: This is how you can delete a shortcut.
     return null;
   }
   const definition = {};
@@ -348,7 +337,7 @@ function _shortCutDefinitionNormalized(shortCutDefinition) {
           shortCutDefinition[key].length > 1 &&
           shortCutDefinition[key].includes(",")
         ) {
-          // it's a list of keys
+          // It's a list of keys, if it contains a comma
           shortCutDefinition[key] = shortCutDefinition[key].split(",");
         }
       }
@@ -381,7 +370,7 @@ function validateShortCutDefinition(key, definition) {
   } else {
     if (definition.keysOrCodes && definition.keysOrCodes.length > 1) {
       if (definition.keysOrCodes.includes(",")) {
-        // check if it's a valid key combination
+        // collect items to be checked later if it's a valid key
         definition.keysOrCodes.split(",").forEach((key) => {
           keysOrCodes.push(key);
         });
