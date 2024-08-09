@@ -248,28 +248,35 @@ export class Form extends SimpleElement {
     if (fieldItem.style) {
       inputElement.style = fieldItem.style;
     }
-    let shorcutCommand = "";
+    // collect the shorcut commands in set to avoid duplicates
+    let shorcutCommands = new Set();
     inputElement.onkeydown = (event) => {
-      event.preventDefault();
-      // Record shortcut within 1.5 seconds, reset after 1.6 seconds.
-      setTimeout(() => {
-        shorcutCommand = "";
-      }, 1600);
+      event.preventDefault(); // avoid typing with preventDefault -> only 'record' typing.
+      clearTimeout(this.timeoutID); // Clear the timeout each time a key is pressed
+
       const mainkey = `${event.key.toLowerCase()}Key`;
       if (event[mainkey]) {
-        shorcutCommand += getNiceKey(mainkey);
+        shorcutCommands.add(mainkey);
       } else if (getNiceKey(event.code, false)) {
-        shorcutCommand += getNiceKey(event.code);
+        shorcutCommands.add(event.code);
       } else {
-        shorcutCommand += event.key;
+        shorcutCommands.add(event.key);
       }
-      setTimeout(() => {
-        if (!shorcutCommand.length) {
-          return;
-        }
+
+      this.timeoutID = setTimeout(() => {
+        // This is a delay before the command is sent
+        let shorcutCommand = "";
+        Array.from(shorcutCommands).forEach((item) => {
+          if (getNiceKey(item, false)) {
+            shorcutCommand += getNiceKey(item);
+          } else {
+            shorcutCommand += item;
+          }
+        });
+
         this._fieldChanging(fieldItem, shorcutCommand, undefined);
-        inputElement.focus();
-      }, 1500);
+        shorcutCommands = new Set();
+      }, 650);
     };
     this._fieldGetters[fieldItem.key] = () => inputElement.value;
     this._fieldSetters[fieldItem.key] = (value) => (inputElement.value = value);
