@@ -1,9 +1,9 @@
-aiohttp==3.10.2
+aiohttp==3.10.3
 cattrs==23.2.3
 fonttools[ufo,unicode]==4.53.1
-glyphsLib==6.8.0
+glyphsLib==6.8.1
 pyyaml==6.0.2
-ufomerge==1.7.1
+ufomerge==1.8.0
 unicodedata2==15.1.0
 watchfiles==0.23.0
 skia-pathops==0.8.0.post1
