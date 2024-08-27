@@ -365,14 +365,14 @@ export class EditorController {
             {
               title: translate("zoom-in"),
               enabled: () => true,
-              shortCut: { keysOrCodes: "+=", metaKey: true, globalOverride: true },
+              shortCut: getShortCut("zoom-in"),
               callback: () => {
                 this.zoomIn();
               },
             },
             {
               title: translate("zoom-out"),
-              shortCut: { keysOrCodes: "-", metaKey: true, globalOverride: true },
+              shortCut: getShortCut("zoom-out"),
               enabled: () => true,
               callback: () => {
                 this.zoomOut();
@@ -395,7 +395,7 @@ export class EditorController {
                 }
                 return !this.canvasController.isActualViewBox(viewBox);
               },
-              shortCut: { keysOrCodes: "0", metaKey: true, globalOverride: true },
+              shortCut: getShortCut("zoom-fit-selection"),
               callback: () => {
                 this.zoomFit();
               },
@@ -1146,7 +1146,7 @@ export class EditorController {
         title: () => this.getUndoRedoLabel(isRedo),
         enabled: () => this.canUndoRedo(isRedo),
         callback: () => this.doUndoRedo(isRedo),
-        shortCut: { keysOrCodes: "z", metaKey: true, shiftKey: isRedo },
+        shortCut: isRedo ? getShortCut("action.redo") : getShortCut("action.undo"),
       });
     }
     this.basicContextMenuItems.push(MenuItemDivider);
@@ -1162,19 +1162,19 @@ export class EditorController {
           title: translate("action.cut"),
           enabled: () => this.canCut(),
           callback: () => this.doCut(),
-          shortCut: { keysOrCodes: "x", metaKey: true, shiftKey: false },
+          shortCut: getShortCut("action.cut"),
         },
         {
           title: translate("action.copy"),
           enabled: () => this.canCopy(),
           callback: () => this.doCopy(),
-          shortCut: { keysOrCodes: "c", metaKey: true, shiftKey: false },
+          shortCut: getShortCut("action.copy"),
         },
         {
           title: translate("action.paste"),
           enabled: () => this.canPaste(),
           callback: () => this.doPaste(),
-          shortCut: { keysOrCodes: "v", metaKey: true, shiftKey: false },
+          shortCut: getShortCut("action.paste"),
         }
       );
     }
@@ -1200,7 +1200,9 @@ export class EditorController {
           : translate("action.select-all"),
         enabled: () => this.canSelectAllNone(selectNone),
         callback: () => this.doSelectAllNone(selectNone),
-        shortCut: { keysOrCodes: "a", metaKey: true, shiftKey: selectNone },
+        shortCut: selectNone
+          ? getShortCut("action.select-none")
+          : getShortCut("action.select-all"),
       });
     }
 
@@ -1210,14 +1212,14 @@ export class EditorController {
       title: translate("action.add-component"),
       enabled: () => this.canAddComponent(),
       callback: () => this.doAddComponent(),
-      shortCut: undefined,
+      shortCut: getShortCut("action.add-component"),
     });
 
     this.glyphEditContextMenuItems.push({
       title: translate("action.add-anchor"),
       enabled: () => this.canAddAnchor(),
       callback: () => this.doAddAnchor(),
-      shortCut: undefined,
+      shortCut: getShortCut("action.add-anchor"),
     });
 
     this.glyphEditContextMenuItems.push({
@@ -1227,7 +1229,7 @@ export class EditorController {
       title: translate("action.add-guideline"),
       enabled: () => this.canAddGuideline(),
       callback: () => this.doAddGuideline(),
-      shortCut: undefined,
+      shortCut: getShortCut("action.add-guideline"),
     });
 
     this.glyphEditContextMenuItems.push({
@@ -1247,12 +1249,9 @@ export class EditorController {
         title: translate("menubar.view.select.part.all", prevNext),
         enabled: () => true,
         callback: () => this.doSelectPreviousNextSource(selectPrevious),
-        shortCut: {
-          keysOrCodes: [selectPrevious ? "ArrowUp" : "ArrowDown"],
-          metaKey: true,
-          altKey: false,
-          shiftKey: false,
-        },
+        shortCut: selectPrevious
+          ? getShortCut("menubar.view.select.part.next")
+          : getShortCut("menubar.view.select.part.previous"),
       });
     }
 
