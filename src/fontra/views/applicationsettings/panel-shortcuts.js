@@ -40,6 +40,8 @@ function createShortCutsData() {
       }
     }
 
+    // TODO: Data is missing keysOrCodes and I don't know why.
+
     const storedCustomData = localStorage.getItem("shortCuts-custom");
     const customData = storedCustomData ? JSON.parse(storedCustomData) : {};
     shortCutsData = { ...data, ...customData };
