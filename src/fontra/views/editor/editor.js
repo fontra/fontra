@@ -1416,13 +1416,24 @@ export class EditorController {
     }
   }
 
-  _getShortCutCallback(event) {
-    let handlerDefs =
-      this.shortCutHandlers[this.getShortCutHandleKey(getNiceKey(event.key), event)];
-    if (!handlerDefs) {
-      handlerDefs =
-        this.shortCutHandlers[this.getShortCutHandleKey(getNiceKey(event.code), event)];
+  _getHandleDefs(event) {
+    const possibleKeys = [
+      event.key,
+      event.code,
+      getNiceKey(event.key),
+      getNiceKey(event.code),
+    ];
+    for (const keyOrCode of possibleKeys) {
+      const handlerDefs =
+        this.shortCutHandlers[this.getShortCutHandleKey(keyOrCode, event)];
+      if (handlerDefs) {
+        return handlerDefs;
+      }
     }
+  }
+
+  _getShortCutCallback(event) {
+    const handlerDefs = this._getHandleDefs(event);
     if (!handlerDefs) {
       return {};
     }
