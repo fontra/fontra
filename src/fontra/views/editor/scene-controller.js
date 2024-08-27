@@ -1,3 +1,4 @@
+import { getShortCut } from "../applicationsettings/panel-shortcuts.js";
 import { recordChanges } from "../core/change-recorder.js";
 import {
   ChangeCollector,
@@ -674,25 +675,25 @@ export class SceneController {
           this.contextMenuState.joinContourSelection?.length === 2
             ? this.doJoinSelectedOpenContours()
             : this.doCloseSelectedOpenContours(),
-        shortCut: { keysOrCodes: "j", metaKey: true },
+        shortCut: getShortCut("action.join-contours"),
       },
       {
         title: translate("action.break-contour"),
         enabled: () => this.contextMenuState.pointSelection?.length,
         callback: () => this.doBreakSelectedContours(),
-        shortCut: undefined,
+        shortCut: getShortCut("action.break-contour"),
       },
       {
         title: translate("action.reverse-contour"),
         enabled: () => this.contextMenuState.pointSelection?.length,
         callback: () => this.doReverseSelectedContours(),
-        shortCut: undefined,
+        shortCut: getShortCut("action.reverse-contour"),
       },
       {
         title: translate("action.set-contour-start"),
         enabled: () => this.contextMenuState.pointSelection?.length,
         callback: () => this.doSetStartPoint(),
-        shortCut: undefined,
+        shortCut: getShortCut("action.set-contour-start"),
       },
       {
         title: () =>
@@ -702,7 +703,7 @@ export class SceneController {
           ),
         enabled: () => !!this.contextMenuState?.componentSelection?.length,
         callback: () => this.doDecomposeSelectedComponents(),
-        shortCut: { keysOrCodes: "d", metaKey: true, shiftKey: true },
+        shortCut: getShortCut("action.decompose-component"),
       },
     ];
     return contextMenuItems;
