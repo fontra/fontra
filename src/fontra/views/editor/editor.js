@@ -1376,7 +1376,10 @@ export class EditorController {
     // enabled. If `enabled()` returns false, `callback` will not be called.
     // If `enabled` is not given, `callback` will be called unconditionally.
     //
-
+    if (!shortCutDefinition) {
+      // might be null if the shortcut was removed by user.
+      return;
+    }
     const keysOrCodes = shortCutDefinition.keysOrCodes;
     delete shortCutDefinition["keysOrCodes"];
     const modifiers = shortCutDefinition;
