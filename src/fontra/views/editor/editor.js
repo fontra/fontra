@@ -1388,7 +1388,7 @@ export class EditorController {
   }
 
   getShortCutHandleKey(keyOrCode, modifiers) {
-    let handleKey = keyOrCode;
+    let handleKey = keyOrCode.toLowerCase();
     if (modifiers.metaKey) {
       handleKey += "+meta";
     }
