@@ -66,7 +66,7 @@ import * as html from "/core/html-utils.js";
 import { themeController } from "/core/theme-settings.js";
 import { getDecomposedIdentity } from "/core/transform.js";
 import { MenuBar } from "/web-components/menu-bar.js";
-import { MenuItemDivider, showMenu } from "/web-components/menu-panel.js";
+import { MenuItemDivider, getNiceKey, showMenu } from "/web-components/menu-panel.js";
 import { dialog, dialogSetup, message } from "/web-components/modal-dialog.js";
 import { parsePluginBasePath } from "/web-components/plugin-manager.js";
 
@@ -1418,9 +1418,10 @@ export class EditorController {
 
   _getShortCutCallback(event) {
     let handlerDefs =
-      this.shortCutHandlers[this.getShortCutHandleKey(event.key, event)];
+      this.shortCutHandlers[this.getShortCutHandleKey(getNiceKey(event.key), event)];
     if (!handlerDefs) {
-      handlerDefs = this.shortCutHandlers[this.getShortCutHandleKey(event.code, event)];
+      handlerDefs =
+        this.shortCutHandlers[this.getShortCutHandleKey(getNiceKey(event.code), event)];
     }
     if (!handlerDefs) {
       return {};
