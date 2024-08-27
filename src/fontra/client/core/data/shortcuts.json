@@ -17,6 +17,7 @@
     "keysOrCodes": ["Delete", "Backspace"],
     "globalOverride": true
   },
+  "action.delete-selection": { "keysOrCodes": ["Delete", "Backspace"] },
   "zoom-fit-selection": { "keysOrCodes": "0", "metaKey": true, "globalOverride": true },
   "action.join-contours": { "keysOrCodes": "j", "metaKey": true },
   "action.undo": { "keysOrCodes": "z", "metaKey": true },

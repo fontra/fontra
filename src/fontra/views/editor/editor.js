@@ -1186,11 +1186,9 @@ export class EditorController {
           : translate("action.delete-glyph"),
       enabled: () => this.canDelete(),
       callback: (event) => this.doDelete(event),
-      shortCut: {
-        keysOrCodes: ["Delete", "Backspace"],
-        metaKey: false,
-        shiftKey: false,
-      },
+      shortCut: this.sceneSettings.selectedGlyph?.isEditing
+        ? getShortCut("action.delete-selection")
+        : getShortCut("action.delete-glyph"),
     });
 
     this.basicContextMenuItems.push(MenuItemDivider);
@@ -1325,11 +1323,7 @@ export class EditorController {
       ...this.glyphSelectedContextMenuItems,
     ]) {
       if (menuItem.shortCut) {
-        this.registerShortCut(
-          { keysOrCodes: menuItem.shortCut.keysOrCodes, ...menuItem.shortCut },
-          menuItem.callback,
-          menuItem.enabled
-        );
+        this.registerShortCut(menuItem.shortCut, menuItem.callback, menuItem.enabled);
       }
     }
   }
@@ -1386,10 +1380,7 @@ export class EditorController {
 
     for (const keyOrCode of keysOrCodes) {
       const handlerDef = { ...modifiers, callback, enabled };
-      const shortCutHandleKey = this.getShortCutHandleKey(
-        keyOrCode.toLowerCase(),
-        modifiers
-      );
+      const shortCutHandleKey = this.getShortCutHandleKey(keyOrCode, modifiers);
       if (!this.shortCutHandlers[shortCutHandleKey]) {
         this.shortCutHandlers[shortCutHandleKey] = [];
       }

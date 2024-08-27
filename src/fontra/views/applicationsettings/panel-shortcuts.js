@@ -85,6 +85,7 @@ const shortCutsGrouped = {
     "action.select-all",
     "action.select-none",
     "action.delete-glyph",
+    "action.delete-selection",
     "action.add-component",
     "action.decompose-component",
     "action.join-contours",
