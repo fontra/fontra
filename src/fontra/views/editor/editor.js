@@ -1416,7 +1416,7 @@ export class EditorController {
     }
   }
 
-  _getHandleDefs(event) {
+  _getHandlerDefs(event) {
     const possibleKeys = [
       event.key,
       event.code,
@@ -1433,7 +1433,7 @@ export class EditorController {
   }
 
   _getShortCutCallback(event) {
-    const handlerDefs = this._getHandleDefs(event);
+    const handlerDefs = this._getHandlerDefs(event);
     if (!handlerDefs) {
       return {};
     }
