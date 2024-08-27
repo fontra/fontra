@@ -254,7 +254,9 @@ export class Form extends SimpleElement {
       event.preventDefault(); // avoid typing with preventDefault -> only 'record' typing.
       clearTimeout(this.timeoutID); // Clear the timeout each time a key is pressed
 
-      const mainkey = `${event.key.toLowerCase()}Key`;
+      const mainkey = `${
+        event.key.toLowerCase() === "control" ? "ctrl" : event.key.toLowerCase()
+      }Key`;
       if (event[mainkey]) {
         shorcutCommands.add(mainkey);
       } else if (getNiceKey(event.code, false)) {
