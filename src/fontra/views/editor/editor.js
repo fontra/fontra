@@ -1386,11 +1386,32 @@ export class EditorController {
 
     for (const keyOrCode of keysOrCodes) {
       const handlerDef = { ...modifiers, callback, enabled };
-      if (!this.shortCutHandlers[keyOrCode]) {
-        this.shortCutHandlers[keyOrCode] = [];
+      const shortCutHandleKey = this.getShortCutHandleKey(
+        keyOrCode.toLowerCase(),
+        modifiers
+      );
+      if (!this.shortCutHandlers[shortCutHandleKey]) {
+        this.shortCutHandlers[shortCutHandleKey] = [];
       }
-      this.shortCutHandlers[keyOrCode].push(handlerDef);
+      this.shortCutHandlers[shortCutHandleKey].push(handlerDef);
     }
+  }
+
+  getShortCutHandleKey(keyOrCode, modifiers) {
+    let handleKey = keyOrCode;
+    if (modifiers.metaKey) {
+      handleKey += "+meta";
+    }
+    if (modifiers.shiftKey) {
+      handleKey += "+shift";
+    }
+    if (modifiers.altKey) {
+      handleKey += "+alt";
+    }
+    if (modifiers.ctrlKey) {
+      handleKey += "+ctrl";
+    }
+    return handleKey;
   }
 
   async keyDownHandler(event) {
@@ -1406,9 +1427,10 @@ export class EditorController {
   }
 
   _getShortCutCallback(event) {
-    let handlerDefs = this.shortCutHandlers[event.key.toLowerCase()];
+    let handlerDefs =
+      this.shortCutHandlers[this.getShortCutHandleKey(event.key, event)];
     if (!handlerDefs) {
-      handlerDefs = this.shortCutHandlers[event.code];
+      handlerDefs = this.shortCutHandlers[this.getShortCutHandleKey(event.code, event)];
     }
     if (!handlerDefs) {
       return {};
