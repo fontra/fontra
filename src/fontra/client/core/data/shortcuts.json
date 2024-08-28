@@ -6,13 +6,13 @@
     "metaKey": true,
     "shiftKey": true
   },
-  "editor.pointer-tool": { "keysOrCodes": "v", "globalOverride": true },
-  "editor.pen-tool": { "keysOrCodes": "p", "globalOverride": true },
-  "editor.knife-tool": { "keysOrCodes": "s", "globalOverride": true },
-  "editor.shape-tool-rectangle": { "keysOrCodes": "r", "globalOverride": true },
-  "editor.shape-tool-ellipse": { "keysOrCodes": "o", "globalOverride": true },
-  "editor.power-ruler-tool": { "keysOrCodes": "m", "globalOverride": true },
-  "editor.hand-tool": { "keysOrCodes": "h", "globalOverride": true },
+  "editor.pointer-tool": { "keysOrCodes": "1", "globalOverride": true },
+  "editor.pen-tool": { "keysOrCodes": "2", "globalOverride": true },
+  "editor.knife-tool": { "keysOrCodes": "3", "globalOverride": true },
+  "editor.shape-tool-rectangle": { "keysOrCodes": "4", "globalOverride": true },
+  "editor.shape-tool-ellipse": { "keysOrCodes": "5", "globalOverride": true },
+  "editor.power-ruler-tool": { "keysOrCodes": "6", "globalOverride": true },
+  "editor.hand-tool": { "keysOrCodes": "7", "globalOverride": true },
   "action.delete-glyph": {
     "keysOrCodes": ["Delete", "Backspace"],
     "globalOverride": true
