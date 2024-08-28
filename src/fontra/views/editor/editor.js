@@ -314,7 +314,7 @@ export class EditorController {
       // This is for testing only, will be commented out.
       {
         title: translate("menubar.fontra"),
-        class: "menu-item menu-item-bold",
+        bold: true,
         getItems() {
           return [
             {

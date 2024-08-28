@@ -183,7 +183,7 @@ export class MenuBar extends SimpleElement {
       fragment.appendChild(
         html.div(
           {
-            class: item.class ? item.class : "menu-item",
+            class: item.bold ? "menu-item menu-item-bold" : "menu-item",
             onmousedown: (event) => {
               const currentSelection = this.contentElement.querySelector(".current");
               if (currentSelection === event.target) {
