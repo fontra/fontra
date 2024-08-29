@@ -205,6 +205,10 @@ function isDifferentShortCutDefinition(a, b) {
     return defA != defB;
   }
 
+  // we ignore globalOverride for comparison, therefore delete it.
+  delete defA.globalOverride;
+  delete defB.globalOverride;
+
   if (Object.keys(defA).length !== Object.keys(defB).length) {
     return true;
   }
@@ -411,6 +415,7 @@ function _shortCutPropertiesContentElement(controller) {
   return { contentElement, warningElement };
 }
 
+const shotcutsPanelInputWidth = isMac ? "6em" : "12em";
 addStyleSheet(`
   .fontra-ui-shotcuts-panel-element {
     background-color: var(--ui-element-background-color);
@@ -424,6 +429,7 @@ addStyleSheet(`
   }
 
   .fontra-ui-shotcuts-panel-input {
+    width: ${shotcutsPanelInputWidth};
     text-align: center;
   }
 
@@ -432,7 +438,8 @@ addStyleSheet(`
   }
 
   .fontra-ui-shotcuts-panel-label {
-    width: 12em;
+    width: 14em;
+    overflow: hidden;
     text-align: right;
   }
 
@@ -461,8 +468,11 @@ class ShortCutElement extends HTMLElement {
       // User cancelled, do nothing.
       return;
     }
-    this.saveShortCut(newShortCutDefinition);
-    this.setupUI(); // leave for now.
+    newShortCutDefinition.globalOverride = this.globalOverride;
+    if (this.saveShortCut(newShortCutDefinition)) {
+      const element = document.getElementById(id);
+      element.value = buildShortCutString(newShortCutDefinition);
+    }
   }
 
   saveShortCut(newShortCutDefinition) {
@@ -525,12 +535,15 @@ class ShortCutElement extends HTMLElement {
 
   _updateContents() {
     this.innerHTML = "";
+    const labelString = translate(this.key, "");
     this.append(
       html.label(
         {
-          class: "fontra-ui-shotcuts-panel-label",
+          "class": "fontra-ui-shotcuts-panel-label",
+          "data-tooltip": labelString,
+          "data-tooltipposition": "top",
         },
-        [translate(this.key, "")]
+        [labelString]
       )
     );
 
@@ -545,7 +558,7 @@ class ShortCutElement extends HTMLElement {
           "Click and record a shortcut OR double click and open dialog for editing",
         "data-tooltipposition": "top",
         "onkeydown": (event) => this.recordShortCut(id, event),
-        "ondblclick": (event) => this.doEditShortCut(),
+        "ondblclick": (event) => this.doEditShortCut(id),
       })
     );
 
