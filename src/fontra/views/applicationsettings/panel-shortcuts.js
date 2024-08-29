@@ -398,7 +398,6 @@ function _shortCutPropertiesContentElement(controller) {
     [
       ...labeledTextInput("Keys or codes:", controller, "keysOrCodes", {
         id: "shortCut-text-input",
-        style: "text-transform: uppercase;",
       }),
       html.div(),
       labeledCheckbox(`Meta (${getNiceKey("metaKey")})`, controller, "metaKey", {}),

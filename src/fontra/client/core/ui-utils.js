@@ -136,9 +136,6 @@ export function textInput(controller, key, options) {
   if (options?.class) {
     inputElement.className = options.class;
   }
-  if (options?.style) {
-    inputElement.style = options.style;
-  }
   inputElement.value = formatter.toString(controller.model[key]);
   inputElement[options.continuous ? "oninput" : "onchange"] = () => {
     const { value, error } = formatter.fromString(inputElement.value);
