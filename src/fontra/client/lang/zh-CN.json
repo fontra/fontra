@@ -8,6 +8,7 @@
   "action.copy": "Copy",
   "action.cut": "Cut",
   "action.decompose-component": "释放 %0 个组件",
+  "action.delete": "Delete Glyph/Selection",
   "action.delete-glyph": "删除字符形",
   "action.delete-selection": "删除选中",
   "action.join-contours": "Join Contours",

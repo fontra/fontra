@@ -9,6 +9,7 @@
   "action.cut": "Cut",
   "action.decompose-component": "Decompose %0 Component",
   "action.decompose-component.plural": "Decompose %0 Components",
+  "action.delete": "Delete Glyph/Selection",
   "action.delete-glyph": "Delete Glyph",
   "action.delete-selection": "Delete Selection",
   "action.join-contours": "Join Contours",

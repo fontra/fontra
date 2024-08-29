@@ -13,11 +13,7 @@
   "editor.shape-tool-ellipse": { "keysOrCodes": "5", "globalOverride": true },
   "editor.power-ruler-tool": { "keysOrCodes": "6", "globalOverride": true },
   "editor.hand-tool": { "keysOrCodes": "7", "globalOverride": true },
-  "action.delete-glyph": {
-    "keysOrCodes": ["Delete", "Backspace"],
-    "globalOverride": true
-  },
-  "action.delete-selection": { "keysOrCodes": ["Delete", "Backspace"] },
+  "action.delete": { "keysOrCodes": ["Delete", "Backspace"] },
   "zoom-fit-selection": { "keysOrCodes": "0", "metaKey": true, "globalOverride": true },
   "action.join-contours": { "keysOrCodes": "j", "metaKey": true },
   "action.undo": { "keysOrCodes": "z", "metaKey": true },

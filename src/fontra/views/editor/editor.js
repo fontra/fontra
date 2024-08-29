@@ -1187,8 +1187,8 @@ export class EditorController {
       enabled: () => this.canDelete(),
       callback: (event) => this.doDelete(event),
       shortCut: this.sceneSettings.selectedGlyph?.isEditing
-        ? getShortCut("action.delete-selection")
-        : getShortCut("action.delete-glyph"),
+        ? { ...getShortCut("action.delete"), globalOverride: false }
+        : { ...getShortCut("action.delete"), globalOverride: true },
     });
 
     this.basicContextMenuItems.push(MenuItemDivider);
