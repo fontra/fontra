@@ -1,5 +1,3 @@
-// import { label } from "../../client/core/html-utils.js";
-// import { recordChanges } from "../core/change-recorder.js";
 import * as html from "../core/html-utils.js";
 import { addStyleSheet } from "../core/html-utils.js";
 import { ObservableController } from "../core/observable-object.js";
@@ -19,6 +17,7 @@ import { dialog, dialogSetup, message } from "/web-components/modal-dialog.js";
 const isMac = window.navigator.userAgent.indexOf("Mac") != -1;
 
 let shortCutsData = {};
+let shortCutsDataDefault = {};
 let shortCutsDataCustom = {};
 let resolveShortCutsHasLoaded;
 
@@ -43,7 +42,8 @@ function createShortCutsData() {
 
     const storedCustomData = localStorage.getItem("shortCuts-custom");
     const customData = storedCustomData ? JSON.parse(storedCustomData) : {};
-    shortCutsData = { ...data, ...customData };
+    shortCutsDataDefault = data;
+    shortCutsData = { ...shortCutsDataDefault, ...customData };
     resolveShortCutsHasLoaded();
   });
 }
@@ -159,7 +159,7 @@ export class ShortCutsPanel extends BaseInfoPanel {
 }
 
 const swappedKeyMap = getKeyMapSwapped();
-function parseShortCutString(value, globalOverride) {
+function parseShortCutString(value) {
   if (value === "") {
     // Shortcut has been removed, therefore return null,
     // which is valid for json and different to undefined.
@@ -190,7 +190,7 @@ function parseShortCutString(value, globalOverride) {
     : swappedKeyMap[value]
     ? [swappedKeyMap[value]]
     : value;
-  definition.globalOverride = globalOverride;
+
   return definition;
 }
 
@@ -413,7 +413,7 @@ function _shortCutPropertiesContentElement(controller) {
   return { contentElement, warningElement };
 }
 
-const shotcutsPanelInputWidth = isMac ? "6em" : "12em";
+const shotcutsPanelInputWidth = isMac ? "6em" : "12em"; // longer on windows because no icons are shown.
 addStyleSheet(`
   .fontra-ui-shotcuts-panel-element {
     background-color: var(--ui-element-background-color);
@@ -421,7 +421,7 @@ addStyleSheet(`
     padding: 0.35rem 0 0 0;
     display: grid;
     grid-template-rows: auto auto;
-    grid-template-columns: max-content max-content auto;
+    grid-template-columns: max-content max-content max-content max-content;
     grid-row-gap: 0.1em;
     grid-column-gap: 1em;
   }
@@ -431,8 +431,16 @@ addStyleSheet(`
     text-align: center;
   }
 
+  .fontra-ui-shotcuts-panel-refresh {
+    cursor: pointer;
+    /*justify-self: end;*/
+    background-color: yellow;
+  }
+
   .fontra-ui-shotcuts-panel-delete {
-    justify-self: end;
+    cursor: pointer;
+    /*justify-self: end;*/
+    background-color: red;
   }
 
   .fontra-ui-shotcuts-panel-label {
@@ -519,16 +527,28 @@ class ShortCutElement extends HTMLElement {
         }
       });
 
-      const shortCutDefinition = parseShortCutString(
-        shorcutCommand,
-        this.globalOverride
-      );
+      const shortCutDefinition = parseShortCutString(shorcutCommand);
+      shortCutDefinition.globalOverride = this.globalOverride;
       if (this.saveShortCut(shortCutDefinition)) {
         element.value = shorcutCommand;
       }
 
       this.shorcutCommands = new Set();
     }, 650);
+  }
+
+  resetShortCut(id) {
+    const shortCutDefinition = shortCutsDataDefault[this.key];
+
+    if (this.saveShortCut(shortCutDefinition)) {
+      document.getElementById(id).value = buildShortCutString(shortCutDefinition);
+    }
+  }
+
+  deleteShortCut(id) {
+    if (this.saveShortCut(null)) {
+      document.getElementById(id).value = "";
+    }
   }
 
   _updateContents() {
@@ -562,13 +582,21 @@ class ShortCutElement extends HTMLElement {
 
     this.append(
       html.createDomElement("icon-button", {
+        "class": "fontra-ui-shotcuts-panel-refresh",
+        "src": "/tabler-icons/refresh.svg",
+        "onclick": (event) => this.resetShortCut(id),
+        "data-tooltip": "Reset to default",
+        "data-tooltipposition": "top",
+      })
+    );
+
+    this.append(
+      html.createDomElement("icon-button", {
         "class": "fontra-ui-shotcuts-panel-delete",
         "src": "/tabler-icons/trash.svg",
-        "onclick": (event) => {
-          console.log("Delete short cut");
-        },
-        "data-tooltip": "Delete short cut",
-        "data-tooltipposition": "left",
+        "onclick": (event) => this.deleteShortCut(id),
+        "data-tooltip": "Delete",
+        "data-tooltipposition": "top",
       })
     );
   }
