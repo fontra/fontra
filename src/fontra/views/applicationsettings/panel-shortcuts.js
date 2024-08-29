@@ -330,7 +330,6 @@ async function doEditShortCutDialog(key) {
     shiftKey: shortCutDefinition ? shortCutDefinition.shiftKey : false,
     metaKey: shortCutDefinition ? shortCutDefinition.metaKey : false,
     keysOrCodes: shortCutDefinition ? shortCutDefinition.keysOrCodes : "",
-    globalOverride: shortCutDefinition ? shortCutDefinition.globalOverride : false,
   });
 
   controller.addKeyListener("ctrlKey", (event) => {
@@ -346,9 +345,6 @@ async function doEditShortCutDialog(key) {
     validateInput();
   });
   controller.addKeyListener("keysOrCodes", (event) => {
-    validateInput();
-  });
-  controller.addKeyListener("globalOverride", (event) => {
     validateInput();
   });
 
@@ -409,8 +405,6 @@ function _shortCutPropertiesContentElement(controller) {
       html.div(),
       labeledCheckbox(`Alt (${getNiceKey("altKey")})`, controller, "altKey", {}),
       html.div(),
-      labeledCheckbox("Global override", controller, "globalOverride", {}),
-      html.br(),
       warningElement,
     ]
   );
@@ -450,7 +444,7 @@ class ShortCutElement extends HTMLElement {
     this.classList.add("fontra-ui-shotcuts-panel-element");
     this.key = key;
     this.shortCutDefinition = shortCutsData[key];
-    // get globalOverride from data or false
+    // get globalOverride from data or false -> no custom settings allowed.
     this.globalOverride =
       shortCutsData[this.key] === null
         ? false
