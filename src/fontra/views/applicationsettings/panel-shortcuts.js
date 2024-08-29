@@ -190,7 +190,6 @@ export class ShortCutsPanel extends BaseInfoPanel {
     // Only export custom shortcuts,
     // because default shortcuts are already in the code.
     const data = JSON.stringify(shortCutsDataCustom);
-    console.log(data);
     const blob = new Blob([data], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -520,8 +519,6 @@ addStyleSheet(`
     opacity: unset;
   }
 
-  .fontra-ui-shotcuts-panel-icon:hover,
-  .fontra-ui-shotcuts-panel-icon:focus,
   .fontra-ui-shotcuts-panel-icon:active {
     pointer-events: unset;
     opacity: unset;
@@ -582,7 +579,7 @@ class ShortCutElement extends HTMLElement {
       event.key.toLowerCase() === "control" ? "ctrl" : event.key.toLowerCase()
     }Key`;
 
-    // collect the keys pressed in set this.shorcutCommands
+    // collect the keys pressed in this.shorcutCommands
     if (event[mainkey]) {
       return mainkey;
     } else if (getNiceKey(event.code, false)) {
@@ -615,7 +612,7 @@ class ShortCutElement extends HTMLElement {
     const element = document.getElementById(id);
     element.value = shorcutCommand;
 
-    // if not main key (not alt, shift, ctrl or meta), end the recording -> save the shortcut
+    // if not alt, shift, ctrl or meta, end of recording -> save shortcut
     if (!event[pressedKey]) {
       const shortCutDefinition = parseShortCutString(shorcutCommand);
       shortCutDefinition.globalOverride = this.globalOverride;
@@ -629,18 +626,16 @@ class ShortCutElement extends HTMLElement {
   }
 
   recordShortCutKeyup(id, event) {
-    if (!this.shorcutCommands.size) {
-      // If shorcutCommands size is zero, it has been saved. Do nothing.
-      return;
-    }
     const mainkey = `${
       event.key.toLowerCase() === "control" ? "ctrl" : event.key.toLowerCase()
     }Key`;
     this.shorcutCommands.delete(mainkey); // remove the main key if it was pressed
-    const shorcutCommand = this.getShortCutCommand();
 
     const element = document.getElementById(id);
-    element.value = shorcutCommand;
+    element.value =
+      this.getShortCutCommand() != ""
+        ? this.getShortCutCommand()
+        : buildShortCutString(this.shortCutDefinition);
   }
 
   resetShortCut(id) {
@@ -690,7 +685,8 @@ class ShortCutElement extends HTMLElement {
     this.append(
       html.createDomElement("icon-button", {
         "class": "fontra-ui-shotcuts-panel-icon",
-        "src": "/tabler-icons/refresh.svg",
+        "src": "/tabler-icons/refresh.svg", // TODO: I don't know why the icon is not shown.
+        "value": "",
         "onclick": (event) => this.resetShortCut(id),
         "data-tooltip": "Reset to default",
         "data-tooltipposition": "top",
@@ -700,7 +696,7 @@ class ShortCutElement extends HTMLElement {
     this.append(
       html.createDomElement("icon-button", {
         "class": "fontra-ui-shotcuts-panel-icon",
-        "src": "/tabler-icons/trash.svg",
+        "src": "/tabler-icons/trash.svg", // TODO: I don't know why the icon is not shown.
         "onclick": (event) => this.deleteShortCut(id),
         "data-tooltip": "Delete",
         "data-tooltipposition": "top",
