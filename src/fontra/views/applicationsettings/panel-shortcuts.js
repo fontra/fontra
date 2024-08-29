@@ -105,6 +105,9 @@ addStyleSheet(`
   border-radius: 0.5em;
   padding: 1em;
 }
+.fontra-ui-shortcuts-panel-header {
+  font-weight: bold;
+}
 `);
 
 export class ShortCutsPanel extends BaseInfoPanel {
@@ -127,104 +130,84 @@ export class ShortCutsPanel extends BaseInfoPanel {
     );
 
     for (const [categoryKey, shortCuts] of Object.entries(shortCutsGrouped)) {
-      this.infoForm = new Form();
-      this.infoForm.className = "fontra-ui-shortcuts-panel";
-      this.infoForm.labelWidth = "20%";
-
-      const formContents = [];
-
-      formContents.push({
-        type: "header",
-        label: translate(categoryKey),
+      const container = html.div({ class: "fontra-ui-shortcuts-panel" }, []);
+      const header = html.createDomElement("div", {
+        class: "fontra-ui-shortcuts-panel-header",
+        innerHTML: translate(categoryKey),
       });
+      container.appendChild(header);
 
       for (const key of shortCuts) {
         const shortCutDefinition = shortCutsData[key];
-
-        formContents.push({
-          type: "universal-row",
-          field1: {
-            type: "auxiliaryElement",
-            key: ["label", key],
-            auxiliaryElement: html.createDomElement("div", {
-              "class": "ui-form-label universal-row",
-              "style": `cursor: pointer;`,
-              "innerHTML": translate(key, ""),
-              "data-tooltip": "click for editing",
-              "data-tooltipposition": "top",
-              "onclick": (event) => this.doEditShortCut(key),
-            }),
-          },
-          field2: {
-            type: "edit-text-shortcut",
-            key: [key],
-            value: buildShortCutString(shortCutDefinition),
-            allowEmptyField: true,
-            style: `width: 6em; text-align: center;`,
-          },
-          field3: {
-            "type": "checkbox",
-            "key": ["globalOverride", key],
-            "value": shortCutDefinition
-              ? shortCutDefinition.globalOverride || false
-              : false,
-            "data-tooltip": "Global Override",
-            "data-tooltipposition": "top",
-          },
-        });
+        container.appendChild(
+          new ShortCutElement(key, shortCutDefinition, this.setupUI.bind(this))
+        );
+        // formContents.push({
+        //   type: "universal-row",
+        //   field1: {
+        //     type: "auxiliaryElement",
+        //     key: ["label", key],
+        //     auxiliaryElement: html.createDomElement("div", {
+        //       "class": "ui-form-label universal-row",
+        //       "style": `cursor: pointer;`,
+        //       "innerHTML": translate(key, ""),
+        //       "data-tooltip": "click for editing",
+        //       "data-tooltipposition": "top",
+        //       "onclick": (event) => this.doEditShortCut(key),
+        //     }),
+        //   },
+        //   field2: {
+        //     type: "edit-text-shortcut",
+        //     key: [key],
+        //     value: buildShortCutString(shortCutDefinition),
+        //     allowEmptyField: true,
+        //     style: `width: 6em; text-align: center;`,
+        //   },
+        //   field3: {
+        //     "type": "checkbox",
+        //     "key": ["globalOverride", key],
+        //     "value": shortCutDefinition
+        //       ? shortCutDefinition.globalOverride || false
+        //       : false,
+        //     "data-tooltip": "Global Override",
+        //     "data-tooltipposition": "top",
+        //   },
+        // });
       }
 
-      this.infoForm.setFieldDescriptions(formContents);
-      this.infoForm.onFieldChange = async (fieldItem, value, valueStream) => {
-        const isGlobalButton = fieldItem.key[0] === "globalOverride";
-        const shortCutKey = isGlobalButton ? fieldItem.key[1] : fieldItem.key[0];
+      // this.infoForm.setFieldDescriptions(formContents);
+      // this.infoForm.onFieldChange = async (fieldItem, value, valueStream) => {
+      //   const isGlobalButton = fieldItem.key[0] === "globalOverride";
+      //   const shortCutKey = isGlobalButton ? fieldItem.key[1] : fieldItem.key[0];
 
-        const globalOverrideDef = isGlobalButton
-          ? value
-          : shortCutsData[shortCutKey] === null
-          ? false
-          : shortCutsData[shortCutKey].globalOverride || false;
-        const shortCutDefinition =
-          isGlobalButton && shortCutsData[shortCutKey] === null
-            ? null
-            : isGlobalButton
-            ? { ...shortCutsData[shortCutKey], globalOverride: globalOverrideDef }
-            : parseShortCutString(value, globalOverrideDef);
+      //   const globalOverrideDef = isGlobalButton
+      //     ? value
+      //     : shortCutsData[shortCutKey] === null
+      //     ? false
+      //     : shortCutsData[shortCutKey].globalOverride || false;
+      //   const shortCutDefinition =
+      //     isGlobalButton && shortCutsData[shortCutKey] === null
+      //       ? null
+      //       : isGlobalButton
+      //       ? { ...shortCutsData[shortCutKey], globalOverride: globalOverrideDef }
+      //       : parseShortCutString(value, globalOverrideDef);
 
-        const warnings = validateShortCutDefinition(shortCutKey, shortCutDefinition);
-        if (warnings.length > 0) {
-          message(
-            `Invalid ShortCut "${buildShortCutString(
-              shortCutDefinition
-            )}" for "${translate(shortCutKey, "")}":`,
-            warnings.join("\n")
-          );
-          this.setupUI();
-          return;
-        }
-        this.saveShortCut(shortCutKey, shortCutDefinition);
-      };
+      //   const warnings = validateShortCutDefinition(shortCutKey, shortCutDefinition);
+      //   if (warnings.length > 0) {
+      //     message(
+      //       `Invalid ShortCut "${buildShortCutString(
+      //         shortCutDefinition
+      //       )}" for "${translate(shortCutKey, "")}":`,
+      //       warnings.join("\n")
+      //     );
+      //     this.setupUI();
+      //     return;
+      //   }
+      //   this.saveShortCut(shortCutKey, shortCutDefinition);
+      // };
 
-      this.panelElement.appendChild(this.infoForm);
+      this.panelElement.appendChild(container);
     }
-  }
-
-  async doEditShortCut(key) {
-    const shortCutDefinition = await doEditShortCutDialog(key);
-    const newShortCutDefinition = _shortCutDefinitionNormalized(shortCutDefinition);
-    if (newShortCutDefinition === undefined) {
-      // User cancelled, do nothing.
-      return;
-    }
-    this.saveShortCut(key, newShortCutDefinition);
-  }
-
-  saveShortCut(key, newShortCutDefinition) {
-    shortCutsData[key] = newShortCutDefinition;
-    shortCutsDataCustom[key] = newShortCutDefinition;
-
-    localStorage.setItem("shortCuts-custom", JSON.stringify(shortCutsDataCustom));
-    this.setupUI();
   }
 
   async resetToDefault() {
@@ -500,4 +483,155 @@ function _shortCutPropertiesContentElement(controller) {
     ]
   );
   return { contentElement, warningElement };
+}
+
+addStyleSheet(`
+  .fontra-ui-shotcuts-panel-element {
+    background-color: var(--ui-element-background-color);
+    border-radius: 0.5em;
+    padding: 0.35rem 0 0 0;
+    display: grid;
+    grid-template-rows: auto auto;
+    grid-template-columns: max-content max-content auto;
+    grid-row-gap: 0.1em;
+    grid-column-gap: 1em;
+  }
+
+  .fontra-ui-shotcuts-panel-input {
+    text-align: center;
+  }
+
+  .fontra-ui-shotcuts-panel-delete {
+    justify-self: end;
+  }
+
+  .fontra-ui-shotcuts-panel-label {
+    width: 12em;
+    text-align: right;
+  }
+
+`);
+
+class ShortCutElement extends HTMLElement {
+  constructor(key, shortCutDefinition, setupUI) {
+    super();
+    this.classList.add("fontra-ui-shotcuts-panel-element");
+    this.key = key;
+    this.shortCutDefinition = shortCutDefinition;
+    this.globalOverrideDef =
+      shortCutsData[this.key] === null
+        ? false
+        : shortCutsData[this.key].globalOverride || false;
+    this.setupUI = setupUI;
+    this.shorcutCommands = new Set();
+    this._updateContents();
+  }
+
+  async doEditShortCut() {
+    const shortCutDefinition = await doEditShortCutDialog(this.key);
+    const newShortCutDefinition = _shortCutDefinitionNormalized(shortCutDefinition);
+    if (newShortCutDefinition === undefined) {
+      // User cancelled, do nothing.
+      return;
+    }
+    this.saveShortCut(newShortCutDefinition);
+  }
+
+  saveShortCut(newShortCutDefinition) {
+    const warnings = validateShortCutDefinition(this.key, newShortCutDefinition);
+    if (warnings.length > 0) {
+      message(
+        `Invalid ShortCut "${buildShortCutString(
+          newShortCutDefinition
+        )}" for "${translate(this.key, "")}":`,
+        warnings.join("\n")
+      );
+      return false;
+    }
+
+    shortCutsData[this.key] = newShortCutDefinition;
+    shortCutsDataCustom[this.key] = newShortCutDefinition;
+
+    localStorage.setItem("shortCuts-custom", JSON.stringify(shortCutsDataCustom));
+    //this.setupUI(); // leave for now.
+    //return true;
+  }
+
+  recordShortCut(id, event) {
+    const element = document.getElementById(id);
+    event.preventDefault(); // avoid typing with preventDefault -> only 'record' typing.
+    clearTimeout(this.timeoutID); // Clear the timeout each time a key is pressed
+
+    const mainkey = `${
+      event.key.toLowerCase() === "control" ? "ctrl" : event.key.toLowerCase()
+    }Key`;
+    if (event[mainkey]) {
+      this.shorcutCommands.add(mainkey);
+    } else if (getNiceKey(event.code, false)) {
+      this.shorcutCommands.add(event.code);
+    } else {
+      this.shorcutCommands.add(event.key);
+    }
+
+    this.timeoutID = setTimeout(() => {
+      // This is a delay before the command is sent
+      let shorcutCommand = "";
+      Array.from(this.shorcutCommands).forEach((item) => {
+        if (getNiceKey(item, false)) {
+          shorcutCommand += getNiceKey(item);
+        } else {
+          shorcutCommand += item;
+        }
+      });
+
+      const shortCutDefinition = parseShortCutString(
+        shorcutCommand,
+        this.globalOverrideDef
+      );
+      if (this.saveShortCut(shortCutDefinition)) {
+        element.value = shorcutCommand;
+      }
+
+      this.shorcutCommands = new Set();
+    }, 650);
+  }
+
+  _updateContents() {
+    this.innerHTML = "";
+    this.append(
+      html.label(
+        {
+          class: "fontra-ui-shotcuts-panel-label",
+        },
+        [translate(this.key, "")]
+      )
+    );
+
+    const id = `shortCut-${this.key}`;
+    this.append(
+      html.input({
+        "type": "text",
+        "id": id,
+        "class": "fontra-ui-shotcuts-panel-input",
+        "value": buildShortCutString(this.shortCutDefinition),
+        "data-tooltip":
+          "Click and record a shortcut OR double click and open dialog for editing",
+        "data-tooltipposition": "top",
+        "onkeydown": (event) => this.recordShortCut(id, event),
+        "ondblclick": (event) => this.doEditShortCut(),
+      })
+    );
+
+    this.append(
+      html.createDomElement("icon-button", {
+        "class": "fontra-ui-shotcuts-panel-delete",
+        "src": "/tabler-icons/trash.svg",
+        "onclick": (event) => {
+          console.log("Delete short cut");
+        }, //this.deleteStatusDef(this.statusIndex),
+        "data-tooltip": "Delete short cut",
+        "data-tooltipposition": "left",
+      })
+    );
+  }
 }
