@@ -16,7 +16,6 @@ import { dialog, dialogSetup, message } from "/web-components/modal-dialog.js";
 // For details please see https://tecadmin.net/javascript-detect-os/
 const isMac = window.navigator.userAgent.indexOf("Mac") != -1;
 
-let shortCutsData = {};
 let shortCutsDataDefault = {};
 let shortCutsDataCustom = {};
 let resolveShortCutsHasLoaded;
@@ -43,7 +42,6 @@ function createShortCutsData() {
     const storedCustomData = localStorage.getItem("shortCuts-custom");
     shortCutsDataCustom = storedCustomData ? JSON.parse(storedCustomData) : {};
     shortCutsDataDefault = data;
-    shortCutsData = { ...shortCutsDataDefault, ...shortCutsDataCustom };
     resolveShortCutsHasLoaded();
   });
 }
@@ -51,7 +49,7 @@ function createShortCutsData() {
 createShortCutsData();
 
 export function getShortCut(key) {
-  return shortCutsData[key];
+  return shortCutsDataCustom[key] || shortCutsDataDefault[key];
 }
 
 // With this grouping we have control over the order of the shortcuts.
@@ -342,12 +340,12 @@ function validateShortCutDefinition(key, definition) {
     return [];
   }
   const warnings = [];
-  for (const otherKey in shortCutsData) {
+  for (const otherKey in shortCutsDataDefault) {
     if (key === otherKey) {
       // skip self
       continue;
     }
-    if (isDifferentShortCutDefinition(shortCutsData[otherKey], definition)) {
+    if (isDifferentShortCutDefinition(getShortCut(otherKey), definition)) {
       continue;
     }
     warnings.push("⚠️ ShortCut exists for: " + translate(otherKey, ""));
@@ -379,7 +377,7 @@ function validateShortCutDefinition(key, definition) {
 }
 
 async function doEditShortCutDialog(key) {
-  const shortCutDefinition = shortCutsData[key];
+  const shortCutDefinition = getShortCut(key);
   const title = "Edit ShortCut: " + translate(key, "");
 
   const validateInput = () => {
@@ -536,12 +534,12 @@ class ShortCutElement extends HTMLElement {
     super();
     this.classList.add("fontra-ui-shotcuts-panel-element");
     this.key = key;
-    this.shortCutDefinition = shortCutsData[key];
+    this.shortCutDefinition = getShortCut(this.key);
     // get globalOverride from data or false -> no custom settings allowed.
     this.globalOverride =
-      shortCutsData[this.key] === null
+      this.shortCutDefinition === null
         ? false
-        : shortCutsData[this.key].globalOverride || false;
+        : this.shortCutDefinition.globalOverride || false;
     this.setupUI = setupUI;
     this.shorcutCommands = new Set();
     this._updateContents();
@@ -574,9 +572,7 @@ class ShortCutElement extends HTMLElement {
       return false;
     }
 
-    shortCutsData[this.key] = newShortCutDefinition;
     shortCutsDataCustom[this.key] = newShortCutDefinition;
-
     localStorage.setItem("shortCuts-custom", JSON.stringify(shortCutsDataCustom));
     return true;
   }
