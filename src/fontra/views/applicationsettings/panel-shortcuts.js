@@ -41,9 +41,9 @@ function createShortCutsData() {
     // TODO: Data is missing keysOrCodes and I don't know why.
 
     const storedCustomData = localStorage.getItem("shortCuts-custom");
-    const customData = storedCustomData ? JSON.parse(storedCustomData) : {};
+    shortCutsDataCustom = storedCustomData ? JSON.parse(storedCustomData) : {};
     shortCutsDataDefault = data;
-    shortCutsData = { ...shortCutsDataDefault, ...customData };
+    shortCutsData = { ...shortCutsDataDefault, ...shortCutsDataCustom };
     resolveShortCutsHasLoaded();
   });
 }
@@ -106,6 +106,11 @@ addStyleSheet(`
 .fontra-ui-shortcuts-panel-header {
   font-weight: bold;
 }
+.fontra-ui-shortcuts-panel-buttons {
+  display: grid;
+  grid-template-columns: max-content max-content max-content;
+  gap: 1em;
+}
 `);
 
 export class ShortCutsPanel extends BaseInfoPanel {
@@ -118,22 +123,48 @@ export class ShortCutsPanel extends BaseInfoPanel {
     this.panelElement.innerHTML = "";
 
     this.panelElement.style = "gap: 1em;";
-    this.panelElement.appendChild(
+
+    const containerButtons = html.div(
+      { class: "fontra-ui-shortcuts-panel-buttons" },
+      []
+    );
+    containerButtons.appendChild(
       html.input({
         type: "button",
         style: `justify-self: start;`,
-        value: "Reset to default",
+        value: "Reset all shortcuts",
         onclick: (event) => this.resetToDefault(),
       })
     );
 
+    containerButtons.appendChild(
+      html.input({
+        type: "button",
+        style: `justify-self: start;`,
+        value: "Export shortcuts",
+        onclick: (event) => this.exportShortCuts(),
+      })
+    );
+
+    containerButtons.appendChild(
+      html.input({
+        type: "button",
+        style: `justify-self: start;`,
+        value: "Import shortcuts",
+        onclick: (event) => this.importShortCuts(),
+      })
+    );
+
+    this.panelElement.appendChild(containerButtons);
+
     for (const [categoryKey, shortCuts] of Object.entries(shortCutsGrouped)) {
       const container = html.div({ class: "fontra-ui-shortcuts-panel" }, []);
-      const header = html.createDomElement("div", {
-        class: "fontra-ui-shortcuts-panel-header",
-        innerHTML: translate(categoryKey),
-      });
-      container.appendChild(header);
+      container.appendChild(
+        html.createDomElement("div", {
+          class: "fontra-ui-shortcuts-panel-header",
+          innerHTML: translate(categoryKey),
+        })
+      );
       for (const key of shortCuts) {
         container.appendChild(new ShortCutElement(key, this.setupUI.bind(this)));
       }
@@ -155,6 +186,40 @@ export class ShortCutsPanel extends BaseInfoPanel {
     }
     localStorage.removeItem("shortCuts-custom");
     location.reload();
+  }
+
+  async exportShortCuts() {
+    // only export custom shortcuts,
+    // because default shortcuts are already in the code.
+    const data = JSON.stringify(shortCutsDataCustom);
+    console.log(data);
+    const blob = new Blob([data], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "shortcuts.json";
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  async importShortCuts() {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = ".json";
+    input.onchange = async (event) => {
+      const file = event.target.files[0];
+      if (!file) {
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = async (event) => {
+        const data = JSON.parse(event.target.result);
+        localStorage.setItem("shortCuts-custom", JSON.stringify(data));
+        location.reload();
+      };
+      reader.readAsText(file);
+    };
+    input.click();
   }
 }
 
