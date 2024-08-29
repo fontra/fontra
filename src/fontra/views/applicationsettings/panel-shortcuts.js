@@ -189,7 +189,7 @@ export class ShortCutsPanel extends BaseInfoPanel {
   }
 
   async exportShortCuts() {
-    // only export custom shortcuts,
+    // Only export custom shortcuts,
     // because default shortcuts are already in the code.
     const data = JSON.stringify(shortCutsDataCustom);
     console.log(data);
@@ -489,11 +489,19 @@ addStyleSheet(`
     grid-template-columns: max-content max-content max-content max-content;
     grid-row-gap: 0.1em;
     grid-column-gap: 1em;
+    height: 1.4em;
   }
 
   .fontra-ui-shotcuts-panel-input {
     width: ${shotcutsPanelInputWidth};
     text-align: center;
+    caret-color: transparent;
+  }
+
+  .fontra-ui-shotcuts-panel-input:focus {
+    border: 1px solid var(--background-color-dark);
+    outline: unset;
+    color: #999;
   }
 
   .fontra-ui-shotcuts-panel-label {
@@ -502,14 +510,23 @@ addStyleSheet(`
     text-align: right;
   }
 
-  .fontra-ui-shotcuts-panel-icon {
+  .fontra-ui-shotcuts-panel-icon, .fontra-ui-shotcuts-panel-icon {
     cursor: pointer;
-    display: none;
-    background-color: red; /* for debugging */
+    opacity: 0;
+    pointer-events: none;
+    background-color: green; /* for debugging */
   }
 
-  .fontra-ui-shotcuts-panel-element:hover > * {
-    display: unset;
+  .fontra-ui-shotcuts-panel-input:focus ~ * {
+    pointer-events: unset;
+    opacity: unset;
+  }
+
+  .fontra-ui-shotcuts-panel-icon:hover,
+  .fontra-ui-shotcuts-panel-icon:focus,
+  .fontra-ui-shotcuts-panel-icon:active {
+    pointer-events: unset;
+    opacity: unset;
   }
 
 `);
@@ -530,7 +547,7 @@ class ShortCutElement extends HTMLElement {
     this._updateContents();
   }
 
-  async doEditShortCut() {
+  async doEditShortCut(id) {
     const shortCutDefinition = await doEditShortCutDialog(this.key);
     const newShortCutDefinition = _shortCutDefinitionNormalized(shortCutDefinition);
     if (newShortCutDefinition === undefined) {
@@ -541,6 +558,7 @@ class ShortCutElement extends HTMLElement {
     if (this.saveShortCut(newShortCutDefinition)) {
       const element = document.getElementById(id);
       element.value = buildShortCutString(newShortCutDefinition);
+      element.blur(); // remove focus
     }
   }
 
@@ -563,41 +581,70 @@ class ShortCutElement extends HTMLElement {
     return true;
   }
 
-  recordShortCut(id, event) {
-    const element = document.getElementById(id);
-    event.preventDefault(); // avoid typing with preventDefault -> only 'record' typing.
-    clearTimeout(this.timeoutID); // Clear the timeout each time a key is pressed
-
+  getPressedKey(event) {
     const mainkey = `${
       event.key.toLowerCase() === "control" ? "ctrl" : event.key.toLowerCase()
     }Key`;
+
+    // collect the keys pressed in set this.shorcutCommands
     if (event[mainkey]) {
-      this.shorcutCommands.add(mainkey);
+      return mainkey;
     } else if (getNiceKey(event.code, false)) {
-      this.shorcutCommands.add(event.code);
+      return event.code;
     } else {
-      this.shorcutCommands.add(event.key);
+      return event.key;
     }
+  }
 
-    this.timeoutID = setTimeout(() => {
-      // This is a delay before the command is sent
-      let shorcutCommand = "";
-      Array.from(this.shorcutCommands).forEach((item) => {
-        if (getNiceKey(item, false)) {
-          shorcutCommand += getNiceKey(item);
-        } else {
-          shorcutCommand += item;
-        }
-      });
+  getShortCutCommand() {
+    let shorcutCommand = "";
+    Array.from(this.shorcutCommands).forEach((item) => {
+      if (getNiceKey(item, false)) {
+        shorcutCommand += getNiceKey(item);
+      } else {
+        shorcutCommand += item;
+      }
+    });
+    return shorcutCommand;
+  }
 
+  recordShortCut(id, event) {
+    event.preventDefault();
+
+    const pressedKey = this.getPressedKey(event);
+    this.shorcutCommands.add(pressedKey);
+    const shorcutCommand = this.getShortCutCommand();
+
+    // show the current shortcut immediately, no delay:
+    const element = document.getElementById(id);
+    element.value = shorcutCommand;
+
+    // if not main key (not alt, shift, ctrl or meta), end the recording -> save the shortcut
+    if (!event[pressedKey]) {
       const shortCutDefinition = parseShortCutString(shorcutCommand);
       shortCutDefinition.globalOverride = this.globalOverride;
-      if (this.saveShortCut(shortCutDefinition)) {
-        element.value = shorcutCommand;
+      if (!this.saveShortCut(shortCutDefinition)) {
+        // if the shortcut is invalid, reset the input field
+        element.value = buildShortCutString(this.shortCutDefinition);
       }
-
+      element.blur(); // remove focus
       this.shorcutCommands = new Set();
-    }, 650);
+    }
+  }
+
+  recordShortCutKeyup(id, event) {
+    if (!this.shorcutCommands.size) {
+      // If shorcutCommands size is zero, it has been saved. Do nothing.
+      return;
+    }
+    const mainkey = `${
+      event.key.toLowerCase() === "control" ? "ctrl" : event.key.toLowerCase()
+    }Key`;
+    this.shorcutCommands.delete(mainkey); // remove the main key if it was pressed
+    const shorcutCommand = this.getShortCutCommand();
+
+    const element = document.getElementById(id);
+    element.value = shorcutCommand;
   }
 
   resetShortCut(id) {
@@ -628,7 +675,7 @@ class ShortCutElement extends HTMLElement {
       )
     );
 
-    const id = `shortCut-${this.key}`;
+    const id = `shortcut-input-${this.key}`;
     this.append(
       html.input({
         "type": "text",
@@ -639,6 +686,7 @@ class ShortCutElement extends HTMLElement {
           "Click and record a shortcut OR double click and open dialog for editing",
         "data-tooltipposition": "top",
         "onkeydown": (event) => this.recordShortCut(id, event),
+        "onkeyup": (event) => this.recordShortCutKeyup(id, event),
         "ondblclick": (event) => this.doEditShortCut(id),
       })
     );
