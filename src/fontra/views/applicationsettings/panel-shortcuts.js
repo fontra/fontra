@@ -14,7 +14,6 @@ import {
   getNiceKey,
 } from "/web-components/menu-panel.js";
 import { dialog, dialogSetup, message } from "/web-components/modal-dialog.js";
-import { Form } from "/web-components/ui-form.js";
 
 // For details please see https://tecadmin.net/javascript-detect-os/
 const isMac = window.navigator.userAgent.indexOf("Mac") != -1;
@@ -136,76 +135,9 @@ export class ShortCutsPanel extends BaseInfoPanel {
         innerHTML: translate(categoryKey),
       });
       container.appendChild(header);
-
       for (const key of shortCuts) {
-        const shortCutDefinition = shortCutsData[key];
-        container.appendChild(
-          new ShortCutElement(key, shortCutDefinition, this.setupUI.bind(this))
-        );
-        // formContents.push({
-        //   type: "universal-row",
-        //   field1: {
-        //     type: "auxiliaryElement",
-        //     key: ["label", key],
-        //     auxiliaryElement: html.createDomElement("div", {
-        //       "class": "ui-form-label universal-row",
-        //       "style": `cursor: pointer;`,
-        //       "innerHTML": translate(key, ""),
-        //       "data-tooltip": "click for editing",
-        //       "data-tooltipposition": "top",
-        //       "onclick": (event) => this.doEditShortCut(key),
-        //     }),
-        //   },
-        //   field2: {
-        //     type: "edit-text-shortcut",
-        //     key: [key],
-        //     value: buildShortCutString(shortCutDefinition),
-        //     allowEmptyField: true,
-        //     style: `width: 6em; text-align: center;`,
-        //   },
-        //   field3: {
-        //     "type": "checkbox",
-        //     "key": ["globalOverride", key],
-        //     "value": shortCutDefinition
-        //       ? shortCutDefinition.globalOverride || false
-        //       : false,
-        //     "data-tooltip": "Global Override",
-        //     "data-tooltipposition": "top",
-        //   },
-        // });
+        container.appendChild(new ShortCutElement(key, this.setupUI.bind(this)));
       }
-
-      // this.infoForm.setFieldDescriptions(formContents);
-      // this.infoForm.onFieldChange = async (fieldItem, value, valueStream) => {
-      //   const isGlobalButton = fieldItem.key[0] === "globalOverride";
-      //   const shortCutKey = isGlobalButton ? fieldItem.key[1] : fieldItem.key[0];
-
-      //   const globalOverrideDef = isGlobalButton
-      //     ? value
-      //     : shortCutsData[shortCutKey] === null
-      //     ? false
-      //     : shortCutsData[shortCutKey].globalOverride || false;
-      //   const shortCutDefinition =
-      //     isGlobalButton && shortCutsData[shortCutKey] === null
-      //       ? null
-      //       : isGlobalButton
-      //       ? { ...shortCutsData[shortCutKey], globalOverride: globalOverrideDef }
-      //       : parseShortCutString(value, globalOverrideDef);
-
-      //   const warnings = validateShortCutDefinition(shortCutKey, shortCutDefinition);
-      //   if (warnings.length > 0) {
-      //     message(
-      //       `Invalid ShortCut "${buildShortCutString(
-      //         shortCutDefinition
-      //       )}" for "${translate(shortCutKey, "")}":`,
-      //       warnings.join("\n")
-      //     );
-      //     this.setupUI();
-      //     return;
-      //   }
-      //   this.saveShortCut(shortCutKey, shortCutDefinition);
-      // };
-
       this.panelElement.appendChild(container);
     }
   }
@@ -513,12 +445,13 @@ addStyleSheet(`
 `);
 
 class ShortCutElement extends HTMLElement {
-  constructor(key, shortCutDefinition, setupUI) {
+  constructor(key, setupUI) {
     super();
     this.classList.add("fontra-ui-shotcuts-panel-element");
     this.key = key;
-    this.shortCutDefinition = shortCutDefinition;
-    this.globalOverrideDef =
+    this.shortCutDefinition = shortCutsData[key];
+    // get globalOverride from data or false
+    this.globalOverride =
       shortCutsData[this.key] === null
         ? false
         : shortCutsData[this.key].globalOverride || false;
@@ -535,6 +468,7 @@ class ShortCutElement extends HTMLElement {
       return;
     }
     this.saveShortCut(newShortCutDefinition);
+    this.setupUI(); // leave for now.
   }
 
   saveShortCut(newShortCutDefinition) {
@@ -553,8 +487,7 @@ class ShortCutElement extends HTMLElement {
     shortCutsDataCustom[this.key] = newShortCutDefinition;
 
     localStorage.setItem("shortCuts-custom", JSON.stringify(shortCutsDataCustom));
-    //this.setupUI(); // leave for now.
-    //return true;
+    return true;
   }
 
   recordShortCut(id, event) {
@@ -586,7 +519,7 @@ class ShortCutElement extends HTMLElement {
 
       const shortCutDefinition = parseShortCutString(
         shorcutCommand,
-        this.globalOverrideDef
+        this.globalOverride
       );
       if (this.saveShortCut(shortCutDefinition)) {
         element.value = shorcutCommand;
@@ -628,10 +561,12 @@ class ShortCutElement extends HTMLElement {
         "src": "/tabler-icons/trash.svg",
         "onclick": (event) => {
           console.log("Delete short cut");
-        }, //this.deleteStatusDef(this.statusIndex),
+        },
         "data-tooltip": "Delete short cut",
         "data-tooltipposition": "left",
       })
     );
   }
 }
+
+customElements.define("shortcut-element", ShortCutElement);

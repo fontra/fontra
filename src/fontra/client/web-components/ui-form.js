@@ -2,7 +2,6 @@ import * as html from "../core/html-utils.js";
 import { SimpleElement } from "../core/html-utils.js";
 import { QueueIterator } from "../core/queue-iterator.js";
 import { enumerate, hyphenatedToCamelCase, round } from "../core/utils.js";
-import { getNiceKey } from "/web-components/menu-panel.js";
 import { RangeSlider } from "/web-components/range-slider.js";
 import "/web-components/rotary-control.js";
 
@@ -81,11 +80,6 @@ export class Form extends SimpleElement {
 
     .ui-form-value input[type="number"] {
       width: 4em;
-    }
-
-    .ui-form-value input[type="checkbox"] {
-      width: 4em;
-      height: unset;
     }
 
     .ui-form-value.text {
@@ -229,78 +223,11 @@ export class Form extends SimpleElement {
     inputElement.type = "text";
     inputElement.value = fieldItem.value || "";
     inputElement.disabled = fieldItem.disabled;
-    if (fieldItem.style) {
-      inputElement.style = fieldItem.style;
-    }
     inputElement.onchange = (event) => {
       this._fieldChanging(fieldItem, inputElement.value, undefined);
     };
     this._fieldGetters[fieldItem.key] = () => inputElement.value;
     this._fieldSetters[fieldItem.key] = (value) => (inputElement.value = value);
-    valueElement.appendChild(inputElement);
-  }
-
-  _addEditTextShortcut(valueElement, fieldItem) {
-    const inputElement = document.createElement("input");
-    inputElement.type = "text";
-    inputElement.value = fieldItem.value || "";
-    inputElement.disabled = fieldItem.disabled;
-    if (fieldItem.style) {
-      inputElement.style = fieldItem.style;
-    }
-    // collect the shorcut commands in set to avoid duplicates
-    let shorcutCommands = new Set();
-    inputElement.onkeydown = (event) => {
-      event.preventDefault(); // avoid typing with preventDefault -> only 'record' typing.
-      clearTimeout(this.timeoutID); // Clear the timeout each time a key is pressed
-
-      const mainkey = `${
-        event.key.toLowerCase() === "control" ? "ctrl" : event.key.toLowerCase()
-      }Key`;
-      if (event[mainkey]) {
-        shorcutCommands.add(mainkey);
-      } else if (getNiceKey(event.code, false)) {
-        shorcutCommands.add(event.code);
-      } else {
-        shorcutCommands.add(event.key);
-      }
-
-      this.timeoutID = setTimeout(() => {
-        // This is a delay before the command is sent
-        let shorcutCommand = "";
-        Array.from(shorcutCommands).forEach((item) => {
-          if (getNiceKey(item, false)) {
-            shorcutCommand += getNiceKey(item);
-          } else {
-            shorcutCommand += item;
-          }
-        });
-
-        this._fieldChanging(fieldItem, shorcutCommand, undefined);
-        shorcutCommands = new Set();
-      }, 650);
-    };
-    this._fieldGetters[fieldItem.key] = () => inputElement.value;
-    this._fieldSetters[fieldItem.key] = (value) => (inputElement.value = value);
-    valueElement.appendChild(inputElement);
-  }
-
-  _addCheckbox(valueElement, fieldItem) {
-    const inputElement = document.createElement("input");
-    if (fieldItem["data-tooltip"]) {
-      inputElement.setAttribute("title", fieldItem["data-tooltip"]);
-    }
-
-    inputElement.type = "checkbox";
-    inputElement.checked = fieldItem.value;
-    if (fieldItem.style) {
-      inputElement.style = fieldItem.style;
-    }
-    inputElement.onchange = (event) => {
-      this._fieldChanging(fieldItem, inputElement.checked, undefined);
-    };
-    this._fieldGetters[fieldItem.key] = () => inputElement.checked;
-    this._fieldSetters[fieldItem.key] = (value) => (inputElement.checked = value);
     valueElement.appendChild(inputElement);
   }
 
