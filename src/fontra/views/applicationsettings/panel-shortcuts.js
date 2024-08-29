@@ -496,22 +496,20 @@ addStyleSheet(`
     text-align: center;
   }
 
-  .fontra-ui-shotcuts-panel-refresh {
-    cursor: pointer;
-    /*justify-self: end;*/
-    background-color: yellow;
-  }
-
-  .fontra-ui-shotcuts-panel-delete {
-    cursor: pointer;
-    /*justify-self: end;*/
-    background-color: red;
-  }
-
   .fontra-ui-shotcuts-panel-label {
     width: 14em;
     overflow: hidden;
     text-align: right;
+  }
+
+  .fontra-ui-shotcuts-panel-icon {
+    cursor: pointer;
+    display: none;
+    background-color: red; /* for debugging */
+  }
+
+  .fontra-ui-shotcuts-panel-element:hover > * {
+    display: unset;
   }
 
 `);
@@ -647,7 +645,7 @@ class ShortCutElement extends HTMLElement {
 
     this.append(
       html.createDomElement("icon-button", {
-        "class": "fontra-ui-shotcuts-panel-refresh",
+        "class": "fontra-ui-shotcuts-panel-icon",
         "src": "/tabler-icons/refresh.svg",
         "onclick": (event) => this.resetShortCut(id),
         "data-tooltip": "Reset to default",
@@ -657,7 +655,7 @@ class ShortCutElement extends HTMLElement {
 
     this.append(
       html.createDomElement("icon-button", {
-        "class": "fontra-ui-shotcuts-panel-delete",
+        "class": "fontra-ui-shotcuts-panel-icon",
         "src": "/tabler-icons/trash.svg",
         "onclick": (event) => this.deleteShortCut(id),
         "data-tooltip": "Delete",
