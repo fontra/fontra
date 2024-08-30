@@ -5,7 +5,6 @@ import { labeledCheckbox, labeledTextInput } from "../core/ui-utils.js";
 import { fetchJSON } from "../core/utils.js";
 import { BaseInfoPanel } from "./panel-base.js";
 import { translate } from "/core/localization.js";
-import { InlineSVG } from "/web-components/inline-svg.js";
 import {
   buildShortCutString,
   getKeyMap,
@@ -508,10 +507,11 @@ addStyleSheet(`
     text-align: right;
   }
 
-  .fontra-ui-shotcuts-panel-icon {
+  .fontra-ui-shotcuts-panel-icon, .fontra-ui-shotcuts-panel-icon {
     cursor: pointer;
     opacity: 0;
     pointer-events: none;
+    background-color: green; /* for debugging */
   }
 
   .fontra-ui-shotcuts-panel-input:focus ~ * {
@@ -682,61 +682,25 @@ class ShortCutElement extends HTMLElement {
       })
     );
 
-    // this.append(
-    //   html.createDomElement("icon-button", {
-    //     "class": "fontra-ui-shotcuts-panel-icon",
-    //     "src": "/tabler-icons/refresh.svg", // TODO: I don't know why the icon is not shown.
-    //     "value": "",
-    //     "onclick": (event) => this.resetShortCut(id),
-    //     "data-tooltip": "Reset to default",
-    //     "data-tooltipposition": "top",
-    //   })
-    // );
-
-    // this.append(
-    //   html.createDomElement("icon-button", {
-    //     "class": "fontra-ui-shotcuts-panel-icon",
-    //     "src": "/tabler-icons/trash.svg", // TODO: I don't know why the icon is not shown.
-    //     "onclick": (event) => this.deleteShortCut(id),
-    //     "data-tooltip": "Delete",
-    //     "data-tooltipposition": "top",
-    //   })
-    // );
-
-    // TODO:
-    // I still don't know why "icon-button" does not work,
-    // but the following code would be a work around,
-    // including some changes in InlineSVG.
     this.append(
-      html.div(
-        {
-          "class": "fontra-ui-shotcuts-panel-icon",
-          "onclick": (event) => this.resetShortCut(id),
-          "data-tooltip": "Reset to default",
-          "data-tooltipposition": "top",
-        },
-        [
-          new InlineSVG(`/tabler-icons/refresh.svg`, {
-            style: "display: flex; height: 1.4em;",
-          }),
-        ]
-      )
+      html.createDomElement("icon-button", {
+        "class": "fontra-ui-shotcuts-panel-icon",
+        "src": "/tabler-icons/refresh.svg", // TODO: I don't know why the icon is not shown.
+        "value": "",
+        "onclick": (event) => this.resetShortCut(id),
+        "data-tooltip": "Reset to default",
+        "data-tooltipposition": "top",
+      })
     );
 
     this.append(
-      html.div(
-        {
-          "class": "fontra-ui-shotcuts-panel-icon",
-          "onclick": (event) => this.deleteShortCut(id),
-          "data-tooltip": "Delete",
-          "data-tooltipposition": "top",
-        },
-        [
-          new InlineSVG(`/tabler-icons/trash.svg`, {
-            style: "display: flex; height: 1.4em;",
-          }),
-        ]
-      )
+      html.createDomElement("icon-button", {
+        "class": "fontra-ui-shotcuts-panel-icon",
+        "src": "/tabler-icons/trash.svg", // TODO: I don't know why the icon is not shown.
+        "onclick": (event) => this.deleteShortCut(id),
+        "data-tooltip": "Delete",
+        "data-tooltipposition": "top",
+      })
     );
   }
 }

@@ -3,15 +3,10 @@
 import { htmlToElement } from "/core/html-utils.js";
 
 export class InlineSVG extends HTMLElement {
-  constructor(src, options) {
+  constructor(src) {
     super();
     if (src) {
       this.setAttribute("src", src);
-    }
-    if (options) {
-      if (options.style) {
-        this.setAttribute("style", options.style);
-      }
     }
   }
 
