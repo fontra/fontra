@@ -313,7 +313,7 @@ export class EditorController {
       // TODO: The following 'menubar.fontra' is in preparation for the future.
       // This is for testing only, will be commented out.
       {
-        title: translate("menubar.fontra"),
+        title: "Fontra",
         bold: true,
         getItems() {
           return [
