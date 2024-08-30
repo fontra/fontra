@@ -475,9 +475,9 @@ function _shortCutPropertiesContentElement(controller) {
   return { contentElement, warningElement };
 }
 
-const shotcutsPanelInputWidth = isMac ? "6em" : "12em"; // longer on windows because no icons are shown.
+const shortcutsPanelInputWidth = isMac ? "6em" : "12em"; // longer on windows because no icons are shown.
 addStyleSheet(`
-  .fontra-ui-shotcuts-panel-element {
+  .fontra-ui-shortcuts-panel-element {
     background-color: var(--ui-element-background-color);
     border-radius: 0.5em;
     padding: 0.35rem 0 0 0;
@@ -489,37 +489,37 @@ addStyleSheet(`
     height: 1.4em;
   }
 
-  .fontra-ui-shotcuts-panel-input {
-    width: ${shotcutsPanelInputWidth};
+  .fontra-ui-shortcuts-panel-input {
+    width: ${shortcutsPanelInputWidth};
     text-align: center;
     caret-color: transparent;
   }
 
-  .fontra-ui-shotcuts-panel-input:focus {
+  .fontra-ui-shortcuts-panel-input:focus {
     border: 1px solid var(--background-color-dark);
     outline: unset;
     color: #999;
   }
 
-  .fontra-ui-shotcuts-panel-label {
+  .fontra-ui-shortcuts-panel-label {
     width: 14em;
     overflow: hidden;
     text-align: right;
   }
 
-  .fontra-ui-shotcuts-panel-icon, .fontra-ui-shotcuts-panel-icon {
+  .fontra-ui-shortcuts-panel-icon {
     cursor: pointer;
     opacity: 0;
     pointer-events: none;
     background-color: green; /* for debugging */
   }
 
-  .fontra-ui-shotcuts-panel-input:focus ~ * {
+  .fontra-ui-shortcuts-panel-input:focus ~ * {
     pointer-events: unset;
     opacity: unset;
   }
 
-  .fontra-ui-shotcuts-panel-icon:active {
+  .fontra-ui-shortcuts-panel-icon:active {
     pointer-events: unset;
     opacity: unset;
   }
@@ -529,7 +529,7 @@ addStyleSheet(`
 class ShortCutElement extends HTMLElement {
   constructor(key, setupUI) {
     super();
-    this.classList.add("fontra-ui-shotcuts-panel-element");
+    this.classList.add("fontra-ui-shortcuts-panel-element");
     this.key = key;
     this.shortCutDefinition = getShortCut(this.key);
     // get globalOverride from data or false -> no custom settings allowed.
@@ -658,7 +658,7 @@ class ShortCutElement extends HTMLElement {
     this.append(
       html.label(
         {
-          "class": "fontra-ui-shotcuts-panel-label",
+          "class": "fontra-ui-shortcuts-panel-label",
           "data-tooltip": labelString,
           "data-tooltipposition": "top",
         },
@@ -671,7 +671,7 @@ class ShortCutElement extends HTMLElement {
       html.input({
         "type": "text",
         "id": id,
-        "class": "fontra-ui-shotcuts-panel-input",
+        "class": "fontra-ui-shortcuts-panel-input",
         "value": buildShortCutString(this.shortCutDefinition),
         "data-tooltip":
           "Click and record a shortcut OR double click and open dialog for editing",
@@ -684,7 +684,7 @@ class ShortCutElement extends HTMLElement {
 
     this.append(
       html.createDomElement("icon-button", {
-        "class": "fontra-ui-shotcuts-panel-icon",
+        "class": "fontra-ui-shortcuts-panel-icon",
         "src": "/tabler-icons/refresh.svg", // TODO: I don't know why the icon is not shown.
         "value": "",
         "onclick": (event) => this.resetShortCut(id),
@@ -695,7 +695,7 @@ class ShortCutElement extends HTMLElement {
 
     this.append(
       html.createDomElement("icon-button", {
-        "class": "fontra-ui-shotcuts-panel-icon",
+        "class": "fontra-ui-shortcuts-panel-icon",
         "src": "/tabler-icons/trash.svg", // TODO: I don't know why the icon is not shown.
         "onclick": (event) => this.deleteShortCut(id),
         "data-tooltip": "Delete",
