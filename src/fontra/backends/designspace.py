@@ -42,6 +42,7 @@ from ..core.classes import (
     GlyphAxis,
     GlyphSource,
     Guideline,
+    Image,
     Kerning,
     Layer,
     LineMetric,
@@ -1397,6 +1398,7 @@ class UFOGlyph:
     height: float | None = None
     anchors: list = []
     guidelines: list = []
+    image: Image | None = None
     note: str | None = None
     lib: dict
 
@@ -1583,6 +1585,7 @@ def ufoLayerToStaticGlyph(glyphSet, glyphName, penClass=PackedPathPointPen):
         verticalOrigin=verticalOrigin,
         anchors=unpackAnchors(glyph.anchors),
         guidelines=unpackGuidelines(glyph.guidelines),
+        image=unpackImage(glyph.image),
     )
 
     return staticGlyph, glyph
@@ -1603,6 +1606,22 @@ def unpackVariableComponents(lib):
 
 def unpackAnchors(anchors):
     return [Anchor(name=a.get("name"), x=a["x"], y=a["y"]) for a in anchors]
+
+
+def unpackImage(image):
+    if image is None:
+        return None
+    return Image(
+        fileName=image["fileName"],
+        xScale=image.get("xScale", 1),
+        yScale=image.get("yScale", 1),
+        xOffset=image.get("xOffset", 0),
+        yOffset=image.get("yOffset", 0),
+        xyScale=image.get("xyScale", 0),
+        yxScale=image.get("yxScale", 0),
+        color=image.get("color", None),
+        customData=image.get("customData", {}),
+    )
 
 
 def unpackGuidelines(guidelines):

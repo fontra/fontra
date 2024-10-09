@@ -193,6 +193,10 @@
     "guidelines": {
       "type": "list",
       "subtype": "Guideline"
+    },
+    "image": {
+      "type": "Image",
+      "optional": true
     }
   },
   "PackedPath": {
@@ -294,6 +298,43 @@
     },
     "locked": {
       "type": "bool"
+    },
+    "customData": {
+      "type": "dict",
+      "subtype": "Any"
+    }
+  },
+  "Image": {
+    "fileName": {
+      "type": "str"
+    },
+    "xScale": {
+      "type": "float",
+      "optional": true
+    },
+    "xyScale": {
+      "type": "float",
+      "optional": true
+    },
+    "yxScale": {
+      "type": "float",
+      "optional": true
+    },
+    "yScale": {
+      "type": "float",
+      "optional": true
+    },
+    "xOffset": {
+      "type": "float",
+      "optional": true
+    },
+    "yOffset": {
+      "type": "float",
+      "optional": true
+    },
+    "color": {
+      "type": "str",
+      "optional": true
     },
     "customData": {
       "type": "dict",

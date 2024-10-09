@@ -21,6 +21,7 @@ from fontra.core.classes import (
     GlyphAxis,
     GlyphSource,
     Guideline,
+    Image,
     Layer,
     LineMetric,
     OpenTypeFeatures,
@@ -282,6 +283,29 @@ async def test_addAnchor(writableTestFont):
     assert (
         glyph.layers[layerName].glyph.anchors
         == savedGlyph.layers[layerName].glyph.anchors
+    )
+
+
+async def test_getImage(writableTestFont):
+    glyph = await writableTestFont.getGlyph("M")
+
+    layerName = "MutatorSansLightCondensed/foreground"
+    layer = glyph.layers[layerName]
+
+    assert layer.glyph.image is not None
+    assert (
+        Image(
+            fileName="W_images.png",
+            xScale=-0.29948946703118456,
+            xyScale=8.326672684688672e-17,
+            yxScale=-5.5511151231257815e-17,
+            yScale=-0.29948946703118473,
+            xOffset=901.6748243052426,
+            yOffset=789.4527729820308,
+            color=None,
+            customData={},
+        )
+        == layer.glyph.image
     )
 
 

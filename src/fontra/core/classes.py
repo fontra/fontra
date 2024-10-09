@@ -205,6 +205,7 @@ class StaticGlyph:
     verticalOrigin: Optional[float] = None
     anchors: list[Anchor] = field(default_factory=list)
     guidelines: list[Guideline] = field(default_factory=list)
+    image: Optional[Image] = None
 
     def convertToPackedPaths(self):
         return replace(self, path=self.path.asPackedPath())
@@ -225,6 +226,19 @@ class Anchor:
     name: Optional[str]
     x: float
     y: float
+    customData: CustomData = field(default_factory=dict)
+
+
+@dataclass(kw_only=True)
+class Image:
+    fileName: str
+    xScale: Optional[float] = 1
+    xyScale: Optional[float] = 0
+    yxScale: Optional[float] = 0
+    yScale: Optional[float] = 1
+    xOffset: Optional[float] = 0
+    yOffset: Optional[float] = 0
+    color: Optional[str] = None
     customData: CustomData = field(default_factory=dict)
 
 
@@ -410,6 +424,7 @@ registerHook(
 registerHook(GlyphAxis, customData=_unstructureDictSortedRecursively)
 registerHook(Anchor, customData=_unstructureDictSortedRecursively)
 registerHook(Guideline, customData=_unstructureDictSortedRecursively)
+registerHook(Image, customData=_unstructureDictSortedRecursively)
 registerHook(StaticGlyph, customData=_unstructureDictSortedRecursively)
 registerHook(
     GlyphSource,
