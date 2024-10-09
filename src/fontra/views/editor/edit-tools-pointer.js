@@ -128,6 +128,7 @@ export class PointerTool extends BaseTool {
         !!rotationHandle
       );
       delete sceneController.sceneModel.clickedTransformSelectionHandle;
+      initialEvent.preventDefault();
       return;
     }
 
