@@ -720,6 +720,14 @@ registerVisualizationLayerDefinition({
     if (!model.showTransformSelection) {
       return;
     }
+
+    if (
+      !!positionedGlyph.varGlyph?.glyph.customData["fontra.glyph.locked"] ||
+      model.fontController.readOnly
+    ) {
+      return;
+    }
+
     const transformBounds = getTransformSelectionBounds(
       positionedGlyph.glyph,
       model.selection
