@@ -3,6 +3,7 @@
   <advance width="530"/>
   <unicode hex="004D"/>
   <unicode hex="006D"/>
+  <image fileName="W_images.png" xScale="-0.29948946703118456" xyScale="8.326672684688672e-17" yxScale="-5.5511151231257815e-17" yScale="-0.29948946703118473" xOffset="901.6748243052426" yOffset="789.4527729820308"/>
   <outline>
     <contour>
       <point x="60" y="0" type="line"/>
