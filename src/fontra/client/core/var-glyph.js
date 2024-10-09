@@ -60,6 +60,8 @@ export class StaticGlyph {
     source.guidelines = noCopy
       ? obj.guidelines || []
       : normalizeGuidelines(obj.guidelines || []);
+    //source.image = noCopy ? obj.image || undefined : copyCustomData(obj.image || undefined);
+    source.image = obj.image;
     return source;
   }
 

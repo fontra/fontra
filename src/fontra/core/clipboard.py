@@ -15,6 +15,7 @@ from ..backends.designspace import (
     readGlyphOrCreate,
     unpackAnchors,
     unpackGuidelines,
+    unpackImage,
 )
 from .classes import StaticGlyph
 from .path import PackedPathPointPen
@@ -75,6 +76,7 @@ def parseGLIF(data: str) -> StaticGlyph | None:
         xAdvance=ufoGlyph.width,
         anchors=unpackAnchors(ufoGlyph.anchors),
         guidelines=unpackGuidelines(ufoGlyph.guidelines),
+        image=unpackImage(ufoGlyph.image),
     )
 
 

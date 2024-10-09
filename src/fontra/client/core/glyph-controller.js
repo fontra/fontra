@@ -558,6 +558,10 @@ export class StaticGlyphController {
     return this.instance.guidelines;
   }
 
+  get image() {
+    return this.instance.image;
+  }
+
   get path() {
     return this.instance.path;
   }
