@@ -438,10 +438,7 @@ registerVisualizationLayerDefinition({
     const img = new Image();
     img.type = "file";
     img.src = `http://localhost:8000/MutatorSansLightCondensed.ufo/images/${image.fileName}`;
-    img.addEventListener("load", () => {
-      context.drawImage(img, sx, sy, img.width * xScale, img.height * yScale);
-    });
-
+    context.drawImage(img, sx, sy, img.width * xScale, img.height * yScale);
     context.strokeStyle = parameters.strokeColor;
     context.lineWidth = parameters.strokeWidth;
     context.strokeRect(sx, sy, img.width * xScale, img.height * yScale);
