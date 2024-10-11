@@ -422,7 +422,12 @@ registerVisualizationLayerDefinition({
   colorsDarkMode: { strokeColor: "#FFF8" },
 
   draw: (context, positionedGlyph, parameters, model, controller) => {
+    const url = new URL(window.location);
+    console.log("url: ", url);
     const image = positionedGlyph.glyph.image;
+    if (!image) {
+      return;
+    }
     const sx = image.xOffset ? image.xOffset : 0;
     const sy = image.yOffset ? image.yOffset : 0;
     const xScale = image.xScale ? image.xScale : 1;
@@ -430,11 +435,9 @@ registerVisualizationLayerDefinition({
 
     // https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/drawImage
     // drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
-    const img = new Image(800, 800);
-    img.src = image.fileName;
-    // for testing use local path
-    //img.src = "/Users/ollimeier/Documents/fontraTempProjects/mutatorsans/MutatorSansLightCondensed.ufo/images/W_images.png";
-
+    const img = new Image();
+    img.type = "file";
+    img.src = `http://localhost:8000/MutatorSansLightCondensed.ufo/images/${image.fileName}`;
     img.addEventListener("load", () => {
       context.drawImage(img, sx, sy, img.width * xScale, img.height * yScale);
     });
@@ -443,7 +446,7 @@ registerVisualizationLayerDefinition({
     context.lineWidth = parameters.strokeWidth;
     context.strokeRect(sx, sy, img.width * xScale, img.height * yScale);
 
-    console.log("positionedGlyph.glyph.image: ", positionedGlyph.glyph.image);
+    console.log("image: ", image);
   },
 });
 
