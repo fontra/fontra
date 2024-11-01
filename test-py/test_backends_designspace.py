@@ -1,3 +1,4 @@
+import base64
 import pathlib
 import shutil
 from contextlib import aclosing
@@ -292,6 +293,11 @@ async def test_getImage(writableTestFont):
     layerName = "MutatorSansLightCondensed/foreground"
     layer = glyph.layers[layerName]
 
+    ufoDir = writableTestFont.ufoLayers.findItem(fontraLayerName=layerName).path
+    pathToImage = pathlib.Path(ufoDir) / "images" / "W_images.png"
+    with open(pathToImage, "rb") as image_file:
+        base64Data = base64.b64encode(image_file.read()).decode("utf-8")
+
     assert layer.glyph.image is not None
     image = Image(
         fileName="W_images.png",
@@ -302,7 +308,7 @@ async def test_getImage(writableTestFont):
         xOffset=901.6748243052426,
         yOffset=789.4527729820308,
         color=None,
-        customData={},
+        customData={"base64": base64Data},
     )
     assert image.fileName == layer.glyph.image.fileName
     assert image.xScale == layer.glyph.image.xScale
@@ -312,8 +318,7 @@ async def test_getImage(writableTestFont):
     assert image.xOffset == layer.glyph.image.xOffset
     assert image.yOffset == layer.glyph.image.yOffset
     assert image.color == layer.glyph.image.color
-    # do not compare customData because of base64
-    # assert image.customData == layer.glyph.image.customData
+    assert image.customData == layer.glyph.image.customData
 
 
 async def test_getGlyphSourceStatusCode(testFont):

@@ -1574,8 +1574,6 @@ class ItemList:
 def ufoLayerToStaticGlyph(
     glyphSet, glyphName, penClass=PackedPathPointPen, ufoDir=None
 ):
-    print("ufoLayerToStaticGlyph", glyphName)
-    print("glyphSet", glyphSet)
     glyph = UFOGlyph()
     glyph.lib = {}
     pen = penClass()
@@ -1615,17 +1613,17 @@ def unpackAnchors(anchors):
     return [Anchor(name=a.get("name"), x=a["x"], y=a["y"]) for a in anchors]
 
 
-def unpackImage(image, ufoDir):
+def unpackImage(image, ufoDir=None):
     if image is None:
         return None
 
     if ufoDir is None:
-        customData = (image.get("customData", {}),)
+        customData = image.get("customData", {})
     else:
         pathToImage = os.path.join(ufoDir, "images/", image["fileName"])
         with open(pathToImage, "rb") as image_file:
             base64Data = base64.b64encode(image_file.read()).decode("utf-8")
-        customData = (image.get("customData", {"base64": base64Data}),)
+        customData = image.get("customData", {"base64": base64Data})
 
     return Image(
         fileName=image["fileName"],

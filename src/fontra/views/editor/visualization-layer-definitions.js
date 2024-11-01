@@ -434,7 +434,7 @@ registerVisualizationLayerDefinition({
     const yScale = image.yScale ? image.yScale : 1;
 
     const img = new Image();
-    img.src = "data:image/jpg;base64," + image.customData[0]["base64"];
+    img.src = "data:image/jpg;base64," + image.customData["base64"];
     context.drawImage(img, sx, sy, img.width * xScale, img.height * yScale);
     context.strokeStyle = parameters.strokeColor;
     context.lineWidth = parameters.strokeWidth;
