@@ -7,6 +7,7 @@ from dataclasses import asdict
 
 import pytest
 from fontTools.designspaceLib import DesignSpaceDocument
+from fontTools.misc.transform import DecomposedTransform, Transform
 
 from fontra.backends import getFileSystemBackend, newFileSystemBackend
 from fontra.backends.copy import copyFont
@@ -29,9 +30,6 @@ from fontra.core.classes import (
     StaticGlyph,
     unstructure,
 )
-
-# from fontTools.misc.transform import Transform
-
 
 dataDir = pathlib.Path(__file__).resolve().parent / "data"
 
@@ -301,36 +299,25 @@ async def test_getImage(writableTestFont):
     with open(pathToImage, "rb") as image_file:
         base64Data = base64.b64encode(image_file.read()).decode("utf-8")
 
-    # transformation = Transform(
-    #     -0.29948946703118456,
-    #     8.326672684688672e-17,
-    #     -5.5511151231257815e-17,
-    #     -0.29948946703118473,
-    #     901.6748243052426,
-    #     789.4527729820308
-    # )
+    transformation = Transform(
+        -0.29948946703118456,
+        8.326672684688672e-17,
+        -5.5511151231257815e-17,
+        -0.29948946703118473,
+        901.6748243052426,
+        789.4527729820308,
+    )
+    transformation = DecomposedTransform.fromTransform(transformation)
 
     assert layer.glyph.image is not None
     image = Image(
         fileName="W_images.png",
-        xScale=-0.29948946703118456,
-        xyScale=8.326672684688672e-17,
-        yxScale=-5.5511151231257815e-17,
-        yScale=-0.29948946703118473,
-        xOffset=901.6748243052426,
-        yOffset=789.4527729820308,
-        # transformation=transformation,
+        transformation=transformation,
         color=None,
         customData={"base64": base64Data},
     )
     assert image.fileName == layer.glyph.image.fileName
-    assert image.xScale == layer.glyph.image.xScale
-    assert image.xyScale == layer.glyph.image.xyScale
-    assert image.yxScale == layer.glyph.image.yxScale
-    assert image.yScale == layer.glyph.image.yScale
-    assert image.xOffset == layer.glyph.image.xOffset
-    assert image.yOffset == layer.glyph.image.yOffset
-    # assert image.transformation == layer.glyph.image.transformation
+    assert image.transformation == layer.glyph.image.transformation
     assert image.color == layer.glyph.image.color
     assert image.customData == layer.glyph.image.customData
 

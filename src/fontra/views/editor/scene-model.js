@@ -743,10 +743,10 @@ export class SceneModel {
     const img = new Image();
     img.src = "data:image/jpg;base64," + image.customData["base64"];
 
-    const sx = image.xOffset ? image.xOffset : 0;
-    const sy = image.yOffset ? image.yOffset : 0;
-    const xScale = image.xScale ? image.xScale : 1;
-    const yScale = image.yScale ? image.yScale : 1;
+    const sx = image.transformation.translateX;
+    const sy = image.transformation.translateY;
+    const xScale = image.transformation.scaleX;
+    const yScale = image.transformation.scaleY;
 
     const p1 = { x: sx, y: sy };
     const p2 = { x: sx + img.width * xScale, y: sy };

@@ -23,9 +23,7 @@ from fontTools.designspaceLib import (
     DiscreteAxisDescriptor,
     SourceDescriptor,
 )
-from fontTools.misc.transform import DecomposedTransform
-
-# from fontTools.misc.transform import Transform
+from fontTools.misc.transform import DecomposedTransform, Transform
 from fontTools.pens.pointPen import AbstractPointPen
 from fontTools.pens.recordingPen import RecordingPointPen
 from fontTools.ufoLib import UFOReaderWriter
@@ -1627,23 +1625,18 @@ def unpackImage(image, ufoDir=None):
             base64Data = base64.b64encode(image_file.read()).decode("utf-8")
         customData = image.get("customData", {"base64": base64Data})
 
-    # xx = image.get("xScale", 1)
-    # xy = image.get("xyScale", 0)
-    # yx = image.get("yxScale", 0)
-    # yy = image.get("yScale", 1)
-    # dx = image.get("xOffset", 0)
-    # dy = image.get("yOffset", 0)
-    # transformation = Transform(xx, xy, yx, yy, dx, dy)
+    xx = image.get("xScale", 1)
+    xy = image.get("xyScale", 0)
+    yx = image.get("yxScale", 0)
+    yy = image.get("yScale", 1)
+    dx = image.get("xOffset", 0)
+    dy = image.get("yOffset", 0)
+    transformation = Transform(xx, xy, yx, yy, dx, dy)
+    transformation = DecomposedTransform.fromTransform(transformation)
 
     return Image(
         fileName=image["fileName"],
-        xScale=image.get("xScale", 1),
-        yScale=image.get("yScale", 1),
-        xOffset=image.get("xOffset", 0),
-        yOffset=image.get("yOffset", 0),
-        xyScale=image.get("xyScale", 0),
-        yxScale=image.get("yxScale", 0),
-        # transformation=transformation,
+        transformation=transformation,
         color=image.get("color", None),
         customData=customData,
     )

@@ -426,10 +426,11 @@ registerVisualizationLayerDefinition({
     if (!image) {
       return;
     }
-    const sx = image.xOffset ? image.xOffset : 0;
-    const sy = image.yOffset ? image.yOffset : 0;
-    const xScale = image.xScale ? image.xScale : 1;
-    const yScale = image.yScale ? image.yScale : 1;
+
+    const sx = image.transformation.translateX;
+    const sy = image.transformation.translateY;
+    const xScale = image.transformation.scaleX;
+    const yScale = image.transformation.scaleY;
 
     const img = new Image();
     img.src = "data:image/jpg;base64," + image.customData["base64"];
@@ -448,8 +449,6 @@ registerVisualizationLayerDefinition({
     // context.strokeStyle = parameters.strokeColor;
     // context.lineWidth = parameters.strokeWidth;
     // context.strokeRect(sx, sy, img.width * xScale, img.height * yScale);
-
-    // console.log("image: ", image);
 
     // Visualisation might not be needed if we have the selection transformation tool active.
 

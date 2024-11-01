@@ -308,29 +308,8 @@
     "fileName": {
       "type": "str"
     },
-    "xScale": {
-      "type": "float",
-      "optional": true
-    },
-    "xyScale": {
-      "type": "float",
-      "optional": true
-    },
-    "yxScale": {
-      "type": "float",
-      "optional": true
-    },
-    "yScale": {
-      "type": "float",
-      "optional": true
-    },
-    "xOffset": {
-      "type": "float",
-      "optional": true
-    },
-    "yOffset": {
-      "type": "float",
-      "optional": true
+    "transformation": {
+      "type": "DecomposedTransform"
     },
     "color": {
       "type": "str",

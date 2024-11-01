@@ -232,13 +232,7 @@ class Anchor:
 @dataclass(kw_only=True)
 class Image:
     fileName: str
-    xScale: Optional[float] = 1
-    xyScale: Optional[float] = 0
-    yxScale: Optional[float] = 0
-    yScale: Optional[float] = 1
-    xOffset: Optional[float] = 0
-    yOffset: Optional[float] = 0
-    # transformation: DecomposedTransform = field(default_factory=DecomposedTransform)
+    transformation: DecomposedTransform = field(default_factory=DecomposedTransform)
     color: Optional[str] = None
     customData: CustomData = field(default_factory=dict)
 
