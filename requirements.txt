@@ -7,3 +7,4 @@ ufomerge==1.8.2
 unicodedata2==15.1.0
 watchfiles==0.24.0
 skia-pathops==0.8.0.post2
+pybase64==1.4.0

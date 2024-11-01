@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import base64
 import logging
 import os
 import pathlib
@@ -345,7 +346,9 @@ class DesignspaceBackend:
             if glyphName not in ufoLayer.glyphSet:
                 continue
 
-            staticGlyph, ufoGlyph = ufoLayerToStaticGlyph(ufoLayer.glyphSet, glyphName)
+            staticGlyph, ufoGlyph = ufoLayerToStaticGlyph(
+                ufoLayer.glyphSet, glyphName, ufoDir=ufoLayer.path
+            )
             if ufoLayer == self.defaultUFOLayer:
                 localDS = ufoGlyph.lib.get(GLYPH_DESIGNSPACE_LIB_KEY)
                 if localDS is not None:
@@ -1568,7 +1571,11 @@ class ItemList:
             yield getattr(item, attrName)
 
 
-def ufoLayerToStaticGlyph(glyphSet, glyphName, penClass=PackedPathPointPen):
+def ufoLayerToStaticGlyph(
+    glyphSet, glyphName, penClass=PackedPathPointPen, ufoDir=None
+):
+    print("ufoLayerToStaticGlyph", glyphName)
+    print("glyphSet", glyphSet)
     glyph = UFOGlyph()
     glyph.lib = {}
     pen = penClass()
@@ -1585,7 +1592,7 @@ def ufoLayerToStaticGlyph(glyphSet, glyphName, penClass=PackedPathPointPen):
         verticalOrigin=verticalOrigin,
         anchors=unpackAnchors(glyph.anchors),
         guidelines=unpackGuidelines(glyph.guidelines),
-        image=unpackImage(glyph.image),
+        image=unpackImage(glyph.image, ufoDir),
     )
 
     return staticGlyph, glyph
@@ -1608,9 +1615,18 @@ def unpackAnchors(anchors):
     return [Anchor(name=a.get("name"), x=a["x"], y=a["y"]) for a in anchors]
 
 
-def unpackImage(image):
+def unpackImage(image, ufoDir):
     if image is None:
         return None
+
+    if ufoDir is None:
+        customData = (image.get("customData", {}),)
+    else:
+        pathToImage = os.path.join(ufoDir, "images/", image["fileName"])
+        with open(pathToImage, "rb") as image_file:
+            base64Data = base64.b64encode(image_file.read()).decode("utf-8")
+        customData = (image.get("customData", {"base64": base64Data}),)
+
     return Image(
         fileName=image["fileName"],
         xScale=image.get("xScale", 1),
@@ -1620,7 +1636,7 @@ def unpackImage(image):
         xyScale=image.get("xyScale", 0),
         yxScale=image.get("yxScale", 0),
         color=image.get("color", None),
-        customData=image.get("customData", {}),
+        customData=customData,
     )
 
 

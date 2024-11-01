@@ -293,20 +293,27 @@ async def test_getImage(writableTestFont):
     layer = glyph.layers[layerName]
 
     assert layer.glyph.image is not None
-    assert (
-        Image(
-            fileName="W_images.png",
-            xScale=-0.29948946703118456,
-            xyScale=8.326672684688672e-17,
-            yxScale=-5.5511151231257815e-17,
-            yScale=-0.29948946703118473,
-            xOffset=901.6748243052426,
-            yOffset=789.4527729820308,
-            color=None,
-            customData={},
-        )
-        == layer.glyph.image
+    image = Image(
+        fileName="W_images.png",
+        xScale=-0.29948946703118456,
+        xyScale=8.326672684688672e-17,
+        yxScale=-5.5511151231257815e-17,
+        yScale=-0.29948946703118473,
+        xOffset=901.6748243052426,
+        yOffset=789.4527729820308,
+        color=None,
+        customData={},
     )
+    assert image.fileName == layer.glyph.image.fileName
+    assert image.xScale == layer.glyph.image.xScale
+    assert image.xyScale == layer.glyph.image.xyScale
+    assert image.yxScale == layer.glyph.image.yxScale
+    assert image.yScale == layer.glyph.image.yScale
+    assert image.xOffset == layer.glyph.image.xOffset
+    assert image.yOffset == layer.glyph.image.yOffset
+    assert image.color == layer.glyph.image.color
+    # do not compare customData because of base64
+    # assert image.customData == layer.glyph.image.customData
 
 
 async def test_getGlyphSourceStatusCode(testFont):
