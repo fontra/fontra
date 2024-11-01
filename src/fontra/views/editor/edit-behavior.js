@@ -47,7 +47,11 @@ export class EditBehaviorFactory {
     this.enableScalingEdit = enableScalingEdit;
   }
 
-  getBehavior(behaviorName, fullComponentTransform = false) {
+  getBehavior(
+    behaviorName,
+    fullComponentTransform = false,
+    fullImageTransform = false
+  ) {
     let behavior = this.behaviors[behaviorName];
     if (!behavior) {
       let behaviorType = behaviorTypes[behaviorName];
@@ -67,7 +71,8 @@ export class EditBehaviorFactory {
         this.componentOriginIndices,
         this.componentTCenterIndices,
         behaviorType,
-        fullComponentTransform
+        fullComponentTransform,
+        fullImageTransform
       );
       this.behaviors[behaviorName] = behavior;
     }
@@ -85,9 +90,11 @@ class EditBehavior {
     componentOriginIndices,
     componentTCenterIndices,
     behavior,
-    fullComponentTransform
+    fullComponentTransform,
+    fullImageTransform
   ) {
     this.fullComponentTransform = fullComponentTransform;
+    this.fullImageTransform = fullImageTransform;
     this.roundFunc = Math.round;
     this.constrainDelta = behavior.constrainDelta || ((v) => v);
     const [pointEditFuncs, participatingPointIndices] = makePointEditFuncs(
@@ -155,13 +162,14 @@ class EditBehavior {
       guidelineRollbackChanges.push(guidelineRollback);
     }
 
+    const makeImageEditFunc = fullImageTransform
+      ? makeImageTransformationEditFunc
+      : makeImageOriginEditFunc;
+
     const imageRollbackChanges = [];
     this.imageEditFuncs = [];
     if (image) {
-      const [editFunc, imageRollback] = makeImageTransformationEditFunc(
-        image,
-        this.roundFunc
-      );
+      const [editFunc, imageRollback] = makeImageEditFunc(image, this.roundFunc);
       this.imageEditFuncs.push(editFunc);
       imageRollbackChanges.push(imageRollback);
     }
@@ -201,6 +209,11 @@ class EditBehavior {
     if (this.fullComponentTransform && !transformComponentFunc) {
       throw Error(
         "assert -- must pass transformComponentFunc when doing fullComponentTransform"
+      );
+    }
+    if (this.fullImageTransform && !transformImageFunc) {
+      throw Error(
+        "assert -- must pass transformImageFunc when doing fullImageTransform"
       );
     }
     const transform = {
@@ -327,6 +340,24 @@ function makeComponentOriginEditFunc(component, componentIndex, roundFunc) {
   ];
 }
 
+function makeImageOriginEditFunc(image, roundFunc) {
+  const origin = {
+    x: image.transformation.translateX,
+    y: image.transformation.translateY,
+  };
+  return [
+    (transform) => {
+      const editedOrigin = transform.constrained(origin);
+      return makeImageOriginChange(
+        0,
+        roundFunc(editedOrigin.x),
+        roundFunc(editedOrigin.y)
+      );
+    },
+    makeImageOriginChange(0, origin.x, origin.y),
+  ];
+}
+
 function makeImageTransformationEditFunc(image) {
   const oldImage = copyImage(image);
   return [
@@ -338,9 +369,37 @@ function makeImageTransformationEditFunc(image) {
   ];
 }
 
+// function makeImageChange(image, imageIndex) {
+//   return { f: "=", a: [imageIndex, image] };
+// }
+
 function makeImageChange(image, imageIndex) {
-  return { f: "=", a: [imageIndex, image] };
+  return {
+    p: ["transformation"],
+    c: [
+      { f: "=", a: ["translateX", image.transformation.translateX] },
+      { f: "=", a: ["translateY", image.transformation.translateY] },
+      { f: "=", a: ["scaleX", image.transformation.scaleX] },
+      { f: "=", a: ["scaleY", image.transformation.scaleY] },
+      { f: "=", a: ["tCenterX", image.transformation.tCenterX] },
+      { f: "=", a: ["tCenterY", image.transformation.tCenterY] },
+    ],
+  };
 }
+
+// function makeImageChange(image, imageIndex) {
+//   return {
+//     p: ["transformation"],
+//     c: [
+//       { f: "=", a: ["translateX", image.transformation.translateX] },
+//       { f: "=", a: ["translateY", image.transformation.translateY] },
+//       { f: "=", a: ["scaleX", image.transformation.scaleX] },
+//       { f: "=", a: ["scaleY", image.transformation.scaleY] },
+//       { f: "=", a: ["tCenterX", image.transformation.tCenterX] },
+//       { f: "=", a: ["tCenterY", image.transformation.tCenterY] },
+//     ],
+//   };
+// }
 
 function makeAnchorEditFunc(anchor, anchorIndex, roundFunc) {
   const oldAnchor = { ...anchor };
@@ -467,6 +526,16 @@ function makeGuidelineChange(guidelineIndex, x, y, angle, roundFunc) {
 function makeComponentOriginChange(componentIndex, x, y) {
   return {
     p: [componentIndex, "transformation"],
+    c: [
+      { f: "=", a: ["translateX", x] },
+      { f: "=", a: ["translateY", y] },
+    ],
+  };
+}
+
+function makeImageOriginChange(imageIndex, x, y) {
+  return {
+    p: ["transformation"],
     c: [
       { f: "=", a: ["translateX", x] },
       { f: "=", a: ["translateY", y] },
