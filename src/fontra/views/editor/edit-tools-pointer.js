@@ -36,7 +36,7 @@ const rotationHandleSizeFactor = 1.2;
 
 export class PointerTools {
   identifier = "pointer-tools";
-  subTools = [PointerTool, PointerToolScale];
+  subTools = [PointerTool, PointerToolScale]; //, PointerToolImage];
 }
 
 export class PointerTool extends BaseTool {
@@ -777,6 +777,29 @@ export class PointerToolScale extends PointerTool {
     return true;
   }
 }
+
+// export class PointerToolImage extends PointerTool {
+//   iconPath = "/images/pointer.svg";
+//   identifier = "pointer-tool-image";
+
+//   async handleDrag(eventStream, initialEvent) {
+//     console.log("PointerToolImage: handleDrag");
+//     const sceneController = this.sceneController;
+//     const initialSelection = sceneController.selection;
+
+//     const eventPoint = sceneController.localPoint(eventStream);
+//     const point = sceneController.localPoint(initialEvent);
+//     console.log("PointerToolImage eventPoint: ", eventPoint);
+//     console.log("PointerToolImage: ", point);
+
+//     for await (const event of eventStream) {
+//       const currentPoint = sceneController.selectedGlyphPoint(event);
+//       console.log("PointerToolImage currentPoint: ", currentPoint);
+//     }
+
+//   }
+
+// }
 
 function getTransformHandles(transformBounds, margin) {
   const { width, height } = rectSize(transformBounds);

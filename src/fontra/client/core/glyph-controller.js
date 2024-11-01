@@ -10,7 +10,7 @@ import {
 import { VariationError } from "./errors.js";
 import { filterPathByPointIndices } from "./path-functions.js";
 import { PathHitTester } from "./path-hit-tester.js";
-import { centeredRect, sectRect, unionRect } from "./rectangle.js";
+import { centeredRect, rectFromArray, sectRect, unionRect } from "./rectangle.js";
 import {
   getRepresentation,
   registerRepresentationFactory,
@@ -619,6 +619,7 @@ export class StaticGlyphController {
       point: pointIndices,
       component: componentIndices,
       anchor: anchorIndices,
+      image: imageIndices,
     } = parseSelection(selection);
 
     pointIndices = pointIndices || [];
@@ -648,6 +649,24 @@ export class StaticGlyphController {
       const anchor = this.instance.anchors[anchorIndex];
       if (anchor) {
         selectionRects.push(centeredRect(anchor.x, anchor.y, 0));
+      }
+    }
+
+    for (const imageIndex of imageIndices) {
+      // currently it clear it's just one image
+      const image = this.image;
+      if (image) {
+        const sx = image.xOffset ? image.xOffset : 0;
+        const sy = image.yOffset ? image.yOffset : 0;
+        const xScale = image.xScale ? image.xScale : 1;
+        const yScale = image.yScale ? image.yScale : 1;
+
+        const img = new Image();
+        img.src = "data:image/jpg;base64," + image.customData["base64"];
+
+        const w = img.width * xScale;
+        const h = img.height * yScale;
+        selectionRects.push(rectFromArray([sx, sy, sx + w, sy + h]));
       }
     }
 

@@ -422,8 +422,6 @@ registerVisualizationLayerDefinition({
   colorsDarkMode: { strokeColor: "#FFF8" },
 
   draw: (context, positionedGlyph, parameters, model, controller) => {
-    const url = new URL(window.location);
-    // console.log("url: ", url);
     const image = positionedGlyph.glyph.image;
     if (!image) {
       return;
@@ -436,10 +434,11 @@ registerVisualizationLayerDefinition({
     const img = new Image();
     img.src = "data:image/jpg;base64," + image.customData["base64"];
     context.drawImage(img, sx, sy, img.width * xScale, img.height * yScale);
-    context.strokeStyle = parameters.strokeColor;
-    context.lineWidth = parameters.strokeWidth;
-    context.strokeRect(sx, sy, img.width * xScale, img.height * yScale);
+    // context.strokeStyle = parameters.strokeColor;
+    // context.lineWidth = parameters.strokeWidth;
+    // context.strokeRect(sx, sy, img.width * xScale, img.height * yScale);
 
+    // const url = new URL(window.location);
     // // https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/drawImage
     // // drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
     // const img = new Image();
@@ -451,6 +450,28 @@ registerVisualizationLayerDefinition({
     // context.strokeRect(sx, sy, img.width * xScale, img.height * yScale);
 
     // console.log("image: ", image);
+
+    // Visualisation might not be needed if we have the selection transformation tool active.
+
+    const { image: imageIndices } = parseSelection(model.selection);
+
+    // Selected image
+    context.strokeStyle = parameters.strokeColor;
+    context.lineWidth = parameters.strokeWidth;
+    for (const imageIndex of imageIndices || []) {
+      context.strokeRect(sx, sy, img.width * xScale, img.height * yScale);
+    }
+
+    // const {
+    //   image: hoveredImageIndices,
+    // } = parseSelection(model.hoverSelection);
+
+    // // Hovered image
+    // context.strokeStyle = parameters.strokeColor;
+    // context.lineWidth = parameters.strokeWidth;
+    // for (const imageIndex of hoveredImageIndices || []) {
+    //   context.strokeRect(sx, sy, img.width * xScale, img.height * yScale);
+    // }
   },
 });
 

@@ -18,14 +18,21 @@ import {
   reversed,
 } from "../core/utils.js";
 import * as vector from "../core/vector.js";
+import { convexHull } from "/core/convex-hull.js";
 import { loaderSpinner } from "/core/loader-spinner.js";
 
 export class SceneModel {
-  constructor(fontController, sceneSettingsController, isPointInPath) {
+  constructor(
+    fontController,
+    sceneSettingsController,
+    isPointInPath,
+    editorController
+  ) {
     this.fontController = fontController;
     this.sceneSettingsController = sceneSettingsController;
     this.sceneSettings = sceneSettingsController.model;
     this.isPointInPath = isPointInPath;
+    this.editorController = editorController;
     this.hoveredGlyph = undefined;
     this._glyphLocations = {}; // glyph name -> glyph location
     this.longestLineLength = 0;
@@ -539,6 +546,11 @@ export class SceneModel {
     //   return { selection: fontGuidelineSelection };
     // }
 
+    const imageSelection = this.imageSelectionAtPoint(point);
+    if (imageSelection.size) {
+      return { selection: imageSelection };
+    }
+
     return {};
   }
 
@@ -705,6 +717,47 @@ export class SceneModel {
   // TODO: Font Guidelines
   //fontGuidelineSelectionAtPoint(point, size) {
   // }
+
+  imageSelectionAtPoint(point) {
+    if (
+      !this.editorController.visualizationLayersSettings.model[
+        "fontra.background.image"
+      ]
+    ) {
+      return new Set();
+    }
+
+    const positionedGlyph = this.getSelectedPositionedGlyph();
+    if (!positionedGlyph) {
+      return new Set();
+    }
+
+    const image = positionedGlyph.glyph.image;
+    if (!image) {
+      return new Set();
+    }
+
+    const x = point.x - positionedGlyph.x;
+    const y = point.y - positionedGlyph.y;
+
+    const img = new Image();
+    img.src = "data:image/jpg;base64," + image.customData["base64"];
+
+    const sx = image.xOffset ? image.xOffset : 0;
+    const sy = image.yOffset ? image.yOffset : 0;
+    const xScale = image.xScale ? image.xScale : 1;
+    const yScale = image.yScale ? image.yScale : 1;
+
+    const p1 = { x: sx, y: sy };
+    const p2 = { x: sx + img.width * xScale, y: sy };
+    const p3 = { x: sx + img.width * xScale, y: sy + img.height * yScale };
+    const p4 = { x: sx, y: sy + img.height * yScale };
+
+    if (pointInConvexPolygon(x, y, convexHull([p1, p2, p3, p4]))) {
+      return new Set([`image/0`]);
+    }
+    return new Set([]);
+  }
 
   selectionAtRect(selRect, pointFilterFunc) {
     const selection = new Set();

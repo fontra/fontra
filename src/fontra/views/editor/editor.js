@@ -134,7 +134,8 @@ export class EditorController {
     this.sceneController = new SceneController(
       this.fontController,
       canvasController,
-      applicationSettingsController
+      applicationSettingsController,
+      this
     );
 
     this.sceneSettingsController = this.sceneController.sceneSettingsController;

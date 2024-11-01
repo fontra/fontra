@@ -36,7 +36,12 @@ import { translate, translatePlural } from "/core/localization.js";
 import { dialog, message } from "/web-components/modal-dialog.js";
 
 export class SceneController {
-  constructor(fontController, canvasController, applicationSettingsController) {
+  constructor(
+    fontController,
+    canvasController,
+    applicationSettingsController,
+    editorController
+  ) {
     this.canvasController = canvasController;
     this.applicationSettings = applicationSettingsController.model;
     this.fontController = fontController;
@@ -53,7 +58,8 @@ export class SceneController {
     this.sceneModel = new SceneModel(
       fontController,
       this.sceneSettingsController,
-      isPointInPath
+      isPointInPath,
+      editorController
     );
 
     this.selectedTool = undefined;
