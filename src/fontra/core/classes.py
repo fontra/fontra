@@ -238,6 +238,7 @@ class Image:
     yScale: Optional[float] = 1
     xOffset: Optional[float] = 0
     yOffset: Optional[float] = 0
+    # transformation: DecomposedTransform = field(default_factory=DecomposedTransform)
     color: Optional[str] = None
     customData: CustomData = field(default_factory=dict)
 

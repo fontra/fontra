@@ -30,6 +30,9 @@ from fontra.core.classes import (
     unstructure,
 )
 
+# from fontTools.misc.transform import Transform
+
+
 dataDir = pathlib.Path(__file__).resolve().parent / "data"
 
 
@@ -298,6 +301,15 @@ async def test_getImage(writableTestFont):
     with open(pathToImage, "rb") as image_file:
         base64Data = base64.b64encode(image_file.read()).decode("utf-8")
 
+    # transformation = Transform(
+    #     -0.29948946703118456,
+    #     8.326672684688672e-17,
+    #     -5.5511151231257815e-17,
+    #     -0.29948946703118473,
+    #     901.6748243052426,
+    #     789.4527729820308
+    # )
+
     assert layer.glyph.image is not None
     image = Image(
         fileName="W_images.png",
@@ -307,6 +319,7 @@ async def test_getImage(writableTestFont):
         yScale=-0.29948946703118473,
         xOffset=901.6748243052426,
         yOffset=789.4527729820308,
+        # transformation=transformation,
         color=None,
         customData={"base64": base64Data},
     )
@@ -317,6 +330,7 @@ async def test_getImage(writableTestFont):
     assert image.yScale == layer.glyph.image.yScale
     assert image.xOffset == layer.glyph.image.xOffset
     assert image.yOffset == layer.glyph.image.yOffset
+    # assert image.transformation == layer.glyph.image.transformation
     assert image.color == layer.glyph.image.color
     assert image.customData == layer.glyph.image.customData
 
