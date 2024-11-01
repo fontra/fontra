@@ -427,21 +427,21 @@ registerVisualizationLayerDefinition({
       return;
     }
 
-    const sx = image.transformation.translateX;
-    const sy = image.transformation.translateY;
-    const xScale = image.transformation.scaleX;
-    const yScale = image.transformation.scaleY;
-
     const img = new Image();
     img.src = "data:image/jpg;base64," + image.customData["base64"];
-    context.drawImage(img, sx, sy, img.width * xScale, img.height * yScale);
-    // context.strokeStyle = parameters.strokeColor;
-    // context.lineWidth = parameters.strokeWidth;
-    // context.strokeRect(sx, sy, img.width * xScale, img.height * yScale);
+
+    const sx = image.transformation.translateX;
+    const sy = image.transformation.translateY;
+    const sWidth = img.width;
+    const sHeight = img.height;
+    const dWidth = sWidth * image.transformation.scaleX;
+    const dHeight = sHeight * image.transformation.scaleY;
+
+    context.drawImage(img, sx, sy, dWidth, dHeight);
 
     // const url = new URL(window.location);
-    // // https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/drawImage
-    // // drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
+    // https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/drawImage
+    // drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
     // const img = new Image();
     // img.type = "file";
     // img.src = `http://localhost:8000/MutatorSansLightCondensed.ufo/images/${image.fileName}`;
@@ -458,7 +458,7 @@ registerVisualizationLayerDefinition({
     context.strokeStyle = parameters.strokeColor;
     context.lineWidth = parameters.strokeWidth;
     for (const imageIndex of imageIndices || []) {
-      context.strokeRect(sx, sy, img.width * xScale, img.height * yScale);
+      context.strokeRect(sx, sy, dWidth, dHeight);
     }
 
     // const {

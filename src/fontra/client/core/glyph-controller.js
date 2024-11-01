@@ -625,6 +625,7 @@ export class StaticGlyphController {
     pointIndices = pointIndices || [];
     componentIndices = componentIndices || [];
     anchorIndices = anchorIndices || [];
+    imageIndices = imageIndices || [];
 
     const selectionRects = [];
     if (pointIndices.length) {

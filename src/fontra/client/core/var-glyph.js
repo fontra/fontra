@@ -78,6 +78,15 @@ export function copyComponent(component) {
   };
 }
 
+export function copyImage(image) {
+  return {
+    fileName: image.fileName,
+    transformation: { ...getDecomposedIdentity(), ...image.transformation },
+    color: image.color,
+    customData: { ...image.customData },
+  };
+}
+
 function copyCustomData(data) {
   return JSON.parse(JSON.stringify(data));
 }

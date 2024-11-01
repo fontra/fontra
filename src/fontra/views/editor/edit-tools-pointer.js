@@ -28,7 +28,7 @@ import {
   strokeRoundNode,
   strokeSquareNode,
 } from "./visualization-layer-definitions.js";
-import { copyComponent } from "/core/var-glyph.js";
+import { copyComponent, copyImage } from "/core/var-glyph.js";
 
 const transformHandleMargin = 6;
 const transformHandleSize = 8;
@@ -566,10 +566,20 @@ export class PointerTool extends BaseTool {
             return component;
           };
 
+          const imageTransformFunction = (image) => {
+            image = copyImage(image);
+            image.transformation = prependTransformToDecomposed(
+              t,
+              image.transformation
+            );
+            return image;
+          };
+
           const editChange = layer.editBehavior.makeChangeForTransformFunc(
             pointTransformFunction,
             null,
-            componentTransformFunction
+            componentTransformFunction,
+            imageTransformFunction
           );
 
           applyChange(layerGlyph, editChange);

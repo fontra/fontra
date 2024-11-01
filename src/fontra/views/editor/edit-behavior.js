@@ -2,7 +2,7 @@ import { consolidateChanges } from "../core/changes.js";
 import { polygonIsConvex } from "../core/convex-hull.js";
 import { Transform, decomposedToTransform } from "../core/transform.js";
 import { enumerate, parseSelection, reversed, unionIndexSets } from "../core/utils.js";
-import { copyComponent } from "../core/var-glyph.js";
+import { copyComponent, copyImage } from "../core/var-glyph.js";
 import * as vector from "../core/vector.js";
 import {
   ANY,
@@ -23,6 +23,7 @@ export class EditBehaviorFactory {
       component: componentSelection,
       anchor: anchorSelection,
       guideline: guidelineSelection,
+      image: imageSelection,
       componentOrigin: componentOriginSelection,
       componentTCenter: componentTCenterSelection,
     } = parseSelection(selection);
@@ -39,6 +40,7 @@ export class EditBehaviorFactory {
     this.components = unpackComponents(instance.components, relevantComponentIndices);
     this.anchors = unpackAnchors(instance.anchors, anchorSelection || []);
     this.guidelines = unpackGuidelines(instance.guidelines, guidelineSelection || []);
+    this.image = imageSelection ? instance.image : undefined;
     this.componentOriginIndices = componentOriginIndices || [];
     this.componentTCenterIndices = componentTCenterSelection || [];
     this.behaviors = {};
@@ -61,6 +63,7 @@ export class EditBehaviorFactory {
         this.components,
         this.anchors,
         this.guidelines,
+        this.image,
         this.componentOriginIndices,
         this.componentTCenterIndices,
         behaviorType,
@@ -78,6 +81,7 @@ class EditBehavior {
     components,
     anchors,
     guidelines,
+    image,
     componentOriginIndices,
     componentTCenterIndices,
     behavior,
@@ -151,12 +155,24 @@ class EditBehavior {
       guidelineRollbackChanges.push(guidelineRollback);
     }
 
+    const imageRollbackChanges = [];
+    this.imageEditFuncs = [];
+    if (image) {
+      const [editFunc, imageRollback] = makeImageTransformationEditFunc(
+        image,
+        this.roundFunc
+      );
+      this.imageEditFuncs.push(editFunc);
+      imageRollbackChanges.push(imageRollback);
+    }
+
     this.rollbackChange = makeRollbackChange(
       contours,
       participatingPointIndices,
       componentRollbackChanges,
       anchorRollbackChanges,
-      guidelineRollbackChanges
+      guidelineRollbackChanges,
+      imageRollbackChanges
     );
   }
 
@@ -179,7 +195,8 @@ class EditBehavior {
   makeChangeForTransformFunc(
     transformFunc,
     freeTransformFunc = null,
-    transformComponentFunc = null
+    transformComponentFunc = null,
+    transformImageFunc = null
   ) {
     if (this.fullComponentTransform && !transformComponentFunc) {
       throw Error(
@@ -191,6 +208,7 @@ class EditBehavior {
       free: freeTransformFunc || transformFunc,
       constrainDelta: this.constrainDelta,
       transformComponent: transformComponentFunc,
+      transformImage: transformImageFunc,
     };
     const pathChanges = this.pointEditFuncs
       ?.map((editFunc) => {
@@ -210,6 +228,9 @@ class EditBehavior {
     const guidelineChanges = this.guidelineEditFuncs?.map((editFunc) => {
       return editFunc(transform);
     });
+    const imageChanges = this.imageEditFuncs?.map((editFunc) => {
+      return editFunc(transform);
+    });
     const changes = [];
     if (pathChanges && pathChanges.length) {
       changes.push(consolidateChanges(pathChanges, ["path"]));
@@ -223,6 +244,9 @@ class EditBehavior {
     if (guidelineChanges && guidelineChanges.length) {
       changes.push(consolidateChanges(guidelineChanges, ["guidelines"]));
     }
+    if (imageChanges && imageChanges.length) {
+      changes.push(consolidateChanges(imageChanges, ["image"]));
+    }
     return consolidateChanges(changes);
   }
 }
@@ -232,7 +256,8 @@ function makeRollbackChange(
   participatingPointIndices,
   componentRollback,
   anchorRollback,
-  guidelineRollback
+  guidelineRollback,
+  imageRollbackChanges
 ) {
   const pointRollback = [];
   for (let i = 0; i < contours.length; i++) {
@@ -262,6 +287,9 @@ function makeRollbackChange(
   }
   if (guidelineRollback.length) {
     changes.push(consolidateChanges(guidelineRollback, ["guidelines"]));
+  }
+  if (imageRollbackChanges.length) {
+    changes.push(consolidateChanges(imageRollbackChanges, ["image"]));
   }
   return consolidateChanges(changes);
 }
@@ -297,6 +325,21 @@ function makeComponentOriginEditFunc(component, componentIndex, roundFunc) {
     },
     makeComponentOriginChange(componentIndex, origin.x, origin.y),
   ];
+}
+
+function makeImageTransformationEditFunc(image) {
+  const oldImage = copyImage(image);
+  return [
+    (transform) => {
+      const newImage = transform.transformImage(image, 0);
+      return makeImageChange(newImage, 0);
+    },
+    makeImageChange(oldImage, 0),
+  ];
+}
+
+function makeImageChange(image, imageIndex) {
+  return { f: "=", a: [imageIndex, image] };
 }
 
 function makeAnchorEditFunc(anchor, anchorIndex, roundFunc) {

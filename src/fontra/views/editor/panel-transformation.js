@@ -24,7 +24,7 @@ import {
   reversed,
   zip,
 } from "/core/utils.js";
-import { copyComponent } from "/core/var-glyph.js";
+import { copyComponent, copyImage } from "/core/var-glyph.js";
 import { VarPackedPath } from "/core/var-path.js";
 import { Form } from "/web-components/ui-form.js";
 
@@ -665,12 +665,19 @@ export default class TransformationPanel extends Panel {
       point: pointIndices,
       component: componentIndices,
       anchor: anchorIndices,
+      image: imageIndices,
     } = parseSelection(this.sceneController.selection);
 
     pointIndices = pointIndices || [];
     componentIndices = componentIndices || [];
     anchorIndices = anchorIndices || [];
-    if (!pointIndices.length && !componentIndices.length && !anchorIndices.length) {
+    imageIndices = imageIndices || [];
+    if (
+      !pointIndices.length &&
+      !componentIndices.length &&
+      !anchorIndices.length &&
+      !imageIndices.length
+    ) {
       return;
     }
 
@@ -720,10 +727,17 @@ export default class TransformationPanel extends Panel {
           return component;
         };
 
+        const imageTransformFunction = (image) => {
+          image = copyImage(image);
+          image.transformation = prependTransformToDecomposed(t, image.transformation);
+          return image;
+        };
+
         const editChange = editBehavior.makeChangeForTransformFunc(
           pointTransformFunction,
           null,
-          componentTransformFunction
+          componentTransformFunction,
+          imageTransformFunction
         );
         applyChange(layerGlyph, editChange);
         editChanges.push(consolidateChanges(editChange, changePath));
