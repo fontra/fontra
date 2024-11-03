@@ -71,31 +71,33 @@ export default class RelatedGlyphPanel extends Panel {
 
     this.accordion.items = [
       {
-        label: "Alternate glyphs",
+        label: translate("sidebar.related-glyphs.alternate-glyphs"),
         open: true,
         content: html.div({ class: "related-glyphs-accordion-item" }, []),
         getRelatedGlyphsFunc: getRelatedGlyphsByExtension,
       },
       {
-        label: "Components used by this glyph",
+        label: translate("sidebar.related-glyphs.components-used-by-this-glyph"),
         open: true,
         content: html.div({ class: "related-glyphs-accordion-item" }, []),
         getRelatedGlyphsFunc: getComponentGlyphs,
       },
       {
-        label: "Glyphs using this glyph as a component",
+        label: translate(
+          "sidebar.related-glyphs.glyphs-using-this-glyph-as-a-component"
+        ),
         open: true,
         content: html.div({ class: "related-glyphs-accordion-item" }, []),
         getRelatedGlyphsFunc: getUsedByGlyphs,
       },
       {
-        label: "Character decomposition",
+        label: translate("sidebar.related-glyphs.character-decomposition"),
         open: true,
         content: html.div({ class: "related-glyphs-accordion-item" }, []),
         getRelatedGlyphsFunc: getUnicodeDecomposed,
       },
       {
-        label: "Characters that decompose with this character",
+        label: translate("sidebar.related-glyphs.character-decompose-with-character"),
         open: true,
         content: html.div({ class: "related-glyphs-accordion-item" }, []),
         getRelatedGlyphsFunc: getUnicodeUsedBy,
@@ -106,7 +108,12 @@ export default class RelatedGlyphPanel extends Panel {
       {
         class: "sidebar-glyph-relationships",
       },
-      [html.div({ id: "related-glyphs-header" }, ["Related Glyphs"]), this.accordion]
+      [
+        html.div({ id: "related-glyphs-header" }, [
+          translate("sidebar.related-glyphs.related-glyphs"),
+        ]),
+        this.accordion,
+      ]
     );
   }
 
@@ -147,8 +154,10 @@ export default class RelatedGlyphPanel extends Panel {
             this.relatedGlyphsHeaderElement.appendChild(
               html.div({ class: "no-related-glyphs" }, [
                 glyphName
-                  ? "(No related glyphs or characters were found)"
-                  : "(No glyph selected)",
+                  ? translate(
+                      "sidebar.related-glyphs.no-related-glyphs-or-characters-were-found"
+                    )
+                  : translate("sidebar.related-glyphs.no-glyph-selected"),
               ])
             );
           }
@@ -166,7 +175,11 @@ export default class RelatedGlyphPanel extends Panel {
     element.innerHTML = "";
     let hideAccordionItem = true;
     if (glyphName) {
-      element.appendChild(html.span({ class: "placeholder-label" }, ["(loading)"]));
+      element.appendChild(
+        html.span({ class: "placeholder-label" }, [
+          translate("sidebar.related-glyphs.loading"),
+        ])
+      );
       const relatedGlyphs = await item.getRelatedGlyphsFunc(
         this.fontController,
         glyphName,
@@ -227,31 +240,35 @@ export default class RelatedGlyphPanel extends Panel {
 
     const items = [
       {
-        title: "Replace selected glyph",
+        title: translate("sidebar.related-glyphs.replace-selected-glyph"),
         callback: () => {
           this.insertGlyphIntoTextString(glyphCell, 0, true);
         },
       },
       {
-        title: "Insert after selected glyph",
+        title: translate("sidebar.related-glyphs.insert-after-selected-glyph"),
         callback: () => {
           this.insertGlyphIntoTextString(glyphCell, 1, false);
         },
       },
       {
-        title: "Insert after selected glyph and select",
+        title: translate(
+          "sidebar.related-glyphs.insert-after-selected-glyph-and-select"
+        ),
         callback: () => {
           this.insertGlyphIntoTextString(glyphCell, 1, true);
         },
       },
       {
-        title: "Insert before selected glyph",
+        title: translate("sidebar.related-glyphs.insert-before-selected-glyph"),
         callback: () => {
           this.insertGlyphIntoTextString(glyphCell, -1, false);
         },
       },
       {
-        title: "Insert before selected glyph and select",
+        title: translate(
+          "sidebar.related-glyphs.insert-before-selected-glyph-and-select"
+        ),
         callback: () => {
           this.insertGlyphIntoTextString(glyphCell, -1, true);
         },

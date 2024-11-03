@@ -182,6 +182,28 @@ export const strings = {
     "Füge eine oder mehrere .ttf-, .otf-, .woff- oder .woff2-Dateien in das unten stehende Feld ein",
   "sidebar.reference-font.language": "Sprache",
   "sidebar.related-glyphs": "Verwandte Glyphen & Zeichen",
+  "sidebar.related-glyphs.alternate-glyphs": "Alternative Glyphen",
+  "sidebar.related-glyphs.character-decompose-with-character":
+    "Zeichen, die mit diesem Zeichen zerlegt werden",
+  "sidebar.related-glyphs.character-decomposition": "Zeichen-Zerlegung",
+  "sidebar.related-glyphs.components-used-by-this-glyph":
+    "Komponenten, benutzt von diesem Glyphen",
+  "sidebar.related-glyphs.glyphs-using-this-glyph-as-a-component":
+    "Glyphen, die dieses Zeichen als Komponente nutzen",
+  "sidebar.related-glyphs.insert-after-selected-glyph":
+    "Nach ausgewähltem Glyphen einfügen",
+  "sidebar.related-glyphs.insert-after-selected-glyph-and-select":
+    "Nach ausgewähltem Glyphen einfügen und auswählen",
+  "sidebar.related-glyphs.insert-before-selected-glyph":
+    "Vor ausgewähltem Glyphen einfügen",
+  "sidebar.related-glyphs.insert-before-selected-glyph-and-select":
+    "Vor ausgewähltem Glyphen einfügen und auswählen",
+  "sidebar.related-glyphs.loading": "(Laden)",
+  "sidebar.related-glyphs.no-glyph-selected": "(keine Glyphe ausgewählt)",
+  "sidebar.related-glyphs.no-related-glyphs-or-characters-were-found":
+    "(keine verwandten Glyphen oder Zeichen wurden gefunden)",
+  "sidebar.related-glyphs.related-glyphs": "Verwandte Glyphen",
+  "sidebar.related-glyphs.replace-selected-glyph": "Ersetze ausgewählten Glyphen",
   "sidebar.related-glyphs.title": "Verwandte Glyphen & Zeichen für %0",
   "sidebar.selection-info": "Auswahl-Info",
   "sidebar.selection-info.advance-width": "Breite",

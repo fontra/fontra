@@ -183,6 +183,26 @@ export const strings = {
     "Drop één of meer .ttf, .otf, .woff of .woff2 bestanden in het veld hieronder",
   "sidebar.reference-font.language": "Taal",
   "sidebar.related-glyphs": "Gerelateerde glyphs & karakters",
+  "sidebar.related-glyphs.alternate-glyphs": "Alternate glyphs",
+  "sidebar.related-glyphs.character-decompose-with-character":
+    "Characters that decompose with this character",
+  "sidebar.related-glyphs.character-decomposition": "Character decomposition",
+  "sidebar.related-glyphs.components-used-by-this-glyph":
+    "Components used by this glyph",
+  "sidebar.related-glyphs.glyphs-using-this-glyph-as-a-component":
+    "Glyphs using this glyph as a component",
+  "sidebar.related-glyphs.insert-after-selected-glyph": "Insert after selected glyph",
+  "sidebar.related-glyphs.insert-after-selected-glyph-and-select":
+    "Insert after selected glyph and select",
+  "sidebar.related-glyphs.insert-before-selected-glyph": "Insert before selected glyph",
+  "sidebar.related-glyphs.insert-before-selected-glyph-and-select":
+    "Insert before selected glyph and select",
+  "sidebar.related-glyphs.loading": "(loading)",
+  "sidebar.related-glyphs.no-glyph-selected": "(No glyph selected)",
+  "sidebar.related-glyphs.no-related-glyphs-or-characters-were-found":
+    "(No related glyphs or characters were found)",
+  "sidebar.related-glyphs.related-glyphs": "Related Glyphs",
+  "sidebar.related-glyphs.replace-selected-glyph": "Replace selected glyph",
   "sidebar.related-glyphs.title": "Gerelateerde glyphs & karakters voor %0",
   "sidebar.selection-info": "Selecie informatie",
   "sidebar.selection-info.advance-width": "Zetbreedte",

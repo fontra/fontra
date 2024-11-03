@@ -185,6 +185,26 @@ export const strings = {
     "Déposer ci-dessous un ou plusieurs fichiers .ttf, .otf, .woff ou .woff2",
   "sidebar.reference-font.language": "Langues",
   "sidebar.related-glyphs": "Glyphes et caractères en lien",
+  "sidebar.related-glyphs.alternate-glyphs": "Alternate glyphs",
+  "sidebar.related-glyphs.character-decompose-with-character":
+    "Characters that decompose with this character",
+  "sidebar.related-glyphs.character-decomposition": "Character decomposition",
+  "sidebar.related-glyphs.components-used-by-this-glyph":
+    "Components used by this glyph",
+  "sidebar.related-glyphs.glyphs-using-this-glyph-as-a-component":
+    "Glyphs using this glyph as a component",
+  "sidebar.related-glyphs.insert-after-selected-glyph": "Insert after selected glyph",
+  "sidebar.related-glyphs.insert-after-selected-glyph-and-select":
+    "Insert after selected glyph and select",
+  "sidebar.related-glyphs.insert-before-selected-glyph": "Insert before selected glyph",
+  "sidebar.related-glyphs.insert-before-selected-glyph-and-select":
+    "Insert before selected glyph and select",
+  "sidebar.related-glyphs.loading": "(loading)",
+  "sidebar.related-glyphs.no-glyph-selected": "(No glyph selected)",
+  "sidebar.related-glyphs.no-related-glyphs-or-characters-were-found":
+    "(No related glyphs or characters were found)",
+  "sidebar.related-glyphs.related-glyphs": "Related Glyphs",
+  "sidebar.related-glyphs.replace-selected-glyph": "Replace selected glyph",
   "sidebar.related-glyphs.title": "Glyphes et caractères en lien pour %0",
   "sidebar.selection-info": "Information de la sélection",
   "sidebar.selection-info.advance-width": "Chasse",
