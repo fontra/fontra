@@ -73,7 +73,7 @@ export class ShortCutsPanel extends BaseInfoPanel {
       html.input({
         type: "button",
         style: `justify-self: start;`,
-        value: translate("application-settings.shortcuts.reset-all"),
+        value: translate("shortcuts.reset-all"),
         onclick: (event) => this.resetToDefault(),
       })
     );
@@ -82,7 +82,7 @@ export class ShortCutsPanel extends BaseInfoPanel {
       html.input({
         type: "button",
         style: `justify-self: start;`,
-        value: translate("application-settings.shortcuts.export"),
+        value: translate("shortcuts.export"),
         onclick: (event) => this.exportShortCuts(),
       })
     );
@@ -91,7 +91,7 @@ export class ShortCutsPanel extends BaseInfoPanel {
       html.input({
         type: "button",
         style: `justify-self: start;`,
-        value: translate("application-settings.shortcuts.import"),
+        value: translate("shortcuts.import"),
         onclick: (event) => this.importShortCuts(),
       })
     );
@@ -115,8 +115,8 @@ export class ShortCutsPanel extends BaseInfoPanel {
 
   async resetToDefault() {
     const result = await dialog(
-      translate("application-settings.shortcuts.dialog.reset-all.title"),
-      translate("application-settings.shortcuts.dialog.reset-all.content"),
+      translate("shortcuts.dialog.reset-all.title"),
+      translate("shortcuts.dialog.reset-all.content"),
       [
         { title: translate("dialog.cancel"), isCancelButton: true },
         { title: translate("dialog.okay"), isDefaultButton: true },
@@ -310,10 +310,7 @@ class ShortCutElement extends HTMLElement {
       }
     }
     if (warnings.length > 0) {
-      message(
-        translate("application-settings.shortcuts.dialog.warning.title"),
-        warnings.join("\n")
-      );
+      message(translate("shortcuts.dialog.warning.title"), warnings.join("\n"));
       return false;
     }
     setCustomShortCuts(this.actionIdentifier, newShortCutDefinitions);
@@ -459,7 +456,7 @@ class ShortCutElement extends HTMLElement {
         "class": "fontra-ui-shortcuts-panel-icon",
         "src": "/tabler-icons/x.svg",
         "onclick": (event) => this.deleteShortCut(id),
-        "data-tooltip": translate("application-settings.shortcuts.tooltip.clear"),
+        "data-tooltip": translate("shortcuts.tooltip.clear"),
         "data-tooltipposition": "top",
       })
     );
