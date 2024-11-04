@@ -97,10 +97,6 @@ export const strings = {
   "designspace-navigation.edit-all-compatible-sources": "Edit all compatible sources",
   "development-status-definitions.add": "add status definition %0",
   "development-status-definitions.button.new": "New status definition",
-  "development-status-definitions.default.label.ckecking": "Checking-%0",
-  "development-status-definitions.default.label.in-progress": "In progress",
-  "development-status-definitions.default.label.next-status": "Status definition %0",
-  "development-status-definitions.default.label.validated": "Validated",
   "development-status-definitions.dialog.cannot-edit-status-definition.title":
     "Can’t edit status definition value",
   "development-status-definitions.label.is-default": "Is Default",

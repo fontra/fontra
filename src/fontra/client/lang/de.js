@@ -98,10 +98,6 @@ export const strings = {
     "Bearbeite alle kompatiblen Sourcen",
   "development-status-definitions.add": "Status-Definition %0 hinzufügen",
   "development-status-definitions.button.new": "Neue Status-Definition",
-  "development-status-definitions.default.label.ckecking": "Check-%0",
-  "development-status-definitions.default.label.in-progress": "In Bearbeitung",
-  "development-status-definitions.default.label.next-status": "Status-Definition %0",
-  "development-status-definitions.default.label.validated": "Geprüft",
   "development-status-definitions.dialog.cannot-edit-status-definition.title":
     "Status-Definition kann nicht bearbeitet werden",
   "development-status-definitions.label.is-default": "Ist Default",
