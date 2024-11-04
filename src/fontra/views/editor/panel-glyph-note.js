@@ -1,5 +1,6 @@
 import Panel from "./panel.js";
 import * as html from "/core/html-utils.js";
+import { translate } from "/core/localization.js";
 import { throttleCalls } from "/core/utils.js";
 
 export default class GlyphNotePanel extends Panel {
@@ -68,7 +69,7 @@ export default class GlyphNotePanel extends Panel {
       },
       [
         html.div({ class: "glyph-note-header", id: "glyph-note-header" }, [
-          "Glyph note",
+          translate("sidebar.glyph-note"),
         ]),
         html.createDomElement("textarea", {
           rows: 1,
@@ -110,8 +111,10 @@ export default class GlyphNotePanel extends Panel {
     this._selectedGlyphName = varGlyph?.name;
 
     this.glyphNoteHeaderElement.innerHTML = varGlyph
-      ? `<b>Glyph note for ${varGlyph.name}</b>`
-      : `<b>Glyph note</b> (no glyph selected)`;
+      ? `<b>${translate("sidebar.glyph-note.glyph-note-for-glyph", varGlyph.name)}</b>`
+      : `<b>${translate("sidebar.glyph-note")}</b> ${translate(
+          "sidebar.glyph-note.no-glyph-selected"
+        )}`;
     const glyphNote = varGlyph?.customData["fontra.glyph.note"] ?? "";
     this.glyphNoteElement.value = glyphNote;
     this.glyphNoteElement.disabled = !varGlyph;
@@ -140,9 +143,9 @@ async function saveGlyphNote(glyphName, sceneController, newNote) {
     glyph.customData["fontra.glyph.note"] = newNote;
     return oldNote
       ? newNote
-        ? "edit glyph note"
-        : "delete glyph note"
-      : "add glyph note";
+        ? translate("sidebar.glyph-note.undo.edit")
+        : translate("sidebar.glyph-note.undo.delete")
+      : translate("sidebar.glyph-note.undo.add");
   });
 }
 
