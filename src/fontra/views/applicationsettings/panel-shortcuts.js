@@ -73,7 +73,7 @@ export class ShortCutsPanel extends BaseInfoPanel {
       html.input({
         type: "button",
         style: `justify-self: start;`,
-        value: "Reset all shortcuts",
+        value: translate("application-settings.shortcuts.reset-all"),
         onclick: (event) => this.resetToDefault(),
       })
     );
@@ -82,7 +82,7 @@ export class ShortCutsPanel extends BaseInfoPanel {
       html.input({
         type: "button",
         style: `justify-self: start;`,
-        value: "Export shortcuts",
+        value: translate("application-settings.shortcuts.export"),
         onclick: (event) => this.exportShortCuts(),
       })
     );
@@ -91,7 +91,7 @@ export class ShortCutsPanel extends BaseInfoPanel {
       html.input({
         type: "button",
         style: `justify-self: start;`,
-        value: "Import shortcuts",
+        value: translate("application-settings.shortcuts.import"),
         onclick: (event) => this.importShortCuts(),
       })
     );
@@ -115,11 +115,11 @@ export class ShortCutsPanel extends BaseInfoPanel {
 
   async resetToDefault() {
     const result = await dialog(
-      "Reset to default",
-      "Are you sure you want to reset all shortcuts to their default settings?",
+      translate("application-settings.shortcuts.dialog.reset-all.title"),
+      translate("application-settings.shortcuts.dialog.reset-all.content"),
       [
         { title: translate("dialog.cancel"), isCancelButton: true },
-        { title: "Okay", isDefaultButton: true },
+        { title: translate("dialog.okay"), isDefaultButton: true },
       ]
     );
     if (!result) {
@@ -206,7 +206,12 @@ function validateShortCutDefinition(key, definition) {
     }
     for (const otherDefinition of getShortCuts(otherKey)) {
       if (isShortCutDefinitionEqual(otherDefinition, definition)) {
-        warnings.push(`⚠️ ShortCut exists for "${getActionTitle(otherKey)}"`);
+        warnings.push(
+          `⚠️ ${translate(
+            "application-settings.shortcuts.warning.exists",
+            getActionTitle(otherKey)
+          )}`
+        );
         break;
       }
     }
@@ -306,9 +311,7 @@ class ShortCutElement extends HTMLElement {
     }
     if (warnings.length > 0) {
       message(
-        `Duplicate ShortCut "${getShortCutRepresentation(
-          newShortCutDefinitions[0]
-        )}" for "${this.shortCutLabel}":`,
+        translate("application-settings.shortcuts.dialog.warning.title"),
         warnings.join("\n")
       );
       return false;
@@ -428,7 +431,9 @@ class ShortCutElement extends HTMLElement {
         "onkeydown": (event) => this.recordShortCut(id, event),
         "onkeyup": (event) => this.recordShortCutKeyUp(id, event),
         "onblur": (event) => this.handleOnBlur(id),
-        "data-tooltip": "Click and record a shortcut",
+        "data-tooltip": translate(
+          "application-settings.shortcuts.tooltip.click-and-record"
+        ),
         "data-tooltipposition": "top",
       })
     );
@@ -442,7 +447,9 @@ class ShortCutElement extends HTMLElement {
         "class": "fontra-ui-shortcuts-panel-icon",
         "src": "/tabler-icons/refresh.svg",
         "onclick": (event) => this.resetShortCut(id),
-        "data-tooltip": "Reset to default",
+        "data-tooltip": translate(
+          "application-settings.shortcuts.tooltip.reset-to-default"
+        ),
         "data-tooltipposition": "top",
       })
     );
@@ -452,7 +459,7 @@ class ShortCutElement extends HTMLElement {
         "class": "fontra-ui-shortcuts-panel-icon",
         "src": "/tabler-icons/x.svg",
         "onclick": (event) => this.deleteShortCut(id),
-        "data-tooltip": "Clear",
+        "data-tooltip": translate("application-settings.shortcuts.tooltip.clear"),
         "data-tooltipposition": "top",
       })
     );

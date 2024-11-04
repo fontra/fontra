@@ -45,7 +45,21 @@ export const strings = {
   "application-settings.editor-behavior.title": "Editor-Verhalten",
   "application-settings.plugins-manager.title": "Plugin Manager",
   "application-settings.server-info.title": "Server Info",
+  "application-settings.shortcuts.dialog.reset-all.content":
+    "Bist du dir sicher, dass du alle Tastaturkurzbefehle zurücksetzen willst zu den Default-Einstellungen?",
+  "application-settings.shortcuts.dialog.reset-all.title": "Zurücksetzen zum 'Default'",
+  "application-settings.shortcuts.dialog.warning.title": "Tastaturkurzbefehl-Warnung",
+  "application-settings.shortcuts.export": "Tastaturkurzbefehle exportieren",
+  "application-settings.shortcuts.import": "Tastaturkurzbefehle importieren",
+  "application-settings.shortcuts.reset-all": "Alle Tastaturkurzbefehle zurücksetzen",
   "application-settings.shortcuts.title": "Tastaturkurzbefehle",
+  "application-settings.shortcuts.tooltip.clear": "Entfernen",
+  "application-settings.shortcuts.tooltip.click-and-record":
+    "Klicke und nehme ein Tastaturkurzbefehl auf",
+  "application-settings.shortcuts.tooltip.reset-to-default":
+    "Zurücksetzen zum 'Default'",
+  "application-settings.shortcuts.warning.exists":
+    "Tastaturkurzbefehl existiert bereits für: %0",
   "application-settings.theme-settings.title": "Design-Einstellungen",
   "axes.add": "Neue Achse hinzufügen",
   "axes.axis-values": "Achsen Werte",
@@ -105,6 +119,7 @@ export const strings = {
   "dialog.create-new-glyph.body.2": ' für das Zeichen "%0" (%1)',
   "dialog.create-new-glyph.title": 'Einen neuen Glyphen "%0" erstellen?',
   "dialog.glyphs.search": "Glyphen suchen",
+  "dialog.okay": "Okay",
   "dialog.replace": "Ersetzen",
   "editor.hand-tool": "Hand Werkzeug",
   "editor.knife-tool": "Messer Werkzeug",
