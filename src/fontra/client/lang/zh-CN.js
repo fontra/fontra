@@ -144,6 +144,7 @@ export const strings = {
   "font-info.sampletext": "示例文本",
   "font-info.title": "字体信息",
   "font-info.trademark": "商标",
+  "font-info.upm": "Units Per Em",
   "font-info.vendorid": "供应商标识符",
   "font-info.version.major": "主要版本号",
   "font-info.version.minor": "次要版本号",

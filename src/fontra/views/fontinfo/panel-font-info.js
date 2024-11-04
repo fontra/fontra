@@ -82,7 +82,7 @@ export class FontInfoPanel extends BaseInfoPanel {
     formContents.push({
       type: "edit-number",
       key: JSON.stringify(["unitsPerEm"]),
-      label: "Units Per Em", // TODO: translation
+      label: translate("font-info.upm"),
       value: this.fontController.unitsPerEm,
       minValue: 1,
       integer: true,

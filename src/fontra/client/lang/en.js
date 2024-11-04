@@ -149,6 +149,7 @@ export const strings = {
   "font-info.sampletext": "Sample text",
   "font-info.title": "Font Info",
   "font-info.trademark": "Trademark",
+  "font-info.upm": "Units Per Em",
   "font-info.vendorid": "Vendor ID",
   "font-info.version.major": "Version Major",
   "font-info.version.minor": "Version Minor",
