@@ -126,6 +126,7 @@ export const strings = {
   "editor.pen-tool-quad": "Outil de dessin (Quadratique)",
   "editor.pointer-tool": "Outil de sélection",
   "editor.pointer-tool-scale": "Outil de sélection (transformation à l'échelle)",
+  "editor.pointer-tools": "Pointer Tools",
   "editor.power-ruler-tool": "Outil Power Ruler",
   "editor.shape-tool": "Outil de forme",
   "editor.shape-tool-ellipse": "Outil ellipse",

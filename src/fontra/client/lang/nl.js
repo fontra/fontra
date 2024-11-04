@@ -125,6 +125,7 @@ export const strings = {
   "editor.pen-tool-quad": "Pen gereedschap (quadratisch)",
   "editor.pointer-tool": "Pointer gereedschap",
   "editor.pointer-tool-scale": "Pointer gereedschap (schalend edit gedrag)",
+  "editor.pointer-tools": "Pointer Tools",
   "editor.power-ruler-tool": "Power Ruler gereedschap",
   "editor.shape-tool": "Vorm gereedschap",
   "editor.shape-tool-ellipse": "Ellips gereedschap",

@@ -124,6 +124,7 @@ export const strings = {
   "editor.pen-tool-quad": "钢笔工具 (quadratic)",
   "editor.pointer-tool": "指针工具",
   "editor.pointer-tool-scale": "指针工具 (Scaling edit tool behavior)",
+  "editor.pointer-tools": "Pointer Tools",
   "editor.power-ruler-tool": "测量尺工具",
   "editor.shape-tool": "图形工具",
   "editor.shape-tool-ellipse": "椭圆工具",
