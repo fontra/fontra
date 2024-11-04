@@ -25,7 +25,7 @@ import "/third-party/lib-font/unbrotli.js";
 import { Font } from "/third-party/lib-font.js";
 
 import { registerVisualizationLayerDefinition } from "./visualization-layer-definitions.js";
-import { translate } from "/core/localization.js";
+import { translate, translatePlural } from "/core/localization.js";
 
 let referenceFontModel;
 
@@ -489,16 +489,16 @@ export default class ReferenceFontPanel extends Panel {
       });
 
     if (fontItemsInvalid.length) {
-      const dialogTitle = `The following item${
-        // TODO: translation
-        fontItemsInvalid.length > 1 ? "s" : ""
-      } can't be used as a reference font:`; // TODO: translation
+      const dialogTitle = translatePlural(
+        "sidebar.reference-font.dialog.title",
+        fontItemsInvalid.length
+      );
       const dialogMessage = fontItemsInvalid
         .map((file) => {
           return `- ${file.name}`;
         })
         .join("\n");
-      dialog(dialogTitle, dialogMessage, [{ title: "Okay" }], 5000); // TODO: translation
+      dialog(dialogTitle, dialogMessage, [{ title: translate("dialog.okay") }], 5000);
     }
 
     const newSelectedItemIndex = this.filesUIList.items.length;
@@ -514,7 +514,10 @@ export default class ReferenceFontPanel extends Panel {
         writtenFontItems.push(fontItem);
       }
     } catch (error) {
-      message("Could not store some reference fonts", error.toString()); // TODO: translation
+      message(
+        translate("sidebar.reference-font.warning.could-not-store"),
+        error.toString()
+      );
     }
 
     // Only notify the list controller *after* the files have been written,
@@ -658,7 +661,7 @@ export default class ReferenceFontPanel extends Panel {
     const columnDescriptions = [
       {
         key: "uplodadedFileName",
-        title: "file name", // TODO: translation
+        title: translate("sidebar.reference-font.file-name"),
       },
     ];
     this.filesUIList = new UIList();

@@ -217,9 +217,16 @@ export const strings = {
   "sidebar.glyphs.search": "搜索字形",
   "sidebar.reference-font": "参考字体",
   "sidebar.reference-font.custom-character": "自定义字符",
+  "sidebar.reference-font.dialog.title":
+    " The following item can't be used as a reference font:",
+  "sidebar.reference-font.dialog.title.plural":
+    " The following items can't be used as a reference font:",
+  "sidebar.reference-font.file-name": "file name",
   "sidebar.reference-font.info":
     "将一个或多个.ttf、.otf、.woff或.woff2字体文件拖放到下面的方框内",
   "sidebar.reference-font.language": "语言",
+  "sidebar.reference-font.warning.could-not-store":
+    "Could not store some reference fonts",
   "sidebar.related-glyphs": "相关字形与字符",
   "sidebar.related-glyphs.alternate-glyphs": "备用字形",
   "sidebar.related-glyphs.character-decompose-with-character": "可释放为该字符的字符",

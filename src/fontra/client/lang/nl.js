@@ -227,9 +227,16 @@ export const strings = {
   "sidebar.glyphs.search": "Zoek glyphs",
   "sidebar.reference-font": "Referentiefont",
   "sidebar.reference-font.custom-character": "Custom karakter",
+  "sidebar.reference-font.dialog.title":
+    " The following item can't be used as a reference font:",
+  "sidebar.reference-font.dialog.title.plural":
+    " The following items can't be used as a reference font:",
+  "sidebar.reference-font.file-name": "file name",
   "sidebar.reference-font.info":
     "Drop één of meer .ttf, .otf, .woff of .woff2 bestanden in het veld hieronder",
   "sidebar.reference-font.language": "Taal",
+  "sidebar.reference-font.warning.could-not-store":
+    "Could not store some reference fonts",
   "sidebar.related-glyphs": "Gerelateerde glyphs & karakters",
   "sidebar.related-glyphs.alternate-glyphs": "Alternate glyphs",
   "sidebar.related-glyphs.character-decompose-with-character":

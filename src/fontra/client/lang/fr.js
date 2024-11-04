@@ -229,9 +229,16 @@ export const strings = {
   "sidebar.glyphs.search": "Chercher des glyphes",
   "sidebar.reference-font": "Fonte de référence",
   "sidebar.reference-font.custom-character": "Caractère personnalisé",
+  "sidebar.reference-font.dialog.title":
+    " The following item can't be used as a reference font:",
+  "sidebar.reference-font.dialog.title.plural":
+    " The following items can't be used as a reference font:",
+  "sidebar.reference-font.file-name": "file name",
   "sidebar.reference-font.info":
     "Déposer ci-dessous un ou plusieurs fichiers .ttf, .otf, .woff ou .woff2",
   "sidebar.reference-font.language": "Langues",
+  "sidebar.reference-font.warning.could-not-store":
+    "Could not store some reference fonts",
   "sidebar.related-glyphs": "Glyphes et caractères en lien",
   "sidebar.related-glyphs.alternate-glyphs": "Alternate glyphs",
   "sidebar.related-glyphs.character-decompose-with-character":
