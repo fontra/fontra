@@ -96,7 +96,30 @@ export const strings = {
   "cross-axis-mapping.undo.reorder": "reorder cross-axis mapping",
   "designspace-navigation.edit-all-compatible-sources":
     "Éditer toutes les sources compatibles",
+  "development-status-definitions.add": "add status definition %0",
+  "development-status-definitions.button.new": "New status definition",
+  "development-status-definitions.default.label.ckecking": "Checking-%0",
+  "development-status-definitions.default.label.in-progress": "In progress",
+  "development-status-definitions.default.label.next-status": "Status definition %0",
+  "development-status-definitions.default.label.validated": "Validated",
+  "development-status-definitions.dialog.cannot-edit-status-definition.title":
+    "Can’t edit status definition value",
+  "development-status-definitions.label.is-default": "Is Default",
   "development-status-definitions.title": "Définition des statuts",
+  "development-status-definitions.tooltip.color":
+    "Specify the color for this status definition",
+  "development-status-definitions.tooltip.delete": "Delete status definition",
+  "development-status-definitions.tooltip.is-default":
+    "If checked, this status will be used as a fallback when a source status is not set",
+  "development-status-definitions.undo.change": "change status definition value",
+  "development-status-definitions.undo.change-color": "change status definition color",
+  "development-status-definitions.undo.change-is-default":
+    "change status definition isDefault",
+  "development-status-definitions.undo.delete": "delete status definition %0",
+  "development-status-definitions.warning.entry-exists":
+    "%0 exists already, please use a different value.",
+  "development-status-definitions.warning.positive-number":
+    "Value must be a positive number.",
   "dialog.add": "Ajouter",
   "dialog.cancel": "Annuler",
   "dialog.create": "Créer",

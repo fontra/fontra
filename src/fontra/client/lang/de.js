@@ -96,7 +96,31 @@ export const strings = {
   "cross-axis-mapping.undo.reorder": "achsübergreifendes Mapping umsortieren",
   "designspace-navigation.edit-all-compatible-sources":
     "Bearbeite alle kompatiblen Sourcen",
-  "development-status-definitions.title": "Status Definitionen",
+  "development-status-definitions.add": "Status-Definition %0 hinzufügen",
+  "development-status-definitions.button.new": "Neue Status-Definition",
+  "development-status-definitions.default.label.ckecking": "Check-%0",
+  "development-status-definitions.default.label.in-progress": "In Bearbeitung",
+  "development-status-definitions.default.label.next-status": "Status-Definition %0",
+  "development-status-definitions.default.label.validated": "Geprüft",
+  "development-status-definitions.dialog.cannot-edit-status-definition.title":
+    "Status-Definition kann nicht bearbeitet werden",
+  "development-status-definitions.label.is-default": "Ist Default",
+  "development-status-definitions.title": "Status-Definitionen",
+  "development-status-definitions.tooltip.color":
+    "Definiere die Farbe für die Status-Definition",
+  "development-status-definitions.tooltip.delete": "Status-Definition entfernen",
+  "development-status-definitions.tooltip.is-default":
+    "Wenn ausgewählt, wird diese Status-Definition als Default benutzt",
+  "development-status-definitions.undo.change": "Wert ändern von Status-Definition",
+  "development-status-definitions.undo.change-color":
+    "Farbe ändern von Status-Definition",
+  "development-status-definitions.undo.change-is-default":
+    "Ist Default' ändern von Status-Definition",
+  "development-status-definitions.undo.delete": "Status-Definition %0 entfernen",
+  "development-status-definitions.warning.entry-exists":
+    "%0 existiert bereits, bitte verwende einen anderen Wert.",
+  "development-status-definitions.warning.positive-number":
+    "Wert muss eine positive Nummer sein.",
   "dialog.add": "Hinzufügen",
   "dialog.cancel": "Abbrechen",
   "dialog.create": "Erstellen",

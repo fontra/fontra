@@ -3,6 +3,7 @@ import * as html from "../core/html-utils.js";
 import { addStyleSheet } from "../core/html-utils.js";
 import { enumerate, hexToRgba, range, rgbaToHex } from "../core/utils.js";
 import { BaseInfoPanel } from "./panel-base.js";
+import { translate } from "/core/localization.js";
 import { message } from "/web-components/modal-dialog.js";
 
 const defaultStatusFieldDefinitions = {
@@ -10,27 +11,27 @@ const defaultStatusFieldDefinitions = {
     {
       color: [1, 0, 0, 1],
       isDefault: true,
-      label: "In progress",
+      labelKey: "development-status-definitions.default.label.in-progress",
       value: 0,
     },
     {
       color: [1, 0.5, 0, 1],
-      label: "Checking-1",
+      labelKey: "development-status-definitions.default.label.ckecking",
       value: 1,
     },
     {
       color: [1, 1, 0, 1],
-      label: "Checking-2",
+      labelKey: "development-status-definitions.default.label.ckecking",
       value: 2,
     },
     {
       color: [0, 0.5, 1, 1],
-      label: "Checking-3",
+      labelKey: "development-status-definitions.default.label.ckecking",
       value: 3,
     },
     {
       color: [0, 1, 0.5, 1],
-      label: "Validated",
+      labelKey: "development-status-definitions.default.label.validated",
       value: 4,
     },
   ],
@@ -73,8 +74,8 @@ export class DevelopmentStatusDefinitionsPanel extends BaseInfoPanel {
     this.panelElement.appendChild(
       html.input({
         type: "button",
-        style: `justify-self: start;`,
-        value: "New status definition",
+        style: "justify-self: start;",
+        value: translate("development-status-definitions.button.new"),
         onclick: (event) => this.newStatusDefinition(),
       })
     );
@@ -98,15 +99,24 @@ export class DevelopmentStatusDefinitionsPanel extends BaseInfoPanel {
       (statusDef) => statusDef.value == nextStatusValue
     );
 
-    if (!statusDef) {
+    if (statusDef) {
+      // get translation via the given label key
+      statusDef.label = translate(statusDef.labelKey, statusDef.value);
+    } else {
       statusDef = {
         color: [1, 0, 0, 1],
-        label: `Status definition ${nextStatusValue}`,
+        label: translate(
+          "development-status-definitions.default.label.next-status",
+          nextStatusValue
+        ),
         value: nextStatusValue,
       };
     }
 
-    const undoLabel = `add status definition ${statusDef.value} '${statusDef.label}'`;
+    const undoLabel = translate(
+      "development-status-definitions.add",
+      `${statusDef.value} '${statusDef.label}'`
+    );
     const root = { customData: this.fontController.customData };
     const changes = recordChanges(root, (root) => {
       if (!statusFieldDefinitions) {
@@ -186,24 +196,35 @@ class StatusDefinitionBox extends HTMLElement {
     const statusDefinitions =
       this.fontController.customData["fontra.sourceStatusFieldDefinitions"];
     if (statusDefinitions.some((statusDef) => statusDef.value == statusDefValue)) {
-      errorMessage = `“${statusDefValue}” exists already, please use a different value.`;
+      errorMessage = translate(
+        "development-status-definitions.warning.entry-exists",
+        statusDefValue
+      );
     }
 
     if (!Number.isInteger(statusDefValue) || statusDefValue < 0) {
-      errorMessage = "Value must be a positive number.";
+      errorMessage = translate(
+        "development-status-definitions.warning.positive-number"
+      );
     }
 
     if (errorMessage) {
-      message(`Can’t edit status definition value`, errorMessage);
+      message(
+        translate(
+          "development-status-definitions.dialog.cannot-edit-status-definition.title"
+        ),
+        errorMessage
+      );
       return false;
     }
     return true;
   }
 
-  replaceStatusDef(newStatusDef, undoLabel, statusIndex = this.statusIndex) {
+  replaceStatusDef(newStatusDef) {
+    const undoLabel = translate("development-status-definitions.undo.change-color");
     const root = { customData: this.fontController.customData };
     const changes = recordChanges(root, (root) => {
-      root.customData["fontra.sourceStatusFieldDefinitions"][statusIndex] =
+      root.customData["fontra.sourceStatusFieldDefinitions"][this.statusIndex] =
         newStatusDef;
     });
     if (changes.hasChange) {
@@ -213,7 +234,10 @@ class StatusDefinitionBox extends HTMLElement {
   }
 
   deleteStatusDef(statusIndex) {
-    const undoLabel = `delete status definition '${this.statusDef.name}'`;
+    const undoLabel = translate(
+      "development-status-definitions.undo.delete",
+      `'${this.statusDef.name}'`
+    );
     const root = { customData: this.fontController.customData };
     const changes = recordChanges(root, (root) => {
       root.customData["fontra.sourceStatusFieldDefinitions"].splice(statusIndex, 1);
@@ -228,7 +252,9 @@ class StatusDefinitionBox extends HTMLElement {
   }
 
   changeStatusDefIsDefault(event) {
-    const undoLabel = `change status definition isDefault`;
+    const undoLabel = translate(
+      "development-status-definitions.undo.change-is-default"
+    );
     const statusDefinitions =
       this.fontController.customData["fontra.sourceStatusFieldDefinitions"];
 
@@ -253,7 +279,7 @@ class StatusDefinitionBox extends HTMLElement {
   }
 
   changeStatusDefValue(value) {
-    const undoLabel = `change status definition value`;
+    const undoLabel = translate("development-status-definitions.undo.change");
     let statusDefinitions =
       this.fontController.customData["fontra.sourceStatusFieldDefinitions"];
 
@@ -309,9 +335,9 @@ class StatusDefinitionBox extends HTMLElement {
             ...statusDef,
             color: hexToRgba(event.target.value),
           };
-          this.replaceStatusDef(updatedStatusDef, "change status definition color");
+          this.replaceStatusDef(updatedStatusDef);
         },
-        "data-tooltip": "Specify the color for this status definition",
+        "data-tooltip": translate("development-status-definitions.tooltip.color"),
         "data-tooltipposition": "top",
       })
     );
@@ -325,7 +351,7 @@ class StatusDefinitionBox extends HTMLElement {
             ...statusDef,
             label: event.target.value,
           };
-          this.replaceStatusDef(updatedStatusDef, "change status definition label");
+          this.replaceStatusDef(updatedStatusDef);
         },
       })
     );
@@ -335,8 +361,9 @@ class StatusDefinitionBox extends HTMLElement {
       html.div(
         {
           "style": "margin: auto;",
-          "data-tooltip":
-            "If checked, this status will be used as a fallback when a source status is not set",
+          "data-tooltip": translate(
+            "development-status-definitions.tooltip.is-default"
+          ),
           "data-tooltipposition": "top",
         },
         [
@@ -351,7 +378,7 @@ class StatusDefinitionBox extends HTMLElement {
               for: checkBoxIdentifier,
               style: "margin: auto;",
             },
-            ["Is Default"]
+            [translate("development-status-definitions.label.is-default")]
           ),
         ]
       )
@@ -362,7 +389,7 @@ class StatusDefinitionBox extends HTMLElement {
         "class": "fontra-ui-font-info-status-definitions-panel-status-def-box-delete",
         "src": "/tabler-icons/trash.svg",
         "onclick": (event) => this.deleteStatusDef(this.statusIndex),
-        "data-tooltip": "Delete status definition",
+        "data-tooltip": translate("development-status-definitions.tooltip.delete"),
         "data-tooltipposition": "left",
       })
     );
