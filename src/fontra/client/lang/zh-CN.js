@@ -253,6 +253,7 @@ export const strings = {
   "sidebar.selection-transformation.align.right": "右对齐",
   "sidebar.selection-transformation.align.top": "顶部对齐",
   "sidebar.selection-transformation.distribute": "分布部件",
+  "sidebar.selection-transformation.distribute.distance-in-units": "Distance in units",
   "sidebar.selection-transformation.distribute.horizontally": "水平分布",
   "sidebar.selection-transformation.distribute.vertically": "垂直分布",
   "sidebar.selection-transformation.flip": "翻转",

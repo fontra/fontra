@@ -266,6 +266,7 @@ export const strings = {
   "sidebar.selection-transformation.align.right": "Rechts uitlijnen",
   "sidebar.selection-transformation.align.top": "Boven uitlijnen",
   "sidebar.selection-transformation.distribute": "Objecten verdelen",
+  "sidebar.selection-transformation.distribute.distance-in-units": "Distance in units",
   "sidebar.selection-transformation.distribute.horizontally": "Horizontaal verdelen",
   "sidebar.selection-transformation.distribute.vertically": "Verticaal verdelen",
   "sidebar.selection-transformation.flip": "Omdraaien",

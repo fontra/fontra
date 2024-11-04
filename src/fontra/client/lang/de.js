@@ -267,6 +267,7 @@ export const strings = {
   "sidebar.selection-transformation.align.right": "Rechts ausrichten",
   "sidebar.selection-transformation.align.top": "Oben ausrichten",
   "sidebar.selection-transformation.distribute": "Objekte verteilen",
+  "sidebar.selection-transformation.distribute.distance-in-units": "Abstand in Units",
   "sidebar.selection-transformation.distribute.horizontally": "Horizontal verteilen",
   "sidebar.selection-transformation.distribute.vertically": "Vertikal verteilen",
   "sidebar.selection-transformation.flip": "Spiegeln",

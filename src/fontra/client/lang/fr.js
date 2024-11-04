@@ -268,6 +268,7 @@ export const strings = {
   "sidebar.selection-transformation.align.right": "Aligner à droite",
   "sidebar.selection-transformation.align.top": "Aligner en haut",
   "sidebar.selection-transformation.distribute": "Distribuer les objets",
+  "sidebar.selection-transformation.distribute.distance-in-units": "Distance in units",
   "sidebar.selection-transformation.distribute.horizontally":
     "Distribuer horizontalement",
   "sidebar.selection-transformation.distribute.vertically": "Distribuer verticalement",
