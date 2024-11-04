@@ -1,6 +1,7 @@
 import { recordChanges } from "../core/change-recorder.js";
 import * as html from "../core/html-utils.js";
 import { addStyleSheet } from "../core/html-utils.js";
+import { translate } from "../core/localization.js";
 import { ObservableController } from "../core/observable-object.js";
 import {
   OptionalNumberFormatter,
@@ -75,7 +76,7 @@ export class SourcesPanel extends BaseInfoPanel {
       html.input({
         type: "button",
         style: `justify-self: start;`,
-        value: "New font source...",
+        value: translate("sources.button.new-source"),
         onclick: (event) => this.newSource(),
       })
     );
@@ -113,7 +114,7 @@ export class SourcesPanel extends BaseInfoPanel {
       const warnings = [];
       const editedSourceName = nameController.model.sourceName;
       if (!editedSourceName.length || !editedSourceName.trim()) {
-        warnings.push("⚠️ The source name must not be empty");
+        warnings.push(`⚠️ ${translate("sources.warning.empty-source-name")}`);
       }
       if (
         Object.keys(sources)
@@ -124,13 +125,13 @@ export class SourcesPanel extends BaseInfoPanel {
           })
           .includes(true)
       ) {
-        warnings.push("⚠️ The source name should be unique");
+        warnings.push(`⚠️ ${translate("sources.warning.unique-source-name")}`);
       }
       const locStr = locationToString(
         makeSparseLocation(locationController.model, locationAxes)
       );
       if (sourceLocations.has(locStr)) {
-        warnings.push("⚠️ The source location must be unique");
+        warnings.push(`⚠️ ${translate("sources.warning.unique-location")}`);
       }
       warningElement.innerText = warnings.length ? warnings.join("\n") : "";
       dialog.defaultButton.classList.toggle("disabled", warnings.length);
@@ -165,10 +166,14 @@ export class SourcesPanel extends BaseInfoPanel {
 
     const disable = nameController.model.sourceName ? false : true;
 
-    const dialog = await dialogSetup("Add font source", null, [
-      { title: "Cancel", isCancelButton: true },
-      { title: "Add", isDefaultButton: true, disabled: disable },
-    ]);
+    const dialog = await dialogSetup(
+      translate("sources.dialog.add-source.title"),
+      null,
+      [
+        { title: translate("dialog.cancel"), isCancelButton: true },
+        { title: translate("dialog.add"), isDefaultButton: true, disabled: disable },
+      ]
+    );
     dialog.setContent(contentElement);
 
     setTimeout(
@@ -219,10 +224,10 @@ export class SourcesPanel extends BaseInfoPanel {
     const sourceNames = Object.keys(sources).map((sourceIdentifier) => {
       return sources[sourceIdentifier].name;
     });
-    let sourceName = "Untitled source";
+    let sourceName = translate("sources.untitled-source");
     let i = 1;
     while (sourceNames.includes(sourceName)) {
-      sourceName = `Untitled source ${i}`;
+      sourceName = `${translate("sources.untitled-source")} ${i}`;
       i++;
     }
     return sourceName;
@@ -240,7 +245,12 @@ export class SourcesPanel extends BaseInfoPanel {
     locationElement.controller = locationController;
 
     const containerContent = [
-      ...labeledTextInput("Source name:", nameController, "sourceName", {}),
+      ...labeledTextInput(
+        translate("sources.dialog.add-source.label.source-name"),
+        nameController,
+        "sourceName",
+        {}
+      ),
       html.br(),
       locationElement,
     ];
@@ -418,14 +428,16 @@ class SourceBox extends HTMLElement {
       }
 
       if (existsAlready) {
-        errorMessage = `${key}${valueKey ? " " + valueKey : ""}: “${thisSourceValue}”
-          exists already, please use a different value.`;
+        const valueString = `${key}${
+          valueKey ? " " + valueKey : ""
+        }: “${thisSourceValue}”`;
+        errorMessage = translate("sources.warning.entry-exists", valueString);
         break;
       }
     }
 
     if (errorMessage) {
-      message(`Can’t edit font source`, errorMessage);
+      message(translate("sources.dialog.cannot-edit-source.title"), errorMessage);
       return false;
     }
     return true;
@@ -442,7 +454,7 @@ class SourceBox extends HTMLElement {
   }
 
   deleteSource() {
-    const undoLabel = `delete source '${this.source.name}'`;
+    const undoLabel = translate("sources.undo.delete", this.source.name);
     const root = { sources: this.sources };
     const changes = recordChanges(root, (root) => {
       delete root.sources[this.sourceIdentifier];
@@ -584,7 +596,7 @@ class SourceBox extends HTMLElement {
         "class": "fontra-ui-font-info-sources-panel-icon",
         "src": "/tabler-icons/trash.svg",
         "onclick": (event) => this.deleteSource(),
-        "data-tooltip": "Delete source",
+        "data-tooltip": translate("sources.tooltip.delete-source"),
         "data-tooltipposition": "left",
       })
     );
@@ -740,19 +752,18 @@ function getLineMetricsHorRounded(lineMetricsHorizontalLayout) {
 }
 
 function getLabelFromKey(key) {
-  // TODO: this may use translate in future
   const keyLabelMap = {
-    name: "Name",
-    italicAngle: "Italic Angle",
-    isSparse: "Is Sparse",
-    ascender: "Ascender",
-    capHeight: "Cap Height",
-    xHeight: "x-Height",
-    baseline: "Baseline",
-    descender: "Descender",
-    general: "General",
-    location: "Location",
-    lineMetricsHorizontalLayout: "Line metrics",
+    name: translate("sources.labels.name"),
+    italicAngle: translate("sources.labels.italic-angle"),
+    isSparse: translate("sources.labels.is-sparse"),
+    ascender: translate("sources.labels.ascender"),
+    capHeight: translate("sources.labels.cap-height"),
+    xHeight: translate("sources.labels.x-height"),
+    baseline: translate("sources.labels.baseline"),
+    descender: translate("sources.labels.descender"),
+    general: translate("sources.labels.general"),
+    location: translate("sources.labels.location"),
+    lineMetricsHorizontalLayout: translate("sources.labels.line-metrics"),
   };
   return keyLabelMap[key] || key;
 }
