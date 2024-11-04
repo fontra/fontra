@@ -1,5 +1,6 @@
 import { recordChanges } from "../core/change-recorder.js";
 import { ChangeCollector, applyChange, consolidateChanges } from "../core/changes.js";
+import { translate } from "../core/localization.js";
 import { insertHandles, insertPoint, scalePoint } from "../core/path-functions.js";
 import { isEqualSet } from "../core/set-ops.js";
 import { modulo, parseSelection } from "../core/utils.js";
@@ -169,7 +170,7 @@ export class PenToolCubic extends BaseTool {
       }
       delete this.sceneModel.pathConnectTargetPoint;
       this.sceneController.selection = selection;
-      return "Insert Point"; // TODO: translation
+      return translate("edit-tools-pen.undo.insert-point");
     });
   }
 
@@ -189,7 +190,7 @@ export class PenToolCubic extends BaseTool {
       }
       delete this.sceneModel.pathInsertHandles;
       this.sceneController.selection = selection;
-      return "Insert Handles"; // TODO: translation
+      return translate("edit-tools-pen.undo.insert-handles");
     });
   }
 
@@ -354,7 +355,7 @@ function getPenToolBehavior(sceneController, initialEvent, path, curveType) {
 }
 
 class PenToolBehavior {
-  undoLabel = "add point(s)";
+  undoLabel = translate("edit-tools-pen.undo.add-points");
 
   constructor(getPointFromEvent, appendInfo, behaviorFuncs, curveType) {
     this.getPointFromEvent = getPointFromEvent;
