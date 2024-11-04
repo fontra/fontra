@@ -317,6 +317,7 @@ export const strings = {
   "sidebar.user-settings.glyph.statuscolor": "Entwicklungsstatus Farbe",
   "sidebar.user-settings.glyph.upmgrid": "UPM-Raster (Units-per-em)",
   "sidebar.user-settings.language": "Anzeigesprache",
+  "sidebar.user-settings.line-metrics": "Zeilen Metriken",
   "sidebar.user-settings.server": "Server Info",
   "sidebar.user-settings.theme": "Design-Einstellungen",
   "sidebar.user-settings.theme.auto": "Automatisch (benutzt OS Einstellungen)",

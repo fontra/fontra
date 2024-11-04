@@ -301,6 +301,7 @@ export const strings = {
   "sidebar.user-settings.glyph.statuscolor": "开发状态颜色标签",
   "sidebar.user-settings.glyph.upmgrid": "UPM 网格",
   "sidebar.user-settings.language": "显示语言",
+  "sidebar.user-settings.line-metrics": "Line metrics",
   "sidebar.user-settings.server": "服务器信息",
   "sidebar.user-settings.theme": "主题设置",
   "sidebar.user-settings.theme.auto": "自动（使用操作系统设置）",

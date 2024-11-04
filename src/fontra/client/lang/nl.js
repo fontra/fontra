@@ -314,6 +314,7 @@ export const strings = {
   "sidebar.user-settings.glyph.statuscolor": "Onwikkelingsstatuskleur",
   "sidebar.user-settings.glyph.upmgrid": "Units-per-em grid",
   "sidebar.user-settings.language": "Weergavetaal",
+  "sidebar.user-settings.line-metrics": "Line metrics",
   "sidebar.user-settings.server": "Server informatie",
   "sidebar.user-settings.theme": "Thema instellingen",
   "sidebar.user-settings.theme.auto": "Automatisch (gebruik OS instelling)",

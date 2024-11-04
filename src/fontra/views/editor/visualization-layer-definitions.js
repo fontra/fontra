@@ -173,7 +173,7 @@ registerVisualizationLayerDefinition({
 
 registerVisualizationLayerDefinition({
   identifier: "fontra.lineMetrics",
-  name: "Line metrics", // TODO: translation
+  name: "sidebar.user-settings.line-metrics",
   selectionMode: "editing",
   userSwitchable: true,
   defaultOn: true,
