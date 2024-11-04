@@ -484,7 +484,9 @@ export default class TransformationPanel extends Panel {
         "key": "customDistributionSpacing",
         "value": this.transformParameters.customDistributionSpacing,
         "allowEmptyField": true,
-        "data-tooltip": "Distance in units", // TODO: translation
+        "data-tooltip": translate(
+          "sidebar.selection-transformation.distribute.distance-in-units"
+        ),
         "data-tooltipposition": "top-right",
       },
     });
