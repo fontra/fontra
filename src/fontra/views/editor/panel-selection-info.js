@@ -177,11 +177,10 @@ export default class SelectionInfoPanel extends Panel {
               : "/tabler-icons/lock-open-2.svg",
           "onclick": (event) => this._toggleGlyphLock(varGlyphController.glyph),
           "data-tooltip": this.fontController.readOnly
-            ? translate("sidebar.selection-info.glyph-locking.tooltip.read-only")
+            ? "Glyph is read-only" // TODO: translation
             : glyphLocked
-            ? translate("sidebar.selection-info.glyph-locking.tooltip.unlock")
-            : translate("sidebar.selection-info.glyph-locking.tooltip.lock"),
-
+            ? "Unlock glyph" // TODO: translation
+            : "Lock glyph", // TODO: translation
           "data-tooltipposition": "left",
         }),
       });
@@ -194,14 +193,14 @@ export default class SelectionInfoPanel extends Panel {
       formContents.push({
         key: "unicodes",
         type: "text",
-        label: translate("sidebar.selection-info.unicode"),
+        label: "Unicode", // TODO: translation
         value: codePointsStr,
       });
       if (baseCodePointsStr) {
         formContents.push({
           key: "baseUnicodes",
           type: "text",
-          label: translate("sidebar.selection-info.base-unicode"),
+          label: "Base unicode", // TODO: translation
           value: baseCodePointsStr,
         });
       }
@@ -291,9 +290,7 @@ export default class SelectionInfoPanel extends Panel {
           "style": `width: 1.3em;`,
           "src": "/tabler-icons/refresh.svg",
           "onclick": (event) => this._resetTransformationForComponent(index),
-          "data-tooltip": translate(
-            "sidebar.selection-info.component.transformation.tooltip"
-          ),
+          "data-tooltip": "Reset transformation", // TODO: translation
           "data-tooltipposition": "left",
         }),
       });
@@ -410,9 +407,7 @@ export default class SelectionInfoPanel extends Panel {
               "style": `width: 1.3em;`,
               "src": "/tabler-icons/refresh.svg",
               "onclick": (event) => this._resetAxisValuesForComponent(index),
-              "data-tooltip": translate(
-                "sidebar.selection-info.component.reset-axis-values.tooltip"
-              ),
+              "data-tooltip": "Reset axis values", // TODO: translation
               "data-tooltipposition": "left",
             }),
           });
@@ -446,11 +441,11 @@ export default class SelectionInfoPanel extends Panel {
   async _toggleGlyphLock(varGlyph) {
     if (varGlyph.customData["fontra.glyph.locked"]) {
       const result = await dialog(
-        translate("sidebar.selection-info.dialog.unlock-glyph.title", varGlyph.name),
+        `Are you sure you want to unlock glyph ${varGlyph.name}?`, // TODO: translation
         "",
         [
-          { title: translate("dialog.cancel"), isCancelButton: true },
-          { title: translate("dialog.yes"), isDefaultButton: true, resultValue: "ok" },
+          { title: "Cancel", isCancelButton: true }, // TODO: translation
+          { title: "Yes", isDefaultButton: true, resultValue: "ok" }, // TODO: translation
         ]
       );
 
@@ -472,9 +467,7 @@ export default class SelectionInfoPanel extends Panel {
         } else {
           glyph.customData["fontra.glyph.locked"] = true;
         }
-        return glyph.customData["fontra.glyph.locked"]
-          ? translate("sidebar.selection-info.glyph-locking.tooltip.lock")
-          : translate("sidebar.selection-info.glyph-locking.tooltip.unlock");
+        return glyph.customData["fontra.glyph.locked"] ? "lock glyph" : "unlock glyph"; // TODO: translation
       },
       undefined,
       undefined,
@@ -491,7 +484,7 @@ export default class SelectionInfoPanel extends Panel {
       for (const [layerName, layerGlyph] of Object.entries(editLayerGlyphs)) {
         layerGlyph.components[componentIndex].transformation = getDecomposedIdentity();
       }
-      return translate("sidebar.selection-info.component.transformation.tooltip");
+      return "reset transformation"; // TODO: translation
     });
   }
 
@@ -522,7 +515,7 @@ export default class SelectionInfoPanel extends Panel {
           }
         }
       }
-      return translate("sidebar.selection-info.component.reset-axis-values.tooltip");
+      return "reset axis values"; // TODO: translation
     });
   }
 

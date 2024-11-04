@@ -221,7 +221,7 @@ export function getUnpackedContoursEllipse(cx, cy, rx, ry, t = bezierArcMagic) {
 
 registerVisualizationLayerDefinition({
   identifier: "fontra.shapetool.shape",
-  name: "Shape tool shape",
+  name: "Shape tool shape", // TODO: translation
   selectionMode: "editing",
   zIndex: 500,
   screenParameters: { strokeWidth: 1 },

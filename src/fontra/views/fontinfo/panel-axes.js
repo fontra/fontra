@@ -96,7 +96,7 @@ export class AxesPanel extends BaseInfoPanel {
         reorderedAxes.push(axisBox.axis);
         axisBox.axisIndex = index;
       }
-      this.replaceAxes(reorderedAxes, translate("axes.reorder"));
+      this.replaceAxes(reorderedAxes, "Reorder axes"); // TODO: translation
     });
 
     this.panelElement.innerHTML = "";
@@ -198,7 +198,7 @@ export class AxesPanel extends BaseInfoPanel {
       maxValue: presetAxis.maxValue,
     };
 
-    const undoLabel = translate("axes.undo.add", newAxis.name);
+    const undoLabel = `add axis '${newAxis.name}'`;
     const root = { axes: this.fontController.axes };
     const changes = recordChanges(root, (root) => {
       root.axes.axes.push(newAxis);
@@ -218,10 +218,7 @@ export class AxesPanel extends BaseInfoPanel {
   }
 
   async deleteAxis(axisIndex) {
-    const undoLabel = translate(
-      "axes.undo.delete",
-      this.fontController.axes.axes[axisIndex].name
-    );
+    const undoLabel = `delete axis '${this.fontController.axes.axes[axisIndex].name}'`;
     const root = { axes: this.fontController.axes };
     const changes = recordChanges(root, (root) => {
       root.axes.axes.splice(axisIndex, 1);
@@ -337,12 +334,9 @@ class AxisBox extends HTMLElement {
         this.axisController.model.values = newValues;
         this.axisController.model.valuesString = newValues.join(" ");
       } else {
-        this.editAxis(
-          (axis) => {
-            axis[event.key] = event.newValue;
-          },
-          translate("axes.undo.edit", event.key)
-        );
+        this.editAxis((axis) => {
+          axis[event.key] = event.newValue;
+        }, `edit axis ${event.key}`);
       }
     });
     this.axisController.addKeyListener("mapping", (event) => {
@@ -373,7 +367,7 @@ class AxisBox extends HTMLElement {
     );
     const axisItems = !isDiscreteAxis
       ? [
-          [translate("axes.range.minimum"), "minValue"],
+          [translate("axes.range.minumum"), "minValue"],
           [translate("axes.range.default"), "defaultValue"],
           [translate("axes.range.maxium"), "maxValue"],
         ]

@@ -28,7 +28,6 @@ import {
   strokeRoundNode,
   strokeSquareNode,
 } from "./visualization-layer-definitions.js";
-import { translate } from "/core/localization.js";
 import { copyComponent } from "/core/var-glyph.js";
 
 const transformHandleMargin = 6;
@@ -284,7 +283,7 @@ export class PointerTool extends BaseTool {
       for (const layerGlyph of Object.values(layerGlyphs)) {
         newPointType = toggleSmooth(layerGlyph.path, pointIndices, newPointType);
       }
-      return translate("edit-tools-pointer.undo.toggle-smooth");
+      return "Toggle Smooth"; // TODO: translation
     });
   }
 
@@ -420,12 +419,7 @@ export class PointerTool extends BaseTool {
         }
       }
       return {
-        undoLabel: translate(
-          "edit-tools-pointer.undo.drag-selection",
-          shouldConnect
-            ? " " + translate("edit-tools-pointer.undo.and-connect-contours")
-            : ""
-        ),
+        undoLabel: "drag selection" + (shouldConnect ? " and connect contours" : ""), // TODO: translation
         changes: changes,
         broadcast: true,
       };
@@ -596,9 +590,7 @@ export class PointerTool extends BaseTool {
       );
 
       return {
-        undoLabel: rotation
-          ? translate("edit-tools-pointer.undo.rotate-selection")
-          : translate("edit-tools-pointer.undo.resize-selection"),
+        undoLabel: `${rotation ? "rotate" : "resize"} selection`, // TODO: translation
         changes: changes,
         broadcast: true,
       };
@@ -710,7 +702,7 @@ function getSelectModeFunction(event) {
 
 registerVisualizationLayerDefinition({
   identifier: "fontra.transform.selection",
-  name: "edit-tools-pointer.transform.selection",
+  name: "Transform selection", // TODO: translation
   selectionMode: "editing",
   userSwitchable: true,
   defaultOn: true,

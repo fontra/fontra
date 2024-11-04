@@ -91,7 +91,7 @@ export class KnifeTool extends BaseTool {
         for (const [layerName, layerPath] of Object.entries(layerPaths)) {
           glyph.layers[layerName].glyph.path = layerPath;
         }
-        return translate("edit-tools-knife.undo.slice-glyph");
+        return "slice glyph"; // TODO: translation
       },
       undefined,
       true
@@ -105,7 +105,7 @@ export class KnifeTool extends BaseTool {
 
 registerVisualizationLayerDefinition({
   identifier: "fontra.knifetool.line",
-  name: "Knife tool line",
+  name: "Knife tool line", // TODO: translation
   selectionMode: "editing",
   zIndex: 500,
   screenParameters: { strokeWidth: 1, nodeSize: 10 },

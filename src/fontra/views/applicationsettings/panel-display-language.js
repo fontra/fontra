@@ -44,7 +44,7 @@ export class DisplayLanguagePanel extends BaseInfoPanel {
     });
     return [
       {
-        displayName: "Display Language",
+        displayName: "Display Language", // TODO: translation
         controller: languageController,
         descriptions: [
           {
@@ -56,7 +56,7 @@ export class DisplayLanguagePanel extends BaseInfoPanel {
             ui: "plain",
             displayName: html.div({}, [
               html.br(),
-              "If you'd like to contribute to the translations, please visit the ",
+              "If you'd like to contribute to the translations, please visit the ", // TODO: translation
               html.a(
                 {
                   href: "https://docs.google.com/spreadsheets/d/1woTU8dZCHJh7yvdk-N1kgQBUj4Sn3SdRsbKgn6ltJQs/edit?gid=1731105247#gid=1731105247",
