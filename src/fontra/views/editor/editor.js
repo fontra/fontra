@@ -1509,15 +1509,15 @@ export class EditorController {
       // do not add their menu items.
       this.basicContextMenuItems.push(
         {
-          title: "Cut",
+          title: translate("action.cut"),
           actionIdentifier: "action.cut",
         },
         {
-          title: "Copy",
+          title: translate("action.copy"),
           actionIdentifier: "action.copy",
         },
         {
-          title: "Paste",
+          title: translate("action.paste"),
           actionIdentifier: "action.paste",
         }
       );
