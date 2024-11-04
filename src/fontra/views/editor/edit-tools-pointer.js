@@ -283,7 +283,7 @@ export class PointerTool extends BaseTool {
       for (const layerGlyph of Object.values(layerGlyphs)) {
         newPointType = toggleSmooth(layerGlyph.path, pointIndices, newPointType);
       }
-      return "Toggle Smooth";
+      return "Toggle Smooth"; // TODO: translation
     });
   }
 
@@ -419,7 +419,7 @@ export class PointerTool extends BaseTool {
         }
       }
       return {
-        undoLabel: "drag selection" + (shouldConnect ? " and connect contours" : ""),
+        undoLabel: "drag selection" + (shouldConnect ? " and connect contours" : ""), // TODO: translation
         changes: changes,
         broadcast: true,
       };
@@ -590,7 +590,7 @@ export class PointerTool extends BaseTool {
       );
 
       return {
-        undoLabel: `${rotation ? "rotate" : "resize"} selection`,
+        undoLabel: `${rotation ? "rotate" : "resize"} selection`, // TODO: translation
         changes: changes,
         broadcast: true,
       };
@@ -702,7 +702,7 @@ function getSelectModeFunction(event) {
 
 registerVisualizationLayerDefinition({
   identifier: "fontra.transform.selection",
-  name: "Transform selection",
+  name: "Transform selection", // TODO: translation
   selectionMode: "editing",
   userSwitchable: true,
   defaultOn: true,

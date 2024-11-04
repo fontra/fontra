@@ -96,7 +96,7 @@ export class AxesPanel extends BaseInfoPanel {
         reorderedAxes.push(axisBox.axis);
         axisBox.axisIndex = index;
       }
-      this.replaceAxes(reorderedAxes, "Reorder axes");
+      this.replaceAxes(reorderedAxes, "Reorder axes"); // TODO: translation
     });
 
     this.panelElement.innerHTML = "";

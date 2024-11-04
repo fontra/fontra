@@ -490,14 +490,15 @@ export default class ReferenceFontPanel extends Panel {
 
     if (fontItemsInvalid.length) {
       const dialogTitle = `The following item${
+        // TODO: translation
         fontItemsInvalid.length > 1 ? "s" : ""
-      } can't be used as a reference font:`;
+      } can't be used as a reference font:`; // TODO: translation
       const dialogMessage = fontItemsInvalid
         .map((file) => {
           return `- ${file.name}`;
         })
         .join("\n");
-      dialog(dialogTitle, dialogMessage, [{ title: "Okay" }], 5000);
+      dialog(dialogTitle, dialogMessage, [{ title: "Okay" }], 5000); // TODO: translation
     }
 
     const newSelectedItemIndex = this.filesUIList.items.length;
@@ -513,7 +514,7 @@ export default class ReferenceFontPanel extends Panel {
         writtenFontItems.push(fontItem);
       }
     } catch (error) {
-      message("Could not store some reference fonts", error.toString());
+      message("Could not store some reference fonts", error.toString()); // TODO: translation
     }
 
     // Only notify the list controller *after* the files have been written,
@@ -657,7 +658,7 @@ export default class ReferenceFontPanel extends Panel {
     const columnDescriptions = [
       {
         key: "uplodadedFileName",
-        title: "file name",
+        title: "file name", // TODO: translation
       },
     ];
     this.filesUIList = new UIList();

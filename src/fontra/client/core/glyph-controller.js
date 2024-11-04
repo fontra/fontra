@@ -224,7 +224,7 @@ export class VariableGlyphController {
     }
     return locationStrings.map((s) =>
       bag[s]?.length > 1
-        ? `location is not unique in sources ${bag[s]
+        ? `location is not unique in sources ${bag[s] // TODO: translation
             .map((i) => this.sources[i].name)
             .join(", ")}`
         : null

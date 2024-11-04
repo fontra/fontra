@@ -177,10 +177,10 @@ export default class SelectionInfoPanel extends Panel {
               : "/tabler-icons/lock-open-2.svg",
           "onclick": (event) => this._toggleGlyphLock(varGlyphController.glyph),
           "data-tooltip": this.fontController.readOnly
-            ? "Glyph is read-only"
+            ? "Glyph is read-only" // TODO: translation
             : glyphLocked
-            ? "Unlock glyph"
-            : "Lock glyph",
+            ? "Unlock glyph" // TODO: translation
+            : "Lock glyph", // TODO: translation
           "data-tooltipposition": "left",
         }),
       });
@@ -193,14 +193,14 @@ export default class SelectionInfoPanel extends Panel {
       formContents.push({
         key: "unicodes",
         type: "text",
-        label: "Unicode",
+        label: "Unicode", // TODO: translation
         value: codePointsStr,
       });
       if (baseCodePointsStr) {
         formContents.push({
           key: "baseUnicodes",
           type: "text",
-          label: "Base unicode",
+          label: "Base unicode", // TODO: translation
           value: baseCodePointsStr,
         });
       }
@@ -290,7 +290,7 @@ export default class SelectionInfoPanel extends Panel {
           "style": `width: 1.3em;`,
           "src": "/tabler-icons/refresh.svg",
           "onclick": (event) => this._resetTransformationForComponent(index),
-          "data-tooltip": "Reset transformation",
+          "data-tooltip": "Reset transformation", // TODO: translation
           "data-tooltipposition": "left",
         }),
       });
@@ -407,7 +407,7 @@ export default class SelectionInfoPanel extends Panel {
               "style": `width: 1.3em;`,
               "src": "/tabler-icons/refresh.svg",
               "onclick": (event) => this._resetAxisValuesForComponent(index),
-              "data-tooltip": "Reset axis values",
+              "data-tooltip": "Reset axis values", // TODO: translation
               "data-tooltipposition": "left",
             }),
           });
@@ -441,11 +441,11 @@ export default class SelectionInfoPanel extends Panel {
   async _toggleGlyphLock(varGlyph) {
     if (varGlyph.customData["fontra.glyph.locked"]) {
       const result = await dialog(
-        `Are you sure you want to unlock glyph ${varGlyph.name}?`,
+        `Are you sure you want to unlock glyph ${varGlyph.name}?`, // TODO: translation
         "",
         [
-          { title: "Cancel", isCancelButton: true },
-          { title: "Yes", isDefaultButton: true, resultValue: "ok" },
+          { title: "Cancel", isCancelButton: true }, // TODO: translation
+          { title: "Yes", isDefaultButton: true, resultValue: "ok" }, // TODO: translation
         ]
       );
 
@@ -467,7 +467,7 @@ export default class SelectionInfoPanel extends Panel {
         } else {
           glyph.customData["fontra.glyph.locked"] = true;
         }
-        return glyph.customData["fontra.glyph.locked"] ? "lock glyph" : "unlock glyph";
+        return glyph.customData["fontra.glyph.locked"] ? "lock glyph" : "unlock glyph"; // TODO: translation
       },
       undefined,
       undefined,
@@ -484,7 +484,7 @@ export default class SelectionInfoPanel extends Panel {
       for (const [layerName, layerGlyph] of Object.entries(editLayerGlyphs)) {
         layerGlyph.components[componentIndex].transformation = getDecomposedIdentity();
       }
-      return "reset transformation";
+      return "reset transformation"; // TODO: translation
     });
   }
 
@@ -515,7 +515,7 @@ export default class SelectionInfoPanel extends Panel {
           }
         }
       }
-      return "reset axis values";
+      return "reset axis values"; // TODO: translation
     });
   }
 

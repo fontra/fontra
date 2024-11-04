@@ -169,7 +169,7 @@ export class PenToolCubic extends BaseTool {
       }
       delete this.sceneModel.pathConnectTargetPoint;
       this.sceneController.selection = selection;
-      return "Insert Point";
+      return "Insert Point"; // TODO: translation
     });
   }
 
@@ -189,7 +189,7 @@ export class PenToolCubic extends BaseTool {
       }
       delete this.sceneModel.pathInsertHandles;
       this.sceneController.selection = selection;
-      return "Insert Handles";
+      return "Insert Handles"; // TODO: translation
     });
   }
 

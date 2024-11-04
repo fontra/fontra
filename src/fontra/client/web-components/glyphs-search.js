@@ -66,7 +66,7 @@ export class GlyphsSearch extends UnlitElement {
           return guessedChar ? html.span({ class: "guessed-char" }, [guessedChar]) : "";
         },
       },
-      { key: "glyphName", title: "glyph name", width: "10em", isIdentifierKey: true },
+      { key: "glyphName", title: "glyph name", width: "10em", isIdentifierKey: true }, // TODO: translation
       {
         key: "unicode",
         width: "fit-content",

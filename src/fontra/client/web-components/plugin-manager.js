@@ -51,8 +51,9 @@ export class PluginManager extends SimpleElement {
 
   async promptAddPlugin(text = "") {
     const newPluginPrompt = await dialogSetup("Add plugin", "", [
-      { title: "Cancel", resultValue: "no", isCancelButton: true },
-      { title: "Create", resultValue: "ok", isDefaultButton: true, disabled: true },
+      // TODO: translation
+      { title: "Cancel", resultValue: "no", isCancelButton: true }, // TODO: translation
+      { title: "Create", resultValue: "ok", isDefaultButton: true, disabled: true }, // TODO: translation
     ]);
     let address = text;
     const pluginContent = html.div(
@@ -61,7 +62,7 @@ export class PluginManager extends SimpleElement {
           "display: grid; grid-template-columns: auto 1fr; grid-gap: 1rem; align-items: center;",
       },
       [
-        html.label({ for: `plugin-path` }, "Plugin path:"),
+        html.label({ for: `plugin-path` }, "Plugin path:"), // TODO: translation
         html.input({
           id: "plugin-path",
           autofocus: true,
@@ -107,16 +108,16 @@ export class PluginManager extends SimpleElement {
         ({ address }) => parsePluginBasePath(address) === pluginPath
       )
     ) {
-      return [false, "Plugin exists."];
+      return [false, "Plugin exists."]; // TODO: translation
     }
     let response;
     try {
       response = await fetch(`${pluginPath}/plugin.json`);
     } catch (e) {
-      return [false, "An error occured when fetching the plugin."];
+      return [false, "An error occured when fetching the plugin."]; // TODO: translation
     }
     if (response.status === 404) {
-      return [false, "Plugin not found."];
+      return [false, "Plugin not found."]; // TODO: translation
     }
     return [true];
   }
@@ -128,7 +129,7 @@ export class PluginManager extends SimpleElement {
 
   render() {
     const fragment = document.createDocumentFragment();
-    fragment.appendChild(html.div({}, ["Fontra plugins:"]));
+    fragment.appendChild(html.div({}, ["Fontra plugins:"])); // TODO: translation
     fragment.appendChild(this.pluginList);
     fragment.appendChild(
       (this.addRemoveButton = createDomElement("add-remove-buttons", {
