@@ -120,6 +120,7 @@ export const strings = {
   "dialog.glyphs.search": "搜索字形",
   "dialog.okay": "确认",
   "dialog.replace": "替换",
+  "edit-tools-knife.undo.slice-glyph": "slice glyph",
   "edit-tools-pen.undo.add-points": "add point(s)",
   "edit-tools-pen.undo.insert-handles": "Insert Handles",
   "edit-tools-pen.undo.insert-point": "Insert Point",

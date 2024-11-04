@@ -127,6 +127,7 @@ export const strings = {
   "dialog.glyphs.search": "Glyphen suchen",
   "dialog.okay": "Okay",
   "dialog.replace": "Ersetzen",
+  "edit-tools-knife.undo.slice-glyph": "Glyph schneiden",
   "edit-tools-pen.undo.add-points": "Punkt(e) hinzufügen",
   "edit-tools-pen.undo.insert-handles": "Griffe einfügen",
   "edit-tools-pen.undo.insert-point": "Punkt einfügen",
