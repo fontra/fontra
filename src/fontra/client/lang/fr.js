@@ -41,7 +41,7 @@ export const strings = {
   "application-settings.clipboard.title": "Presse-papier",
   "application-settings.display-language.status.beta": "beta",
   "application-settings.display-language.status.wip": "Travail en cours",
-  "application-settings.display-language.title": "Langue utilisée",
+  "application-settings.display-language.title": "Display Language",
   "application-settings.editor-behavior.title": "Comportement de l'éditeur",
   "application-settings.plugins-manager.title": "Gestionnaire de plugins",
   "application-settings.server-info.title": "Information du serveur",

@@ -41,7 +41,7 @@ export const strings = {
   "application-settings.clipboard.title": "剪贴板导出格式",
   "application-settings.display-language.status.beta": "试用版",
   "application-settings.display-language.status.wip": "开发中",
-  "application-settings.display-language.title": "显示语言",
+  "application-settings.display-language.title": "Display Language",
   "application-settings.editor-behavior.title": "编辑器行为",
   "application-settings.plugins-manager.title": "插件管理器",
   "application-settings.server-info.title": "服务器信息",

@@ -41,7 +41,7 @@ export const strings = {
   "application-settings.clipboard.title": "Zwischenablage",
   "application-settings.display-language.status.beta": "Beta",
   "application-settings.display-language.status.wip": "In Arbeit",
-  "application-settings.display-language.title": "Anzeigesprache",
+  "application-settings.display-language.title": "Display Language",
   "application-settings.editor-behavior.title": "Editor-Verhalten",
   "application-settings.plugins-manager.title": "Plugin Manager",
   "application-settings.server-info.title": "Server Info",

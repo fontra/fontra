@@ -41,7 +41,7 @@ export const strings = {
   "application-settings.clipboard.title": "Klembord",
   "application-settings.display-language.status.beta": "beta",
   "application-settings.display-language.status.wip": "in ontwikkeling",
-  "application-settings.display-language.title": "Weergavetaal",
+  "application-settings.display-language.title": "Display Language",
   "application-settings.editor-behavior.title": "Editor gedrag",
   "application-settings.plugins-manager.title": "Plugin Manager",
   "application-settings.server-info.title": "Server info",
