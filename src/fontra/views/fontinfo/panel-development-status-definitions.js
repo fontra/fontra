@@ -11,27 +11,27 @@ const defaultStatusFieldDefinitions = {
     {
       color: [1, 0, 0, 1],
       isDefault: true,
-      labelKey: "development-status-definitions.default.label.in-progress",
+      label: "In progress",
       value: 0,
     },
     {
       color: [1, 0.5, 0, 1],
-      labelKey: "development-status-definitions.default.label.ckecking",
+      label: "Checking-1",
       value: 1,
     },
     {
       color: [1, 1, 0, 1],
-      labelKey: "development-status-definitions.default.label.ckecking",
+      label: "Checking-2",
       value: 2,
     },
     {
       color: [0, 0.5, 1, 1],
-      labelKey: "development-status-definitions.default.label.ckecking",
+      label: "Checking-3",
       value: 3,
     },
     {
       color: [0, 1, 0.5, 1],
-      labelKey: "development-status-definitions.default.label.validated",
+      label: "Validated",
       value: 4,
     },
   ],
@@ -99,16 +99,10 @@ export class DevelopmentStatusDefinitionsPanel extends BaseInfoPanel {
       (statusDef) => statusDef.value == nextStatusValue
     );
 
-    if (statusDef) {
-      // get translation via the given label key
-      statusDef.label = translate(statusDef.labelKey, statusDef.value);
-    } else {
+    if (!statusDef) {
       statusDef = {
         color: [1, 0, 0, 1],
-        label: translate(
-          "development-status-definitions.default.label.next-status",
-          nextStatusValue
-        ),
+        label: `Status definition ${nextStatusValue}`,
         value: nextStatusValue,
       };
     }
