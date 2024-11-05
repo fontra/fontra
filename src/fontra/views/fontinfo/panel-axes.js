@@ -367,7 +367,7 @@ class AxisBox extends HTMLElement {
     );
     const axisItems = !isDiscreteAxis
       ? [
-          [translate("axes.range.minumum"), "minValue"],
+          [translate("axes.range.minimum"), "minValue"],
           [translate("axes.range.default"), "defaultValue"],
           [translate("axes.range.maxium"), "maxValue"],
         ]

@@ -1150,7 +1150,7 @@ export default class DesignspaceNavigationPanel extends Panel {
       },
       {
         key: "minValue",
-        title: translate("axes.range.minumum"),
+        title: translate("axes.range.minimum"),
         width: "5em",
         align: "right",
         editable: true,
