@@ -80,7 +80,7 @@ export const strings = {
   "axes.range.axis-type.discrete": "Discrete",
   "axes.range.default": "Default",
   "axes.range.maxium": "Maximum",
-  "axes.range.minumum": "Minimum",
+  "axes.range.minimum": "Minimum",
   "axes.range.values": "Values",
   "axes.title": "Axes",
   "canvas.clean-view-and-hand-tool": "Clean View and Hand Tool",

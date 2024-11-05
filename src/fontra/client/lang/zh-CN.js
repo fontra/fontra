@@ -80,7 +80,7 @@ export const strings = {
   "axes.range.axis-type.discrete": "离散",
   "axes.range.default": "默认值",
   "axes.range.maxium": "最大值",
-  "axes.range.minumum": "最小值",
+  "axes.range.minimum": "最小值",
   "axes.range.values": "可选值",
   "axes.title": "参数轴",
   "canvas.clean-view-and-hand-tool": "预览与拖拽工具",
