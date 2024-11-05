@@ -82,7 +82,11 @@ export const strings = {
   "axes.range.maxium": "最大值",
   "axes.range.minimum": "最小值",
   "axes.range.values": "可选值",
+  "axes.reorder": "Reorder axes",
   "axes.title": "参数轴",
+  "axes.undo.add": "add axis %0",
+  "axes.undo.delete": "delete axis %0",
+  "axes.undo.edit": "edit axis %0",
   "canvas.clean-view-and-hand-tool": "预览与拖拽工具",
   "cross-axis-mapping.axis-participates":
     "When checked, this axis participates in the mapping",

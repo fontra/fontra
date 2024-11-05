@@ -82,7 +82,11 @@ export const strings = {
   "axes.range.maxium": "Maximum",
   "axes.range.minimum": "Minimum",
   "axes.range.values": "Values",
+  "axes.reorder": "Reorder axes",
   "axes.title": "Axes",
+  "axes.undo.add": "add axis %0",
+  "axes.undo.delete": "delete axis %0",
+  "axes.undo.edit": "edit axis %0",
   "canvas.clean-view-and-hand-tool": "Clean View and Hand Tool",
   "cross-axis-mapping.axis-participates":
     "When checked, this axis participates in the mapping",
