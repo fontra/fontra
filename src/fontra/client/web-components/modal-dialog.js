@@ -1,5 +1,6 @@
 import * as html from "/core/html-utils.js";
 import { SimpleElement } from "/core/html-utils.js";
+import { translate } from "/core/localization.js";
 import { enumerate } from "/core/utils.js";
 
 export async function dialog(headline, message, buttonDefs, autoDismissTimeout) {
@@ -24,7 +25,9 @@ export async function dialogSetup(headline, message, buttonDefs, autoDismissTime
 }
 
 export function message(headline, message) {
-  return dialog(headline, message, [{ title: "Okay", isDefaultButton: true }]);
+  return dialog(headline, message, [
+    { title: translate("dialog.okay"), isDefaultButton: true },
+  ]);
 }
 
 export class ModalDialog extends SimpleElement {
