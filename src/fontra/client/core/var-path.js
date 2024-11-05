@@ -736,7 +736,7 @@ export class VarPackedPath {
 
   _ensureCompatibility(other) {
     if (!this.isCompatible(other)) {
-      throw new VariationError("paths are not compatible");
+      throw new VariationError("paths are not compatible"); // TODO: translation
     }
   }
 

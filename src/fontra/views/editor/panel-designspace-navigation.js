@@ -96,7 +96,9 @@ export default class DesignspaceNavigationPanel extends Panel {
           makeAccordionHeaderButton({
             icon: "menu-2",
             id: "font-axes-view-options-button",
-            tooltip: "View options", // TODO: translation
+            tooltip: translate(
+              "sidebar.designspace-navigation.font-axes-view-options-button.tooltip"
+            ),
             onclick: (event) => this.showFontAxesViewOptionsMenu(event),
           }),
           makeAccordionHeaderButton({
@@ -489,7 +491,9 @@ export default class DesignspaceNavigationPanel extends Panel {
   showFontAxesViewOptionsMenu(event) {
     const menuItems = [
       {
-        title: "Apply single-axis mapping", // TODO: translation
+        title: translate(
+          "sidebar.designspace-navigation.font-axes-view-options-menu.apply-single-axis-mapping"
+        ),
         callback: () => {
           this.sceneSettings.fontAxesUseSourceCoordinates =
             !this.sceneSettings.fontAxesUseSourceCoordinates;
@@ -497,7 +501,9 @@ export default class DesignspaceNavigationPanel extends Panel {
         checked: !this.sceneSettings.fontAxesUseSourceCoordinates,
       },
       {
-        title: "Apply cross-axis mapping", // TODO: translation
+        title: translate(
+          "sidebar.designspace-navigation.font-axes-view-options-menu.apply-cross-axis-mapping"
+        ),
         callback: () => {
           this.sceneSettings.fontAxesSkipMapping =
             !this.sceneSettings.fontAxesSkipMapping;
@@ -506,7 +512,9 @@ export default class DesignspaceNavigationPanel extends Panel {
       },
       { title: "-" },
       {
-        title: "Show effective location", // TODO: translation
+        title: translate(
+          "sidebar.designspace-navigation.font-axes-view-options-menu.show-effective-location"
+        ),
         callback: () => {
           this.sceneSettings.fontAxesShowEffectiveLocation =
             !this.sceneSettings.fontAxesShowEffectiveLocation;
@@ -514,7 +522,9 @@ export default class DesignspaceNavigationPanel extends Panel {
         checked: this.sceneSettings.fontAxesShowEffectiveLocation,
       },
       {
-        title: "Show hidden axes", // TODO: translation
+        title: translate(
+          "sidebar.designspace-navigation.font-axes-view-options-menu.show-hidden-axes"
+        ),
         callback: () => {
           this.sceneSettings.fontAxesShowHidden =
             !this.sceneSettings.fontAxesShowHidden;
@@ -671,7 +681,12 @@ export default class DesignspaceNavigationPanel extends Panel {
       sourceController.addKeyListener("active", async (event) => {
         await this.sceneController.editGlyphAndRecordChanges((glyph) => {
           glyph.sources[index].inactive = !event.newValue;
-          return `${event.newValue ? "" : "de"}activate ${source.name}`; // TODO: translation
+          return event.newValue
+            ? translate("sidebar.designspace-navigation.source.activate", source.name)
+            : translate(
+                "sidebar.designspace-navigation.source.deactivate",
+                source.name
+              );
         });
       });
       sourceController.addKeyListener("visible", async (event) => {
@@ -756,11 +771,14 @@ export default class DesignspaceNavigationPanel extends Panel {
     const glyphController = await this.sceneModel.getSelectedVariableGlyphController();
     const glyph = glyphController.glyph;
     const source = glyph.sources[sourceIndex];
-    const dialog = await dialogSetup("Delete source", null, [
-      // TODO: translation
-      { title: "Cancel", isCancelButton: true }, // TODO: translation
-      { title: "Delete", isDefaultButton: true, result: "ok" }, // TODO: translation
-    ]);
+    const dialog = await dialogSetup(
+      translate("sidebar.designspace-navigation.dialog.delete-source.title"),
+      null,
+      [
+        { title: translate("dialog.cancel"), isCancelButton: true },
+        { title: translate("dialog.delete"), isDefaultButton: true, result: "ok" },
+      ]
+    );
 
     const canDeleteLayer =
       1 ===
@@ -777,12 +795,18 @@ export default class DesignspaceNavigationPanel extends Panel {
 
     const dialogContent = html.div({}, [
       html.div({ class: "message" }, [
-        `Are you sure you want to delete source #${sourceIndex}, “${source.name}”?`,
+        translate(
+          "sidebar.designspace-navigation.warning.delete-source",
+          `#${sourceIndex}, “${source.name}”`
+        ),
       ]),
       html.br(),
       deleteLayerCheckBox,
       html.label({ for: "delete-layer", style: canDeleteLayer ? "" : "color: gray;" }, [
-        `Also delete associated layer “${source.layerName}”`, // TODO: translation
+        translate(
+          "sidebar.designspace-navigation.warning.delete-associated-layer",
+          `“${source.layerName}”`
+        ),
       ]),
     ]);
     dialog.setContent(dialogContent);
@@ -797,9 +821,12 @@ export default class DesignspaceNavigationPanel extends Panel {
       let layerMessage = "";
       if (layer !== undefined && deleteLayerCheckBox.checked) {
         delete glyph.layers[source.layerName];
-        layerMessage = " and layer"; // TODO: translation
+        layerMessage = ` ${translate("sidebar.designspace-navigation.undo.and-layer")}`;
       }
-      return "delete source" + layerMessage; // TODO: translation
+      return translate(
+        "sidebar.designspace-navigation.undo.delete-source",
+        layerMessage
+      );
     });
     this.sourcesList.setSelectedItemIndex(undefined, true);
   }
@@ -819,8 +846,8 @@ export default class DesignspaceNavigationPanel extends Panel {
       layerName,
       layerNames,
     } = await this._sourcePropertiesRunDialog(
-      "Add source", // TODO: translation
-      "Add",
+      translate("sidebar.designspace-navigation.dialog.add-source.title"),
+      translate("sidebar.designspace-navigation.dialog.add-source.ok-button-title"),
       glyph,
       "",
       "",
@@ -852,7 +879,7 @@ export default class DesignspaceNavigationPanel extends Panel {
         // Only add layer if the name is new
         glyph.layers[layerName] = Layer.fromObject({ glyph: instance });
       }
-      return "add source"; // TODO: translation
+      return translate("sidebar.designspace-navigation.dialog.add-source.title");
     });
     // Navigate to new source
     const selectedSourceIndex = glyph.sources.length - 1; /* the newly added source */
@@ -871,8 +898,10 @@ export default class DesignspaceNavigationPanel extends Panel {
       layerName,
       layerNames,
     } = await this._sourcePropertiesRunDialog(
-      "Source properties", // TODO: translation
-      "Done",
+      translate("sidebar.designspace-navigation.dialog.source-properties.title"),
+      translate(
+        "sidebar.designspace-navigation.dialog.source-properties.ok-button-title"
+      ),
       glyph,
       source.name,
       source.layerName,
@@ -906,7 +935,7 @@ export default class DesignspaceNavigationPanel extends Panel {
           }
         }
       }
-      return "edit source properties"; // TODO: translation
+      return translate("sidebar.designspace-navigation.source-properties.undo");
     });
   }
 
@@ -923,18 +952,18 @@ export default class DesignspaceNavigationPanel extends Panel {
       const editedSourceName =
         nameController.model.sourceName || nameController.model.suggestedSourceName;
       if (!editedSourceName.length) {
-        warnings.push("⚠️ The source name must not be empty"); // TODO: translation
+        warnings.push(`⚠️ ${translate("sources.warning.empty-source-name")}`);
       } else if (
         editedSourceName !== sourceName &&
         glyph.sources.some((source) => source.name === editedSourceName)
       ) {
-        warnings.push("⚠️ The source name should be unique"); // TODO: translation
+        warnings.push(`⚠️ ${translate("sources.warning.unique-source-name")}`);
       }
       const locStr = locationToString(
         makeSparseLocation(locationController.model, locationAxes)
       );
       if (sourceLocations.has(locStr)) {
-        warnings.push("⚠️ The source location must be unique"); // TODO: translation
+        warnings.push(`⚠️ ${translate("sources.warning.unique-location")}`);
       }
       warningElement.innerText = warnings.length ? warnings.join("\n") : "";
       dialog.defaultButton.classList.toggle("disabled", warnings.length);
@@ -996,7 +1025,7 @@ export default class DesignspaceNavigationPanel extends Panel {
     );
 
     const dialog = await dialogSetup(title, null, [
-      { title: "Cancel", isCancelButton: true },
+      { title: translate("dialog.cancel"), isCancelButton: true },
       { title: okButtonTitle, isDefaultButton: true, disabled: !sourceName.length },
     ]);
     dialog.setContent(contentElement);
@@ -1069,16 +1098,26 @@ export default class DesignspaceNavigationPanel extends Panel {
         `,
       },
       [
-        ...labeledTextInput("Source name:", nameController, "sourceName", {
-          // TODO: translation
-          placeholderKey: "suggestedSourceName",
-          id: "source-name-text-input",
-        }),
-        ...labeledTextInput("Layer:", nameController, "layerName", {
-          // TODO: translation
-          placeholderKey: "suggestedLayerName",
-          choices: layerNames,
-        }),
+        ...labeledTextInput(
+          translate(
+            "sidebar.designspace-navigation.dialog.add-source.label.source-name"
+          ),
+          nameController,
+          "sourceName",
+          {
+            placeholderKey: "suggestedSourceName",
+            id: "source-name-text-input",
+          }
+        ),
+        ...labeledTextInput(
+          translate("sidebar.designspace-navigation.dialog.add-source.label.layer"),
+          nameController,
+          "layerName",
+          {
+            placeholderKey: "suggestedLayerName",
+            choices: layerNames,
+          }
+        ),
         html.br(),
         locationElement,
         warningElement,
@@ -1093,17 +1132,25 @@ export default class DesignspaceNavigationPanel extends Panel {
     if (!varGlyphController) {
       return;
     }
-    const dialog = await dialogSetup("Edit glyph axes", null, [
-      // TODO: translation
-      { title: "Cancel", isCancelButton: true }, // TODO: translation
-      { title: "Okay", isDefaultButton: true, result: "ok" }, // TODO: translation
-    ]);
+    const dialog = await dialogSetup(
+      translate("sidebar.designspace-navigation.glyph-axes.edit"),
+      null,
+      [
+        { title: translate("dialog.cancel"), isCancelButton: true },
+        { title: translate("dialog.okay"), isDefaultButton: true, result: "ok" },
+      ]
+    );
 
     const columnDescriptions = [
-      { key: "name", title: "Name", width: "8em", editable: true },
+      {
+        key: "name",
+        title: translate("axes.names.name"),
+        width: "8em",
+        editable: true,
+      },
       {
         key: "minValue",
-        title: "Minimum",
+        title: translate("axes.range.minumum"),
         width: "5em",
         align: "right",
         editable: true,
@@ -1111,7 +1158,7 @@ export default class DesignspaceNavigationPanel extends Panel {
       },
       {
         key: "defaultValue",
-        title: "Default",
+        title: translate("axes.range.default"),
         width: "5em",
         align: "right",
         editable: true,
@@ -1119,7 +1166,7 @@ export default class DesignspaceNavigationPanel extends Panel {
       },
       {
         key: "maxValue",
-        title: "Maximum",
+        title: translate("axes.range.maxium"),
         width: "5em",
         align: "right",
         editable: true,
@@ -1181,7 +1228,7 @@ export default class DesignspaceNavigationPanel extends Panel {
       // glyph.axes = axisItems;
       // Work around like this:
       glyph.axes.splice(0, glyph.axes.length, ...axisItems);
-      return "edit axes"; // TODO: translation
+      return translate("sidebar.designspace-navigation.glyph-axes.edit");
     });
   }
 
@@ -1309,7 +1356,7 @@ function interpolationErrorCell(item, colDesc) {
         onclick: (event) => {
           event.stopImmediatePropagation();
           message(
-            "The source has an interpolation incompatibility", // TODO: translation
+            translate("sources.warning.interpolation-incompatibility"),
             escapeHTMLCharacters(value.error)
           );
         },
