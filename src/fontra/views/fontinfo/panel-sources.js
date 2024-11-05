@@ -76,7 +76,7 @@ export class SourcesPanel extends BaseInfoPanel {
       html.input({
         type: "button",
         style: `justify-self: start;`,
-        value: translate("sources.button.new-source"),
+        value: translate("sources.button.new-font-source"),
         onclick: (event) => this.newSource(),
       })
     );
