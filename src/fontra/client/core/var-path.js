@@ -1,6 +1,7 @@
 import { Bezier } from "../third-party/bezier-js.js";
 import { convexHull } from "./convex-hull.js";
 import { VariationError } from "./errors.js";
+import { translate } from "./localization.js";
 import { centeredRect, pointInRect, rectFromPoints, updateRect } from "./rectangle.js";
 import {
   arrayExtend,
@@ -735,7 +736,7 @@ export class VarPackedPath {
 
   _ensureCompatibility(other) {
     if (!this.isCompatible(other)) {
-      throw new VariationError("paths are not compatible"); // TODO: translation
+      throw new VariationError(translate("validation.error.path-not-compatible"));
     }
   }
 

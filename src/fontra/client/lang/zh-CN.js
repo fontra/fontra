@@ -386,6 +386,7 @@ export const strings = {
   "sources.warning.unique-location": "The source location must be unique",
   "sources.warning.unique-source-name": "The source name must be unique",
   "toggle-fullscreen": "切换全屏",
+  "validation.error.path-not-compatible": "paths are not compatible",
   "zoom-fit-selection": "缩放到选区",
   "zoom-in": "放大",
   "zoom-out": "缩小",

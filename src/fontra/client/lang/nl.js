@@ -402,6 +402,7 @@ export const strings = {
   "sources.warning.unique-location": "The source location must be unique",
   "sources.warning.unique-source-name": "The source name must be unique",
   "toggle-fullscreen": "Schakel volledig scherm",
+  "validation.error.path-not-compatible": "paths are not compatible",
   "zoom-fit-selection": "Zoom naar de selectie",
   "zoom-in": "Zoom in",
   "zoom-out": "Zoom uit",

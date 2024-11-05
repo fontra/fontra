@@ -397,6 +397,7 @@ export const strings = {
   "sources.warning.unique-location": "The source location must be unique",
   "sources.warning.unique-source-name": "The source name must be unique",
   "toggle-fullscreen": "Toggle Fullscreen",
+  "validation.error.path-not-compatible": "paths are not compatible",
   "zoom-fit-selection": "Zoom To Fit Selection",
   "zoom-in": "Zoom In",
   "zoom-out": "Zoom Out",
