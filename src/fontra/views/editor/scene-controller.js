@@ -606,7 +606,7 @@ export class SceneController {
           changePath: ["layers", layerName, "glyph"],
           pathPrefix: [],
           editBehavior: behaviorFactory.getBehavior(
-            event.altKey ? "alternate" : "default" // TODO: translation
+            event.altKey ? "alternate" : "default"
           ),
         };
       });
@@ -652,7 +652,7 @@ export class SceneController {
 
       return {
         changes: changes,
-        undoLabel: "nudge selection", // TODO: translation
+        undoLabel: translate("action.nudge-selection"),
         broadcast: true,
       };
     });
@@ -1107,8 +1107,10 @@ export class SceneController {
         await editContext.editIncremental(changes.rollbackChange, false);
         editContext.editCancel();
         message(
-          "The glyph could not be saved.", // TODO: translation
-          `The edit has been reverted.\n\n${this._cancelGlyphEditing}` // TODO: translation
+          translate("message.glyph-could-not-be-saved"),
+          `${translate("message.edit-has-been-reverted")}\n\n${
+            this._cancelGlyphEditing
+          }`
         );
       }
     } else {
@@ -1173,7 +1175,7 @@ export class SceneController {
         }
       }
       this.selection = selection;
-      return "Reverse Contour Direction"; // TODO: translation
+      return translate("action.reverse-contour");
     });
   }
 
@@ -1214,7 +1216,7 @@ export class SceneController {
       }
 
       this.selection = newSelection;
-      return "Set Start Point"; // TODO: translation
+      return translate("action.set-contour-start");
     });
   }
 
@@ -1261,7 +1263,7 @@ export class SceneController {
         numSplits = splitPathAtPointIndices(layerGlyph.path, pointIndices);
       }
       this.selection = new Set();
-      return "Break Contour" + (numSplits > 1 ? "s" : ""); // TODO: translation
+      return translatePlural("action.break-contour", numSplits);
     });
   }
 
@@ -1325,7 +1327,7 @@ export class SceneController {
         }
       }
       this.selection = new Set();
-      return "Decompose Component" + (componentSelection?.length === 1 ? "" : "s"); // TODO: translation
+      return translatePlural("action.decompose-component", componentSelection?.length);
     });
   }
 
