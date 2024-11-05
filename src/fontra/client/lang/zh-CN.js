@@ -400,6 +400,12 @@ export const strings = {
   "sources.warning.unique-location": "The source location must be unique",
   "sources.warning.unique-source-name": "The source name must be unique",
   "toggle-fullscreen": "切换全屏",
+  "validation.error.axes-not-present-in-location": "axes %0 not present in location",
+  "validation.error.invalid-axis-values":
+    "Invalid axis values, must be minimum, default, maximum: %0",
+  "validation.error.locations-must-be-unique": "locations must be unique",
+  "validation.error.locations-must-contain-default":
+    "locations must contain default (missing base source)",
   "validation.error.path-not-compatible": "paths are not compatible",
   "zoom-fit-selection": "缩放到选区",
   "zoom-in": "放大",

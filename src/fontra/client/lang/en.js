@@ -411,6 +411,12 @@ export const strings = {
   "sources.warning.unique-location": "The source location must be unique",
   "sources.warning.unique-source-name": "The source name must be unique",
   "toggle-fullscreen": "Toggle Fullscreen",
+  "validation.error.axes-not-present-in-location": "axes %0 not present in location",
+  "validation.error.invalid-axis-values":
+    "Invalid axis values, must be minimum, default, maximum: %0",
+  "validation.error.locations-must-be-unique": "locations must be unique",
+  "validation.error.locations-must-contain-default":
+    "locations must contain default (missing base source)",
   "validation.error.path-not-compatible": "paths are not compatible",
   "zoom-fit-selection": "Zoom To Fit Selection",
   "zoom-in": "Zoom In",
