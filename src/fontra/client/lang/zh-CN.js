@@ -119,6 +119,7 @@ export const strings = {
   "dialog.create-new-glyph.body": '如果你想%1创建一个新的字形 "%0"，请点击 "创建"。',
   "dialog.create-new-glyph.body.2": '为字符 "%0" (%1)',
   "dialog.create-new-glyph.title": '创建新字形 "%0"？',
+  "dialog.delete": "Delete",
   "dialog.glyphs.search": "搜索字形",
   "dialog.okay": "确认",
   "dialog.replace": "替换",
@@ -209,7 +210,24 @@ export const strings = {
   "shortcuts.tooltip.reset-to-default": "重置为默认",
   "shortcuts.warning.exists": "快捷键已存在：0%",
   "sidebar.designspace-navigation": "Designspace 导航",
+  "sidebar.designspace-navigation.dialog.add-source.label.layer": "Layer:",
+  "sidebar.designspace-navigation.dialog.add-source.label.source-name": "Source name:",
+  "sidebar.designspace-navigation.dialog.add-source.ok-button-title": "Add",
+  "sidebar.designspace-navigation.dialog.add-source.title": "Add source",
+  "sidebar.designspace-navigation.dialog.delete-source.title": "Delete source",
+  "sidebar.designspace-navigation.dialog.source-properties.ok-button-title": "Done",
+  "sidebar.designspace-navigation.dialog.source-properties.title": "Source properties",
   "sidebar.designspace-navigation.font-axes": "字体参数轴",
+  "sidebar.designspace-navigation.font-axes-view-options-button.tooltip":
+    "View options",
+  "sidebar.designspace-navigation.font-axes-view-options-menu.apply-cross-axis-mapping":
+    "Apply cross-axis mapping",
+  "sidebar.designspace-navigation.font-axes-view-options-menu.apply-single-axis-mapping":
+    "Apply single-axis mapping",
+  "sidebar.designspace-navigation.font-axes-view-options-menu.show-effective-location":
+    "Show effective location",
+  "sidebar.designspace-navigation.font-axes-view-options-menu.show-hidden-axes":
+    "Show hidden axes",
   "sidebar.designspace-navigation.font-axes.edit": "编辑字体参数轴",
   "sidebar.designspace-navigation.font-axes.reset": "重置字体参数轴",
   "sidebar.designspace-navigation.glyph-axes": "字形参数轴",
@@ -218,6 +236,15 @@ export const strings = {
   "sidebar.designspace-navigation.glyph-sources": "字形图层",
   "sidebar.designspace-navigation.glyph-sources.name": "图层名称",
   "sidebar.designspace-navigation.glyph-sources.status": "状态",
+  "sidebar.designspace-navigation.source-properties.undo": "edit source properties",
+  "sidebar.designspace-navigation.source.activate": "activate %0",
+  "sidebar.designspace-navigation.source.deactivate": "deactivate %0",
+  "sidebar.designspace-navigation.undo.and-layer": "and layer",
+  "sidebar.designspace-navigation.undo.delete-source": "delete source%0",
+  "sidebar.designspace-navigation.warning.delete-associated-layer":
+    "Also delete associated layer %0",
+  "sidebar.designspace-navigation.warning.delete-source":
+    "Are you sure you want to delete source %0?",
   "sidebar.glyph-note": "字形注释",
   "sidebar.glyph-note.glyph-note-for-glyph": "0% 的字形备忘",
   "sidebar.glyph-note.no-glyph-selected": "（无选中字形）",
@@ -354,6 +381,8 @@ export const strings = {
   "sources.untitled-source": "Untitled source",
   "sources.warning.empty-source-name": "The source name must not be empty",
   "sources.warning.entry-exists": "%0 exists already, please use a different value.",
+  "sources.warning.interpolation-incompatibility":
+    "The source has an interpolation incompatibility",
   "sources.warning.unique-location": "The source location must be unique",
   "sources.warning.unique-source-name": "The source name must be unique",
   "toggle-fullscreen": "切换全屏",

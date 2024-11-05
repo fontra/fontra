@@ -126,6 +126,7 @@ export const strings = {
     'Klicke "Erstellen" um einen neuen Glyphen hinzuzufügen mit dem Namen "%0"%1.',
   "dialog.create-new-glyph.body.2": ' für das Zeichen "%0" (%1)',
   "dialog.create-new-glyph.title": 'Einen neuen Glyphen "%0" erstellen?',
+  "dialog.delete": "Entfernen",
   "dialog.glyphs.search": "Glyphen suchen",
   "dialog.okay": "Okay",
   "dialog.replace": "Ersetzen",
@@ -220,7 +221,25 @@ export const strings = {
   "shortcuts.tooltip.reset-to-default": "Zurücksetzen zu 'Default'",
   "shortcuts.warning.exists": "Tastaturkurzbefehl existiert bereits für: %0",
   "sidebar.designspace-navigation": "Designspace Navigation",
+  "sidebar.designspace-navigation.dialog.add-source.label.layer": "Layer:",
+  "sidebar.designspace-navigation.dialog.add-source.label.source-name": "Source Name:",
+  "sidebar.designspace-navigation.dialog.add-source.ok-button-title": "Hinzufügen",
+  "sidebar.designspace-navigation.dialog.add-source.title": "Source hinzufügen",
+  "sidebar.designspace-navigation.dialog.delete-source.title": "Source entfernen",
+  "sidebar.designspace-navigation.dialog.source-properties.ok-button-title": "Fertig",
+  "sidebar.designspace-navigation.dialog.source-properties.title":
+    "Source Eigenschaften",
   "sidebar.designspace-navigation.font-axes": "Font-Achsen",
+  "sidebar.designspace-navigation.font-axes-view-options-button.tooltip":
+    "Optionen anzeigen",
+  "sidebar.designspace-navigation.font-axes-view-options-menu.apply-cross-axis-mapping":
+    "Achsübergreifendes Mapping anwenden",
+  "sidebar.designspace-navigation.font-axes-view-options-menu.apply-single-axis-mapping":
+    "Einachsiges Mapping anwenden",
+  "sidebar.designspace-navigation.font-axes-view-options-menu.show-effective-location":
+    'effektive "location" anzeigen',
+  "sidebar.designspace-navigation.font-axes-view-options-menu.show-hidden-axes":
+    "Versteckte Achsen anzeigen",
   "sidebar.designspace-navigation.font-axes.edit": "Font-Achsen bearbeiten ",
   "sidebar.designspace-navigation.font-axes.reset": "Font-Achsen zurücksetzen",
   "sidebar.designspace-navigation.glyph-axes": "Glyph-Achsen",
@@ -229,6 +248,16 @@ export const strings = {
   "sidebar.designspace-navigation.glyph-sources": "Glyph-Sourcen",
   "sidebar.designspace-navigation.glyph-sources.name": "Source Name",
   "sidebar.designspace-navigation.glyph-sources.status": "Status",
+  "sidebar.designspace-navigation.source-properties.undo":
+    "Source Eigenschaften bearbeiten",
+  "sidebar.designspace-navigation.source.activate": "aktiviere %0",
+  "sidebar.designspace-navigation.source.deactivate": "deaktivere %0",
+  "sidebar.designspace-navigation.undo.and-layer": "und Layer",
+  "sidebar.designspace-navigation.undo.delete-source": "entferne Source%0",
+  "sidebar.designspace-navigation.warning.delete-associated-layer":
+    "Auch den dazugehörigen Layer %0 entfernen",
+  "sidebar.designspace-navigation.warning.delete-source":
+    "Bist du sicher, dass du Source %0 entfernen willst?",
   "sidebar.glyph-note": "Glyph-Notiz",
   "sidebar.glyph-note.glyph-note-for-glyph": "Glyph-Notiz für %0",
   "sidebar.glyph-note.no-glyph-selected": "(keine Glyphe ausgewählt)",
@@ -375,6 +404,8 @@ export const strings = {
   "sources.warning.empty-source-name": "Der Source-Name darf nicht leer sein",
   "sources.warning.entry-exists":
     "%0 existiert bereits, bitte verwende einen anderen Wert.",
+  "sources.warning.interpolation-incompatibility":
+    "Die Source hat eine Interpolations-Inkompatibilität",
   "sources.warning.unique-location": "Die Location muss einzigartig sein",
   "sources.warning.unique-source-name": "Der Source-Name muss einzigartig sein",
   "toggle-fullscreen": "Vollbild einschalten",

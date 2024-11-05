@@ -125,6 +125,7 @@ export const strings = {
     'Cliquez "Créer" si vous voulez créer un nouveau glyphe nommé  "%0"%1.',
   "dialog.create-new-glyph.body.2": ' pour le caractère "%0" (%1)',
   "dialog.create-new-glyph.title": 'Créer un nouveau glyphe "%0"?',
+  "dialog.delete": "Delete",
   "dialog.glyphs.search": "Chercher des glyphes",
   "dialog.okay": "Okay",
   "dialog.replace": "Remplacer",
@@ -220,7 +221,24 @@ export const strings = {
   "shortcuts.tooltip.reset-to-default": "Reset to default",
   "shortcuts.warning.exists": "Shortcut exists for: %0",
   "sidebar.designspace-navigation": "Navigation du designspace",
+  "sidebar.designspace-navigation.dialog.add-source.label.layer": "Layer:",
+  "sidebar.designspace-navigation.dialog.add-source.label.source-name": "Source name:",
+  "sidebar.designspace-navigation.dialog.add-source.ok-button-title": "Add",
+  "sidebar.designspace-navigation.dialog.add-source.title": "Add source",
+  "sidebar.designspace-navigation.dialog.delete-source.title": "Delete source",
+  "sidebar.designspace-navigation.dialog.source-properties.ok-button-title": "Done",
+  "sidebar.designspace-navigation.dialog.source-properties.title": "Source properties",
   "sidebar.designspace-navigation.font-axes": "Axes de la fonte",
+  "sidebar.designspace-navigation.font-axes-view-options-button.tooltip":
+    "View options",
+  "sidebar.designspace-navigation.font-axes-view-options-menu.apply-cross-axis-mapping":
+    "Apply cross-axis mapping",
+  "sidebar.designspace-navigation.font-axes-view-options-menu.apply-single-axis-mapping":
+    "Apply single-axis mapping",
+  "sidebar.designspace-navigation.font-axes-view-options-menu.show-effective-location":
+    "Show effective location",
+  "sidebar.designspace-navigation.font-axes-view-options-menu.show-hidden-axes":
+    "Show hidden axes",
   "sidebar.designspace-navigation.font-axes.edit": "Éditer les axes de la fonte",
   "sidebar.designspace-navigation.font-axes.reset":
     "Réinitialiser les axes de la fonte",
@@ -230,6 +248,15 @@ export const strings = {
   "sidebar.designspace-navigation.glyph-sources": "Sources du glyphe",
   "sidebar.designspace-navigation.glyph-sources.name": "Nom de la source",
   "sidebar.designspace-navigation.glyph-sources.status": "Statut",
+  "sidebar.designspace-navigation.source-properties.undo": "edit source properties",
+  "sidebar.designspace-navigation.source.activate": "activate %0",
+  "sidebar.designspace-navigation.source.deactivate": "deactivate %0",
+  "sidebar.designspace-navigation.undo.and-layer": "and layer",
+  "sidebar.designspace-navigation.undo.delete-source": "delete source%0",
+  "sidebar.designspace-navigation.warning.delete-associated-layer":
+    "Also delete associated layer %0",
+  "sidebar.designspace-navigation.warning.delete-source":
+    "Are you sure you want to delete source %0?",
   "sidebar.glyph-note": "Note du glyphe",
   "sidebar.glyph-note.glyph-note-for-glyph": "Glyph Note for %0",
   "sidebar.glyph-note.no-glyph-selected": "(No glyph selected)",
@@ -378,6 +405,8 @@ export const strings = {
   "sources.untitled-source": "Untitled source",
   "sources.warning.empty-source-name": "The source name must not be empty",
   "sources.warning.entry-exists": "%0 exists already, please use a different value.",
+  "sources.warning.interpolation-incompatibility":
+    "The source has an interpolation incompatibility",
   "sources.warning.unique-location": "The source location must be unique",
   "sources.warning.unique-source-name": "The source name must be unique",
   "toggle-fullscreen": "Plein écran",
