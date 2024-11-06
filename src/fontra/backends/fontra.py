@@ -1,4 +1,5 @@
 import asyncio
+import base64
 import csv
 import json
 import logging
@@ -91,6 +92,13 @@ class FontraBackend:
     @property
     def glyphsDir(self):
         return self.path / self.glyphsDirName
+
+    @property
+    def binaryDataPath(self):
+        binaryDataPath = self.path / "binaryData"
+        if not binaryDataPath.is_dir():
+            binaryDataPath.mkdir()
+        return binaryDataPath
 
     async def aclose(self):
         self.flush()
@@ -187,6 +195,21 @@ class FontraBackend:
     async def putCustomData(self, customData: dict[str, Any]) -> None:
         self.fontData.customData = deepcopy(customData)
         self._scheduler.schedule(self._writeFontData)
+
+    async def getBinaryData(self) -> bytes | None:
+        binaryData = {}
+        if not self.binaryDataPath.is_dir():
+            return binaryData
+        for filePath in self.binaryDataPath.iterdir():
+            if filePath.is_file():
+                binaryData[filePath.name] = base64.b64encode(
+                    filePath.read_bytes()
+                ).decode("utf-8")
+        return binaryData
+
+    async def putBinaryData(self, name: str, binaryData: bytes) -> None:
+        filePath = self.binaryDataPath / name
+        filePath.write_bytes(binaryData)
 
     def _readGlyphInfo(self) -> None:
         with self.glyphInfoPath.open("r", encoding="utf-8", newline="") as file:

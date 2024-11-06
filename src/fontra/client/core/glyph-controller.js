@@ -663,7 +663,9 @@ export class StaticGlyphController {
         const yScale = image.transformation.scaleY;
 
         const img = new Image();
-        img.src = "data:image/jpg;base64," + image.customData["base64"];
+        // TODO: We need the fontController to get the image data for calculating the size
+        // of the image to get the right bounding box.
+        // img.src = "data:image/jpg;base64," + fontController.getImage(image.fileName);
 
         const w = img.width * xScale;
         const h = img.height * yScale;

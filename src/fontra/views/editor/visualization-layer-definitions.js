@@ -428,7 +428,7 @@ registerVisualizationLayerDefinition({
     }
 
     const img = new Image();
-    img.src = "data:image/jpg;base64," + image.customData["base64"];
+    img.src = "data:image/jpg;base64," + model.fontController.getImage(image.fileName);
 
     const sx = image.transformation.translateX;
     const sy = image.transformation.translateY;

@@ -220,6 +220,8 @@ class FontHandler:
                 value = await self.backend.getCustomData()
             case "unitsPerEm":
                 value = await self.backend.getUnitsPerEm()
+            case "binaryData":
+                value = await self.backend.getBinaryData()
             case _:
                 raise KeyError(key)
 
@@ -267,6 +269,13 @@ class FontHandler:
     @remoteMethod
     async def getCustomData(self, *, connection):
         return await self.getData("customData")
+
+    # Then add getBinaryData() on FontHandler as a "remotemethod"
+    @remoteMethod
+    async def getBinaryData(self, *, connection):
+        print("FontHandler getBinaryData")
+        # and do the base64 conversion there.
+        return await self.getData("binaryData")
 
     def _getClientData(self, connection, key, default=None):
         return self.clientData[connection.clientUUID].get(key, default)

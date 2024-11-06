@@ -55,6 +55,7 @@ export class FontController {
     this._rootObject.sources = ensureDenseSources(await this.font.getSources());
     this._rootObject.unitsPerEm = await this.font.getUnitsPerEm();
     this._rootObject.customData = await this.font.getCustomData();
+    this._rootObject.binaryData = await this.font.getBinaryData();
     this._rootClassDef = (await getClassSchema())["Font"];
     this.backendInfo = await this.font.getBackEndInfo();
     this.readOnly = await this.font.isReadOnly();
@@ -102,6 +103,15 @@ export class FontController {
 
   get customData() {
     return this._rootObject.customData;
+  }
+
+  get binaryData() {
+    return this._rootObject.binaryData;
+  }
+
+  getImage(name) {
+    // async messes up the visualization of the image
+    return this.binaryData[name];
   }
 
   async getData(key) {

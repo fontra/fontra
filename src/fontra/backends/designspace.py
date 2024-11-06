@@ -1076,6 +1076,40 @@ class DesignspaceBackend:
         self.dsDoc.write(self.dsDoc.path)
         self.dsDocModTime = os.stat(self.dsDoc.path).st_mtime
 
+    async def getBinaryData(self) -> dict[str, bytes]:
+        binaryData = {}
+
+        for ufoLayer in self.ufoLayers:
+            folderPath = pathlib.Path(ufoLayer.path) / "images"
+            if not folderPath.is_dir():
+                continue
+            for filePath in folderPath.iterdir():
+                if filePath.is_file():
+                    binaryData[filePath.name] = base64.b64encode(
+                        filePath.read_bytes()
+                    ).decode("utf-8")
+
+        return binaryData
+
+    async def putBinaryData(
+        self, name: str, fontraLayerName: str | None, binaryData: bytes
+    ) -> None:
+        if fontraLayerName is not None:
+            ufoDir = self.ufoLayers.findItem(fontraLayerName=fontraLayerName).path
+            filePath = pathlib.Path(ufoDir) / "images" / name
+        else:
+            # loop through all layers and return the first found image
+            for ufoLayer in self.ufoLayers:
+                ufoDir = ufoLayer.path
+                filePath = pathlib.Path(ufoDir) / "images" / name
+                if filePath.is_file():
+                    break
+
+        if not filePath.is_file():
+            filePath = pathlib.Path(self.defaultUFOLayer.path) / "images" / name
+
+        filePath.write_bytes(binaryData)
+
     async def watchExternalChanges(
         self, callback: Callable[[Any], Awaitable[None]]
     ) -> None:
@@ -1590,7 +1624,7 @@ def ufoLayerToStaticGlyph(
         verticalOrigin=verticalOrigin,
         anchors=unpackAnchors(glyph.anchors),
         guidelines=unpackGuidelines(glyph.guidelines),
-        image=unpackImage(glyph.image, ufoDir),
+        image=unpackImage(glyph.image),
     )
 
     return staticGlyph, glyph
@@ -1613,17 +1647,9 @@ def unpackAnchors(anchors):
     return [Anchor(name=a.get("name"), x=a["x"], y=a["y"]) for a in anchors]
 
 
-def unpackImage(image, ufoDir=None):
+def unpackImage(image):
     if image is None:
         return None
-
-    if ufoDir is None:
-        customData = image.get("customData", {})
-    else:
-        pathToImage = os.path.join(ufoDir, "images/", image["fileName"])
-        with open(pathToImage, "rb") as image_file:
-            base64Data = base64.b64encode(image_file.read()).decode("utf-8")
-        customData = image.get("customData", {"base64": base64Data})
 
     xx = image.get("xScale", 1)
     xy = image.get("xyScale", 0)
@@ -1632,13 +1658,13 @@ def unpackImage(image, ufoDir=None):
     dx = image.get("xOffset", 0)
     dy = image.get("yOffset", 0)
     transformation = Transform(xx, xy, yx, yy, dx, dy)
-    transformation = DecomposedTransform.fromTransform(transformation)
+    decomposedTransform = DecomposedTransform.fromTransform(transformation)
 
     return Image(
         fileName=image["fileName"],
-        transformation=transformation,
+        transformation=decomposedTransform,
         color=image.get("color", None),
-        customData=customData,
+        customData=image.get("customData", {}),
     )
 
 

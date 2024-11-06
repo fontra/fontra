@@ -288,16 +288,26 @@ async def test_addAnchor(writableTestFont):
     )
 
 
+async def test_getBinaryData(writableTestFont):
+    glyph = await writableTestFont.getGlyph("M")
+
+    layerName = "MutatorSansLightCondensed/foreground"
+    layer = glyph.layers[layerName]
+    binaryData = await writableTestFont.getBinaryData()
+
+    ufoDir = writableTestFont.ufoLayers.findItem(fontraLayerName=layerName).path
+    filePath = pathlib.Path(ufoDir) / "images" / "W_images.png"
+
+    assert binaryData[layer.glyph.image.fileName] == base64.b64encode(
+        filePath.read_bytes()
+    ).decode("utf-8")
+
+
 async def test_getImage(writableTestFont):
     glyph = await writableTestFont.getGlyph("M")
 
     layerName = "MutatorSansLightCondensed/foreground"
     layer = glyph.layers[layerName]
-
-    ufoDir = writableTestFont.ufoLayers.findItem(fontraLayerName=layerName).path
-    pathToImage = pathlib.Path(ufoDir) / "images" / "W_images.png"
-    with open(pathToImage, "rb") as image_file:
-        base64Data = base64.b64encode(image_file.read()).decode("utf-8")
 
     transformation = Transform(
         -0.29948946703118456,
@@ -307,14 +317,14 @@ async def test_getImage(writableTestFont):
         901.6748243052426,
         789.4527729820308,
     )
-    transformation = DecomposedTransform.fromTransform(transformation)
+    decomposedTransform = DecomposedTransform.fromTransform(transformation)
 
     assert layer.glyph.image is not None
     image = Image(
         fileName="W_images.png",
-        transformation=transformation,
+        transformation=decomposedTransform,
         color=None,
-        customData={"base64": base64Data},
+        customData={},
     )
     assert image.fileName == layer.glyph.image.fileName
     assert image.transformation == layer.glyph.image.transformation

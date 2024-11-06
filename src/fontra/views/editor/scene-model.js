@@ -546,6 +546,7 @@ export class SceneModel {
     //   return { selection: fontGuidelineSelection };
     // }
 
+    // TODO: If images are locked, don't allow selection
     const imageSelection = this.imageSelectionAtPoint(point);
     if (imageSelection.size) {
       return { selection: imageSelection };
@@ -741,7 +742,7 @@ export class SceneModel {
     const y = point.y - positionedGlyph.y;
 
     const img = new Image();
-    img.src = "data:image/jpg;base64," + image.customData["base64"];
+    img.src = "data:image/jpg;base64," + this.fontController.getImage(image.fileName);
 
     const sx = image.transformation.translateX;
     const sy = image.transformation.translateY;
