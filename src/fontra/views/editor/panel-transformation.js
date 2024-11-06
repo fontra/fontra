@@ -959,7 +959,7 @@ class MovableObject {
 
 // Define moveDescriptor objects
 const alignLeft = {
-  undoLabel: "align left", // TODO: translation
+  undoLabel: "align left", // TODO: maybe use translate("sidebar.selection-transformation.align.left")
   computeDeltasFromBoundingBoxes: (boundingBoxes) => {
     const xMins = boundingBoxes.map((bounds) => bounds.xMin);
     const left = Math.min(...xMins);
@@ -971,7 +971,7 @@ const alignLeft = {
 };
 
 const alignCenter = {
-  undoLabel: "align center", // TODO: translation
+  undoLabel: "align center", // TODO: maybe use translate("sidebar.selection-transformation.align.center")
   computeDeltasFromBoundingBoxes: (boundingBoxes) => {
     const xMaxes = boundingBoxes.map((bounds) => bounds.xMax);
     const xMins = boundingBoxes.map((bounds) => bounds.xMin);
@@ -985,7 +985,7 @@ const alignCenter = {
 };
 
 const alignRight = {
-  undoLabel: "align right", // TODO: translation
+  undoLabel: "align right", // TODO: maybe use translate("sidebar.selection-transformation.align.right")
   computeDeltasFromBoundingBoxes: (boundingBoxes) => {
     const xMaxes = boundingBoxes.map((bounds) => bounds.xMax);
     const right = Math.max(...xMaxes);
@@ -997,7 +997,7 @@ const alignRight = {
 };
 
 const alignTop = {
-  undoLabel: "align top", // TODO: translation
+  undoLabel: "align top", // TODO: maybe use translate("sidebar.selection-transformation.align.top")
   computeDeltasFromBoundingBoxes: (boundingBoxes) => {
     const yMaxes = boundingBoxes.map((bounds) => bounds.yMax);
     const top = Math.max(...yMaxes);
@@ -1009,7 +1009,7 @@ const alignTop = {
 };
 
 const alignMiddle = {
-  undoLabel: "align middle", // TODO: translation
+  undoLabel: "align middle", // TODO: maybe use translate("sidebar.selection-transformation.align.middle")
   computeDeltasFromBoundingBoxes: (boundingBoxes) => {
     const yMaxes = boundingBoxes.map((bounds) => bounds.yMax);
     const yMins = boundingBoxes.map((bounds) => bounds.yMin);
@@ -1023,7 +1023,7 @@ const alignMiddle = {
 };
 
 const alignBottom = {
-  undoLabel: "align bottom", // TODO: translation
+  undoLabel: "align bottom", // TODO: maybe use translate("sidebar.selection-transformation.align.bottom")
   computeDeltasFromBoundingBoxes: (boundingBoxes) => {
     const yMins = boundingBoxes.map((bounds) => bounds.yMin);
     const bottom = Math.min(...yMins);
