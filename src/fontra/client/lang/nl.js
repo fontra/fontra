@@ -409,6 +409,7 @@ export const strings = {
   "sidebar.user-settings.glyph.sidebearings": "Breedtes voor overige glyphs",
   "sidebar.user-settings.glyph.statuscolor": "Onwikkelingsstatuskleur",
   "sidebar.user-settings.glyph.upmgrid": "Units-per-em grid",
+  "sidebar.user-settings.guidelines": "Guidelines",
   "sidebar.user-settings.language": "Weergavetaal",
   "sidebar.user-settings.line-metrics": "Line metrics",
   "sidebar.user-settings.server": "Server informatie",

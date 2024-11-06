@@ -404,6 +404,7 @@ export const strings = {
   "sidebar.user-settings.glyph.sidebearings": "Sidebearings for non-editing glyphs",
   "sidebar.user-settings.glyph.statuscolor": "Development status color",
   "sidebar.user-settings.glyph.upmgrid": "Units-per-em grid",
+  "sidebar.user-settings.guidelines": "Guidelines",
   "sidebar.user-settings.language": "Display language",
   "sidebar.user-settings.line-metrics": "Line metrics",
   "sidebar.user-settings.server": "Server info",

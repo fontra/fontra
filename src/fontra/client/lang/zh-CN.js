@@ -394,6 +394,7 @@ export const strings = {
   "sidebar.user-settings.glyph.sidebearings": "非编辑字形的边距",
   "sidebar.user-settings.glyph.statuscolor": "开发状态颜色标签",
   "sidebar.user-settings.glyph.upmgrid": "UPM 网格",
+  "sidebar.user-settings.guidelines": "Guidelines",
   "sidebar.user-settings.language": "显示语言",
   "sidebar.user-settings.line-metrics": "Line metrics",
   "sidebar.user-settings.server": "服务器信息",

@@ -417,6 +417,7 @@ export const strings = {
   "sidebar.user-settings.glyph.sidebearings": "Approches pour les glyphes non édités",
   "sidebar.user-settings.glyph.statuscolor": "Couleurs des statuts de développement",
   "sidebar.user-settings.glyph.upmgrid": "Grille UPM (Units-per-em)",
+  "sidebar.user-settings.guidelines": "Guidelines",
   "sidebar.user-settings.language": "Langue utilisée",
   "sidebar.user-settings.line-metrics": "Line metrics",
   "sidebar.user-settings.server": "Information du serveur",

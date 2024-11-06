@@ -420,6 +420,7 @@ export const strings = {
     "Glyph-Rand für nicht editierende Glyphen",
   "sidebar.user-settings.glyph.statuscolor": "Entwicklungsstatus Farbe",
   "sidebar.user-settings.glyph.upmgrid": "UPM-Raster (Units-per-em)",
+  "sidebar.user-settings.guidelines": "Hilfslinien",
   "sidebar.user-settings.language": "Anzeigesprache",
   "sidebar.user-settings.line-metrics": "Zeilen Metriken",
   "sidebar.user-settings.server": "Server Info",
