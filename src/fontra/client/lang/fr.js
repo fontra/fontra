@@ -125,8 +125,6 @@ export const strings = {
   "development-status-definitions.undo.change-is-default":
     "change status definition isDefault",
   "development-status-definitions.undo.delete": "delete status definition %0",
-  "development-status-definitions.warning.entry-exists":
-    "%0 exists already, please use a different value.",
   "development-status-definitions.warning.positive-number":
     "Value must be a positive number.",
   "dialog.add": "Ajouter",
@@ -448,12 +446,12 @@ export const strings = {
   "sources.undo.delete": "delete source %0",
   "sources.untitled-source": "Untitled source",
   "sources.warning.empty-source-name": "The source name must not be empty",
-  "sources.warning.entry-exists": "%0 exists already, please use a different value.",
   "sources.warning.interpolation-incompatibility":
     "The source has an interpolation incompatibility",
   "sources.warning.unique-location": "The source location must be unique",
   "sources.warning.unique-source-name": "The source name must be unique",
   "toggle-fullscreen": "Plein écran",
+  "warning.entry-exists": "%0 exists already, please use a different value.",
   "warning.must-be-number": "The %0 value must be a number",
   "warning.name-must-be-unique": "The name must be unique",
   "warning.name-must-not-be-empty": "The name must not be empty",

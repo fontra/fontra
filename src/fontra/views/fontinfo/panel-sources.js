@@ -431,7 +431,7 @@ class SourceBox extends HTMLElement {
         const valueString = `${key}${
           valueKey ? " " + valueKey : ""
         }: “${thisSourceValue}”`;
-        errorMessage = translate("sources.warning.entry-exists", valueString);
+        errorMessage = translate("warning.entry-exists", valueString);
         break;
       }
     }

@@ -190,10 +190,7 @@ class StatusDefinitionBox extends HTMLElement {
     const statusDefinitions =
       this.fontController.customData["fontra.sourceStatusFieldDefinitions"];
     if (statusDefinitions.some((statusDef) => statusDef.value == statusDefValue)) {
-      errorMessage = translate(
-        "development-status-definitions.warning.entry-exists",
-        statusDefValue
-      );
+      errorMessage = translate("warning.entry-exists", statusDefValue);
     }
 
     if (!Number.isInteger(statusDefValue) || statusDefValue < 0) {

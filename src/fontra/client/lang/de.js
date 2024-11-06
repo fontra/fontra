@@ -126,8 +126,6 @@ export const strings = {
   "development-status-definitions.undo.change-is-default":
     "Ist Default' ändern von Status-Definition",
   "development-status-definitions.undo.delete": "Status-Definition %0 entfernen",
-  "development-status-definitions.warning.entry-exists":
-    "%0 existiert bereits, bitte verwende einen anderen Wert.",
   "development-status-definitions.warning.positive-number":
     "Wert muss eine positive Nummer sein.",
   "dialog.add": "Hinzufügen",
@@ -451,13 +449,12 @@ export const strings = {
   "sources.undo.delete": "%0 Source entfernen",
   "sources.untitled-source": "Unbenannte Source",
   "sources.warning.empty-source-name": "Der Source-Name darf nicht leer sein",
-  "sources.warning.entry-exists":
-    "%0 existiert bereits, bitte verwende einen anderen Wert.",
   "sources.warning.interpolation-incompatibility":
     "Die Source hat eine Interpolations-Inkompatibilität",
   "sources.warning.unique-location": "Die Location muss einzigartig sein",
   "sources.warning.unique-source-name": "Der Source-Name muss einzigartig sein",
   "toggle-fullscreen": "Vollbild einschalten",
+  "warning.entry-exists": "%0 existiert bereits, bitte verwende einen anderen Wert.",
   "warning.must-be-number": "Der Wert %0 muss eine Zahl sein",
   "warning.name-must-be-unique": "Der Name muss einzigartig sein",
   "warning.name-must-not-be-empty": "Der Name darf nicht leer sein",
