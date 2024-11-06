@@ -50,6 +50,7 @@ export const strings = {
   "application-settings.display-language.status.beta": "Beta",
   "application-settings.display-language.status.wip": "In Arbeit",
   "application-settings.display-language.title": "Display Language",
+  "application-settings.display-language.title.translated": "Anzeigesprache",
   "application-settings.editor-behavior.title": "Editor-Verhalten",
   "application-settings.plugins-manager.title": "Plugin Manager",
   "application-settings.server-info.title": "Server Info",
@@ -457,14 +458,6 @@ export const strings = {
   "sources.warning.unique-location": "Die Location muss einzigartig sein",
   "sources.warning.unique-source-name": "Der Source-Name muss einzigartig sein",
   "toggle-fullscreen": "Vollbild einschalten",
-  "validation.error.axes-not-present-in-location":
-    "Achsen %0 nicht in Location vorhanden",
-  "validation.error.invalid-axis-values":
-    "Ungültige Achsenwerte, müssen Minimum, Default, Maximum sein: %0",
-  "validation.error.locations-must-be-unique": "Location muss einzigartig sein",
-  "validation.error.locations-must-contain-default":
-    "Location muss Default enthalten (Basis-Source fehlt)",
-  "validation.error.path-not-compatible": "Pfade sind nicht kompatibel",
   "warning.must-be-number": "Der Wert %0 muss eine Zahl sein",
   "warning.name-must-be-unique": "Der Name muss einzigartig sein",
   "warning.name-must-not-be-empty": "Der Name darf nicht leer sein",

@@ -13,12 +13,10 @@ export class VariationModel {
     const locationsSet = new Set(locations.map((item) => locationToString(item)));
     if (locationsSet.size != locations.length) {
       console.log("locations:", locations);
-      throw new VariationError(translate("validation.error.locations-must-be-unique"));
+      throw new VariationError("locations must be unique");
     }
     if (!locationsSet.has("{}")) {
-      throw new VariationError(
-        translate("validation.error.locations-must-contain-default")
-      );
+      throw new VariationError("locations must contain default (missing base source)");
     }
     this.locations = sortedLocations(locations, axisOrder);
     // Mapping from user's master order to our master order
@@ -297,7 +295,7 @@ export function normalizeValue(v, lower, dflt, upper) {
   // Normalizes value based on a min/default/max triple.
   if (!(lower <= dflt && dflt <= upper)) {
     throw new VariationError(
-      translate("validation.error.invalid-axis-values", `${lower}, ${dflt}, ${upper}`)
+      `Invalid axis values, must be minimum, default, maximum: ${lower}, ${dflt}, ${upper}`
     );
   }
   v = clamp(v, lower, upper);
@@ -379,9 +377,7 @@ export function supportScalar(location, support, ot = true) {
       v = location[axis] || 0.0;
     } else {
       if (location[axis] === undefined) {
-        throw new VariationError(
-          translate("validation.error.axes-not-present-in-location", axis)
-        );
+        throw new VariationError(`axes ${axis} not present in location`);
       }
       v = location[axis];
     }

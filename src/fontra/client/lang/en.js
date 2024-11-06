@@ -50,6 +50,7 @@ export const strings = {
   "application-settings.display-language.status.beta": "beta",
   "application-settings.display-language.status.wip": "work in progress",
   "application-settings.display-language.title": "Display Language",
+  "application-settings.display-language.title.translated": "Display Language",
   "application-settings.editor-behavior.title": "Editor Behavior",
   "application-settings.plugins-manager.title": "Plugin Manager",
   "application-settings.server-info.title": "Server info",
@@ -440,13 +441,6 @@ export const strings = {
   "sources.warning.unique-location": "The source location must be unique",
   "sources.warning.unique-source-name": "The source name must be unique",
   "toggle-fullscreen": "Toggle Fullscreen",
-  "validation.error.axes-not-present-in-location": "axes %0 not present in location",
-  "validation.error.invalid-axis-values":
-    "Invalid axis values, must be minimum, default, maximum: %0",
-  "validation.error.locations-must-be-unique": "locations must be unique",
-  "validation.error.locations-must-contain-default":
-    "locations must contain default (missing base source)",
-  "validation.error.path-not-compatible": "paths are not compatible",
   "warning.must-be-number": "The %0 value must be a number",
   "warning.name-must-be-unique": "The name must be unique",
   "warning.name-must-not-be-empty": "The name must not be empty",
