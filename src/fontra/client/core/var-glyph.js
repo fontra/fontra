@@ -77,7 +77,7 @@ export function copyComponent(component) {
   };
 }
 
-export function copyBackgroundImage(image) {
+function copyBackgroundImage(image) {
   if (!image) {
     return undefined;
   }
