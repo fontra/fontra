@@ -18,7 +18,9 @@ import {
   reversed,
 } from "../core/utils.js";
 import * as vector from "../core/vector.js";
+import { convexHull } from "/core/convex-hull.js";
 import { loaderSpinner } from "/core/loader-spinner.js";
+import { decomposedToTransform } from "/core/transform.js";
 
 export class SceneModel {
   constructor(
@@ -545,6 +547,11 @@ export class SceneModel {
     //   return { selection: fontGuidelineSelection };
     // }
 
+    const backgroundImageSelection = this.backgroundImageSelectionAtPoint(point);
+    if (backgroundImageSelection.size) {
+      return { selection: backgroundImageSelection };
+    }
+
     return {};
   }
 
@@ -715,6 +722,61 @@ export class SceneModel {
   // TODO: Font Guidelines
   //fontGuidelineSelectionAtPoint(point, size) {
   // }
+
+  backgroundImageSelectionAtPoint(point) {
+    // TODO: If backgroundImages are locked or hidden don't allow selection
+    // if (
+    //   !this.editorController.visualizationLayersSettings.model[
+    //     "fontra.background.image"
+    //   ]
+    // ) {
+    //   return new Set();
+    // }
+
+    const positionedGlyph = this.getSelectedPositionedGlyph();
+    if (!positionedGlyph) {
+      return new Set();
+    }
+
+    const backgroundImage = positionedGlyph.glyph.backgroundImage;
+    if (!backgroundImage) {
+      return new Set();
+    }
+
+    const image = this.fontController.getBackgroundImageCached(
+      backgroundImage.identifier,
+      () => controller.requestUpdate()
+    );
+
+    if (!image) {
+      return new Set();
+    }
+
+    const x = point.x - positionedGlyph.x;
+    const y = point.y - positionedGlyph.y;
+
+    const p1 = {
+      x: backgroundImage.transformation.translateX,
+      y: backgroundImage.transformation.translateY,
+    };
+    const p2 = {
+      x: p1.x + image.width * backgroundImage.transformation.scaleX,
+      y: p1.y,
+    };
+    const p3 = {
+      x: p1.x + image.width * backgroundImage.transformation.scaleX,
+      y: p1.y + image.height * backgroundImage.transformation.scaleY,
+    };
+    const p4 = {
+      x: p1.x,
+      y: p1.y + image.height * backgroundImage.transformation.scaleY,
+    };
+
+    if (pointInConvexPolygon(x, y, convexHull([p1, p2, p3, p4]))) {
+      return new Set([`backgroundImage/0`]);
+    }
+    return new Set([]);
+  }
 
   selectionAtRect(selRect, pointFilterFunc) {
     const selection = new Set();

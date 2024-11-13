@@ -414,6 +414,11 @@ registerVisualizationLayerDefinition({
   userSwitchable: true,
   defaultOn: true,
   zIndex: 50,
+  screenParameters: {
+    strokeWidth: 2,
+  },
+  colors: { strokeColor: "#888" },
+  colorsDarkMode: { strokeColor: "#FFF" },
 
   draw: (context, positionedGlyph, parameters, model, controller) => {
     const backgroundImage = positionedGlyph.glyph.backgroundImage;
@@ -429,6 +434,10 @@ registerVisualizationLayerDefinition({
     if (!image) {
       return;
     }
+
+    const { backgroundImage: backgroundImageSelection } = parseSelection(
+      model.selection
+    );
 
     const affine = decomposedToTransform(backgroundImage.transformation)
       .translate(0, image.height)
@@ -449,6 +458,13 @@ registerVisualizationLayerDefinition({
         context.globalAlpha = backgroundImage.color.alpha;
       }
       context.drawImage(image, 0, 0, image.width, image.height);
+
+      if (backgroundImageSelection) {
+        context.globalAlpha = 1.0; // undo alpha for selection border
+        context.strokeStyle = parameters.strokeColor;
+        context.lineWidth = parameters.strokeWidth;
+        context.strokeRect(0, 0, image.width, image.height);
+      }
     });
   },
 });
