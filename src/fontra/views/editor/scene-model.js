@@ -744,8 +744,7 @@ export class SceneModel {
     }
 
     const image = this.fontController.getBackgroundImageCached(
-      backgroundImage.identifier,
-      () => controller.requestUpdate()
+      backgroundImage.identifier
     );
 
     if (!image) {
@@ -755,24 +754,23 @@ export class SceneModel {
     const x = point.x - positionedGlyph.x;
     const y = point.y - positionedGlyph.y;
 
-    const p1 = {
-      x: backgroundImage.transformation.translateX,
-      y: backgroundImage.transformation.translateY,
-    };
-    const p2 = {
-      x: p1.x + image.width * backgroundImage.transformation.scaleX,
-      y: p1.y,
-    };
-    const p3 = {
-      x: p1.x + image.width * backgroundImage.transformation.scaleX,
-      y: p1.y + image.height * backgroundImage.transformation.scaleY,
-    };
-    const p4 = {
-      x: p1.x,
-      y: p1.y + image.height * backgroundImage.transformation.scaleY,
-    };
+    const affine = decomposedToTransform(backgroundImage.transformation)
+      .translate(0, image.height)
+      .scale(1, -1);
 
-    if (pointInConvexPolygon(x, y, convexHull([p1, p2, p3, p4]))) {
+    const p1 = affine.transformPoint(0, 0);
+    const p2 = affine.transformPoint(image.width, 0);
+    const p3 = affine.transformPoint(image.width, image.height);
+    const p4 = affine.transformPoint(0, image.height);
+
+    const imageHull = convexHull([
+      { x: p1[0], y: p1[1] },
+      { x: p2[0], y: p2[1] },
+      { x: p3[0], y: p3[1] },
+      { x: p4[0], y: p4[1] },
+    ]);
+
+    if (pointInConvexPolygon(x, y, imageHull)) {
       return new Set([`backgroundImage/0`]);
     }
     return new Set([]);
