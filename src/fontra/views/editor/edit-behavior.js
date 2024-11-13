@@ -2,7 +2,7 @@ import { consolidateChanges } from "../core/changes.js";
 import { polygonIsConvex } from "../core/convex-hull.js";
 import { Transform, decomposedToTransform } from "../core/transform.js";
 import { enumerate, parseSelection, reversed, unionIndexSets } from "../core/utils.js";
-import { copyComponent } from "../core/var-glyph.js";
+import { copyBackgroundImage, copyComponent } from "../core/var-glyph.js";
 import * as vector from "../core/vector.js";
 import {
   ANY,
@@ -25,6 +25,7 @@ export class EditBehaviorFactory {
       guideline: guidelineSelection,
       componentOrigin: componentOriginSelection,
       componentTCenter: componentTCenterSelection,
+      backgroundImage: backgroundImageSelection,
     } = parseSelection(selection);
     const componentOriginIndices = unionIndexSets(
       componentSelection,
@@ -39,6 +40,9 @@ export class EditBehaviorFactory {
     this.components = unpackComponents(instance.components, relevantComponentIndices);
     this.anchors = unpackAnchors(instance.anchors, anchorSelection || []);
     this.guidelines = unpackGuidelines(instance.guidelines, guidelineSelection || []);
+    this.backgroundImage = backgroundImageSelection
+      ? instance.backgroundImage
+      : undefined;
     this.componentOriginIndices = componentOriginIndices || [];
     this.componentTCenterIndices = componentTCenterSelection || [];
     this.behaviors = {};
@@ -61,6 +65,7 @@ export class EditBehaviorFactory {
         this.components,
         this.anchors,
         this.guidelines,
+        this.backgroundImage,
         this.componentOriginIndices,
         this.componentTCenterIndices,
         behaviorType,
@@ -78,6 +83,7 @@ class EditBehavior {
     components,
     anchors,
     guidelines,
+    backgroundImage,
     componentOriginIndices,
     componentTCenterIndices,
     behavior,
@@ -151,12 +157,30 @@ class EditBehavior {
       guidelineRollbackChanges.push(guidelineRollback);
     }
 
+    const backgroundImageRollbackChanges = [];
+    this.backgroundImageEditFuncs = [];
+
+    const makeBackgroundImageEditFunc = makeBackgroundImageOriginEditFunc;
+    // const makeBackgroundImageEditFunc = fullBackgroundImageTransform
+    // ? makeBackgroundImageTransformationEditFunc
+    // : makeBackgroundImageOriginEditFunc;
+
+    if (backgroundImage) {
+      const [editFunc, backgroundImageRollback] = makeBackgroundImageEditFunc(
+        backgroundImage,
+        this.roundFunc
+      );
+      this.backgroundImageEditFuncs.push(editFunc);
+      backgroundImageRollbackChanges.push(backgroundImageRollback);
+    }
+
     this.rollbackChange = makeRollbackChange(
       contours,
       participatingPointIndices,
       componentRollbackChanges,
       anchorRollbackChanges,
-      guidelineRollbackChanges
+      guidelineRollbackChanges,
+      backgroundImageRollbackChanges
     );
   }
 
@@ -210,6 +234,9 @@ class EditBehavior {
     const guidelineChanges = this.guidelineEditFuncs?.map((editFunc) => {
       return editFunc(transform);
     });
+    const backgroundImageChanges = this.backgroundImageEditFuncs?.map((editFunc) => {
+      return editFunc(transform);
+    });
     const changes = [];
     if (pathChanges && pathChanges.length) {
       changes.push(consolidateChanges(pathChanges, ["path"]));
@@ -223,6 +250,9 @@ class EditBehavior {
     if (guidelineChanges && guidelineChanges.length) {
       changes.push(consolidateChanges(guidelineChanges, ["guidelines"]));
     }
+    if (backgroundImageChanges && backgroundImageChanges.length) {
+      changes.push(consolidateChanges(backgroundImageChanges, ["backgroundImage"]));
+    }
     return consolidateChanges(changes);
   }
 }
@@ -232,7 +262,8 @@ function makeRollbackChange(
   participatingPointIndices,
   componentRollback,
   anchorRollback,
-  guidelineRollback
+  guidelineRollback,
+  backgroundImageRollback
 ) {
   const pointRollback = [];
   for (let i = 0; i < contours.length; i++) {
@@ -262,6 +293,9 @@ function makeRollbackChange(
   }
   if (guidelineRollback.length) {
     changes.push(consolidateChanges(guidelineRollback, ["guidelines"]));
+  }
+  if (backgroundImageRollback.length) {
+    changes.push(consolidateChanges(backgroundImageRollback, ["backgroundImage"]));
   }
   return consolidateChanges(changes);
 }
@@ -296,6 +330,23 @@ function makeComponentOriginEditFunc(component, componentIndex, roundFunc) {
       );
     },
     makeComponentOriginChange(componentIndex, origin.x, origin.y),
+  ];
+}
+
+function makeBackgroundImageOriginEditFunc(image, roundFunc) {
+  const origin = {
+    x: image.transformation.translateX,
+    y: image.transformation.translateY,
+  };
+  return [
+    (transform) => {
+      const editedOrigin = transform.constrained(origin);
+      return makeBackgroundImageOriginChange(
+        roundFunc(editedOrigin.x),
+        roundFunc(editedOrigin.y)
+      );
+    },
+    makeBackgroundImageOriginChange(origin.x, origin.y),
   ];
 }
 
@@ -424,6 +475,16 @@ function makeGuidelineChange(guidelineIndex, x, y, angle, roundFunc) {
 function makeComponentOriginChange(componentIndex, x, y) {
   return {
     p: [componentIndex, "transformation"],
+    c: [
+      { f: "=", a: ["translateX", x] },
+      { f: "=", a: ["translateY", y] },
+    ],
+  };
+}
+
+function makeBackgroundImageOriginChange(x, y) {
+  return {
+    p: ["transformation"],
     c: [
       { f: "=", a: ["translateX", x] },
       { f: "=", a: ["translateY", y] },
