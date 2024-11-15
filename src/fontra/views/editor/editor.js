@@ -30,12 +30,18 @@ import { getRemoteProxy } from "../core/remote.js";
 import { SceneView } from "../core/scene-view.js";
 import { parseClipboard } from "../core/server-utils.js";
 import { isSuperset } from "../core/set-ops.js";
-import { labeledCheckbox, labeledTextInput } from "../core/ui-utils.js";
+import {
+  labeledCheckbox,
+  labeledColorInput,
+  labeledSliderInput,
+  labeledTextInput,
+} from "../core/ui-utils.js";
 import {
   commandKeyProperty,
   dumpURLFragment,
   enumerate,
   fetchJSON,
+  hexToRgba,
   hyphenatedToCamelCase,
   hyphenatedToLabel,
   isActiveElementTypeable,
@@ -47,6 +53,7 @@ import {
   range,
   readFromClipboard,
   reversed,
+  rgbaToHex,
   scheduleCalls,
   writeToClipboard,
 } from "../core/utils.js";
@@ -214,6 +221,13 @@ export class EditorController {
     // this.sceneController.addEventListener("doubleClickedFontGuidelines", async (event) => {
     //   this.doubleClickedFontGuidelinesCallback(event);
     // });
+
+    this.sceneController.addEventListener(
+      "doubleClickedBackgroundImage",
+      async (event) => {
+        this.doubleClickedBackgroundImageCallback(event);
+      }
+    );
 
     this.sceneController.addEventListener("glyphEditCannotEditReadOnly", async () => {
       this.showDialogGlyphEditCannotEditReadOnly();
@@ -1526,6 +1540,38 @@ export class EditorController {
     });
   }
 
+  async doubleClickedBackgroundImageCallback(event) {
+    const glyphController = await this.sceneModel.getSelectedStaticGlyphController();
+    if (!glyphController.canEdit) {
+      this.sceneController._dispatchEvent("glyphEditLocationNotAtSource");
+      return;
+    }
+
+    const instance = glyphController.instance;
+    const backgroundImage = instance.backgroundImage;
+    if (!backgroundImage) {
+      return;
+    }
+
+    const { backgroundImageColor: newBackgroundImageColor } =
+      await this.doEditBackgroundImageDialog(backgroundImage.color);
+    if (!newBackgroundImageColor) {
+      return;
+    }
+    await this.sceneController.editLayersAndRecordChanges((layerGlyphs) => {
+      for (const layerGlyph of Object.values(layerGlyphs)) {
+        const oldBackgroundImage = layerGlyph.backgroundImage;
+        if (!oldBackgroundImage) {
+          // skip: if no background image, create a new one
+          continue;
+        }
+        layerGlyph.backgroundImage.color = newBackgroundImageColor;
+      }
+      this.sceneController.selection = new Set([`backgroundImage/0`]);
+      return translate("action.edit-background-image");
+    });
+  }
+
   initContextMenuItems() {
     this.basicContextMenuItems = [];
     this.basicContextMenuItems.push({
@@ -2747,6 +2793,86 @@ export class EditorController {
         ),
         html.br(),
         warningElement,
+      ]
+    );
+    return { contentElement, warningElement };
+  }
+
+  async doEditBackgroundImageDialog(backgroundImageColor) {
+    const titleDialog = translate("action.edit-background-image");
+    const defaultButton = translate("dialog.edit");
+
+    const backgroundImageController = new ObservableController({
+      backgroundImageColor: rgbaToHex([
+        backgroundImageColor.red,
+        backgroundImageColor.green,
+        backgroundImageColor.blue,
+      ]),
+      backgroundImageOpacity: backgroundImageColor.alpha,
+    });
+
+    // even though we don't need warning for color,
+    // I keep it for consistency + if we want to add transformation later
+    const { contentElement, warningElement } =
+      this._backgroundImagePropertiesContentElement(backgroundImageController);
+    const dialog = await dialogSetup(titleDialog, null, [
+      { title: translate("dialog.cancel"), isCancelButton: true },
+      { title: defaultButton, isDefaultButton: true },
+    ]);
+
+    dialog.setContent(contentElement);
+
+    if (!(await dialog.run())) {
+      // User cancelled
+      return {};
+    }
+
+    // The color picker only returns rgb, no alpha. This is why the following is only rgb,
+    // even though hexToRgba would be possible to return alpha as well.
+    // But we get the alpha from the slider via backgroundImageOpacity.
+    const rgb = hexToRgba(backgroundImageController.model.backgroundImageColor);
+    const newNackgroundImageColor = {
+      red: rgb[0],
+      green: rgb[1],
+      blue: rgb[2],
+      alpha: parseFloat(backgroundImageController.model.backgroundImageOpacity),
+    };
+
+    return { backgroundImageColor: newNackgroundImageColor };
+  }
+
+  _backgroundImagePropertiesContentElement(controller) {
+    const warningElement = html.div({
+      id: "warning-text-guideline-name",
+      style: `grid-column: 1 / -1; min-height: 1.5em;`,
+    });
+    const contentElement = html.div(
+      {
+        style: `overflow: hidden;
+          white-space: nowrap;
+          display: grid;
+          gap: 0.5em;
+          grid-template-columns: auto auto;
+          align-items: center;
+          height: 100%;
+          min-height: 0;
+        `,
+      },
+      [
+        ...labeledColorInput(
+          translate("backgroundImage.labels.color"),
+          controller,
+          "backgroundImageColor",
+          {}
+        ),
+        ...labeledSliderInput(
+          translate("backgroundImage.labels.opacity"),
+          controller,
+          "backgroundImageOpacity",
+          { min: 0, max: 1, step: 0.001 }
+        ),
+        html.br(),
+        // warningElement,
       ]
     );
     return { contentElement, warningElement };

@@ -25,6 +25,7 @@ export const strings = {
   "action.delete-glyph": "Glyph entfernen",
   "action.delete-selection": "Auswahl entfernen",
   "action.edit-anchor": "Anker bearbeiten",
+  "action.edit-background-image": "Hintergrund-Bild bearbeiten",
   "action.edit-guideline": "Hilfslinie bearbeiten",
   "action.export-as.designspace": "Designspace + UFO (*.designspace)",
   "action.export-as.fontra": "Fontra (*.fontra)",
@@ -94,6 +95,8 @@ export const strings = {
   "axes.undo.add": "Achse %0 hinzufügen",
   "axes.undo.delete": "Achse %0 entfernen",
   "axes.undo.edit": "Achse %0 bearbeiten",
+  "backgroundImage.labels.color": "Farbe",
+  "backgroundImage.labels.opacity": "Opacity",
   "canvas.clean-view-and-hand-tool": "Ungehinderte Sicht und Hand Werkzeug",
   "cross-axis-mapping.axis-participates":
     "Wenn markiert, dann ist diese Achse teil des Mappings",

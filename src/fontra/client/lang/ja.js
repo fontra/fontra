@@ -25,6 +25,7 @@ export const strings = {
   "action.delete-glyph": "グリフを削除",
   "action.delete-selection": "選択範囲を削除",
   "action.edit-anchor": "アンカーを編集",
+  "action.edit-background-image": "Edit Background Image",
   "action.edit-guideline": "ガイドラインを編集",
   "action.export-as.designspace": "Designspace + UFO (*.designspace)",
   "action.export-as.fontra": "Fontra (*.fontra)",
@@ -94,6 +95,8 @@ export const strings = {
   "axes.undo.add": "補完軸%0を追加",
   "axes.undo.delete": "補完軸%0を削除",
   "axes.undo.edit": "補完軸%0を編集",
+  "backgroundImage.labels.color": "Color",
+  "backgroundImage.labels.opacity": "Opacity",
   "canvas.clean-view-and-hand-tool": "塗りのプレビューと手のひらツール",
   "cross-axis-mapping.axis-participates":
     "チェックすると、この補完軸がマッピング内で有効になります",

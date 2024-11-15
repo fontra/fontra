@@ -171,6 +171,75 @@ export function labeledTextInput(label, controller, key, options) {
   return items;
 }
 
+export function labeledColorInput(label, controller, key, options) {
+  const inputElement = colorInput(controller, key, options);
+  const items = [labelForElement(label, inputElement), inputElement];
+
+  return items;
+}
+
+export function colorInput(controller, key, options) {
+  const inputID = options?.id || `color-input-${uniqueID()}-${key}`;
+  const style =
+    options?.style ||
+    `
+    margin: 0;
+    padding: 0;
+    outline: none;
+    border: none;
+    border-color: transparent;
+    border-radius: 0.25em;
+    width: 100%;`;
+  const inputElement = html.input({ type: "color", id: inputID, style: style });
+  inputElement.value = controller.model[key];
+
+  inputElement.onchange = () => {
+    controller.model[key] = inputElement.value;
+  };
+
+  controller.addKeyListener(key, (event) => {
+    inputElement.value = event.newValue;
+  });
+
+  return inputElement;
+}
+
+export function labeledSliderInput(label, controller, key, options) {
+  const inputElement = sliderInput(controller, key, options);
+  const items = [labelForElement(label, inputElement), inputElement];
+
+  return items;
+}
+
+// for now keep it as is, but maybe better use: return html.createDomElement("range-slider", parms);
+export function sliderInput(controller, key, options) {
+  const inputID = options?.id || `range-input-${uniqueID()}-${key}`;
+  const min = options?.min || 0;
+  const max = options?.max || 100;
+  const value = options?.value || 0;
+  const step = options?.step || 1;
+
+  const inputElement = html.input({
+    type: "range",
+    id: inputID,
+    min: min,
+    max: max,
+    step: step,
+    value: value,
+  });
+  inputElement.value = controller.model[key];
+
+  inputElement.onchange = () => {
+    controller.model[key] = inputElement.value;
+  };
+
+  controller.addKeyListener(key, (event) => {
+    inputElement.value = event.newValue;
+  });
+
+  return inputElement;
+}
+
 export const DefaultFormatter = {
   toString: (value) => (value !== undefined && value !== null ? value.toString() : ""),
   fromString: (value) => {
