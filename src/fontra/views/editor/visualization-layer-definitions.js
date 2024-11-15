@@ -10,6 +10,7 @@ import {
   makeUPlusStringFromCodePoint,
   parseSelection,
   rgbaToCSS,
+  rgbaToHex,
   round,
   unionIndexSets,
   withSavedState,
@@ -450,9 +451,18 @@ registerVisualizationLayerDefinition({
         affine.dy
       );
       if (backgroundImage.color) {
-        // TODO: solve colorizing with backgroundImage.color
-        // For now: apply alpha
         context.globalAlpha = backgroundImage.color.alpha;
+        const hexColor = rgbaToHex([
+          backgroundImage.color.red,
+          backgroundImage.color.green,
+          backgroundImage.color.blue,
+          backgroundImage.color.alpha,
+        ]);
+        context.fillStyle = hexColor;
+        // The following code does do the color change, of the background is transparent.
+        // Reference: https://stackoverflow.com/questions/45706829/change-color-image-in-canvas
+        context.fillRect(0, 0, image.width, image.height);
+        context.globalCompositeOperation = "destination-in";
       }
       context.drawImage(image, 0, 0, image.width, image.height);
     });
