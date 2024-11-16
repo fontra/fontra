@@ -163,11 +163,11 @@ export class FontController {
     if (!imageData) {
       return null;
     }
+
     const image = new Image();
     const imagePromise = new Promise((resolve, reject) => {
       image.onload = (event) => resolve(image);
     });
-
     image.src = `data:image/${imageData.type};base64,${imageData.data}`;
 
     return await imagePromise;
