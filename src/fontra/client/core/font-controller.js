@@ -163,31 +163,12 @@ export class FontController {
     if (!imageData) {
       return null;
     }
-
     const image = new Image();
     const imagePromise = new Promise((resolve, reject) => {
       image.onload = (event) => resolve(image);
     });
 
-    // The following code makes white pixels transparent, this is needed for applying color.
-    // Reference: https://stackoverflow.com/questions/30438524/algorithm-to-make-image-white-and-transparent
-    const idata = imageData.data;
-    const data32 = new Uint32Array(imageData.data.buffer); // use uint32 view for speed
-    const len = data32.length;
-
-    for (const i = 0; i < len; i++) {
-      const px = data32[i]; // pixel
-      // is white? then knock it out
-      if (px === 0xffffffff) data32[i] = px = 0;
-      // extract alpha channel from a pixel
-      px = px & 0xff000000; // little-endian: ABGR
-      // any non-transparency? ie. alpha > 0
-      if (px) {
-        data32[i] = px | 0xffffff; // set this pixel to white, keep alpha level
-      }
-    }
-
-    image.src = `data:image/${imageData.type};base64,${idata}`;
+    image.src = `data:image/${imageData.type};base64,${imageData.data}`;
 
     return await imagePromise;
   }

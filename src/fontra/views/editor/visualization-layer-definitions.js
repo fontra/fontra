@@ -436,10 +436,44 @@ registerVisualizationLayerDefinition({
     if (!image) {
       return;
     }
-
     const affine = decomposedToTransform(backgroundImage.transformation)
       .translate(0, image.height)
       .scale(1, -1);
+
+    // The following code cannot be the right solution, but it's a demo of the idea:
+    // Converte white pixels to transparent pixels.
+    // I am wonding if we should be doing this in the backend, or if we should be doing this in the frontend?
+    // Reference: https://stackoverflow.com/questions/6755314/canvas-imagedata-remove-white-pixels
+    function white2transparent(img) {
+      var c = document.createElement("canvas");
+
+      var w = img.width,
+        h = img.height;
+
+      c.width = w;
+      c.height = h;
+
+      var ctx = c.getContext("2d");
+
+      ctx.drawImage(img, 0, 0, w, h);
+      var imageData = ctx.getImageData(0, 0, w, h);
+      var pixel = imageData.data;
+
+      var r = 0,
+        g = 1,
+        b = 2,
+        a = 3;
+      for (var p = 0; p < pixel.length; p += 4) {
+        if (pixel[p + r] == 255 && pixel[p + g] == 255 && pixel[p + b] == 255) {
+          // if white then change alpha to 0
+          pixel[p + a] = 0;
+        }
+      }
+
+      ctx.putImageData(imageData, 0, 0);
+
+      return c.toDataURL("image/png");
+    }
 
     withSavedState(context, () => {
       context.transform(
@@ -464,6 +498,7 @@ registerVisualizationLayerDefinition({
         context.fillRect(0, 0, image.width, image.height);
         context.globalCompositeOperation = "destination-in";
       }
+      image.src = white2transparent(image);
       context.drawImage(image, 0, 0, image.width, image.height);
     });
 
