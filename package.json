@@ -12,7 +12,7 @@
     "mocha": "^10.8.2",
     "prettier-plugin-organize-imports": "^4.1.0",
     "prettier-plugin-sort-json": "^4.0.0",
-    "rollup": "^4.27.0"
+    "rollup": "^4.27.3"
   },
   "dependencies": {
     "bezier-js": "^6.1.4",
