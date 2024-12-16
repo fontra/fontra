@@ -189,6 +189,12 @@ async def mainAsync() -> None:
     if not sourcePath.exists():
         raise FileNotFoundError(sourcePath)
     destPath = pathlib.Path(args.destination)
+
+    if destPath == sourcePath:
+        raise argparse.ArgumentError(
+            None, "the destination file is equal to the source file"
+        )
+
     if args:
         if destPath.is_dir():
             shutil.rmtree(destPath)
