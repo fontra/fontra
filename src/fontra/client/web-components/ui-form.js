@@ -14,8 +14,6 @@ export class Form extends SimpleElement {
   static styles = `
     :host {
       --label-column-width: 32%;
-      padding: 1em;
-      overflow: hidden auto;
     }
 
     .ui-form {

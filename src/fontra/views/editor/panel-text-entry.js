@@ -6,22 +6,13 @@ export default class TextEntryPanel extends Panel {
   identifier = "text-entry";
   iconPath = "/images/texttool.svg";
 
-  static styles = `
-    .sidebar-text-entry {
-      box-sizing: border-box;
-      height: 100%;
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      gap: 0.5em;
-      padding: 1em;
-    }
-
+  static stylesContent = `
     #text-align-menu {
       display: grid;
       grid-template-columns: auto auto auto;
       justify-content: start;
       gap: 0.5em;
+      margin: 1em 0;
     }
 
     #text-align-menu > inline-svg {
@@ -59,10 +50,50 @@ export default class TextEntryPanel extends Panel {
       resize: none;
       overflow-x: auto;
     }
+
+    .text-entry {
+      display: flex;
+      flex-direction: column;
+    }
   `;
 
   constructor(editorController) {
     super(editorController);
+
+    this.appendStyle(TextEntryPanel.stylesContent);
+    this.contentElement.appendChild(
+      this.getPanelSection({
+        children: [
+          html.div({ class: "text-entry" }, [
+            html.createDomElement("textarea", {
+              rows: 1,
+              wrap: "off",
+              id: "text-entry-textarea",
+            }),
+          ]),
+          html.div(
+            {
+              id: "text-align-menu",
+            },
+            [
+              html.createDomElement("inline-svg", {
+                "data-align": "left",
+                "src": "/images/alignleft.svg",
+              }),
+              html.createDomElement("inline-svg", {
+                "class": "selected",
+                "data-align": "center",
+                "src": "/images/aligncenter.svg",
+              }),
+              html.createDomElement("inline-svg", {
+                "data-align": "right",
+                "src": "/images/alignright.svg",
+              }),
+            ]
+          ),
+        ],
+      })
+    );
 
     this.textSettingsController = this.editorController.sceneSettingsController;
     this.sceneController = this.editorController.sceneController;
@@ -71,41 +102,6 @@ export default class TextEntryPanel extends Panel {
     this.setupTextEntryElement();
     this.setupTextAlignElement();
     this.setupIntersectionObserver();
-  }
-
-  getContentElement() {
-    return html.div(
-      {
-        class: "sidebar-text-entry",
-      },
-      [
-        html.createDomElement("textarea", {
-          rows: 1,
-          wrap: "off",
-          id: "text-entry-textarea",
-        }),
-        html.div(
-          {
-            id: "text-align-menu",
-          },
-          [
-            html.createDomElement("inline-svg", {
-              "data-align": "left",
-              "src": "/images/alignleft.svg",
-            }),
-            html.createDomElement("inline-svg", {
-              "class": "selected",
-              "data-align": "center",
-              "src": "/images/aligncenter.svg",
-            }),
-            html.createDomElement("inline-svg", {
-              "data-align": "right",
-              "src": "/images/alignright.svg",
-            }),
-          ]
-        ),
-      ]
-    );
   }
 
   updateAlignElement(align) {

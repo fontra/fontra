@@ -32,22 +32,6 @@ export default class TransformationPanel extends Panel {
   identifier = "selection-transformation";
   iconPath = "/tabler-icons/shape.svg";
 
-  static styles = `
-    .selection-transformation {
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      box-sizing: border-box;
-      height: 100%;
-      width: 100%;
-      white-space: normal;
-    }
-
-    .selection-transformation-form {
-      flex: 1;
-    }
-  `;
-
   static stylesForm = `
   .ui-form-label {
     overflow-x: unset;
@@ -83,13 +67,11 @@ export default class TransformationPanel extends Panel {
 
   constructor(editorController) {
     super(editorController);
-    this.infoForm = new Form();
-    this.infoForm.classList.add("selection-transformation-form");
-    this.infoForm.appendStyle(TransformationPanel.stylesForm);
-    this.contentElement.appendChild(this.infoForm);
+    this.uiForm = new Form();
+    this.uiForm.appendStyle(TransformationPanel.stylesForm);
+    this.contentElement.appendChild(this.getPanelSection({ children: [this.uiForm] }));
     this.fontController = this.editorController.fontController;
     this.sceneController = this.editorController.sceneController;
-
     this.transformParameters = {
       scaleX: 100,
       scaleY: undefined,
@@ -146,17 +128,8 @@ export default class TransformationPanel extends Panel {
     }
   }
 
-  getContentElement() {
-    return html.div(
-      {
-        class: "selection-transformation",
-      },
-      []
-    );
-  }
-
   async update(senderInfo) {
-    if (!this.infoForm.contentElement.offsetParent) {
+    if (!this.uiForm.contentElement.offsetParent) {
       // If the info form is not visible, do nothing
       return;
     }
@@ -556,14 +529,14 @@ export default class TransformationPanel extends Panel {
       field3: {},
     });
 
-    this.infoForm.setFieldDescriptions(formContents);
+    this.uiForm.setFieldDescriptions(formContents);
 
-    this.infoForm.onFieldChange = async (fieldItem, value, valueStream) => {
+    this.uiForm.onFieldChange = async (fieldItem, value, valueStream) => {
       this.transformParameters[fieldItem.key] = value;
       if (fieldItem.key === "originXButton" || fieldItem.key === "originYButton") {
         this.transformParameters[fieldItem.key.replace("Button", "")] = value;
 
-        const iconRadioButtons = this.infoForm.shadowRoot.querySelectorAll(
+        const iconRadioButtons = this.uiForm.shadowRoot.querySelectorAll(
           ".ui-form-radio-button"
         );
         iconRadioButtons.forEach((radioButton) => {

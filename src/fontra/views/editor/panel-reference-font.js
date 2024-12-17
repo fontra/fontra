@@ -223,17 +223,10 @@ export default class ReferenceFontPanel extends Panel {
   identifier = "reference-font";
   iconPath = "/images/reference.svg";
 
-  static styles = `
-    .sidebar-reference-font {
-      width: 100%;
-      height: 100%;
-      display: flex;
-    }
-
+  static stylesContent = `
     #reference-font {
       width: 100%;
       display: grid;
-      padding: 1em;
       gap: 1em;
       height: 100%;
       box-sizing: border-box;
@@ -273,6 +266,56 @@ export default class ReferenceFontPanel extends Panel {
 
   constructor(editorController) {
     super(editorController);
+
+    this.setupLanguage();
+    this.setupController();
+    this.setupUiList();
+
+    this.appendStyle(ReferenceFontPanel.stylesContent);
+    this.contentElement.appendChild(
+      this.getPanelSection({
+        children: [
+          div(
+            {
+              id: "reference-font",
+            },
+            [
+              div({ class: "title" }, [translate("sidebar.reference-font")]),
+              div({}, [translate("sidebar.reference-font.info")]),
+              this.filesUIList,
+              div(
+                {
+                  style: `
+                display: grid;
+                grid-template-columns: max-content auto;
+                align-items: center;
+                gap: 0.666em;
+                `,
+                },
+                [
+                  label(
+                    { for: "char-override" },
+                    translate("sidebar.reference-font.custom-character")
+                  ),
+                  input({
+                    type: "text",
+                    id: "char-override",
+                    value: this.model.charOverride,
+                    oninput: (event) => (this.model.charOverride = event.target.value),
+                  }),
+                  label(
+                    { for: "language-code" },
+                    translate("sidebar.reference-font.language")
+                  ),
+                  this.languageCodeInput,
+                ]
+              ),
+              div({ class: "reference-font-preview" }, []),
+            ]
+          ),
+        ],
+      })
+    );
 
     fetchJSON("/editor/language-mapping.json").then((languageMapping) => {
       this.languageMapping = languageMapping;
@@ -325,6 +368,62 @@ export default class ReferenceFontPanel extends Panel {
     });
 
     this.initActions();
+  }
+
+  setupLanguage() {
+    this.languageMapping = {};
+    this.supportedLanguagesMemoized = {};
+    this.languageCodeInput = select(
+      {
+        id: "language-code",
+        style: "width: 100%;",
+        onchange: (event) => {
+          this.model.languageCode = event.target.value;
+        },
+      },
+      []
+    );
+  }
+
+  setupController() {
+    this.controller = new ObservableController({
+      languageCode: "",
+      fontSize: DEFAULT_FONT_SIZE,
+      selectedFontIndex: -1,
+      fontList: [],
+      charOverride: "",
+      referenceFontName: "",
+    });
+    this.controller.synchronizeWithLocalStorage("fontra.reference-font.");
+    this.controller.addKeyListener("fontList", (event) => {
+      this._fontListChangedHandler(event);
+      this.requestReferenceFontsPreview();
+    });
+    garbageCollectUnusedFiles(this.model.fontList);
+  }
+
+  setupUiList() {
+    this.filesUIList = new UIList();
+    this.filesUIList.columnDescriptions = [
+      {
+        key: "uplodadedFileName",
+        title: translate("sidebar.reference-font.file-name"),
+      },
+    ];
+    this.filesUIList.itemEqualFunc = (a, b) => a.fontIdentifier == b.fontIdentifier;
+    this.filesUIList.minHeight = "6em";
+    this.filesUIList.onFilesDrop = (files) => this._filesDropHandler(files);
+    this.filesUIList.addEventListener("listSelectionChanged", () => {
+      this._listSelectionChangedHandler();
+    });
+    this.filesUIList.addEventListener("deleteKey", () =>
+      this._deleteSelectedItemHandler()
+    );
+    this.filesUIList.addEventListener("deleteKeyAlt", () => this._deleteAllHandler());
+    this.filesUIList.setItems([...this.model.fontList]);
+    if (this.model.selectedFontIndex != -1) {
+      this.filesUIList.setSelectedItemIndex(this.model.selectedFontIndex, true);
+    }
   }
 
   initActions() {
@@ -637,112 +736,6 @@ export default class ReferenceFontPanel extends Panel {
         )
       );
     }
-  }
-
-  getContentElement() {
-    this.languageMapping = {};
-    this.supportedLanguagesMemoized = {};
-
-    this.controller = new ObservableController({
-      languageCode: "",
-      fontSize: DEFAULT_FONT_SIZE,
-      selectedFontIndex: -1,
-      fontList: [],
-      charOverride: "",
-      referenceFontName: "",
-    });
-    this.controller.synchronizeWithLocalStorage("fontra.reference-font.");
-    this.controller.addKeyListener("fontList", (event) => {
-      this._fontListChangedHandler(event);
-      this.requestReferenceFontsPreview();
-    });
-    garbageCollectUnusedFiles(this.model.fontList);
-
-    const columnDescriptions = [
-      {
-        key: "uplodadedFileName",
-        title: translate("sidebar.reference-font.file-name"),
-      },
-    ];
-    this.filesUIList = new UIList();
-
-    this.filesUIList.columnDescriptions = columnDescriptions;
-    this.filesUIList.itemEqualFunc = (a, b) => a.fontIdentifier == b.fontIdentifier;
-
-    this.filesUIList.minHeight = "6em";
-
-    this.filesUIList.onFilesDrop = (files) => this._filesDropHandler(files);
-
-    this.filesUIList.addEventListener("listSelectionChanged", () => {
-      this._listSelectionChangedHandler();
-    });
-
-    this.filesUIList.addEventListener("deleteKey", () =>
-      this._deleteSelectedItemHandler()
-    );
-    this.filesUIList.addEventListener("deleteKeyAlt", () => this._deleteAllHandler());
-
-    this.filesUIList.setItems([...this.model.fontList]);
-    if (this.model.selectedFontIndex != -1) {
-      this.filesUIList.setSelectedItemIndex(this.model.selectedFontIndex, true);
-    }
-
-    this.languageCodeInput = select(
-      {
-        id: "language-code",
-        style: "width: 100%;",
-        onchange: (event) => {
-          this.model.languageCode = event.target.value;
-        },
-      },
-      []
-    );
-
-    return div(
-      {
-        class: "sidebar-reference-font",
-      },
-      [
-        div(
-          {
-            id: "reference-font",
-          },
-          [
-            div({ class: "title" }, [translate("sidebar.reference-font")]),
-            div({}, [translate("sidebar.reference-font.info")]),
-            this.filesUIList,
-            div(
-              {
-                style: `
-                display: grid;
-                grid-template-columns: max-content auto;
-                align-items: center;
-                gap: 0.666em;
-                `,
-              },
-              [
-                label(
-                  { for: "char-override" },
-                  translate("sidebar.reference-font.custom-character")
-                ),
-                input({
-                  type: "text",
-                  id: "char-override",
-                  value: this.model.charOverride,
-                  oninput: (event) => (this.model.charOverride = event.target.value),
-                }),
-                label(
-                  { for: "language-code" },
-                  translate("sidebar.reference-font.language")
-                ),
-                this.languageCodeInput,
-              ]
-            ),
-            div({ class: "reference-font-preview" }, []),
-          ]
-        ),
-      ]
-    );
   }
 }
 

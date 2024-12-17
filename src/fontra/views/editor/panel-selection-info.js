@@ -23,32 +23,13 @@ export default class SelectionInfoPanel extends Panel {
   identifier = "selection-info";
   iconPath = "/images/info.svg";
 
-  static styles = `
-    .selection-info {
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      box-sizing: border-box;
-      height: 100%;
-      width: 100%;
-      white-space: normal;
-    }
-
-    .selection-info-form {
-      flex: 1;
-    }
-
-    .behavior-field {
-      padding: 1em;
-    }
-  `;
-
   constructor(editorController) {
     super(editorController);
-    this.infoForm = new Form();
-    this.infoForm.classList.add("selection-info-form");
-    this.contentElement.appendChild(this.infoForm);
-    this.contentElement.appendChild(this.setupBehaviorCheckBox());
+    this.uiForm = new Form();
+    this.contentElement.appendChild(this.getPanelSection({ children: [this.uiForm] }));
+    this.contentElement.appendChild(
+      this.getPanelSection({ children: [this.getBehaviorField()], flexible: false })
+    );
     this.throttledUpdate = throttleCalls((senderID) => this.update(senderID), 100);
     this.fontController = this.editorController.fontController;
     this.sceneController = this.editorController.sceneController;
@@ -86,22 +67,13 @@ export default class SelectionInfoPanel extends Panel {
     });
   }
 
-  getContentElement() {
-    return html.div(
-      {
-        class: "selection-info",
-      },
-      []
-    );
-  }
-
   async toggle(on, focus) {
     if (on) {
       this.update();
     }
   }
 
-  setupBehaviorCheckBox() {
+  getBehaviorField() {
     const storageKey = "fontra.selection-info.absolute-value-changes";
     this.multiEditChangesAreAbsolute = localStorage.getItem(storageKey) === "true";
     return html.div({ class: "behavior-field" }, [
@@ -133,7 +105,7 @@ export default class SelectionInfoPanel extends Panel {
       await this.updateDimensions();
       return;
     }
-    if (!this.infoForm.contentElement.offsetParent) {
+    if (!this.uiForm.contentElement.offsetParent) {
       // If the info form is not visible, do nothing
       return;
     }
@@ -449,11 +421,11 @@ export default class SelectionInfoPanel extends Panel {
     }
 
     if (!formContents.length) {
-      this.infoForm.setFieldDescriptions([
+      this.uiForm.setFieldDescriptions([
         { type: "text", value: translate("selection.none") },
       ]);
     } else {
-      this.infoForm.setFieldDescriptions(formContents);
+      this.uiForm.setFieldDescriptions(formContents);
       if (glyphController) {
         await this._setupSelectionInfoHandlers(glyphName);
       }
@@ -477,7 +449,7 @@ export default class SelectionInfoPanel extends Panel {
       }
     }
 
-    const iconElement = this.infoForm.shadowRoot.querySelectorAll("#glyphLocking")[0];
+    const iconElement = this.uiForm.shadowRoot.querySelectorAll("#glyphLocking")[0];
     iconElement.src = varGlyph.customData["fontra.glyph.locked"]
       ? "/tabler-icons/lock-open-2.svg"
       : "/tabler-icons/lock.svg";
@@ -586,8 +558,8 @@ export default class SelectionInfoPanel extends Panel {
       pointIndices,
       componentIndices
     );
-    if (this.infoForm.hasKey("dimensions")) {
-      this.infoForm.setValue("dimensions", dimensionsString);
+    if (this.uiForm.hasKey("dimensions")) {
+      this.uiForm.setValue("dimensions", dimensionsString);
     }
   }
 
@@ -642,7 +614,7 @@ export default class SelectionInfoPanel extends Panel {
   async _setupSelectionInfoHandlers(glyphName) {
     const varGlyph = await this.fontController.getGlyph(glyphName);
 
-    this.infoForm.onFieldChange = async (fieldItem, value, valueStream) => {
+    this.uiForm.onFieldChange = async (fieldItem, value, valueStream) => {
       const changePath = JSON.parse(fieldItem.key);
       const senderInfo = { senderID: this, fieldKeyPath: changePath };
 
@@ -731,7 +703,7 @@ export default class SelectionInfoPanel extends Panel {
 
     const keyToUpdata = keyMap[changedKey];
     const fieldKey = JSON.stringify([keyToUpdata]);
-    this.infoForm.setValue(fieldKey, glyphController[keyToUpdata]);
+    this.uiForm.setValue(fieldKey, glyphController[keyToUpdata]);
   }
 }
 

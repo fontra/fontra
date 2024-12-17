@@ -5,19 +5,29 @@ export default class GlyphSearchPanel extends Panel {
   identifier = "glyph-search";
   iconPath = "/images/magnifyingglass.svg";
 
-  static styles = `
-    .glyph-search {
-      box-sizing: border-box;
-      height: 100%;
-      width: 100%;
-      display: grid;
-      gap: 1em;
-      padding: 1em;
-    }
-  `;
+  static stylesContent = `
+  .glyph-search {
+    box-sizing: border-box;
+    height: 100%;
+    width: 100%;
+    display: grid;
+    gap: 1em;
+    padding: 1em;
+  }
+`;
 
   constructor(editorController) {
     super(editorController);
+
+    this.appendStyle(GlyphSearchPanel.stylesContent);
+    this.contentElement.appendChild(
+      html.div({ class: "glyph-search" }, [
+        html.createDomElement("glyphs-search", {
+          id: "glyphs-search",
+        }),
+      ])
+    );
+
     this.glyphsSearch = this.contentElement.querySelector("#glyphs-search");
     this.glyphsSearch.addEventListener("selectedGlyphNameChanged", (event) =>
       this.glyphNameChangedCallback(event.detail)
@@ -57,19 +67,6 @@ export default class GlyphSearchPanel extends Panel {
     }
 
     this.editorController.sceneSettings.selectedGlyph = selectedGlyphState;
-  }
-
-  getContentElement() {
-    return html.div(
-      {
-        class: "glyph-search",
-      },
-      [
-        html.createDomElement("glyphs-search", {
-          id: "glyphs-search",
-        }),
-      ]
-    );
   }
 
   async toggle(on, focus) {

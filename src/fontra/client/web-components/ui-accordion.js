@@ -5,14 +5,12 @@ import { enumerate } from "/core/utils.js";
 export class Accordion extends UnlitElement {
   static styles = `
   .ui-accordion-contents {
-    padding: 1em;
     display: grid;
     grid-template-rows: auto;
     align-content: start;
     gap: 0.5em;
     text-wrap: wrap;
     width: 100%;
-    height: 100%;
     box-sizing: border-box;
   }
 

@@ -6,7 +6,6 @@ import {
   getSuggestedGlyphName,
 } from "/core/server-utils.js";
 import { unicodeMadeOf, unicodeUsedBy } from "/core/unicode-utils.js";
-
 import { getCharFromCodePoint, throttleCalls } from "/core/utils.js";
 import { GlyphCell } from "/web-components/glyph-cell.js";
 import { showMenu } from "/web-components/menu-panel.js";
@@ -16,15 +15,9 @@ export default class RelatedGlyphPanel extends Panel {
   identifier = "related-glyphs";
   iconPath = "/tabler-icons/binary-tree-2.svg";
 
-  static styles = `
-    .sidebar-glyph-relationships {
-      box-sizing: border-box;
-      height: calc(100% - 2em); // Would be nice to do without the calc
-      width: 100%;
-    }
-
+  static stylesContent = `
     #related-glyphs-header {
-      padding: 1em 1em 0 1em;
+      margin-bottom: 1em;
       text-wrap: wrap;
     }
 
@@ -34,28 +27,7 @@ export default class RelatedGlyphPanel extends Panel {
     }
   `;
 
-  constructor(editorController) {
-    super(editorController);
-    this.throttledUpdate = throttleCalls((senderID) => this.update(senderID), 100);
-    this.fontController = this.editorController.fontController;
-    this.sceneController = this.editorController.sceneController;
-
-    this.setupGlyphRelationshipsElement();
-
-    this.sceneController.sceneSettingsController.addKeyListener(
-      ["selectedGlyphName"],
-      (event) => this.throttledUpdate()
-    );
-
-    this.fontController.addChangeListener({ glyphMap: null }, (event) =>
-      this.throttledUpdate()
-    );
-  }
-
-  getContentElement() {
-    this.accordion = new Accordion();
-
-    this.accordion.appendStyle(`
+  static stylesAccordion = `
     .placeholder-label {
       font-size: 0.9em;
       opacity: 40%;
@@ -67,8 +39,13 @@ export default class RelatedGlyphPanel extends Panel {
       overflow-y: scroll;
       white-space: normal;
     }
-    `);
+  `;
 
+  constructor(editorController) {
+    super(editorController);
+    this.appendStyle(RelatedGlyphPanel.stylesContent);
+    this.accordion = new Accordion();
+    this.accordion.appendStyle(RelatedGlyphPanel.stylesAccordion);
     this.accordion.items = [
       {
         label: translate("sidebar.related-glyphs.alternate-glyphs"),
@@ -103,17 +80,30 @@ export default class RelatedGlyphPanel extends Panel {
         getRelatedGlyphsFunc: getUnicodeUsedBy,
       },
     ];
+    this.contentElement.appendChild(
+      this.getPanelSection({
+        children: [
+          html.div({ id: "related-glyphs-header" }, [
+            translate("sidebar.related-glyphs.related-glyphs"),
+          ]),
+          this.accordion,
+        ],
+      })
+    );
 
-    return html.div(
-      {
-        class: "sidebar-glyph-relationships",
-      },
-      [
-        html.div({ id: "related-glyphs-header" }, [
-          translate("sidebar.related-glyphs.related-glyphs"),
-        ]),
-        this.accordion,
-      ]
+    this.throttledUpdate = throttleCalls((senderID) => this.update(senderID), 100);
+    this.fontController = this.editorController.fontController;
+    this.sceneController = this.editorController.sceneController;
+
+    this.setupGlyphRelationshipsElement();
+
+    this.sceneController.sceneSettingsController.addKeyListener(
+      ["selectedGlyphName"],
+      (event) => this.throttledUpdate()
+    );
+
+    this.fontController.addChangeListener({ glyphMap: null }, (event) =>
+      this.throttledUpdate()
     );
   }
 

@@ -7,17 +7,7 @@ export default class GlyphNotePanel extends Panel {
   identifier = "glyph-note";
   iconPath = "/tabler-icons/notes.svg";
 
-  static styles = `
-    .sidebar-glyph-note {
-      box-sizing: border-box;
-      height: 100%;
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      gap: 0.5em;
-      padding: 1em;
-    }
-
+  static stylesContent = `
     #glyph-note-textarea {
       background-color: var(--text-input-background-color);
       color: var(--text-input-foreground-color);
@@ -37,10 +27,12 @@ export default class GlyphNotePanel extends Panel {
     }
 
     .glyph-note-header {
-      overflow-x: unset;
-      text-align: left;
-      text-wrap: wrap;
-      word-break: break-word;
+      margin-bottom: 0.5em;
+    }
+
+    .glyph-note-content {
+      display: flex;
+      flex-direction: column;
     }
   `;
 
@@ -49,6 +41,24 @@ export default class GlyphNotePanel extends Panel {
     this.throttledUpdate = throttleCalls((senderID) => this.update(senderID), 100);
     this.fontController = this.editorController.fontController;
     this.sceneController = this.editorController.sceneController;
+
+    this.appendStyle(GlyphNotePanel.stylesContent);
+    this.contentElement.appendChild(
+      this.getPanelSection({
+        children: [
+          html.div({ class: "glyph-note-header", id: "glyph-note-header" }, [
+            translate("sidebar.glyph-note"),
+          ]),
+          html.div({ class: "glyph-note-content" }, [
+            html.createDomElement("textarea", {
+              rows: 1,
+              wrap: "off",
+              id: "glyph-note-textarea",
+            }),
+          ]),
+        ],
+      })
+    );
 
     this.setupGlyphNoteElement();
 
@@ -60,24 +70,6 @@ export default class GlyphNotePanel extends Panel {
     this.sceneController.addCurrentGlyphChangeListener((event) => {
       this.throttledUpdate(event.senderID);
     });
-  }
-
-  getContentElement() {
-    return html.div(
-      {
-        class: "sidebar-glyph-note",
-      },
-      [
-        html.div({ class: "glyph-note-header", id: "glyph-note-header" }, [
-          translate("sidebar.glyph-note"),
-        ]),
-        html.createDomElement("textarea", {
-          rows: 1,
-          wrap: "off",
-          id: "glyph-note-textarea",
-        }),
-      ]
-    );
   }
 
   setupGlyphNoteElement() {
