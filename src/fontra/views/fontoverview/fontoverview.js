@@ -1,3 +1,4 @@
+import { registerAction } from "../core/actions.js";
 import { FontOverviewNavigation } from "./panel-navigation.js";
 import { GlyphOrganizer } from "/core/glyph-organizer.js";
 import * as html from "/core/html-utils.js";
@@ -48,7 +49,83 @@ export class FontOverviewController extends ViewController {
       (event) => this._updateWindowLocation(),
       200
     );
+
+    this.initActions();
     this.initTopBar();
+    this.initContextMenuItems();
+  }
+
+  initActions() {
+    {
+      const topic = "0030-action-topics.menu.edit";
+
+      registerAction(
+        "action.undo",
+        {
+          topic,
+          sortIndex: 0,
+          defaultShortCuts: [{ baseKey: "z", commandKey: true, shiftKey: false }],
+        },
+        () => this.doUndoRedo(false),
+        () => this.canUndoRedo(false)
+      );
+
+      registerAction(
+        "action.redo",
+        {
+          topic,
+          defaultShortCuts: [{ baseKey: "z", commandKey: true, shiftKey: true }],
+        },
+        () => this.doUndoRedo(true),
+        () => this.canUndoRedo(true)
+      );
+    }
+
+    {
+      const topic = "0020-action-topics.menu.view";
+
+      registerAction(
+        "action.zoom-in",
+        {
+          topic,
+          titleKey: "zoom-in",
+          defaultShortCuts: [
+            { baseKey: "+", commandKey: true },
+            { baseKey: "=", commandKey: true },
+          ],
+          allowGlobalOverride: true,
+        },
+        () => this.zoomIn()
+      );
+
+      registerAction(
+        "action.zoom-out",
+        {
+          topic,
+          titleKey: "zoom-out",
+          defaultShortCuts: [{ baseKey: "-", commandKey: true }],
+          allowGlobalOverride: true,
+        },
+        () => this.zoomOut()
+      );
+    }
+  }
+
+  makeMenuBarSubmenuView() {
+    return {
+      title: translate("menubar.view"),
+      getItems: () => {
+        const items = [
+          {
+            actionIdentifier: "action.zoom-in",
+          },
+          {
+            actionIdentifier: "action.zoom-out",
+          },
+        ];
+        return items;
+      },
+    };
   }
 
   async start() {
@@ -235,6 +312,14 @@ export class FontOverviewController extends ViewController {
 
   handleRemoteError(event) {
     //
+  }
+
+  zoomIn() {
+    console.log("font overview zoom in");
+  }
+
+  zoomOut() {
+    console.log("font overview zoom out");
   }
 }
 
