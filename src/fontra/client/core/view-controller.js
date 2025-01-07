@@ -1,11 +1,9 @@
-import { registerAction } from "../core/actions.js";
 import { Backend } from "./backend-api.js";
 import { FontController } from "./font-controller.js";
 import { getRemoteProxy } from "./remote.js";
 import { makeDisplayPath } from "./view-utils.js";
 import { ensureLanguageHasLoaded, translate } from "/core/localization.js";
 import { MenuBar } from "/web-components/menu-bar.js";
-import { MenuItemDivider } from "/web-components/menu-panel.js";
 import { message } from "/web-components/modal-dialog.js";
 
 export class ViewController {
@@ -40,13 +38,7 @@ export class ViewController {
 
   constructor(font) {
     this.fontController = new FontController(font);
-
     this.basicContextMenuItems = [];
-    this.glyphEditContextMenuItems = [];
-    this.glyphSelectedContextMenuItems = [];
-
-    // this.initTopBar(); // these need to be call in the view
-    // this.initContextMenuItems();
   }
 
   async start() {
@@ -121,6 +113,7 @@ export class ViewController {
   makeMenuBarSubmenuFontra() {
     return {
       title: "Fontra",
+      enabled: () => true,
       bold: true,
       getItems: () => {
         const menuItems = [
@@ -148,6 +141,7 @@ export class ViewController {
   makeMenuBarSubmenuFile() {
     return {
       title: translate("menubar.file"),
+      enabled: () => true,
       getItems: () => {
         let exportFormats =
           this.fontController.backendInfo.projectManagerFeatures["export-as"] || [];
@@ -182,14 +176,9 @@ export class ViewController {
   makeMenuBarSubmenuEdit() {
     return {
       title: translate("menubar.edit"),
+      enabled: () => true,
       getItems: () => {
-        const menuItems = [...this.basicContextMenuItems];
-        if (this.sceneSettings?.selectedGlyph?.isEditing) {
-          this.sceneController.updateContextMenuState(event);
-          menuItems.push(MenuItemDivider);
-          menuItems.push(...this.glyphEditContextMenuItems);
-        }
-        return menuItems;
+        return [...this.basicContextMenuItems];
       },
     };
   }
@@ -197,6 +186,7 @@ export class ViewController {
   makeMenuBarSubmenuView() {
     return {
       title: translate("menubar.view"),
+      enabled: () => true,
       getItems: () => {
         const items = [
           {
@@ -205,36 +195,7 @@ export class ViewController {
           {
             actionIdentifier: "action.zoom-out",
           },
-          {
-            actionIdentifier: "action.zoom-fit-selection",
-          },
         ];
-
-        if (typeof this.sceneModel?.selectedGlyph !== "undefined") {
-          this.sceneController.updateContextMenuState();
-          items.push(MenuItemDivider);
-          items.push(...this.glyphSelectedContextMenuItems);
-        }
-
-        if (this.visualizationLayers) {
-          items.push(MenuItemDivider);
-          items.push({
-            title: translate("action-topics.glyph-editor-appearance"),
-            getItems: () => {
-              const layerDefs = this.visualizationLayers?.definitions.filter(
-                (layer) => layer.userSwitchable
-              );
-
-              return layerDefs.map((layerDef) => {
-                return {
-                  actionIdentifier: `actions.glyph-editor-appearance.${layerDef.identifier}`,
-                  checked: this.visualizationLayersSettings.model[layerDef.identifier],
-                };
-              });
-            },
-          });
-        }
-
         return items;
       },
     };
@@ -261,10 +222,7 @@ export class ViewController {
           enabled: () => enabled,
           callback: () => {
             const url = new URL(window.location);
-            console.log("url.pathname: ", url.pathname);
-            const projectName = url.pathname.split("/").slice(-1)[0];
-
-            url.pathname = `/fontinfo/-/${projectName}`; //url.pathname.replace("/editor/", "/fontinfo/");
+            url.pathname = `/fontinfo/-/${url.pathname.split("/").slice(-1)[0]}`;
             url.hash = panelID;
             window.open(url.toString());
           },
@@ -276,14 +234,8 @@ export class ViewController {
   makeMenuBarSubmenuGlyph() {
     return {
       title: translate("menubar.glyph"),
-      enabled: () => true,
-      getItems: () => [
-        { actionIdentifier: "action.glyph.add-source" },
-        { actionIdentifier: "action.glyph.delete-source" },
-        { actionIdentifier: "action.glyph.edit-glyph-axes" },
-        MenuItemDivider,
-        { actionIdentifier: "action.glyph.add-background-image" },
-      ],
+      enabled: () => false,
+      getItems: () => [],
     };
   }
 
@@ -355,40 +307,5 @@ export class ViewController {
     this.basicContextMenuItems.push({
       actionIdentifier: "action.redo",
     });
-  }
-
-  initActions() {
-    {
-      const topic = "0030-action-topics.menu.edit";
-
-      registerAction(
-        "action.undo",
-        {
-          topic,
-          sortIndex: 0,
-          defaultShortCuts: [{ baseKey: "z", commandKey: true, shiftKey: false }],
-        },
-        () => this.doUndoRedo(false),
-        () => this.canUndoRedo(false)
-      );
-
-      registerAction(
-        "action.redo",
-        {
-          topic,
-          defaultShortCuts: [{ baseKey: "z", commandKey: true, shiftKey: true }],
-        },
-        () => this.doUndoRedo(true),
-        () => this.canUndoRedo(true)
-      );
-    }
-  }
-
-  async canUndoRedo(isRedo) {
-    return true;
-  }
-
-  async doUndoRedo(isRedo) {
-    console.log(isRedo ? "redo" : "undo");
   }
 }

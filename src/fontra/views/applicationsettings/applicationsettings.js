@@ -7,9 +7,21 @@ import { ServerInfoPanel } from "./panel-server-info.js";
 import { ShortCutsPanel } from "./panel-shortcuts.js";
 import { ThemeSettingsPanel } from "./panel-theme-settings.js";
 import { ensureLanguageHasLoaded, translate } from "/core/localization.js";
+import { ViewController } from "/core/view-controller.js";
 import { message } from "/web-components/modal-dialog.js";
 
-export class ApplicationSettingsController {
+export class ApplicationSettingsController extends ViewController {
+  static titlePattern(displayPath) {
+    return `Fontra Application Settings — ${decodeURI(displayPath)}`;
+  }
+
+  constructor(font) {
+    super(font);
+
+    this.initTopBar();
+    this.initContextMenuItems();
+  }
+
   async start() {
     await ensureLanguageHasLoaded;
 

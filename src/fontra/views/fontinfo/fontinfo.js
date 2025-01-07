@@ -12,6 +12,13 @@ export class FontInfoController extends ViewController {
     return `Fontra Font Info — ${decodeURI(displayPath)}`;
   }
 
+  constructor(font) {
+    super(font);
+
+    this.initTopBar();
+    this.initContextMenuItems();
+  }
+
   async start() {
     await this.fontController.initialize();
 

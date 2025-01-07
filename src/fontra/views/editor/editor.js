@@ -287,6 +287,84 @@ export class EditorController extends ViewController {
     this.updateWithDelay();
   }
 
+  // Menu bar modifications for the editor view:
+  makeMenuBarSubmenuEdit() {
+    return {
+      title: translate("menubar.edit"),
+      enabled: () => true,
+      getItems: () => {
+        const menuItems = [...this.basicContextMenuItems];
+        if (this.sceneSettings.selectedGlyph?.isEditing) {
+          this.sceneController.updateContextMenuState(event);
+          menuItems.push(MenuItemDivider);
+          menuItems.push(...this.glyphEditContextMenuItems);
+        }
+        return menuItems;
+      },
+    };
+  }
+
+  makeMenuBarSubmenuView() {
+    return {
+      title: translate("menubar.view"),
+      enabled: () => true,
+      getItems: () => {
+        const items = [
+          {
+            actionIdentifier: "action.zoom-in",
+          },
+          {
+            actionIdentifier: "action.zoom-out",
+          },
+          {
+            actionIdentifier: "action.zoom-fit-selection",
+          },
+        ];
+
+        if (typeof this.sceneModel?.selectedGlyph !== "undefined") {
+          this.sceneController.updateContextMenuState();
+          items.push(MenuItemDivider);
+          items.push(...this.glyphSelectedContextMenuItems);
+        }
+
+        if (this.visualizationLayers) {
+          items.push(MenuItemDivider);
+          items.push({
+            title: translate("action-topics.glyph-editor-appearance"),
+            getItems: () => {
+              const layerDefs = this.visualizationLayers?.definitions.filter(
+                (layer) => layer.userSwitchable
+              );
+
+              return layerDefs.map((layerDef) => {
+                return {
+                  actionIdentifier: `actions.glyph-editor-appearance.${layerDef.identifier}`,
+                  checked: this.visualizationLayersSettings.model[layerDef.identifier],
+                };
+              });
+            },
+          });
+        }
+
+        return items;
+      },
+    };
+  }
+
+  makeMenuBarSubmenuGlyph() {
+    return {
+      title: translate("menubar.glyph"),
+      enabled: () => true,
+      getItems: () => [
+        { actionIdentifier: "action.glyph.add-source" },
+        { actionIdentifier: "action.glyph.delete-source" },
+        { actionIdentifier: "action.glyph.edit-glyph-axes" },
+        MenuItemDivider,
+        { actionIdentifier: "action.glyph.add-background-image" },
+      ],
+    };
+  }
+
   initActions() {
     {
       const topic = "0030-action-topics.menu.edit";

@@ -27,6 +27,10 @@ export class MenuBar extends SimpleElement {
   .menu-item-bold {
     font-weight: bold;
   }
+
+  .menu-item-disabled {
+    color: grey;
+  }
   `;
 
   constructor(items = []) {
@@ -183,7 +187,11 @@ export class MenuBar extends SimpleElement {
       fragment.appendChild(
         html.div(
           {
-            class: item.bold ? "menu-item menu-item-bold" : "menu-item",
+            class: item.bold
+              ? "menu-item menu-item-bold"
+              : !item.enabled()
+              ? "menu-item-disabled"
+              : "menu-item",
             onmousedown: (event) => {
               const currentSelection = this.contentElement.querySelector(".current");
               if (currentSelection === event.target) {

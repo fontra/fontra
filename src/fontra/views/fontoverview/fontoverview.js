@@ -55,76 +55,15 @@ export class FontOverviewController extends ViewController {
     this.initContextMenuItems();
   }
 
-  initActions() {
-    {
-      const topic = "0030-action-topics.menu.edit";
-
-      registerAction(
-        "action.undo",
-        {
-          topic,
-          sortIndex: 0,
-          defaultShortCuts: [{ baseKey: "z", commandKey: true, shiftKey: false }],
-        },
-        () => this.doUndoRedo(false),
-        () => this.canUndoRedo(false)
-      );
-
-      registerAction(
-        "action.redo",
-        {
-          topic,
-          defaultShortCuts: [{ baseKey: "z", commandKey: true, shiftKey: true }],
-        },
-        () => this.doUndoRedo(true),
-        () => this.canUndoRedo(true)
-      );
-    }
-
-    {
-      const topic = "0020-action-topics.menu.view";
-
-      registerAction(
-        "action.zoom-in",
-        {
-          topic,
-          titleKey: "zoom-in",
-          defaultShortCuts: [
-            { baseKey: "+", commandKey: true },
-            { baseKey: "=", commandKey: true },
-          ],
-          allowGlobalOverride: true,
-        },
-        () => this.zoomIn()
-      );
-
-      registerAction(
-        "action.zoom-out",
-        {
-          topic,
-          titleKey: "zoom-out",
-          defaultShortCuts: [{ baseKey: "-", commandKey: true }],
-          allowGlobalOverride: true,
-        },
-        () => this.zoomOut()
-      );
-    }
-  }
-
-  makeMenuBarSubmenuView() {
+  // Menu bar modifications for the fontOverview view:
+  makeMenuBarSubmenuGlyph() {
     return {
-      title: translate("menubar.view"),
-      getItems: () => {
-        const items = [
-          {
-            actionIdentifier: "action.zoom-in",
-          },
-          {
-            actionIdentifier: "action.zoom-out",
-          },
-        ];
-        return items;
-      },
+      title: translate("menubar.glyph"),
+      enabled: () => true,
+      getItems: () => [
+        { actionIdentifier: "action.glyph.duplicate" },
+        { actionIdentifier: "action.glyph.delete" },
+      ],
     };
   }
 
@@ -314,12 +253,92 @@ export class FontOverviewController extends ViewController {
     //
   }
 
-  zoomIn() {
+  initActions() {
+    {
+      const topic = "0030-action-topics.menu.edit";
+
+      registerAction(
+        "action.undo",
+        {
+          topic,
+          sortIndex: 0,
+          defaultShortCuts: [{ baseKey: "z", commandKey: true, shiftKey: false }],
+        },
+        () => this.doUndoRedo(false),
+        () => this.canUndoRedo(false)
+      );
+
+      registerAction(
+        "action.redo",
+        {
+          topic,
+          defaultShortCuts: [{ baseKey: "z", commandKey: true, shiftKey: true }],
+        },
+        () => this.doUndoRedo(true),
+        () => this.canUndoRedo(true)
+      );
+    }
+    {
+      const topic = "0020-action-topics.menu.view";
+
+      registerAction(
+        "action.zoom-in",
+        {
+          topic,
+          titleKey: "zoom-in",
+          defaultShortCuts: [
+            { baseKey: "+", commandKey: true },
+            { baseKey: "=", commandKey: true },
+          ],
+          allowGlobalOverride: true,
+        },
+        () => this.zoomIn()
+      );
+
+      registerAction(
+        "action.zoom-out",
+        {
+          topic,
+          titleKey: "zoom-out",
+          defaultShortCuts: [{ baseKey: "-", commandKey: true }],
+          allowGlobalOverride: true,
+        },
+        () => this.zoomOut()
+      );
+    }
+    {
+      const topic = "0035-action-topics.menu.glyph";
+      registerAction("action.glyph.duplicate", { topic }, () => this.duplicateGlyph());
+      registerAction("action.glyph.delete", { topic }, () => this.deleteGlyphs());
+    }
+  }
+
+  async canUndoRedo(isRedo) {
+    // TODO: Do we really need this here? Or is it always true anyway?
+    return true;
+  }
+
+  async doUndoRedo(isRedo) {
+    // TODO: Implement the undo/redo functionality.
+    console.log(isRedo ? "redo" : "undo");
+  }
+
+  async zoomIn() {
     console.log("font overview zoom in");
   }
 
-  zoomOut() {
+  async zoomOut() {
     console.log("font overview zoom out");
+  }
+
+  async duplicateGlyph() {
+    // TODO: See doCopy and doPaste
+    console.log("duplicate glyph");
+  }
+
+  async deleteGlyphs() {
+    // TODO: delete one or more glyphs, based on selection. See _deleteCurrentGlyph(event)
+    console.log("delete glyphs");
   }
 }
 
