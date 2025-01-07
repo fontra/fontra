@@ -13,14 +13,6 @@
 
   --editor-mini-console-foreground-color-light: black;
   --editor-mini-console-foreground-color-dark: white;
-
-  --editor-top-bar-background-color-light: #eee;
-  --editor-top-bar-background-color-dark: #444;
-  --editor-top-bar-border-color-light: #d3d3d3;
-  --editor-top-bar-border-color-dark: #2e2e2e;
-  --editor-top-bar-link-hover-light: #e1e1e1;
-  --editor-top-bar-link-hover-dark: rgb(47, 47, 47);
-  --editor-top-bar-height: 35px;
 }
 
 :root {
@@ -39,10 +31,6 @@
   --editor-mini-console-foreground-color: var(
     --editor-mini-console-foreground-color-light
   );
-
-  --editor-top-bar-background-color: var(--editor-top-bar-background-color-light);
-  --editor-top-bar-border-color: var(--editor-top-bar-border-color-light);
-  --editor-top-bar-link-hover: var(--editor-top-bar-link-hover-light);
 }
 
 :root.dark-theme {
@@ -61,9 +49,6 @@
   --editor-mini-console-foreground-color: var(
     --editor-mini-console-foreground-color-dark
   );
-  --editor-top-bar-background-color: var(--editor-top-bar-background-color-dark);
-  --editor-top-bar-border-color: var(--editor-top-bar-border-color-dark);
-  --editor-top-bar-link-hover: var(--editor-top-bar-link-hover-dark);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -83,9 +68,6 @@
     --editor-mini-console-foreground-color: var(
       --editor-mini-console-foreground-color-dark
     );
-    --editor-top-bar-background-color: var(--editor-top-bar-background-color-dark);
-    --editor-top-bar-border-color: var(--editor-top-bar-border-color-dark);
-    --editor-top-bar-link-hover: var(--editor-top-bar-link-hover-dark);
   }
 
   :root.light-theme {
@@ -104,9 +86,6 @@
     --editor-mini-console-foreground-color: var(
       --editor-mini-console-foreground-color-light
     );
-    --editor-top-bar-background-color: var(--editor-top-bar-background-color-light);
-    --editor-top-bar-border-color: var(--editor-top-bar-border-color-light);
-    --editor-top-bar-link-hover: var(--editor-top-bar-link-hover-light);
   }
 }
 
@@ -126,15 +105,6 @@ body {
   width: 100%;
 }
 
-.top-bar-container {
-  grid-column: 1 / 4;
-  grid-row: 1;
-  z-index: 200;
-  height: var(--editor-top-bar-height);
-  background: var(--editor-top-bar-background-color);
-  box-shadow: 0px 0px 5px #0006;
-}
-
 .sidebar-container,
 .main-container {
   grid-row-start: 2;
@@ -144,7 +114,7 @@ body {
 .sidebar-container {
   z-index: 100;
   background-color: var(--ui-element-background-color);
-  height: calc(100vh - var(--editor-top-bar-height));
+  height: calc(100vh - var(--menu-top-bar-height));
   width: 0;
   position: relative;
 }

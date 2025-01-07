@@ -18,19 +18,45 @@
 :root {
   /* https://css-tricks.com/the-css-custom-property-toggle-trick/ */
   --fontra-theme-marker: ; /* a space, which is valid */
+
+  --menu-top-bar-background-color-light: #eee;
+  --menu-top-bar-background-color-dark: #444;
+  --menu-top-bar-border-color-light: #d3d3d3;
+  --menu-top-bar-border-color-dark: #2e2e2e;
+  --menu-top-bar-link-hover-light: #e1e1e1;
+  --menu-top-bar-link-hover-dark: rgb(47, 47, 47);
+  --menu-top-bar-height: 35px;
+}
+
+:root {
+  --menu-top-bar-background-color: var(--menu-top-bar-background-color-light);
+  --menu-top-bar-border-color: var(--menu-top-bar-border-color-light);
+  --menu-top-bar-link-hover: var(--menu-top-bar-link-hover-light);
 }
 
 :root.dark-theme {
   --fontra-theme-marker: initial; /* invalidates the "light" variables */
+
+  --menu-top-bar-background-color: var(--menu-top-bar-background-color-dark);
+  --menu-top-bar-border-color: var(--menu-top-bar-border-color-dark);
+  --menu-top-bar-link-hover: var(--menu-top-bar-link-hover-dark);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --fontra-theme-marker: initial; /* invalidates the "light" variables */
+
+    --menu-top-bar-background-color: var(--menu-top-bar-background-color-dark);
+    --menu-top-bar-border-color: var(--menu-top-bar-border-color-dark);
+    --menu-top-bar-link-hover: var(--menu-top-bar-link-hover-dark);
   }
 
   :root.light-theme {
     --fontra-theme-marker: ; /* a space, which is valid */
+
+    --menu-top-bar-background-color: var(--menu-top-bar-background-color-light);
+    --menu-top-bar-border-color: var(--menu-top-bar-border-color-light);
+    --menu-top-bar-link-hover: var(--menu-top-bar-link-hover-light);
   }
 }
 
@@ -77,6 +103,18 @@
   );
 
   --horizontal-rule-color: #aaa8;
+
+  --menu-top-bar-background-color-light: #eee;
+  --menu-top-bar-background-color-dark: #444;
+  --menu-top-bar-border-color-light: #d3d3d3;
+  --menu-top-bar-border-color-dark: #2e2e2e;
+  --menu-top-bar-link-hover-light: #e1e1e1;
+  --menu-top-bar-link-hover-dark: rgb(47, 47, 47);
+  --menu-top-bar-height: 35px;
+
+  --menu-top-bar-background-color: var(--menu-top-bar-background-color-light);
+  --menu-top-bar-border-color: var(--menu-top-bar-border-color-light);
+  --menu-top-bar-link-hover: var(--menu-top-bar-link-hover-light);
 }
 
 html,
@@ -163,4 +201,12 @@ input[type="button"]:hover {
 
 input[type="button"]:active {
   background-color: #bbb;
+}
+
+.top-bar-container {
+  position: relative; /* for z-index */
+  z-index: 200;
+  height: var(--menu-top-bar-height);
+  background: var(--menu-top-bar-background-color);
+  box-shadow: 0px 0px 5px #0006;
 }

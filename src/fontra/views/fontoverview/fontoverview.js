@@ -48,6 +48,7 @@ export class FontOverviewController extends ViewController {
       (event) => this._updateWindowLocation(),
       200
     );
+    this.initTopBar();
   }
 
   async start() {
