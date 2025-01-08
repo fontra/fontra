@@ -4,7 +4,7 @@ import * as html from "/core/html-utils.js";
 import { htmlToElement } from "/core/html-utils.js";
 import { translate } from "/core/localization.js";
 import { controllerKey, ObservableController } from "/core/observable-object.js";
-import { labeledTextInput } from "/core/ui-utils.js";
+import { labeledTextInput, NumberFormatter } from "/core/ui-utils.js";
 import {
   boolInt,
   enumerate,
@@ -30,10 +30,8 @@ import { IconButton } from "/web-components/icon-button.js";
 import { InlineSVG } from "/web-components/inline-svg.js";
 import { showMenu } from "/web-components/menu-panel.js";
 import { dialog, dialogSetup, message } from "/web-components/modal-dialog.js";
+import Panel from "/web-components/panel.js";
 import { Accordion } from "/web-components/ui-accordion.js";
-
-import Panel from "./panel.js";
-import { NumberFormatter } from "/core/ui-utils.js";
 
 const FONTRA_STATUS_KEY = "fontra.development.status";
 const FONTRA_STATUS_DEFINITIONS_KEY = "fontra.sourceStatusFieldDefinitions";
@@ -97,7 +95,7 @@ export default class DesignspaceNavigationPanel extends Panel {
     }
   }
 
-  getContentElement() {
+  get panelSections() {
     this.accordion = new Accordion();
     this.accordion.appendStyle(`
       .interpolation-error-icon {
@@ -208,7 +206,7 @@ export default class DesignspaceNavigationPanel extends Panel {
       },
     ];
 
-    return html.div({ style: "height: 100%; padding: 1em;" }, [this.accordion]);
+    return [{ modifiers: ["flex"], children: [this.accordion] }];
   }
 
   get fontAxesElement() {
