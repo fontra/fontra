@@ -148,11 +148,13 @@ export function htmlToElements(html) {
   return template.content.childNodes;
 }
 
-export function addStyleSheet(cssText, element = null) {
+export function addStyleSheet(cssText, element = null, id = null) {
   if (!element) {
     element = document.head;
   }
-  element.appendChild(style({}, [cssText]));
+  if (!document.querySelector(`style#css-${id}`)) {
+    element.appendChild(style(id ? { id: `css-${id}` } : {}, [cssText]));
+  }
 }
 
 export function addStyleSheetLink(href, element = null) {
