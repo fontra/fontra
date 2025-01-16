@@ -980,6 +980,14 @@ export class EditorController extends ViewController {
 
     const editToolsElement = document.querySelector("#" + wrapperID);
 
+    const globalListener = {
+      handleEvent: (event) => {
+        if (event.type != "keydown" || event.key == "Escape") {
+          collapseSubTools(editToolsElement);
+        }
+      },
+    };
+
     for (const [index, tool] of enumerate(toolDefs)) {
       const toolButton = html.div(
         {
@@ -997,27 +1005,23 @@ export class EditorController extends ViewController {
         ]
       );
 
+      toolButton.oncontextmenu = (event) => {
+        event.preventDefault();
+        showSubTools(editToolsElement);
+        window.addEventListener("mousedown", globalListener, false);
+        window.addEventListener("keydown", globalListener, false);
+      };
+
       if (wrapperID === "edit-tools") {
         toolButton.onclick = () => {
           this.setSelectedTool(tool.identifier);
           this.canvasController.canvas.focus();
         };
       } else {
-        const globalListener = {
-          handleEvent: (event) => {
-            if (event.type != "keydown" || event.key == "Escape") {
-              collapseSubTools(editToolsElement);
-            }
-          },
-        };
-
         toolButton.onmousedown = () => {
           clearTimeout(this._multiToolMouseDownTimer);
           this._multiToolMouseDownTimer = setTimeout(function () {
-            // Show sub tools
-            for (const child of editToolsElement.children) {
-              child.style.visibility = "visible";
-            }
+            showSubTools(editToolsElement);
             window.addEventListener("mousedown", globalListener, false);
             window.addEventListener("keydown", globalListener, false);
           }, 650);
@@ -3650,5 +3654,12 @@ function collapseSubTools(editToolsElement) {
   for (const [index, child] of enumerate(editToolsElement.children)) {
     child.style.visibility = index ? "hidden" : "visible";
     child.dataset.tooltipposition = index ? "right" : "bottom";
+  }
+}
+
+function showSubTools(editToolsElement) {
+  // Show sub tools
+  for (const child of editToolsElement.children) {
+    child.style.visibility = "visible";
   }
 }
