@@ -275,9 +275,9 @@ export default class ReferenceFontPanel extends Panel {
       for (const axis of this.editorController.fontController.fontAxes) {
         const axisValue =
           this.editorController.sceneSettings.fontLocationUser[axis.name];
-        if (axisValue != undefined) {
-          fontVariationSettings.push(`'${axis.tag}' ${axisValue}`);
-        }
+        fontVariationSettings.push(
+          `'${axis.tag}' ${axisValue != undefined ? axisValue : axis.defaultValue}`
+        );
       }
       const cssString = fontVariationSettings.join(",");
       this.contentElement.style.fontVariationSettings = cssString;
