@@ -552,8 +552,7 @@ class SourceBox extends HTMLElement {
         source.lineMetricsHorizontalLayout
       ),
       guidelines: { ...source.guidelines },
-      // TODO: hhea, OS/2 line metrics, etc
-      // customData: { ...source.customData },
+      customData: { ...source.customData },
     };
   }
 
@@ -676,6 +675,21 @@ class SourceBox extends HTMLElement {
       }, `edit guidelines`); // TODO: translation
     });
 
+    this.controllers.customData.addListener((event) => {
+      this.editSource((source) => {
+        source.customData = {};
+        for (const item of event.newValue) {
+          const value = parseFloat(item["value"]);
+          // TODO: How do we handle different types of values?
+          if (value == NaN) {
+            source.customData[item["key"]] = item["value"];
+          } else {
+            source.customData[item["key"]] = value;
+          }
+        }
+      }, `edit customData`); // TODO: translation
+    });
+
     this.innerHTML = "";
     this.append(
       html.div({ class: "fontra-ui-font-info-sources-panel-header" }, [
@@ -705,6 +719,12 @@ class SourceBox extends HTMLElement {
           getLabelFromKey("guidelines"),
         ]),
         buildFontGuidelineList(this.controllers.guidelines)
+      );
+      this.append(
+        html.div({ class: "fontra-ui-font-info-sources-panel-header" }, [
+          getLabelFromKey("customData"),
+        ]),
+        buildFontCustomDataList(this.controllers.customData)
       );
     }
   }
@@ -879,6 +899,86 @@ function buildFontGuidelineList(controller) {
 
   updateRemoveButton(labelList, addRemoveButton);
 
+  return html.div({ style: "display: grid; grid-gap: 0.3em; padding-bottom: 2em;" }, [
+    labelList,
+    addRemoveButton,
+  ]);
+}
+
+function buildFontCustomDataList(controller) {
+  const model = controller.model;
+
+  const makeItem = ([key, value]) => {
+    const item = new ObservableController({ key: key, value: value });
+    item.addListener((event) => {
+      const newCustomData = labelList.items.map((customData) => {
+        return { ...customData };
+      });
+      model.customData = newCustomData;
+    });
+    return item.model;
+  };
+
+  const items = Object.entries(model)?.map(makeItem) || [];
+
+  const labelList = new UIList();
+  labelList.classList.add("fontra-ui-font-info-sources-panel-guideline-list");
+  labelList.style = `min-width: 12em;`;
+  labelList.columnDescriptions = [
+    {
+      key: "key",
+      title: translate("Key"), // TODO: translation
+      width: "14em",
+      editable: true,
+      continuous: false,
+    },
+    {
+      key: "value",
+      title: translate("Value"), // TODO: translation
+      width: "14em",
+      editable: true,
+      // formatter: OptionalNumberFormatter,
+      continuous: false,
+    },
+  ];
+  labelList.showHeader = true;
+  labelList.minHeight = "5em";
+  labelList.setItems(items);
+
+  const deleteSelectedItem = () => {
+    const index = labelList.getSelectedItemIndex();
+    if (index === undefined) {
+      return;
+    }
+    const items = [...labelList.items];
+    items.splice(index, 1);
+    labelList.setItems(items);
+    const newCustomData = items.map((customData) => {
+      console.log("customData: ", customData);
+      return { ...customData };
+    });
+    model.customData = newCustomData;
+  };
+
+  labelList.addEventListener("deleteKey", deleteSelectedItem);
+
+  const addRemoveButton = html.createDomElement("add-remove-buttons", {
+    addButtonCallback: () => {
+      // TODO: Maybe open a dialog with a list of possible keys?
+      const newItem = makeItem(["openTypeHheaAscender", 800]); // ufo.info.
+      const newItems = [...labelList.items, newItem];
+      model.customData = newItems.map((label) => {
+        return { ...label };
+      });
+      labelList.setItems(newItems);
+      labelList.editCell(newItems.length - 1, "key");
+    },
+    removeButtonCallback: deleteSelectedItem,
+    disableRemoveButton: true,
+  });
+
+  updateRemoveButton(labelList, addRemoveButton);
+
   return html.div({ style: "display: grid; grid-gap: 0.3em;" }, [
     labelList,
     addRemoveButton,
@@ -968,6 +1068,7 @@ function getLabelFromKey(key) {
     location: translate("sources.labels.location"),
     lineMetricsHorizontalLayout: translate("sources.labels.line-metrics"),
     guidelines: translate("sidebar.user-settings.guidelines"),
+    customData: translate("Custom Data"), // TODO: translation
   };
   return keyLabelMap[key] || key;
 }
