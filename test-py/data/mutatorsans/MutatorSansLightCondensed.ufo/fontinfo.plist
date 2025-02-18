@@ -53,12 +53,6 @@
     </array>
     <key>italicAngle</key>
     <integer>0</integer>
-    <key>openTypeHheaAscender</key>
-    <integer>888</integer>
-    <key>openTypeHheaDescender</key>
-    <integer>-222</integer>
-    <key>openTypeHheaLineGap</key>
-    <integer>0</integer>
     <key>openTypeNameLicense</key>
     <string>License same as MutatorMath. BSD 3-clause. [test-token: C]</string>
     <key>openTypeOS2TypoAscender</key>
