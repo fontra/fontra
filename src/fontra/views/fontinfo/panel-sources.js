@@ -927,17 +927,16 @@ function buildFontCustomDataList(controller) {
   labelList.columnDescriptions = [
     {
       key: "key",
-      title: translate("Key"), // TODO: translation
+      title: "Key", // TODO: translation
       width: "14em",
       editable: true,
       continuous: false,
     },
     {
       key: "value",
-      title: translate("Value"), // TODO: translation
-      width: "14em",
+      title: "Value", // TODO: translation
+      width: "10em",
       editable: true,
-      // formatter: OptionalNumberFormatter,
       continuous: false,
     },
   ];
@@ -954,7 +953,6 @@ function buildFontCustomDataList(controller) {
     items.splice(index, 1);
     labelList.setItems(items);
     const newCustomData = items.map((customData) => {
-      console.log("customData: ", customData);
       return { ...customData };
     });
     model.customData = newCustomData;
