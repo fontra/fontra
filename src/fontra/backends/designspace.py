@@ -124,76 +124,74 @@ fontInfoNameMapping = [
 ]
 
 
-ufoInfoPrefix = "ufo.info."
-
-
-ufoInfoAttributesToRoundTrip = [
-    "openTypeGaspRangeRecords",
-    "openTypeHeadCreated",
-    "openTypeHeadFlags",
-    "openTypeHeadLowestRecPPEM",
-    "openTypeHheaAscender",
-    "openTypeHheaCaretOffset",
-    "openTypeHheaCaretSlopeRise",
-    "openTypeHheaCaretSlopeRun",
-    "openTypeHheaDescender",
-    "openTypeHheaLineGap",
-    "openTypeNameCompatibleFullName",
-    "openTypeNamePreferredFamilyName",
-    "openTypeNamePreferredSubfamilyName",
-    "openTypeNameRecords",
-    "openTypeNameUniqueID",
-    "openTypeNameVersion",
-    "openTypeNameWWSFamilyName",
-    "openTypeNameWWSSubfamilyName",
-    "openTypeOS2CodePageRanges",
-    "openTypeOS2FamilyClass",
-    "openTypeOS2Panose",
-    "openTypeOS2Selection",
-    "openTypeOS2StrikeoutPosition",
-    "openTypeOS2StrikeoutSize",
-    "openTypeOS2SubscriptXOffset",
-    "openTypeOS2SubscriptXSize",
-    "openTypeOS2SubscriptYOffset",
-    "openTypeOS2SubscriptYSize",
-    "openTypeOS2SuperscriptXOffset",
-    "openTypeOS2SuperscriptXSize",
-    "openTypeOS2SuperscriptYOffset",
-    "openTypeOS2SuperscriptYSize",
-    "openTypeOS2Type",
-    "openTypeOS2TypoAscender",
-    "openTypeOS2TypoDescender",
-    "openTypeOS2TypoLineGap",
-    "openTypeOS2UnicodeRanges",
-    "openTypeOS2WeightClass",
-    "openTypeOS2WidthClass",
-    "openTypeOS2WinAscent",
-    "openTypeOS2WinDescent",
-    "openTypeVheaCaretOffset",
-    "openTypeVheaCaretSlopeRise",
-    "openTypeVheaCaretSlopeRun",
-    "openTypeVheaVertTypoLineGap",
-    "postscriptBlueFuzz",
-    "postscriptBlueScale",
-    "postscriptBlueShift",
-    "postscriptBlueValues",
-    "postscriptDefaultCharacter",
-    "postscriptDefaultWidthX",
-    "postscriptFamilyBlues",
-    "postscriptFamilyOtherBlues",
-    "postscriptForceBold",
-    "postscriptIsFixedPitch",
-    "postscriptNominalWidthX",
-    "postscriptOtherBlues",
-    "postscriptSlantAngle",
-    "postscriptStemSnapH",
-    "postscriptStemSnapV",
-    "postscriptUnderlinePosition",
-    "postscriptUnderlineThickness",
-    "postscriptUniqueID",
-    "postscriptWeightName",
-    "postscriptWindowsCharacterSet",
-]
+customDataNameMapping = {
+    # Fontra / UFO
+    "gaspRangeRecords": "openTypeGaspRangeRecords",
+    "headCreated": "openTypeHeadCreated",
+    "headFlags": "openTypeHeadFlags",
+    "headLowestRecPPEM": "openTypeHeadLowestRecPPEM",
+    "hheaAscender": "openTypeHheaAscender",
+    "hheaCaretOffset": "openTypeHheaCaretOffset",
+    "hheaCaretSlopeRise": "openTypeHheaCaretSlopeRise",
+    "hheaCaretSlopeRun": "openTypeHheaCaretSlopeRun",
+    "hheaDescender": "openTypeHheaDescender",
+    "hheaLineGap": "openTypeHheaLineGap",
+    "compatibleFullName": "openTypeNameCompatibleFullName",
+    "preferredFamilyName": "openTypeNamePreferredFamilyName",
+    "preferredSubfamilyName": "openTypeNamePreferredSubfamilyName",
+    "records": "openTypeNameRecords",
+    "uniqueID": "openTypeNameUniqueID",
+    "version": "openTypeNameVersion",
+    "WWSFamilyName": "openTypeNameWWSFamilyName",
+    "WWSSubfamilyName": "openTypeNameWWSSubfamilyName",
+    "codePageRanges": "openTypeOS2CodePageRanges",
+    "familyClass": "openTypeOS2FamilyClass",
+    "panose": "openTypeOS2Panose",
+    "fsSelection": "openTypeOS2Selection",
+    "strikeoutPosition": "openTypeOS2StrikeoutPosition",
+    "strikeoutSize": "openTypeOS2StrikeoutSize",
+    "subscriptXOffset": "openTypeOS2SubscriptXOffset",
+    "subscriptXSize": "openTypeOS2SubscriptXSize",
+    "subscriptYOffset": "openTypeOS2SubscriptYOffset",
+    "subscriptYSize": "openTypeOS2SubscriptYSize",
+    "superscriptXOffset": "openTypeOS2SuperscriptXOffset",
+    "superscriptXSize": "openTypeOS2SuperscriptXSize",
+    "superscriptYOffset": "openTypeOS2SuperscriptYOffset",
+    "superscriptYSize": "openTypeOS2SuperscriptYSize",
+    "fsType": "openTypeOS2Type",
+    "typoAscender": "openTypeOS2TypoAscender",
+    "typoDescender": "openTypeOS2TypoDescender",
+    "typoLineGap": "openTypeOS2TypoLineGap",
+    "unicodeRanges": "openTypeOS2UnicodeRanges",
+    "weightClass": "openTypeOS2WeightClass",
+    "widthClass": "openTypeOS2WidthClass",
+    "winAscent": "openTypeOS2WinAscent",
+    "winDescent": "openTypeOS2WinDescent",
+    "vheaCaretOffset": "openTypeVheaCaretOffset",
+    "vheaCaretSlopeRise": "openTypeVheaCaretSlopeRise",
+    "vheaCaretSlopeRun": "openTypeVheaCaretSlopeRun",
+    "vheaVertTypoLineGap": "openTypeVheaVertTypoLineGap",
+    "blueFuzz": "postscriptBlueFuzz",
+    "blueScale": "postscriptBlueScale",
+    "blueShift": "postscriptBlueShift",
+    "blueValues": "postscriptBlueValues",
+    "defaultCharacter": "postscriptDefaultCharacter",
+    "defaultWidthX": "postscriptDefaultWidthX",
+    "familyBlues": "postscriptFamilyBlues",
+    "familyOtherBlues": "postscriptFamilyOtherBlues",
+    "forceBold": "postscriptForceBold",
+    "isFixedPitch": "postscriptIsFixedPitch",
+    "nominalWidthX": "postscriptNominalWidthX",
+    "otherBlues": "postscriptOtherBlues",
+    "slantAngle": "postscriptSlantAngle",
+    "stemSnapH": "postscriptStemSnapH",
+    "stemSnapV": "postscriptStemSnapV",
+    "underlinePosition": "postscriptUnderlinePosition",
+    "underlineThickness": "postscriptUnderlineThickness",
+    "psUniqueID": "postscriptUniqueID",  # inconsistent psXXX, because uniqueID exists already.
+    "weightName": "postscriptWeightName",
+    "windowsCharacterSet": "postscriptWindowsCharacterSet",
+}
 
 
 class DesignspaceBackend:
@@ -1619,10 +1617,10 @@ class DSSource:
             guidelines = unpackGuidelines(fontInfo.guidelines)
             italicAngle = getattr(fontInfo, "italicAngle", 0)
 
-            for infoAttr in ufoInfoAttributesToRoundTrip:
-                value = getattr(fontInfo, infoAttr, None)
+            for infoAttrFontra, infoAttrUFO in customDataNameMapping.items():
+                value = getattr(fontInfo, infoAttrUFO, None)
                 if value is not None:
-                    customData[f"{ufoInfoPrefix}{infoAttr}"] = value
+                    customData[infoAttrFontra] = value
 
         return FontSource(
             name=self.name,
@@ -2174,9 +2172,9 @@ def updateFontInfoFromFontSource(reader, fontSource):
     fontInfo.guidelines = packGuidelines(fontSource.guidelines)
 
     for key, value in fontSource.customData.items():
-        if key.startswith(ufoInfoPrefix):
-            infoAttr = key[len(ufoInfoPrefix) :]
-            setattr(fontInfo, infoAttr, value)
+        ufoName = customDataNameMapping.get(key)
+        if ufoName is not None:
+            setattr(fontInfo, ufoName, value)
 
     reader.writeInfo(fontInfo)
 

@@ -963,7 +963,7 @@ function buildFontCustomDataList(controller) {
   const addRemoveButton = html.createDomElement("add-remove-buttons", {
     addButtonCallback: () => {
       // TODO: Maybe open a dialog with a list of possible keys?
-      const newItem = makeItem(["openTypeHheaAscender", 800]); // ufo.info.
+      const newItem = makeItem(["hheaAscender", 800]);
       const newItems = [...labelList.items, newItem];
       model.customData = newItems.map((label) => {
         return { ...label };
