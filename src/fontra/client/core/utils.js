@@ -911,8 +911,8 @@ export const customDataNameMapping = {
   // misc
   weightClass: { default: () => 400, formatter: _NumberFormatter },
   widthClass: { default: () => 5, formatter: _NumberFormatter },
-  fsSelection: { default: () => 0, formatter: _NumberFormatter },
-  fsType: { default: () => 0, formatter: _NumberFormatter },
+  // fsSelection: { default: () => 0, formatter: _NumberFormatter }, // invalid type: () => 0
+  // fsType: { default: () => 0, formatter: _NumberFormatter }, // invalid type: () => 0
   panose: {
     default: () => [2, 11, 5, 2, 4, 5, 4, 2, 2, 4],
     formatter: PanoseArrayFormatter,
