@@ -2176,6 +2176,10 @@ def updateFontInfoFromFontSource(reader, fontSource):
         ufoName = customDataNameMapping.get(key)
         if ufoName is not None:
             setattr(fontInfo, ufoName, value)
+        else:
+            raise NotImplementedError(
+                f"The CustomData attribute '{key}' lacks a UFO equivalent"
+            )
 
     # delete custom data
     for fontraName, ufoName in customDataNameMapping.items():
