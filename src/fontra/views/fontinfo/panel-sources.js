@@ -5,6 +5,7 @@ import { addStyleSheet } from "../core/html-utils.js";
 import { translate } from "../core/localization.js";
 import { ObservableController } from "../core/observable-object.js";
 import {
+  DefaultFormatter,
   NumberFormatter,
   OptionalNumberFormatter,
   checkboxListCell,
@@ -13,9 +14,16 @@ import {
   labeledTextInput,
   textInput,
 } from "../core/ui-utils.js";
-import { arrowKeyDeltas, enumerate, modulo, range, round } from "../core/utils.js";
+import {
+  arrowKeyDeltas,
+  customDataNameMapping,
+  enumerate,
+  modulo,
+  range,
+  round,
+} from "../core/utils.js";
 import { UIList } from "../web-components/ui-list.js";
-import { updateRemoveButton } from "./panel-axes.js";
+import { arraysEqual, updateRemoveButton } from "./panel-axes.js";
 import { BaseInfoPanel } from "./panel-base.js";
 import {
   locationToString,
@@ -513,7 +521,7 @@ addStyleSheet(`
   padding-bottom: 1em;
 }
 
-.fontra-ui-font-info-sources-panel-guideline-list {
+.fontra-ui-font-info-sources-panel-list-element {
   min-width: max-content;
   max-width: 29.5em; // 4.5 + 25
   max-height: 12em;
@@ -679,12 +687,11 @@ class SourceBox extends HTMLElement {
       this.editSource((source) => {
         source.customData = {};
         for (const item of event.newValue) {
-          const value = parseFloat(item["value"]);
-          // TODO: How do we handle different types of values?
-          if (value == NaN) {
-            source.customData[item["key"]] = item["value"];
-          } else {
-            source.customData[item["key"]] = value;
+          const key = item["key"];
+          const formatter = customDataNameMapping[key]?.formatter || DefaultFormatter;
+          const value = formatter.fromString(item["value"]).value;
+          if (value !== undefined) {
+            source.customData[key] = value;
           }
         }
       }, `edit customData`); // TODO: translation
@@ -724,7 +731,7 @@ class SourceBox extends HTMLElement {
         html.div({ class: "fontra-ui-font-info-sources-panel-header" }, [
           getLabelFromKey("customData"),
         ]),
-        buildFontCustomDataList(this.controllers.customData)
+        buildFontCustomDataList(this.controllers.customData, this.source)
       );
     }
   }
@@ -806,7 +813,7 @@ function buildFontGuidelineList(controller) {
   const items = Object.values(model)?.map(makeItem) || [];
 
   const labelList = new UIList();
-  labelList.classList.add("fontra-ui-font-info-sources-panel-guideline-list");
+  labelList.classList.add("fontra-ui-font-info-sources-panel-list-element");
   labelList.style = `min-width: 12em;`;
   labelList.columnDescriptions = [
     {
@@ -905,13 +912,23 @@ function buildFontGuidelineList(controller) {
   ]);
 }
 
-function buildFontCustomDataList(controller) {
+function buildFontCustomDataList(controller, fontSource) {
+  const customDataNames = Object.keys(customDataNameMapping);
   const model = controller.model;
 
   const makeItem = ([key, value]) => {
     const item = new ObservableController({ key: key, value: value });
     item.addListener((event) => {
-      const newCustomData = labelList.items.map((customData) => {
+      const sortedItems = [...labelList.items];
+      sortedItems.sort(
+        (a, b) => customDataNames.indexOf(a.key) - customDataNames.indexOf(b.key)
+      );
+
+      if (!arraysEqual(labelList.items, sortedItems)) {
+        labelList.setItems(sortedItems);
+      }
+
+      const newCustomData = sortedItems.map((customData) => {
         return { ...customData };
       });
       model.customData = newCustomData;
@@ -919,10 +936,14 @@ function buildFontCustomDataList(controller) {
     return item.model;
   };
 
-  const items = Object.entries(model)?.map(makeItem) || [];
+  const sortedItems = Object.entries(model);
+  sortedItems.sort(
+    (a, b) => customDataNames.indexOf(a[0]) - customDataNames.indexOf(b[0])
+  );
+  const items = sortedItems?.map(makeItem) || [];
 
   const labelList = new UIList();
-  labelList.classList.add("fontra-ui-font-info-sources-panel-guideline-list");
+  labelList.classList.add("fontra-ui-font-info-sources-panel-list-element");
   labelList.style = `min-width: 12em;`;
   labelList.columnDescriptions = [
     {
@@ -956,20 +977,43 @@ function buildFontCustomDataList(controller) {
       return { ...customData };
     });
     model.customData = newCustomData;
+    addRemoveButton.scrollIntoView({
+      behavior: "auto",
+      block: "nearest",
+      inline: "nearest",
+    });
+    labelList.setSelectedItemIndex(items.length - 1);
   };
 
   labelList.addEventListener("deleteKey", deleteSelectedItem);
-
   const addRemoveButton = html.createDomElement("add-remove-buttons", {
     addButtonCallback: () => {
       // TODO: Maybe open a dialog with a list of possible keys?
-      const newItem = makeItem(["hheaAscender", 800]);
+      const currentKeys = labelList.items.map((customData) => {
+        return customData.key;
+      });
+      let nextKey = `attributeName${currentKeys.length}`;
+      for (const key of Object.keys(customDataNameMapping)) {
+        if (!currentKeys.includes(key)) {
+          nextKey = key;
+          break;
+        }
+      }
+      const valueDefault = customDataNameMapping[nextKey]
+        ? customDataNameMapping[nextKey].default(fontSource)
+        : "";
+      const newItem = makeItem([nextKey, valueDefault]);
       const newItems = [...labelList.items, newItem];
       model.customData = newItems.map((label) => {
         return { ...label };
       });
       labelList.setItems(newItems);
       labelList.editCell(newItems.length - 1, "key");
+      addRemoveButton.scrollIntoView({
+        behavior: "auto",
+        block: "nearest",
+        inline: "nearest",
+      });
     },
     removeButtonCallback: deleteSelectedItem,
     disableRemoveButton: true,

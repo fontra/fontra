@@ -243,6 +243,7 @@ export const DefaultFormatter = {
   },
 };
 
+// TODO: Maybe move formatters to utils.js, so we can write unittests for it.
 export const NumberFormatter = {
   toString: (value) => value.toString(),
   fromString: (value) => {

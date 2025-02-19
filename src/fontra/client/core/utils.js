@@ -805,3 +805,160 @@ export const friendlyHttpStatus = {
   504: "Gateway Timeout",
   505: "HTTP Version Not Supported",
 };
+
+// TODO: This is a temporary solution. Need further refactoring.
+export const _NumberFormatter = {
+  toString: (value) => value.toString(),
+  fromString: (value) => {
+    if (typeof value === "number") {
+      return { value: value };
+    } else if (typeof value === "boolean" || !value) {
+      return { error: "not a number" };
+    }
+    const number = Number(value);
+    if (isNaN(number)) {
+      return { error: "not a number" };
+    } else {
+      return { value: number };
+    }
+  },
+};
+
+export const ArrayFormatter = {
+  toString: (value) => {
+    if (Array.isArray(value)) {
+      return value.toString();
+    }
+  },
+  fromString: (value) => {
+    const array = JSON.parse("[" + value + "]");
+    if (Array.isArray(array)) {
+      return { value: array };
+    } else {
+      return { error: "not an array" };
+    }
+  },
+};
+
+export const NumberArrayFormatter = {
+  toString: (value) => value.toString(),
+  fromString: (value, arrayLength) => {
+    const array = JSON.parse("[" + value + "]");
+    if (Array.isArray(array)) {
+      if (arrayLength && array.length != arrayLength) {
+        return { error: `array length must be ${arrayLength}` };
+      }
+      return { value: array };
+    } else {
+      return { error: "not an array" };
+    }
+  },
+};
+
+export const PanoseArrayFormatter = {
+  toString: (value) => NumberArrayFormatter.toString(value),
+  fromString: (value) => NumberArrayFormatter.fromString(value, 10),
+};
+
+function getAscenderDefault(fontSource = undefined) {
+  return fontSource.lineMetricsHorizontalLayout.ascender.value || 800;
+}
+
+function getDescenderDefault(fontSource = undefined) {
+  return fontSource.lineMetricsHorizontalLayout.descender.value || -200;
+}
+
+function getDescenderWinDefault(fontSource = undefined) {
+  return fontSource.lineMetricsHorizontalLayout.descender.value * -1 || 200;
+}
+
+function getFamilyNameDefault(fontSource = undefined) {
+  return fontSource.familyName || "Family Name";
+}
+
+function getSubfamilyNameDefault(fontSource = undefined) {
+  return fontSource.name || "Subfamily Name";
+}
+
+function getstrikeoutPositionDefault(fontSource = undefined) {
+  return fontSource.lineMetricsHorizontalLayout.ascender.value / 2 || 250;
+}
+
+export const customDataNameMapping = {
+  // verticl metrics values
+  hheaAscender: { default: getAscenderDefault, formatter: _NumberFormatter },
+  hheaDescender: { default: getDescenderDefault, formatter: _NumberFormatter },
+  hheaLineGap: { default: () => 0, formatter: _NumberFormatter },
+  typoAscender: { default: getAscenderDefault, formatter: _NumberFormatter },
+  typoDescender: { default: getDescenderDefault, formatter: _NumberFormatter },
+  typoLineGap: { default: () => 0, formatter: _NumberFormatter },
+  winAscent: { default: getAscenderDefault, formatter: _NumberFormatter },
+  winDescent: { default: getDescenderWinDefault, formatter: _NumberFormatter },
+  underlinePosition: { default: () => -100, formatter: _NumberFormatter },
+  underlineThickness: { default: () => 50, formatter: _NumberFormatter },
+  strikeoutPosition: {
+    default: getstrikeoutPositionDefault,
+    formatter: _NumberFormatter,
+  },
+  strikeoutSize: { default: () => 50, formatter: _NumberFormatter },
+  // name table entries
+  version: { default: () => "Version 1.0" }, // Name ID 7
+  preferredFamilyName: { default: getFamilyNameDefault }, // Name ID 16
+  preferredSubfamilyName: { default: getSubfamilyNameDefault }, // Name ID 17
+  compatibleFullName: { default: () => "Compatible Full Name" }, // Name ID 18
+  WWSFamilyName: { default: getFamilyNameDefault }, // Name ID 21
+  WWSSubfamilyName: { default: getSubfamilyNameDefault }, // Name ID 22
+  // misc
+  weightClass: { default: () => 400, formatter: _NumberFormatter },
+  widthClass: { default: () => 5, formatter: _NumberFormatter },
+  fsSelection: { default: () => 0, formatter: _NumberFormatter },
+  fsType: { default: () => 0, formatter: _NumberFormatter },
+  panose: {
+    default: () => [2, 11, 5, 2, 4, 5, 4, 2, 2, 4],
+    formatter: PanoseArrayFormatter,
+  }, // default: sans-serif
+};
+
+// TODO: Based on customDataNameMapping (designspace.py)
+// "gaspRangeRecords": "openTypeGaspRangeRecords",
+// "headCreated": "openTypeHeadCreated",
+// "headFlags": "openTypeHeadFlags",
+// "headLowestRecPPEM": "openTypeHeadLowestRecPPEM",
+// "hheaCaretOffset": "openTypeHheaCaretOffset",
+// "hheaCaretSlopeRise": "openTypeHheaCaretSlopeRise",
+// "hheaCaretSlopeRun": "openTypeHheaCaretSlopeRun",
+// "records": "openTypeNameRecords",
+// "uniqueID": "openTypeNameUniqueID",
+// "codePageRanges": "openTypeOS2CodePageRanges",
+// "familyClass": "openTypeOS2FamilyClass",
+// "subscriptXOffset": "openTypeOS2SubscriptXOffset",
+// "subscriptXSize": "openTypeOS2SubscriptXSize",
+// "subscriptYOffset": "openTypeOS2SubscriptYOffset",
+// "subscriptYSize": "openTypeOS2SubscriptYSize",
+// "superscriptXOffset": "openTypeOS2SuperscriptXOffset",
+// "superscriptXSize": "openTypeOS2SuperscriptXSize",
+// "superscriptYOffset": "openTypeOS2SuperscriptYOffset",
+// "superscriptYSize": "openTypeOS2SuperscriptYSize",
+// "unicodeRanges": "openTypeOS2UnicodeRanges",
+// "vheaCaretOffset": "openTypeVheaCaretOffset",
+// "vheaCaretSlopeRise": "openTypeVheaCaretSlopeRise",
+// "vheaCaretSlopeRun": "openTypeVheaCaretSlopeRun",
+// "vheaVertTypoLineGap": "openTypeVheaVertTypoLineGap",
+// "blueFuzz": "postscriptBlueFuzz",
+// "blueScale": "postscriptBlueScale",
+// "blueShift": "postscriptBlueShift",
+// "blueValues": "postscriptBlueValues",
+// "defaultCharacter": "postscriptDefaultCharacter",
+// "defaultWidthX": "postscriptDefaultWidthX",
+// "familyBlues": "postscriptFamilyBlues",
+// "familyOtherBlues": "postscriptFamilyOtherBlues",
+// "forceBold": "postscriptForceBold",
+// "isFixedPitch": "postscriptIsFixedPitch",
+// "nominalWidthX": "postscriptNominalWidthX",
+// "otherBlues": "postscriptOtherBlues",
+// "slantAngle": "postscriptSlantAngle",
+// "stemSnapH": "postscriptStemSnapH",
+// "stemSnapV": "postscriptStemSnapV",
+// "psUniqueID": "postscriptUniqueID",  # inconsistent psXXX, because uniqueID exists already.
+// "weightName": "postscriptWeightName",
+// "windowsCharacterSet": "postscriptWindowsCharacterSet",
