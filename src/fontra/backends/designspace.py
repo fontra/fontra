@@ -2171,10 +2171,18 @@ def updateFontInfoFromFontSource(reader, fontSource):
 
     fontInfo.guidelines = packGuidelines(fontSource.guidelines)
 
+    # set custom data
     for key, value in fontSource.customData.items():
         ufoName = customDataNameMapping.get(key)
         if ufoName is not None:
             setattr(fontInfo, ufoName, value)
+
+    # delete custom data
+    for fontraName, ufoName in customDataNameMapping.items():
+        if fontraName not in fontSource.customData.keys():
+            value = getattr(fontInfo, ufoName, None)
+            if value is not None:
+                delattr(fontInfo, ufoName)
 
     reader.writeInfo(fontInfo)
 
