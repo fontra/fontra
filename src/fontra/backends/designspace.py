@@ -141,7 +141,7 @@ customDataNameMapping = {
     "preferredSubfamilyName": "openTypeNamePreferredSubfamilyName",
     "records": "openTypeNameRecords",
     "uniqueID": "openTypeNameUniqueID",
-    "version": "openTypeNameVersion",
+    "versionString": "openTypeNameVersion",
     "WWSFamilyName": "openTypeNameWWSFamilyName",
     "WWSSubfamilyName": "openTypeNameWWSSubfamilyName",
     "codePageRanges": "openTypeOS2CodePageRanges",
