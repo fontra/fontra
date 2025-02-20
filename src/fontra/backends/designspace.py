@@ -127,7 +127,7 @@ fontInfoNameMapping = [
 customDataNameMapping = {
     # Fontra / UFO
     "gaspRangeRecords": "openTypeGaspRangeRecords",
-    "headCreated": "openTypeHeadCreated",
+    "created": "openTypeHeadCreated",
     "headFlags": "openTypeHeadFlags",
     "headLowestRecPPEM": "openTypeHeadLowestRecPPEM",
     "hheaAscender": "openTypeHheaAscender",

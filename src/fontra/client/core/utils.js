@@ -884,6 +884,21 @@ function getstrikeoutPositionDefault(fontSource = undefined) {
   return fontSource.lineMetricsHorizontalLayout.ascender.value / 2 || 250;
 }
 
+function getCreatedDefault() {
+  // Note: UTC might differ from your local time.
+  const date = new Date();
+
+  const YYYY = date.getUTCFullYear();
+  const MM = String(date.getUTCMonth() + 1).padStart(2, "0");
+  const DD = String(date.getUTCDate()).padStart(2, "0");
+
+  const HH = String(date.getUTCHours()).padStart(2, "0");
+  const mm = String(date.getUTCMinutes()).padStart(2, "0");
+  const SS = String(date.getUTCSeconds()).padStart(2, "0");
+
+  return `${YYYY}/${MM}/${DD} ${HH}:${mm}:${SS}`; // "YYYY/MM/DD HH:MM:SS"
+}
+
 export const customDataNameMapping = {
   // verticl metrics values
   hheaAscender: { default: getAscenderDefault, formatter: _NumberFormatter },
@@ -911,7 +926,8 @@ export const customDataNameMapping = {
   // misc
   weightClass: { default: () => 400, formatter: _NumberFormatter },
   widthClass: { default: () => 5, formatter: _NumberFormatter },
-  fsSelection: { default: () => [], formatter: NumberArrayFormatter }, // 7 = Use Typo Metrics, 8 = has WWS name, https://github.com/fonttools/fonttools/blob/598b974f87f35972da24e96e45bd0176d18930a0/Lib/fontTools/ufoLib/__init__.py#L1889
+  created: { default: getCreatedDefault }, // The timezone is UTC.
+  fsSelection: { default: getSubfamilyNameDefault, formatter: NumberArrayFormatter }, // 7 = Use Typo Metrics, 8 = has WWS name, https://github.com/fonttools/fonttools/blob/598b974f87f35972da24e96e45bd0176d18930a0/Lib/fontTools/ufoLib/__init__.py#L1889
   fsType: { default: () => [3], formatter: NumberArrayFormatter }, // https://github.com/googlefonts/glyphsLib/blob/c4db6b981d577f456d64ebe9993818770e170454/Lib/glyphsLib/builder/custom_params.py#L1166
   panose: {
     default: () => [2, 11, 5, 2, 4, 5, 4, 2, 2, 4],
@@ -921,7 +937,6 @@ export const customDataNameMapping = {
 
 // TODO: Based on customDataNameMapping (designspace.py)
 // "gaspRangeRecords": "openTypeGaspRangeRecords",
-// "headCreated": "openTypeHeadCreated",
 // "headFlags": "openTypeHeadFlags",
 // "headLowestRecPPEM": "openTypeHeadLowestRecPPEM",
 // "hheaCaretOffset": "openTypeHheaCaretOffset",
