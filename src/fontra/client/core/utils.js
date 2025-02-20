@@ -927,7 +927,7 @@ export const customDataNameMapping = {
   weightClass: { default: () => 400, formatter: _NumberFormatter },
   widthClass: { default: () => 5, formatter: _NumberFormatter },
   created: { default: getCreatedDefault }, // The timezone is UTC.
-  fsSelection: { default: getSubfamilyNameDefault, formatter: NumberArrayFormatter }, // 7 = Use Typo Metrics, 8 = has WWS name, https://github.com/fonttools/fonttools/blob/598b974f87f35972da24e96e45bd0176d18930a0/Lib/fontTools/ufoLib/__init__.py#L1889
+  fsSelection: { default: () => [], formatter: NumberArrayFormatter }, // 7 = Use Typo Metrics, 8 = has WWS name, https://github.com/fonttools/fonttools/blob/598b974f87f35972da24e96e45bd0176d18930a0/Lib/fontTools/ufoLib/__init__.py#L1889
   fsType: { default: () => [3], formatter: NumberArrayFormatter }, // https://github.com/googlefonts/glyphsLib/blob/c4db6b981d577f456d64ebe9993818770e170454/Lib/glyphsLib/builder/custom_params.py#L1166
   panose: {
     default: () => [2, 11, 5, 2, 4, 5, 4, 2, 2, 4],
