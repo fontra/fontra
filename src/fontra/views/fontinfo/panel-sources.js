@@ -696,6 +696,11 @@ class SourceBox extends HTMLElement {
           const value = formatter.fromString(item["value"]).value;
           if (value !== undefined) {
             source.customData[key] = value;
+          } else {
+            message(
+              translate("sources.dialog.cannot-edit-source.title"),
+              `"${key}" invalid value: ${item["value"]}`
+            );
           }
         }
       }, `edit customData`); // TODO: translation
