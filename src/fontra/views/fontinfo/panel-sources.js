@@ -925,7 +925,13 @@ function buildFontCustomDataList(controller, fontSource) {
     item.addListener((event) => {
       const sortedItems = [...labelList.items];
       sortedItems.sort(
-        (a, b) => customDataNames.indexOf(a.key) - customDataNames.indexOf(b.key)
+        (a, b) =>
+          (customDataNames.indexOf(a.key) != -1
+            ? customDataNames.indexOf(a.key)
+            : customDataNames.length) -
+          (customDataNames.indexOf(b.key) != -1
+            ? customDataNames.indexOf(b.key)
+            : customDataNames.length)
       );
 
       if (!arraysEqual(labelList.items, sortedItems)) {
@@ -942,7 +948,13 @@ function buildFontCustomDataList(controller, fontSource) {
 
   const sortedItems = Object.entries(model);
   sortedItems.sort(
-    (a, b) => customDataNames.indexOf(a[0]) - customDataNames.indexOf(b[0])
+    (a, b) =>
+      (customDataNames.indexOf(a[0]) != -1
+        ? customDataNames.indexOf(a[0])
+        : customDataNames.length) -
+      (customDataNames.indexOf(b[0]) != -1
+        ? customDataNames.indexOf(b[0])
+        : customDataNames.length)
   );
   const items = sortedItems?.map(makeItem) || [];
 
