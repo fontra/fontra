@@ -62,6 +62,9 @@ from ..core.varutils import locationToTuple, makeDenseLocation, makeSparseLocati
 from .filewatcher import Change, FileWatcher
 from .ufo_utils import extractGlyphNameAndCodePoints
 
+# from glyphsLib.builder.custom_params import KNOWN_PARAM_HANDLERS
+
+
 logger = logging.getLogger(__name__)
 
 
@@ -123,6 +126,16 @@ fontInfoNameMapping = [
     ("vendorID", "openTypeOS2VendorID"),
 ]
 
+# TODO: Alternative idea: Use glyphsLib KNOWN_PARAM_HANDLERS to create the mapping
+# customDataNameMapping = {}
+# for handler in KNOWN_PARAM_HANDLERS:
+#     try:
+#         key = handler.glyphs_name
+#     except AttributeError:
+#         # Handler without glyphs_name
+#         continue
+#     # print(f"{key}: {handler.ufo_name}")
+#     customDataNameMapping[key] = handler.ufo_name
 
 customDataNameMapping = {
     # Fontra / UFO

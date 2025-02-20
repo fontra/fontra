@@ -977,3 +977,108 @@ export const customDataNameMapping = {
 // "psUniqueID": "postscriptUniqueID",  # inconsistent psXXX, because uniqueID exists already.
 // "weightName": "postscriptWeightName",
 // "windowsCharacterSet": "postscriptWindowsCharacterSet",
+
+// GlyphsApp to UFO mapping
+// compatibleFullName: openTypeNameCompatibleFullName
+// hheaAscender: openTypeHheaAscender
+// hheaDescender: openTypeHheaDescender
+// hheaLineGap: openTypeHheaLineGap
+// panose: openTypeOS2Panose
+// fsType: openTypeOS2Type
+// typoAscender: openTypeOS2TypoAscender
+// typoDescender: openTypeOS2TypoDescender
+// typoLineGap: openTypeOS2TypoLineGap
+// unicodeRanges: openTypeOS2UnicodeRanges
+// strikeoutSize: openTypeOS2StrikeoutSize
+// strikeoutPosition: openTypeOS2StrikeoutPosition
+// subscriptXSize: openTypeOS2SubscriptXSize
+// subscriptYSize: openTypeOS2SubscriptYSize
+// subscriptXOffset: openTypeOS2SubscriptXOffset
+// subscriptYOffset: openTypeOS2SubscriptYOffset
+// superscriptXSize: openTypeOS2SuperscriptXSize
+// superscriptYSize: openTypeOS2SuperscriptYSize
+// superscriptXOffset: openTypeOS2SuperscriptXOffset
+// superscriptYOffset: openTypeOS2SuperscriptYOffset
+// vheaVertAscender: openTypeVheaVertTypoAscender
+// vheaVertDescender: openTypeVheaVertTypoDescender
+// vheaVertLineGap: openTypeVheaVertTypoLineGap
+// vheaVertTypoAscender: openTypeVheaVertTypoAscender
+// vheaVertTypoDescender: openTypeVheaVertTypoDescender
+// vheaVertTypoLineGap: openTypeVheaVertTypoLineGap
+// blueScale: postscriptBlueScale
+// blueShift: postscriptBlueShift
+// isFixedPitch: postscriptIsFixedPitch
+// underlinePosition: postscriptUnderlinePosition
+// underlineThickness: postscriptUnderlineThickness
+// versionString: openTypeNameVersion
+// vendorID: openTypeOS2VendorID
+// uniqueID: openTypeNameUniqueID
+// license: openTypeNameLicense
+// licenseURL: openTypeNameLicenseURL
+// trademark: trademark
+// description: openTypeNameDescription
+// sampleText: openTypeNameSampleText
+// postscriptFullName: postscriptFullName
+// postscriptFontName: postscriptFontName
+// preferredFamilyName: openTypeNamePreferredFamilyName
+// preferredSubfamilyName: openTypeNamePreferredSubfamilyName
+// WWSFamilyName: openTypeNameWWSFamilyName
+// WWSSubfamilyName: openTypeNameWWSSubfamilyName
+// openTypeHheaCaretSlopeRun: openTypeHheaCaretSlopeRun
+// openTypeVheaCaretSlopeRun: openTypeVheaCaretSlopeRun
+// openTypeHheaCaretSlopeRise: openTypeHheaCaretSlopeRise
+// openTypeVheaCaretSlopeRise: openTypeVheaCaretSlopeRise
+// openTypeHheaCaretOffset: openTypeHheaCaretOffset
+// openTypeVheaCaretOffset: openTypeVheaCaretOffset
+// openTypeHeadLowestRecPPEM: openTypeHeadLowestRecPPEM
+// openTypeHeadFlags: openTypeHeadFlags
+// openTypeNameVersion: openTypeNameVersion
+// openTypeNameUniqueID: openTypeNameUniqueID
+// openTypeOS2FamilyClass: openTypeOS2FamilyClass
+// postscriptSlantAngle: postscriptSlantAngle
+// postscriptUniqueID: postscriptUniqueID
+// postscriptBlueFuzz: postscriptBlueFuzz
+// postscriptForceBold: postscriptForceBold
+// postscriptDefaultWidthX: postscriptDefaultWidthX
+// postscriptNominalWidthX: postscriptNominalWidthX
+// postscriptWeightName: postscriptWeightName
+// postscriptDefaultCharacter: postscriptDefaultCharacter
+// postscriptWindowsCharacterSet: postscriptWindowsCharacterSet
+// macintoshFONDFamilyID: macintoshFONDFamilyID
+// macintoshFONDName: macintoshFONDName
+// styleMapFamilyName: styleMapFamilyName
+// styleMapStyleName: styleMapStyleName
+// postscriptFamilyBlues: postscriptFamilyBlues
+// postscriptFamilyOtherBlues: postscriptFamilyOtherBlues
+// winAscent: openTypeOS2WinAscent
+// winDescent: openTypeOS2WinDescent
+// weightClass: openTypeOS2WeightClass
+// widthClass: openTypeOS2WidthClass
+// GASP Table: openTypeGaspRangeRecords
+// gasp Table: openTypeGaspRangeRecords
+// meta Table: public.openTypeMeta
+// Color Palettes: com.github.googlei18n.ufo2ft.colorPalettes
+// Disable Last Change: disablesLastChange
+// Don't use Production Names: com.github.googlei18n.ufo2ft.useProductionNames
+// disablesAutomaticAlignment: disablesAutomaticAlignment
+// iconName: iconName
+// DisplayStrings: DisplayStrings
+// disablesNiceNames: useNiceNames
+// customValue: customValue
+// customValue1: customValue1
+// customValue2: customValue2
+// customValue3: customValue3
+// weightValue: weightValue
+// widthValue: widthValue
+// Virtual Master: Virtual Master
+
+// Handler without glyphs_name
+// <glyphsLib.builder.custom_params.OS2CodePageRangesParamHandler object at 0x103629ed0>
+// <glyphsLib.builder.custom_params.NameRecordParamHandler object at 0x10362a190>
+// <glyphsLib.builder.custom_params.OS2SelectionParamHandler object at 0x10362a690>
+// <glyphsLib.builder.custom_params.GlyphOrderParamHandler object at 0x10362a750>
+// <glyphsLib.builder.custom_params.FilterParamHandler object at 0x10362a810>
+// <glyphsLib.builder.custom_params.ReplacePrefixParamHandler object at 0x10362a8d0>
+// <glyphsLib.builder.custom_params.ReplaceFeatureParamHandler object at 0x10362a990>
+// <glyphsLib.builder.custom_params.ReencodeGlyphsParamHandler object at 0x10362aa50>
+// <glyphsLib.builder.custom_params.RenameGlyphsParamHandler object at 0x10362ab10>
