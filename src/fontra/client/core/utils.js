@@ -824,6 +824,22 @@ export const _NumberFormatter = {
   },
 };
 
+export const BooleanFormatter = {
+  toString: (value) => value.toString(),
+  fromString: (value) => {
+    if (typeof value === "boolean") {
+      return { value: value };
+    }
+    if (value.trim().toLowerCase() === "true") {
+      return { value: true };
+    } else if (value.trim().toLowerCase() === "false") {
+      return { value: false };
+    } else {
+      return { error: "not a boolean" };
+    }
+  },
+};
+
 export const ArrayFormatter = {
   toString: (value) => {
     if (Array.isArray(value)) {
@@ -917,6 +933,7 @@ export const customDataNameMapping = {
   },
   strikeoutSize: { default: () => 50, formatter: _NumberFormatter },
   // name table entries
+  uniqueID: { default: () => "uniqueID Name ID 3" }, // Name ID 3
   versionString: { default: () => "Version 1.0" }, // Name ID 7
   preferredFamilyName: { default: getFamilyNameDefault }, // Name ID 16
   preferredSubfamilyName: { default: getSubfamilyNameDefault }, // Name ID 17
@@ -933,6 +950,19 @@ export const customDataNameMapping = {
     default: () => [2, 11, 5, 2, 4, 5, 4, 2, 2, 4],
     formatter: PanoseArrayFormatter,
   }, // default: sans-serif
+  unicodeRanges: { default: () => [], formatter: NumberArrayFormatter },
+  codePageRanges: { default: () => [], formatter: NumberArrayFormatter },
+  // Postscript Font Level Hints, // https://adobe-type-tools.github.io/font-tech-notes/pdfs/T1_SPEC.pdf
+  blueValues: { default: () => [], formatter: NumberArrayFormatter },
+  otherBlues: { default: () => [], formatter: NumberArrayFormatter },
+  familyBlues: { default: () => [], formatter: NumberArrayFormatter },
+  familyOtherBlues: { default: () => [], formatter: NumberArrayFormatter },
+  blueScale: { default: () => 0.039625, formatter: _NumberFormatter },
+  blueShift: { default: () => 1, formatter: _NumberFormatter },
+  blueFuzz: { default: () => 1, formatter: _NumberFormatter },
+  stemSnapH: { default: () => [], formatter: NumberArrayFormatter },
+  stemSnapV: { default: () => [], formatter: NumberArrayFormatter },
+  forceBold: { default: () => false, formatter: BooleanFormatter },
 };
 
 // TODO: Based on customDataNameMapping (designspace.py)
