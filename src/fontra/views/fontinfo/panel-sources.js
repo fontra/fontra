@@ -1,6 +1,6 @@
 import { doPerformAction, getActionIdentifierFromKeyEvent } from "../core/actions.js";
 import { recordChanges } from "../core/change-recorder.js";
-import { customDataNameMapping } from "../core/customData.js";
+import { customDataNameMapping } from "../core/font-info-data.js";
 import * as html from "../core/html-utils.js";
 import { addStyleSheet } from "../core/html-utils.js";
 import { translate } from "../core/localization.js";
