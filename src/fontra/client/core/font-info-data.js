@@ -45,7 +45,7 @@ function getCreatedDefault() {
 }
 
 export const customDataNameMapping = {
-  // verticl metrics values
+  // vertical metrics values
   openTypeHheaAscender: { default: getAscenderDefault, formatter: _NumberFormatter },
   openTypeHheaDescender: { default: getDescenderDefault, formatter: _NumberFormatter },
   openTypeHheaLineGap: { default: () => 0, formatter: _NumberFormatter },
