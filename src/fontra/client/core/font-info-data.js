@@ -1,7 +1,7 @@
 import {
   ArrayFormatter,
   BooleanFormatter,
-  PanoseArrayFormatter,
+  FixedLengthArrayFormatter,
   _NumberFormatter,
 } from "./formatters.js";
 
@@ -79,9 +79,12 @@ export const customDataNameMapping = {
   openTypeOS2Type: { default: () => [3], formatter: ArrayFormatter }, // https://github.com/googlefonts/glyphsLib/blob/c4db6b981d577f456d64ebe9993818770e170454/Lib/glyphsLib/builder/custom_params.py#L1166
   openTypeOS2Panose: {
     default: () => [2, 11, 5, 2, 4, 5, 4, 2, 2, 4],
-    formatter: PanoseArrayFormatter,
+    formatter: FixedLengthArrayFormatter(10),
   }, // default: sans-serif
-  openTypeOS2FamilyClass: { default: () => [8, 0], formatter: ArrayFormatter }, // Class ID 8 = Sans Serif, Subclass ID = 0: No Classification
+  openTypeOS2FamilyClass: {
+    default: () => [8, 0],
+    formatter: FixedLengthArrayFormatter(2),
+  }, // Class ID 8 = Sans Serif, Subclass ID = 0: No Classification
   openTypeOS2UnicodeRanges: { default: () => [], formatter: ArrayFormatter },
   openTypeOS2CodePageRanges: { default: () => [], formatter: ArrayFormatter },
   // Postscript Font Level Hints, // https://adobe-type-tools.github.io/font-tech-notes/pdfs/T1_SPEC.pdf
@@ -107,8 +110,8 @@ export const customDataNameMapping = {
   postscriptDefaultCharacter: { default: () => "glyphName" }, // The name of the glyph that should be used as the default character in PFM files.
   postscriptWindowsCharacterSet: { default: () => 0, formatter: _NumberFormatter },
   // OpenType vhea Table Fields
-  // openTypeVheaVertTypoAscender  // NOTE: not in ufoInfoAttributesToRoundTrip
-  // openTypeVheaVertTypoDescender  // NOTE: not in ufoInfoAttributesToRoundTrip
+  // openTypeVheaVertTypoAscender  // NOTE: part of lineMetricsVerMapping
+  // openTypeVheaVertTypoDescender  // NOTE: part of lineMetricsVerMapping
   openTypeVheaVertTypoLineGap: { default: () => 0, formatter: _NumberFormatter },
   openTypeVheaCaretSlopeRise: { default: () => 0, formatter: _NumberFormatter },
   openTypeVheaCaretSlopeRun: { default: () => 0, formatter: _NumberFormatter },

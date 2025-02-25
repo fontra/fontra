@@ -2,7 +2,7 @@ import { expect } from "chai";
 import {
   ArrayFormatter,
   BooleanFormatter,
-  PanoseArrayFormatter,
+  FixedLengthArrayFormatter,
   _NumberFormatter,
 } from "../src/fontra/client/core/formatters.js";
 
@@ -65,50 +65,36 @@ describe("ArrayFormatter", () => {
   );
 });
 
-describe("ArrayFormatter", () => {
+describe("FixedLengthArrayFormatter", () => {
   parametrize(
-    "ArrayFormatter with arrayLength fromString tests",
+    "FixedLengthArrayFormatter fromString tests",
     [
-      ["1,2,3,4", [1, 2, 3, 4], 4],
-      ["1, 2,3, 4", [1, 2, 3, 4], 4],
-      ["1, 2,3,4", undefined, 3],
-      ["", [], 0],
+      [10, "1,2,3,4,5,6,7,8,9,10", [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]],
+      [10, "1,2,3,4,5,6,7,8,9", undefined],
+      [2, "8,0", [8, 0]],
     ],
     (testData) => {
-      const [input, expectedResult, arrayLength] = testData;
-      expect(ArrayFormatter.fromString(input, arrayLength).value).to.deep.equal(
-        expectedResult
-      );
+      const [arrayLength, input, expectedResult] = testData;
+      expect(
+        FixedLengthArrayFormatter(arrayLength).fromString(input).value
+      ).to.deep.equal(expectedResult);
     }
   );
 });
 
-describe("PanoseArrayFormatter", () => {
+describe("FixedLengthArrayFormatter", () => {
   parametrize(
-    "PanoseArrayFormatter fromString tests",
+    "FixedLengthArrayFormatter toString tests",
     [
-      ["1,2,3,4,5,6,7,8,9,10", [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]],
-      ["1,2,3,4,5,6,7,8,9", undefined],
+      [10, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], "1,2,3,4,5,6,7,8,9,10"],
+      [10, [1, 2, 3, 4, 5, 6, 7, 8, 9], { error: "array length must be 10" }],
+      [2, [8, 0], "8,0"],
     ],
     (testData) => {
-      const [input, expectedResult] = testData;
-      expect(PanoseArrayFormatter.fromString(input).value).to.deep.equal(
+      const [arrayLength, input, expectedResult] = testData;
+      expect(FixedLengthArrayFormatter(arrayLength).toString(input)).to.deep.equal(
         expectedResult
       );
-    }
-  );
-});
-
-describe("PanoseArrayFormatter", () => {
-  parametrize(
-    "PanoseArrayFormatter toString tests",
-    [
-      [[1, 2, 3, 4, 5, 6, 7, 8, 9, 10], "1,2,3,4,5,6,7,8,9,10"],
-      [[1, 2, 3, 4, 5, 6, 7, 8, 9], { error: "array length must be 10" }],
-    ],
-    (testData) => {
-      const [input, expectedResult] = testData;
-      expect(PanoseArrayFormatter.toString(input)).to.deep.equal(expectedResult);
     }
   );
 });

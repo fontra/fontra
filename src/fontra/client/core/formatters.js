@@ -63,7 +63,7 @@ export const ArrayFormatter = {
   },
 };
 
-export const PanoseArrayFormatter = {
-  toString: (value) => ArrayFormatter.toString(value, 10),
-  fromString: (value) => ArrayFormatter.fromString(value, 10),
-};
+export const FixedLengthArrayFormatter = (arrayLength) => ({
+  toString: (value) => ArrayFormatter.toString(value, arrayLength),
+  fromString: (value) => ArrayFormatter.fromString(value, arrayLength),
+});
