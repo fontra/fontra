@@ -631,8 +631,8 @@ getSourcesTestData = [
             {"name": "Guideline Baseline Overshoot", "y": -10},
         ],
         "customData": {
-            "typoAscender": 700,
-            "typoDescender": -200,
+            "ufo.info.openTypeOS2TypoAscender": 700,
+            "ufo.info.openTypeOS2TypoDescender": -200,
         },
     },
     {
