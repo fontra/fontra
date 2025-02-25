@@ -1,4 +1,10 @@
 import { strFromU8, strToU8, unzlibSync, zlibSync } from "../third-party/fflate.js";
+import {
+  BooleanFormatter,
+  NumberArrayFormatter,
+  PanoseArrayFormatter,
+  _NumberFormatter,
+} from "./formatters.js";
 import { Transform } from "./transform.js";
 
 export function objectsEqual(obj1, obj2) {
@@ -804,76 +810,6 @@ export const friendlyHttpStatus = {
   503: "Service Unavailable",
   504: "Gateway Timeout",
   505: "HTTP Version Not Supported",
-};
-
-// TODO: This is a temporary solution. Need further refactoring.
-export const _NumberFormatter = {
-  toString: (value) => value.toString(),
-  fromString: (value) => {
-    if (typeof value === "number") {
-      return { value: value };
-    } else if (typeof value === "boolean" || !value) {
-      return { error: "not a number" };
-    }
-    const number = Number(value);
-    if (isNaN(number)) {
-      return { error: "not a number" };
-    } else {
-      return { value: number };
-    }
-  },
-};
-
-export const BooleanFormatter = {
-  toString: (value) => value.toString(),
-  fromString: (value) => {
-    if (typeof value === "boolean") {
-      return { value: value };
-    }
-    if (value.trim().toLowerCase() === "true") {
-      return { value: true };
-    } else if (value.trim().toLowerCase() === "false") {
-      return { value: false };
-    } else {
-      return { error: "not a boolean" };
-    }
-  },
-};
-
-export const ArrayFormatter = {
-  toString: (value) => {
-    if (Array.isArray(value)) {
-      return value.toString();
-    }
-  },
-  fromString: (value) => {
-    const array = JSON.parse("[" + value + "]");
-    if (Array.isArray(array)) {
-      return { value: array };
-    } else {
-      return { error: "not an array" };
-    }
-  },
-};
-
-export const NumberArrayFormatter = {
-  toString: (value) => value.toString(),
-  fromString: (value, arrayLength) => {
-    const array = JSON.parse("[" + value + "]");
-    if (Array.isArray(array)) {
-      if (arrayLength && array.length != arrayLength) {
-        return { error: `array length must be ${arrayLength}` };
-      }
-      return { value: array };
-    } else {
-      return { error: "not an array" };
-    }
-  },
-};
-
-export const PanoseArrayFormatter = {
-  toString: (value) => NumberArrayFormatter.toString(value),
-  fromString: (value) => NumberArrayFormatter.fromString(value, 10),
 };
 
 function getAscenderDefault(fontSource = undefined) {
