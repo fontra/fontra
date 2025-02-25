@@ -695,14 +695,15 @@ class SourceBox extends HTMLElement {
             continue;
           }
           const formatter = customDataNameMapping[key]?.formatter || DefaultFormatter;
-          const value = formatter.fromString(item["value"]).value;
-          if (value !== undefined) {
-            source.customData[`${ufoInfoPrefix}${key}`] = value;
-          } else {
+          const result = formatter.fromString(item["value"]);
+          if (result.value == undefined) {
+            const msg = result.error ? ` (${result.error})` : "";
             message(
               translate("sources.dialog.cannot-edit-source.title"),
-              `"${key}" invalid value: ${item["value"]}`
+              `"${key}" invalid value: ${item["value"]}${msg}`
             );
+          } else {
+            source.customData[`${ufoInfoPrefix}${key}`] = result.value;
           }
         }
       }, `edit customData`); // TODO: translation

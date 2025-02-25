@@ -2,7 +2,7 @@ import { expect } from "chai";
 import {
   ArrayFormatter,
   BooleanFormatter,
-  NumberArrayFormatter,
+  PanoseArrayFormatter,
   _NumberFormatter,
 } from "../src/fontra/client/core/formatters.js";
 
@@ -40,6 +40,7 @@ describe("ArrayFormatter", () => {
       ["1,2,3,4", [1, 2, 3, 4]],
       ["1, 2,3,4", [1, 2, 3, 4]],
       ["", []],
+      ["Hello", undefined],
     ],
     (testData) => {
       const [input, expectedResult] = testData;
@@ -54,8 +55,8 @@ describe("ArrayFormatter", () => {
     [
       [[1, 2, 3, 4], "1,2,3,4"],
       [[], ""],
-      [true, undefined],
-      [new Set([1, 2, 3]), undefined],
+      [true, { error: "not an array" }],
+      [new Set([1, 2, 3]), { error: "not an array" }],
     ],
     (testData) => {
       const [input, expectedResult] = testData;
@@ -64,9 +65,9 @@ describe("ArrayFormatter", () => {
   );
 });
 
-describe("NumberArrayFormatter", () => {
+describe("ArrayFormatter", () => {
   parametrize(
-    "NumberArrayFormatter fromString tests",
+    "ArrayFormatter with arrayLength fromString tests",
     [
       ["1,2,3,4", [1, 2, 3, 4], 4],
       ["1, 2,3, 4", [1, 2, 3, 4], 4],
@@ -75,9 +76,39 @@ describe("NumberArrayFormatter", () => {
     ],
     (testData) => {
       const [input, expectedResult, arrayLength] = testData;
-      expect(NumberArrayFormatter.fromString(input, arrayLength).value).to.deep.equal(
+      expect(ArrayFormatter.fromString(input, arrayLength).value).to.deep.equal(
         expectedResult
       );
+    }
+  );
+});
+
+describe("PanoseArrayFormatter", () => {
+  parametrize(
+    "PanoseArrayFormatter fromString tests",
+    [
+      ["1,2,3,4,5,6,7,8,9,10", [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]],
+      ["1,2,3,4,5,6,7,8,9", undefined],
+    ],
+    (testData) => {
+      const [input, expectedResult] = testData;
+      expect(PanoseArrayFormatter.fromString(input).value).to.deep.equal(
+        expectedResult
+      );
+    }
+  );
+});
+
+describe("PanoseArrayFormatter", () => {
+  parametrize(
+    "PanoseArrayFormatter toString tests",
+    [
+      [[1, 2, 3, 4, 5, 6, 7, 8, 9, 10], "1,2,3,4,5,6,7,8,9,10"],
+      [[1, 2, 3, 4, 5, 6, 7, 8, 9], { error: "array length must be 10" }],
+    ],
+    (testData) => {
+      const [input, expectedResult] = testData;
+      expect(PanoseArrayFormatter.toString(input)).to.deep.equal(expectedResult);
     }
   );
 });

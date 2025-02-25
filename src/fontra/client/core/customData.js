@@ -1,6 +1,6 @@
 import {
+  ArrayFormatter,
   BooleanFormatter,
-  NumberArrayFormatter,
   PanoseArrayFormatter,
   _NumberFormatter,
 } from "./formatters.js";
@@ -79,25 +79,25 @@ export const customDataNameMapping = {
   openTypeOS2WeightClass: { default: () => 400, formatter: _NumberFormatter },
   openTypeOS2WidthClass: { default: () => 5, formatter: _NumberFormatter },
   openTypeHeadCreated: { default: getCreatedDefault }, // The timezone is UTC.
-  openTypeOS2Selection: { default: () => [], formatter: NumberArrayFormatter }, // 7 = Use Typo Metrics, 8 = has WWS name, https://github.com/fonttools/fonttools/blob/598b974f87f35972da24e96e45bd0176d18930a0/Lib/fontTools/ufoLib/__init__.py#L1889
-  openTypeOS2Type: { default: () => [3], formatter: NumberArrayFormatter }, // https://github.com/googlefonts/glyphsLib/blob/c4db6b981d577f456d64ebe9993818770e170454/Lib/glyphsLib/builder/custom_params.py#L1166
+  openTypeOS2Selection: { default: () => [], formatter: ArrayFormatter }, // 7 = Use Typo Metrics, 8 = has WWS name, https://github.com/fonttools/fonttools/blob/598b974f87f35972da24e96e45bd0176d18930a0/Lib/fontTools/ufoLib/__init__.py#L1889
+  openTypeOS2Type: { default: () => [3], formatter: ArrayFormatter }, // https://github.com/googlefonts/glyphsLib/blob/c4db6b981d577f456d64ebe9993818770e170454/Lib/glyphsLib/builder/custom_params.py#L1166
   openTypeOS2Panose: {
     default: () => [2, 11, 5, 2, 4, 5, 4, 2, 2, 4],
     formatter: PanoseArrayFormatter,
   }, // default: sans-serif
-  openTypeOS2FamilyClass: { default: () => [8, 0], formatter: NumberArrayFormatter }, // Class ID 8 = Sans Serif, Subclass ID = 0: No Classification
-  openTypeOS2UnicodeRanges: { default: () => [], formatter: NumberArrayFormatter },
-  openTypeOS2CodePageRanges: { default: () => [], formatter: NumberArrayFormatter },
+  openTypeOS2FamilyClass: { default: () => [8, 0], formatter: ArrayFormatter }, // Class ID 8 = Sans Serif, Subclass ID = 0: No Classification
+  openTypeOS2UnicodeRanges: { default: () => [], formatter: ArrayFormatter },
+  openTypeOS2CodePageRanges: { default: () => [], formatter: ArrayFormatter },
   // Postscript Font Level Hints, // https://adobe-type-tools.github.io/font-tech-notes/pdfs/T1_SPEC.pdf
-  postscriptBlueValues: { default: () => [], formatter: NumberArrayFormatter },
-  postscriptOtherBlues: { default: () => [], formatter: NumberArrayFormatter },
-  postscriptFamilyBlues: { default: () => [], formatter: NumberArrayFormatter },
-  postscriptFamilyOtherBlues: { default: () => [], formatter: NumberArrayFormatter },
+  postscriptBlueValues: { default: () => [], formatter: ArrayFormatter },
+  postscriptOtherBlues: { default: () => [], formatter: ArrayFormatter },
+  postscriptFamilyBlues: { default: () => [], formatter: ArrayFormatter },
+  postscriptFamilyOtherBlues: { default: () => [], formatter: ArrayFormatter },
   postscriptBlueScale: { default: () => 0.039625, formatter: _NumberFormatter },
   postscriptBlueShift: { default: () => 1, formatter: _NumberFormatter },
   postscriptBlueFuzz: { default: () => 1, formatter: _NumberFormatter },
-  postscriptStemSnapH: { default: () => [], formatter: NumberArrayFormatter },
-  postscriptStemSnapV: { default: () => [], formatter: NumberArrayFormatter },
+  postscriptStemSnapH: { default: () => [], formatter: ArrayFormatter },
+  postscriptStemSnapV: { default: () => [], formatter: ArrayFormatter },
   postscriptForceBold: { default: () => false, formatter: BooleanFormatter },
   // PostScript Specific Data
   // postscriptFontName // NOTE: not in ufoInfoAttributesToRoundTrip
@@ -132,7 +132,7 @@ export const customDataNameMapping = {
   openTypeOS2SuperscriptYOffset: { default: () => 0, formatter: _NumberFormatter },
   // OpenType OS/2 Table Fields
   openTypeHeadLowestRecPPEM: { default: () => 6, formatter: _NumberFormatter }, // Smallest readable size in pixels.
-  openTypeHeadFlags: { default: () => [], formatter: NumberArrayFormatter },
+  openTypeHeadFlags: { default: () => [], formatter: ArrayFormatter },
 };
 
 // TODO: Based on ufoInfoAttributesToRoundTrip (designspace.py)

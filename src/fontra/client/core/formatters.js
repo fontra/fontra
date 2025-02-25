@@ -36,25 +36,22 @@ export const BooleanFormatter = {
 };
 
 export const ArrayFormatter = {
-  toString: (value) => {
-    if (Array.isArray(value)) {
-      return value.toString();
-    }
-  },
-  fromString: (value) => {
-    const array = JSON.parse("[" + value + "]");
-    if (Array.isArray(array)) {
-      return { value: array };
-    } else {
+  toString: (value, arrayLength) => {
+    if (!Array.isArray(value)) {
       return { error: "not an array" };
     }
+    if (arrayLength && value.length != arrayLength) {
+      return { error: `array length must be ${arrayLength}` };
+    }
+    return value.toString();
   },
-};
-
-export const NumberArrayFormatter = {
-  toString: (value) => value.toString(),
   fromString: (value, arrayLength) => {
-    const array = JSON.parse("[" + value + "]");
+    let array = [];
+    try {
+      array = JSON.parse("[" + value + "]");
+    } catch (e) {
+      return { error: e };
+    }
     if (Array.isArray(array)) {
       if (arrayLength && array.length != arrayLength) {
         return { error: `array length must be ${arrayLength}` };
@@ -67,6 +64,6 @@ export const NumberArrayFormatter = {
 };
 
 export const PanoseArrayFormatter = {
-  toString: (value) => NumberArrayFormatter.toString(value),
-  fromString: (value) => NumberArrayFormatter.fromString(value, 10),
+  toString: (value) => ArrayFormatter.toString(value, 10),
+  fromString: (value) => ArrayFormatter.fromString(value, 10),
 };
