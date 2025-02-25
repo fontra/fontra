@@ -1,5 +1,6 @@
 import { doPerformAction, getActionIdentifierFromKeyEvent } from "../core/actions.js";
 import { recordChanges } from "../core/change-recorder.js";
+import { customDataNameMapping } from "../core/customData.js";
 import * as html from "../core/html-utils.js";
 import { addStyleSheet } from "../core/html-utils.js";
 import { translate } from "../core/localization.js";
@@ -14,14 +15,7 @@ import {
   labeledTextInput,
   textInput,
 } from "../core/ui-utils.js";
-import {
-  arrowKeyDeltas,
-  customDataNameMapping,
-  enumerate,
-  modulo,
-  range,
-  round,
-} from "../core/utils.js";
+import { arrowKeyDeltas, enumerate, modulo, range, round } from "../core/utils.js";
 import { UIList } from "../web-components/ui-list.js";
 import { arraysEqual, updateRemoveButton } from "./panel-axes.js";
 import { BaseInfoPanel } from "./panel-base.js";
@@ -34,6 +28,7 @@ import "/web-components/add-remove-buttons.js";
 import "/web-components/designspace-location.js";
 import { dialogSetup, message } from "/web-components/modal-dialog.js";
 
+const ufoInfoPrefix = "ufo.info.";
 let selectedSourceIdentifier = undefined;
 
 addStyleSheet(`
@@ -692,10 +687,17 @@ class SourceBox extends HTMLElement {
             // Skip this, so people can edit this placeholder it.
             continue;
           }
+          if (!customDataNameMapping[key]) {
+            message(
+              translate("sources.dialog.cannot-edit-source.title"),
+              `CustomData "${key}" not implemented, yet.`
+            );
+            continue;
+          }
           const formatter = customDataNameMapping[key]?.formatter || DefaultFormatter;
           const value = formatter.fromString(item["value"]).value;
           if (value !== undefined) {
-            source.customData[key] = value;
+            source.customData[`${ufoInfoPrefix}${key}`] = value;
           } else {
             message(
               translate("sources.dialog.cannot-edit-source.title"),
@@ -926,7 +928,10 @@ function buildFontCustomDataList(controller, fontSource) {
   const model = controller.model;
 
   const makeItem = ([key, value]) => {
-    const item = new ObservableController({ key: key, value: value });
+    const keyDisplayed = key.startsWith(ufoInfoPrefix)
+      ? key.substring(ufoInfoPrefix.length)
+      : key;
+    const item = new ObservableController({ key: keyDisplayed, value: value });
     item.addListener((event) => {
       const sortedItems = [...labelList.items];
       sortedItems.sort(
