@@ -13,10 +13,6 @@ function getDescenderDefault(fontSource = undefined) {
   return fontSource.lineMetricsHorizontalLayout.descender.value || -200;
 }
 
-function getFamilyNameDefault(fontSource = undefined) {
-  return fontSource.familyName || "Family Name";
-}
-
 function getSubfamilyNameDefault(fontSource = undefined) {
   return fontSource.name || "Subfamily Name";
 }
@@ -66,10 +62,10 @@ export const customDataNameMapping = {
   // name table entries
   openTypeNameUniqueID: { default: () => "uniqueID Name ID 3" }, // Name ID 3
   openTypeNameVersion: { default: () => "Version 1.0" }, // Name ID 7
-  openTypeNamePreferredFamilyName: { default: getFamilyNameDefault }, // Name ID 16
+  openTypeNamePreferredFamilyName: { default: "Family Name" }, // Name ID 16
   openTypeNamePreferredSubfamilyName: { default: getSubfamilyNameDefault }, // Name ID 17
   openTypeNameCompatibleFullName: { default: () => "Compatible Full Name" }, // Name ID 18
-  openTypeNameWWSFamilyName: { default: getFamilyNameDefault }, // Name ID 21
+  openTypeNameWWSFamilyName: { default: "Family Name" }, // Name ID 21
   openTypeNameWWSSubfamilyName: { default: getSubfamilyNameDefault }, // Name ID 22
   // misc
   openTypeOS2WeightClass: { default: () => 400, formatter: _NumberFormatter },
