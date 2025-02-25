@@ -959,11 +959,11 @@ function buildFontCustomDataList(controller, fontSource) {
   const sortedItems = Object.entries(model);
   sortedItems.sort(
     (a, b) =>
-      (customDataNames.indexOf(a[0]) != -1
-        ? customDataNames.indexOf(a[0])
+      (customDataNames.indexOf(a[0].substring(ufoInfoPrefix.length)) != -1
+        ? customDataNames.indexOf(a[0].substring(ufoInfoPrefix.length))
         : customDataNames.length) -
-      (customDataNames.indexOf(b[0]) != -1
-        ? customDataNames.indexOf(b[0])
+      (customDataNames.indexOf(b[0].substring(ufoInfoPrefix.length)) != -1
+        ? customDataNames.indexOf(b[0].substring(ufoInfoPrefix.length))
         : customDataNames.length)
   );
   const items = sortedItems?.map(makeItem) || [];
