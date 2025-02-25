@@ -85,6 +85,7 @@ export const customDataNameMapping = {
     default: () => [2, 11, 5, 2, 4, 5, 4, 2, 2, 4],
     formatter: PanoseArrayFormatter,
   }, // default: sans-serif
+  openTypeOS2FamilyClass: { default: () => [8, 0], formatter: NumberArrayFormatter }, // Class ID 8 = Sans Serif, Subclass ID = 0: No Classification
   openTypeOS2UnicodeRanges: { default: () => [], formatter: NumberArrayFormatter },
   openTypeOS2CodePageRanges: { default: () => [], formatter: NumberArrayFormatter },
   // Postscript Font Level Hints, // https://adobe-type-tools.github.io/font-tech-notes/pdfs/T1_SPEC.pdf
@@ -98,34 +99,42 @@ export const customDataNameMapping = {
   postscriptStemSnapH: { default: () => [], formatter: NumberArrayFormatter },
   postscriptStemSnapV: { default: () => [], formatter: NumberArrayFormatter },
   postscriptForceBold: { default: () => false, formatter: BooleanFormatter },
+  // PostScript Specific Data
+  // postscriptFontName // NOTE: not in ufoInfoAttributesToRoundTrip
+  // postscriptFullName // NOTE: not in ufoInfoAttributesToRoundTrip
+  postscriptSlantAngle: { default: () => 0.0, formatter: _NumberFormatter },
+  postscriptUniqueID: { default: () => 0, formatter: _NumberFormatter },
+  postscriptWeightName: { default: () => "postscriptWeightName" },
+  postscriptIsFixedPitch: { default: () => false, formatter: BooleanFormatter }, // Indicates if the font is monospaced.
+  postscriptDefaultWidthX: { default: () => 0, formatter: _NumberFormatter },
+  postscriptNominalWidthX: { default: () => 0, formatter: _NumberFormatter },
+  postscriptDefaultCharacter: { default: () => "glyphName" }, // 	The name of the glyph that should be used as the default character in PFM files.
+  postscriptWindowsCharacterSet: { default: () => 0, formatter: _NumberFormatter },
+  // OpenType vhea Table Fields
+  // openTypeVheaVertTypoAscender  // NOTE: not in ufoInfoAttributesToRoundTrip
+  // openTypeVheaVertTypoDescender  // NOTE: not in ufoInfoAttributesToRoundTrip
+  openTypeVheaVertTypoLineGap: { default: () => 0, formatter: _NumberFormatter },
+  openTypeVheaCaretSlopeRise: { default: () => 0, formatter: _NumberFormatter },
+  openTypeVheaCaretSlopeRun: { default: () => 0, formatter: _NumberFormatter },
+  openTypeVheaCaretOffset: { default: () => 0, formatter: _NumberFormatter },
+  // OpenType hhea Table Fields
+  openTypeHheaCaretSlopeRise: { default: () => 0, formatter: _NumberFormatter },
+  openTypeHheaCaretSlopeRun: { default: () => 0, formatter: _NumberFormatter },
+  openTypeHheaCaretOffset: { default: () => 0, formatter: _NumberFormatter },
+  // OpenType OS/2 Table Fields
+  openTypeOS2SubscriptXSize: { default: () => 0, formatter: _NumberFormatter },
+  openTypeOS2SubscriptYSize: { default: () => 0, formatter: _NumberFormatter },
+  openTypeOS2SubscriptXOffset: { default: () => 0, formatter: _NumberFormatter },
+  openTypeOS2SubscriptYOffset: { default: () => 0, formatter: _NumberFormatter },
+  openTypeOS2SuperscriptXSize: { default: () => 0, formatter: _NumberFormatter },
+  openTypeOS2SuperscriptYSize: { default: () => 0, formatter: _NumberFormatter },
+  openTypeOS2SuperscriptXOffset: { default: () => 0, formatter: _NumberFormatter },
+  openTypeOS2SuperscriptYOffset: { default: () => 0, formatter: _NumberFormatter },
+  // OpenType OS/2 Table Fields
+  openTypeHeadLowestRecPPEM: { default: () => 6, formatter: _NumberFormatter }, // Smallest readable size in pixels.
+  openTypeHeadFlags: { default: () => [], formatter: NumberArrayFormatter },
 };
 
 // TODO: Based on ufoInfoAttributesToRoundTrip (designspace.py)
-//   "openTypeGaspRangeRecords",
-//   "openTypeHeadFlags",
-//   "openTypeHeadLowestRecPPEM",
-//   "openTypeHheaCaretOffset",
-//   "openTypeHheaCaretSlopeRise",
-//   "openTypeHheaCaretSlopeRun",
-//   "openTypeNameRecords",
-//   "openTypeOS2FamilyClass",
-//   "openTypeOS2SubscriptXOffset",
-//   "openTypeOS2SubscriptXSize",
-//   "openTypeOS2SubscriptYOffset",
-//   "openTypeOS2SubscriptYSize",
-//   "openTypeOS2SuperscriptXOffset",
-//   "openTypeOS2SuperscriptXSize",
-//   "openTypeOS2SuperscriptYOffset",
-//   "openTypeOS2SuperscriptYSize",
-//   "openTypeVheaCaretOffset",
-//   "openTypeVheaCaretSlopeRise",
-//   "openTypeVheaCaretSlopeRun",
-//   "openTypeVheaVertTypoLineGap",
-//   "postscriptDefaultCharacter",
-//   "postscriptDefaultWidthX",
-//   "postscriptIsFixedPitch",
-//   "postscriptNominalWidthX",
-//   "postscriptSlantAngle",
-//   "postscriptUniqueID",
-//   "postscriptWeightName",
-//   "postscriptWindowsCharacterSet",
+//   "openTypeGaspRangeRecords", // TODO: This is more complex, please see: https://unifiedfontobject.org/versions/ufo3/fontinfo.plist/#opentype-gasp-table-fields
+//   "openTypeNameRecords", // TODO: This is more complex, please see: https://unifiedfontobject.org/versions/ufo3/fontinfo.plist/#name-record-format
