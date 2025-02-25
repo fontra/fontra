@@ -930,7 +930,7 @@ function buildFontCustomDataList(controller, fontSource) {
 
   const makeItem = ([key, value]) => {
     const keyDisplayed = key.startsWith(ufoInfoPrefix)
-      ? key.substring(ufoInfoPrefix.length)
+      ? key.slice(ufoInfoPrefix.length)
       : key;
     const item = new ObservableController({ key: keyDisplayed, value: value });
     item.addListener((event) => {
@@ -960,11 +960,11 @@ function buildFontCustomDataList(controller, fontSource) {
   const sortedItems = Object.entries(model);
   sortedItems.sort(
     (a, b) =>
-      (customDataNames.indexOf(a[0].substring(ufoInfoPrefix.length)) != -1
-        ? customDataNames.indexOf(a[0].substring(ufoInfoPrefix.length))
+      (customDataNames.indexOf(a[0].slice(ufoInfoPrefix.length)) != -1
+        ? customDataNames.indexOf(a[0].slice(ufoInfoPrefix.length))
         : customDataNames.length) -
-      (customDataNames.indexOf(b[0].substring(ufoInfoPrefix.length)) != -1
-        ? customDataNames.indexOf(b[0].substring(ufoInfoPrefix.length))
+      (customDataNames.indexOf(b[0].slice(ufoInfoPrefix.length)) != -1
+        ? customDataNames.indexOf(b[0].slice(ufoInfoPrefix.length))
         : customDataNames.length)
   );
   const items = sortedItems?.map(makeItem) || [];
