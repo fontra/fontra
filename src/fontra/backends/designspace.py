@@ -123,7 +123,9 @@ fontInfoNameMapping = [
     ("vendorID", "openTypeOS2VendorID"),
 ]
 
+
 ufoInfoPrefix = "ufo.info."
+
 
 ufoInfoAttributesToRoundTrip = [
     "openTypeGaspRangeRecords",
@@ -192,10 +194,6 @@ ufoInfoAttributesToRoundTrip = [
     "postscriptWeightName",
     "postscriptWindowsCharacterSet",
 ]
-
-customDataNameMapping = {
-    # Fontra / UFO
-}
 
 
 class DesignspaceBackend:
