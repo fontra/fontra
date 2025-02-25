@@ -13,10 +13,6 @@ function getDescenderDefault(fontSource = undefined) {
   return fontSource.lineMetricsHorizontalLayout.descender.value || -200;
 }
 
-function getDescenderWinDefault(fontSource = undefined) {
-  return fontSource.lineMetricsHorizontalLayout.descender.value * -1 || 200;
-}
-
 function getFamilyNameDefault(fontSource = undefined) {
   return fontSource.familyName || "Family Name";
 }
@@ -25,7 +21,7 @@ function getSubfamilyNameDefault(fontSource = undefined) {
   return fontSource.name || "Subfamily Name";
 }
 
-function getstrikeoutPositionDefault(fontSource = undefined) {
+function getStrikeoutPositionDefault(fontSource = undefined) {
   return fontSource.lineMetricsHorizontalLayout.ascender.value / 2 || 250;
 }
 
@@ -57,13 +53,13 @@ export const customDataNameMapping = {
   openTypeOS2TypoLineGap: { default: () => 0, formatter: _NumberFormatter },
   openTypeOS2WinAscent: { default: getAscenderDefault, formatter: _NumberFormatter },
   openTypeOS2WinDescent: {
-    default: getDescenderWinDefault,
+    default: (fontSource) => getDescenderDefault(fontSource) * -1,
     formatter: _NumberFormatter,
   },
   postscriptUnderlinePosition: { default: () => -100, formatter: _NumberFormatter },
   postscriptUnderlineThickness: { default: () => 50, formatter: _NumberFormatter },
   openTypeOS2StrikeoutPosition: {
-    default: getstrikeoutPositionDefault,
+    default: getStrikeoutPositionDefault,
     formatter: _NumberFormatter,
   },
   openTypeOS2StrikeoutSize: { default: () => 50, formatter: _NumberFormatter },
@@ -108,7 +104,7 @@ export const customDataNameMapping = {
   postscriptIsFixedPitch: { default: () => false, formatter: BooleanFormatter }, // Indicates if the font is monospaced.
   postscriptDefaultWidthX: { default: () => 0, formatter: _NumberFormatter },
   postscriptNominalWidthX: { default: () => 0, formatter: _NumberFormatter },
-  postscriptDefaultCharacter: { default: () => "glyphName" }, // 	The name of the glyph that should be used as the default character in PFM files.
+  postscriptDefaultCharacter: { default: () => "glyphName" }, // The name of the glyph that should be used as the default character in PFM files.
   postscriptWindowsCharacterSet: { default: () => 0, formatter: _NumberFormatter },
   // OpenType vhea Table Fields
   // openTypeVheaVertTypoAscender  // NOTE: not in ufoInfoAttributesToRoundTrip
