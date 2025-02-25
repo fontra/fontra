@@ -2181,8 +2181,8 @@ def updateFontInfoFromFontSource(reader, fontSource):
 
     # delete custom data
     for infoAttr in ufoInfoAttributesToRoundTrip:
-        customDataKay = f"{ufoInfoPrefix}{infoAttr}"
-        if customDataKay not in fontSource.customData.keys():
+        customDataKey = f"{ufoInfoPrefix}{infoAttr}"
+        if customDataKey not in fontSource.customData.keys():
             value = getattr(fontInfo, infoAttr, None)
             if value is not None:
                 delattr(fontInfo, infoAttr)
