@@ -684,7 +684,7 @@ class SourceBox extends HTMLElement {
         for (const item of event.newValue) {
           const key = item["key"];
           if (key === "attributeName") {
-            // Skip this, so people can edit this placeholder it.
+            // Skip this, so people can edit this placeholder.
             continue;
           }
           if (!customDataNameMapping[key]) {
