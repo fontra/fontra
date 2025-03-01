@@ -7,12 +7,12 @@
   "devDependencies": {
     "@rollup/plugin-commonjs": "^28.0.2",
     "@rollup/plugin-node-resolve": "^16.0.0",
-    "chai": "^5.1.2",
+    "chai": "^5.2.0",
     "chai-almost": "^1.0.1",
     "mocha": "^11.1.0",
     "prettier-plugin-organize-imports": "^4.1.0",
     "prettier-plugin-sort-json": "^4.1.1",
-    "rollup": "^4.34.0"
+    "rollup": "^4.34.9"
   },
   "dependencies": {
     "bezier-js": "^6.1.4",
