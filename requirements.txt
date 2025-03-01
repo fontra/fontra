@@ -1,6 +1,6 @@
-aiohttp==3.11.11
+aiohttp==3.11.13
 cattrs==24.1.2
-fonttools[ufo,unicode]==4.55.8
+fonttools[ufo,unicode]==4.56.0
 pillow==11.1.0
 pyyaml==6.0.2
 ufomerge==1.8.2
