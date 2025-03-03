@@ -1,0 +1,99 @@
+{
+"axes": {
+"axes": [
+{
+"name": "wght",
+"label": "wght",
+"tag": "wght",
+"minValue": 200,
+"defaultValue": 200,
+"maxValue": 900,
+"mapping": [
+[
+200,
+0
+],
+[
+300.018310546875,
+0.094970703125
+],
+[
+399.993896484375,
+0.21002197265625
+],
+[
+500.01220703125,
+0.3599853515625
+],
+[
+599.98779296875,
+0.510009765625
+],
+[
+700.006103515625,
+0.72998046875
+],
+[
+900,
+1
+]
+]
+}
+]
+},
+"customData": {
+"fontra.sourceStatusFieldDefinitions": [
+{
+"color": [
+1,
+0,
+0,
+1
+],
+"isDefault": true,
+"label": "In progress",
+"value": 0
+},
+{
+"color": [
+1,
+0.5,
+0,
+1
+],
+"label": "Checking-1",
+"value": 1
+},
+{
+"color": [
+1,
+1,
+0,
+1
+],
+"label": "Checking-2",
+"value": 2
+},
+{
+"color": [
+0,
+0.5,
+1,
+1
+],
+"label": "Checking-3",
+"value": 3
+},
+{
+"color": [
+0,
+1,
+0.5,
+1
+],
+"label": "Validated",
+"value": 4
+}
+]
+}
+}

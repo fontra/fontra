@@ -1,0 +1,69 @@
+{
+"name": "uni4FFC",
+"sources": [
+{
+"name": "<default>",
+"layerName": "foreground",
+"customData": {
+"fontra.development.status": 4
+}
+},
+{
+"name": "wght=1",
+"layerName": "wght=1",
+"location": {
+"wght": 1
+},
+"customData": {
+"fontra.development.status": 3
+}
+}
+],
+"layers": {
+"foreground": {
+"glyph": {
+"components": [
+{
+"name": "T_4EBB_2FF0",
+"location": {
+"S_moveH": 6,
+"S_top_moveV": -5,
+"width": 309
+}
+},
+{
+"name": "T_2FF0_80B2",
+"location": {
+"width": 629
+}
+}
+],
+"xAdvance": 1000
+}
+},
+"wght=1": {
+"glyph": {
+"components": [
+{
+"name": "T_4EBB_2FF0",
+"location": {
+"S_moveH": -2,
+"S_top_moveV": -5,
+"width": 308
+}
+},
+{
+"name": "T_2FF0_80B2",
+"transformation": {
+"translateX": -10
+},
+"location": {
+"width": 669
+}
+}
+],
+"xAdvance": 1000
+}
+}
+}
+}

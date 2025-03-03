@@ -3,7 +3,7 @@ from __future__ import annotations
 import itertools
 import logging
 from collections import defaultdict
-from dataclasses import dataclass, replace
+from dataclasses import dataclass, field, replace
 from enum import Enum
 from typing import Any
 
@@ -24,7 +24,7 @@ from ...core.classes import (
 )
 from ...core.glyphdependencies import GlyphDependencies
 from ...core.instancer import FontInstancer, GlyphInstancer
-from ...core.path import PackedPath, PackedPathPointPen
+from ...core.path import PackedPath, PackedPathPointPen, joinPaths
 from ...core.pathops import unionPath
 from ...core.varutils import locationToTuple
 from .axes import (
@@ -321,6 +321,60 @@ class MoveDefaultBehavior(Enum):
     none = "none"  # Don't move any default axis positions
     empty = "empty"  # Only move the default for axes that will be dropped, as a way to instantiate
     any = "any"  # Move the default for axes if the needed range does not include the default
+
+
+@registerFilterAction("shallow-decompose-composites")
+@dataclass(kw_only=True)
+class ShallowDecomposeComposites(BaseFilter):
+    glyphNames: set[str] = field(default_factory=set)
+    componentGlyphNames: set[str] = field(default_factory=set)
+
+    def __post_init__(self):
+        self.glyphNames = set(self.glyphNames)
+        self.componentGlyphNames = set(self.componentGlyphNames)
+
+    async def processGlyph(self, glyph: VariableGlyph) -> VariableGlyph:
+        glyphName = glyph.name
+        if self.glyphNames and glyphName not in self.glyphNames:
+            return glyph
+
+        componentNames = {
+            compo.name
+            for layer in glyph.layers.values()
+            for compo in layer.glyph.components
+        }
+
+        if self.componentGlyphNames:
+            componentNames = componentNames & self.componentGlyphNames
+
+        if not componentNames:
+            return glyph
+
+        instancer = await self.fontInstancer.getGlyphInstancer(glyphName)
+
+        newLayers = dict(glyph.layers)
+
+        for source in instancer.activeSources:
+            location = instancer.getGlyphSourceLocation(source)
+            instance = instancer.instantiate(location)
+            newPaths = [instance.glyph.path]
+            newComponents = []
+            for compo in instance.glyph.components:
+                if compo.name in componentNames:
+                    decomposed = await instance.shallowDecomposeComponent(compo)
+                    newPaths.append(decomposed.path)
+                    newComponents.extend(decomposed.components)
+                else:
+                    newComponents.append(compo)
+            layerGlyph = replace(
+                instance.glyph, path=joinPaths(newPaths), components=newComponents
+            )
+
+            newLayers[source.layerName] = replace(
+                newLayers[source.layerName], glyph=layerGlyph
+            )
+
+        return replace(glyph, layers=newLayers)
 
 
 @registerFilterAction("trim-variable-glyphs")

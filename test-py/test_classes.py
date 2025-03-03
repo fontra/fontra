@@ -12,7 +12,7 @@ from fontra.core.classes import (
 )
 
 repoRoot = pathlib.Path(__file__).resolve().parent.parent
-jsonPath = repoRoot / "src" / "fontra" / "client" / "core" / "classes.json"
+jsonPath = repoRoot / "src-js" / "fontra-core" / "src" / "classes.json"
 
 
 def test_classes_json():

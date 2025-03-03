@@ -1,0 +1,16 @@
+{
+  "name": "@fontra/projectmanager-filesystem",
+  "version": "0.0.1",
+  "scripts": {
+    "test": "echo \"No test specified for @fontra/projectmanager-filesystem\""
+  },
+  "exports": {
+    "./landing.js": "./src/landing.js",
+    "./landing.html": "./landing.html",
+    "./assets/*": "./assets/*"
+  },
+  "type": "module",
+  "fontra": {
+    "projectmanager": "filesystem"
+  }
+}

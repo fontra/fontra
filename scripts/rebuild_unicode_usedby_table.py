@@ -36,9 +36,7 @@ def insertUsedByInUnicodeUtilsModule(check=False):
     csv = formatUsedByTable(makeUsedByTable())
 
     repoDir = pathlib.Path(__file__).resolve().parent.parent
-    unicodeUtilsPath = (
-        repoDir / "src" / "fontra" / "client" / "core" / "unicode-utils.js"
-    )
+    unicodeUtilsPath = repoDir / "src-js" / "fontra-core" / "src" / "unicode-utils.js"
 
     sourceText = unicodeUtilsPath.read_text(encoding="utf-8")
 

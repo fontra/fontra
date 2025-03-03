@@ -10,9 +10,9 @@ import subprocess
 from urllib.request import urlopen
 
 repoDir = pathlib.Path(__file__).resolve().parent.parent
-langDir = repoDir / "src" / "fontra" / "client" / "lang"
+langDir = repoDir / "src-js" / "fontra-core" / "assets" / "lang"
 assert langDir.is_dir()
-localizationJSPath = repoDir / "src" / "fontra" / "client" / "core" / "localization.js"
+localizationJSPath = repoDir / "src-js" / "fontra-core" / "src" / "localization.js"
 assert localizationJSPath.is_file()
 
 languagesBlockTemplate = """\

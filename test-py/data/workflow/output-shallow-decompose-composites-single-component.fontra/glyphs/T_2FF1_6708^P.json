@@ -1,0 +1,829 @@
+{
+"name": "T_2FF1_6708",
+"axes": [
+{
+"name": "height",
+"minValue": 505,
+"defaultValue": 594,
+"maxValue": 594
+},
+{
+"name": "width",
+"minValue": -200,
+"defaultValue": 0,
+"maxValue": 0
+}
+],
+"sources": [
+{
+"name": "<default>",
+"layerName": "foreground",
+"customData": {
+"fontra.development.status": 0
+}
+},
+{
+"name": "wght=1",
+"layerName": "wght=1",
+"location": {
+"wght": 1
+},
+"customData": {
+"fontra.development.status": 0
+}
+},
+{
+"name": "height=505",
+"layerName": "height=505",
+"location": {
+"height": 505
+},
+"customData": {
+"fontra.development.status": 0
+}
+},
+{
+"name": "wght=1,height=505",
+"layerName": "wght=1,height=505",
+"location": {
+"height": 505,
+"wght": 1
+},
+"customData": {
+"fontra.development.status": 0
+}
+},
+{
+"name": "width=-200",
+"layerName": "width=-200",
+"location": {
+"width": -200
+},
+"customData": {
+"fontra.development.status": 0
+}
+}
+],
+"layers": {
+"foreground": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": 241,
+"y": 469
+},
+{
+"x": 250,
+"y": 469,
+"type": "cubic"
+},
+{
+"x": 265,
+"y": 469,
+"type": "cubic"
+},
+{
+"x": 277,
+"y": 469
+},
+{
+"x": 197,
+"y": 510
+},
+{
+"x": 197,
+"y": 510
+},
+{
+"x": 197,
+"y": 337.3263157894737
+},
+{
+"x": 197,
+"y": 337.3263157894737
+},
+{
+"x": 197,
+"y": 123.72631578947369
+},
+{
+"x": 197,
+"y": 123.72631578947369
+},
+{
+"x": 197,
+"y": -75
+},
+{
+"x": 206,
+"y": -75,
+"smooth": true
+},
+{
+"x": 222,
+"y": -75,
+"type": "cubic"
+},
+{
+"x": 241,
+"y": -64,
+"type": "cubic"
+},
+{
+"x": 241,
+"y": -55
+},
+{
+"x": 241,
+"y": 124.16315789473686
+},
+{
+"x": 241,
+"y": 124.16315789473686
+},
+{
+"x": 241,
+"y": 336.88947368421054
+},
+{
+"x": 241,
+"y": 336.88947368421054
+}
+],
+"isClosed": true
+}
+]
+},
+"components": [
+{
+"name": "VG_31C6_00",
+"transformation": {
+"translateX": -203,
+"translateY": -395
+},
+"location": {
+"G_height": 4,
+"G_width": -34,
+"H_left_angle": 0,
+"H_weight": 0,
+"S_weight": -1,
+"TR_serif_right_height": 0,
+"TR_serif_right_moveV": 0,
+"TR_serif_right_width": 0,
+"TR_serif_top_height": 0,
+"TR_serif_top_moveH": 0,
+"TR_serif_top_width": 0,
+"height": 559,
+"weight": 45,
+"width": 580
+}
+},
+{
+"name": "VG_4E00_01",
+"transformation": {
+"translateX": 214,
+"translateY": -69
+},
+"location": {
+"L_cutangle": 0,
+"serif_height": 0,
+"serif_right_moveV": 0,
+"serif_top_moveH": 0,
+"serif_width": 0,
+"weight": 30,
+"width": 560.22
+}
+},
+{
+"name": "VG_4E00_01",
+"transformation": {
+"translateX": 214,
+"translateY": -221
+},
+"location": {
+"L_cutangle": 0,
+"serif_height": 0,
+"serif_right_moveV": 0,
+"serif_top_moveH": 0,
+"serif_width": 0,
+"weight": 30,
+"width": 560.22
+}
+}
+],
+"xAdvance": 1000
+}
+},
+"height=505": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": 281,
+"y": 379
+},
+{
+"x": 290,
+"y": 379,
+"type": "cubic"
+},
+{
+"x": 305,
+"y": 379,
+"type": "cubic"
+},
+{
+"x": 317,
+"y": 379
+},
+{
+"x": 237,
+"y": 420
+},
+{
+"x": 237,
+"y": 420
+},
+{
+"x": 237,
+"y": 272.33684210526314
+},
+{
+"x": 237,
+"y": 272.33684210526314
+},
+{
+"x": 237,
+"y": 91.13684210526321
+},
+{
+"x": 237,
+"y": 91.13684210526321
+},
+{
+"x": 237,
+"y": -75
+},
+{
+"x": 246,
+"y": -75,
+"smooth": true
+},
+{
+"x": 262,
+"y": -75,
+"type": "cubic"
+},
+{
+"x": 281,
+"y": -64,
+"type": "cubic"
+},
+{
+"x": 281,
+"y": -55
+},
+{
+"x": 281,
+"y": 91.66842105263163
+},
+{
+"x": 281,
+"y": 91.66842105263163
+},
+{
+"x": 281,
+"y": 271.80526315789473
+},
+{
+"x": 281,
+"y": 271.80526315789473
+}
+],
+"isClosed": true
+}
+]
+},
+"components": [
+{
+"name": "VG_31C6_00",
+"transformation": {
+"translateX": -226,
+"translateY": -485
+},
+"location": {
+"G_height": 0,
+"G_width": -34,
+"H_left_angle": 0,
+"H_weight": 0,
+"S_weight": -1,
+"TR_serif_right_height": 0,
+"TR_serif_right_moveV": 0,
+"TR_serif_right_width": 0,
+"TR_serif_top_height": 0,
+"TR_serif_top_moveH": 0,
+"TR_serif_top_width": 0,
+"height": 471,
+"weight": 45,
+"width": 520
+}
+},
+{
+"name": "VG_4E00_01",
+"transformation": {
+"translateX": 249,
+"translateY": -140
+},
+"location": {
+"L_cutangle": 0,
+"serif_height": 0,
+"serif_right_moveV": 0,
+"serif_top_moveH": 0,
+"serif_width": 0,
+"weight": 30,
+"width": 510.22
+}
+},
+{
+"name": "VG_4E00_01",
+"transformation": {
+"translateX": 250,
+"translateY": -269
+},
+"location": {
+"L_cutangle": 0,
+"serif_height": 0,
+"serif_right_moveV": 0,
+"serif_top_moveH": 0,
+"serif_width": 0,
+"weight": 30,
+"width": 510.22
+}
+}
+],
+"xAdvance": 1000
+}
+},
+"wght=1": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": 310,
+"y": 453.3275862068965
+},
+{
+"x": 327.7068965517242,
+"y": 454.19827586206895,
+"type": "cubic"
+},
+{
+"x": 343.5775862068965,
+"y": 456.81034482758616,
+"type": "cubic"
+},
+{
+"x": 354.7068965517242,
+"y": 460.2931034482758
+},
+{
+"x": 165,
+"y": 534
+},
+{
+"x": 165,
+"y": 534
+},
+{
+"x": 165,
+"y": 348.54315789473685
+},
+{
+"x": 165,
+"y": 348.54315789473685
+},
+{
+"x": 165,
+"y": 118.38315789473688
+},
+{
+"x": 165,
+"y": 118.38315789473688
+},
+{
+"x": 165,
+"y": -97
+},
+{
+"x": 190.54310344827587,
+"y": -97,
+"smooth": true
+},
+{
+"x": 249.20689655172418,
+"y": -97,
+"type": "cubic"
+},
+{
+"x": 310,
+"y": -61.62068965517244,
+"type": "cubic"
+},
+{
+"x": 310,
+"y": -47.39655172413791
+},
+{
+"x": 310,
+"y": 118.77157894736843
+},
+{
+"x": 310,
+"y": 118.77157894736843
+},
+{
+"x": 310,
+"y": 348.1547368421053
+},
+{
+"x": 310,
+"y": 348.1547368421053
+}
+],
+"isClosed": true
+}
+]
+},
+"components": [
+{
+"name": "VG_31C6_00",
+"transformation": {
+"translateX": -167,
+"translateY": -406
+},
+"location": {
+"G_height": 9,
+"G_width": -14,
+"H_left_angle": 0,
+"H_weight": -2,
+"S_weight": -1,
+"TR_serif_right_height": -4,
+"TR_serif_right_moveV": 0,
+"TR_serif_right_width": -7,
+"TR_serif_top_height": -5,
+"TR_serif_top_moveH": -3,
+"TR_serif_top_width": 0,
+"height": 571,
+"weight": 150,
+"width": 580
+}
+},
+{
+"name": "VG_4E00_01",
+"transformation": {
+"translateX": 214,
+"translateY": -67
+},
+"location": {
+"L_cutangle": 0,
+"serif_height": 0,
+"serif_right_moveV": 0,
+"serif_top_moveH": 0,
+"serif_width": 0,
+"weight": 28,
+"width": 560.22
+}
+},
+{
+"name": "VG_4E00_01",
+"transformation": {
+"translateX": 214,
+"translateY": -208
+},
+"location": {
+"L_cutangle": 0,
+"serif_height": 0,
+"serif_right_moveV": 0,
+"serif_top_moveH": 0,
+"serif_width": 0,
+"weight": 28,
+"width": 560.22
+}
+}
+],
+"xAdvance": 1000
+}
+},
+"wght=1,height=505": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": 336,
+"y": 369.94827586206895
+},
+{
+"x": 353.3620689655172,
+"y": 370.7844827586207,
+"type": "cubic"
+},
+{
+"x": 369.19827586206895,
+"y": 373.2931034482758,
+"type": "cubic"
+},
+{
+"x": 380.3620689655172,
+"y": 376.6379310344828
+},
+{
+"x": 195,
+"y": 447
+},
+{
+"x": 195,
+"y": 447
+},
+{
+"x": 195,
+"y": 286.5536842105263
+},
+{
+"x": 195,
+"y": 286.5536842105263
+},
+{
+"x": 195,
+"y": 88.79368421052641
+},
+{
+"x": 195,
+"y": 88.79368421052641
+},
+{
+"x": 195,
+"y": -94
+},
+{
+"x": 219.88793103448273,
+"y": -94,
+"smooth": true
+},
+{
+"x": 276.8620689655172,
+"y": -94,
+"type": "cubic"
+},
+{
+"x": 336,
+"y": -59.586206896551744,
+"type": "cubic"
+},
+{
+"x": 336,
+"y": -45.568965517241395
+},
+{
+"x": 336,
+"y": 89.27684210526309
+},
+{
+"x": 336,
+"y": 89.27684210526309
+},
+{
+"x": 336,
+"y": 286.0705263157895
+},
+{
+"x": 336,
+"y": 286.0705263157895
+}
+],
+"isClosed": true
+}
+]
+},
+"components": [
+{
+"name": "VG_31C6_00",
+"transformation": {
+"translateX": -191,
+"translateY": -490
+},
+"location": {
+"G_height": -20,
+"G_width": -58,
+"H_left_angle": 0,
+"H_weight": -2,
+"S_weight": -1,
+"TR_serif_right_height": -4,
+"TR_serif_right_moveV": 0,
+"TR_serif_right_width": -4,
+"TR_serif_top_height": -4,
+"TR_serif_top_moveH": -1,
+"TR_serif_top_width": 0,
+"height": 489,
+"weight": 148,
+"width": 520
+}
+},
+{
+"name": "VG_4E00_01",
+"transformation": {
+"translateX": 249,
+"translateY": -136
+},
+"location": {
+"L_cutangle": 0,
+"serif_height": 0,
+"serif_right_moveV": 0,
+"serif_top_moveH": 0,
+"serif_width": 0,
+"weight": 28,
+"width": 510.22
+}
+},
+{
+"name": "VG_4E00_01",
+"transformation": {
+"translateX": 240,
+"translateY": -258
+},
+"location": {
+"L_cutangle": 0,
+"serif_height": 0,
+"serif_right_moveV": 0,
+"serif_top_moveH": 0,
+"serif_width": 0,
+"weight": 28,
+"width": 510.22
+}
+}
+],
+"xAdvance": 1000
+}
+},
+"width=-200": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": 341,
+"y": 469
+},
+{
+"x": 350,
+"y": 469,
+"type": "cubic"
+},
+{
+"x": 365,
+"y": 469,
+"type": "cubic"
+},
+{
+"x": 377,
+"y": 469
+},
+{
+"x": 297,
+"y": 510
+},
+{
+"x": 297,
+"y": 510
+},
+{
+"x": 297,
+"y": 337.3263157894737
+},
+{
+"x": 297,
+"y": 337.3263157894737
+},
+{
+"x": 297,
+"y": 123.72631578947369
+},
+{
+"x": 297,
+"y": 123.72631578947369
+},
+{
+"x": 297,
+"y": -75
+},
+{
+"x": 306,
+"y": -75,
+"smooth": true
+},
+{
+"x": 322,
+"y": -75,
+"type": "cubic"
+},
+{
+"x": 341,
+"y": -64,
+"type": "cubic"
+},
+{
+"x": 341,
+"y": -55
+},
+{
+"x": 341,
+"y": 124.16315789473686
+},
+{
+"x": 341,
+"y": 124.16315789473686
+},
+{
+"x": 341,
+"y": 336.88947368421054
+},
+{
+"x": 341,
+"y": 336.88947368421054
+}
+],
+"isClosed": true
+}
+]
+},
+"components": [
+{
+"name": "VG_31C6_00",
+"transformation": {
+"translateX": -303,
+"translateY": -395
+},
+"location": {
+"G_height": 4,
+"G_width": -74,
+"H_left_angle": 0,
+"H_weight": 0,
+"S_weight": -1,
+"TR_serif_right_height": 0,
+"TR_serif_right_moveV": 0,
+"TR_serif_right_width": 0,
+"TR_serif_top_height": 0,
+"TR_serif_top_moveH": 0,
+"TR_serif_top_width": 0,
+"height": 559,
+"weight": 45,
+"width": 380
+}
+},
+{
+"name": "VG_4E00_01",
+"transformation": {
+"translateX": 314,
+"translateY": -69
+},
+"location": {
+"L_cutangle": 0,
+"serif_height": 0,
+"serif_right_moveV": 0,
+"serif_top_moveH": 0,
+"serif_width": 0,
+"weight": 30,
+"width": 360
+}
+},
+{
+"name": "VG_4E00_01",
+"transformation": {
+"translateX": 314,
+"translateY": -221
+},
+"location": {
+"L_cutangle": 0,
+"serif_height": 0,
+"serif_right_moveV": 0,
+"serif_top_moveH": 0,
+"serif_width": 0,
+"weight": 30,
+"width": 360
+}
+}
+],
+"xAdvance": 1000
+}
+}
+}
+}

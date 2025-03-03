@@ -1,0 +1,224 @@
+{
+"name": "VG_4E00_01",
+"axes": [
+{
+"name": "width",
+"minValue": 50,
+"defaultValue": 1000,
+"maxValue": 1000
+},
+{
+"name": "weight",
+"minValue": 10,
+"defaultValue": 10,
+"maxValue": 200
+},
+{
+"name": "L_cutangle",
+"minValue": -200,
+"defaultValue": 0,
+"maxValue": 200
+}
+],
+"sources": [
+{
+"name": "<default>",
+"layerName": "foreground",
+"customData": {
+"fontra.development.status": 4
+}
+},
+{
+"name": "width=50",
+"layerName": "width=50",
+"location": {
+"width": 50
+},
+"customData": {
+"fontra.development.status": 0
+}
+},
+{
+"name": "weight=200",
+"layerName": "weight=200",
+"location": {
+"weight": 200
+},
+"customData": {
+"fontra.development.status": 0
+}
+},
+{
+"name": "L_cutangle=200",
+"layerName": "L_cutangle=200",
+"location": {
+"L_cutangle": 200
+},
+"customData": {
+"fontra.development.status": 0
+}
+},
+{
+"name": "L_cutangle=-200",
+"layerName": "L_cutangle=-200",
+"location": {
+"L_cutangle": -200
+},
+"customData": {
+"fontra.development.status": 0
+}
+}
+],
+"layers": {
+"L_cutangle=-200": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": -200,
+"y": 380
+},
+{
+"x": 1000,
+"y": 380
+},
+{
+"x": 1000,
+"y": 390
+},
+{
+"x": 0,
+"y": 390
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 1000
+}
+},
+"L_cutangle=200": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": 200,
+"y": 380
+},
+{
+"x": 1000,
+"y": 380
+},
+{
+"x": 1000,
+"y": 390
+},
+{
+"x": 0,
+"y": 390
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 1000
+}
+},
+"foreground": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": 0,
+"y": 380
+},
+{
+"x": 1000,
+"y": 380
+},
+{
+"x": 1000,
+"y": 390
+},
+{
+"x": 0,
+"y": 390
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 1000
+}
+},
+"weight=200": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": 0,
+"y": 380
+},
+{
+"x": 1000,
+"y": 380
+},
+{
+"x": 1000,
+"y": 580
+},
+{
+"x": 0,
+"y": 580
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 1000
+}
+},
+"width=50": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": 0,
+"y": 380
+},
+{
+"x": 50,
+"y": 380
+},
+{
+"x": 50,
+"y": 390
+},
+{
+"x": 0,
+"y": 390
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 1000
+}
+}
+}
+}

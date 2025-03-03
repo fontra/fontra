@@ -1,6 +1,7 @@
 import argparse
 import logging
 import secrets
+import subprocess
 from importlib.metadata import entry_points
 
 from . import __version__ as fontraVersion
@@ -18,6 +19,7 @@ def main() -> None:
     )
     parser = argparse.ArgumentParser()
     parser.add_argument("--host", default="localhost")
+    parser.add_argument("--dev", action="store_true", help="Enable development mode")
     parser.add_argument(
         "--http-port",
         type=int,
@@ -51,6 +53,10 @@ def main() -> None:
     host = args.host
     httpPort = args.http_port
     manager: ProjectManager = args.getProjectManager(args)
+
+    if args.dev:
+        subprocess.Popen(["npm", "run", "bundle-watch"])
+
     server = FontraServer(
         host=host,
         httpPort=httpPort if httpPort is not None else findFreeTCPPort(DEFAULT_PORT),

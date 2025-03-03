@@ -1,0 +1,160 @@
+@font-face {
+  font-family: "fontra-ui-regular";
+  src: url("../fonts/InriaSans-Light.woff2") format("woff2");
+  font-weight: 400;
+}
+
+@font-face {
+  font-family: "fontra-ui-regular";
+  src: url("../fonts/InriaSans-Medium.woff2") format("woff2");
+  font-weight: 700;
+}
+
+@font-face {
+  font-family: "fontra-ui-semibold";
+  src: url("../fonts/InriaSans-Regular.woff2") format("woff2");
+}
+
+:root {
+  /* https://css-tricks.com/the-css-custom-property-toggle-trick/ */
+  --fontra-theme-marker: ; /* a space, which is valid */
+  --top-bar-height: 35px;
+}
+
+:root.dark-theme {
+  --fontra-theme-marker: initial; /* invalidates the "light" variables */
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --fontra-theme-marker: initial; /* invalidates the "light" variables */
+  }
+
+  :root.light-theme {
+    --fontra-theme-marker: ; /* a space, which is valid */
+  }
+}
+
+:root {
+  --fontra-red-color: #f11759;
+  --fontra-light-red-color: #ff3366;
+
+  --foreground-color-light: var(--fontra-theme-marker) black;
+  --foreground-color-dark: white;
+
+  --background-color-light: var(--fontra-theme-marker) #f6f6f6;
+  --background-color-dark: #333;
+
+  --ui-element-foreground-color-light: var(--fontra-theme-marker) black;
+  --ui-element-foreground-color-dark: white;
+
+  --ui-element-background-color-light: var(--fontra-theme-marker) white;
+  --ui-element-background-color-dark: #484848;
+
+  --text-input-foreground-color-light: var(--fontra-theme-marker) black;
+  --text-input-foreground-color-dark: white;
+
+  --text-input-background-color-light: var(--fontra-theme-marker) #eee;
+  --text-input-background-color-dark: #333;
+
+  --top-bar-background-color-light: var(--fontra-theme-marker) #eee;
+  --top-bar-background-color-dark: #3c3c3c;
+
+  --foreground-color: var(--foreground-color-light, var(--foreground-color-dark));
+  --background-color: var(--background-color-light, var(--background-color-dark));
+
+  --ui-element-foreground-color: var(
+    --ui-element-foreground-color-light,
+    var(--ui-element-foreground-color-dark)
+  );
+  --ui-element-background-color: var(
+    --ui-element-background-color-light,
+    var(--ui-element-background-color-dark)
+  );
+  --text-input-foreground-color: var(
+    --text-input-foreground-color-light,
+    var(--text-input-foreground-color-dark)
+  );
+  --text-input-background-color: var(
+    --text-input-background-color-light,
+    var(--text-input-background-color-dark)
+  );
+
+  --top-bar-background-color: var(
+    --top-bar-background-color-light,
+    var(--top-bar-background-color-dark)
+  );
+
+  --horizontal-rule-color: #aaa8;
+}
+
+html,
+body {
+  font-family:
+    fontra-ui-regular,
+    -apple-system,
+    sans-serif;
+  font-feature-settings: "tnum" 1;
+  font-size: 0.9em;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden; /* Hide scrollbars */
+  overscroll-behavior: none;
+  touch-action: none;
+  color: var(--foreground-color);
+  fill: var(--foreground-color); /* for SVG */
+  background-color: var(--background-color);
+}
+
+@keyframes global-loader-spinner {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+#global-loader-spinner {
+  display: none;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 10rem;
+  height: 10rem;
+  margin-top: -5rem;
+  margin-left: -5rem;
+  border-radius: 50%;
+  border: 0.6rem solid #fff8;
+  border-top-color: #0005;
+  border-left-color: #0005;
+  animation: global-loader-spinner 0.8s linear infinite;
+}
+
+input[type="text"],
+input[type="number"],
+input[type="password"] {
+  background-color: var(--text-input-background-color);
+  color: var(--text-input-foreground-color);
+  border-radius: 0.25em;
+  border: none;
+  outline: none;
+  padding: 0.1em 0.3em;
+  font-family: "fontra-ui-regular", sans-serif;
+  font-size: 100%;
+}
+
+inline-svg {
+  display: inline-block;
+}
+
+icon-button {
+  width: 1.25em;
+}
+
+.top-bar-container {
+  position: relative; /* for z-index */
+  z-index: 200;
+  height: var(--top-bar-height);
+  box-shadow: 0px 0px 5px #0006;
+  background-color: var(--top-bar-background-color);
+}

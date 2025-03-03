@@ -1,7 +1,9 @@
+import math
 import pathlib
+from dataclasses import asdict
 
 import pytest
-from fontTools.misc.transform import DecomposedTransform
+from fontTools.misc.transform import DecomposedTransform, Transform
 from fontTools.pens.recordingPen import RecordingPointPen
 
 from fontra.backends import getFileSystemBackend
@@ -17,6 +19,7 @@ from fontra.core.instancer import (
     FontInstancer,
     FontSourcesInstancer,
     LocationCoordinateSystem,
+    prependTransformToDecomposed,
 )
 from fontra.core.path import Contour, Path
 
@@ -818,3 +821,43 @@ def test_FontSourcesInstancer_empty_sources_list():
     fsi = FontSourcesInstancer(fontAxes=[], fontSources={})
     sourceInstance = fsi.instantiate({})
     assert sourceInstance is None
+
+
+testData_prependTransformToDecomposed = [
+    (
+        Transform(),
+        DecomposedTransform(),
+        DecomposedTransform(),
+    ),
+    (
+        Transform(),
+        DecomposedTransform(rotation=30),
+        DecomposedTransform(rotation=30),
+    ),
+    (
+        Transform().rotate((30 * math.pi) / 180),
+        DecomposedTransform(rotation=30),
+        DecomposedTransform(rotation=60),
+    ),
+    (
+        Transform().rotate((30 * math.pi) / 180),
+        DecomposedTransform(rotation=30, tCenterX=50, tCenterY=50),
+        DecomposedTransform(
+            rotation=60,
+            translateX=-31.698729810778058,
+            translateY=18.301270189221924,
+            tCenterX=50,
+            tCenterY=50,
+        ),
+    ),
+]
+
+
+@pytest.mark.parametrize(
+    "prependTransform, decomposed, expectedResult",
+    testData_prependTransformToDecomposed,
+)
+def test_prependTransformToDecomposed(prependTransform, decomposed, expectedResult):
+    result = prependTransformToDecomposed(prependTransform, decomposed)
+    assert asdict(result) == pytest.approx(asdict(expectedResult))
+    assert result.toTransform() == pytest.approx(expectedResult.toTransform())

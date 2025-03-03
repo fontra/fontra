@@ -193,7 +193,7 @@ def _areComponentLocationsCompatible(
     componentAxisNames: list[Any] | None = None
 
     for glyph in glyphs:
-        if numComponents is None:
+        if numComponents is None or componentAxisNames is None:
             numComponents = len(glyph.components)
             componentAxisNames = [None] * numComponents
 
@@ -514,6 +514,32 @@ class GlyphInstance:
         if parentTransform is not None:
             transform = parentTransform.transform(transform)
         return await instance.getDecomposedPath(transform)
+
+    async def shallowDecomposeComponent(self, component: Component) -> StaticGlyph:
+        try:
+            instancer = await self.fontInstancer.getGlyphInstancer(component.name, True)
+        except GlyphNotFoundError:
+            self.fontInstancer.glyphError(
+                f"glyph {self.glyphName} references non-existing glyph: {component.name}"
+            )
+            return StaticGlyph()
+
+        instance = instancer.instantiate(self.parentLocation | component.location)
+        transform = component.transformation.toTransform()
+        path = instance.glyph.path.transformed(transform)
+        components = [
+            transformComponent(compo, transform) for compo in instance.glyph.components
+        ]
+        return StaticGlyph(path=path, components=components)
+
+
+def transformComponent(component: Component, transform: Transform) -> Component:
+    return replace(
+        component,
+        transformation=prependTransformToDecomposed(
+            transform, component.transformation
+        ),
+    )
 
 
 @dataclass(kw_only=True)
@@ -920,3 +946,34 @@ def mapValueFromUserToSource(value, axis):
     if not axis.mapping:
         return value
     return piecewiseLinearMap(value, dict(axis.mapping))
+
+
+def prependTransformToDecomposed(
+    prependTransform: Transform, decomposed: DecomposedTransform
+) -> DecomposedTransform:
+    """Prepend `prependTransform` to `decomposed`
+
+    `prependTransform` is a `Transform` instance
+    `decomposed` is a `DecomposedTransform` instance
+    The return value is a `DecomposedTransform` instance
+
+    This operation ensures the `tCenterX` and `tCenterY` properties of the
+    `decomposed` transform are not lost.
+    """
+
+    # Ported from prependTransformToDecomposed() in transform.js
+
+    [tCenterX, tCenterY] = [decomposed.tCenterX, decomposed.tCenterY]
+
+    newTransform = (
+        Transform()
+        .translate(-tCenterX, -tCenterY)
+        .transform(prependTransform)
+        .transform(decomposed.toTransform())
+        .translate(tCenterX, tCenterY)
+    )
+
+    newDecomposed = newTransform.toDecomposed()
+    newDecomposed.tCenterX = tCenterX
+    newDecomposed.tCenterY = tCenterY
+    return newDecomposed

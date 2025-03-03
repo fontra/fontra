@@ -21,7 +21,7 @@ Fontra Pak should also work on Linux and other platforms, but you will have to b
 
 - Ensure you have **Python >= 3.10** installed, preferably from [python.org](https://www.python.org/downloads/)
 
-- Ensure you have **Node.js >= 19** installed, preferably from [nodejs.org](https://nodejs.org/en/download/)
+- Ensure you have **Node.js >= 20** installed, preferably from [nodejs.org](https://nodejs.org/en/download/)
 
 #### Setup
 
@@ -76,6 +76,12 @@ The following steps are needed if you want to run the automated tests and if you
 - To use Fontra with .rcjk data on disk, or to connect to a remote rcjk server, install the [`fontra-rcjk`](https://github.com/googlefonts/fontra-rcjk) plugin package. Then you can start it with a robocjk server hostname, using the `rcjk` subcommand provided by the `fontra-rcjk` plugin:
 
   `fontra --launch rcjk some-robocjk-server.some-domain.com`
+
+- To use Fontra in development mode, add `--dev` to the command line:
+
+  `fontra --dev --launch filesystem /path/to/a/folder`
+
+With this option in place, a separate process will be spawned which watches for any changes made to the Javascript files, and automatically bundles these into the client directory on save. Additionally, in developer mode, Javascript errors report a more human-readable traceback.
 
 ## Roadmap
 

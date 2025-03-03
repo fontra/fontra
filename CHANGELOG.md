@@ -1,5 +1,16 @@
 # Changelog for Fontra
 
+## 2025-02-28
+
+Many smaller bugs were fixed:
+
+- Allow menus from the menubar to be opened with click-drag [Issue 2049](https://github.com/googlefonts/fontra/issues/2049) [PR 2060](https://github.com/googlefonts/fontra/pull/2060)
+- Paste only plain text in editable list cells [Issue 2043](https://github.com/googlefonts/fontra/issues/2043) [PR 2057](https://github.com/googlefonts/fontra/pull/2057)
+- Fix tooltips layout issues [Issue 2050](https://github.com/googlefonts/fontra/issues/2050) [PR 2056](https://github.com/googlefonts/fontra/pull/2056)
+- Show warning befor deleting a font source, as this can have deeper consequences than one might think [Issue 2048](https://github.com/googlefonts/fontra/issues/2048) [PR 2055](https://github.com/googlefonts/fontra/pull/2055)
+- Improve point deletion if a point is overlapping another, or is a tangent [Issue 2033](https://github.com/googlefonts/fontra/issues/2033) [PR 2035](https://github.com/googlefonts/fontra/pull/2035) [PR 2038](https://github.com/googlefonts/fontra/pull/2038)
+- Fix bug where the Italic Angle font source parameter was written as the wrong type [Issue 2036](https://github.com/googlefonts/fontra/issues/2036) [PR 2037](https://github.com/googlefonts/fontra/pull/2037)
+
 ## 2025-02-16
 
 - Do not display the "selection bounds" handles if the selection is only a single point [Issue 2022](https://github.com/googlefonts/fontra/issues/2022) [PR 2024](https://github.com/googlefonts/fontra/pull/2024)

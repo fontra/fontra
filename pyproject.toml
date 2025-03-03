@@ -54,10 +54,10 @@ fontra-workflow = "fontra.workflow.command:main"
 
 
 [project.entry-points."fontra.views"]
-editor = "fontra.views.editor"
-fontoverview = "fontra.views.fontoverview"
-fontinfo = "fontra.views.fontinfo"
-applicationsettings = "fontra.views.applicationsettings"
+editor = "fontra.client"
+fontoverview = "fontra.client"
+fontinfo = "fontra.client"
+applicationsettings = "fontra.client"
 
 
 [project.entry-points."fontra.projectmanagers"]
@@ -65,7 +65,6 @@ filesystem = "fontra.filesystem.projectmanager:FileSystemProjectManagerFactory"
 
 
 [project.entry-points."fontra.webcontent"]
-filesystem = "fontra.filesystem"
 localplugins = "fontra.localplugins"
 
 
@@ -84,9 +83,7 @@ yaml = "fontra.backends.workflow:WorkflowBackend"
 packages = ["src/fontra"]
 # Items that are ignored in .gitignore, but are added in a build hook
 # and must be included in the wheel:
-artifacts = [
-  "src/fontra/client/third-party/"
-]
+artifacts = ["src/fontra/client/"]
 
 
 [tool.hatch.version]

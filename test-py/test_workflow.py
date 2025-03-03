@@ -622,6 +622,62 @@ def test_command(tmpdir, configYAMLSources, substitutions):
             [],
         ),
         (
+            "shallow-decompose-composites",
+            """
+            steps:
+            - input: fontra-read
+              source: "test-py/data/workflow/input-variable-composites.fontra"
+            - filter: shallow-decompose-composites
+            - output: fontra-write
+              destination: "output-shallow-decompose-composites.fontra"
+            """,
+            False,
+            [],
+        ),
+        (
+            "shallow-decompose-composites-single-glyph",
+            """
+            steps:
+            - input: fontra-read
+              source: "test-py/data/workflow/input-variable-composites.fontra"
+            - filter: shallow-decompose-composites
+              glyphNames: ["uni4FFC"]
+            - output: fontra-write
+              destination: "output-shallow-decompose-composites-single-glyph.fontra"
+            """,
+            False,
+            [],
+        ),
+        (
+            "shallow-decompose-composites-single-component",
+            """
+            steps:
+            - input: fontra-read
+              source: "test-py/data/workflow/input-variable-composites.fontra"
+            - filter: shallow-decompose-composites
+              componentGlyphNames: ["VG_4E28_00"]
+            - output: fontra-write
+              destination: "output-shallow-decompose-composites-single-component.fontra"
+            """,
+            False,
+            [],
+        ),
+        (
+            "shallow-decompose-composites-single-glyph-component",
+            """
+            steps:
+            - input: fontra-read
+              source: "test-py/data/workflow/input-variable-composites.fontra"
+            - filter: shallow-decompose-composites
+              glyphNames: ["T_2FF0_80B2"]
+              componentGlyphNames: ["VG_4E28_00"]
+            - output: fontra-write
+              destination: "output-shallow-decompose-composites-single-glyph-component.fontra"
+            """,
+            False,
+            [],
+        ),
+        (
             "set-font-info",
             """
             steps:

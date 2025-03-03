@@ -1,22 +1,35 @@
 {
+  "name": "fontra",
   "scripts": {
-    "test": "mocha test-js --reporter spec",
-    "bundle": "rollup --bundleConfigAsCjs -c"
+    "test": "npm run --workspace src-js test",
+    "bundle": "webpack --config webpack.config.cjs --mode production",
+    "bundle-watch": "webpack --config webpack.config.cjs --watch"
   },
   "type": "module",
   "devDependencies": {
-    "@rollup/plugin-commonjs": "^28.0.2",
-    "@rollup/plugin-node-resolve": "^16.0.0",
-    "chai": "^5.1.2",
-    "chai-almost": "^1.0.1",
-    "mocha": "^11.1.0",
+    "copy-webpack-plugin": "^12.0.2",
+    "css-loader": "^7.1.2",
+    "html-bundler-webpack-plugin": "^4.12.2",
+    "npm": "^11.0.0",
     "prettier-plugin-organize-imports": "^4.1.0",
     "prettier-plugin-sort-json": "^4.1.1",
-    "rollup": "^4.34.0"
+    "ts-loader": "^9.5.2",
+    "typescript": "^5.7.3",
+    "webpack": "^5.97.1",
+    "webpack-cli": "^5.1.4"
   },
+  "workspaces": [
+    "src-js/fontra-core",
+    "src-js/fontra-webcomponents",
+    "src-js/projectmanager-filesystem",
+    "src-js/views-applicationsettings",
+    "src-js/views-editor",
+    "src-js/views-fontinfo",
+    "src-js/views-fontoverview"
+  ],
   "dependencies": {
-    "bezier-js": "^6.1.4",
-    "fflate": "^0.8.2",
-    "lib-font": "^2.4.3"
+    "@babel/preset-env": "^7.26.0",
+    "@babel/preset-typescript": "^7.26.0",
+    "babel-loader": "^9.2.1"
   }
 }

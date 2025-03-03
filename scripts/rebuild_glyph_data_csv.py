@@ -63,7 +63,9 @@ def glyphDataAsCSV():
 
 def rebuildGlyphData(check=False):
     repoDir = pathlib.Path(__file__).resolve().parent.parent
-    glyphDataPath = repoDir / "src" / "fontra" / "client" / "data" / "glyph-data.csv"
+    glyphDataPath = (
+        repoDir / "src-js" / "fontra-core" / "assets" / "data" / "glyph-data.csv"
+    )
 
     csvGlyphData = glyphDataAsCSV()
 

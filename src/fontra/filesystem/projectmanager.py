@@ -82,7 +82,7 @@ class FileSystemProjectManager:
         request: web.Request,
         filterContent: Callable[[bytes, str], bytes] | None = None,
     ) -> web.Response:
-        htmlPath = resources.files("fontra") / "filesystem" / "landing.html"
+        htmlPath = resources.files("fontra") / "client" / "landing.html"
         html = htmlPath.read_bytes()
         if filterContent is not None:
             html = filterContent(html, "text/html")
