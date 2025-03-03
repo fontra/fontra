@@ -29,7 +29,7 @@ import "@fontra/web-components/designspace-location.js";
 import { dialogSetup, message } from "@fontra/web-components/modal-dialog.js";
 import { UIList } from "@fontra/web-components/ui-list.js";
 import { arraysEqual, updateRemoveButton } from "./panel-axes.js";
-import { BaseInfoPanel, BaseInfoPanel } from "./panel-base.js";
+import { BaseInfoPanel } from "./panel-base.js";
 
 const ufoInfoPrefix = "ufo.info.";
 let selectedSourceIdentifier = undefined;
