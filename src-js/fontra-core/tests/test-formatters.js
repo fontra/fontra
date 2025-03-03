@@ -1,10 +1,10 @@
-import { expect } from "chai";
 import {
   ArrayFormatter,
   BooleanFormatter,
   FixedLengthArrayFormatter,
   _NumberFormatter,
-} from "../src/fontra/client/core/formatters.js";
+} from "@fontra/core/formatters.js";
+import { expect } from "chai";
 
 import { getTestData, parametrize } from "./test-support.js";
 
