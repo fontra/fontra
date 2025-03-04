@@ -35,6 +35,53 @@ import { BaseInfoPanel } from "./panel-base.js";
 
 let selectedSourceIdentifier = undefined;
 
+// Please see: ufoInfoAttributesToRoundTrip
+const customDataAttributesSupported = [
+  // "openTypeGaspRangeRecords", # part of MVAR, but commented out for now, as too complex
+  "openTypeHheaAscender",
+  "openTypeHheaCaretOffset",
+  "openTypeHheaCaretSlopeRise",
+  "openTypeHheaCaretSlopeRun",
+  "openTypeHheaDescender",
+  "openTypeHheaLineGap",
+  "openTypeOS2StrikeoutPosition",
+  "openTypeOS2StrikeoutSize",
+  "openTypeOS2SubscriptXOffset",
+  "openTypeOS2SubscriptXSize",
+  "openTypeOS2SubscriptYOffset",
+  "openTypeOS2SubscriptYSize",
+  "openTypeOS2SuperscriptXOffset",
+  "openTypeOS2SuperscriptXSize",
+  "openTypeOS2SuperscriptYOffset",
+  "openTypeOS2SuperscriptYSize",
+  "openTypeOS2TypoAscender",
+  "openTypeOS2TypoDescender",
+  "openTypeOS2TypoLineGap",
+  "openTypeOS2WinAscent",
+  "openTypeOS2WinDescent",
+  "openTypeVheaCaretOffset",
+  "openTypeVheaCaretSlopeRise",
+  "openTypeVheaCaretSlopeRun",
+  "openTypeVheaVertTypoLineGap",
+  "postscriptUnderlinePosition",
+  "postscriptUnderlineThickness",
+  "openTypeNameCompatibleFullName",
+  "openTypeNamePreferredSubfamilyName",
+  "openTypeNameWWSSubfamilyName",
+  "postscriptBlueFuzz",
+  "postscriptBlueScale",
+  "postscriptBlueShift",
+  "postscriptBlueValues",
+  "postscriptFamilyBlues",
+  "postscriptFamilyOtherBlues",
+  "postscriptForceBold",
+  "postscriptIsFixedPitch",
+  "postscriptOtherBlues",
+  "postscriptSlantAngle",
+  "postscriptStemSnapH",
+  "postscriptStemSnapV",
+];
+
 addStyleSheet(`
 .font-sources-container {
   display: grid;
@@ -759,6 +806,7 @@ class SourceBox extends HTMLElement {
       const customDataList = new CustomDataList({
         controller: this.controllers.customData,
         fontObject: this.source,
+        supportedAttributes: customDataAttributesSupported,
       });
       this.append(
         html.div({ class: "fontra-ui-font-info-sources-panel-header" }, [
