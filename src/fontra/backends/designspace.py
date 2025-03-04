@@ -126,17 +126,26 @@ fontInfoNameMapping = [
 
 ufoInfoPrefix = "ufo.info."
 
-# # Font Family Level Attributes
-#     "openTypeHeadCreated",
-#     "openTypeNameVersion",
-#     "openTypeNamePreferredFamilyName",
-#     "openTypeNameWWSFamilyName",
-#     "openTypeOS2CodePageRanges",
-#     "openTypeOS2UnicodeRanges",
-#     "openTypeOS2FamilyClass",
-#     "openTypeOS2Type", # embedding bit
-#     "postscriptWindowsCharacterSet", # The Windows character set.
+# CustomData, Font Family Level:
+ufoInfoAttributesToRoundTripFamilyLevel = [
+    "openTypeNameUniqueID",
+    "openTypeHeadCreated",
+    "openTypeNameVersion",
+    "openTypeNamePreferredFamilyName",
+    "openTypeNameWWSFamilyName",
+    "openTypeOS2CodePageRanges",
+    "openTypeOS2UnicodeRanges",
+    "openTypeOS2FamilyClass",
+    "openTypeOS2Type",  # embedding bit
+    "postscriptWindowsCharacterSet",  # The Windows character set.
+]
+# *Maybe* to family, as a per-VF setting??
+#     "openTypeOS2Panose", # Allow this to be set for a VF?
+#     "openTypeOS2Selection", # The 'Bold' might be set for each static font individually (depending if it's a style linked bold font) # noqa: E501
+#     "openTypeOS2WeightClass", # Note: The OS/2.usWeightClass, OS/2.usWidthClass and post.italicAngle values are not supported by variation data in the MVAR table. # noqa: E501
+#     "openTypeOS2WidthClass",
 
+# CustomData, Font Source Level:
 ufoInfoAttributesToRoundTrip = [
     # "openTypeGaspRangeRecords", # part of MVAR, but commented out for now, as too complex
     "openTypeHheaAscender",
@@ -166,38 +175,32 @@ ufoInfoAttributesToRoundTrip = [
     "openTypeVheaVertTypoLineGap",
     "postscriptUnderlinePosition",
     "postscriptUnderlineThickness",
+    "openTypeNameCompatibleFullName",
+    "openTypeNamePreferredSubfamilyName",
+    "openTypeNameWWSSubfamilyName",
+    "postscriptBlueFuzz",
+    "postscriptBlueScale",
+    "postscriptBlueShift",
+    "postscriptBlueValues",
+    "postscriptFamilyBlues",
+    "postscriptFamilyOtherBlues",
+    "postscriptForceBold",
+    "postscriptIsFixedPitch",
+    "postscriptOtherBlues",
+    "postscriptSlantAngle",
+    "postscriptStemSnapH",
+    "postscriptStemSnapV",
 ]
 
-# # Not clear
-#     "openTypeHeadFlags",
+# Let's NOT expose (for now):
+#     "openTypeHeadFlags",  # too low level?
 #     "openTypeHeadLowestRecPPEM", # the smallest readable size might different between fonts (eg. Text vs. Display) # noqa: E501
-#     "openTypeNameCompatibleFullName", # because combination of family and subfamily bname
-#     "openTypeNamePreferredSubfamilyName",
 #     "openTypeNameRecords", # more complex, can be all, family level, source level and instance level + different languages # noqa: E501
-#     "openTypeNameUniqueID", # unique ID per font
-#     "openTypeNameWWSSubfamilyName",
-#     "openTypeOS2Panose", # Panose should be set for each static font individually
-#     "openTypeOS2Selection", # The 'Bold' might be set for each static font individually (depending if it's a style linked bold font) # noqa: E501
-#     "openTypeOS2WeightClass", # Note: The OS/2.usWeightClass, OS/2.usWidthClass and post.italicAngle values are not supported by variation data in the MVAR table. # noqa: E501
-#     "openTypeOS2WidthClass",
 #     "postscriptUniqueID",
 #     "postscriptWeightName",
 #     "postscriptDefaultCharacter", # The name of the glyph that should be used as the default character in PFM files. # noqa: E501
 #     "postscriptDefaultWidthX", # Default width for glyphs.
 #     "postscriptNominalWidthX", # Nominal width for glyphs.
-#     # Postscript hinting
-#     "postscriptBlueFuzz",
-#     "postscriptBlueScale",
-#     "postscriptBlueShift",
-#     "postscriptBlueValues",
-#     "postscriptFamilyBlues",
-#     "postscriptFamilyOtherBlues",
-#     "postscriptForceBold",
-#     "postscriptIsFixedPitch",
-#     "postscriptOtherBlues",
-#     "postscriptSlantAngle",
-#     "postscriptStemSnapH",
-#     "postscriptStemSnapV",
 
 
 class DesignspaceBackend:
