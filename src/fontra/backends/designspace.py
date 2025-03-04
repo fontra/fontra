@@ -124,8 +124,6 @@ fontInfoNameMapping = [
 ]
 
 
-ufoInfoPrefix = "ufo.info."
-
 # CustomData, Font Family Level:
 ufoInfoAttributesToRoundTripFamilyLevel = [
     "openTypeNameUniqueID",
@@ -1629,7 +1627,7 @@ class DSSource:
             for infoAttr in ufoInfoAttributesToRoundTrip:
                 value = getattr(fontInfo, infoAttr, None)
                 if value is not None:
-                    customData[f"{ufoInfoPrefix}{infoAttr}"] = value
+                    customData[infoAttr] = value
 
         return FontSource(
             name=self.name,
@@ -2181,15 +2179,12 @@ def updateFontInfoFromFontSource(reader, fontSource):
     fontInfo.guidelines = packGuidelines(fontSource.guidelines)
 
     # set custom data
-    for key, value in fontSource.customData.items():
-        if key.startswith(ufoInfoPrefix):
-            infoAttr = key[len(ufoInfoPrefix) :]
-            setattr(fontInfo, infoAttr, value)
+    for infoAttr, value in fontSource.customData.items():
+        setattr(fontInfo, infoAttr, value)
 
     # delete custom data
     for infoAttr in ufoInfoAttributesToRoundTrip:
-        customDataKey = f"{ufoInfoPrefix}{infoAttr}"
-        if customDataKey not in fontSource.customData.keys():
+        if infoAttr not in fontSource.customData.keys():
             value = getattr(fontInfo, infoAttr, None)
             if value is not None:
                 delattr(fontInfo, infoAttr)

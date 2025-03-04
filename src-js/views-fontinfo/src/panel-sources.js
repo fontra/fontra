@@ -31,7 +31,6 @@ import { UIList } from "@fontra/web-components/ui-list.js";
 import { arraysEqual, updateRemoveButton } from "./panel-axes.js";
 import { BaseInfoPanel } from "./panel-base.js";
 
-const ufoInfoPrefix = "ufo.info.";
 let selectedSourceIdentifier = undefined;
 
 addStyleSheet(`
@@ -719,7 +718,7 @@ class SourceBox extends HTMLElement {
               `"${key}" invalid value: ${item["value"]}${msg}`
             );
           } else {
-            source.customData[`${ufoInfoPrefix}${key}`] = result.value;
+            source.customData[key] = result.value;
           }
         }
       }, `edit customData`); // TODO: translation
@@ -945,10 +944,7 @@ function buildFontCustomDataList(controller, fontSource) {
   const model = controller.model;
 
   const makeItem = ([key, value]) => {
-    const keyDisplayed = key.startsWith(ufoInfoPrefix)
-      ? key.slice(ufoInfoPrefix.length)
-      : key;
-    const item = new ObservableController({ key: keyDisplayed, value: value });
+    const item = new ObservableController({ key: key, value: value });
     item.addListener((event) => {
       const sortedItems = [...labelList.items];
       sortedItems.sort(
@@ -976,11 +972,11 @@ function buildFontCustomDataList(controller, fontSource) {
   const sortedItems = Object.entries(model);
   sortedItems.sort(
     (a, b) =>
-      (customDataNames.indexOf(a[0].slice(ufoInfoPrefix.length)) != -1
-        ? customDataNames.indexOf(a[0].slice(ufoInfoPrefix.length))
+      (customDataNames.indexOf(a[0]) != -1
+        ? customDataNames.indexOf(a[0])
         : customDataNames.length) -
-      (customDataNames.indexOf(b[0].slice(ufoInfoPrefix.length)) != -1
-        ? customDataNames.indexOf(b[0].slice(ufoInfoPrefix.length))
+      (customDataNames.indexOf(b[0]) != -1
+        ? customDataNames.indexOf(b[0])
         : customDataNames.length)
   );
   const items = sortedItems?.map(makeItem) || [];
