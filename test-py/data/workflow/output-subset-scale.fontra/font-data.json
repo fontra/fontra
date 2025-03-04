@@ -165,8 +165,8 @@
 }
 ],
 "customData": {
-"ufo.info.openTypeOS2TypoAscender": 700,
-"ufo.info.openTypeOS2TypoDescender": -200
+"openTypeOS2TypoAscender": 700,
+"openTypeOS2TypoDescender": -200
 }
 },
 "light-condensed-italic": {
