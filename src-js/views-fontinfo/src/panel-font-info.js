@@ -156,8 +156,6 @@ export class FontInfoPanel extends BaseInfoPanel {
       }, `edit customData`); // TODO: translation
     });
 
-    // TODO: Need better UI, but for now keep as is for testing functionality.
-    // Need to discuss the design, later.
     const customDataList = new CustomDataList({
       controller: cutomDataController,
       fontObject: info,
