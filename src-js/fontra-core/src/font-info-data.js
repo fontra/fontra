@@ -5,20 +5,21 @@ import {
   _NumberFormatter,
 } from "./formatters.js";
 
-function getAscenderDefault(fontSource = undefined) {
-  return fontSource.lineMetricsHorizontalLayout.ascender.value || 800;
+// NOTE: fontObject can be FontInfo or FontSource
+function getAscenderDefault(fontObject = undefined) {
+  return fontObject.lineMetricsHorizontalLayout?.ascender.value || 800;
 }
 
-function getDescenderDefault(fontSource = undefined) {
-  return fontSource.lineMetricsHorizontalLayout.descender.value || -200;
+function getDescenderDefault(fontObject = undefined) {
+  return fontObject.lineMetricsHorizontalLayout?.descender.value || -200;
 }
 
-function getSubfamilyNameDefault(fontSource = undefined) {
-  return fontSource.name || "Subfamily Name";
+function getSubfamilyNameDefault(fontObject = undefined) {
+  return fontObject.name || "Subfamily Name";
 }
 
-function getStrikeoutPositionDefault(fontSource = undefined) {
-  return fontSource.lineMetricsHorizontalLayout.ascender.value / 2 || 250;
+function getStrikeoutPositionDefault(fontObject = undefined) {
+  return fontObject.lineMetricsHorizontalLayout?.ascender.value / 2 || 250;
 }
 
 function getCreatedDefault() {
@@ -60,7 +61,7 @@ export const customDataNameMapping = {
   },
   openTypeOS2StrikeoutSize: { default: () => 50, formatter: _NumberFormatter },
   // name table entries
-  openTypeNameUniqueID: { default: () => "uniqueID Name ID 3" }, // Name ID 3
+  openTypeNameUniqueID: { default: () => "Unique ID Name ID 3" }, // Name ID 3
   openTypeNameVersion: { default: () => "Version 1.0" }, // Name ID 7
   openTypeNamePreferredFamilyName: { default: () => "Family Name" }, // Name ID 16
   openTypeNamePreferredSubfamilyName: { default: getSubfamilyNameDefault }, // Name ID 17
