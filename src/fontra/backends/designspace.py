@@ -126,30 +126,25 @@ fontInfoNameMapping = [
 
 ufoInfoPrefix = "ufo.info."
 
+# # Font Family Level Attributes
+#     "openTypeHeadCreated",
+#     "openTypeNameVersion",
+#     "openTypeNamePreferredFamilyName",
+#     "openTypeNameWWSFamilyName",
+#     "openTypeOS2CodePageRanges",
+#     "openTypeOS2UnicodeRanges",
+#     "openTypeOS2FamilyClass",
+#     "openTypeOS2Type", # embedding bit
+#     "postscriptWindowsCharacterSet", # The Windows character set.
 
 ufoInfoAttributesToRoundTrip = [
-    "openTypeGaspRangeRecords",
-    "openTypeHeadCreated",
-    "openTypeHeadFlags",
-    "openTypeHeadLowestRecPPEM",
+    # "openTypeGaspRangeRecords", # part of MVAR, but commented out for now, as too complex
     "openTypeHheaAscender",
     "openTypeHheaCaretOffset",
     "openTypeHheaCaretSlopeRise",
     "openTypeHheaCaretSlopeRun",
     "openTypeHheaDescender",
     "openTypeHheaLineGap",
-    "openTypeNameCompatibleFullName",
-    "openTypeNamePreferredFamilyName",
-    "openTypeNamePreferredSubfamilyName",
-    "openTypeNameRecords",
-    "openTypeNameUniqueID",
-    "openTypeNameVersion",
-    "openTypeNameWWSFamilyName",
-    "openTypeNameWWSSubfamilyName",
-    "openTypeOS2CodePageRanges",
-    "openTypeOS2FamilyClass",
-    "openTypeOS2Panose",
-    "openTypeOS2Selection",
     "openTypeOS2StrikeoutPosition",
     "openTypeOS2StrikeoutSize",
     "openTypeOS2SubscriptXOffset",
@@ -160,40 +155,49 @@ ufoInfoAttributesToRoundTrip = [
     "openTypeOS2SuperscriptXSize",
     "openTypeOS2SuperscriptYOffset",
     "openTypeOS2SuperscriptYSize",
-    "openTypeOS2Type",
     "openTypeOS2TypoAscender",
     "openTypeOS2TypoDescender",
     "openTypeOS2TypoLineGap",
-    "openTypeOS2UnicodeRanges",
-    "openTypeOS2WeightClass",
-    "openTypeOS2WidthClass",
     "openTypeOS2WinAscent",
     "openTypeOS2WinDescent",
     "openTypeVheaCaretOffset",
     "openTypeVheaCaretSlopeRise",
     "openTypeVheaCaretSlopeRun",
     "openTypeVheaVertTypoLineGap",
-    "postscriptBlueFuzz",
-    "postscriptBlueScale",
-    "postscriptBlueShift",
-    "postscriptBlueValues",
-    "postscriptDefaultCharacter",
-    "postscriptDefaultWidthX",
-    "postscriptFamilyBlues",
-    "postscriptFamilyOtherBlues",
-    "postscriptForceBold",
-    "postscriptIsFixedPitch",
-    "postscriptNominalWidthX",
-    "postscriptOtherBlues",
-    "postscriptSlantAngle",
-    "postscriptStemSnapH",
-    "postscriptStemSnapV",
     "postscriptUnderlinePosition",
     "postscriptUnderlineThickness",
-    "postscriptUniqueID",
-    "postscriptWeightName",
-    "postscriptWindowsCharacterSet",
 ]
+
+# # Not clear
+#     "openTypeHeadFlags",
+#     "openTypeHeadLowestRecPPEM", # the smallest readable size might different between fonts (eg. Text vs. Display) # noqa: E501
+#     "openTypeNameCompatibleFullName", # because combination of family and subfamily bname
+#     "openTypeNamePreferredSubfamilyName",
+#     "openTypeNameRecords", # more complex, can be all, family level, source level and instance level + different languages # noqa: E501
+#     "openTypeNameUniqueID", # unique ID per font
+#     "openTypeNameWWSSubfamilyName",
+#     "openTypeOS2Panose", # Panose should be set for each static font individually
+#     "openTypeOS2Selection", # The 'Bold' might be set for each static font individually (depending if it's a style linked bold font) # noqa: E501
+#     "openTypeOS2WeightClass", # Note: The OS/2.usWeightClass, OS/2.usWidthClass and post.italicAngle values are not supported by variation data in the MVAR table. # noqa: E501
+#     "openTypeOS2WidthClass",
+#     "postscriptUniqueID",
+#     "postscriptWeightName",
+#     "postscriptDefaultCharacter", # The name of the glyph that should be used as the default character in PFM files. # noqa: E501
+#     "postscriptDefaultWidthX", # Default width for glyphs.
+#     "postscriptNominalWidthX", # Nominal width for glyphs.
+#     # Postscript hinting
+#     "postscriptBlueFuzz",
+#     "postscriptBlueScale",
+#     "postscriptBlueShift",
+#     "postscriptBlueValues",
+#     "postscriptFamilyBlues",
+#     "postscriptFamilyOtherBlues",
+#     "postscriptForceBold",
+#     "postscriptIsFixedPitch",
+#     "postscriptOtherBlues",
+#     "postscriptSlantAngle",
+#     "postscriptStemSnapH",
+#     "postscriptStemSnapV",
 
 
 class DesignspaceBackend:
