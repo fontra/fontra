@@ -163,8 +163,8 @@ export class FontInfoPanel extends BaseInfoPanel {
       fontObject: info,
       supportedAttributes: customDataAttributesSupported,
     });
-    this.panelElement.append(
-      html.div({ class: "fontra-ui-font-info-sources-panel-header" }, [
+    containerFontInfo.append(
+      html.div({ class: "fontra-ui-font-info-header", style: "padding-top: 1em;" }, [
         translate("Custom Data"), // TODO: translation
       ]),
       customDataList
