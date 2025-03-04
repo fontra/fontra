@@ -939,7 +939,12 @@ function buildFontGuidelineList(controller) {
   ]);
 }
 
-function buildFontCustomDataList(controller, fontSource) {
+export function buildFontCustomDataList(
+  controller,
+  fontObject = undefined,
+  supportedAttributes = Object.keys(customDataNameMapping)
+) {
+  // fontObject can either be FontInfo or FontSource.
   const customDataNames = Object.keys(customDataNameMapping);
   const model = controller.model;
 
@@ -1032,14 +1037,14 @@ function buildFontCustomDataList(controller, fontSource) {
         return customData.key;
       });
       let nextKey = "attributeName";
-      for (const key of Object.keys(customDataNameMapping)) {
+      for (const key of supportedAttributes) {
         if (!currentKeys.includes(key)) {
           nextKey = key;
           break;
         }
       }
       const valueDefault = customDataNameMapping[nextKey]
-        ? customDataNameMapping[nextKey].default(fontSource)
+        ? customDataNameMapping[nextKey].default(fontObject)
         : "";
       const newItem = makeItem([nextKey, valueDefault]);
       const newItems = [...labelList.items, newItem];

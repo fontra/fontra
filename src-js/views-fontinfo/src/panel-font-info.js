@@ -1,9 +1,14 @@
 import { recordChanges } from "@fontra/core/change-recorder.js";
+import { customDataNameMapping } from "@fontra/core/font-info-data.js";
 import * as html from "@fontra/core/html-utils.js";
 import { addStyleSheet } from "@fontra/core/html-utils.js";
 import { translate } from "@fontra/core/localization.js";
+import { ObservableController } from "@fontra/core/observable-object.js";
+import { DefaultFormatter } from "@fontra/core/ui-utils.js";
+import { message } from "@fontra/web-components/modal-dialog.js";
 import { Form } from "@fontra/web-components/ui-form.js";
 import { BaseInfoPanel } from "./panel-base.js";
+import { buildFontCustomDataList } from "./panel-sources.js";
 
 const fontInfoFields = [
   // [property name, localization key, type]
@@ -21,6 +26,20 @@ const fontInfoFields = [
   ["vendorID", "font-info.vendorid", "edit-text"],
   ["versionMajor", "font-info.version.major", "edit-number"],
   ["versionMinor", "font-info.version.minor", "edit-number"],
+];
+
+// Please see: ufoInfoAttributesToRoundTripFamilyLevel
+const customDataAttributesSupported = [
+  "openTypeNameUniqueID",
+  "openTypeHeadCreated",
+  "openTypeNameVersion",
+  "openTypeNamePreferredFamilyName",
+  "openTypeNameWWSFamilyName",
+  "openTypeOS2CodePageRanges",
+  "openTypeOS2UnicodeRanges",
+  "openTypeOS2FamilyClass",
+  "openTypeOS2Type", // embedding bit
+  "postscriptWindowsCharacterSet", // The Windows character set.
 ];
 
 addStyleSheet(`
@@ -92,5 +111,60 @@ export class FontInfoPanel extends BaseInfoPanel {
 
     this.panelElement.innerHTML = "";
     this.panelElement.appendChild(this.infoForm);
+
+    const cutomDataController = new ObservableController({ ...info.customData });
+
+    cutomDataController.addListener((event) => {
+      this.editFontInfo((root) => {
+        root.fontInfo.customData = {};
+        for (const item of event.newValue) {
+          const key = item["key"];
+          if (key === "attributeName") {
+            // Skip this, so people can edit this placeholder.
+            continue;
+          }
+          if (!customDataAttributesSupported.includes(key)) {
+            message(
+              translate("sources.dialog.cannot-edit-source.title"),
+              `CustomData "${key}" not implemented, yet.`
+            );
+            continue;
+          }
+          const formatter = customDataNameMapping[key]?.formatter || DefaultFormatter;
+          const result = formatter.fromString(item["value"]);
+          if (result.value == undefined) {
+            const msg = result.error ? ` (${result.error})` : "";
+            message(
+              translate("sources.dialog.cannot-edit-source.title"),
+              `"${key}" invalid value: ${item["value"]}${msg}`
+            );
+          } else {
+            root.fontInfo.customData[key] = result.value;
+          }
+        }
+      }, `edit customData`); // TODO: translation
+    });
+
+    // TODO: Need better UI, but for now keep as is for testing functionality.
+    // Need to discuss the design, later.
+    this.panelElement.append(
+      html.div({ class: "fontra-ui-font-info-sources-panel-header" }, [
+        translate("Custom Data"), // TODO: translation
+      ]),
+      buildFontCustomDataList(cutomDataController, info, customDataAttributesSupported)
+    );
+  }
+
+  async editFontInfo(editFunc, undoLabel) {
+    const root = {
+      fontInfo: await this.fontController.getFontInfo(),
+      unitsPerEm: this.fontController.unitsPerEm,
+    };
+    const changes = recordChanges(root, (root) => {
+      editFunc(root);
+    });
+    if (changes.hasChange) {
+      this.postChange(changes.change, changes.rollbackChange, undoLabel);
+    }
   }
 }

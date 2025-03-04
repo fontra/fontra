@@ -913,6 +913,15 @@ class DesignspaceBackend:
             if value is not None:
                 info[fontraName] = value
 
+        customData = {}
+        for infoAttr in ufoInfoAttributesToRoundTripFamilyLevel:
+            value = getattr(ufoInfo, infoAttr, None)
+            if value is not None:
+                customData[infoAttr] = value
+
+        if customData:
+            info["customData"] = customData
+
         return FontInfo(**info)
 
     async def putFontInfo(self, fontInfo: FontInfo):
@@ -924,6 +933,10 @@ class DesignspaceBackend:
 
         if fontInfo.familyName:
             self._familyName = fontInfo.familyName
+
+        infoDict["customData"] = {}
+        for infoAttr, value in fontInfo.customData.items():
+            infoDict["customData"][infoAttr] = value
 
         self._updateGlobalFontInfo(infoDict)
 
@@ -1551,6 +1564,17 @@ def _updateFontInfoFromDict(fontInfo: UFOFontInfo, infoDict: dict):
     for infoAttr, value in infoDict.items():
         if value is not None:
             setattr(fontInfo, infoAttr, value)
+
+    for infoAttr in ufoInfoAttributesToRoundTripFamilyLevel:
+        if infoAttr in infoDict.get("customData", {}).keys():
+            # set custom data
+            value = infoDict["customData"][infoAttr]
+            setattr(fontInfo, infoAttr, value)
+        else:
+            # delete custom data
+            value = getattr(fontInfo, infoAttr, None)
+            if value is not None:
+                delattr(fontInfo, infoAttr)
 
 
 @dataclass(kw_only=True)

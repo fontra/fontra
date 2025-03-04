@@ -631,8 +631,8 @@ getSourcesTestData = [
             {"name": "Guideline Baseline Overshoot", "y": -10},
         ],
         "customData": {
-            "ufo.info.openTypeOS2TypoAscender": 700,
-            "ufo.info.openTypeOS2TypoDescender": -200,
+            "openTypeOS2TypoAscender": 700,
+            "openTypeOS2TypoDescender": -200,
         },
     },
     {
@@ -925,6 +925,19 @@ async def test_putFontInfo_no_sources_issue_1465(tmpdir, testFontSingleUFO):
     reopenedBackend = getFileSystemBackend(destPath)
     reopenedInfo = await reopenedBackend.getFontInfo()
     assert reopenedInfo.familyName == "Testing"
+
+
+async def test_putFontInfoCustomData(writableTestFont):
+    info = FontInfo(
+        familyName="Testing",
+        customData={"openTypeNameUniqueID": "This is Unique Font ID"},
+    )
+    async with aclosing(writableTestFont):
+        await writableTestFont.putFontInfo(info)
+
+    reopenedBackend = getFileSystemBackend(writableTestFont.dsDoc.path)
+    reopenedInfo = await reopenedBackend.getFontInfo()
+    assert reopenedInfo.customData == info.customData
 
 
 async def test_lineMetricsVerticalLayout(tmpdir):
