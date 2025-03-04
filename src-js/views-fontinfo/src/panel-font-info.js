@@ -5,10 +5,10 @@ import { addStyleSheet } from "@fontra/core/html-utils.js";
 import { translate } from "@fontra/core/localization.js";
 import { ObservableController } from "@fontra/core/observable-object.js";
 import { DefaultFormatter } from "@fontra/core/ui-utils.js";
+import { CustomDataList } from "@fontra/web-components/custom-data-list.js";
 import { message } from "@fontra/web-components/modal-dialog.js";
 import { Form } from "@fontra/web-components/ui-form.js";
 import { BaseInfoPanel } from "./panel-base.js";
-import { buildFontCustomDataList } from "./panel-sources.js";
 
 const fontInfoFields = [
   // [property name, localization key, type]
@@ -141,11 +141,16 @@ export class FontInfoPanel extends BaseInfoPanel {
 
     // TODO: Need better UI, but for now keep as is for testing functionality.
     // Need to discuss the design, later.
+    const customDataList = new CustomDataList({
+      controller: cutomDataController,
+      fontObject: info,
+      supportedAttributes: customDataAttributesSupported,
+    });
     this.panelElement.append(
       html.div({ class: "fontra-ui-font-info-sources-panel-header" }, [
         translate("Custom Data"), // TODO: translation
       ]),
-      buildFontCustomDataList(cutomDataController, info, customDataAttributesSupported)
+      customDataList
     );
   }
 
