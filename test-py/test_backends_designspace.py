@@ -940,6 +940,22 @@ async def test_putFontInfoCustomData(writableTestFont):
     assert reopenedInfo.customData == info.customData
 
 
+async def test_putFontInfoDeleteDescription(writableTestFont):
+    info = await writableTestFont.getFontInfo()
+    info.description = "Some description"
+    # First add info.description
+    async with aclosing(writableTestFont):
+        await writableTestFont.putFontInfo(info)
+
+    # Then delete, and later look if it still exists.
+    del info.description
+    await writableTestFont.putFontInfo(info)
+
+    reopenedBackend = getFileSystemBackend(writableTestFont.dsDoc.path)
+    reopenedInfo = await reopenedBackend.getFontInfo()
+    assert reopenedInfo == info
+
+
 async def test_lineMetricsVerticalLayout(tmpdir):
     tmpdir = pathlib.Path(tmpdir)
     fontPath = tmpdir / "test.designspace"

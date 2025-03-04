@@ -1561,9 +1561,19 @@ def createDSDocFromUFOPath(ufoPath, styleName):
 
 
 def _updateFontInfoFromDict(fontInfo: UFOFontInfo, infoDict: dict):
+    # set attribute
     for infoAttr, value in infoDict.items():
         if value is not None:
             setattr(fontInfo, infoAttr, value)
+
+    # delete attribute
+    for fontraName, ufoName in fontInfoNameMapping:
+        if infoDict.get(ufoName, None):
+            # If exists in infoDict, don't delete: skip.
+            continue
+        value = getattr(fontInfo, ufoName, None)
+        if value is not None:
+            delattr(fontInfo, ufoName)
 
     for infoAttr in ufoInfoAttributesToRoundTripFamilyLevel:
         if infoAttr in infoDict.get("customData", {}).keys():
