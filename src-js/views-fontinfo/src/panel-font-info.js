@@ -43,11 +43,21 @@ const customDataAttributesSupported = [
 ];
 
 addStyleSheet(`
-.fontra-ui-font-info-axes-panel {
+.font-info-form-container {
   background-color: var(--ui-element-background-color);
   border-radius: 0.5em;
   padding: 1em;
 }
+
+.fontra-ui-font-info-form {
+  padding-bottom: 1em; // This has no effect, sadly. And I don't know why.
+}
+
+.fontra-ui-font-info-header {
+  font-weight: bold;
+  padding-bottom: 0.5em;
+}
+
 `);
 
 export class FontInfoPanel extends BaseInfoPanel {
@@ -58,8 +68,12 @@ export class FontInfoPanel extends BaseInfoPanel {
   async setupUI() {
     const info = await this.fontController.getFontInfo();
 
+    const containerFontInfo = html.div({
+      class: "font-info-form-container",
+    });
+
     this.infoForm = new Form();
-    this.infoForm.className = "fontra-ui-font-info-axes-panel";
+    this.infoForm.className = "fontra-ui-font-info-form";
     this.infoForm.labelWidth = "max-content";
 
     this.infoForm.onFieldChange = async (fieldItem, value, valueStream) => {
@@ -102,9 +116,12 @@ export class FontInfoPanel extends BaseInfoPanel {
     });
 
     this.infoForm.setFieldDescriptions(formContents);
-
-    this.panelElement.innerHTML = "";
-    this.panelElement.appendChild(this.infoForm);
+    containerFontInfo.append(
+      html.div({ class: "fontra-ui-font-info-header" }, [
+        translate("sources.labels.general"), // TODO: translation
+      ]),
+      this.infoForm
+    );
 
     const cutomDataController = new ObservableController({ ...info.customData });
 
@@ -139,14 +156,16 @@ export class FontInfoPanel extends BaseInfoPanel {
       }, `edit customData`); // TODO: translation
     });
 
-    // TODO: Need better UI, but for now keep as is for testing functionality.
-    // Need to discuss the design, later.
-    this.panelElement.append(
-      html.div({ class: "fontra-ui-font-info-sources-panel-header" }, [
+    containerFontInfo.append(
+      html.div({ class: "fontra-ui-font-info-header", style: "padding-top: 1em;" }, [
         translate("Custom Data"), // TODO: translation
       ]),
       buildFontCustomDataList(cutomDataController, info, customDataAttributesSupported)
     );
+
+    this.panelElement.innerHTML = "";
+    this.panelElement.appendChild(containerFontInfo);
+    this.panelElement.focus();
   }
 
   async editFontInfo(editFunc, undoLabel) {
