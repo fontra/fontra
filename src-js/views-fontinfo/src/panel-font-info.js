@@ -64,23 +64,17 @@ export class FontInfoPanel extends BaseInfoPanel {
 
     this.infoForm.onFieldChange = async (fieldItem, value, valueStream) => {
       const [rootKey, itemKey] = JSON.parse(fieldItem.key);
-      const undoLabel = `change ${itemKey ? itemKey : rootKey}`; // TODO: translation
-
-      const root = {
-        fontInfo: await this.fontController.getFontInfo(),
-        unitsPerEm: this.fontController.unitsPerEm,
-      };
-      const changes = recordChanges(root, (root) => {
-        if (itemKey) {
-          const subject = root[rootKey];
-          subject[itemKey] = value;
-        } else {
-          root[rootKey] = value;
-        }
-      });
-      if (changes.hasChange) {
-        await this.postChange(changes.change, changes.rollbackChange, undoLabel);
-      }
+      this.editFontInfo(
+        (root) => {
+          if (itemKey) {
+            const subject = root[rootKey];
+            subject[itemKey] = value;
+          } else {
+            root[rootKey] = value;
+          }
+        },
+        `change ${itemKey ? itemKey : rootKey}`
+      ); // TODO: translation
     };
 
     const formContents = [];
