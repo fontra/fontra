@@ -191,7 +191,7 @@ export class CustomDataList extends SimpleElement {
   }
 
   async _customDataPropertiesRunDialog(fontObject, nextKey, supportedAttributes) {
-    const title = translate("Add advanced information");
+    const title = translate("Add advanced information"); // TODO: translation
 
     const validateInput = () => {
       const infos = [];
@@ -209,7 +209,7 @@ export class CustomDataList extends SimpleElement {
         }
 
         if (!customDataNameMapping[customDataKey]) {
-          warnings.push(`⚠️ ${translate("Unkown custom data key")}`); // TODO: Translation
+          warnings.push(`⚠️ ${translate("Unkown custom data key")}`); // TODO: translation
         }
 
         const customDataValue =
@@ -222,7 +222,7 @@ export class CustomDataList extends SimpleElement {
           const result = formatter.fromString(customDataValue);
           if (result.value == undefined) {
             const msg = result.error ? ` "${result.error}"` : "";
-            warnings.push(`⚠️ Invalid value${msg}`); // TODO: Translation
+            warnings.push(`⚠️ Invalid value${msg}`); // TODO: translation
           }
         }
       }

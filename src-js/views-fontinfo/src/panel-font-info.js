@@ -175,7 +175,6 @@ export class FontInfoPanel extends BaseInfoPanel {
     this.panelElement.appendChild(
       html.div({ class: "font-info-container" }, [accordion])
     );
-    // this.panelElement.appendChild(containerFontInfo);
     this.panelElement.focus();
   }
 
