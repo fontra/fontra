@@ -29,6 +29,7 @@ import "@fontra/web-components/custom-data-list.js";
 import { CustomDataList } from "@fontra/web-components/custom-data-list.js";
 import "@fontra/web-components/designspace-location.js";
 import { dialogSetup, message } from "@fontra/web-components/modal-dialog.js";
+import { Accordion } from "@fontra/web-components/ui-accordion.js";
 import { UIList } from "@fontra/web-components/ui-list.js";
 import { updateRemoveButton } from "./panel-axes.js";
 import { BaseInfoPanel } from "./panel-base.js";
@@ -561,31 +562,6 @@ addStyleSheet(`
   margin-left: 1em;
   height: fit-content;
 }
-
-.fontra-ui-font-info-sources-panel-column {
-  display: grid;
-  grid-template-columns: minmax(4.5em, max-content) minmax(max-content, 25em);
-  gap: 0.5em;
-  align-items: start;
-  align-content: start;
-  padding-bottom: 2em;
-}
-
-.fontra-ui-font-info-sources-panel-line-metrics-hor {
-  grid-template-columns: minmax(4.5em, max-content) 4em 4em;
-}
-
-.fontra-ui-font-info-sources-panel-header {
-  font-weight: bold;
-  padding-bottom: 1em;
-}
-
-.fontra-ui-font-info-sources-panel-list-element {
-  min-width: max-content;
-  max-width: 29.5em; // 4.5 + 25
-  max-height: 12em;
-}
-
 `);
 
 class SourceBox extends HTMLElement {
@@ -773,48 +749,98 @@ class SourceBox extends HTMLElement {
       }, `edit customData`); // TODO: translation
     });
 
-    this.innerHTML = "";
-    this.append(
-      html.div({ class: "fontra-ui-font-info-sources-panel-header" }, [
-        getLabelFromKey("general"),
-      ]),
-      buildElement(this.controllers.general)
-    );
+    const accordion = new Accordion();
+    accordion.appendStyle(`
+.fontra-ui-font-info-sources-panel-column {
+  display: grid;
+  grid-template-columns: minmax(4.5em, max-content) minmax(max-content, 25em);
+  gap: 0.5em;
+  align-items: start;
+  align-content: start;
+  padding-bottom: 2em;
+}
+
+.fontra-ui-font-info-sources-panel-line-metrics-hor {
+  grid-template-columns: minmax(4.5em, max-content) 4em 4em;
+}
+
+.fontra-ui-font-info-sources-panel-list-element {
+  min-width: max-content;
+  max-width: 29.5em; // 4.5 + 25
+  max-height: 12em;
+}
+
+input {
+  background-color: var(--text-input-background-color);
+  color: var(--text-input-foreground-color);
+  border-radius: 0.25em;
+  border: none;
+  outline: none;
+  padding: 0.1em 0.3em;
+  font-family: "fontra-ui-regular";
+  font-size: 100%;
+}
+
+.ui-form-value input {
+  width: min(100%, 9.5em);
+  height: 1.6em;
+}
+    `);
+    const accordionItems = [
+      {
+        label: getLabelFromKey("general"),
+        id: "general",
+        content: buildElement(this.controllers.general),
+        open: true,
+      },
+    ];
+
     // Don't add 'Location', if the font has no axes.
     if (this.fontAxesSourceSpace.length > 0) {
-      this.append(
-        html.div({ class: "fontra-ui-font-info-sources-panel-header" }, [
-          getLabelFromKey("location"),
-        ]),
-        buildElementLocations(this.controllers.location, this.fontAxesSourceSpace)
-      );
+      accordionItems.push({
+        label: getLabelFromKey("location"),
+        id: "location",
+        content: buildElementLocations(
+          this.controllers.location,
+          this.fontAxesSourceSpace
+        ),
+        open: true,
+      });
     }
+
     if (!this.source.isSparse) {
       // NOTE: Don't show 'Line Metrics' or 'Guidelines' for sparse sources.
-      this.append(
-        html.div({ class: "fontra-ui-font-info-sources-panel-header" }, [
-          getLabelFromKey("lineMetricsHorizontalLayout"),
-        ]),
-        buildElementLineMetricsHor(this.controllers.lineMetricsHorizontalLayout)
-      );
-      this.append(
-        html.div({ class: "fontra-ui-font-info-sources-panel-header" }, [
-          getLabelFromKey("guidelines"),
-        ]),
-        buildFontGuidelineList(this.controllers.guidelines)
-      );
+      accordionItems.push({
+        label: getLabelFromKey("lineMetricsHorizontalLayout"),
+        id: "lineMetricsHorizontalLayout",
+        content: buildElementLineMetricsHor(
+          this.controllers.lineMetricsHorizontalLayout
+        ),
+        open: true,
+      });
+      accordionItems.push({
+        label: getLabelFromKey("guidelines"),
+        id: "guidelines",
+        content: buildFontGuidelineList(this.controllers.guidelines),
+        open: Object.keys(this.source.guidelines).length > 0,
+      });
       const customDataList = new CustomDataList({
         controller: this.controllers.customData,
         fontObject: this.source,
         supportedAttributes: customDataAttributesSupported,
       });
-      this.append(
-        html.div({ class: "fontra-ui-font-info-sources-panel-header" }, [
-          getLabelFromKey("customData"),
-        ]),
-        customDataList
-      );
+      accordionItems.push({
+        label: getLabelFromKey("customData"),
+        id: "customData",
+        content: customDataList,
+        open: Object.keys(this.source.customData).length > 0,
+      });
     }
+
+    accordion.items = accordionItems;
+
+    this.innerHTML = "";
+    this.appendChild(accordion);
   }
 }
 
