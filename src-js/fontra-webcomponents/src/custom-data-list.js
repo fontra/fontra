@@ -1,9 +1,10 @@
 import { customDataNameMapping } from "@fontra/core/font-info-data.js";
 import * as html from "@fontra/core/html-utils.js";
 import { SimpleElement } from "@fontra/core/html-utils.js";
+import { translate } from "@fontra/core/localization.js";
 import { ObservableController } from "@fontra/core/observable-object.js";
-import { DefaultFormatter } from "@fontra/core/ui-utils.js";
-import { message } from "@fontra/web-components/modal-dialog.js";
+import { DefaultFormatter, labeledTextInput } from "@fontra/core/ui-utils.js";
+import { dialogSetup, message } from "@fontra/web-components/modal-dialog.js";
 import { UIList } from "@fontra/web-components/ui-list.js";
 import { themeColorCSS } from "./theme-support.js";
 
@@ -140,22 +141,28 @@ export class CustomDataList extends SimpleElement {
 
     labelList.addEventListener("deleteKey", deleteSelectedItem);
     const addRemoveButton = html.createDomElement("add-remove-buttons", {
-      addButtonCallback: () => {
-        // TODO: Maybe open a dialog with a list of possible keys?
+      addButtonCallback: async () => {
         const currentKeys = labelList.items.map((customData) => {
           return customData.key;
         });
-        let nextKey = "attributeName";
+        let nextKey = undefined;
         for (const key of this.supportedAttributes) {
           if (!currentKeys.includes(key)) {
             nextKey = key;
             break;
           }
         }
-        const valueDefault = customDataNameMapping[nextKey]
-          ? customDataNameMapping[nextKey].default(this.fontObject)
-          : "";
-        const newItem = makeItem([nextKey, valueDefault]);
+        const { key, value } = await this._customDataPropertiesRunDialog(
+          this.fontObject,
+          nextKey,
+          this.supportedAttributes
+        );
+        console.log("Add new custom data: ", key, value);
+        if (key == undefined || value == undefined) {
+          return;
+        }
+
+        const newItem = makeItem([key, value]);
         const newItems = [...labelList.items, newItem];
         model.customData = newItems.map((label) => {
           return { ...label };
@@ -182,6 +189,131 @@ export class CustomDataList extends SimpleElement {
 
   render() {
     this.contentElement.appendChild(this.buildCustomDataList());
+  }
+
+  async _customDataPropertiesRunDialog(fontObject, nextKey, supportedAttributes) {
+    const title = translate("Add Custom Data");
+
+    const validateInput = () => {
+      const infos = [];
+      const warnings = [];
+      const customDataKey =
+        nameController.model.customDataKey == ""
+          ? undefined
+          : nameController.model.customDataKey;
+      nameController.model.suggestedCustomDataValue = `Please enter the correct value`;
+      nameController.model.suggestedCustomDataKey = `Please enter a valid key`;
+      if (customDataKey != undefined) {
+        const customDataInfo = customDataNameMapping[customDataKey]?.info;
+        if (customDataInfo) {
+          infos.push(customDataInfo);
+        }
+
+        if (!customDataNameMapping[customDataKey]) {
+          warnings.push(`⚠️ ${translate("Unkown custom data key")}`); // TODO: Translation
+        }
+
+        const customDataValue =
+          nameController.model.customDataValue == ""
+            ? undefined
+            : nameController.model.customDataValue;
+        if (customDataValue != undefined) {
+          const formatter =
+            customDataNameMapping[customDataKey]?.formatter || DefaultFormatter;
+          const result = formatter.fromString(customDataValue);
+          if (result.value == undefined) {
+            const msg = result.error ? ` "${result.error}"` : "";
+            warnings.push(`⚠️ Invalid value${msg}`); // TODO: Translation
+          }
+        }
+      }
+
+      warningElement.innerText = warnings.length ? warnings.join("\n") : "";
+      dialog.defaultButton.classList.toggle("disabled", warnings.length);
+      infoElement.innerText = infos.length ? infos.join("\n") : "";
+    };
+
+    const nameController = new ObservableController({
+      customDataKey: nextKey,
+      suggestedCustomDataKey: nextKey,
+      customDataValue: customDataNameMapping[nextKey].default(fontObject),
+      suggestedCustomDataValue: "Enter number, list or boolean",
+    });
+
+    nameController.addKeyListener("customDataKey", (event) => {
+      validateInput();
+      nameController.model.customDataValue =
+        customDataNameMapping[nameController.model.customDataKey]?.default(fontObject);
+    });
+
+    nameController.addKeyListener("customDataValue", (event) => {
+      validateInput();
+    });
+
+    const { contentElement, warningElement, infoElement } =
+      this._customDataPropertiesContentElement(nameController, supportedAttributes);
+
+    const dialog = await dialogSetup(title, null, [
+      { title: translate("dialog.cancel"), isCancelButton: true },
+      { title: translate("dialog.add"), isDefaultButton: true },
+    ]);
+    dialog.setContent(contentElement);
+
+    setTimeout(
+      () => contentElement.querySelector("#source-name-text-input")?.focus(),
+      0
+    );
+
+    validateInput();
+
+    if (!(await dialog.run())) {
+      // User cancelled
+      return {};
+    }
+
+    return {
+      key: nameController.model.customDataKey,
+      value: nameController.model.customDataValue,
+    };
+  }
+
+  _customDataPropertiesContentElement(nameController, supportedAttributes) {
+    const warningElement = html.div({
+      id: "warning-text",
+      style: `grid-column: 1 / -1; min-height: 1.5em;`,
+    });
+
+    const infoElement = html.div({
+      id: "info-text",
+      style: `grid-column: 1 / -1; min-height: 1.5em;`,
+    });
+
+    const contentElement = html.div(
+      {
+        style: `overflow: hidden;
+          white-space: nowrap;
+          display: grid;
+          gap: 0.5em;
+          grid-template-columns: max-content auto;
+          align-items: center;
+          height: 100%;
+          min-height: 0;
+        `,
+      },
+      [
+        ...labeledTextInput(translate("Key"), nameController, "customDataKey", {
+          placeholderKey: "suggestedCustomDataKey",
+          choices: supportedAttributes,
+        }),
+        ...labeledTextInput(translate("Value"), nameController, "customDataValue", {
+          placeholderKey: "suggestedCustomDataValue",
+        }),
+        html.br(),
+        infoElement,
+        warningElement,
+      ]
+    );
+    return { contentElement, warningElement, infoElement };
   }
 }
 
