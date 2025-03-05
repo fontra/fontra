@@ -157,7 +157,6 @@ export class CustomDataList extends SimpleElement {
           nextKey,
           this.supportedAttributes
         );
-        console.log("Add new custom data: ", key, value);
         if (key == undefined || value == undefined) {
           return;
         }
@@ -192,7 +191,7 @@ export class CustomDataList extends SimpleElement {
   }
 
   async _customDataPropertiesRunDialog(fontObject, nextKey, supportedAttributes) {
-    const title = translate("Add Custom Data");
+    const title = translate("Add advanced information");
 
     const validateInput = () => {
       const infos = [];

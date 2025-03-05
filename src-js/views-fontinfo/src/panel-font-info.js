@@ -162,7 +162,7 @@ export class FontInfoPanel extends BaseInfoPanel {
         open: true,
       },
       {
-        label: translate("Custom Data"), // TODO: translate
+        label: translate("Advanced Information"), // TODO: translate
         id: "custom-data",
         content: customDataList,
         open: info.customData || false,

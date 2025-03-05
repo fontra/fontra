@@ -808,33 +808,35 @@ input {
       });
     }
 
+    // NOTE: Don't show 'Line Metrics' or 'Guidelines' for sparse sources.
     if (!this.source.isSparse) {
-      // NOTE: Don't show 'Line Metrics' or 'Guidelines' for sparse sources.
-      accordionItems.push({
-        label: getLabelFromKey("lineMetricsHorizontalLayout"),
-        id: "lineMetricsHorizontalLayout",
-        content: buildElementLineMetricsHor(
-          this.controllers.lineMetricsHorizontalLayout
-        ),
-        open: true,
-      });
-      accordionItems.push({
-        label: getLabelFromKey("guidelines"),
-        id: "guidelines",
-        content: buildFontGuidelineList(this.controllers.guidelines),
-        open: Object.keys(this.source.guidelines).length > 0,
-      });
       const customDataList = new CustomDataList({
         controller: this.controllers.customData,
         fontObject: this.source,
         supportedAttributes: customDataAttributesSupported,
       });
-      accordionItems.push({
-        label: getLabelFromKey("customData"),
-        id: "customData",
-        content: customDataList,
-        open: Object.keys(this.source.customData).length > 0,
-      });
+      accordionItems.push(
+        {
+          label: getLabelFromKey("lineMetricsHorizontalLayout"),
+          id: "lineMetricsHorizontalLayout",
+          content: buildElementLineMetricsHor(
+            this.controllers.lineMetricsHorizontalLayout
+          ),
+          open: true,
+        },
+        {
+          label: getLabelFromKey("guidelines"),
+          id: "guidelines",
+          content: buildFontGuidelineList(this.controllers.guidelines),
+          open: Object.keys(this.source.guidelines).length > 0,
+        },
+        {
+          label: getLabelFromKey("customData"),
+          id: "customData",
+          content: customDataList,
+          open: Object.keys(this.source.customData).length > 0,
+        }
+      );
     }
 
     accordion.items = accordionItems;
@@ -1102,7 +1104,7 @@ function getLabelFromKey(key) {
     location: translate("sources.labels.location"),
     lineMetricsHorizontalLayout: translate("sources.labels.line-metrics"),
     guidelines: translate("sidebar.user-settings.guidelines"),
-    customData: translate("Custom Data"), // TODO: translation
+    customData: translate("Advanced Information"), // TODO: translation
   };
   return keyLabelMap[key] || key;
 }
