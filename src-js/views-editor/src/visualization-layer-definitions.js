@@ -754,18 +754,13 @@ registerVisualizationLayerDefinition({
     if (!positionedGlyph.kernValue) {
       return;
     }
-    const lineMetrics = model.fontSourceInstance?.lineMetricsHorizontalLayout;
-
     context.fillStyle =
       positionedGlyph.kernValue > 0
         ? parameters.positiveKernColor
         : parameters.negativeKernColor;
 
-    const ascender =
-      lineMetrics?.ascender?.value || model.fontController.unitsPerEm * 0.8;
-    const descender =
-      lineMetrics?.descender?.value || model.fontController.unitsPerEm * -0.2;
-
+    const ascender = model.ascender;
+    const descender = model.descender;
     context.fillRect(0, descender, -positionedGlyph.kernValue, ascender - descender);
   },
 });
