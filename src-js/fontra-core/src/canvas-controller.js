@@ -254,6 +254,7 @@ export class CanvasController {
     this.origin.y = this.canvasHeight / 2 + this.origin.y - canvasCenter.y;
     this._magnificationChangedCallback?.(this.magnification);
     this.requestUpdate();
+    this._dispatchEvent("viewBoxChanged", "set-view-box");
   }
 
   getProposedViewBoxClampAdjustment(viewBox) {
