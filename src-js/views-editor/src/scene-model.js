@@ -953,6 +953,16 @@ export class SceneModel {
     return foundGlyph;
   }
 
+  get ascender() {
+    const lineMetrics = this.fontSourceInstance?.lineMetricsHorizontalLayout;
+    return lineMetrics?.ascender?.value || this.fontController.unitsPerEm * 0.8;
+  }
+
+  get descender() {
+    const lineMetrics = this.fontSourceInstance?.lineMetricsHorizontalLayout;
+    return lineMetrics?.descender?.value || model.fontController.unitsPerEm * -0.2;
+  }
+
   getSceneBounds() {
     let bounds = undefined;
     for (const line of this.positionedLines) {
