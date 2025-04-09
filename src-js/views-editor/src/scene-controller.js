@@ -292,7 +292,7 @@ export class SceneController {
     this.canvasController.canvas.addEventListener("viewBoxChanged", (event) => {
       if (event.detail === "canvas-size") {
         this.setAutoViewBox();
-      } else {
+      } else if (event.detail !== "set-view-box") {
         this.autoViewBox = false;
       }
       this.sceneSettingsController.setItem(
