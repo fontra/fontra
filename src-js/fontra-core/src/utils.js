@@ -221,6 +221,10 @@ export function* product(...args) {
   }
 }
 
+export function valueInRange(min, v, max) {
+  return min <= v && v <= max;
+}
+
 export function parseSelection(selection) {
   const result = {};
   for (const item of selection) {
