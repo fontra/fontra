@@ -68,11 +68,22 @@ export class PointerTool extends BaseTool {
       event.altKey
     );
     sceneController.hoverSelection = selection;
-    sceneController.hoveredGlyph = undefined;
     sceneController.hoverPathHit = pathHit;
 
     if (!sceneController.hoverSelection.size && !sceneController.hoverPathHit) {
       sceneController.hoveredGlyph = this.sceneModel.glyphAtPoint(point);
+
+      if (!sceneController.hoveredGlyph) {
+        sceneController.hoveredSidebearing = this.sceneModel.sidebearingAtPoint(
+          point,
+          size
+        );
+      } else {
+        sceneController.hoveredSidebearing = undefined;
+      }
+    } else {
+      sceneController.hoveredGlyph = undefined;
+      sceneController.hoveredSidebearing = undefined;
     }
 
     this.sceneController.sceneModel.showTransformSelection = true;
