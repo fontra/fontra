@@ -494,3 +494,40 @@ body {
 .text-entry {
   padding: 0.5em;
 }
+
+.sidebearing-handle {
+  display: none;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  font-size: 0.8em;
+  padding: 0.2em 1.2em 0.2em 1.2em;
+  color: white;
+  background-color: #999;
+  cursor: pointer;
+  user-select: none;
+}
+
+.sidebearing-handle:hover {
+  background-color: #777;
+}
+
+.sidebearing-handle:active {
+  background-color: #555;
+}
+
+.sidebearing-handle.right {
+  transform: translate(-100%, 0);
+}
+
+.sidebearing-handle.visible {
+  display: initial;
+}
+
+.sidebearing-handle.left {
+  border-radius: 0 0.66em 0.66em 0;
+}
+
+.sidebearing-handle.right {
+  border-radius: 0.66em 0 0 0.66em;
+}
