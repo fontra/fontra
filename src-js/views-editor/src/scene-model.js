@@ -954,7 +954,7 @@ export class SceneModel {
     return foundGlyph;
   }
 
-  sidebearingAtPoint(point, size) {
+  metricAtPoint(point, size) {
     if (!this.positionedLines.length) {
       return;
     }
