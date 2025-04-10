@@ -23,6 +23,7 @@ import {
   parseSelection,
   range,
   reversed,
+  valueInRange,
 } from "@fontra/core/utils.js";
 import * as vector from "@fontra/core/vector.js";
 
@@ -951,6 +952,49 @@ export class SceneModel {
       foundGlyph = { lineIndex: i, glyphIndex: j };
     }
     return foundGlyph;
+  }
+
+  sidebearingAtPoint(point, size) {
+    if (!this.positionedLines.length) {
+      return;
+    }
+
+    const ascender = this.ascender;
+    const descender = this.descender;
+
+    for (const [lineIndex, line] of enumerate(this.positionedLines)) {
+      if (!line.glyphs.length) {
+        continue;
+      }
+      const firstGlyph = line.glyphs[0];
+      const lastGlyph = line.glyphs.at(-1);
+      const metricsBox = {
+        xMin: firstGlyph.x,
+        yMin: firstGlyph.y + descender,
+        xMax: lastGlyph.x + lastGlyph.glyph.xAdvance,
+        yMax: firstGlyph.y + ascender,
+      };
+      if (!pointInRect(point.x, point.y, metricsBox)) {
+        continue;
+      }
+
+      for (const [glyphIndex, positionedGlyph] of enumerate(line.glyphs)) {
+        const leftPos = positionedGlyph.x;
+        const rightPos = positionedGlyph.x + positionedGlyph.glyph.xAdvance;
+        if (valueInRange(leftPos, point.x, leftPos + size)) {
+          return { lineIndex, glyphIndex, metric: "left" };
+        }
+        const kernRange = [leftPos - positionedGlyph.kernValue, leftPos].sort(
+          (a, b) => a - b
+        );
+        if (valueInRange(kernRange[0], point.x, kernRange[1])) {
+          return { lineIndex, glyphIndex, metric: "kern" };
+        }
+        if (valueInRange(rightPos - size, point.x, rightPos)) {
+          return { lineIndex, glyphIndex, metric: "right" };
+        }
+      }
+    }
   }
 
   get ascender() {
