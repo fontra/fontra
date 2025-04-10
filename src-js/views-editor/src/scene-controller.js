@@ -879,15 +879,15 @@ export class SceneController {
     }
   }
 
-  get hoveredSidebearing() {
-    return this.sceneModel.hoveredSidebearing;
+  get hoveredMetric() {
+    return this.sceneModel.hoveredMetric;
   }
 
-  set hoveredSidebearing(hoveredSidebearing) {
-    if (!equalGlyphSelection(this.sceneModel.hoveredSidebearing, hoveredSidebearing)) {
-      this.sceneModel.hoveredSidebearing = hoveredSidebearing;
+  set hoveredMetric(hoveredMetric) {
+    if (!equalGlyphSelection(this.sceneModel.hoveredMetric, hoveredMetric)) {
+      this.sceneModel.hoveredMetric = hoveredMetric;
       // TODO update sb controls
-      // console.log("hoveredSidebearing", hoveredSidebearing);
+      // console.log("hoveredMetric", hoveredMetric);
     }
   }
 
