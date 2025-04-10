@@ -879,6 +879,18 @@ export class SceneController {
     }
   }
 
+  get hoveredSidebearing() {
+    return this.sceneModel.hoveredSidebearing;
+  }
+
+  set hoveredSidebearing(hoveredSidebearing) {
+    if (!equalGlyphSelection(this.sceneModel.hoveredSidebearing, hoveredSidebearing)) {
+      this.sceneModel.hoveredSidebearing = hoveredSidebearing;
+      // TODO update sb controls
+      // console.log("hoveredSidebearing", hoveredSidebearing);
+    }
+  }
+
   get selectionRect() {
     return this.sceneModel.selectionRect;
   }
@@ -1636,7 +1648,8 @@ function positionedGlyphPosition(positionedGlyph) {
 export function equalGlyphSelection(glyphSelectionA, glyphSelectionB) {
   return (
     glyphSelectionA?.lineIndex === glyphSelectionB?.lineIndex &&
-    glyphSelectionA?.glyphIndex === glyphSelectionB?.glyphIndex
+    glyphSelectionA?.glyphIndex === glyphSelectionB?.glyphIndex &&
+    glyphSelectionA?.metric === glyphSelectionB?.metric
   );
 }
 
