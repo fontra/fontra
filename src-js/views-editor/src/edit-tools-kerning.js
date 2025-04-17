@@ -12,6 +12,9 @@ export class KerningTool extends BaseTool {
     this.handleContainer = document.querySelector("#metric-handle-container");
     assert(this.handleContainer);
 
+    this.sceneSettingsController.addKeyListener("glyphLines", (event) => {
+      this.handles.forEach((handle) => handle.remove());
+    });
     this.sceneSettingsController.addKeyListener(
       ["viewBox", "positionedLines"],
       (event) => {
