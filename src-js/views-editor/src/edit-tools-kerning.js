@@ -12,11 +12,14 @@ export class KerningTool extends BaseTool {
     this.handleContainer = document.querySelector("#metric-handle-container");
     assert(this.handleContainer);
 
-    this.sceneSettingsController.addKeyListener("viewBox", (event) => {
-      this.handles.forEach((handle) => {
-        this._updateHandle(handle);
-      });
-    });
+    this.sceneSettingsController.addKeyListener(
+      ["viewBox", "positionedLines"],
+      (event) => {
+        this.handles.forEach((handle) => {
+          this._updateHandle(handle);
+        });
+      }
+    );
   }
 
   handleHover(event) {
