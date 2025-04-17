@@ -879,18 +879,6 @@ export class SceneController {
     }
   }
 
-  get hoveredMetric() {
-    return this.sceneModel.hoveredMetric;
-  }
-
-  set hoveredMetric(hoveredMetric) {
-    if (!equalGlyphSelection(this.sceneModel.hoveredMetric, hoveredMetric)) {
-      this.sceneModel.hoveredMetric = hoveredMetric;
-      // TODO update sb controls
-      // console.log("hoveredMetric", hoveredMetric);
-    }
-  }
-
   get selectionRect() {
     return this.sceneModel.selectionRect;
   }
