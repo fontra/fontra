@@ -79,7 +79,7 @@ export class KerningController {
       [leftGroup, rightGroup],
     ];
 
-    let value = 0;
+    let value = null;
 
     for (const [leftName, rightName] of pairsToTry) {
       if (!leftName || !rightName) {
