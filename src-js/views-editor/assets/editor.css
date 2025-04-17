@@ -506,7 +506,13 @@ body {
   background-color: #aaa;
   cursor: pointer;
   user-select: none;
+  pointer-events: none;
   transform: translate(-50%, 0);
+  opacity: 66%;
+}
+
+.kerning-handle.selected {
+  opacity: 100%;
 }
 
 .kerning-handle.positive {
