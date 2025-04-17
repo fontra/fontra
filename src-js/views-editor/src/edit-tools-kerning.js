@@ -12,6 +12,12 @@ export class KerningTool extends BaseTool {
     this.handleContainer = document.querySelector("#metric-handle-container");
     assert(this.handleContainer);
     this.kerningHandles = new Map();
+
+    this.sceneSettingsController.addKeyListener("viewBox", (event) => {
+      if (this.hoveredKerningHandle) {
+        this._updateHandle(this.hoveredKerningHandle, this.hoveredKerning);
+      }
+    });
   }
 
   handleHover(event) {
@@ -37,6 +43,11 @@ export class KerningTool extends BaseTool {
   }
 
   _updateHandle(kerningHandle, kerningSelector) {
+    if (!kerningSelector) {
+      kerningHandle.remove();
+      return;
+    }
+
     const { lineIndex, glyphIndex } = kerningSelector;
     const positionedGlyph =
       this.sceneModel.positionedLines[lineIndex].glyphs[glyphIndex];
