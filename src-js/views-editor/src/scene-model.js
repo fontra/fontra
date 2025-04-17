@@ -954,7 +954,7 @@ export class SceneModel {
     return foundGlyph;
   }
 
-  metricAtPoint(point, size) {
+  kerningAtPoint(point, size) {
     if (!this.positionedLines.length) {
       return;
     }
@@ -978,20 +978,14 @@ export class SceneModel {
         continue;
       }
 
-      for (const [glyphIndex, positionedGlyph] of enumerate(line.glyphs)) {
+      for (let glyphIndex = 1; glyphIndex < line.glyphs.length; glyphIndex++) {
+        const positionedGlyph = line.glyphs[glyphIndex];
         const leftPos = positionedGlyph.x;
-        const rightPos = positionedGlyph.x + positionedGlyph.glyph.xAdvance;
-        if (valueInRange(leftPos, point.x, leftPos + size)) {
-          return { lineIndex, glyphIndex, metric: "left" };
-        }
         const kernRange = [leftPos - positionedGlyph.kernValue, leftPos].sort(
           (a, b) => a - b
         );
-        if (valueInRange(kernRange[0], point.x, kernRange[1])) {
-          return { lineIndex, glyphIndex, metric: "kern" };
-        }
-        if (valueInRange(rightPos - size, point.x, rightPos)) {
-          return { lineIndex, glyphIndex, metric: "right" };
+        if (valueInRange(kernRange[0] - size, point.x, kernRange[1] + size)) {
+          return { lineIndex, glyphIndex };
         }
       }
     }
