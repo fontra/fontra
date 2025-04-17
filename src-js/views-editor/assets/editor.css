@@ -379,7 +379,7 @@ body {
   user-select: none;
   background-color: var(--ui-element-background-color);
   fill: var(--foreground-color);
-  width: 2.7rem;
+  width: 2.2rem;
   height: 1.9rem;
   padding: 0.1rem;
   transition: 0.15s;
@@ -415,7 +415,7 @@ body {
   border-top: 5px solid transparent;
   border-right: 5px solid var(--foreground-color);
   margin-right: -5px;
-  margin-left: 2.3rem;
+  margin-left: 1.8rem;
   margin-top: calc(1.9rem - 6px);
   pointer-events: none;
 }
@@ -495,39 +495,24 @@ body {
   padding: 0.5em;
 }
 
-.sidebearing-handle {
-  display: none;
+.kerning-handle {
   position: absolute;
   top: 0px;
   left: 0px;
   font-size: 0.8em;
   padding: 0.2em 1.2em 0.2em 1.2em;
+  border-radius: 0.66em;
   color: white;
-  background-color: #999;
+  background-color: #aaa;
   cursor: pointer;
   user-select: none;
+  transform: translate(-50%, 0);
 }
 
-.sidebearing-handle:hover {
-  background-color: #777;
+.kerning-handle.positive {
+  background-color: #1759f1;
 }
 
-.sidebearing-handle:active {
-  background-color: #555;
-}
-
-.sidebearing-handle.right {
-  transform: translate(-100%, 0);
-}
-
-.sidebearing-handle.visible {
-  display: initial;
-}
-
-.sidebearing-handle.left {
-  border-radius: 0 0.66em 0.66em 0;
-}
-
-.sidebearing-handle.right {
-  border-radius: 0.66em 0 0 0.66em;
+.kerning-handle.negative {
+  background-color: #f11759;
 }
