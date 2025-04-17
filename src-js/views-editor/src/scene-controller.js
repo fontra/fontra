@@ -622,8 +622,12 @@ export class SceneController {
 
   handleKeyDown(event) {
     if ((!event[commandKeyProperty] || event.shiftKey) && event.key in arrowKeyDeltas) {
-      this.handleArrowKeys(event);
       event.preventDefault();
+      if (this.selectedTool?.handleArrowKeys) {
+        this.selectedTool.handleArrowKeys(event);
+      } else {
+        this.handleArrowKeys(event);
+      }
       return;
     } else {
       this.selectedTool?.handleKeyDown(event);
