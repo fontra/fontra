@@ -414,10 +414,14 @@ export default class DesignspaceNavigationPanel extends Panel {
       } else {
         this.sceneSettings.editLayerName = null;
         if (selectedItem) {
-          const { fontLocation } = varGlyphController.splitLocation(
-            selectedItem.denseLocation
-          );
-          this.sceneSettings.fontLocationSourceMapped = fontLocation;
+          if (!varGlyphController) {
+            this.sceneSettings.fontLocationSourceMapped = {};
+          } else {
+            const { fontLocation } = varGlyphController.splitLocation(
+              selectedItem.denseLocation
+            );
+            this.sceneSettings.fontLocationSourceMapped = fontLocation;
+          }
           this.sceneSettings.glyphLocation = {};
         }
       }
@@ -1060,8 +1064,9 @@ export default class DesignspaceNavigationPanel extends Panel {
   async goToNearestSource() {
     const glyphController = await this.sceneModel.getSelectedVariableGlyphController();
     const targetLocation = {
-      ...glyphController.getDenseDefaultSourceLocation(),
-      ...glyphController.expandNLIAxes({
+      ...this.fontController.fontSourcesInstancer.defaultSourceLocation,
+      ...glyphController?.getDenseDefaultSourceLocation(),
+      ...glyphController?.expandNLIAxes({
         ...this.sceneSettings.fontLocationSourceMapped,
         ...this.sceneSettings.glyphLocation,
       }),
