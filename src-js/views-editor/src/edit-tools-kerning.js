@@ -11,12 +11,11 @@ export class KerningTool extends BaseTool {
     super(editor);
     this.handleContainer = document.querySelector("#metric-handle-container");
     assert(this.handleContainer);
-    this.kerningHandles = new Map();
 
     this.sceneSettingsController.addKeyListener("viewBox", (event) => {
-      if (this.hoveredKerningHandle) {
-        this._updateHandle(this.hoveredKerningHandle, this.hoveredKerning);
-      }
+      this.handles.forEach((handle) => {
+        this._updateHandle(handle);
+      });
     });
   }
 
@@ -29,29 +28,24 @@ export class KerningTool extends BaseTool {
     if (!equalGlyphSelection(this.hoveredKerning, hoveredKerning)) {
       this.hoveredKerning = hoveredKerning;
 
-      if (this.hoveredKerningHandle) {
-        this.hoveredKerningHandle.remove();
-        delete this.hoveredKerningHandle;
-      }
+      const hoveredHandleId = hoveredKerning ? selectorToString(hoveredKerning) : null;
+
+      this.handles.forEach((handle) => {
+        if (handle.id !== hoveredHandleId && !handle.selected) {
+          handle.remove();
+        }
+      });
 
       if (hoveredKerning) {
-        this.hoveredKerningHandle = new KerningHandle(this.handleContainer);
-        this._updateHandle(this.hoveredKerningHandle, hoveredKerning);
+        let handle = document.getElementById(hoveredHandleId);
+        if (!handle) {
+          handle = new KerningHandle(hoveredKerning);
+          this._updateHandle(handle);
+          this.handleContainer.appendChild(handle);
+        }
       }
       this.setCursor();
     }
-  }
-
-  _updateHandle(kerningHandle, kerningSelector) {
-    if (!kerningSelector) {
-      kerningHandle.remove();
-      return;
-    }
-
-    const { lineIndex, glyphIndex } = kerningSelector;
-    const positionedGlyph =
-      this.sceneModel.positionedLines[lineIndex].glyphs[glyphIndex];
-    kerningHandle.update(positionedGlyph, this.canvasController);
   }
 
   async handleDrag(eventStream, initialEvent) {
@@ -59,11 +53,37 @@ export class KerningTool extends BaseTool {
       return;
     }
 
+    this._selectHandle(this.hoveredKerning, event.shiftKey);
+
     if (!(await shouldInitiateDrag(eventStream, initialEvent))) {
       return;
     }
 
     // do drag
+  }
+
+  _updateHandle(kerningHandle) {
+    const { lineIndex, glyphIndex } = kerningHandle.selector;
+    const positionedGlyph =
+      this.sceneModel.positionedLines[lineIndex].glyphs[glyphIndex];
+    kerningHandle.update(positionedGlyph, this.canvasController);
+  }
+
+  _selectHandle(selector, shiftKey) {
+    const handleId = selectorToString(selector);
+    const selectedHandle = document.getElementById(handleId);
+
+    if (shiftKey) {
+      selectedHandle.selected = !selectedHandle.selected;
+    } else {
+      this.handles.forEach((handle) => {
+        if (handle.id === handleId) {
+          handle.selected = true;
+        } else if (!selectedHandle.selected) {
+          handle.remove();
+        }
+      });
+    }
   }
 
   setCursor() {
@@ -78,15 +98,22 @@ export class KerningTool extends BaseTool {
 
   deactivate() {
     delete this.hoveredKerning;
-    this.hoveredKerningHandle?.remove();
-    delete this.hoveredKerningHandle;
+    this.handles.forEach((handle) => handle.remove());
+  }
+
+  get handles() {
+    return [...this.handleContainer.querySelectorAll("kerning-handle")];
   }
 }
 
-class KerningHandle {
-  constructor(container) {
-    this.handleElement = html.div({ class: "kerning-handle" });
-    container.appendChild(this.handleElement);
+class KerningHandle extends HTMLElement {
+  constructor(selector) {
+    super();
+
+    this.selector = selector;
+
+    this.id = selectorToString(selector);
+    this.classList.add("kerning-handle");
   }
 
   update(positionedGlyph, canvasController) {
@@ -94,20 +121,25 @@ class KerningHandle {
       x: positionedGlyph.x - positionedGlyph.kernValue / 2,
       y: positionedGlyph.y,
     });
-    this.handleElement.style.left = `${x}px`;
-    this.handleElement.style.top = `${y}px`;
+    this.style.left = `${x}px`;
+    this.style.top = `${y}px`;
 
-    this.handleElement.classList.toggle("positive", positionedGlyph.kernValue > 0);
-    this.handleElement.classList.toggle("negative", positionedGlyph.kernValue < 0);
+    this.classList.toggle("positive", positionedGlyph.kernValue > 0);
+    this.classList.toggle("negative", positionedGlyph.kernValue < 0);
 
-    this.handleElement.innerText = formatKerningValue(positionedGlyph.kernValue);
+    this.innerText = formatKerningValue(positionedGlyph.kernValue);
   }
 
-  remove() {
-    this.handleElement.remove();
-    delete this.handleElement;
+  get selected() {
+    return this.classList.contains("selected");
+  }
+
+  set selected(onOff) {
+    this.classList.toggle("selected", onOff);
   }
 }
+
+customElements.define("kerning-handle", KerningHandle);
 
 function formatKerningValue(n) {
   if (n === null) {
@@ -115,4 +147,9 @@ function formatKerningValue(n) {
   }
   n = round(n, 1);
   return n == undefined ? "\u00A0" : n.toString();
+}
+
+function selectorToString(kerningSelector) {
+  const { lineIndex, glyphIndex } = kerningSelector;
+  return `kerning-selector-${lineIndex}/${glyphIndex}`;
 }
