@@ -72,15 +72,8 @@ export class PointerTool extends BaseTool {
 
     if (!sceneController.hoverSelection.size && !sceneController.hoverPathHit) {
       sceneController.hoveredGlyph = this.sceneModel.glyphAtPoint(point);
-
-      if (!sceneController.hoveredGlyph) {
-        sceneController.hoveredMetric = this.sceneModel.metricAtPoint(point, size);
-      } else {
-        sceneController.hoveredMetric = undefined;
-      }
     } else {
       sceneController.hoveredGlyph = undefined;
-      sceneController.hoveredMetric = undefined;
     }
 
     this.sceneController.sceneModel.showTransformSelection = true;
