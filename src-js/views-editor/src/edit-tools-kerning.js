@@ -1,5 +1,5 @@
 import * as html from "@fontra/core/html-utils.js";
-import { assert } from "@fontra/core/utils.js";
+import { assert, round } from "@fontra/core/utils.js";
 import { BaseTool, shouldInitiateDrag } from "./edit-tools-base.js";
 import { equalGlyphSelection } from "./scene-controller.js";
 
@@ -85,7 +85,7 @@ export class KerningTool extends BaseTool {
 
 class KerningHandle {
   constructor(container) {
-    this.handleElement = html.div({ class: "kerning-handle" }, ["123"]);
+    this.handleElement = html.div({ class: "kerning-handle" });
     container.appendChild(this.handleElement);
   }
 
@@ -113,6 +113,6 @@ function formatKerningValue(n) {
   if (n === null) {
     return "–";
   }
-  n = Math.round(n * 10) / 10;
+  n = round(n, 1);
   return n == undefined ? "\u00A0" : n.toString();
 }
