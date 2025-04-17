@@ -34,7 +34,7 @@ export class KerningTool extends BaseTool {
     if (!equalGlyphSelection(this.hoveredKerning, hoveredKerning)) {
       this.hoveredKerning = hoveredKerning;
 
-      const hoveredHandleId = hoveredKerning ? selectorToString(hoveredKerning) : null;
+      const hoveredHandleId = hoveredKerning ? selectorToId(hoveredKerning) : null;
 
       this.handles.forEach((handle) => {
         if (handle.id !== hoveredHandleId && !handle.selected) {
@@ -80,7 +80,7 @@ export class KerningTool extends BaseTool {
   }
 
   _selectHandle(selector, shiftKey) {
-    const handleId = selectorToString(selector);
+    const handleId = selectorToId(selector);
     const selectedHandle = document.getElementById(handleId);
 
     if (shiftKey) {
@@ -126,7 +126,7 @@ class KerningHandle extends HTMLElement {
 
     this.selector = selector;
 
-    this.id = selectorToString(selector);
+    this.id = selectorToId(selector);
     this.classList.add("kerning-handle");
   }
 
@@ -163,7 +163,7 @@ function formatKerningValue(n) {
   return n == undefined ? "\u00A0" : n.toString();
 }
 
-function selectorToString(kerningSelector) {
+function selectorToId(kerningSelector) {
   const { lineIndex, glyphIndex } = kerningSelector;
   return `kerning-selector-${lineIndex}/${glyphIndex}`;
 }
