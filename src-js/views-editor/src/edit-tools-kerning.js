@@ -69,7 +69,7 @@ export class KerningTool extends BaseTool {
   }
 
   handleArrowKeys(event) {
-    console.log(this.selectedHandles.map((handle) => handle.id));
+    console.log(this.selectedHandles.map((handle) => handle.selector));
   }
 
   _updateHandle(kerningHandle) {
