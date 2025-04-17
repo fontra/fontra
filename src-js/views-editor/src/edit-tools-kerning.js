@@ -68,6 +68,10 @@ export class KerningTool extends BaseTool {
     // do drag
   }
 
+  handleArrowKeys(event) {
+    console.log(this.selectedHandles.map((handle) => handle.id));
+  }
+
   _updateHandle(kerningHandle) {
     const { lineIndex, glyphIndex } = kerningHandle.selector;
     const positionedGlyph =
@@ -109,6 +113,10 @@ export class KerningTool extends BaseTool {
 
   get handles() {
     return [...this.handleContainer.querySelectorAll("kerning-handle")];
+  }
+
+  get selectedHandles() {
+    return this.handles.filter((handle) => handle.selected);
   }
 }
 
