@@ -51,15 +51,16 @@ export class KerningController {
   _getPairFunction(leftName, rightName) {
     let pairFunction = this._pairFunctions[leftName]?.[rightName];
     if (pairFunction === undefined) {
-      const sourceValues = this.kernData.values[leftName]?.[rightName];
+      let sourceValues = this.kernData.values[leftName]?.[rightName];
       if (sourceValues === undefined) {
         // We don't have kerning for this pair
         pairFunction = null;
       } else {
-        const { subModel, subValues } = this.model.getSubModel(sourceValues);
-        const deltas = subModel.getDeltas(subValues);
+        // Replace missing values with zeros
+        sourceValues = sourceValues.map((v) => (v == null ? 0 : v));
+        const deltas = this.model.getDeltas(sourceValues);
         pairFunction = (location) =>
-          subModel.interpolateFromDeltas(location, deltas).instance;
+          this.model.interpolateFromDeltas(location, deltas).instance;
       }
       if (!this._pairFunctions[leftName]) {
         this._pairFunctions[leftName] = {};
