@@ -2,10 +2,10 @@ import { DiscreteVariationModel } from "./discrete-variation-model.js";
 import { longestCommonPrefix } from "./utils.js";
 
 export class KerningController {
-  constructor(kernData, fontAxesSourceSpace, fontSources) {
+  constructor(kernTag, kernData, fontController) {
+    this.kernTag = kernTag;
     this.kernData = kernData;
-    this.fontAxesSourceSpace = fontAxesSourceSpace;
-    this.fontSources = fontSources;
+    this.fontController = fontController;
     this._setup();
   }
 
@@ -38,9 +38,12 @@ export class KerningController {
     );
 
     const locations = this.kernData.sourceIdentifiers.map(
-      (sourceIdentifier) => this.fontSources[sourceIdentifier].location
+      (sourceIdentifier) => this.fontController.sources[sourceIdentifier].location
     );
-    this.model = new DiscreteVariationModel(locations, this.fontAxesSourceSpace);
+    this.model = new DiscreteVariationModel(
+      locations,
+      this.fontController.fontAxesSourceSpace
+    );
     this._pairFunctions = {};
   }
 

@@ -1022,11 +1022,7 @@ export class FontController {
       const kerning = await this.getKerning();
       const kerningTable = kerning[kernTag];
       if (kerningTable) {
-        kerningController = new KerningController(
-          kerningTable,
-          this.fontAxesSourceSpace,
-          this.sources
-        );
+        kerningController = new KerningController(kernTag, kerningTable, this);
       }
       this._kerningControllers[kernTag] = kerningController || null;
     }
