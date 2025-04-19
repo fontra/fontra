@@ -84,7 +84,7 @@ export function throttleCalls(func, minTime) {
       lastTime = now;
     } else {
       // Ensure that the wrapped function gets called eventually,
-      // in the case that no superceding calls come soon enough.
+      // in the case that no superseding calls come soon enough.
       timeoutID = setTimeout(() => {
         timeoutID = null;
         func(...args);
