@@ -46,12 +46,12 @@ describe("KerningController Tests", () => {
   parametrize("KerningController basic test", testCasesBasic, (testCase) => {
     const controller = new KerningController("kern", testKernData, testFontController);
     const instance = controller.instantiate(testCase.location);
-    expect(instance.getPairValue(testCase.leftGlyph, testCase.rightGlyph)).to.equal(
-      testCase.expectedValue
-    );
+    expect(
+      instance.getGlyphPairValue(testCase.leftGlyph, testCase.rightGlyph)
+    ).to.equal(testCase.expectedValue);
   });
 
-  it("testing kerning editing", async () => {
+  it("Kerning edit tests", async () => {
     const fontController = copyObject(testFontController);
 
     // Mock edit methods

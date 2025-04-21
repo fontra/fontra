@@ -88,7 +88,7 @@ export class KerningController {
     return pairFunction;
   }
 
-  getPairValue(location, leftGlyph, rightGlyph) {
+  getGlyphPairValue(leftGlyph, rightGlyph, location) {
     const leftGroup = this.leftPairGroupMapping[leftGlyph];
     const rightGroup = this.rightPairGroupMapping[rightGlyph];
     const pairsToTry = [
@@ -128,10 +128,10 @@ class KerningInstance {
     this.valueCache = {};
   }
 
-  getPairValue(leftGlyph, rightGlyph) {
+  getGlyphPairValue(leftGlyph, rightGlyph) {
     let value = this.valueCache[leftGlyph]?.[rightGlyph];
     if (value === undefined) {
-      value = this.controller.getPairValue(this.location, leftGlyph, rightGlyph);
+      value = this.controller.getGlyphPairValue(leftGlyph, rightGlyph, this.location);
       if (!this.valueCache[leftGlyph]) {
         this.valueCache[leftGlyph] = {};
       }
