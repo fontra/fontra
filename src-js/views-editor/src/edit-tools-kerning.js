@@ -1,5 +1,5 @@
 import * as html from "@fontra/core/html-utils.js";
-import { assert, round } from "@fontra/core/utils.js";
+import { arrowKeyDeltas, assert, round } from "@fontra/core/utils.js";
 import { BaseTool, shouldInitiateDrag } from "./edit-tools-base.js";
 import { equalGlyphSelection } from "./scene-controller.js";
 
@@ -9,6 +9,7 @@ export class KerningTool extends BaseTool {
 
   constructor(editor) {
     super(editor);
+    this.fontController = editor.fontController;
     this.handleContainer = document.querySelector("#metric-handle-container");
     assert(this.handleContainer);
 
@@ -68,8 +69,50 @@ export class KerningTool extends BaseTool {
     // do drag
   }
 
-  handleArrowKeys(event) {
-    console.log(this.selectedHandles.map((handle) => handle.selector));
+  async handleArrowKeys(event) {
+    let [deltaX, deltaY] = arrowKeyDeltas[event.key];
+    if (deltaY) {
+      return;
+    }
+    if (event.shiftKey) {
+      deltaX *= 10;
+    }
+    const sourceIdentifier =
+      this.fontController.fontSourcesInstancer.getSourceIdentifierForLocation(
+        this.sceneSettings.fontLocationSourceMapped
+      );
+    if (!sourceIdentifier) {
+      return;
+    }
+
+    const kerningController = await this.fontController.getKerningController("kern");
+
+    const pairSelectors = [];
+    const newValues = [];
+    for (const handle of this.selectedHandles) {
+      const { lineIndex, glyphIndex } = handle.selector;
+      assert(glyphIndex > 0);
+      const glyphs = this.sceneModel.positionedLines[lineIndex].glyphs;
+      const leftGlyph = glyphs[glyphIndex - 1].glyphName;
+      const rightGlyph = glyphs[glyphIndex].glyphName;
+      const [leftName, rightName] = kerningController.getPairNames(
+        leftGlyph,
+        rightGlyph
+      );
+      pairSelectors.push({ leftName, rightName, sourceIdentifier });
+      newValues.push(
+        (kerningController.getPairValueForSource(
+          leftName,
+          rightName,
+          sourceIdentifier
+        ) || 0) + deltaX
+      );
+    }
+
+    const editContext = kerningController.getEditContext(pairSelectors);
+    const change = await editContext.edit([newValues][Symbol.iterator]());
+    console.log(change.change);
+    console.log(change.rollbackChange);
   }
 
   _updateHandle(kerningHandle) {
