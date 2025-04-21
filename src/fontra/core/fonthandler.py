@@ -251,6 +251,8 @@ class FontHandler:
                 await self.writableBackend.putUnitsPerEm(value)
             case "features":
                 await self.writableBackend.putFeatures(value)
+            case "kerning":
+                await self.writableBackend.putKerning(value)
             case _:
                 raise KeyError(key)
 
