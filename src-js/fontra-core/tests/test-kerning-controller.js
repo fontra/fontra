@@ -56,7 +56,36 @@ describe("KerningController Tests", () => {
     ).to.equal(testCase.expectedValue);
   });
 
-  it("Kerning edit tests", async () => {
+  const testCasesEditing = [
+    {
+      pairSelectors: [{ sourceIdentifier: "a", leftName: "v", rightName: "q" }],
+      newValues: [[10], [40], [300]],
+      valueChecks: [
+        { leftGlyph: "v", rightGlyph: "q", expectedValue: 300, location: {} },
+        {
+          leftGlyph: "v",
+          rightGlyph: "q",
+          expectedValue: 150,
+          location: { Weight: 500 },
+        },
+      ],
+    },
+    {
+      pairSelectors: [{ sourceIdentifier: "a", leftName: "T", rightName: "A" }],
+      newValues: [[20], [60], [300]],
+      valueChecks: [
+        { leftGlyph: "T", rightGlyph: "A", expectedValue: 300, location: {} },
+        {
+          leftGlyph: "T",
+          rightGlyph: "A",
+          expectedValue: 150,
+          location: { Weight: 500 },
+        },
+      ],
+    },
+  ];
+
+  parametrize("KerningController editing test", testCasesEditing, async (testCase) => {
     const testFont = { kerning: { kern: testKernData } };
 
     const editedFont = copyObject(testFont);
@@ -66,13 +95,17 @@ describe("KerningController Tests", () => {
       editedFont.kerning["kern"],
       testFontController
     );
-    const editContext = controller.getEditContext([
-      { sourceIdentifier: "a", leftName: "v", rightName: "q" },
-    ]);
-    const newValues = [[0], [1], [2], [300]];
-    const changes = await editContext.edit(newValues[Symbol.iterator]());
+    const editContext = controller.getEditContext(testCase.pairSelectors);
+    const changes = await editContext.edit(testCase.newValues[Symbol.iterator]());
 
     expect(editedFont).to.not.deep.equal(testFont);
+
+    for (const valueCheck of testCase.valueChecks) {
+      const instance = controller.instantiate(valueCheck.location);
+      expect(
+        instance.getGlyphPairValue(valueCheck.leftGlyph, valueCheck.rightGlyph)
+      ).to.equal(valueCheck.expectedValue);
+    }
 
     const revertedFont = copyObject(editedFont);
     applyChange(revertedFont, changes.rollbackChange);
