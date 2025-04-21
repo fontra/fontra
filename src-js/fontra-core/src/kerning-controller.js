@@ -1,5 +1,6 @@
+import { consolidateChanges, recordChanges } from "./changes.js";
 import { DiscreteVariationModel } from "./discrete-variation-model.js";
-import { longestCommonPrefix } from "./utils.js";
+import { assert, enumerate, longestCommonPrefix, zip } from "./utils.js";
 
 export class KerningController {
   constructor(kernTag, kernData, fontController) {
@@ -44,7 +45,16 @@ export class KerningController {
       locations,
       this.fontController.fontAxesSourceSpace
     );
+
     this._pairFunctions = {};
+  }
+
+  get sourceIdentifiers() {
+    return this.kernData.sourceIdentifiers;
+  }
+
+  get values() {
+    return this.kernData.values;
   }
 
   instantiate(location) {
@@ -136,7 +146,60 @@ class KerningEditContext {
     this.pairSelectors = pairSelectors;
   }
 
-  _setupRollback() {}
+  async edit(valuesIterator, undoLabel) {
+    const fontController = this.kerningController.fontController;
+    const basePath = ["kerning", this.kerningController.kernTag, "values"];
+
+    let initialChanges = recordChanges(this.kerningController.values, (values) => {
+      for (const { leftName, rightName } of this.pairSelectors) {
+        if (!values[leftName]) {
+          values[leftName] = {};
+        }
+        if (!values[leftName][rightName]) {
+          values[leftName][rightName] = Array(
+            this.kerningController.sourceIdentifiers
+          ).fill(null);
+        }
+      }
+    });
+
+    initialChanges = initialChanges.prefix(basePath);
+
+    if (initialChanges.hasChange) {
+      await fontController.editIncremental(initialChanges.change);
+    }
+
+    const sourceIndices = {};
+    for (const [i, sourceIdentifier] of this.kerningController.sourceIdentifiers) {
+      sourceIndex[sourceIdentifier] = i;
+    }
+
+    let lastChanges;
+    for (const newValues of valuesIterator) {
+      assert(newValues.length === this.pairSelectors.length);
+      lastChanges = recordChanges(this.kerningController.values, (values) => {
+        for (const [{ sourceIdentifier, leftName, rightName }, newValue] of zip(
+          this.pairSelectors,
+          newValues
+        )) {
+          const index = sourceIndices[sourceIdentifier];
+          assert(index !== undefined);
+          values[leftName][rightName][index] = newValue;
+        }
+      });
+      lastChanges = lastChanges.prefix(basePath);
+      await fontController.editIncremental(lastChanges.change); // XXXX throttle
+    }
+    await fontController.editIncremental(lastChanges.change); // XXXX no throttle
+
+    const finalChanges = initialChanges.concat(lastChanges);
+    await fontController.editFinal(
+      finalChanges.change,
+      finalChanges.rollbackChange,
+      undoLabel,
+      false
+    );
+  }
 }
 
 function makeGlyphGroupMapping(groupNames, groups) {
