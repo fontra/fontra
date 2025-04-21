@@ -94,23 +94,23 @@ export class KerningController {
     return pairFunction;
   }
 
-  getGlyphPairValue(leftGlyph, rightGlyph, location) {
+  getPairsToTry(leftGlyph, rightGlyph) {
     const leftGroup = this.leftPairGroupMapping[leftGlyph];
     const rightGroup = this.rightPairGroupMapping[rightGlyph];
-    const pairsToTry = [
+    return [
       [leftGlyph, rightGlyph],
       [leftGlyph, rightGroup],
       [leftGroup, rightGlyph],
       [leftGroup, rightGroup],
-    ];
+    ].filter(([leftName, rightName]) => leftName && rightName);
+  }
+
+  getGlyphPairValue(leftGlyph, rightGlyph, location) {
+    const pairsToTry = this.getPairsToTry(leftGlyph, rightGlyph);
 
     let value = null;
 
     for (const [leftName, rightName] of pairsToTry) {
-      if (!leftName || !rightName) {
-        continue;
-      }
-
       const pairFunction = this._getPairFunction(leftName, rightName);
 
       if (pairFunction) {
