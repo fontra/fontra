@@ -111,6 +111,12 @@ describe("KerningController Tests", () => {
     applyChange(revertedFont, changes.rollbackChange);
     expect(revertedFont).to.not.deep.equal(editedFont);
     expect(revertedFont).to.deep.equal(testFont);
+
+    // Check forward changes
+    const newlyEditedFont = copyObject(testFont);
+    applyChange(newlyEditedFont, changes.change);
+    expect(newlyEditedFont).to.deep.equal(editedFont);
+    expect(newlyEditedFont).to.not.deep.equal(testFont);
   });
 });
 
