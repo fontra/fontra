@@ -18,6 +18,16 @@ const testData = [
     expectedRollbackChange: { f: "=", a: ["a", 12] },
   },
   {
+    testName: "object set equal value",
+    subject: { a: 12 },
+    operation: (subject) => {
+      subject.a = 12;
+    },
+    expectedSubject: { a: 12 },
+    expectedChange: { f: "=", a: ["a", 12] },
+    expectedRollbackChange: { f: "=", a: ["a", 12] },
+  },
+  {
     testName: "object delete",
     subject: { a: 12 },
     operation: (subject) => {
@@ -43,6 +53,16 @@ const testData = [
     },
     expectedSubject: [13],
     expectedChange: { f: "=", a: [0, 13] },
+    expectedRollbackChange: { f: "=", a: [0, 12] },
+  },
+  {
+    testName: "array set item equal value",
+    subject: [12],
+    operation: (subject) => {
+      subject[0] = 12;
+    },
+    expectedSubject: [12],
+    expectedChange: { f: "=", a: [0, 12] },
     expectedRollbackChange: { f: "=", a: [0, 12] },
   },
   {
