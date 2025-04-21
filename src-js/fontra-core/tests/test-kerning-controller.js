@@ -107,6 +107,7 @@ describe("KerningController Tests", () => {
       ).to.equal(valueCheck.expectedValue);
     }
 
+    // Check rollback changes
     const revertedFont = copyObject(editedFont);
     applyChange(revertedFont, changes.rollbackChange);
     expect(revertedFont).to.not.deep.equal(editedFont);
