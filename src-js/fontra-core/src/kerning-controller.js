@@ -1,7 +1,7 @@
 import { recordChanges } from "./change-recorder.js";
 import { ChangeCollector } from "./changes.js";
 import { DiscreteVariationModel } from "./discrete-variation-model.js";
-import { assert, enumerate, longestCommonPrefix, zip } from "./utils.js";
+import { assert, enumerate, longestCommonPrefix, throttleCalls, zip } from "./utils.js";
 
 export class KerningController {
   constructor(kernTag, kernData, fontController) {
@@ -151,7 +151,23 @@ class KerningEditContext {
   constructor(kerningController, pairSelectors) {
     assert(pairSelectors.length > 0);
     this.kerningController = kerningController;
+    this.fontController = kerningController.fontController;
     this.pairSelectors = pairSelectors;
+    this._throttledEditIncremental = throttleCalls(async (change) => {
+      this.fontController.editIncremental(change);
+    }, 50);
+    this._throttledEditIncrementalTimeoutID = null;
+  }
+
+  async _editIncremental(change, mayDrop = false) {
+    // If mayDrop is true, the call is not guaranteed to be broadcast, and is throttled
+    // at a maximum number of changes per second, to prevent flooding the network
+    if (mayDrop) {
+      this._throttledEditIncrementalTimeoutID = this._throttledEditIncremental(change);
+    } else {
+      clearTimeout(this._throttledEditIncrementalTimeoutID);
+      this.fontController.editIncremental(change);
+    }
   }
 
   async edit(valuesIterator, undoLabel) {
@@ -204,9 +220,9 @@ class KerningEditContext {
       if (!firstChanges) {
         firstChanges = lastChanges;
       }
-      await fontController.editIncremental(lastChanges.change); // XXXX throttle
+      await this._editIncremental(lastChanges.change, true); // may drop
     }
-    await fontController.editIncremental(lastChanges.change); // XXXX no throttle
+    await this._editIncremental(lastChanges.change, false);
 
     const finalForwardChanges = initialChanges.concat(lastChanges);
     const finalRollbackChanges = initialChanges.concat(firstChanges);
