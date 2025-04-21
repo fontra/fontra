@@ -62,6 +62,12 @@ export class KerningController {
     return new KerningInstance(this, location);
   }
 
+  getPairValueForSource(leftName, rightName, sourceIdentifier) {
+    const index = this.sourceIdentifiers.indexOf(sourceIdentifier);
+    assert(index >= 0);
+    return this.getPairValues(leftName, rightName)?.[index];
+  }
+
   getPairValues(leftName, rightName) {
     return this.kernData.values[leftName]?.[rightName];
   }
