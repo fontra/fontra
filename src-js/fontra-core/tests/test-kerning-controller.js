@@ -3,18 +3,19 @@ import { expect } from "chai";
 import { parametrize } from "./test-support.js";
 
 describe("KerningController Tests", () => {
-  const testAxes = [
-    { name: "Weight", minValue: 400, defaultValue: 400, maxValue: 800 },
-    { name: "Width", minValue: 100, defaultValue: 100, maxValue: 200 },
-  ];
-
-  const testSources = {
-    a: { location: { Weight: 400 } },
-    b: { location: { Weight: 600 } },
-    c: { location: { Weight: 800 } },
-    d: { location: { Weight: 400, Width: 200 } },
-    e: { location: { Weight: 600, Width: 200 } },
-    f: { location: { Weight: 800, Width: 200 } },
+  const testFontController = {
+    fontAxesSourceSpace: [
+      { name: "Weight", minValue: 400, defaultValue: 400, maxValue: 800 },
+      { name: "Width", minValue: 100, defaultValue: 100, maxValue: 200 },
+    ],
+    sources: {
+      a: { location: { Weight: 400 } },
+      b: { location: { Weight: 600 } },
+      c: { location: { Weight: 800 } },
+      d: { location: { Weight: 400, Width: 200 } },
+      e: { location: { Weight: 600, Width: 200 } },
+      f: { location: { Weight: 800, Width: 200 } },
+    },
   };
 
   const testKernData = {
@@ -37,12 +38,13 @@ describe("KerningController Tests", () => {
     { leftGlyph: "O", rightGlyph: "O", expectedValue: 10, location: {} },
     { leftGlyph: "D", rightGlyph: "G", expectedValue: 10, location: {} },
     { leftGlyph: "O", rightGlyph: "Q", expectedValue: 20, location: {} },
-    { leftGlyph: "O", rightGlyph: "Q", expectedValue: 30, location: { Weight: 600 } },
+    { leftGlyph: "O", rightGlyph: "Q", expectedValue: 10, location: { Weight: 500 } },
+    { leftGlyph: "O", rightGlyph: "Q", expectedValue: 0, location: { Weight: 600 } },
     { leftGlyph: "Q", rightGlyph: "Q", expectedValue: 1, location: {} },
   ];
 
   parametrize("KerningController basic test", testCasesBasic, (testCase) => {
-    const controller = new KerningController(testKernData, testAxes, testSources);
+    const controller = new KerningController("kern", testKernData, testFontController);
     const instance = controller.instantiate(testCase.location);
     expect(instance.getPairValue(testCase.leftGlyph, testCase.rightGlyph)).to.equal(
       testCase.expectedValue
