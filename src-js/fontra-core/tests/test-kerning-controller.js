@@ -1,9 +1,14 @@
+import { applyChange } from "@fontra/core/changes.js";
 import { KerningController } from "@fontra/core/kerning-controller.js";
 import { expect } from "chai";
 import { parametrize } from "./test-support.js";
 
 describe("KerningController Tests", () => {
   const testFontController = {
+    // Mock edit methods
+    editIncremental: () => {},
+    editFinal: () => {},
+
     fontAxesSourceSpace: [
       { name: "Weight", minValue: 400, defaultValue: 400, maxValue: 800 },
       { name: "Width", minValue: 100, defaultValue: 100, maxValue: 200 },
@@ -52,20 +57,27 @@ describe("KerningController Tests", () => {
   });
 
   it("Kerning edit tests", async () => {
-    const fontController = copyObject(testFontController);
+    const testFont = { kerning: { kern: testKernData } };
 
-    // Mock edit methods
-    fontController.editIncremental = () => {};
-    fontController.editFinal = () => {};
+    const editedFont = copyObject(testFont);
 
-    const controller = new KerningController("kern", testKernData, fontController);
+    const controller = new KerningController(
+      "kern",
+      editedFont.kerning["kern"],
+      testFontController
+    );
     const editContext = controller.getEditContext([
       { sourceIdentifier: "a", leftName: "v", rightName: "q" },
     ]);
     const newValues = [[0], [1], [2], [300]];
     const changes = await editContext.edit(newValues[Symbol.iterator]());
-    // console.log("ch", JSON.stringify(changes.change, null, 2));
-    // console.log("rb", JSON.stringify(changes.rollbackChange, null, 2));
+
+    expect(editedFont).to.not.deep.equal(testFont);
+
+    const revertedFont = copyObject(editedFont);
+    applyChange(revertedFont, changes.rollbackChange);
+    expect(revertedFont).to.not.deep.equal(editedFont);
+    expect(revertedFont).to.deep.equal(testFont);
   });
 });
 
