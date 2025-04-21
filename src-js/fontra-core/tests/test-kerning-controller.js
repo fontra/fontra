@@ -83,6 +83,26 @@ describe("KerningController Tests", () => {
         },
       ],
     },
+    {
+      pairSelectors: [
+        { sourceIdentifier: "a", leftName: "T", rightName: "A" },
+        { sourceIdentifier: "b", leftName: "T", rightName: "A" },
+      ],
+      newValues: [
+        [20, 30],
+        [60, 70],
+        [300, 400],
+      ],
+      valueChecks: [
+        { leftGlyph: "T", rightGlyph: "A", expectedValue: 300, location: {} },
+        {
+          leftGlyph: "T",
+          rightGlyph: "A",
+          expectedValue: 350,
+          location: { Weight: 500 },
+        },
+      ],
+    },
   ];
 
   parametrize("KerningController editing test", testCasesEditing, async (testCase) => {
