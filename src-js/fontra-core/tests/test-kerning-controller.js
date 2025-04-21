@@ -50,4 +50,25 @@ describe("KerningController Tests", () => {
       testCase.expectedValue
     );
   });
+
+  it("testing kerning editing", async () => {
+    const fontController = copyObject(testFontController);
+
+    // Mock edit methods
+    fontController.editIncremental = () => {};
+    fontController.editFinal = () => {};
+
+    const controller = new KerningController("kern", testKernData, fontController);
+    const editContext = controller.getEditContext([
+      { sourceIdentifier: "a", leftName: "v", rightName: "q" },
+    ]);
+    const newValues = [[0], [1], [2], [300]];
+    const changes = await editContext.edit(newValues[Symbol.iterator]());
+    // console.log("ch", JSON.stringify(changes.change, null, 2));
+    // console.log("rb", JSON.stringify(changes.rollbackChange, null, 2));
+  });
 });
+
+function copyObject(obj) {
+  return JSON.parse(JSON.stringify(obj));
+}

@@ -1,4 +1,5 @@
-import { consolidateChanges, recordChanges } from "./changes.js";
+import { recordChanges } from "./change-recorder.js";
+import { ChangeCollector } from "./changes.js";
 import { DiscreteVariationModel } from "./discrete-variation-model.js";
 import { assert, enumerate, longestCommonPrefix, zip } from "./utils.js";
 
@@ -142,6 +143,7 @@ class KerningInstance {
 
 class KerningEditContext {
   constructor(kerningController, pairSelectors) {
+    assert(pairSelectors.length > 0);
     this.kerningController = kerningController;
     this.pairSelectors = pairSelectors;
   }
@@ -157,23 +159,28 @@ class KerningEditContext {
         }
         if (!values[leftName][rightName]) {
           values[leftName][rightName] = Array(
-            this.kerningController.sourceIdentifiers
+            this.kerningController.sourceIdentifiers.length
           ).fill(null);
         }
       }
     });
 
-    initialChanges = initialChanges.prefix(basePath);
+    if (initialChanges.hasChange) {
+      initialChanges = initialChanges.prefixed(basePath);
+    }
 
     if (initialChanges.hasChange) {
       await fontController.editIncremental(initialChanges.change);
     }
 
     const sourceIndices = {};
-    for (const [i, sourceIdentifier] of this.kerningController.sourceIdentifiers) {
-      sourceIndex[sourceIdentifier] = i;
+    for (const [i, sourceIdentifier] of enumerate(
+      this.kerningController.sourceIdentifiers
+    )) {
+      sourceIndices[sourceIdentifier] = i;
     }
 
+    let firstChanges;
     let lastChanges;
     for (const newValues of valuesIterator) {
       assert(newValues.length === this.pairSelectors.length);
@@ -187,18 +194,28 @@ class KerningEditContext {
           values[leftName][rightName][index] = newValue;
         }
       });
-      lastChanges = lastChanges.prefix(basePath);
+      lastChanges = lastChanges.prefixed(basePath);
+      if (!firstChanges) {
+        firstChanges = lastChanges;
+      }
       await fontController.editIncremental(lastChanges.change); // XXXX throttle
     }
     await fontController.editIncremental(lastChanges.change); // XXXX no throttle
 
-    const finalChanges = initialChanges.concat(lastChanges);
+    const finalForwardChanges = initialChanges.concat(lastChanges);
+    const finalRollbackChanges = initialChanges.concat(firstChanges);
+    const finalChanges = ChangeCollector.fromChanges(
+      finalForwardChanges.change,
+      finalRollbackChanges.rollbackChange
+    );
     await fontController.editFinal(
       finalChanges.change,
       finalChanges.rollbackChange,
       undoLabel,
       false
     );
+
+    return finalChanges;
   }
 }
 
