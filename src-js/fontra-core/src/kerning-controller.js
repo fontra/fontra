@@ -51,10 +51,14 @@ export class KerningController {
     return new KerningInstance(this, location);
   }
 
+  getPairValues(leftName, rightName) {
+    return this.kernData.values[leftName]?.[rightName];
+  }
+
   _getPairFunction(leftName, rightName) {
     let pairFunction = this._pairFunctions[leftName]?.[rightName];
     if (pairFunction === undefined) {
-      let sourceValues = this.kernData.values[leftName]?.[rightName];
+      let sourceValues = this.getPairValues(leftName, rightName);
       if (sourceValues === undefined) {
         // We don't have kerning for this pair
         pairFunction = null;
@@ -100,6 +104,10 @@ export class KerningController {
 
     return value;
   }
+
+  getEditContext(pairSelectors) {
+    return new KerningEditContext(this, pairSelectors);
+  }
 }
 
 class KerningInstance {
@@ -120,6 +128,15 @@ class KerningInstance {
     }
     return value;
   }
+}
+
+class KerningEditContext {
+  constructor(kerningController, pairSelectors) {
+    this.kerningController = kerningController;
+    this.pairSelectors = pairSelectors;
+  }
+
+  _setupRollback() {}
 }
 
 function makeGlyphGroupMapping(groupNames, groups) {
