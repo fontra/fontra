@@ -443,7 +443,7 @@ export class SceneModel {
 
         const kernValue =
           kerningInstance && previousGlyphName
-            ? kerningInstance.getPairValue(previousGlyphName, glyphInfo.glyphName)
+            ? kerningInstance.getGlyphPairValue(previousGlyphName, glyphInfo.glyphName)
             : 0;
 
         x += kernValue;
