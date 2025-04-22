@@ -361,6 +361,11 @@ export class SceneController {
         };
       }
     });
+
+    this.fontController.addChangeListener({ axes: null, kerning: null }, async () => {
+      await this.sceneModel.updateScene();
+      this.canvasController.requestUpdate();
+    });
   }
 
   setupSettingsListeners() {
