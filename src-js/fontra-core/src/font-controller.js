@@ -80,9 +80,15 @@ export class FontController {
 
     if (initListener) {
       this.addChangeListener(
-        { axes: null, sources: null, kerning: null },
-        (change, isExternalChange) => this._purgeCachesRelatedToAxesAndSourcesChanges(),
-        false,
+        { axes: null, sources: null },
+        (change, isExternalChange) => this._purgeCachesRelatedToAxesAndSourcesChanges()
+      );
+      this.addChangeListener(
+        { kerning: null },
+        (change, isExternalChange) => {
+          delete this._kerningControllers;
+        },
+        true,
         true
       );
     }
