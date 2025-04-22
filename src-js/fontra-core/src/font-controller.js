@@ -80,8 +80,10 @@ export class FontController {
 
     if (initListener) {
       this.addChangeListener(
-        { axes: null, sources: null },
-        (change, isExternalChange) => this._purgeCachesRelatedToAxesAndSourcesChanges()
+        { axes: null, sources: null, kerning: null },
+        (change, isExternalChange) => this._purgeCachesRelatedToAxesAndSourcesChanges(),
+        false,
+        true
       );
     }
 
@@ -685,11 +687,16 @@ export class FontController {
     }
   }
 
-  addChangeListener(matchPattern, listener, wantLiveChanges) {
+  addChangeListener(
+    matchPattern,
+    listener,
+    wantLiveChanges = false,
+    immediate = false
+  ) {
     if (wantLiveChanges) {
-      this._changeListenersLive.push({ matchPattern, listener });
+      this._changeListenersLive.push({ matchPattern, listener, immediate });
     } else {
-      this._changeListeners.push({ matchPattern, listener });
+      this._changeListeners.push({ matchPattern, listener, immediate });
     }
   }
 
@@ -709,7 +716,11 @@ export class FontController {
       : chain(this._changeListenersLive, this._changeListeners);
     for (const listenerInfo of listeners) {
       if (!change || matchChangePattern(change, listenerInfo.matchPattern)) {
-        setTimeout(() => listenerInfo.listener(change, isExternalChange), 0);
+        if (listenerInfo.immediate) {
+          listenerInfo.listener(change, isExternalChange);
+        } else {
+          setTimeout(() => listenerInfo.listener(change, isExternalChange), 0);
+        }
       }
     }
   }
