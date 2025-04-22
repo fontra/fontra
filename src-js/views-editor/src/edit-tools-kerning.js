@@ -152,7 +152,7 @@ export class KerningTool extends BaseTool {
 
   deactivate() {
     delete this.hoveredKerning;
-    this.handles.forEach((handle) => handle.remove());
+    this.removeAllHandles();
   }
 
   get handles() {
@@ -161,6 +161,10 @@ export class KerningTool extends BaseTool {
 
   get selectedHandles() {
     return this.handles.filter((handle) => handle.selected);
+  }
+
+  removeAllHandles() {
+    this.handles.forEach((handle) => handle.remove());
   }
 }
 
