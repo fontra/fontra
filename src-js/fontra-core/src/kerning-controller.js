@@ -183,7 +183,14 @@ class KerningEditContext {
     }
   }
 
-  async edit(valuesIterator, undoLabel) {
+  async edit(values, undoLabel) {
+    function* valuesGenerator() {
+      yield values;
+    }
+    return await this.editContinuous(valuesGenerator(), undoLabel);
+  }
+
+  async editContinuous(valuesIterator, undoLabel) {
     const fontController = this.kerningController.fontController;
     const basePath = ["kerning", this.kerningController.kernTag, "values"];
 
@@ -217,7 +224,7 @@ class KerningEditContext {
 
     let firstChanges;
     let lastChanges;
-    for (const newValues of valuesIterator) {
+    for await (const newValues of valuesIterator) {
       assert(newValues.length === this.pairSelectors.length);
       lastChanges = recordChanges(this.kerningController.values, (values) => {
         for (const [{ sourceIdentifier, leftName, rightName }, newValue] of zip(
