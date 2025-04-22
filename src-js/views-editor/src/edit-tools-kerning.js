@@ -145,6 +145,10 @@ export class KerningTool extends BaseTool {
       );
     }
 
+    if (!pairSelectors.length) {
+      return {};
+    }
+
     const editContext = kerningController.getEditContext(pairSelectors);
 
     return { editContext, values };
