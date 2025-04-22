@@ -3,6 +3,8 @@ import { arrowKeyDeltas, assert, round } from "@fontra/core/utils.js";
 import { BaseTool, shouldInitiateDrag } from "./edit-tools-base.js";
 import { equalGlyphSelection } from "./scene-controller.js";
 
+const KERNING_VISUALIZATION_IDENTIFIER = "fontra.kerning-indicators";
+
 export class KerningTool extends BaseTool {
   iconPath = "/images/kerning.svg";
   identifier = "kerning-tool";
@@ -29,6 +31,7 @@ export class KerningTool extends BaseTool {
         this.editor.setSelectedTool("pointer-tool");
       }
     });
+    this.showKerningWhileActive = true;
   }
 
   handleHover(event) {
@@ -209,6 +212,10 @@ export class KerningTool extends BaseTool {
     if (!this.sceneSettings.applyKerning) {
       this.sceneSettings.applyKerning = true;
     }
+
+    this.showKerningWhileInactive = this.showKerning;
+    this.showKerning = this.showKerningWhileActive;
+
     this.setCursor();
   }
 
@@ -219,6 +226,9 @@ export class KerningTool extends BaseTool {
     };
     delete this.hoveredKerning;
     this.removeAllHandles();
+
+    this.showKerningWhileActive = this.showKerning;
+    this.showKerning = this.showKerningWhileInactive;
   }
 
   get handles() {
@@ -231,6 +241,17 @@ export class KerningTool extends BaseTool {
 
   removeAllHandles() {
     this.handles.forEach((handle) => handle.remove());
+  }
+
+  get showKerning() {
+    return this.editor.visualizationLayersSettings.model[
+      KERNING_VISUALIZATION_IDENTIFIER
+    ];
+  }
+
+  set showKerning(onOff) {
+    this.editor.visualizationLayersSettings.model[KERNING_VISUALIZATION_IDENTIFIER] =
+      onOff;
   }
 }
 
