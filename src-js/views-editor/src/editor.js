@@ -770,14 +770,6 @@ export class EditorController extends ViewController {
     document.fonts.add(blankFont);
     await blankFont.load();
 
-    this.fontController.addChangeListener(
-      { axes: null, kerning: null },
-      async (change, isExternalChange) => {
-        await this.sceneModel.updateScene();
-        this.canvasController.requestUpdate();
-      }
-    );
-
     this.initActionsAfterStart();
 
     // Delay a tiny amount to account for a delay in the sidebars being set up,
