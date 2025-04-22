@@ -110,7 +110,7 @@ export class KerningTool extends BaseTool {
     }
 
     const editContext = kerningController.getEditContext(pairSelectors);
-    const change = await editContext.edit(newValues);
+    const change = await editContext.edit(newValues, "edit kerning");
     // TODO: keep undo stack for kerning
     // console.log(">", change.change);
     // console.log("undo", change.rollbackChange);
