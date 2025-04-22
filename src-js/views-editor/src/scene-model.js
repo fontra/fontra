@@ -65,7 +65,7 @@ export class SceneModel {
     this.fontController.addChangeListener(
       { kerning: null },
       () => this._resetKerningInstance(),
-      false,
+      true,
       true
     );
 
