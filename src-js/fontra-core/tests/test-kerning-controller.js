@@ -59,7 +59,7 @@ describe("KerningController Tests", () => {
   const testCasesEditing = [
     {
       pairSelectors: [{ sourceIdentifier: "a", leftName: "v", rightName: "q" }],
-      newValues: [[10], [40], [300]],
+      newValues: [300],
       valueChecks: [
         { leftGlyph: "v", rightGlyph: "q", expectedValue: 300, location: {} },
         {
@@ -72,7 +72,7 @@ describe("KerningController Tests", () => {
     },
     {
       pairSelectors: [{ sourceIdentifier: "a", leftName: "T", rightName: "A" }],
-      newValues: [[20], [60], [300]],
+      newValues: [300],
       valueChecks: [
         { leftGlyph: "T", rightGlyph: "A", expectedValue: 300, location: {} },
         {
@@ -88,11 +88,7 @@ describe("KerningController Tests", () => {
         { sourceIdentifier: "a", leftName: "T", rightName: "A" },
         { sourceIdentifier: "b", leftName: "T", rightName: "A" },
       ],
-      newValues: [
-        [20, 30],
-        [60, 70],
-        [300, 400],
-      ],
+      newValues: [300, 400],
       valueChecks: [
         { leftGlyph: "T", rightGlyph: "A", expectedValue: 300, location: {} },
         {
@@ -116,7 +112,7 @@ describe("KerningController Tests", () => {
       testFontController
     );
     const editContext = controller.getEditContext(testCase.pairSelectors);
-    const changes = await editContext.edit(testCase.newValues[Symbol.iterator]());
+    const changes = await editContext.edit(testCase.newValues);
 
     expect(editedFont).to.not.deep.equal(testFont);
 
