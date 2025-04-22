@@ -1,4 +1,4 @@
-import { consolidateCalls, withSavedState } from "@fontra/core/utils.js";
+import { withSavedState } from "@fontra/core/utils.js";
 import { mulScalar } from "@fontra/core/var-funcs.js";
 import { equalGlyphSelection } from "./scene-controller.js";
 
@@ -12,7 +12,9 @@ export class VisualizationLayers {
         .filter((layer) => !layer.userSwitchable || layer.defaultOn)
         .map((layer) => layer.identifier)
     );
-    this.requestUpdate = consolidateCalls(() => this.buildLayers());
+    this.requestUpdate = () => {
+      delete this.layers;
+    };
   }
 
   get darkTheme() {
