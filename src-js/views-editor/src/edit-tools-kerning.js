@@ -57,6 +57,9 @@ export class KerningTool extends BaseTool {
 
   async handleDrag(eventStream, initialEvent) {
     if (!this.hoveredKerning) {
+      if (!event.shiftKey) {
+        this.removeAllHandles();
+      }
       return;
     }
 
