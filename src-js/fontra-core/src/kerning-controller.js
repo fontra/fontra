@@ -247,7 +247,7 @@ class KerningEditContext {
       finalChanges.change,
       finalChanges.rollbackChange,
       undoLabel,
-      false
+      true
     );
 
     return finalChanges;
