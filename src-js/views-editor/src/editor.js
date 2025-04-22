@@ -764,12 +764,14 @@ export class EditorController extends ViewController {
       false
     );
 
+    await this.fontController.subscribeChanges({ kerning: null }, true);
+
     const blankFont = new FontFace("AdobeBlank", `url("/fonts/AdobeBlank.woff2")`, {});
     document.fonts.add(blankFont);
     await blankFont.load();
 
     this.fontController.addChangeListener(
-      { axes: null },
+      { axes: null, kerning: null },
       async (change, isExternalChange) => {
         await this.sceneModel.updateScene();
         this.canvasController.requestUpdate();
