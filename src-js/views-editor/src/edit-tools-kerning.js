@@ -80,10 +80,7 @@ export class KerningTool extends BaseTool {
     if (event.shiftKey) {
       deltaX *= 10;
     }
-    const sourceIdentifier =
-      this.fontController.fontSourcesInstancer.getSourceIdentifierForLocation(
-        this.sceneSettings.fontLocationSourceMapped
-      );
+    const sourceIdentifier = this.getSourceIdentifier();
     if (!sourceIdentifier) {
       return;
     }
@@ -117,6 +114,12 @@ export class KerningTool extends BaseTool {
     // TODO: keep undo stack for kerning
     // console.log(">", change.change);
     // console.log("undo", change.rollbackChange);
+  }
+
+  getSourceIdentifier() {
+    return this.fontController.fontSourcesInstancer.getSourceIdentifierForLocation(
+      this.sceneSettings.fontLocationSourceMapped
+    );
   }
 
   _updateHandle(kerningHandle) {
