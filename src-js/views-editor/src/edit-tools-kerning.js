@@ -65,11 +65,33 @@ export class KerningTool extends BaseTool {
 
     this._selectHandle(this.hoveredKerning, event.shiftKey);
 
+    const { editContext, values } = await this.getEditContext();
+    if (!editContext) {
+      return;
+    }
+
     if (!(await shouldInitiateDrag(eventStream, initialEvent))) {
       return;
     }
 
-    // do drag
+    const initialPoint = this.canvasController.localPoint(initialEvent);
+
+    const localPoint = (pt) => this.canvasController.localPoint(pt);
+    async function* generateValues() {
+      for await (const event of eventStream) {
+        if (event.x == undefined && event.pageX == undefined) {
+          continue;
+        }
+        const point = localPoint(event);
+        const deltaX = Math.round(point.x - initialPoint.x);
+        yield values.map((v) => v + deltaX);
+      }
+    }
+
+    const change = await editContext.editContinuous(generateValues(), "edit kerning");
+    // TODO: keep undo stack for kerning
+    // console.log(">", change.change);
+    // console.log("undo", change.rollbackChange);
   }
 
   async handleArrowKeys(event) {
@@ -80,15 +102,29 @@ export class KerningTool extends BaseTool {
     if (event.shiftKey) {
       deltaX *= 10;
     }
+
+    const { editContext, values } = await this.getEditContext();
+    if (!editContext) {
+      return;
+    }
+
+    const newValues = values.map((v) => v + deltaX);
+    const change = await editContext.edit(newValues, "edit kerning");
+    // TODO: keep undo stack for kerning
+    // console.log(">", change.change);
+    // console.log("undo", change.rollbackChange);
+  }
+
+  async getEditContext() {
     const sourceIdentifier = this.getSourceIdentifier();
     if (!sourceIdentifier) {
-      return;
+      return {};
     }
 
     const kerningController = await this.fontController.getKerningController("kern");
 
     const pairSelectors = [];
-    const newValues = [];
+    const values = [];
     for (const handle of this.selectedHandles) {
       const { lineIndex, glyphIndex } = handle.selector;
       assert(glyphIndex > 0);
@@ -100,20 +136,18 @@ export class KerningTool extends BaseTool {
         rightGlyph
       );
       pairSelectors.push({ leftName, rightName, sourceIdentifier });
-      newValues.push(
-        (kerningController.getPairValueForSource(
+      values.push(
+        kerningController.getPairValueForSource(
           leftName,
           rightName,
           sourceIdentifier
-        ) || 0) + deltaX
+        ) || 0
       );
     }
 
     const editContext = kerningController.getEditContext(pairSelectors);
-    const change = await editContext.edit(newValues, "edit kerning");
-    // TODO: keep undo stack for kerning
-    // console.log(">", change.change);
-    // console.log("undo", change.rollbackChange);
+
+    return { editContext, values };
   }
 
   getSourceIdentifier() {
