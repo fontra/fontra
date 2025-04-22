@@ -24,6 +24,11 @@ export class KerningTool extends BaseTool {
         });
       }
     );
+    this.sceneSettingsController.addKeyListener("applyKerning", (event) => {
+      if (!event.newValue && this.sceneController.selectedTool === this) {
+        this.editor.setSelectedTool("pointer-tool");
+      }
+    });
   }
 
   handleHover(event) {
@@ -200,6 +205,9 @@ export class KerningTool extends BaseTool {
       this._selectionState.selectors.forEach((selector) =>
         this.addHandle(selector, true)
       );
+    }
+    if (!this.sceneSettings.applyKerning) {
+      this.sceneSettings.applyKerning = true;
     }
     this.setCursor();
   }
