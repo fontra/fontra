@@ -1093,15 +1093,28 @@ export default class DesignspaceNavigationPanel extends Panel {
   }
 
   async doSelectPreviousNextSource(selectPrevious) {
+    const delta = selectPrevious ? -1 : 1;
     let itemIndex = this.sourcesList.getSelectedItemIndex();
     if (itemIndex != undefined) {
-      const newItemIndex = modulo(
-        itemIndex + (selectPrevious ? -1 : 1),
-        this.sourcesList.items.length
-      );
+      const newItemIndex = modulo(itemIndex + delta, this.sourcesList.items.length);
       this.sourcesList.setSelectedItemIndex(newItemIndex, true);
     } else {
-      this.goToNearestSource();
+      const sourceIdentifier =
+        this.fontController.fontSourcesInstancer.getSourceIdentifierForLocation(
+          this.sceneSettings.fontLocationSourceMapped
+        );
+      if (sourceIdentifier) {
+        const sourceIdentifiers = this.fontController.getSortedSourceIdentifiers();
+        const newIndex = modulo(
+          sourceIdentifiers.indexOf(sourceIdentifier) + delta,
+          sourceIdentifiers.length
+        );
+        const newSourceIdentifier = sourceIdentifiers[newIndex];
+        this.sceneSettings.fontLocationSourceMapped =
+          this.fontController.sources[newSourceIdentifier].location;
+      } else {
+        this.goToNearestSource();
+      }
     }
   }
 
