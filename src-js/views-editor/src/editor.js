@@ -331,10 +331,7 @@ export class EditorController extends ViewController {
         "action.delete",
         (event) => this.doDelete(event),
         () => this.canDelete(),
-        () =>
-          this.sceneSettings.selectedGlyph?.isEditing
-            ? translate("action.delete-selection")
-            : translate("action.delete-glyph")
+        () => this.getDeleteLabel()
       );
 
       registerActionCallbacks(
@@ -2147,6 +2144,12 @@ export class EditorController extends ViewController {
       undefined,
       true
     );
+  }
+
+  getDeleteLabel() {
+    return this.sceneSettings.selectedGlyph?.isEditing
+      ? translate("action.delete-selection")
+      : translate("action.delete-glyph");
   }
 
   canDelete() {
