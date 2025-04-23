@@ -190,7 +190,10 @@ export class KerningTool extends BaseTool {
   _updateHandle(kerningHandle) {
     const { lineIndex, glyphIndex } = kerningHandle.selector;
     const positionedGlyph =
-      this.sceneModel.positionedLines[lineIndex].glyphs[glyphIndex];
+      this.sceneModel.positionedLines[lineIndex]?.glyphs[glyphIndex];
+    if (!positionedGlyph) {
+      return;
+    }
     kerningHandle.update(positionedGlyph, this.canvasController);
   }
 
