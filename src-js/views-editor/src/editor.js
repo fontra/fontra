@@ -2147,9 +2147,13 @@ export class EditorController extends ViewController {
   }
 
   getDeleteLabel() {
-    return this.sceneSettings.selectedGlyph?.isEditing
-      ? translate("action.delete-selection")
-      : translate("action.delete-glyph");
+    return translate(
+      this.sceneSettings.selectedGlyph
+        ? this.sceneSettings.selectedGlyph?.isEditing
+          ? "action.delete-selection"
+          : "action.delete-glyph"
+        : "action.delete"
+    );
   }
 
   canDelete() {
