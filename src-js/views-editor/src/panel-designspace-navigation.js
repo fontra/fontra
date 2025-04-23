@@ -1063,10 +1063,25 @@ export default class DesignspaceNavigationPanel extends Panel {
 
   async goToNearestSource() {
     const glyphController = await this.sceneModel.getSelectedVariableGlyphController();
+    if (!glyphController) {
+      const defaultLocation =
+        this.fontController.fontSourcesInstancer.defaultSourceLocation;
+      const sourceIdentifiers = this.fontController.getSortedSourceIdentifiers();
+      const locations = sourceIdentifiers.map((sourceIdentifier) => ({
+        ...defaultLocation,
+        ...this.fontController.sources[sourceIdentifier].location,
+      }));
+      const targetLocation = {
+        ...defaultLocation,
+        ...this.sceneSettings.fontLocationSourceMapped,
+      };
+      const index = findNearestLocationIndex(targetLocation, locations);
+      this.sceneSettings.fontLocationSourceMapped = locations[index];
+      return;
+    }
     const targetLocation = {
-      ...this.fontController.fontSourcesInstancer.defaultSourceLocation,
-      ...glyphController?.getDenseDefaultSourceLocation(),
-      ...glyphController?.expandNLIAxes({
+      ...glyphController.getDenseDefaultSourceLocation(),
+      ...glyphController.expandNLIAxes({
         ...this.sceneSettings.fontLocationSourceMapped,
         ...this.sceneSettings.glyphLocation,
       }),
