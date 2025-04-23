@@ -329,9 +329,9 @@ export class EditorController extends ViewController {
 
       registerActionCallbacks(
         "action.delete",
-        (event) => this.doDelete(event),
-        () => this.canDelete(),
-        () => this.getDeleteLabel()
+        (event) => this.callDelegateMethod("doDelete", event),
+        () => this.callDelegateMethod("canDelete"),
+        () => this.callDelegateMethod("getDeleteLabel")
       );
 
       registerActionCallbacks(
@@ -1450,6 +1450,15 @@ export class EditorController extends ViewController {
       event.preventDefault();
       event.stopImmediatePropagation();
       doPerformAction(actionIdentifier, event);
+    }
+  }
+
+  callDelegateMethod(methodName, ...args) {
+    const tool = this.sceneController.selectedTool;
+    if (tool?.[methodName]) {
+      return tool[methodName](...args);
+    } else {
+      return this[methodName](...args);
     }
   }
 
