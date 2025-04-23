@@ -33,6 +33,17 @@ export class KerningTool extends BaseTool {
         this.editor.setSelectedTool("pointer-tool");
       }
     });
+
+    this.fontController.addChangeListener(
+      { kerning: null },
+      (change, isExternalChange) => {
+        if (isExternalChange) {
+          this.undoStack.clear();
+        }
+      },
+      false
+    );
+
     this.showKerningWhileActive = true;
     this.undoStack = new UndoStack();
   }
