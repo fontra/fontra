@@ -544,6 +544,8 @@ export class SceneController {
         this._previousGlyphPosition.x + this._previousGlyphPosition.xAdvance / 2;
       const glyphCenter = glyphPosition.x + glyphPosition.xAdvance / 2;
       originXDelta = glyphCenter - previousGlyphCenter;
+    } else if (this.scrollAdjustBehavior?.behavior === "tool-pin-point") {
+      originXDelta = this.scrollAdjustBehavior.getPinPointDelta();
     }
 
     if (originXDelta) {

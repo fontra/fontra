@@ -265,7 +265,8 @@ export default class DesignspaceNavigationPanel extends Panel {
     this.fontAxesElement.addEventListener(
       "locationChanged",
       scheduleCalls(async (event) => {
-        this.sceneController.scrollAdjustBehavior = "pin-glyph-center";
+        this.sceneController.scrollAdjustBehavior =
+          this.getScrollAdjustBehavior("pin-glyph-center");
         this.sceneController.autoViewBox = false;
 
         this.sceneSettingsController.setItem(
@@ -281,7 +282,8 @@ export default class DesignspaceNavigationPanel extends Panel {
     this.glyphAxesElement.addEventListener(
       "locationChanged",
       scheduleCalls(async (event) => {
-        this.sceneController.scrollAdjustBehavior = "pin-glyph-center";
+        this.sceneController.scrollAdjustBehavior =
+          this.getScrollAdjustBehavior("pin-glyph-center");
         this.sceneController.autoViewBox = false;
         this.sceneSettingsController.setItem(
           "glyphLocation",
@@ -396,7 +398,8 @@ export default class DesignspaceNavigationPanel extends Panel {
       this.removeSourceLayer();
 
     this.sourcesList.addEventListener("listSelectionChanged", async (event) => {
-      this.sceneController.scrollAdjustBehavior = "pin-glyph-center";
+      this.sceneController.scrollAdjustBehavior =
+        this.getScrollAdjustBehavior("pin-glyph-center");
       const selectedItem = this.sourcesList.getSelectedItem();
       const sourceIndex = selectedItem?.sourceIndex;
 
@@ -508,6 +511,13 @@ export default class DesignspaceNavigationPanel extends Panel {
 
     this._updateAxes();
     this._updateSources();
+  }
+
+  getScrollAdjustBehavior(defaultBehavior) {
+    if (this.sceneController.selectedTool?.getScrollAdjustBehavior) {
+      return this.sceneController.selectedTool.getScrollAdjustBehavior();
+    }
+    return defaultBehavior;
   }
 
   async updateSourceListSelectionFromLocation() {
@@ -1064,6 +1074,9 @@ export default class DesignspaceNavigationPanel extends Panel {
   async goToNearestSource() {
     const glyphController = await this.sceneModel.getSelectedVariableGlyphController();
     if (!glyphController) {
+      this.sceneController.scrollAdjustBehavior =
+        this.getScrollAdjustBehavior("pin-glyph-center");
+
       const defaultLocation =
         this.fontController.fontSourcesInstancer.defaultSourceLocation;
       const sourceIdentifiers = this.fontController.getSortedSourceIdentifiers();
@@ -1110,6 +1123,10 @@ export default class DesignspaceNavigationPanel extends Panel {
           sourceIdentifiers.length
         );
         const newSourceIdentifier = sourceIdentifiers[newIndex];
+
+        this.sceneController.scrollAdjustBehavior =
+          this.getScrollAdjustBehavior("pin-glyph-center");
+
         this.sceneSettings.fontLocationSourceMapped =
           this.fontController.sources[newSourceIdentifier].location;
       } else {

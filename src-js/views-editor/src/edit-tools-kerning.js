@@ -27,6 +27,7 @@ export class KerningTool extends BaseTool {
       (event) => {
         this.handles.forEach((handle) => {
           this._updateHandle(handle);
+          this.getPinPointDelta(); // updates this._prevousKerningCenter
         });
       }
     );
@@ -51,6 +52,9 @@ export class KerningTool extends BaseTool {
   }
 
   handleHover(event) {
+    if (event.type != "mousemove") {
+      return;
+    }
     const sceneController = this.sceneController;
     const point = sceneController.localPoint(event);
     const size = sceneController.mouseClickMargin;
@@ -87,6 +91,10 @@ export class KerningTool extends BaseTool {
 
     this._selectHandle(this.hoveredKerning, event.shiftKey);
 
+    this._prevousKerningCenter = this.getPositionedKerningCenter(
+      this.kerningSelection.at(-1)
+    );
+
     const { editContext, values } = await this.getEditContext();
     if (!editContext) {
       return;
@@ -96,22 +104,40 @@ export class KerningTool extends BaseTool {
       return;
     }
 
-    const initialPoint = this.canvasController.localPoint(initialEvent);
+    const magnification = this.canvasController.magnification;
+    const initialX = initialEvent.x / magnification;
+    const sceneController = this.sceneController; // for scoping
+    const getPinPointDelta = () => this.getPinPointDelta();
 
-    const localPoint = (pt) => this.canvasController.localPoint(pt);
     async function* generateValues() {
+      // Note: `this` is not available here
       for await (const event of eventStream) {
         if (event.x == undefined && event.pageX == undefined) {
           continue;
         }
-        const point = localPoint(event);
-        const deltaX = Math.round(point.x - initialPoint.x);
+
+        sceneController.scrollAdjustBehavior = {
+          behavior: "tool-pin-point",
+          getPinPointDelta,
+        };
+
+        const currentX = event.x / magnification;
+        const deltaX = Math.round(currentX - initialX);
         yield values.map((v) => v + deltaX);
       }
+
+      delete self._offsetDeltaX;
     }
+
+    this._draggingSelector = this.hoveredKerning;
+    this._prevousKerningCenter = this.getPositionedKerningCenter(
+      this._draggingSelector
+    );
 
     const undoLabel = "edit kerning";
     const changes = await editContext.editContinuous(generateValues(), undoLabel);
+    delete this._draggingSelector;
+
     this.pushUndoItem(changes, undoLabel);
   }
 
@@ -346,6 +372,41 @@ export class KerningTool extends BaseTool {
     const undoLabel = "delete kerning";
     const changes = await editContext.delete(undoLabel);
     this.pushUndoItem(changes, undoLabel);
+  }
+
+  getScrollAdjustBehavior() {
+    const getPinPointDelta = () => this.getPinPointDelta();
+    return { behavior: "tool-pin-point", getPinPointDelta };
+  }
+
+  getPinPointDelta() {
+    let deltaX = 0;
+    const selector = this._draggingSelector || this.kerningSelection.at(-1);
+    const currentCenter = this.getPositionedKerningCenter(selector);
+    if (currentCenter != undefined) {
+      if (this._prevousKerningCenter == undefined) {
+        this._prevousKerningCenter = currentCenter;
+      }
+      deltaX = currentCenter - this._prevousKerningCenter;
+    }
+    this._prevousKerningCenter = currentCenter;
+    return deltaX;
+  }
+
+  getPositionedKerningCenter(selector) {
+    const positionedGlyph = this.getPositionedGlyph(selector);
+    if (!positionedGlyph) {
+      return undefined;
+    }
+    return positionedGlyph.x - positionedGlyph.kernValue / 2;
+  }
+
+  getPositionedGlyph(selector) {
+    if (!selector) {
+      return undefined;
+    }
+    const { lineIndex, glyphIndex } = selector;
+    return this.sceneSettings.positionedLines[lineIndex]?.glyphs[glyphIndex];
   }
 }
 
