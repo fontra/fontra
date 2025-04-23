@@ -253,6 +253,20 @@ export class KerningTool extends BaseTool {
     this.editor.visualizationLayersSettings.model[KERNING_VISUALIZATION_IDENTIFIER] =
       onOff;
   }
+
+  canDelete() {
+    return !!this.selectedHandles.length;
+  }
+
+  async doDelete() {
+    const { editContext, values } = await this.getEditContext();
+    if (!editContext) {
+      return;
+    }
+
+    const change = await editContext.delete("delete kerning");
+    // undo
+  }
 }
 
 class KerningHandle extends HTMLElement {

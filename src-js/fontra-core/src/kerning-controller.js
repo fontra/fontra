@@ -1,7 +1,14 @@
 import { recordChanges } from "./change-recorder.js";
 import { ChangeCollector } from "./changes.js";
 import { DiscreteVariationModel } from "./discrete-variation-model.js";
-import { assert, enumerate, longestCommonPrefix, throttleCalls, zip } from "./utils.js";
+import {
+  assert,
+  enumerate,
+  isObjectEmpty,
+  longestCommonPrefix,
+  throttleCalls,
+  zip,
+} from "./utils.js";
 
 export class KerningController {
   constructor(kernTag, kernData, fontController) {
@@ -258,6 +265,34 @@ class KerningEditContext {
     );
 
     return finalChanges;
+  }
+
+  async delete(undoLabel) {
+    let changes = recordChanges(this.kerningController.values, (values) => {
+      for (const { leftName, rightName } of this.pairSelectors) {
+        if (!values[leftName][rightName]) {
+          continue;
+        }
+        delete values[leftName][rightName];
+        if (isObjectEmpty(values[leftName])) {
+          delete values[leftName];
+        }
+      }
+    });
+
+    if (changes.hasChange) {
+      const basePath = ["kerning", this.kerningController.kernTag, "values"];
+      changes = changes.prefixed(basePath);
+    }
+
+    await this.fontController.editFinal(
+      changes.change,
+      changes.rollbackChange,
+      undoLabel,
+      true
+    );
+
+    return changes;
   }
 }
 
