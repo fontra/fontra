@@ -49,6 +49,7 @@ export class KerningTool extends BaseTool {
 
     this.showKerningWhileActive = true;
     this.undoStack = new UndoStack();
+    this._getPinPointDelta = () => this.getPinPointDelta();
   }
 
   handleHover(event) {
@@ -106,20 +107,14 @@ export class KerningTool extends BaseTool {
 
     const magnification = this.canvasController.magnification;
     const initialX = initialEvent.x / magnification;
-    const sceneController = this.sceneController; // for scoping
-    const getPinPointDelta = () => this.getPinPointDelta();
 
     async function* generateValues() {
-      // Note: `this` is not available here
       for await (const event of eventStream) {
         if (event.x == undefined && event.pageX == undefined) {
           continue;
         }
 
-        sceneController.scrollAdjustBehavior = {
-          behavior: "tool-pin-point",
-          getPinPointDelta,
-        };
+        this.sceneController.scrollAdjustBehavior = this.getScrollAdjustBehavior();
 
         const currentX = event.x / magnification;
         const deltaX = Math.round(currentX - initialX);
@@ -128,6 +123,8 @@ export class KerningTool extends BaseTool {
 
       delete self._offsetDeltaX;
     }
+
+    generateValues = generateValues.bind(this); // Because `this` scoping
 
     this._draggingSelector = this.hoveredKerning;
     this._prevousKerningCenter = this.getPositionedKerningCenter(
@@ -226,6 +223,10 @@ export class KerningTool extends BaseTool {
   _selectHandle(selector, shiftKey) {
     const handleId = selectorToId(selector);
     const selectedHandle = document.getElementById(handleId);
+    if (!selectedHandle) {
+      // Shouldn't happen, but does (rarely), some glitchy async timing thing
+      return;
+    }
 
     if (shiftKey) {
       selectedHandle.selected = !selectedHandle.selected;
@@ -283,6 +284,8 @@ export class KerningTool extends BaseTool {
     for (const selector of selection) {
       this.addHandle(selector, true);
     }
+
+    this._prevousKerningCenter = this.getPositionedKerningCenter(selection.at(-1));
   }
 
   get handles() {
@@ -328,6 +331,9 @@ export class KerningTool extends BaseTool {
     if (isRedo) {
       undoRecord = reverseUndoRecord(undoRecord);
     }
+
+    this.sceneController.scrollAdjustBehavior = this.getScrollAdjustBehavior();
+
     this.fontController.applyChange(undoRecord.rollbackChange);
 
     const error = await this.fontController.editFinal(
@@ -375,8 +381,7 @@ export class KerningTool extends BaseTool {
   }
 
   getScrollAdjustBehavior() {
-    const getPinPointDelta = () => this.getPinPointDelta();
-    return { behavior: "tool-pin-point", getPinPointDelta };
+    return { behavior: "tool-pin-point", getPinPointDelta: this._getPinPointDelta };
   }
 
   getPinPointDelta() {
