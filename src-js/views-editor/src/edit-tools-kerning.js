@@ -1,4 +1,6 @@
+import { UndoStack, reverseUndoRecord } from "@fontra/core/font-controller.js";
 import * as html from "@fontra/core/html-utils.js";
+import { translate } from "@fontra/core/localization.js";
 import { arrowKeyDeltas, assert, round } from "@fontra/core/utils.js";
 import { BaseTool, shouldInitiateDrag } from "./edit-tools-base.js";
 import { equalGlyphSelection } from "./scene-controller.js";
@@ -32,6 +34,7 @@ export class KerningTool extends BaseTool {
       }
     });
     this.showKerningWhileActive = true;
+    this.undoStack = new UndoStack();
   }
 
   handleHover(event) {
@@ -94,10 +97,9 @@ export class KerningTool extends BaseTool {
       }
     }
 
-    const change = await editContext.editContinuous(generateValues(), "edit kerning");
-    // TODO: keep undo stack for kerning
-    // console.log(">", change.change);
-    // console.log("undo", change.rollbackChange);
+    const undoLabel = "edit kerning";
+    const changes = await editContext.editContinuous(generateValues(), undoLabel);
+    this.pushUndoItem(changes, undoLabel);
   }
 
   async handleArrowKeys(event) {
@@ -115,10 +117,9 @@ export class KerningTool extends BaseTool {
     }
 
     const newValues = values.map((v) => v + deltaX);
-    const change = await editContext.edit(newValues, "edit kerning");
-    // TODO: keep undo stack for kerning
-    // console.log(">", change.change);
-    // console.log("undo", change.rollbackChange);
+    const undoLabel = "edit kerning";
+    const changes = await editContext.edit(newValues, "edit kerning");
+    this.pushUndoItem(changes, undoLabel);
   }
 
   async getEditContext() {
@@ -254,6 +255,48 @@ export class KerningTool extends BaseTool {
       onOff;
   }
 
+  getUndoRedoLabel(isRedo) {
+    const info = this.undoStack.getTopUndoRedoRecord(isRedo)?.info;
+    return (
+      (isRedo ? translate("action.redo") : translate("action.undo")) +
+      (info ? " " + info.label : "")
+    );
+  }
+
+  canUndoRedo(isRedo) {
+    return this.undoStack.getTopUndoRedoRecord(isRedo)?.info;
+  }
+
+  async doUndoRedo(isRedo) {
+    let undoRecord = this.undoStack.popUndoRedoRecord(isRedo);
+    if (!undoRecord) {
+      return;
+    }
+    if (isRedo) {
+      undoRecord = reverseUndoRecord(undoRecord);
+    }
+    this.fontController.applyChange(undoRecord.rollbackChange);
+
+    const error = await this.fontController.editFinal(
+      undoRecord.rollbackChange,
+      undoRecord.change,
+      undoRecord.info.label,
+      true
+    );
+  }
+
+  pushUndoItem(changes, undoLabel) {
+    const undoRecord = {
+      change: changes.change,
+      rollbackChange: changes.rollbackChange,
+      info: {
+        label: undoLabel,
+      },
+    };
+
+    this.undoStack.pushUndoRecord(undoRecord);
+  }
+
   canDelete() {
     return !!this.selectedHandles.length;
   }
@@ -264,8 +307,9 @@ export class KerningTool extends BaseTool {
       return;
     }
 
-    const change = await editContext.delete("delete kerning");
-    // undo
+    const undoLabel = "delete kerning";
+    const changes = await editContext.delete(undoLabel);
+    this.pushUndoItem(changes, undoLabel);
   }
 }
 

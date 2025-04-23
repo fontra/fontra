@@ -290,16 +290,16 @@ export class EditorController extends ViewController {
 
       registerActionCallbacks(
         "action.undo",
-        () => this.doUndoRedo(false),
-        () => this.canUndoRedo(false),
-        () => this.getUndoRedoLabel(false)
+        () => this.callDelegateMethod("doUndoRedo", false),
+        () => this.callDelegateMethod("canUndoRedo", false),
+        () => this.callDelegateMethod("getUndoRedoLabel", false)
       );
 
       registerActionCallbacks(
         "action.redo",
-        () => this.doUndoRedo(true),
-        () => this.canUndoRedo(true),
-        () => this.getUndoRedoLabel(true)
+        () => this.callDelegateMethod("doUndoRedo", true),
+        () => this.callDelegateMethod("canUndoRedo", true),
+        () => this.callDelegateMethod("getUndoRedoLabel", true)
       );
 
       if (insecureSafariConnection()) {
