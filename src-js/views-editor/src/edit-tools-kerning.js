@@ -18,7 +18,9 @@ export class KerningTool extends BaseTool {
     assert(this.handleContainer);
 
     this.sceneSettingsController.addKeyListener("glyphLines", (event) => {
-      this.handles.forEach((handle) => handle.remove());
+      if (event.senderInfo?.senderID !== this) {
+        this.handles.forEach((handle) => handle.remove());
+      }
     });
     this.sceneSettingsController.addKeyListener(
       ["viewBox", "positionedLines"],
@@ -243,6 +245,17 @@ export class KerningTool extends BaseTool {
     this.showKerning = this.showKerningWhileInactive;
   }
 
+  get kerningSelection() {
+    return this.selectedHandles.map((handle) => handle.selector);
+  }
+
+  set kerningSelection(selection) {
+    this.removeAllHandles();
+    for (const selector of selection) {
+      this.addHandle(selector, true);
+    }
+  }
+
   get handles() {
     return [...this.handleContainer.querySelectorAll("kerning-handle")];
   }
@@ -294,6 +307,12 @@ export class KerningTool extends BaseTool {
       undoRecord.info.label,
       true
     );
+
+    this.sceneSettingsController.setItem("glyphLines", undoRecord.info.glyphLines, {
+      senderID: this,
+    });
+    this.sceneSettings.fontLocationSourceMapped = undoRecord.info.location;
+    this.kerningSelection = undoRecord.info.kerningSelection;
   }
 
   pushUndoItem(changes, undoLabel) {
@@ -302,6 +321,9 @@ export class KerningTool extends BaseTool {
       rollbackChange: changes.rollbackChange,
       info: {
         label: undoLabel,
+        glyphLines: this.sceneSettings.glyphLines,
+        location: this.sceneSettings.fontLocationSourceMapped,
+        kerningSelection: this.kerningSelection,
       },
     };
 
