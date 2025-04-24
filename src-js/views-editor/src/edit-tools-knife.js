@@ -101,6 +101,7 @@ export class KnifeTool extends BaseTool {
   }
 
   deactivate() {
+    super.deactivate();
     this.canvasController.requestUpdate();
   }
 }

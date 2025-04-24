@@ -112,6 +112,7 @@ export class ShapeToolRect extends BaseTool {
   }
 
   deactivate() {
+    super.deactivate();
     this.canvasController.requestUpdate();
   }
 

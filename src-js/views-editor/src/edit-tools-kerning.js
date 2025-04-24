@@ -284,6 +284,7 @@ export class KerningTool extends BaseTool {
   }
 
   activate() {
+    super.activate();
     this.sceneSettings.selectedGlyph = null;
     this.sceneController.hoveredGlyph = null;
     if (this._selectionState?.glyphLines === this.sceneSettings.glyphLines) {
@@ -302,6 +303,7 @@ export class KerningTool extends BaseTool {
   }
 
   deactivate() {
+    super.deactivate();
     this._selectionState = {
       glyphLines: this.sceneSettings.glyphLines,
       selectors: this.selectedHandles.map((h) => h.selector),

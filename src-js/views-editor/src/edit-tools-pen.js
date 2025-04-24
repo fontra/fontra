@@ -54,6 +54,7 @@ export class PenToolCubic extends BaseTool {
   }
 
   deactivate() {
+    super.deactivate();
     this._resetHover();
     this.canvasController.requestUpdate();
   }

@@ -6,6 +6,7 @@ export class BaseTool {
     this.sceneModel = this.sceneController.sceneModel;
     this.sceneSettingsController = editor.sceneSettingsController;
     this.sceneSettings = editor.sceneSettings;
+    this.isActive = false;
   }
 
   setCursor() {
@@ -13,11 +14,12 @@ export class BaseTool {
   }
 
   activate() {
+    this.isActive = true;
     this.setCursor();
   }
 
   deactivate() {
-    //
+    this.isActive = false;
   }
 
   handleKeyDown(event) {
