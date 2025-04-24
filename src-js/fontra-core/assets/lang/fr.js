@@ -437,6 +437,7 @@ export const strings = {
   "sidebar.user-settings.glyph.dragcrosshair": "Croix de sélection",
   "sidebar.user-settings.glyph.dragghostpath": "Afficher la position avant édition",
   "sidebar.user-settings.glyph.kerning": "Kerning",
+  "sidebar.user-settings.glyph.kerning-tool": "Kerning (tool)",
   "sidebar.user-settings.glyph.lockicon":
     "Icône verrouillée du glyphe pour les glyphes non édités",
   "sidebar.user-settings.glyph.point.index": "Index des points",

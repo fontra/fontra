@@ -398,6 +398,7 @@ export const strings = {
   "sidebar.user-settings.glyph.dragcrosshair": "拖拽时显示辅助线",
   "sidebar.user-settings.glyph.dragghostpath": "拖拽时显示原始轮廓",
   "sidebar.user-settings.glyph.kerning": "Kerning",
+  "sidebar.user-settings.glyph.kerning-tool": "Kerning (tool)",
   "sidebar.user-settings.glyph.lockicon": "非编辑字形的锁定图标",
   "sidebar.user-settings.glyph.point.index": "节点序号",
   "sidebar.user-settings.glyph.powerruler": "测量尺",

@@ -428,6 +428,7 @@ export const strings = {
   "sidebar.user-settings.glyph.dragcrosshair": "Fadenkreuz-Bewegung",
   "sidebar.user-settings.glyph.dragghostpath": '"Gespänster"-Pfad-Bewegung',
   "sidebar.user-settings.glyph.kerning": "Kerning",
+  "sidebar.user-settings.glyph.kerning-tool": "Kerning (tool)",
   "sidebar.user-settings.glyph.lockicon":
     "Glyph-Schloss-Symbol für nicht editierende Glyphen",
   "sidebar.user-settings.glyph.point.index": "Punkt-Indexe",

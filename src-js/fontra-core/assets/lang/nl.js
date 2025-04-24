@@ -421,6 +421,7 @@ export const strings = {
   "sidebar.user-settings.glyph.dragcrosshair": "Sleep kruisdraad",
   "sidebar.user-settings.glyph.dragghostpath": 'Sleep "ghost" pad',
   "sidebar.user-settings.glyph.kerning": "Kerning",
+  "sidebar.user-settings.glyph.kerning-tool": "Kerning (tool)",
   "sidebar.user-settings.glyph.lockicon": "Glyph slot icoon voor overige glyphs",
   "sidebar.user-settings.glyph.point.index": "Punt indexen",
   "sidebar.user-settings.glyph.powerruler": "Power Ruler",

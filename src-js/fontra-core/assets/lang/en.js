@@ -416,6 +416,7 @@ export const strings = {
   "sidebar.user-settings.glyph.dragcrosshair": "Drag crosshair",
   "sidebar.user-settings.glyph.dragghostpath": "Drag “ghost” path",
   "sidebar.user-settings.glyph.kerning": "Kerning",
+  "sidebar.user-settings.glyph.kerning-tool": "Kerning (tool)",
   "sidebar.user-settings.glyph.lockicon": "Glyph lock icon for non-editing glyphs",
   "sidebar.user-settings.glyph.point.index": "Point indices",
   "sidebar.user-settings.glyph.powerruler": "Power Ruler",
