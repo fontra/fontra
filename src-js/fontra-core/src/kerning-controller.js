@@ -67,23 +67,22 @@ export class KerningController {
 
   instantiate(location) {
     const sourceIdentifier =
-      this.fontController.fontSourcesInstancer?.getSourceIdentifierForLocation(
-        location
-      );
+      this.fontController.fontSourcesInstancer.getSourceIdentifierForLocation(location);
 
     return new KerningInstance(this, location, sourceIdentifier);
   }
 
   getPairValueForSource(leftName, rightName, sourceIdentifier) {
+    const values = this.getPairValues(leftName, rightName);
+    if (!values) {
+      return undefined;
+    }
     const index = this.sourceIdentifiers.indexOf(sourceIdentifier);
-    let value;
-    if (index >= 0) {
-      value = this.getPairValues(leftName, rightName)?.[index];
+    if (index < 0) {
+      return undefined;
     }
-    if (value == undefined) {
-      value = null;
-    }
-    return value;
+    const value = values[index];
+    return value === undefined ? null : value;
   }
 
   getPairValues(leftName, rightName) {
@@ -143,7 +142,15 @@ export class KerningController {
 
     for (const [leftName, rightName] of pairsToTry) {
       if (sourceIdentifier) {
-        value = this.getPairValueForSource(leftName, rightName, sourceIdentifier);
+        const sourceValue = this.getPairValueForSource(
+          leftName,
+          rightName,
+          sourceIdentifier
+        );
+        if (sourceValue !== undefined) {
+          value = sourceValue;
+          break;
+        }
       } else {
         const pairFunction = this._getPairFunction(leftName, rightName);
 
