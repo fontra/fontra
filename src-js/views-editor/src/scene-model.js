@@ -192,7 +192,7 @@ export class SceneModel {
           this.sceneSettings.fontLocationSourceMapped
         );
       } else {
-        this._kerningInstance = { getPairValue: (leftGlyph, rightGlyph) => 0 };
+        this._kerningInstance = { getGlyphPairValue: (leftGlyph, rightGlyph) => 0 };
       }
     }
     return this._kerningInstance;
