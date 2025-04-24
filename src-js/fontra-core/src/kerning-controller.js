@@ -76,8 +76,14 @@ export class KerningController {
 
   getPairValueForSource(leftName, rightName, sourceIdentifier) {
     const index = this.sourceIdentifiers.indexOf(sourceIdentifier);
-    assert(index >= 0);
-    return this.getPairValues(leftName, rightName)?.[index];
+    let value;
+    if (index >= 0) {
+      value = this.getPairValues(leftName, rightName)?.[index];
+    }
+    if (value == undefined) {
+      value = null;
+    }
+    return value;
   }
 
   getPairValues(leftName, rightName) {
@@ -130,18 +136,14 @@ export class KerningController {
     ].filter(([leftName, rightName]) => leftName && rightName);
   }
 
-  getGlyphPairValue(leftGlyph, rightGlyph, location, sourceIdentifier) {
+  getGlyphPairValue(leftGlyph, rightGlyph, location, sourceIdentifier = null) {
     const pairsToTry = this.getPairsToTry(leftGlyph, rightGlyph);
 
     let value = null;
 
     for (const [leftName, rightName] of pairsToTry) {
       if (sourceIdentifier) {
-        const index = this.sourceIdentifiers.indexOf(sourceIdentifier);
-        const values = this.getPairValues(leftName, rightName);
-        if (index >= 0 && values) {
-          value = values[index];
-        }
+        value = this.getPairValueForSource(leftName, rightName, sourceIdentifier);
       } else {
         const pairFunction = this._getPairFunction(leftName, rightName);
 
