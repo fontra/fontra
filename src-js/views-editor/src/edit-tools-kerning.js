@@ -11,7 +11,7 @@ import {
 
 const KERNING_VISUALIZATION_IDENTIFIER = "fontra.kerning-indicators";
 
-registerVisualizationLayerDefinition({
+const kernVisualizationDefinition = {
   identifier: "fontra.kerning-indicators",
   name: "sidebar.user-settings.glyph.kerning",
   selectionFunc: glyphSelector("all"),
@@ -33,6 +33,14 @@ registerVisualizationLayerDefinition({
     const descender = model.descender;
     context.fillRect(0, descender, -positionedGlyph.kernValue, ascender - descender);
   },
+};
+
+registerVisualizationLayerDefinition(kernVisualizationDefinition);
+registerVisualizationLayerDefinition({
+  ...kernVisualizationDefinition,
+  identifier: "fontra.kerning-indicators-tool",
+  name: "sidebar.user-settings.glyph.kerning-tool",
+  defaultOn: true,
 });
 
 export class KerningTool extends BaseTool {
