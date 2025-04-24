@@ -144,6 +144,7 @@ export const strings = {
     "The location is not at a source.",
   "dialog.cant-edit-glyph.content.locked-glyph": "The glyph is locked.",
   "dialog.cant-edit-glyph.title": "Can’t edit glyph “%0”",
+  "dialog.cant-edit-kerning.title": "Can’t edit kerning",
   "dialog.create": "Creëer",
   "dialog.create-new-glyph.body": 'Klik "Creëer" om een nieuwe glyph "%0" te maken%1.',
   "dialog.create-new-glyph.body.2": ' voor karakter "%0" (%1)',

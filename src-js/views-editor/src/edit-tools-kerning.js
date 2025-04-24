@@ -255,7 +255,7 @@ export class KerningTool extends BaseTool {
   async showDialogLocationNotAtSource() {
     const glyphName = this.sceneSettings.selectedGlyphName;
     const result = await dialog(
-      translate("dialog.cant-edit.title"),
+      translate("dialog.cant-edit-kerning.title"),
       translate("dialog.cant-edit-glyph.content.location-not-at-source"),
       [
         {

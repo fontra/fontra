@@ -138,6 +138,7 @@ export const strings = {
   "dialog.cant-edit-glyph.content.location-not-at-source": "当前位置不是一个源。",
   "dialog.cant-edit-glyph.content.locked-glyph": "该字形已被锁定。",
   "dialog.cant-edit-glyph.title": "无法编辑字形 “%0”",
+  "dialog.cant-edit-kerning.title": "Can’t edit kerning",
   "dialog.create": "创建",
   "dialog.create-new-glyph.body": '如果你想创建一个新的字形 "%0"%1，请点击 "创建"。',
   "dialog.create-new-glyph.body.2": '为字符 "%0" (%1)',
