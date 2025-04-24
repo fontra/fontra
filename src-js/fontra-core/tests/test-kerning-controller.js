@@ -1,4 +1,5 @@
 import { applyChange } from "@fontra/core/changes.js";
+import { FontSourcesInstancer } from "@fontra/core/font-sources-instancer.js";
 import { KerningController } from "@fontra/core/kerning-controller.js";
 import { expect } from "chai";
 import { parametrize } from "./test-support.js";
@@ -23,6 +24,11 @@ describe("KerningController Tests", () => {
     },
   };
 
+  testFontController.fontSourcesInstancer = new FontSourcesInstancer(
+    testFontController.fontAxesSourceSpace,
+    testFontController.sources
+  );
+
   const testKernData = {
     groups: { "left.O": ["O", "D", "Q"], "right.O": ["O", "C", "G", "Q"] },
     sourceIdentifiers: ["a", "b", "c", "d", "e", "f"],
@@ -44,7 +50,7 @@ describe("KerningController Tests", () => {
     { leftGlyph: "D", rightGlyph: "G", expectedValue: 10, location: {} },
     { leftGlyph: "O", rightGlyph: "Q", expectedValue: 20, location: {} },
     { leftGlyph: "O", rightGlyph: "Q", expectedValue: 10, location: { Weight: 500 } },
-    { leftGlyph: "O", rightGlyph: "Q", expectedValue: 0, location: { Weight: 600 } },
+    { leftGlyph: "O", rightGlyph: "Q", expectedValue: null, location: { Weight: 600 } },
     { leftGlyph: "Q", rightGlyph: "Q", expectedValue: 1, location: {} },
   ];
 
