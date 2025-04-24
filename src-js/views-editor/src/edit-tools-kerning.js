@@ -432,16 +432,26 @@ export class KerningTool extends BaseTool {
     return !!this.selectedHandles.length;
   }
 
-  async doDelete() {
-    const { editContext } = await this.getEditContext(false);
+  async doDelete(event) {
+    const deepDelete = event.altKey;
+
+    const { editContext, values } = await this.getEditContext(!deepDelete);
     if (!editContext) {
       return;
     }
 
     this.sceneController.scrollAdjustBehavior = this.getScrollAdjustBehavior();
 
-    const undoLabel = "delete kerning";
-    const changes = await editContext.delete(undoLabel);
+    let undoLabel;
+    let changes;
+    if (deepDelete) {
+      undoLabel = "delete kerning pair";
+      changes = await editContext.delete(undoLabel);
+    } else {
+      undoLabel = "reset kerning value";
+      const newValues = new Array(values.length).fill(0);
+      changes = await editContext.edit(newValues, undoLabel);
+    }
     this.pushUndoItem(changes, undoLabel);
   }
 
