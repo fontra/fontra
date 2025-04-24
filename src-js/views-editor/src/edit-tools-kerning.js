@@ -445,11 +445,11 @@ export class KerningTool extends BaseTool {
     let undoLabel;
     let changes;
     if (deepDelete) {
-      undoLabel = "delete kerning pair";
+      undoLabel = "delete kerning pair from all sources";
       changes = await editContext.delete(undoLabel);
     } else {
-      undoLabel = "reset kerning value";
-      const newValues = new Array(values.length).fill(0);
+      undoLabel = "delete kerning value";
+      const newValues = new Array(values.length).fill(null);
       changes = await editContext.edit(newValues, undoLabel);
     }
     this.pushUndoItem(changes, undoLabel);
