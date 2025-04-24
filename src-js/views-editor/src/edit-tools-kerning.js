@@ -2,6 +2,7 @@ import { UndoStack, reverseUndoRecord } from "@fontra/core/font-controller.js";
 import * as html from "@fontra/core/html-utils.js";
 import { translate } from "@fontra/core/localization.js";
 import { arrowKeyDeltas, assert, round } from "@fontra/core/utils.js";
+import { dialog } from "@fontra/web-components/modal-dialog.js";
 import { BaseTool, shouldInitiateDrag } from "./edit-tools-base.js";
 import { equalGlyphSelection } from "./scene-controller.js";
 import {
@@ -145,12 +146,12 @@ export class KerningTool extends BaseTool {
       this.kerningSelection.at(-1)
     );
 
-    const { editContext, values } = await this.getEditContext();
-    if (!editContext) {
+    if (!(await shouldInitiateDrag(eventStream, initialEvent))) {
       return;
     }
 
-    if (!(await shouldInitiateDrag(eventStream, initialEvent))) {
+    const { editContext, values } = await this.getEditContext();
+    if (!editContext) {
       return;
     }
 
@@ -209,9 +210,10 @@ export class KerningTool extends BaseTool {
     this.pushUndoItem(changes, undoLabel);
   }
 
-  async getEditContext() {
+  async getEditContext(wantValues = true) {
     const sourceIdentifier = this.getSourceIdentifier();
-    if (!sourceIdentifier) {
+    if (!sourceIdentifier && wantValues) {
+      this.showDialogLocationNotAtSource();
       return {};
     }
 
@@ -230,13 +232,15 @@ export class KerningTool extends BaseTool {
         rightGlyph
       );
       pairSelectors.push({ leftName, rightName, sourceIdentifier });
-      values.push(
-        kerningController.getPairValueForSource(
-          leftName,
-          rightName,
-          sourceIdentifier
-        ) || 0
-      );
+      if (wantValues) {
+        values.push(
+          kerningController.getPairValueForSource(
+            leftName,
+            rightName,
+            sourceIdentifier
+          ) || 0
+        );
+      }
     }
 
     if (!pairSelectors.length) {
@@ -246,6 +250,29 @@ export class KerningTool extends BaseTool {
     const editContext = kerningController.getEditContext(pairSelectors);
 
     return { editContext, values };
+  }
+
+  async showDialogLocationNotAtSource() {
+    const glyphName = this.sceneSettings.selectedGlyphName;
+    const result = await dialog(
+      translate("dialog.cant-edit.title"),
+      translate("dialog.cant-edit-glyph.content.location-not-at-source"),
+      [
+        {
+          title: translate("dialog.cancel"),
+          resultValue: "cancel",
+          isCancelButton: true,
+        },
+        {
+          title: translate("sources.button.go-to-nearest-source"),
+          resultValue: "goToNearestSource",
+          isDefaultButton: true,
+        },
+      ]
+    );
+    if (result === "goToNearestSource") {
+      this.editor.goToNearestSource();
+    }
   }
 
   getSourceIdentifier() {
@@ -406,7 +433,7 @@ export class KerningTool extends BaseTool {
   }
 
   async doDelete() {
-    const { editContext, values } = await this.getEditContext();
+    const { editContext } = await this.getEditContext(false);
     if (!editContext) {
       return;
     }
