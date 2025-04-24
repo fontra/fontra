@@ -9,12 +9,22 @@ import {
   registerVisualizationLayerDefinition,
 } from "./visualization-layer-definitions.js";
 
-const KERNING_VISUALIZATION_IDENTIFIER = "fontra.kerning-indicators";
+let theKerningTool; // global simpleton
+
+function kerningVisualizationSelector(forTool) {
+  return (visContext, layer) => {
+    if (forTool === theKerningTool?.isActive) {
+      return glyphSelector("all")(visContext, layer);
+    } else {
+      return [];
+    }
+  };
+}
 
 const kernVisualizationDefinition = {
   identifier: "fontra.kerning-indicators",
   name: "sidebar.user-settings.glyph.kerning",
-  selectionFunc: glyphSelector("all"),
+  selectionFunc: kerningVisualizationSelector(false),
   userSwitchable: true,
   defaultOn: false,
   zIndex: 190,
@@ -40,6 +50,7 @@ registerVisualizationLayerDefinition({
   ...kernVisualizationDefinition,
   identifier: "fontra.kerning-indicators-tool",
   name: "sidebar.user-settings.glyph.kerning-tool",
+  selectionFunc: kerningVisualizationSelector(true),
   defaultOn: true,
 });
 
@@ -83,9 +94,11 @@ export class KerningTool extends BaseTool {
       false
     );
 
-    this.showKerningWhileActive = true;
     this.undoStack = new UndoStack();
     this._getPinPointDelta = () => this.getPinPointDelta();
+
+    assert(!theKerningTool);
+    theKerningTool = this;
   }
 
   handleHover(event) {
@@ -296,9 +309,6 @@ export class KerningTool extends BaseTool {
       this.sceneSettings.applyKerning = true;
     }
 
-    this.showKerningWhileInactive = this.showKerning;
-    this.showKerning = this.showKerningWhileActive;
-
     this.setCursor();
   }
 
@@ -310,9 +320,6 @@ export class KerningTool extends BaseTool {
     };
     delete this.hoveredKerning;
     this.removeAllHandles();
-
-    this.showKerningWhileActive = this.showKerning;
-    this.showKerning = this.showKerningWhileInactive;
   }
 
   get kerningSelection() {
@@ -338,17 +345,6 @@ export class KerningTool extends BaseTool {
 
   removeAllHandles() {
     this.handles.forEach((handle) => handle.remove());
-  }
-
-  get showKerning() {
-    return this.editor.visualizationLayersSettings.model[
-      KERNING_VISUALIZATION_IDENTIFIER
-    ];
-  }
-
-  set showKerning(onOff) {
-    this.editor.visualizationLayersSettings.model[KERNING_VISUALIZATION_IDENTIFIER] =
-      onOff;
   }
 
   getUndoRedoLabel(isRedo) {
