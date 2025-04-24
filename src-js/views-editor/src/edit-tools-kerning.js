@@ -4,8 +4,36 @@ import { translate } from "@fontra/core/localization.js";
 import { arrowKeyDeltas, assert, round } from "@fontra/core/utils.js";
 import { BaseTool, shouldInitiateDrag } from "./edit-tools-base.js";
 import { equalGlyphSelection } from "./scene-controller.js";
+import {
+  glyphSelector,
+  registerVisualizationLayerDefinition,
+} from "./visualization-layer-definitions.js";
 
 const KERNING_VISUALIZATION_IDENTIFIER = "fontra.kerning-indicators";
+
+registerVisualizationLayerDefinition({
+  identifier: "fontra.kerning-indicators",
+  name: "sidebar.user-settings.glyph.kerning",
+  selectionFunc: glyphSelector("all"),
+  userSwitchable: true,
+  defaultOn: false,
+  zIndex: 190,
+  colors: { negativeKernColor: "#F1175933", positiveKernColor: "#1759F133" },
+  colorsDarkMode: { negativeKernColor: "#FF336655", positiveKernColor: "#3366FF55" },
+  draw: (context, positionedGlyph, parameters, model, controller) => {
+    if (!positionedGlyph.kernValue) {
+      return;
+    }
+    context.fillStyle =
+      positionedGlyph.kernValue > 0
+        ? parameters.positiveKernColor
+        : parameters.negativeKernColor;
+
+    const ascender = model.ascender;
+    const descender = model.descender;
+    context.fillRect(0, descender, -positionedGlyph.kernValue, ascender - descender);
+  },
+});
 
 export class KerningTool extends BaseTool {
   iconPath = "/images/kerning.svg";
