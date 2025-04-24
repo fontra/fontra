@@ -67,7 +67,9 @@ export class KerningController {
 
   instantiate(location) {
     const sourceIdentifier =
-      this.fontController.fontSourcesInstancer.getSourceIdentifierForLocation(location);
+      this.fontController.fontSourcesInstancer?.getSourceIdentifierForLocation(
+        location
+      );
 
     return new KerningInstance(this, location, sourceIdentifier);
   }
