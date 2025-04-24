@@ -66,7 +66,10 @@ export class KerningController {
   }
 
   instantiate(location) {
-    return new KerningInstance(this, location);
+    const sourceIdentifier =
+      this.fontController.fontSourcesInstancer.getSourceIdentifierForLocation(location);
+
+    return new KerningInstance(this, location, sourceIdentifier);
   }
 
   getPairValueForSource(leftName, rightName, sourceIdentifier) {
@@ -125,17 +128,25 @@ export class KerningController {
     ].filter(([leftName, rightName]) => leftName && rightName);
   }
 
-  getGlyphPairValue(leftGlyph, rightGlyph, location) {
+  getGlyphPairValue(leftGlyph, rightGlyph, location, sourceIdentifier) {
     const pairsToTry = this.getPairsToTry(leftGlyph, rightGlyph);
 
     let value = null;
 
     for (const [leftName, rightName] of pairsToTry) {
-      const pairFunction = this._getPairFunction(leftName, rightName);
+      if (sourceIdentifier) {
+        const index = this.sourceIdentifiers.indexOf(sourceIdentifier);
+        const values = this.getPairValues(leftName, rightName);
+        if (index >= 0 && values) {
+          value = values[index];
+        }
+      } else {
+        const pairFunction = this._getPairFunction(leftName, rightName);
 
-      if (pairFunction) {
-        value = pairFunction(location);
-        break;
+        if (pairFunction) {
+          value = pairFunction(location);
+          break;
+        }
       }
     }
 
@@ -148,16 +159,22 @@ export class KerningController {
 }
 
 class KerningInstance {
-  constructor(controller, location) {
+  constructor(controller, location, sourceIdentifier) {
     this.controller = controller;
     this.location = location;
+    this.sourceIdentifier = sourceIdentifier; // may be undefined
     this.valueCache = {};
   }
 
   getGlyphPairValue(leftGlyph, rightGlyph) {
     let value = this.valueCache[leftGlyph]?.[rightGlyph];
     if (value === undefined) {
-      value = this.controller.getGlyphPairValue(leftGlyph, rightGlyph, this.location);
+      value = this.controller.getGlyphPairValue(
+        leftGlyph,
+        rightGlyph,
+        this.location,
+        this.sourceIdentifier
+      );
       if (!this.valueCache[leftGlyph]) {
         this.valueCache[leftGlyph] = {};
       }
