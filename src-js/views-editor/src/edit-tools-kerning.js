@@ -438,6 +438,8 @@ export class KerningTool extends BaseTool {
       return;
     }
 
+    this.sceneController.scrollAdjustBehavior = this.getScrollAdjustBehavior();
+
     const undoLabel = "delete kerning";
     const changes = await editContext.delete(undoLabel);
     this.pushUndoItem(changes, undoLabel);
