@@ -73,6 +73,12 @@ export class KerningController {
   }
 
   getPairValueForSource(leftName, rightName, sourceIdentifier) {
+    /*
+     * For the return value, we distinquish between:
+     * - undefined: there exists no kerning data for this pair
+     * - null: there exists kerning data for this pair, but at *this* source
+     *   the value is `null``
+     */
     const values = this.getPairValues(leftName, rightName);
     if (!values) {
       return undefined;
@@ -82,6 +88,7 @@ export class KerningController {
       return undefined;
     }
     const value = values[index];
+    // The values array may be too short, turn undefined into null
     return value === undefined ? null : value;
   }
 
