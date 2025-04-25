@@ -19,7 +19,9 @@ export class KerningController {
   }
 
   get kernData() {
-    return this.kerning[this.kernTag];
+    return (
+      this.kerning[this.kernTag] || { groups: {}, values: {}, sourceIdentifiers: [] }
+    );
   }
 
   _setup() {
