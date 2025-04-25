@@ -107,6 +107,20 @@ describe("KerningController Tests", () => {
         },
       ],
     },
+    {
+      doDelete: true,
+      pairSelectors: [{ sourceIdentifier: "a", leftName: "T", rightName: "A" }],
+      newValues: [300],
+      valueChecks: [
+        { leftGlyph: "T", rightGlyph: "A", expectedValue: null, location: {} },
+        {
+          leftGlyph: "T",
+          rightGlyph: "A",
+          expectedValue: null,
+          location: { Weight: 500 },
+        },
+      ],
+    },
   ];
 
   parametrize("KerningController editing test", testCasesEditing, async (testCase) => {
@@ -120,7 +134,12 @@ describe("KerningController Tests", () => {
       testFontController
     );
     const editContext = controller.getEditContext(testCase.pairSelectors);
-    const changes = await editContext.edit(testCase.newValues);
+    let changes;
+    if (testCase.doDelete) {
+      changes = await editContext.delete();
+    } else {
+      changes = await editContext.edit(testCase.newValues);
+    }
 
     expect(editedFont).to.not.deep.equal(testFont);
 
