@@ -239,10 +239,11 @@ class KerningEditContext {
   }
 
   async editContinuous(valuesIterator, undoLabel) {
+    const font = { kerning: this.kerningController.kerning };
     const fontController = this.kerningController.fontController;
-    const basePath = ["kerning", this.kerningController.kernTag, "values"];
 
-    let initialChanges = recordChanges(this.kerningController.values, (values) => {
+    let initialChanges = recordChanges(font, (font) => {
+      const values = font.kerning[this.kerningController.kernTag].values;
       for (const { leftName, rightName } of this.pairSelectors) {
         if (!values[leftName]) {
           values[leftName] = {};
@@ -254,10 +255,6 @@ class KerningEditContext {
         }
       }
     });
-
-    if (initialChanges.hasChange) {
-      initialChanges = initialChanges.prefixed(basePath);
-    }
 
     if (initialChanges.hasChange) {
       await fontController.editIncremental(initialChanges.change);
@@ -274,7 +271,8 @@ class KerningEditContext {
     let lastChanges;
     for await (const newValues of valuesIterator) {
       assert(newValues.length === this.pairSelectors.length);
-      lastChanges = recordChanges(this.kerningController.values, (values) => {
+      lastChanges = recordChanges(font, (font) => {
+        const values = font.kerning[this.kerningController.kernTag].values;
         for (const [{ sourceIdentifier, leftName, rightName }, newValue] of zip(
           this.pairSelectors,
           newValues
@@ -284,7 +282,6 @@ class KerningEditContext {
           values[leftName][rightName][index] = newValue;
         }
       });
-      lastChanges = lastChanges.prefixed(basePath);
       if (!firstChanges) {
         firstChanges = lastChanges;
       }
