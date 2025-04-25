@@ -162,6 +162,45 @@ describe("KerningController Tests", () => {
     expect(newlyEditedFont).to.deep.equal(editedFont);
     expect(newlyEditedFont).to.not.deep.equal(testFont);
   });
+
+  it("KerningController empty kerning data", async () => {
+    const pairSelectors = [
+      {
+        sourceIdentifier: "a",
+        leftName: "T",
+        rightName: "A",
+      },
+      {
+        sourceIdentifier: "b",
+        leftName: "T",
+        rightName: "A",
+      },
+    ];
+    const testFont = { kerning: {} };
+
+    const editedFont = copyObject(testFont);
+
+    const controller = new KerningController(
+      "kern",
+      editedFont.kerning,
+      testFontController
+    );
+    const editContext = controller.getEditContext(pairSelectors);
+
+    const changes = await editContext.edit([100, 200]);
+
+    {
+      const instance = controller.instantiate({});
+      const value = instance.getGlyphPairValue("T", "A");
+      expect(value).to.equal(100);
+    }
+
+    {
+      const instance = controller.instantiate({ Weight: 500 });
+      const value = instance.getGlyphPairValue("T", "A");
+      expect(value).to.equal(150);
+    }
+  });
 });
 
 function copyObject(obj) {
