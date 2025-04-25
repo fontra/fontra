@@ -1037,10 +1037,7 @@ export class FontController {
     let kerningController = this._kerningControllers[kernTag];
     if (kerningController === undefined) {
       const kerning = await this.getKerning();
-      const kerningTable = kerning[kernTag];
-      if (kerningTable) {
-        kerningController = new KerningController(kernTag, kerningTable, this);
-      }
+      kerningController = new KerningController(kernTag, kerning, this);
       this._kerningControllers[kernTag] = kerningController || null;
     }
     return kerningController;
