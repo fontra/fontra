@@ -309,7 +309,9 @@ class KerningEditContext {
   }
 
   async delete(undoLabel) {
-    let changes = recordChanges(this.kerningController.values, (values) => {
+    const font = { kerning: this.kerningController.kerning };
+    let changes = recordChanges(font, (font) => {
+      const values = font.kerning[this.kerningController.kernTag].values;
       for (const { leftName, rightName } of this.pairSelectors) {
         if (!values[leftName][rightName]) {
           continue;
@@ -320,11 +322,6 @@ class KerningEditContext {
         }
       }
     });
-
-    if (changes.hasChange) {
-      const basePath = ["kerning", this.kerningController.kernTag, "values"];
-      changes = changes.prefixed(basePath);
-    }
 
     await this.fontController.editFinal(
       changes.change,
