@@ -335,6 +335,8 @@ function patternFromPath(matchPath) {
   return pattern;
 }
 
+export const wildcard = "__WILDCARD__"; // A Symbol would be better, but JSON.
+
 export function matchChangePattern(change, matchPattern) {
   //
   // Return `true` or `false`, depending on whether the `change` matches
@@ -346,7 +348,10 @@ export function matchChangePattern(change, matchPattern) {
   //
   let node = matchPattern;
   for (const pathElement of change.p || []) {
-    const childNode = node[pathElement];
+    let childNode = node[pathElement];
+    if (childNode === undefined) {
+      childNode = node[wildcard];
+    }
     if (childNode === undefined) {
       return false;
     }
