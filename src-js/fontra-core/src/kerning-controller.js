@@ -11,11 +11,15 @@ import {
 } from "./utils.js";
 
 export class KerningController {
-  constructor(kernTag, kernData, fontController) {
+  constructor(kernTag, kerning, fontController) {
     this.kernTag = kernTag;
-    this.kernData = kernData;
+    this.kerning = kerning;
     this.fontController = fontController;
     this._setup();
+  }
+
+  get kernData() {
+    return this.kerning[this.kernTag];
   }
 
   _setup() {

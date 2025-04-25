@@ -29,16 +29,18 @@ describe("KerningController Tests", () => {
     testFontController.sources
   );
 
-  const testKernData = {
-    groups: { "left.O": ["O", "D", "Q"], "right.O": ["O", "C", "G", "Q"] },
-    sourceIdentifiers: ["a", "b", "c", "d", "e", "f"],
-    values: {
-      "T": { A: [-100, null, null, -200, null, null] },
-      "left.O": {
-        "right.O": [10, null, null, null, null, null],
-        "Q": [20, null, 40, null, null, null],
+  const testKerning = {
+    kern: {
+      groups: { "left.O": ["O", "D", "Q"], "right.O": ["O", "C", "G", "Q"] },
+      sourceIdentifiers: ["a", "b", "c", "d", "e", "f"],
+      values: {
+        "T": { A: [-100, null, null, -200, null, null] },
+        "left.O": {
+          "right.O": [10, null, null, null, null, null],
+          "Q": [20, null, 40, null, null, null],
+        },
+        "Q": { Q: [1, null, null, null, null, null] },
       },
-      "Q": { Q: [1, null, null, null, null, null] },
     },
   };
 
@@ -55,7 +57,7 @@ describe("KerningController Tests", () => {
   ];
 
   parametrize("KerningController basic test", testCasesBasic, (testCase) => {
-    const controller = new KerningController("kern", testKernData, testFontController);
+    const controller = new KerningController("kern", testKerning, testFontController);
     const instance = controller.instantiate(testCase.location);
     expect(
       instance.getGlyphPairValue(testCase.leftGlyph, testCase.rightGlyph)
@@ -108,13 +110,13 @@ describe("KerningController Tests", () => {
   ];
 
   parametrize("KerningController editing test", testCasesEditing, async (testCase) => {
-    const testFont = { kerning: { kern: testKernData } };
+    const testFont = { kerning: testKerning };
 
     const editedFont = copyObject(testFont);
 
     const controller = new KerningController(
       "kern",
-      editedFont.kerning["kern"],
+      editedFont.kerning,
       testFontController
     );
     const editContext = controller.getEditContext(testCase.pairSelectors);
