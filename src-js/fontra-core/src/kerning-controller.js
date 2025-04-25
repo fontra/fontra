@@ -24,6 +24,10 @@ export class KerningController {
     );
   }
 
+  clearCaches() {
+    this._setup();
+  }
+
   _setup() {
     const leftPairNames = new Set(Object.keys(this.kernData.values));
     const rightPairNames = new Set();
@@ -243,6 +247,8 @@ class KerningEditContext {
     const fontController = this.kerningController.fontController;
 
     let initialChanges = recordChanges(font, (font) => {
+      ensureKerningData(font.kerning, this.kerningController.kernTag);
+
       const values = font.kerning[this.kerningController.kernTag].values;
       for (const { leftName, rightName } of this.pairSelectors) {
         if (!values[leftName]) {
@@ -272,13 +278,31 @@ class KerningEditContext {
     for await (const newValues of valuesIterator) {
       assert(newValues.length === this.pairSelectors.length);
       lastChanges = recordChanges(font, (font) => {
-        const values = font.kerning[this.kerningController.kernTag].values;
+        const kernData = font.kerning[this.kerningController.kernTag];
+        const values = kernData.values;
         for (const [{ sourceIdentifier, leftName, rightName }, newValue] of zip(
           this.pairSelectors,
           newValues
         )) {
-          const index = sourceIndices[sourceIdentifier];
-          assert(index !== undefined);
+          let index = sourceIndices[sourceIdentifier];
+          if (index === undefined) {
+            // We haven't seen this source before, we need to add it to the list
+            index = kernData.sourceIdentifiers.length;
+            kernData.sourceIdentifiers = [
+              ...kernData.sourceIdentifiers,
+              sourceIdentifier,
+            ];
+            sourceIndices[sourceIdentifier] = index;
+            this.kerningController.clearCaches();
+          }
+          if (values[leftName][rightName].length <= index) {
+            // The values list isn't long enough, let's extend it
+            const n = 1 + index - values[leftName][rightName].length;
+            values[leftName][rightName] = values[leftName][rightName].concat(
+              Array(n).fill(null)
+            );
+            assert(values[leftName][rightName][index] === null);
+          }
           values[leftName][rightName][index] = newValue;
         }
       });
@@ -339,4 +363,15 @@ function makeGlyphGroupMapping(groupNames, groups) {
     });
   }
   return mapping;
+}
+
+function ensureKerningData(kerning, kernTag) {
+  if (!kerning[kernTag]) {
+    // We don't have data yet for this kern tag
+    kerning[kernTag] = {
+      sourceIdentifiers: [],
+      groups: {},
+      values: {},
+    };
+  }
 }
