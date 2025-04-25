@@ -1,5 +1,5 @@
 import { recordChanges } from "./change-recorder.js";
-import { ChangeCollector } from "./changes.js";
+import { ChangeCollector, wildcard } from "./changes.js";
 import { DiscreteVariationModel } from "./discrete-variation-model.js";
 import {
   assert,
@@ -15,6 +15,14 @@ export class KerningController {
     this.kernTag = kernTag;
     this.kerning = kerning;
     this.fontController = fontController;
+
+    this.fontController.addChangeListener?.(
+      { kerning: { [wildcard]: { sourceIdentifiers: null } } },
+      (change, isExternalChange) => {
+        this.clearCaches();
+      }
+    );
+
     this._setup();
   }
 
@@ -248,9 +256,17 @@ class KerningEditContext {
 
     let initialChanges = recordChanges(font, (font) => {
       ensureKerningData(font.kerning, this.kerningController.kernTag);
+      const kernData = font.kerning[this.kerningController.kernTag];
 
       const values = font.kerning[this.kerningController.kernTag].values;
-      for (const { leftName, rightName } of this.pairSelectors) {
+      for (const { sourceIdentifier, leftName, rightName } of this.pairSelectors) {
+        if (!kernData.sourceIdentifiers.includes(sourceIdentifier)) {
+          kernData.sourceIdentifiers = [
+            ...kernData.sourceIdentifiers,
+            sourceIdentifier,
+          ];
+          this.kerningController.clearCaches();
+        }
         if (!values[leftName]) {
           values[leftName] = {};
         }
@@ -258,6 +274,19 @@ class KerningEditContext {
           values[leftName][rightName] = Array(
             this.kerningController.sourceIdentifiers.length
           ).fill(null);
+        } else {
+          if (
+            values[leftName][rightName].length <
+            this.kerningController.sourceIdentifiers.length
+          ) {
+            const n =
+              this.kerningController.sourceIdentifiers.length -
+              values[leftName][rightName].length;
+            values[leftName][rightName] = [
+              ...values[leftName][rightName],
+              ...Array(n).fill(null),
+            ];
+          }
         }
       }
     });
@@ -285,24 +314,8 @@ class KerningEditContext {
           newValues
         )) {
           let index = sourceIndices[sourceIdentifier];
-          if (index === undefined) {
-            // We haven't seen this source before, we need to add it to the list
-            index = kernData.sourceIdentifiers.length;
-            kernData.sourceIdentifiers = [
-              ...kernData.sourceIdentifiers,
-              sourceIdentifier,
-            ];
-            sourceIndices[sourceIdentifier] = index;
-            this.kerningController.clearCaches();
-          }
-          if (values[leftName][rightName].length <= index) {
-            // The values list isn't long enough, let's extend it
-            const n = 1 + index - values[leftName][rightName].length;
-            values[leftName][rightName] = values[leftName][rightName].concat(
-              Array(n).fill(null)
-            );
-            assert(values[leftName][rightName][index] === null);
-          }
+          assert(index != undefined);
+          assert(values[leftName][rightName]);
           values[leftName][rightName][index] = newValue;
         }
       });
