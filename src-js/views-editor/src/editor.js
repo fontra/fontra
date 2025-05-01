@@ -780,7 +780,7 @@ export class EditorController extends ViewController {
     const rootSubscriptionPattern = this.fontController.getRootSubscriptionPattern();
     return {
       subscriptionPattern: { ...rootSubscriptionPattern, ...subscriptionPattern },
-      liveSubscriptionPattern,
+      liveSubscriptionPattern: { kerning: null, ...liveSubscriptionPattern },
     };
   }
 
