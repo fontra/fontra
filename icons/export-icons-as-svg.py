@@ -33,7 +33,8 @@ def makeCursorSVG(pathString, width, height):
 
 thisDir = pathlib.Path(__file__).resolve().parent
 ufoPath = thisDir / "fontra-icons.ufo"
-imagesDir = thisDir.parent / "src" / "fontra" / "client" / "images"
+imagesDir = thisDir.parent / "src-js" / "fontra-core" / "assets" / "images"
+
 
 reader = UFOReader(ufoPath)
 
