@@ -56,7 +56,7 @@ registerVisualizationLayerDefinition({
 });
 
 export class KerningTool extends BaseTool {
-  iconPath = "/images/kerning.svg";
+  iconPath = "/images/kerningtool.svg";
   identifier = "kerning-tool";
 
   constructor(editor) {
