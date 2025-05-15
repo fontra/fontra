@@ -60,6 +60,8 @@
     <string>j.glif</string>
     <key>k</key>
     <string>k.glif</string>
+    <key>kerningtool</key>
+    <string>kerningtool.glif</string>
     <key>l</key>
     <string>l.glif</string>
     <key>layers</key>
