@@ -98,6 +98,8 @@
     <string>ruler.glif</string>
     <key>s</key>
     <string>s.glif</string>
+    <key>sidebearingtool</key>
+    <string>sidebearingtool.glif</string>
     <key>skew</key>
     <string>skew.glif</string>
     <key>sliders</key>

@@ -1,0 +1,54 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<glyph name="sidebearingtool" format="2">
+  <advance width="1000"/>
+  <outline>
+    <contour>
+      <point x="310" y="621" type="line"/>
+      <point x="310" y="644"/>
+      <point x="327" y="661"/>
+      <point x="350" y="661" type="curve" smooth="yes"/>
+      <point x="373" y="661"/>
+      <point x="390" y="644"/>
+      <point x="390" y="621" type="curve"/>
+      <point x="390" y="-7" type="line"/>
+      <point x="390" y="-30"/>
+      <point x="373" y="-47"/>
+      <point x="350" y="-47" type="curve" smooth="yes"/>
+      <point x="327" y="-47"/>
+      <point x="310" y="-30"/>
+      <point x="310" y="-7" type="curve"/>
+    </contour>
+    <contour>
+      <point x="610" y="621" type="line"/>
+      <point x="610" y="644"/>
+      <point x="627" y="661"/>
+      <point x="650" y="661" type="curve" smooth="yes"/>
+      <point x="673" y="661"/>
+      <point x="690" y="644"/>
+      <point x="690" y="621" type="curve"/>
+      <point x="690" y="-7" type="line"/>
+      <point x="690" y="-30"/>
+      <point x="673" y="-47"/>
+      <point x="650" y="-47" type="curve" smooth="yes"/>
+      <point x="627" y="-47"/>
+      <point x="610" y="-30"/>
+      <point x="610" y="-7" type="curve"/>
+    </contour>
+    <contour>
+      <point x="351" y="277" type="line"/>
+      <point x="350" y="337" type="line"/>
+      <point x="650" y="337" type="line"/>
+      <point x="650" y="277" type="line"/>
+    </contour>
+    <contour>
+      <point x="202" y="431" type="line"/>
+      <point x="78" y="307" type="line"/>
+      <point x="202" y="183" type="line"/>
+    </contour>
+    <contour>
+      <point x="798" y="183" type="line"/>
+      <point x="922" y="307" type="line"/>
+      <point x="798" y="431" type="line"/>
+    </contour>
+  </outline>
+</glyph>
