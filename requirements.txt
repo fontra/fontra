@@ -1,8 +1,8 @@
-aiohttp==3.12.6
-cattrs==25.1.0
-fonttools[ufo,unicode]==4.58.1
-pillow==11.2.1
+aiohttp==3.12.13
+cattrs==25.1.1
+fonttools[ufo,unicode]==4.58.4
+pillow==11.3.0
 pyyaml==6.0.2
-ufomerge==1.9.3
-watchfiles==1.0.5
+ufomerge==1.9.4
+watchfiles==1.1.0
 skia-pathops==0.8.0.post2
