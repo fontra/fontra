@@ -205,6 +205,11 @@ export class OpenTypeFeatureCodePanel extends BaseInfoPanel {
             run: toggleComment,
             preventDefault: true, // Prevent browser default behavior
           },
+          {
+            key: "Mod-Shift-z", // Cmd-Shift-Z on Mac, Ctrl-Shift-Z on Windows/Linux
+            run: redo,
+            preventDefault: true, // Prevent browser default behavior
+          },
           indentWithTab,
         ]),
         basicSetup,
