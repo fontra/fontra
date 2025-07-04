@@ -31,9 +31,9 @@
     "@babel/preset-env": "^7.27.2",
     "@babel/preset-typescript": "^7.27.1",
     "@codemirror/autocomplete": "^6.18.6",
-    "@codemirror/highlight": "^0.19.8",
-    "@codemirror/history": "^0.19.2",
     "@codemirror/language": "^6.11.2",
+    "@codemirror/legacy-modes": "^6.5.1",
+    "@lezer/highlight": "^1.2.1",
     "babel-loader": "^10.0.0",
     "codemirror": "^6.0.2"
   }
