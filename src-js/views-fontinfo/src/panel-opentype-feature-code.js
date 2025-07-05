@@ -4,7 +4,6 @@ import {
   indentWithTab,
   redo,
   redoDepth,
-  toggleComment,
   undo,
   undoDepth,
 } from "@codemirror/commands";
@@ -200,11 +199,6 @@ export class OpenTypeFeatureCodePanel extends BaseInfoPanel {
       extensions: [
         openTypeFeatureLanguage,
         keymap.of([
-          {
-            key: "Mod-/", // Cmd-/ on Mac, Ctrl-/ on Windows/Linux
-            run: toggleComment,
-            preventDefault: true, // Prevent browser default behavior
-          },
           {
             key: "Mod-Shift-z", // Cmd-Shift-Z on Mac, Ctrl-Shift-Z on Windows/Linux
             run: redo,
