@@ -3159,8 +3159,7 @@ export class EditorController extends ViewController {
   enterCleanViewAndHandTool(event) {
     if (this.sceneSettings.cleanViewSizePreview) {
       this.savedViewBox = this.sceneSettings.viewBox;
-      const pixels = (4 / 3) * this.sceneSettings.textSize;
-      this.zoomToFontSize(pixels, false);
+      this.zoomToFontSize(this.sceneSettings.textSize, false);
     }
     this.canvasController.sceneView = this.cleanSceneView;
     this.canvasController.requestUpdate();
@@ -3447,14 +3446,13 @@ export class EditorController extends ViewController {
   }
 
   zoomToFontSize(size, animate = true) {
-    // `size` is in pixels
-
     let viewBox = this.sceneSettings.viewBox;
     const upm = this.fontController.unitsPerEm;
     const canvasHeight = this.canvasController.canvasHeight;
 
+    const pixel_size = (4 / 3) * size; // pt to px
     const currentHeight = (viewBox.yMax - viewBox.yMin) / upm;
-    const desiredHeight = canvasHeight / size;
+    const desiredHeight = canvasHeight / pixel_size;
 
     const center = rectCenter(viewBox);
     viewBox = rectScaleAroundCenter(viewBox, desiredHeight / currentHeight, center);

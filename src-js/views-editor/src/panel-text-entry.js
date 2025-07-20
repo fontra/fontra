@@ -174,8 +174,7 @@ export default class TextEntryPanel extends Panel {
     const buttonSet = html.createDomElement("icon-button", {
       "src": "/tabler-icons/resize.svg",
       "onclick": (event) => {
-        const pixels = (4 / 3) * this.textSettings.textSize; // pt to px
-        this.editorController.zoomToFontSize(pixels);
+        this.editorController.zoomToFontSize(this.textSettings.textSize);
       },
       "class": "ui-form-icon ui-form-icon-button",
       "data-tooltip": "Set text size", // TODO: translate
