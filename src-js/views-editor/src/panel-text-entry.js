@@ -159,10 +159,6 @@ export default class TextEntryPanel extends Panel {
   }
 
   setupTextSizeForm() {
-    if (!this.textSettings.textSize) {
-      this.textSettings.textSize = 12;
-    }
-
     this.textSizeForm = new Form();
     const formContents = [];
 
@@ -213,9 +209,13 @@ export default class TextEntryPanel extends Panel {
   }
 
   setupTextSizeHandler() {
-    this.textSizeForm.addEventListener("doChange", (event) => {
+    this.textSettingsController.addKeyListener("textSize", (event) => {
+      this.textSizeForm.setValue("textSize", event.newValue);
+    });
+
+    this.textSizeForm.addEventListener("endChange", (event) => {
       if (event.detail.key == "textSize") {
-        this.textSettings.textSize = event.detail.value;
+        this.textSettings.textSize = this.textSizeForm.getValue("textSize");
       }
     });
   }

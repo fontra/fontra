@@ -163,6 +163,7 @@ export class EditorController extends ViewController {
         "selection",
         "substituteGlyphName",
         "text",
+        "textSize",
         "viewBox",
       ],
       (event) => {
@@ -3304,6 +3305,10 @@ export class EditorController extends ViewController {
     }
     this._previousURLText = viewInfo["text"];
 
+    if (viewInfo["textSize"]) {
+      this.sceneSettings.textSize = viewInfo["textSize"];
+    }
+
     this.sceneModel.setGlyphLocations(viewInfo["glyphLocations"]);
 
     if (viewInfo["fontAxesUseSourceCoordinates"]) {
@@ -3375,6 +3380,9 @@ export class EditorController extends ViewController {
     }
     if (this.sceneSettings.text?.length) {
       viewInfo["text"] = this.sceneSettings.text;
+    }
+    if (this.sceneSettings.textSize) {
+      viewInfo["textSize"] = this.sceneSettings.textSize;
     }
     if (this.sceneSettings.selectedGlyph) {
       viewInfo["selectedGlyph"] = this.sceneSettings.selectedGlyph;
