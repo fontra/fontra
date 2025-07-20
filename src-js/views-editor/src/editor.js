@@ -3426,6 +3426,19 @@ export class EditorController extends ViewController {
     this._zoom(Math.sqrt(2));
   }
 
+  zoomToFontSize(size) {
+    // `size` is in pixels
+
+    const viewBox = this.sceneSettings.viewBox;
+    const upm = this.fontController.unitsPerEm;
+    const canvasHeight = this.canvasController.canvasHeight;
+
+    const currentHeight = (viewBox.yMax - viewBox.yMin) / upm;
+    const desiredHeight = canvasHeight / size;
+
+    this._zoom(desiredHeight / currentHeight);
+  }
+
   _zoom(factor) {
     let viewBox = this.sceneSettings.viewBox;
     const selBox = this.sceneController.getSelectionBounds();

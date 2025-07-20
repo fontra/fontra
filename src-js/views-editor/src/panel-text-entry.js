@@ -1,6 +1,7 @@
 import * as html from "@fontra/core/html-utils.js";
 import { labeledCheckbox } from "@fontra/core/ui-utils.js";
 import { findNestedActiveElement } from "@fontra/core/utils.js";
+import { Form } from "@fontra/web-components/ui-form.js";
 import Panel from "./panel.js";
 
 export default class TextEntryPanel extends Panel {
@@ -72,6 +73,8 @@ export default class TextEntryPanel extends Panel {
     this.setupTextEntryElement();
     this.setupTextAlignElement();
     this.setupApplyKerningElement();
+    this.setupTextSizeForm();
+    this.setupTextSizeHandler();
     this.setupIntersectionObserver();
   }
 
@@ -112,6 +115,7 @@ export default class TextEntryPanel extends Panel {
               ]
             ),
             html.div({ id: "apply-kerning-checkbox" }),
+            html.div({ id: "text-size-form" }),
           ]
         ),
       ]
@@ -152,6 +156,57 @@ export default class TextEntryPanel extends Panel {
 
     const placeHolder = this.contentElement.querySelector("#apply-kerning-checkbox");
     placeHolder.replaceWith(this.applyKerningCheckBox);
+  }
+
+  setupTextSizeForm() {
+    if (!this.textSettings.textSize) {
+      this.textSettings.textSize = 12;
+    }
+
+    this.textSizeForm = new Form();
+    const formContents = [];
+
+    formContents.push({
+      type: "header",
+      label: "Text Size", // TODO: translate
+    });
+
+    const buttonSet = html.createDomElement("icon-button", {
+      "src": "/tabler-icons/resize.svg",
+      "onclick": (event) => {
+        const pixels = (4 / 3) * this.textSettings.textSize; // pt to px
+        this.editorController.zoomToFontSize(pixels);
+      },
+      "class": "ui-form-icon ui-form-icon-button",
+      "data-tooltip": "Set text size", // TODO: translate
+      "data-tooltipposition": "top",
+    });
+
+    formContents.push({
+      type: "edit-number-slider",
+      key: "textSize",
+      label: buttonSet,
+      value: this.textSettings.textSize,
+      defaultValue: 12,
+      minValue: 8,
+      maxValue: 96,
+      step: 1,
+    });
+
+    this.textSizeForm.setFieldDescriptions(formContents);
+
+    this.textSizeForm.style.setProperty("--label-column-width", "20%");
+
+    const placeHolder = this.contentElement.querySelector("#text-size-form");
+    placeHolder.replaceWith(this.textSizeForm);
+  }
+
+  setupTextSizeHandler() {
+    this.textSizeForm.addEventListener("doChange", (event) => {
+      if (event.detail.key == "textSize") {
+        this.textSettings.textSize = event.detail.value;
+      }
+    });
   }
 
   setupTextEntryElement() {
