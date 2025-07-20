@@ -193,6 +193,18 @@ export default class TextEntryPanel extends Panel {
       step: 1,
     });
 
+    const checkboxCleanPreview = labeledCheckbox(
+      "Use this size in clean view", // TODO: translate
+      this.textSettingsController,
+      "cleanViewSizePreview",
+      {}
+    );
+
+    formContents.push({
+      type: "single-icon",
+      element: checkboxCleanPreview,
+    });
+
     this.textSizeForm.setFieldDescriptions(formContents);
 
     this.textSizeForm.style.setProperty("--label-column-width", "20%");

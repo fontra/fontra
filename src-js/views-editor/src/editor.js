@@ -150,6 +150,7 @@ export class EditorController extends ViewController {
       [
         "align",
         "applyKerning",
+        "cleanViewSizePreview",
         "editLayerName",
         "editingLayers",
         "fontLocationUser",
@@ -3156,6 +3157,11 @@ export class EditorController extends ViewController {
   }
 
   enterCleanViewAndHandTool(event) {
+    if (this.sceneSettings.cleanViewSizePreview) {
+      this.savedViewBox = this.sceneSettings.viewBox;
+      const pixels = (4 / 3) * this.sceneSettings.textSize;
+      this.zoomToFontSize(pixels, false);
+    }
     this.canvasController.sceneView = this.cleanSceneView;
     this.canvasController.requestUpdate();
     for (const overlay of document.querySelectorAll(".cleanable-overlay")) {
@@ -3177,6 +3183,15 @@ export class EditorController extends ViewController {
     }
     this.setSelectedTool(this.savedSelectedToolIdentifier);
     delete this.savedSelectedToolIdentifier;
+    if (this.savedViewBox) {
+      // wait one frame so that the canvas size has settled back to normal
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          this.sceneSettings.viewBox = this.savedViewBox;
+          delete this.savedViewBox;
+        });
+      });
+    }
   }
 
   buildContextMenuItems(event) {
@@ -3272,6 +3287,8 @@ export class EditorController extends ViewController {
     }
     this.sceneSettings.align = viewInfo["align"] || "center";
     this.sceneSettings.applyKerning = viewInfo["applyKerning"] === false ? false : true;
+    this.sceneSettings.cleanViewSizePreview =
+      viewInfo["cleanViewSizePreview"] === true ? true : false;
     if (viewInfo["viewBox"]) {
       this.sceneController.autoViewBox = false;
       const viewBox = viewInfo["viewBox"];
@@ -3405,6 +3422,9 @@ export class EditorController extends ViewController {
     if (!this.sceneSettings.applyKerning) {
       viewInfo["applyKerning"] = this.sceneSettings.applyKerning;
     }
+    if (this.sceneSettings.cleanViewSizePreview) {
+      viewInfo["cleanViewSizePreview"] = this.sceneSettings.cleanViewSizePreview;
+    }
 
     const url = new URL(window.location);
     clearSearchParams(url.searchParams); /* clear legacy URL format */
@@ -3426,17 +3446,24 @@ export class EditorController extends ViewController {
     this._zoom(Math.sqrt(2));
   }
 
-  zoomToFontSize(size) {
+  zoomToFontSize(size, animate = true) {
     // `size` is in pixels
 
-    const viewBox = this.sceneSettings.viewBox;
+    let viewBox = this.sceneSettings.viewBox;
     const upm = this.fontController.unitsPerEm;
     const canvasHeight = this.canvasController.canvasHeight;
 
     const currentHeight = (viewBox.yMax - viewBox.yMin) / upm;
     const desiredHeight = canvasHeight / size;
 
-    this._zoom(desiredHeight / currentHeight);
+    const center = rectCenter(viewBox);
+    viewBox = rectScaleAroundCenter(viewBox, desiredHeight / currentHeight, center);
+    if (animate) {
+      this.animateToViewBox(viewBox);
+    } else {
+      this.sceneSettings.viewBox = viewBox;
+    }
+    this.sceneController.autoViewBox = false;
   }
 
   _zoom(factor) {
