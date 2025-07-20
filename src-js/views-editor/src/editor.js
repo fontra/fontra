@@ -21,6 +21,7 @@ import {
 } from "@fontra/core/path-functions.js";
 import {
   centeredRect,
+  pointInRect,
   rectAddMargin,
   rectCenter,
   rectFromArray,
@@ -3464,7 +3465,11 @@ export class EditorController extends ViewController {
     const desiredHeight = canvasHeight / pixel_size;
 
     const selBox = this.sceneController.getSelectionBounds();
-    const center = rectCenter(selBox || viewBox);
+    let center = rectCenter(selBox || viewBox);
+    // avoid going completely off-screen when zoomed in very close
+    if (currentHeight < 1.0 || !pointInRect(center.x, center.y, viewBox)) {
+      center = rectCenter(viewBox);
+    }
     viewBox = rectScaleAroundCenter(viewBox, desiredHeight / currentHeight, center);
     if (animate) {
       this.animateToViewBox(viewBox);
