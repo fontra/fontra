@@ -3446,6 +3446,7 @@ export class EditorController extends ViewController {
   }
 
   zoomToFontSize(size, animate = true) {
+    // TODO: does this function need modifications to work with vertical layout?
     let viewBox = this.sceneSettings.viewBox;
     const upm = this.fontController.unitsPerEm;
     const canvasHeight = this.canvasController.canvasHeight;
@@ -3454,7 +3455,8 @@ export class EditorController extends ViewController {
     const currentHeight = (viewBox.yMax - viewBox.yMin) / upm;
     const desiredHeight = canvasHeight / pixel_size;
 
-    const center = rectCenter(viewBox);
+    const selBox = this.sceneController.getSelectionBounds();
+    const center = rectCenter(selBox || viewBox);
     viewBox = rectScaleAroundCenter(viewBox, desiredHeight / currentHeight, center);
     if (animate) {
       this.animateToViewBox(viewBox);
