@@ -188,7 +188,9 @@ export default class TextEntryPanel extends Panel {
       value: this.textSettings.textSize,
       step: 1,
       onChangeCallback: (event) => {
-        this.textSettings.textSize = event.value;
+        if (!event.isDragging) {
+          this.textSettings.textSize = event.value;
+        }
       },
     });
 
