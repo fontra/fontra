@@ -93,7 +93,6 @@ export class SceneController {
       textSize: 12,
       align: "center",
       applyKerning: true,
-      cleanViewSizePreview: false,
       editLayerName: null,
       glyphLines: [],
       fontLocationUser: {},

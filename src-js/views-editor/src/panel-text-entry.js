@@ -139,7 +139,6 @@ export default class TextEntryPanel extends Panel {
                 html.div({ id: "text-size-slider" }),
               ]
             ),
-            html.div({ id: "text-size-clean-checkbox" }),
           ]
         ),
       ]
@@ -207,21 +206,10 @@ export default class TextEntryPanel extends Panel {
       "data-tooltipposition": "top",
     });
 
-    const checkboxCleanPreview = labeledCheckbox(
-      "Use this size in clean view", // TODO: translate
-      this.textSettingsController,
-      "cleanViewSizePreview",
-      {}
-    );
-
     const buttonPlaceHolder = this.contentElement.querySelector("#text-size-button");
     buttonPlaceHolder.replaceWith(buttonSet);
     const sliderPlaceHolder = this.contentElement.querySelector("#text-size-slider");
     sliderPlaceHolder.replaceWith(this.textSizeSlider);
-    const checkboxPlaceHolder = this.contentElement.querySelector(
-      "#text-size-clean-checkbox"
-    );
-    checkboxPlaceHolder.replaceWith(checkboxCleanPreview);
   }
 
   setupTextEntryElement() {
