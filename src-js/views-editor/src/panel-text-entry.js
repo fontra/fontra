@@ -63,10 +63,6 @@ export default class TextEntryPanel extends Panel {
 
     #text-size-menu {
       display: flex;
-    }
-
-    #text-size-menu {
-      display: flex;
       gap: 0.5em;
     }
 
@@ -76,6 +72,10 @@ export default class TextEntryPanel extends Panel {
       height: 1.5em;
       white-space: nowrap;
       flex: none;
+    }
+
+    #text-size-menu > range-slider {
+      flex: auto;
     }
   `;
 
@@ -129,7 +129,6 @@ export default class TextEntryPanel extends Panel {
                 }),
               ]
             ),
-            html.div({ id: "apply-kerning-checkbox" }),
             html.div(
               {
                 id: "text-size-menu",
@@ -139,6 +138,7 @@ export default class TextEntryPanel extends Panel {
                 html.div({ id: "text-size-slider" }),
               ]
             ),
+            html.div({ id: "apply-kerning-checkbox" }),
           ]
         ),
       ]
@@ -183,6 +183,8 @@ export default class TextEntryPanel extends Panel {
 
   setupTextSizeMenuElement() {
     this.textSizeSlider = html.createDomElement("range-slider", {
+      minValue: 6,
+      maxValue: 144,
       defaultValue: 12,
       value: this.textSettings.textSize,
       step: 1,
