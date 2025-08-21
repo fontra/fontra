@@ -17,7 +17,7 @@
   },
   "type": "module",
   "devDependencies": {
-    "chai": "^5.2.1",
+    "chai": "^5.3.1",
     "chai-almost": "^1.0.1",
     "mocha": "^11.7.1"
   }
