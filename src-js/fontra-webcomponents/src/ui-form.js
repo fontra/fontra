@@ -526,6 +526,65 @@ export class Form extends SimpleElement {
     valueElement.appendChild(rangeElement);
   }
 
+  _addSelectionEditNumberSlider(valueElement, fieldItem) {
+    let displayedValue = fieldItem.value;
+    if (displayedValue === undefined) {    
+        displayedValue = fieldItem.defaultValue;
+    }
+
+    const rangeElement = new RangeSlider();
+    rangeElement.value = displayedValue;
+    rangeElement.minValue = fieldItem.minValue;
+    rangeElement.defaultValue = fieldItem.defaultValue;
+    rangeElement.maxValue = fieldItem.maxValue;
+
+    let checkboxElement;
+    {
+      // Slider change closure
+      let valueStream = undefined;
+
+      rangeElement.onChangeCallback = (event) => {
+        const value = event.value;
+        if (event.dragBegin) {
+          valueStream = new QueueIterator(5, true);
+          this._fieldChanging(fieldItem, value, valueStream);
+        }
+
+        if (valueStream) {
+          valueStream.put(value);
+          this._dispatchEvent("doChange", { key: fieldItem.key, value: value });
+          if (event.dragEnd) {
+            valueStream.done();
+            valueStream = undefined;
+            this._dispatchEvent("endChange", { key: fieldItem.key });
+            // mark checkbox as used
+            if (checkboxElement) {
+              checkboxElement.checked = true;
+            }
+          }
+        } else {
+          this._fieldChanging(fieldItem, value, undefined);
+        }
+      };
+
+      checkboxElement = html.input({
+        type: "checkbox",
+        checked: fieldItem.value !== undefined,
+        onchange: (event) => {
+            const isChecked = event.target.checked;
+            const changeToValue = isChecked
+                ? (fieldItem.value !== undefined ? fieldItem.value : fieldItem.defaultValue)
+                : null;
+            console.log("changing", fieldItem.key, "to", changeToValue);
+            this._fieldChanging(fieldItem, changeToValue, undefined);
+        },
+      });
+    }
+    
+    valueElement.appendChild(checkboxElement);
+    valueElement.appendChild(rangeElement);
+  }
+
   _addColorPicker(valueElement, fieldItem) {
     const parseColor = fieldItem.parseColor || ((v) => v);
     const formatColor = fieldItem.formatColor || ((v) => v);
