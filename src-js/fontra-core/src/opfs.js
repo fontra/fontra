@@ -147,8 +147,12 @@ let worker;
 
 function getWriteWorker() {
   if (!worker) {
-    const path = "/core/opfs-write-worker.js"; // + `?${Math.random()}`;
-    worker = new Worker(path);
+    worker = new Worker(
+      /* webpackChunkName: "opfs-write-worker" */ new URL(
+        "./opfs-write-worker.js",
+        import.meta.url
+      )
+    );
   }
   return worker;
 }
@@ -163,6 +167,14 @@ async function writeFileToOPFSInWorker(path, file) {
         } else {
           resolve(event.data.returnValue);
         }
+      };
+      worker.onmessageerror = (event) => {
+        console.log("message error from web worker:", event);
+        reject(event.message);
+      };
+      worker.onerror = (event) => {
+        console.log("error from web worker:", event);
+        reject(event.message);
       };
       worker.postMessage({ path, file });
     }),
