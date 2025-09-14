@@ -409,42 +409,41 @@ export default class SelectionInfoPanel extends Panel {
       addTransformationItems(formContents, componentKey, component.transformation);
 
       const baseGlyph = await this.fontController.getGlyph(component.name);
-      if (baseGlyph && component.location) {
-        const fontAxisNames = this.fontController.fontAxes.map((axis) => axis.name);
+      if (baseGlyph) {
         const locationItems = [];
 
-        // We also add global axes, if in location and not in baseGlyph.axes
-        // (This is partially handled by the .combinedAxes property)
-        // TODO: this needs more thinking, as the axes of *nested* components
-        // may also be of interest. Also: we need to be able to *add* such a value
-        // to component.location.
-        const axes = Object.fromEntries(
-          baseGlyph.combinedAxes
-            .filter(
-              (axis) =>
-                !fontAxisNames.includes(axis.name) || axis.name in component.location
-            )
-            .map((axis) => [axis.name, axis])
-        );
+        // display the global font axes then the component glyph axes in creation order
+        // to match the order shown in the glyph editor
+        const globalFontAxes = this.fontController.fontAxes;
+        const componentGlyphAxes = baseGlyph.axes || [];
 
-        const axisList = Object.values(axes);
-        // Sort axes: lowercase first, uppercase last
-        axisList.sort((a, b) => {
-          const firstCharAIsUpper = a.name[0] === a.name[0].toUpperCase();
-          const firstCharBIsUpper = b.name[0] === b.name[0].toUpperCase();
-          if (firstCharAIsUpper != firstCharBIsUpper) {
-            return firstCharBIsUpper ? -1 : 1;
-          } else {
-            return a.name < b.name ? -1 : +1;
-          }
-        });
-        for (const axis of axisList) {
+        for (const axis of globalFontAxes) {
+          let currentGlobalAxisLocationValue =
+            // this.sceneController.sceneModel.fontSourceInstance.location?[axis.name] ??
+            this.sceneController.sceneSettingsController.model.fontLocationUser[
+              axis.name
+            ] ?? axis.defaultValue;
           let value = component.location[axis.name];
-          if (value === undefined) {
-            value = axis.defaultValue;
+          if (
+            value != null ||
+            this.sceneController.applicationSettings
+              .alwaysShowGlobalAxesInComponentLocation
+          ) {
+            locationItems.push({
+              type: "selection-edit-number-slider",
+              key: componentKey("location", axis.name),
+              label: axis.name,
+              value: value,
+              minValue: axis.minValue,
+              defaultValue: currentGlobalAxisLocationValue,
+              maxValue: axis.maxValue,
+            });
           }
+        }
+        for (const axis of componentGlyphAxes) {
+          let value = component.location[axis.name];
           locationItems.push({
-            type: "edit-number-slider",
+            type: "selection-edit-number-slider",
             key: componentKey("location", axis.name),
             label: axis.name,
             value: value,
@@ -457,15 +456,29 @@ export default class SelectionInfoPanel extends Panel {
           formContents.push({
             type: "header",
             label: "Location",
-            auxiliaryElement: html.createDomElement("icon-button", {
-              "style": `width: 1.3em;`,
-              "src": "/tabler-icons/refresh.svg",
-              "onclick": (event) => this._resetAxisValuesForComponent(index),
-              "data-tooltip": translate(
-                "sidebar.selection-info.component.reset-axis-values"
-              ),
-              "data-tooltipposition": "left",
-            }),
+            auxiliaryElement: html.div(
+              {
+                style: `width: auto; display: flex; flex-direction: row; gap: 0.15em;`,
+              },
+              [
+                html.createDomElement("icon-button", {
+                  "style": `width: 1.3em;`,
+                  "src": "/tabler-icons/world.svg",
+                  "onclick": (event) => this._toggleShowComponentGlobalAxes(),
+                  "data-tooltip": translate("Show global font axes"),
+                  "data-tooltipposition": "left",
+                }),
+                html.createDomElement("icon-button", {
+                  "style": `width: 1.3em;`,
+                  "src": "/tabler-icons/refresh.svg",
+                  "onclick": (event) => this._resetAxisValuesForComponent(index),
+                  "data-tooltip": translate(
+                    "sidebar.selection-info.component.reset-axis-values"
+                  ),
+                  "data-tooltipposition": "left",
+                }),
+              ]
+            ),
           });
           formContents.push(...locationItems);
         }
@@ -559,6 +572,14 @@ export default class SelectionInfoPanel extends Panel {
       }
       return translate("sidebar.selection-info.component.reset-transformation");
     });
+  }
+
+  async _toggleShowComponentGlobalAxes() {
+    const sceneController = this.sceneController;
+    sceneController.applicationSettings.alwaysShowGlobalAxesInComponentLocation =
+      !sceneController.applicationSettings.alwaysShowGlobalAxesInComponentLocation;
+    this.update();
+    return translate("Show global font axes");
   }
 
   async _resetAxisValuesForComponent(componentIndex) {
@@ -740,14 +761,42 @@ export default class SelectionInfoPanel extends Panel {
           await sendIncrementalChange(changes.change, true); // true: "may drop"
         }
       } else {
-        // Simple, atomic change
-        changes = applyNewValue(
-          glyph,
-          layerInfo,
-          value,
-          fieldItem,
-          this.multiEditChangesAreAbsolute
-        );
+        const keyitem = JSON.parse(fieldItem.key);
+        // Handle the specific case for component location changes
+        if (keyitem[0] === "components" && keyitem[2] === "location") {
+          changes = recordChanges(glyph, (glyph) => {
+            // Apply the change to all layers
+            for (const [layerName, layer] of Object.entries(glyph.layers)) {
+              const loopLayerGlyph = layer.glyph;
+              const loopLayerGlyphController =
+                this.fontController.getLayerGlyphController(
+                  glyphName,
+                  layerName,
+                  varGlyph.getSourceIndexForLayerName(layerName)
+                );
+              // Remove the component axis location
+              if (value === null) {
+                deleteFieldValue(loopLayerGlyph, loopLayerGlyphController, fieldItem);
+              } else {
+                setFieldValue(
+                  loopLayerGlyph,
+                  loopLayerGlyphController,
+                  fieldItem,
+                  value
+                );
+              }
+            }
+          });
+        } else {
+          // Simple, atomic change
+          changes = applyNewValue(
+            glyph,
+            layerInfo,
+            value,
+            fieldItem,
+            this.multiEditChangesAreAbsolute
+          );
+        }
       }
 
       const undoLabel =
