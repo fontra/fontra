@@ -428,6 +428,15 @@ export class EditorController extends ViewController {
       );
 
       registerAction(
+        "action.zoom-to-font-size",
+        {
+          topic,
+          titleKey: "meunbar.view.zoom-to-font-size",
+        },
+        () => this.zoomToFontSize(this.sceneSettings.textSize)
+      );
+
+      registerAction(
         "action.select-previous-source",
         {
           topic,
