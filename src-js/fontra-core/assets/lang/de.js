@@ -14,6 +14,7 @@ export const strings = {
   "action.add-anchor": "Anker hinzufügen",
   "action.add-component": "Komponente hinzufügen",
   "action.add-guideline": "Hilfslinie hinzufügen",
+  "action.add-guideline-between-points": "Add Guideline Between Points",
   "action.break-contour": "Kontur öffnen",
   "action.break-contour.plural": "Konturen öffnen",
   "action.close-contour": "%0 Kontur schließen",

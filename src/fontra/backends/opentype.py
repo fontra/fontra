@@ -1,3 +1,4 @@
+from itertools import product
 from os import PathLike
 from typing import Any, Generator
 
@@ -100,8 +101,14 @@ class OTFBackend:
 
         if self.gvarVariations is not None and glyphName in self.gvarVariations:
             locations |= {
-                locationToTuple({k: v[1] for k, v in variation.axes.items()})
+                tuple(sorted(coords))
                 for variation in self.gvarVariations[glyphName]
+                for coords in product(
+                    *(
+                        [(k, v) for v in sorted(set(tent)) if v]
+                        for k, tent in variation.axes.items()
+                    )
+                )
             }
 
         if self.varcTable is not None:

@@ -3,7 +3,7 @@ import fs from "fs";
 
 import { recordChanges } from "@fontra/core/change-recorder.js";
 import { applyChange } from "@fontra/core/changes.js";
-import { enumerate } from "@fontra/core/utils.js";
+import { deepCopyObject, enumerate } from "@fontra/core/utils.js";
 import { VarPackedPath } from "@fontra/core/var-path.js";
 
 const testData = [
@@ -266,6 +266,30 @@ const testData = [
       a: [2],
     },
   },
+  {
+    testName: "new path then append to it",
+    subject: {},
+    operation: (subject) => {
+      subject.list = [];
+      subject.list.push(123);
+    },
+    expectedSubject: {
+      list: [123],
+    },
+    expectedChange: {
+      c: [
+        {
+          a: ["list", []],
+          f: "=",
+        },
+        {
+          a: [0, 123],
+          f: "+",
+          p: ["list"],
+        },
+      ],
+    },
+  },
 ];
 
 describe("recordChanges tests", () => {
@@ -292,6 +316,11 @@ describe("recordChanges tests", () => {
         expect(subject).to.deep.equal(testCase.subject);
         applyChange(subject, changes.change);
         expect(subject).to.deep.equal(testCase.expectedSubject);
+
+        // Apply the change to the subject from scratch
+        const subject2 = copyObject(testCase.subject);
+        applyChange(subject2, changes.change);
+        expect(subject2).to.deep.equal(testCase.expectedSubject);
       }
     });
   }
@@ -301,7 +330,7 @@ function copyObject(obj) {
   if (obj.copy !== undefined) {
     return obj.copy();
   }
-  return JSON.parse(JSON.stringify(obj));
+  return deepCopyObject(obj);
 }
 
 function emptyContour() {

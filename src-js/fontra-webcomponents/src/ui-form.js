@@ -2,6 +2,7 @@ import * as html from "@fontra/core/html-utils.js";
 import { SimpleElement } from "@fontra/core/html-utils.js";
 import { QueueIterator } from "@fontra/core/queue-iterator.js";
 import {
+  assert,
   enumerate,
   hyphenatedToCamelCase,
   round,
@@ -200,6 +201,15 @@ export class Form extends SimpleElement {
         throw new Error(`Unknown field type: ${fieldItem.type}`);
       }
       this[methodName](valueElement, fieldItem, labelElement);
+
+      if (fieldItem.onEnterKey) {
+        valueElement.addEventListener("keyup", (event) => {
+          if (event.key != "Enter") {
+            return;
+          }
+          fieldItem.onEnterKey(event);
+        });
+      }
     }
   }
 
@@ -260,6 +270,10 @@ export class Form extends SimpleElement {
   }
 
   _addEditNumber(valueElement, fieldItem, allowEmptyField = false) {
+    if (fieldItem.evaluateExpression) {
+      return this._addEditNumberExpression(valueElement, fieldItem, allowEmptyField);
+    }
+
     this._lastValidFieldValues[fieldItem.key] = fieldItem.value;
     const inputElement = document.createElement("input");
     inputElement.type = "number";
@@ -326,6 +340,100 @@ export class Form extends SimpleElement {
     this._fieldGetters[fieldItem.key] = () => inputElement.value;
     this._fieldSetters[fieldItem.key] = (value) =>
       (inputElement.value = maybeRound(value, fieldItem.numDigits));
+    valueElement.appendChild(inputElement);
+  }
+
+  _addEditNumberExpression(valueElement, fieldItem, allowEmptyField = false) {
+    this._lastValidFieldValues[fieldItem.key] = fieldItem.value;
+    const inputElement = document.createElement("input");
+    inputElement.value = maybeRoundToString(fieldItem.value, fieldItem.numDigits);
+
+    if (fieldItem["data-tooltip"]) {
+      // data-tooltip doesn't work for input number,
+      // default title is used
+      inputElement.setAttribute("title", fieldItem["data-tooltip"]);
+    }
+
+    inputElement.disabled = fieldItem.disabled;
+    inputElement.onkeydown = (event) => {
+      const increment = event.shiftKey ? 10 : 1;
+      switch (event.key) {
+        case "ArrowUp": {
+          event.preventDefault();
+          let value = Number(event.target.value) + increment;
+          if (fieldItem.maxValue != undefined) {
+            value = Math.min(value, fieldItem.maxValue);
+          }
+          event.target.value = value;
+          this._fieldChanging(fieldItem, value, undefined);
+          break;
+        }
+        case "ArrowDown": {
+          event.preventDefault();
+          let value = Number(event.target.value) - increment;
+          if (fieldItem.minValue != undefined) {
+            value = Math.max(value, fieldItem.minValue);
+          }
+          event.target.value = value;
+          this._fieldChanging(fieldItem, value, undefined);
+          break;
+        }
+      }
+    };
+
+    inputElement.oninput = (event) => {
+      inputElement.setCustomValidity("");
+    };
+
+    inputElement.onchange = async (event) => {
+      let value, valueObject, validitationError;
+      if (allowEmptyField && inputElement.value === "") {
+        value = null;
+      } else {
+        assert(fieldItem.evaluateExpression);
+        value = await fieldItem.evaluateExpression(inputElement.value);
+        if (typeof value !== "number" && typeof value !== "string") {
+          valueObject = value;
+          value = value.value;
+          if (valueObject.error) {
+            validitationError = valueObject.error;
+            value = this._lastValidFieldValues[fieldItem.key];
+            valueObject = undefined;
+          }
+          inputElement.value = maybeRoundToString(value, fieldItem.numDigits);
+        }
+
+        if (!valueObject) {
+          if (isNaN(value)) {
+            value = this._lastValidFieldValues[fieldItem.key];
+            inputElement.value = maybeRoundToString(value, fieldItem.numDigits);
+          }
+          if (fieldItem.minValue != undefined && value < fieldItem.minValue) {
+            validitationError = "value below minimum";
+          } else if (fieldItem.maxValue != undefined && value > fieldItem.maxValue) {
+            validitationError = "value above minimum";
+          }
+        }
+      }
+
+      inputElement.setCustomValidity(validitationError || "");
+
+      if (!inputElement.reportValidity()) {
+        if (fieldItem.minValue != undefined) {
+          value = Math.max(value, fieldItem.minValue);
+        }
+        if (fieldItem.maxValue != undefined) {
+          value = Math.min(value, inputElement.max);
+        }
+        inputElement.value = value;
+      }
+
+      this._lastValidFieldValues[fieldItem.key] = value;
+      this._fieldChanging(fieldItem, valueObject || value, undefined);
+    };
+    this._fieldGetters[fieldItem.key] = () => inputElement.value;
+    this._fieldSetters[fieldItem.key] = (value) =>
+      (inputElement.value = maybeRoundToString(value, fieldItem.numDigits));
     valueElement.appendChild(inputElement);
   }
 
@@ -537,7 +645,11 @@ export class Form extends SimpleElement {
 }
 
 function maybeRound(value, digits) {
-  return digits === undefined ? value : round(value, digits);
+  return digits == undefined || value == undefined ? value : round(value, digits);
+}
+
+function maybeRoundToString(value, digits) {
+  return value == undefined ? "" : digits == undefined ? value : round(value, digits);
 }
 
 customElements.define("ui-form", Form);

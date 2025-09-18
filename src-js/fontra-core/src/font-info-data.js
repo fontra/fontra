@@ -1,4 +1,3 @@
-import { NumberFormatter } from "@fontra/core/ui-utils.js";
 import {
   ArrayFormatter,
   BooleanFormatter,
@@ -6,6 +5,7 @@ import {
   FixedLengthArrayFormatter,
   IntegerFormatter,
   IntegerFormatterMinMax,
+  NumberFormatter,
   UnsignedIntegerFormatter,
   UnsignedNumberFormatter,
 } from "./formatters.js";

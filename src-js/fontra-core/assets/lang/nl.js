@@ -14,6 +14,7 @@ export const strings = {
   "action.add-anchor": "Voeg anker toe",
   "action.add-component": "Voeg component toe",
   "action.add-guideline": "Voeg hulplijn toe",
+  "action.add-guideline-between-points": "Add Guideline Between Points",
   "action.break-contour": "Breek contour",
   "action.break-contour.plural": "Break Contours",
   "action.close-contour": "Sluit %0 contour",

@@ -90,7 +90,7 @@ function getHelpMenu() {
           title: "GitHub",
           enabled: () => true,
           callback: () => {
-            window.open("https://github.com/googlefonts/fontra");
+            window.open("https://github.com/fontra/fontra");
           },
         },
       ];
@@ -154,9 +154,9 @@ function getFontMenuItems() {
   const menuItems = [
     [translate("font-info.title"), "#font-info-panel", true],
     [translate("axes.title"), "#axes-panel", true],
-    [translate("cross-axis-mapping.title"), "#cross-axis-mapping-panel", true],
     [translate("sources.title"), "#sources-panel", true],
     [translate("opentype-feature-code.title"), "#opentype-feature-code-panel", true],
+    [translate("cross-axis-mapping.title"), "#cross-axis-mapping-panel", true],
     [
       translate("development-status-definitions.title"),
       "#development-status-definitions-panel",

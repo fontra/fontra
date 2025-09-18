@@ -52,6 +52,7 @@ import {
   readFromClipboard,
   reversed,
   scheduleCalls,
+  unionIndexSets,
   writeObjectToURLFragment,
   writeToClipboard,
 } from "@fontra/core/utils.js";
@@ -85,6 +86,7 @@ import {
   translate,
   translatePlural,
 } from "@fontra/core/localization.js";
+import { subVectors } from "@fontra/core/vector.js";
 import { ViewController } from "@fontra/core/view-controller.js";
 import DesignspaceNavigationPanel from "./panel-designspace-navigation.js";
 import GlyphNotePanel from "./panel-glyph-note.js";
@@ -369,6 +371,24 @@ export class EditorController extends ViewController {
         { topic },
         () => this.doAddGuideline(),
         () => this.canEditGlyph()
+      );
+
+      registerAction(
+        "action.add-guideline-between-points",
+        { topic },
+        () => this.doAddGuidelineBetweenPoints(),
+        () => {
+          const {
+            point: pointSelection,
+            anchor: anchorSelection,
+            guideline: guidelineSelection,
+          } = parseSelection(this.sceneController.selection);
+          const sum =
+            (pointSelection?.length || 0) +
+            (anchorSelection?.length || 0) +
+            (guidelineSelection?.length || 0);
+          return this.canEditGlyph() && sum == 2;
+        }
       );
 
       registerAction(
@@ -1390,6 +1410,9 @@ export class EditorController extends ViewController {
     this.glyphEditContextMenuItems.push({ actionIdentifier: "action.add-component" });
     this.glyphEditContextMenuItems.push({ actionIdentifier: "action.add-anchor" });
     this.glyphEditContextMenuItems.push({ actionIdentifier: "action.add-guideline" });
+    this.glyphEditContextMenuItems.push({
+      actionIdentifier: "action.add-guideline-between-points",
+    });
 
     this.glyphEditContextMenuItems.push({ actionIdentifier: "action.lock-guideline" });
 
@@ -1751,14 +1774,16 @@ export class EditorController extends ViewController {
       point: pointIndices,
       component: componentIndicesFromComponent,
       componentOrigin: componentIndicesFromOrigin,
+      componentTCenter: componentTCenterSelection,
       anchor: anchorIndices,
       guideline: guidelineIndices,
       backgroundImage: backgroundImageIndices,
     } = parseSelection(this.sceneController.selection);
 
-    const componentIndices = mergeComponentIndices(
+    const componentIndices = unionIndexSets(
       componentIndicesFromComponent,
-      componentIndicesFromOrigin
+      componentIndicesFromOrigin,
+      componentTCenterSelection
     );
 
     let path;
@@ -2745,6 +2770,53 @@ export class EditorController extends ViewController {
     return { contentElement, warningElement };
   }
 
+  async doAddGuidelineBetweenPoints(global = false) {
+    // this function can only be called when exactly 2 points are selected
+
+    this.visualizationLayersSettings.model["fontra.guidelines"] = true;
+    const {
+      point: pointSelection,
+      anchor: anchorSelection,
+      guideline: guidelineSelection,
+    } = parseSelection(this.sceneController.selection);
+
+    const glyph = this.sceneModel.getSelectedPositionedGlyph().glyph;
+
+    const points = [];
+
+    points.push(...(pointSelection?.map((index) => glyph.path.getPoint(index)) || []));
+    points.push(...(anchorSelection?.map((index) => glyph.anchors[index]) || []));
+    points.push(...(guidelineSelection?.map((index) => glyph.guidelines[index]) || []));
+
+    const [pointA, pointB] = points;
+    if (!pointA || !pointB) {
+      return;
+    }
+
+    const delta = subVectors(pointB, pointA);
+
+    const angle = ((Math.atan2(delta.y, delta.x) * 180) / Math.PI + 360) % 360;
+
+    const newGuideline = {
+      x: pointA.x,
+      y: pointA.y,
+      angle: angle,
+      locked: false,
+    };
+
+    if (!global) {
+      const instance = this.sceneModel.getSelectedPositionedGlyph().glyph.instance;
+      await this.sceneController.editLayersAndRecordChanges((layerGlyphs) => {
+        for (const layerGlyph of Object.values(layerGlyphs)) {
+          layerGlyph.guidelines.push({ ...newGuideline });
+        }
+        const newGuidelineIndex = instance.guidelines.length - 1;
+        this.sceneController.selection = new Set([`guideline/${newGuidelineIndex}`]);
+        return translate("action.add-guideline");
+      });
+    }
+  }
+
   doSelectAllNone(selectNone) {
     const positionedGlyph = this.sceneModel.getSelectedPositionedGlyph();
 
@@ -3063,7 +3135,15 @@ export class EditorController extends ViewController {
   }
 
   keyUpHandler(event) {
-    if (this._matchingKeyUpHandler && this._matchingKeyUpHandler.code == event.code) {
+    if (
+      this._matchingKeyUpHandler &&
+      // At least on macOS, in Chrome and Safari, if _while the space key is
+      // pressed_ we additionally press the command key ("Meta"), we will never
+      // receive a keyup event for the space key. So let's also respond to any
+      // keyup for the Meta key.
+      // Oddly, event.metaKey is false at keyup, so we check event.key instead.
+      (this._matchingKeyUpHandler.code == event.code || event.key == "Meta")
+    ) {
       this._matchingKeyUpHandler.callback(event);
       delete this._matchingKeyUpHandler;
     }
@@ -3641,18 +3721,6 @@ function collapseSubTools(editToolsElement) {
     child.style.visibility = index ? "hidden" : "visible";
     child.dataset.tooltipposition = index ? "right" : "bottom";
   }
-}
-
-function mergeComponentIndices(componentIndices1, componentIndices2) {
-  const indexSet = new Set();
-  for (const indices of [componentIndices1, componentIndices2]) {
-    for (const i of indices || []) {
-      indexSet.add(i);
-    }
-  }
-  const componentIndices = [...indexSet];
-  componentIndices.sort((a, b) => a - b);
-  return componentIndices;
 }
 
 function noTimeout(func, dummy) {

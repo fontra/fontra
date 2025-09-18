@@ -14,6 +14,7 @@ export const strings = {
   "action.add-anchor": "アンカーを追加",
   "action.add-component": "コンポーネントを追加",
   "action.add-guideline": "ガイドラインを追加",
+  "action.add-guideline-between-points": "Add Guideline Between Points",
   "action.break-contour": "パスを切り離す",
   "action.break-contour.plural": "パスを切り離す",
   "action.close-contour": "%0パスを閉じる",

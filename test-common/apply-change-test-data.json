@@ -40,6 +40,24 @@
         ]
       },
       "expectedData": [1, [222, 22, 444], 3]
+    },
+    {
+      "testName": "add mutable item, then modify",
+      "inputDataName": "simpleArray",
+      "change": {
+        "c": [
+          {
+            "a": [2, []],
+            "f": "="
+          },
+          {
+            "a": [0, 123],
+            "f": "+",
+            "p": [2]
+          }
+        ]
+      },
+      "expectedData": [1, 2, [123]]
     }
   ]
 }

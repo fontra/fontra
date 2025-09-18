@@ -765,7 +765,7 @@ describe("VarPackedPath Tests", () => {
       { xMin: 0, yMin: 0, xMax: 10, yMax: 20 },
     ],
     [
-      // https://github.com/googlefonts/fontra/issues/1646
+      // https://github.com/fontra/fontra/issues/1646
       (p) => {
         p.moveTo(0, 0);
         p.moveTo(100, 50);

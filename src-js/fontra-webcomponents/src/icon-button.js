@@ -75,6 +75,10 @@ export class IconButton extends UnlitElement {
     this._buttonOnClick = callback;
   }
 
+  click() {
+    this._button.click();
+  }
+
   render() {
     const focus = new FocusKeeper();
     this._button = html.button(

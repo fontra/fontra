@@ -42,9 +42,9 @@ classifiers = [
 
 
 [project.urls]
-Documentation = "https://github.com/googlefonts/fontra#readme"
-Issues = "https://github.com/googlefonts/fontra/issues"
-Source = "https://github.com/googlefonts/fontra"
+Documentation = "https://github.com/fontra/fontra#readme"
+Issues = "https://github.com/fontra/fontra/issues"
+Source = "https://github.com/fontra/fontra"
 
 
 [project.scripts]

@@ -126,7 +126,3 @@ describe("var-glyph Tests", () => {
     });
   }
 });
-
-function copyObject(obj) {
-  return JSON.parse(JSON.stringify(obj));
-}

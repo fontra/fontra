@@ -14,6 +14,7 @@ export const strings = {
   "action.add-anchor": "Add Anchor",
   "action.add-component": "Add Component",
   "action.add-guideline": "Add Guideline",
+  "action.add-guideline-between-points": "Add Guideline Between Points",
   "action.break-contour": "Break Contour",
   "action.break-contour.plural": "Break Contours",
   "action.close-contour": "Close %0 Contour",

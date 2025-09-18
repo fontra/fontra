@@ -1,3 +1,4 @@
+from copy import deepcopy
 from typing import (
     Any,
     Callable,
@@ -113,7 +114,7 @@ def _applyChange(subject: Any, change: dict[str, Any], *, itemCast=None) -> None
 
     if functionName is not None:
         changeFunc: Callable[..., None] = changeFunctions[functionName]
-        args = change.get("a", [])
+        args = deepcopy(change.get("a", []))
         if functionName in baseChangeFunctions:
             if itemCast is None and args:
                 itemCast = getItemCast(subject, args[0], "type")
@@ -330,9 +331,11 @@ def patternIntersect(
 
 
 def collectChangePaths(change: dict[str, Any], depth: int) -> list[tuple]:
-    """Return a sorted list of paths of the specified `depth` that the `change`
-    includes."""
-    return sorted(set(_iterateChangePaths(change, depth)))
+    """Return a list of unique paths of the specified `depth` that the `change`
+    includes. The order of the list is determined by the path occurrences
+    in the change."""
+    # Remove duplicates, but maintain order
+    return list(dict.fromkeys(_iterateChangePaths(change, depth)))
 
 
 def _iterateChangePaths(

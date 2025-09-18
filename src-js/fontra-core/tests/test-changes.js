@@ -9,6 +9,7 @@ import {
   matchChangePath,
   matchChangePattern,
 } from "@fontra/core/changes.js";
+import { deepCopyObject } from "@fontra/core/utils.js";
 import { getTestData } from "./test-support.js";
 
 describe("applyChange Tests", () => {
@@ -22,10 +23,13 @@ describe("applyChange Tests", () => {
     const inputDataName = test["inputDataName"];
     const expectedData = test["expectedData"];
 
-    const subject = copyObject(inputData[inputDataName]);
+    const subject = deepCopyObject(inputData[inputDataName]);
     it(`applyChange Test #${i} -- ${testName}`, () => {
-      applyChange(subject, test["change"]);
+      const change = deepCopyObject(test["change"]);
+      applyChange(subject, change);
       expect(subject).to.deep.equal(expectedData);
+      // ensure the change object wasn't modified itself
+      expect(change).to.deep.equal(test["change"]);
     });
   }
 });
@@ -481,7 +485,3 @@ describe("ChangeCollector tests", () => {
     });
   });
 });
-
-function copyObject(obj) {
-  return JSON.parse(JSON.stringify(obj));
-}

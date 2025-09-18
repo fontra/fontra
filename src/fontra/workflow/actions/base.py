@@ -29,7 +29,7 @@ from ...core.classes import (
 from ...core.instancer import FontInstancer
 from ...core.protocols import ReadableFontBackend
 from . import (
-    OutputActionProtocol,
+    OutputProcessorProtocol,
     registerFilterAction,
     registerInputAction,
     registerOutputAction,
@@ -66,7 +66,7 @@ class FontraWrite:
     @asynccontextmanager
     async def connect(
         self, input: ReadableFontBackend
-    ) -> AsyncGenerator[OutputActionProtocol, None]:
+    ) -> AsyncGenerator[OutputProcessorProtocol, None]:
         self.input = input
         try:
             yield self

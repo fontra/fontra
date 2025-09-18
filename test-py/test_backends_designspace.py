@@ -238,6 +238,22 @@ async def test_addLocalAxis(writableTestFont):
     assert asdict(glyph) == asdict(savedGlyph)
 
 
+async def test_addNewGlyph_glyphOrder(writableTestFont):
+    glyphName = "testglyph"
+    sourceGlyphName = "period"
+    glyph = await writableTestFont.getGlyph(sourceGlyphName)
+    await writableTestFont.putGlyph(glyphName, glyph, [])
+
+    count = 0
+
+    for ufoLayer in writableTestFont.ufoLayers:
+        lib = ufoLayer.reader.readLib()
+        if glyphName in lib.get("public.glyphOrder", []):
+            count += 1
+
+    assert count > 0, (count, len(writableTestFont.ufoLayers))
+
+
 # NOTE: font guidelines are tested via test_getSources, no need to repeat here
 
 
@@ -266,7 +282,7 @@ async def test_addGuidelines(writableTestFont):
     layerName = "test"
     glyph.layers[layerName] = Layer(glyph=StaticGlyph(xAdvance=0))
     glyph.layers[layerName].glyph.guidelines.append(
-        Guideline(name="Left", x=60, angle=90)
+        Guideline(name="Left", x=60, angle=90, locked=True)
     )
     # add guideline without a name
     glyph.layers[layerName].glyph.guidelines.append(Guideline(y=500))
@@ -675,6 +691,11 @@ async def test_deleteGlyph(writableTestFont):
     )
     assert await writableTestFont.getGlyph(glyphName) is None
 
+    # test that we removed the glyph from public.glyphOrder
+    for ufoLayer in writableTestFont.ufoLayers:
+        lib = ufoLayer.reader.readLib()
+        assert glyphName not in lib.get("public.glyphOrder", [])
+
 
 async def test_deleteGlyphRaisesKeyError(writableTestFont):
     glyphName = "A.doesnotexist"
@@ -849,7 +870,7 @@ async def test_putSources_delete_revive(writableTestFont):
 
 
 async def test_putSources_variable_glyph_bug(writableTestFont):
-    # https://github.com/googlefonts/fontra/issues/2040
+    # https://github.com/fontra/fontra/issues/2040
     fontSources = await writableTestFont.getSources()
     await writableTestFont.putSources(fontSources)
 
@@ -1069,7 +1090,7 @@ async def test_changeUnitsPerEmCheckFontInfo(writableTestFont):
 
 
 async def test_putUnitsPerEmMissing(tmpdir, writableTestFont):
-    # https://github.com/googlefonts/fontra/issues/2196
+    # https://github.com/fontra/fontra/issues/2196
 
     await writableTestFont.putUnitsPerEm(2000)
     await writableTestFont.putFeatures(OpenTypeFeatures(text=""))
@@ -1157,6 +1178,12 @@ async def test_kerning_read_write(writableTestFont):
         -150,
         None,
     ]
+
+    # verify we wrote the correct prefixes
+    # https://github.com/fontra/fontra/issues/2238
+    someKerningPath = pathlib.Path(reopenedFont.dsDoc.sources[0].path) / "kerning.plist"
+    someKerningData = someKerningPath.read_text()
+    assert "<key>public.kern2.A</key>" in someKerningData
 
 
 async def test_roundtrip_single_UFO(testFontSingleUFO, tmpdir):

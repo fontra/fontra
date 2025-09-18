@@ -41,7 +41,7 @@ def main() -> None:
     for entryPoint in entry_points(group="fontra.projectmanagers"):
         if entryPoint.name in subParsers.choices:
             # Avoid adding a sub-parser multiple times
-            # See https://github.com/googlefonts/fontra/issues/141
+            # See https://github.com/fontra/fontra/issues/141
             continue
         subParser = subParsers.add_parser(entryPoint.name)
         pmFactory: ProjectManagerFactory = entryPoint.load()

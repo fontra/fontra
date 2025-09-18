@@ -1,6 +1,7 @@
 import { applyChange } from "@fontra/core/changes.js";
 import { FontSourcesInstancer } from "@fontra/core/font-sources-instancer.js";
 import { KerningController } from "@fontra/core/kerning-controller.js";
+import { deepCopyObject } from "@fontra/core/utils.js";
 import { expect } from "chai";
 import { parametrize } from "./test-support.js";
 
@@ -16,6 +17,7 @@ describe("KerningController Tests", () => {
     ],
     sources: {
       a: { location: { Weight: 400 } },
+      ab: { location: { Weight: 500 } },
       b: { location: { Weight: 600 } },
       c: { location: { Weight: 800 } },
       d: { location: { Weight: 400, Width: 200 } },
@@ -128,7 +130,7 @@ describe("KerningController Tests", () => {
   parametrize("KerningController editing test", testCasesEditing, async (testCase) => {
     const testFont = { kerning: testKerning };
 
-    const editedFont = copyObject(testFont);
+    const editedFont = deepCopyObject(testFont);
 
     const controller = new KerningController(
       "kern",
@@ -153,13 +155,13 @@ describe("KerningController Tests", () => {
     }
 
     // Check rollback changes
-    const revertedFont = copyObject(editedFont);
+    const revertedFont = deepCopyObject(editedFont);
     applyChange(revertedFont, changes.rollbackChange);
     expect(revertedFont).to.not.deep.equal(editedFont);
     expect(revertedFont).to.deep.equal(testFont);
 
     // Check forward changes
-    const newlyEditedFont = copyObject(testFont);
+    const newlyEditedFont = deepCopyObject(testFont);
     applyChange(newlyEditedFont, changes.change);
     expect(newlyEditedFont).to.deep.equal(editedFont);
     expect(newlyEditedFont).to.not.deep.equal(testFont);
@@ -180,7 +182,7 @@ describe("KerningController Tests", () => {
     ];
     const testFont = { kerning: {} };
 
-    const editedFont = copyObject(testFont);
+    const editedFont = deepCopyObject(testFont);
 
     const controller = new KerningController(
       "kern",
@@ -203,8 +205,54 @@ describe("KerningController Tests", () => {
       expect(value).to.equal(150);
     }
   });
-});
 
-function copyObject(obj) {
-  return JSON.parse(JSON.stringify(obj));
-}
+  it("test insertInterpolatedSource", () => {
+    const expectedKerning = {
+      kern: {
+        groupsSide1: { O: ["O", "D", "Q"] },
+        groupsSide2: { O: ["O", "C", "G", "Q"] },
+        sourceIdentifiers: ["a", "b", "c", "d", "e", "f", "ab"],
+        values: {
+          "T": { A: [-100, null, null, -200, null, null, -50] },
+          "@O": {
+            "@O": [10, null, null, null, null, null, 5],
+            "Q": [20, null, 40, null, null, null, 10],
+          },
+          "Q": { Q: [1, null, null, null, null, null, 1] }, // rounded: 0.5 -> 1
+        },
+      },
+    };
+
+    const editedKerning = deepCopyObject(testKerning);
+
+    const controller = new KerningController("kern", editedKerning, testFontController);
+
+    const changes = controller.insertInterpolatedSource("ab", { Weight: 500 });
+    expect(editedKerning).to.deep.equal(expectedKerning);
+  });
+
+  it("test deleteSource", () => {
+    const expectedKerning = {
+      kern: {
+        groupsSide1: { O: ["O", "D", "Q"] },
+        groupsSide2: { O: ["O", "C", "G", "Q"] },
+        sourceIdentifiers: ["a", "b", "d", "e", "f"],
+        values: {
+          "T": { A: [-100, null, -200, null, null] },
+          "@O": {
+            "@O": [10, null, null, null, null],
+            "Q": [20, null, null, null, null],
+          },
+          "Q": { Q: [1, null, null, null] },
+        },
+      },
+    };
+
+    const editedKerning = deepCopyObject(testKerning);
+
+    const controller = new KerningController("kern", editedKerning, testFontController);
+
+    const changes = controller.deleteSource("c");
+    expect(editedKerning).to.deep.equal(expectedKerning);
+  });
+});

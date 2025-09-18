@@ -5,13 +5,12 @@ import {
 import { recordChanges } from "@fontra/core/change-recorder.js";
 import { ensureDenseSource } from "@fontra/core/font-controller.js";
 import { openTypeSettingsFontSourcesLevel } from "@fontra/core/font-info-data.js";
+import { NumberFormatter, OptionalNumberFormatter } from "@fontra/core/formatters.js";
 import * as html from "@fontra/core/html-utils.js";
 import { addStyleSheet } from "@fontra/core/html-utils.js";
 import { translate } from "@fontra/core/localization.js";
 import { ObservableController } from "@fontra/core/observable-object.js";
 import {
-  NumberFormatter,
-  OptionalNumberFormatter,
   labelForElement,
   labeledCheckbox,
   labeledTextInput,
@@ -19,6 +18,7 @@ import {
 } from "@fontra/core/ui-utils.js";
 import {
   arrowKeyDeltas,
+  deepCopyObject,
   modulo,
   range,
   round,
@@ -180,12 +180,33 @@ export class SourcesPanel extends BaseInfoPanel {
       "sources.undo.delete",
       this.fontController.sources[selectedSourceIdentifier].name
     );
-    const root = { sources: this.fontController.sources };
-    const changes = recordChanges(root, (root) => {
+    const root = {
+      sources: this.fontController.sources,
+      kerning: await this.fontController.getKerning(),
+    };
+
+    // First, delete kerning source
+    const kerningChanges = [];
+    for (const kernTag of Object.keys(root.kerning)) {
+      const kerningController = await this.fontController.getKerningController(kernTag);
+      const changes = kerningController.deleteSource(selectedSourceIdentifier);
+      kerningChanges.push(changes);
+    }
+
+    // Then delete font source
+    const sourceChanges = recordChanges(root, (root) => {
       delete root.sources[selectedSourceIdentifier];
     });
-    if (changes.hasChange) {
-      await this.postChange(changes.change, changes.rollbackChange, undoLabel);
+
+    const allChanges = [...kerningChanges, sourceChanges];
+    const finalChanges = allChanges[0].concat(...allChanges.slice(1));
+
+    if (finalChanges.hasChange) {
+      await this.postChange(
+        finalChanges.change,
+        finalChanges.rollbackChange,
+        undoLabel
+      );
       selectedSourceIdentifier = undefined;
       await sleepAsync(0); // Breathe, so the font controller can purge some caches
       this.setupUI();
@@ -205,12 +226,34 @@ export class SourcesPanel extends BaseInfoPanel {
       sourceIdentifier = crypto.randomUUID().slice(0, 8);
     } while (sourceIdentifier in this.fontController.sources);
 
-    const root = { sources: this.fontController.sources };
-    const changes = recordChanges(root, (root) => {
+    const root = {
+      sources: this.fontController.sources,
+      kerning: await this.fontController.getKerning(),
+    };
+
+    const sourceChanges = recordChanges(root, (root) => {
       root.sources[sourceIdentifier] = newSource;
     });
-    if (changes.hasChange) {
-      this.postChange(changes.change, changes.rollbackChange, undoLabel);
+
+    const kerningChanges = [];
+    for (const [kernTag, kernData] of Object.entries(root.kerning)) {
+      const kerningController = await this.fontController.getKerningController(kernTag);
+      const changes = kerningController.insertInterpolatedSource(
+        sourceIdentifier,
+        newSource.location,
+        kernData
+      );
+      kerningChanges.push(changes);
+    }
+
+    const finalChanges = sourceChanges.concat(...kerningChanges);
+
+    if (finalChanges.hasChange) {
+      await this.postChange(
+        finalChanges.change,
+        finalChanges.rollbackChange,
+        undoLabel
+      );
       selectedSourceIdentifier = sourceIdentifier;
       this.setupUI();
     }
@@ -996,7 +1039,7 @@ function getInterpolatedSourceData(fontController, newLocation) {
   // }
 
   // TODO: ensure that instancer returns a copy of the source
-  return JSON.parse(JSON.stringify(fontSourceInstance));
+  return deepCopyObject(fontSourceInstance);
 }
 
 const lineMetricsHorizontalLayoutDefaults = {

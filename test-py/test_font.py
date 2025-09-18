@@ -736,6 +736,62 @@ getGlyphTestData = [
         },
     ),
     (
+        "ttf",
+        {
+            "name": "tenttest",
+            "layers": {
+                "default": {
+                    "glyph": {
+                        "path": {
+                            "contourInfo": [{"endPoint": 3, "isClosed": True}],
+                            "coordinates": [60, 0, 60, 120, 110, 120, 110, 0],
+                            "pointTypes": [0, 0, 0, 0],
+                        },
+                        "xAdvance": 170,
+                    },
+                },
+                "wdth=0.20001": {
+                    "glyph": {
+                        "path": {
+                            "coordinates": [60, 0, 60, 120, 110, 120, 110, 0],
+                            "pointTypes": [0, 0, 0, 0],
+                            "contourInfo": [{"endPoint": 3, "isClosed": True}],
+                        },
+                        "xAdvance": 194.00146484375,
+                    },
+                    "customData": {},
+                },
+                "wdth=1": {
+                    "glyph": {
+                        "path": {
+                            "contourInfo": [{"endPoint": 3, "isClosed": True}],
+                            "coordinates": [120, 0, 120, 220, 170, 220, 170, 0],
+                            "pointTypes": [0, 0, 0, 0],
+                        },
+                        "xAdvance": 290,
+                    },
+                },
+            },
+            "sources": [
+                {
+                    "layerName": "default",
+                    "location": {"wdth": 0, "wght": 0},
+                    "name": "default",
+                },
+                {
+                    "layerName": "wdth=0.20001",
+                    "location": {"wdth": 0.20001220703125, "wght": 0},
+                    "name": "wdth=0.20001",
+                },
+                {
+                    "layerName": "wdth=1",
+                    "location": {"wdth": 1.0, "wght": 0},
+                    "name": "wdth=1",
+                },
+            ],
+        },
+    ),
+    (
         "otf",
         {
             "name": "period",

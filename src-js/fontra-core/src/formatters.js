@@ -3,6 +3,42 @@ export function isString(value) {
   return typeof value === "string" || value instanceof String;
 }
 
+export const DefaultFormatter = {
+  toString: (value) => (value !== undefined && value !== null ? value.toString() : ""),
+  fromString: (value) => {
+    return {
+      value: value,
+    };
+  },
+};
+
+export const NumberFormatter = {
+  toString: (value) => value.toString(),
+  fromString: (value) => {
+    const number = Number(value);
+    if (isNaN(number) || !value) {
+      return { error: "not a number" };
+    } else {
+      return { value: number };
+    }
+  },
+};
+
+export const OptionalNumberFormatter = {
+  toString: (value) => (value != undefined ? value.toString() : ""),
+  fromString: (value) => {
+    if (!value) {
+      return { value: null };
+    }
+    const number = Number(value);
+    if (isNaN(number)) {
+      return { error: "not a number" };
+    } else {
+      return { value: number };
+    }
+  },
+};
+
 export const IntegerFormatter = {
   toString: (value) => value.toString(),
   fromString: (

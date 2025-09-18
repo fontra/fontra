@@ -93,7 +93,7 @@ class FontHandler:
             )
             if glyphMapChange:
                 await self.updateLocalDataWithExternalChange(glyphMapChange)
-                await self.broadcastChange(glyphMapChange, None, False)
+                await self.broadcastChange(glyphMapChange, None, False, False)
 
         if reloadPattern or reloadPattern is None:
             await self.reloadData(reloadPattern)
@@ -344,22 +344,28 @@ class FontHandler:
         self._setClientData(connection, key, func(matchPattern, pathOrPattern))
 
     @remoteMethod
-    async def editIncremental(self, liveChange, *, connection):
-        await self.broadcastChange(liveChange, connection, True)
+    async def editIncremental(self, liveChange, *, connection) -> None:
+        await self.broadcastChange(liveChange, connection, True, False)
 
     @remoteMethod
     async def editFinal(
         self, finalChange, rollbackChange, editLabel, broadcast=False, *, connection
-    ):
+    ) -> None:
         # TODO: use finalChange, rollbackChange, editLabel for history recording
         # TODO: locking/checking
         await self.updateLocalDataAndWriteToBackend(finalChange, connection)
         # return {"error": "computer says no"}
-        if broadcast:
-            await self.broadcastChange(finalChange, connection, False)
+        await self.broadcastChange(finalChange, connection, False, not broadcast)
 
-    async def broadcastChange(self, change, sourceConnection, isLiveChange):
-        if isLiveChange:
+    async def broadcastChange(
+        self, change, sourceConnection, isLiveChange, finishesLiveChange
+    ):
+        # If `finishesLiveChange` is True, the same change has already been sent as a live
+        # change, therefore we must *only* send it to the non-live observers.
+        if finishesLiveChange:
+            assert not isLiveChange
+            matchPatternKeys = [CHANGES_PATTERN_KEY]
+        elif isLiveChange:
             matchPatternKeys = [LIVE_CHANGES_PATTERN_KEY]
         else:
             matchPatternKeys = [LIVE_CHANGES_PATTERN_KEY, CHANGES_PATTERN_KEY]

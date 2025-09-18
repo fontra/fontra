@@ -857,3 +857,7 @@ export const friendlyHttpStatus = {
 export function stringCompare(a, b) {
   return a < b ? -1 : a === b ? 0 : 1;
 }
+
+export function deepCopyObject(obj) {
+  return JSON.parse(JSON.stringify(obj));
+}

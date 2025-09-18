@@ -1,3 +1,5 @@
+import { deepCopyObject } from "./utils.js";
+
 export class ChangeCollector {
   constructor(parentCollector, path) {
     this._parentCollector = parentCollector;
@@ -73,12 +75,12 @@ export class ChangeCollector {
 
   addChange(func, ...args) {
     this._ensureForwardChanges();
-    this._forwardChanges.push({ f: func, a: args });
+    this._forwardChanges.push({ f: func, a: deepCopyObject(args) });
   }
 
   addRollbackChange(func, ...args) {
     this._ensureRollbackChanges();
-    this._rollbackChanges.splice(0, 0, { f: func, a: args });
+    this._rollbackChanges.splice(0, 0, { f: func, a: deepCopyObject(args) });
   }
 
   subCollector(...path) {
@@ -310,7 +312,7 @@ export function applyChange(subject, change, subjectClassDef) {
         itemCast = classDef.cast.bind(classDef);
       }
     }
-    changeFunc(subject, itemCast || noopItemCast, ...args);
+    changeFunc(subject, itemCast || noopItemCast, ...deepCopyObject(args));
   }
 
   for (const subChange of children) {
@@ -468,15 +470,15 @@ function normalizeChange(change) {
 
 export function collectChangePaths(change, depth) {
   //
-  // Return a sorted list of paths of the specified `depth` that the `change`
-  // includes.
+  // Return a list of unique paths of the specified `depth` that the `change`
+  // includes. The order of the list is determined by the path occurrences
+  // in the change.
   //
   const pathsSet = new Set();
   for (const path of iterateChangePaths(change, depth)) {
     pathsSet.add(JSON.stringify(path));
   }
   const paths = [...pathsSet];
-  paths.sort();
   return paths.map((item) => JSON.parse(item));
 }
 

@@ -777,13 +777,19 @@ export class SceneModel {
     const guidelines = positionedGlyph.glyph.guidelines;
     const x = point.x - positionedGlyph.x;
     const y = point.y - positionedGlyph.y;
-    const selRect = centeredRect(x, y, size);
     const indices = parsedCurrentSelection
       ? parsedCurrentSelection.guideline || []
       : [...range(guidelines.length)];
     for (const i of reversed(indices)) {
       const guideline = guidelines[i];
-      if (guideline && pointInRect(guideline.x, guideline.y, selRect)) {
+      if (!guideline) {
+        continue;
+      }
+      const angle = (guideline.angle * Math.PI) / 180;
+      const distance = Math.abs(
+        Math.cos(angle) * (guideline.y - y) - Math.sin(angle) * (guideline.x - x)
+      );
+      if (distance < size / 2) {
         return new Set([`guideline/${i}`]);
       }
     }

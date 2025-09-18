@@ -13,9 +13,9 @@ import { SourcesPanel } from "./panel-sources.js";
 const panelClasses = [
   FontInfoPanel,
   AxesPanel,
-  CrossAxisMappingPanel,
   SourcesPanel,
   OpenTypeFeatureCodePanel,
+  CrossAxisMappingPanel,
   DevelopmentStatusDefinitionsPanel,
 ];
 

@@ -1,12 +1,11 @@
 import { recordChanges } from "@fontra/core/change-recorder.js";
+import { NumberFormatter, OptionalNumberFormatter } from "@fontra/core/formatters.js";
 import * as html from "@fontra/core/html-utils.js";
 import { addStyleSheet } from "@fontra/core/html-utils.js";
 import { translate } from "@fontra/core/localization.js";
 import { ObservableController } from "@fontra/core/observable-object.js";
 import * as svg from "@fontra/core/svg-utils.js";
 import {
-  NumberFormatter,
-  OptionalNumberFormatter,
   checkboxListCell,
   labeledTextInput,
   setupSortableList,

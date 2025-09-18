@@ -1,5 +1,5 @@
 import { getDecomposedIdentity } from "./transform.js";
-import { mapObjectValues, normalizeGuidelines, zip } from "./utils.js";
+import { deepCopyObject, mapObjectValues, normalizeGuidelines, zip } from "./utils.js";
 import { VarPackedPath } from "./var-path.js";
 
 export class VariableGlyph {
@@ -12,7 +12,7 @@ export class VariableGlyph {
       }) || [];
     glyph.sources = obj.sources.map((source) => GlyphSource.fromObject(source));
     glyph.layers = mapObjectValues(obj.layers, (layer) => Layer.fromObject(layer));
-    glyph.customData = copyCustomData(obj.customData || {});
+    glyph.customData = deepCopyObject(obj.customData || {});
     return glyph;
   }
 
@@ -25,7 +25,7 @@ export class Layer {
   static fromObject(obj) {
     const layer = new Layer();
     layer.glyph = StaticGlyph.fromObject(obj.glyph);
-    layer.customData = copyCustomData(obj.customData || {});
+    layer.customData = deepCopyObject(obj.customData || {});
     return layer;
   }
 }
@@ -38,7 +38,7 @@ export class GlyphSource {
     source.location = { ...obj.location } || {};
     source.layerName = obj.layerName;
     source.inactive = !!obj.inactive;
-    source.customData = copyCustomData(obj.customData || {});
+    source.customData = deepCopyObject(obj.customData || {});
     return source;
   }
 }
@@ -56,7 +56,7 @@ export class StaticGlyph {
     }
     glyph.components =
       (noCopy ? obj.components : obj.components?.map(copyComponent)) || [];
-    glyph.anchors = noCopy ? obj.anchors || [] : copyCustomData(obj.anchors || []);
+    glyph.anchors = noCopy ? obj.anchors || [] : deepCopyObject(obj.anchors || []);
     glyph.guidelines = noCopy
       ? obj.guidelines || []
       : normalizeGuidelines(obj.guidelines || []);
@@ -123,7 +123,7 @@ export function copyComponent(component) {
     name: component.name,
     transformation: { ...getDecomposedIdentity(), ...component.transformation },
     location: { ...component.location },
-    customData: copyCustomData(component.customData || {}),
+    customData: deepCopyObject(component.customData || {}),
   };
 }
 
@@ -136,10 +136,6 @@ export function copyBackgroundImage(image) {
     transformation: { ...getDecomposedIdentity(), ...image.transformation },
     opacity: image.opacity !== undefined ? image.opacity : 1.0,
     color: image.color ? { ...image.color } : undefined,
-    customData: copyCustomData(image.customData || {}),
+    customData: deepCopyObject(image.customData || {}),
   };
-}
-
-function copyCustomData(data) {
-  return JSON.parse(JSON.stringify(data));
 }

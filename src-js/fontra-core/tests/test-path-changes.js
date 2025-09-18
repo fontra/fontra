@@ -2,6 +2,7 @@ import { expect } from "chai";
 import fs from "fs";
 
 import { applyChange } from "@fontra/core/changes.js";
+import { deepCopyObject } from "@fontra/core/utils.js";
 import { VarPackedPath } from "@fontra/core/var-path.js";
 
 import { dirname, join } from "path";
@@ -28,7 +29,7 @@ describe("Path Changes Tests", () => {
     const expectedPath = VarPackedPath.fromUnpackedContours(test["expectedPath"]);
 
     const subject = VarPackedPath.fromUnpackedContours(
-      copyObject(inputPaths[inputPathName])
+      deepCopyObject(inputPaths[inputPathName])
     );
     it(`Apply Path Changes test #${i} -- ${testName}`, () => {
       applyChange(subject, test["change"]);
@@ -36,7 +37,3 @@ describe("Path Changes Tests", () => {
     });
   }
 });
-
-function copyObject(obj) {
-  return JSON.parse(JSON.stringify(obj));
-}

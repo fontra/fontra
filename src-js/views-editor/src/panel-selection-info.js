@@ -2,6 +2,7 @@ import { recordChanges } from "@fontra/core/change-recorder.js";
 import * as html from "@fontra/core/html-utils.js";
 import { translate } from "@fontra/core/localization.js";
 import { rectFromPoints, rectSize, unionRect } from "@fontra/core/rectangle.js";
+import { compute, nameCapture } from "@fontra/core/simple-compute.js";
 import { getDecomposedIdentity } from "@fontra/core/transform.js";
 import {
   assert,
@@ -212,6 +213,12 @@ export default class SelectionInfoPanel extends Panel {
           label: translate("sidebar.selection-info.advance-width"),
           value: instance.xAdvance,
           numDigits: 1,
+          evaluateExpression: async (expression) =>
+            await this._evaluateMetricsExpression(
+              expression,
+              varGlyphController,
+              "xAdvance"
+            ),
           minValue: 0,
         });
         formContents.push({
@@ -223,11 +230,21 @@ export default class SelectionInfoPanel extends Panel {
             value: glyphController.leftMargin,
             numDigits: 1,
             disabled: glyphController.leftMargin == undefined,
+            evaluateExpression: async (expression) =>
+              await this._evaluateMetricsExpression(
+                expression,
+                varGlyphController,
+                "leftMargin"
+              ),
             getValue: (layerGlyph, layerGlyphController, fieldItem) => {
               return layerGlyphController.leftMargin;
             },
             setValue: (layerGlyph, layerGlyphController, fieldItem, value) => {
-              const translationX = value - layerGlyphController.leftMargin;
+              const translationX = maybeClampValue(
+                value - layerGlyphController.leftMargin,
+                -layerGlyph.xAdvance,
+                undefined
+              );
               for (const i of range(0, layerGlyph.path.coordinates.length, 2)) {
                 layerGlyph.path.coordinates[i] += translationX;
               }
@@ -241,12 +258,22 @@ export default class SelectionInfoPanel extends Panel {
             key: '["rightMargin"]',
             value: glyphController.rightMargin,
             numDigits: 1,
+            evaluateExpression: async (expression) =>
+              await this._evaluateMetricsExpression(
+                expression,
+                varGlyphController,
+                "rightMargin"
+              ),
             disabled: glyphController.rightMargin == undefined,
             getValue: (layerGlyph, layerGlyphController, fieldItem) => {
               return layerGlyphController.rightMargin;
             },
             setValue: (layerGlyph, layerGlyphController, fieldItem, value) => {
-              const translationX = value - layerGlyphController.rightMargin;
+              const translationX = maybeClampValue(
+                value - layerGlyphController.rightMargin,
+                -layerGlyph.xAdvance,
+                undefined
+              );
               layerGlyph.xAdvance += translationX;
             },
           },
@@ -754,6 +781,87 @@ export default class SelectionInfoPanel extends Panel {
     const fieldKey = JSON.stringify([keyToUpdata]);
     this.infoForm.setValue(fieldKey, glyphController[keyToUpdata]);
   }
+
+  async _evaluateMetricsExpression(expression, varGlyphController, metricProperty) {
+    const sidebearingOpposites = {
+      leftMargin: "rightMargin",
+      rightMargin: "leftMargin",
+    };
+
+    let value = Number(expression);
+    if (!isNaN(value)) {
+      return value;
+    }
+
+    const { names, namespace } = nameCapture(
+      this.fontController.glyphMap,
+      (nameObject, name) =>
+        nameObject[name] ||
+        (sidebearingOpposites[metricProperty] &&
+          name.endsWith("!") &&
+          nameObject[name.slice(0, -1)])
+          ? 1
+          : undefined
+    );
+
+    try {
+      const dummyResult = compute(expression, undefined, namespace);
+    } catch (e) {
+      return { error: e.message };
+    }
+
+    const { mainLayerName, locations } = this._getEditingLocations(varGlyphController);
+
+    const layerVariables = {};
+    for (const name of names) {
+      const referencedGlyphName = name.endsWith("!") ? name.slice(0, -1) : name;
+      const referencedGlyph = await this.fontController.getGlyph(referencedGlyphName);
+      for (const [layerName, location] of Object.entries(locations)) {
+        const getGlyphFunc = this.fontController.getGlyph.bind(this.fontController);
+        const instanceController = await referencedGlyph.instantiateController(
+          location,
+          layerName,
+          getGlyphFunc
+        );
+        if (!layerVariables[layerName]) {
+          layerVariables[layerName] = {};
+        }
+        layerVariables[layerName][referencedGlyphName] =
+          instanceController[metricProperty];
+        if (name.endsWith("!") && sidebearingOpposites[metricProperty]) {
+          layerVariables[layerName][referencedGlyphName + "!"] =
+            instanceController[sidebearingOpposites[metricProperty]];
+        }
+      }
+    }
+
+    return {
+      getValue: (layerName) => {
+        try {
+          return ensureFiniteNumber(
+            compute(expression, undefined, layerVariables[layerName])
+          );
+        } catch (e) {
+          console.error(e);
+        }
+        return 0;
+      },
+      value: ensureFiniteNumber(
+        compute(expression, undefined, layerVariables[mainLayerName])
+      ),
+    };
+  }
+
+  _getEditingLocations(varGlyphController) {
+    const layerNames = new Set(this.sceneController.editingLayerNames);
+    const locations = {};
+    for (const [sourceIndex, source] of enumerate(varGlyphController.sources)) {
+      if (layerNames.has(source.layerName) && !locations[source.layerName]) {
+        locations[source.layerName] = varGlyphController.getSourceLocation(source);
+      }
+    }
+    return { mainLayerName: this.sceneController.editingLayerNames[0], locations };
+  }
 }
 
 function addTransformationItems(formContents, keyFunc, transformation) {
@@ -861,12 +969,15 @@ function applyNewValue(glyph, layerInfo, value, fieldItem, absolute) {
 
   const primaryOrgValue = layerInfo[0].orgValue;
   const isNumber = typeof primaryOrgValue === "number";
-  const delta = isNumber && !absolute ? value - primaryOrgValue : null;
+  const delta =
+    isNumber && !absolute && !value?.getValue ? value - primaryOrgValue : null;
   return recordChanges(glyph, (glyph) => {
     const layers = glyph.layers;
     for (const { layerName, layerGlyphController, orgValue } of layerInfo) {
+      const layerValue = value?.getValue ? value.getValue(layerName) : value;
+
       let newValue =
-        delta === null || orgValue === undefined ? value : orgValue + delta;
+        delta === null || orgValue === undefined ? layerValue : orgValue + delta;
       if (isNumber) {
         newValue = maybeClampValue(newValue, fieldItem.minValue, fieldItem.maxValue);
       }
@@ -892,6 +1003,14 @@ function makeCodePointsString(codePoints) {
         `${makeUPlusStringFromCodePoint(code)}\u00A0(${getCharFromCodePoint(code)})`
     )
     .join(" ");
+}
+
+function ensureFiniteNumber(value, fallback = 0) {
+  if (isNaN(value) || Math.abs(value) === Infinity) {
+    console.log(`bad expression result: ${value}, fall back to 0`);
+    value = fallback;
+  }
+  return value;
 }
 
 customElements.define("panel-selection-info", SelectionInfoPanel);

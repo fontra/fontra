@@ -1,8 +1,9 @@
+import { DefaultFormatter } from "@fontra/core/formatters.js";
 import * as html from "@fontra/core/html-utils.js";
 import { SimpleElement } from "@fontra/core/html-utils.js";
 import { translate } from "@fontra/core/localization.js";
 import { ObservableController } from "@fontra/core/observable-object.js";
-import { DefaultFormatter, labeledTextInput } from "@fontra/core/ui-utils.js";
+import { labeledTextInput } from "@fontra/core/ui-utils.js";
 import { zip } from "@fontra/core/utils.js";
 import { dialogSetup } from "@fontra/web-components/modal-dialog.js";
 import { UIList } from "@fontra/web-components/ui-list.js";

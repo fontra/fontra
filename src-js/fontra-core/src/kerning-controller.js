@@ -13,7 +13,9 @@ export class KerningController {
       { kerning: { [wildcard]: { sourceIdentifiers: null } } },
       (change, isExternalChange) => {
         this.clearCaches();
-      }
+      },
+      false,
+      true // immediate
     );
 
     this._setup();
@@ -154,7 +156,7 @@ export class KerningController {
     let value = null;
 
     for (const [leftName, rightName] of pairsToTry) {
-      if (sourceIdentifier) {
+      if (sourceIdentifier && this.sourceIdentifiers.includes(sourceIdentifier)) {
         const sourceValue = this.getPairValueForSource(
           leftName,
           rightName,
@@ -237,6 +239,75 @@ export class KerningController {
       },
       senderID
     );
+  }
+
+  insertInterpolatedSource(sourceIdentifier, location) {
+    const font = { kerning: this.kerning };
+
+    const changes = recordChanges(font, (font) => {
+      this._insertInterpolatedSource(sourceIdentifier, location, font);
+    });
+    this.clearCaches();
+    return changes;
+  }
+
+  _insertInterpolatedSource(sourceIdentifier, location, font) {
+    const kernData = font.kerning[this.kernTag];
+
+    assert(!kernData.sourceIdentifiers.includes(sourceIdentifier));
+    const index = kernData.sourceIdentifiers.length;
+
+    for (const [leftName, valueDict] of Object.entries(kernData.values)) {
+      for (const [rightName, values] of Object.entries(valueDict)) {
+        // Make a copy of values, and ensure it has the correct length
+        const newValues = values.slice(0, index);
+        while (newValues.length < index) {
+          newValues.push(null);
+        }
+
+        const pairFunction = this._getPairFunction(leftName, rightName);
+        assert(pairFunction);
+
+        newValues.push(Math.round(pairFunction(location)));
+        kernData.values[leftName][rightName] = newValues;
+      }
+    }
+
+    kernData.sourceIdentifiers.push(sourceIdentifier);
+  }
+
+  deleteSource(sourceIdentifier) {
+    const font = { kerning: this.kerning };
+
+    const changes = recordChanges(font, (font) => {
+      this._deleteSource(sourceIdentifier, font);
+    });
+    this.clearCaches();
+    return changes;
+  }
+
+  _deleteSource(sourceIdentifier, font) {
+    const kernData = font.kerning[this.kernTag];
+
+    const index = kernData.sourceIdentifiers.indexOf(sourceIdentifier);
+    if (index === -1) {
+      // Unknown source identifier
+      return;
+    }
+
+    for (const [leftName, valueDict] of Object.entries(kernData.values)) {
+      for (const [rightName, values] of Object.entries(valueDict)) {
+        // Make a copy of values
+        const newValues = [...values];
+
+        if (newValues.length > index) {
+          newValues.splice(index, 1);
+          kernData.values[leftName][rightName] = newValues;
+        }
+      }
+    }
+
+    kernData.sourceIdentifiers.splice(index, 1);
   }
 }
 

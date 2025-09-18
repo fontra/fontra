@@ -74,7 +74,7 @@ def parseGLIF(data: str) -> StaticGlyph | None:
         components=pen.components,
         xAdvance=ufoGlyph.width,
         anchors=unpackAnchors(ufoGlyph.anchors),
-        guidelines=unpackGuidelines(ufoGlyph.guidelines),
+        guidelines=unpackGuidelines(ufoGlyph.guidelines, ufoGlyph.lib),
     )
 
 

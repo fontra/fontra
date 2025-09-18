@@ -1225,6 +1225,11 @@ export class SceneController {
       return undefined;
     }
 
+    if (varGlyph.sources.some((source) => source.locationBase === sourceIdentifier)) {
+      // We already have a source here, but it is inactive.
+      return undefined;
+    }
+
     const instance = glyphController.instance.copy();
     // Round coordinates and component positions
     instance.path = instance.path.roundCoordinates();

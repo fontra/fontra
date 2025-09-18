@@ -103,8 +103,24 @@ export default class TransformationPanel extends Panel {
       skewX: 0,
       skewY: 0,
       customDistributionSpacing: null,
+      dimensionWidth: null,
+      dimensionHeight: null,
     };
     this.registerActions();
+
+    this.sceneController.sceneSettingsController.addKeyListener(
+      [
+        "selectedGlyph",
+        "selectedGlyphName",
+        "selection",
+        "fontLocationSourceMapped",
+        "glyphLocation",
+      ],
+      (event) => this.updateDimensions()
+    );
+    this.sceneController.addCurrentGlyphChangeListener((event) => {
+      this.updateDimensions();
+    });
   }
 
   registerActions() {
@@ -220,14 +236,15 @@ export default class TransformationPanel extends Panel {
 
     formContents.push({ type: "divider" });
 
-    let buttonMove = html.createDomElement("icon-button", {
+    const buttonMove = html.createDomElement("icon-button", {
       "src": "/tabler-icons/arrow-move-right.svg",
       "onclick": (event) =>
         this.transformSelection(
-          new Transform().translate(
-            this.transformParameters.moveX,
-            this.transformParameters.moveY
-          ),
+          () =>
+            new Transform().translate(
+              this.transformParameters.moveX,
+              this.transformParameters.moveY
+            ),
           "move"
         ),
       "class": "ui-form-icon ui-form-icon-button",
@@ -246,18 +263,22 @@ export default class TransformationPanel extends Panel {
         key: "moveY",
         value: this.transformParameters.moveY,
       },
+      onEnterKey: (event) => {
+        buttonMove.click();
+      },
     });
 
-    let buttonScale = html.createDomElement("icon-button", {
+    const buttonScale = html.createDomElement("icon-button", {
       "src": "/tabler-icons/resize.svg",
       "onclick": (event) =>
         this.transformSelection(
-          new Transform().scale(
-            this.transformParameters.scaleX / 100,
-            (this.transformParameters.scaleY
-              ? this.transformParameters.scaleY
-              : this.transformParameters.scaleX) / 100
-          ),
+          () =>
+            new Transform().scale(
+              this.transformParameters.scaleX / 100,
+              (this.transformParameters.scaleY
+                ? this.transformParameters.scaleY
+                : this.transformParameters.scaleX) / 100
+            ),
           "scale"
         ),
       "class": "ui-form-icon ui-form-icon-button",
@@ -278,13 +299,17 @@ export default class TransformationPanel extends Panel {
         id: "selection-transformation-scaleY",
         value: this.transformParameters.scaleY,
       },
+      onEnterKey: (event) => {
+        buttonScale.click();
+      },
     });
 
-    let buttonRotate = html.createDomElement("icon-button", {
+    const buttonRotate = html.createDomElement("icon-button", {
       "src": "/tabler-icons/rotate.svg",
       "onclick": (event) =>
         this.transformSelection(
-          new Transform().rotate((this.transformParameters.rotation * Math.PI) / 180),
+          () =>
+            new Transform().rotate((this.transformParameters.rotation * Math.PI) / 180),
           "rotate"
         ),
       "class": "ui-form-icon ui-form-icon-button",
@@ -297,16 +322,20 @@ export default class TransformationPanel extends Panel {
       key: "rotation",
       label: buttonRotate,
       value: this.transformParameters.rotation,
+      onEnterKey: (event) => {
+        buttonRotate.click();
+      },
     });
 
-    let buttonSkew = html.createDomElement("icon-button", {
+    const buttonSkew = html.createDomElement("icon-button", {
       "src": "/images/skew.svg",
       "onclick": (event) =>
         this.transformSelection(
-          new Transform().skew(
-            (this.transformParameters.skewX * Math.PI) / 180,
-            (this.transformParameters.skewY * Math.PI) / 180
-          ),
+          () =>
+            new Transform().skew(
+              (this.transformParameters.skewX * Math.PI) / 180,
+              (this.transformParameters.skewY * Math.PI) / 180
+            ),
           "skew"
         ),
       "class": "ui-form-icon ui-form-icon-button",
@@ -328,6 +357,65 @@ export default class TransformationPanel extends Panel {
         id: "selection-transformation-skewY",
         value: this.transformParameters.skewY,
       },
+      onEnterKey: (event) => {
+        buttonSkew.click();
+      },
+    });
+
+    formContents.push({ type: "divider" });
+
+    const buttonDimensions = html.createDomElement("icon-button", {
+      "src": "/tabler-icons/dimensions.svg",
+      "onclick": async (event) => {
+        const glyph =
+          await this.sceneController.sceneModel.getSelectedStaticGlyphController();
+        const bounds = glyph?.getSelectionBounds(
+          this.sceneController.selection,
+          this.fontController.getBackgroundImageBoundsFunc
+        );
+        if (!bounds) {
+          return;
+        }
+        const { width, height } = rectSize(bounds);
+        const doScaleX = this.transformParameters.dimensionWidth != width;
+        const doScaleY = this.transformParameters.dimensionHeight != height;
+
+        if (doScaleX || doScaleY) {
+          this.transformSelection((layerGlyphController, selectionBounds) => {
+            const { width, height } = rectSize(selectionBounds);
+            const newWidth = this.transformParameters.dimensionWidth || width;
+            const newHeight = this.transformParameters.dimensionHeight || height;
+            const scaleX = doScaleX ? newWidth / width : 1;
+            const scaleY = doScaleY ? newHeight / height : 1;
+
+            return new Transform().scale(scaleX, scaleY);
+          }, "set dimensions");
+        }
+      },
+      "class": "ui-form-icon ui-form-icon-button",
+      "data-tooltip": translate("sidebar.selection-info.dimensions"),
+      "data-tooltipposition": "top",
+    });
+
+    formContents.push({
+      type: "edit-number-x-y",
+      key: '["selectionTransformationDimensions"]',
+      label: buttonDimensions,
+      fieldX: {
+        key: "dimensionWidth",
+        id: "selection-transformation-dimension-width",
+        numDigits: 1,
+        value: null,
+      },
+      fieldY: {
+        key: "dimensionHeight",
+        id: "selection-transformation-dimension-height",
+        numDigits: 1,
+        value: null,
+      },
+      onEnterKey: (event) => {
+        buttonDimensions.click();
+      },
     });
 
     formContents.push({ type: "divider" });
@@ -348,7 +436,10 @@ export default class TransformationPanel extends Panel {
           "data-tooltip": translate("sidebar.selection-transformation.flip.vertically"),
           "data-tooltipposition": "top",
           "onclick": (event) =>
-            this.transformSelection(new Transform().scale(-1, 1), "flip vertically"),
+            this.transformSelection(
+              () => new Transform().scale(-1, 1),
+              "flip vertically"
+            ),
         }),
       },
       field3: {
@@ -362,7 +453,10 @@ export default class TransformationPanel extends Panel {
           ),
           "data-tooltipposition": "top-right",
           "onclick": (event) =>
-            this.transformSelection(new Transform().scale(1, -1), "flip horizontally"),
+            this.transformSelection(
+              () => new Transform().scale(1, -1),
+              "flip horizontally"
+            ),
         }),
       },
     });
@@ -575,6 +669,31 @@ export default class TransformationPanel extends Panel {
         });
       }
     };
+
+    this.updateDimensions();
+  }
+
+  async updateDimensions() {
+    const glyph =
+      await this.sceneController.sceneModel.getSelectedStaticGlyphController();
+
+    const settings = this.sceneController.sceneSettings;
+    const bounds =
+      glyph &&
+      settings.selectedGlyph?.isEditing &&
+      settings.selectedGlyphName &&
+      settings.selection?.size
+        ? glyph.getSelectionBounds(
+            this.sceneController.selection,
+            this.fontController.getBackgroundImageBoundsFunc
+          )
+        : null;
+
+    const { width, height } = bounds ? rectSize(bounds) : { width: null, height: null };
+    this.infoForm.setValue("dimensionWidth", width);
+    this.infoForm.setValue("dimensionHeight", height);
+    this.transformParameters.dimensionWidth = width;
+    this.transformParameters.dimensionHeight = height;
   }
 
   async doPathOperations(pathOperationFunc, key) {
@@ -668,7 +787,7 @@ export default class TransformationPanel extends Panel {
     this.sceneController.selection = new Set(); // Clear selection
   }
 
-  async transformSelection(transformation, undoLabel) {
+  async transformSelection(transformationForLayer, undoLabel) {
     let {
       point: pointIndices,
       component: componentIndices,
@@ -713,18 +832,19 @@ export default class TransformationPanel extends Panel {
       const rollbackChanges = [];
       for (const { changePath, editBehavior, layerGlyphController } of layerInfo) {
         const layerGlyph = layerGlyphController.instance;
+        const selectionBounds = layerGlyphController.getSelectionBounds(
+          this.sceneController.selection,
+          this.fontController.getBackgroundImageBoundsFunc
+        );
         const pinPoint = getPinPoint(
-          layerGlyphController.getSelectionBounds(
-            this.sceneController.selection,
-            this.fontController.getBackgroundImageBoundsFunc
-          ),
+          selectionBounds,
           this.transformParameters.originX,
           this.transformParameters.originY
         );
 
         const pinnedTransformation = new Transform()
           .translate(pinPoint.x, pinPoint.y)
-          .transform(transformation)
+          .transform(transformationForLayer(layerGlyphController, selectionBounds))
           .translate(-pinPoint.x, -pinPoint.y);
 
         const editChange =
@@ -755,7 +875,8 @@ export default class TransformationPanel extends Panel {
     this.transformParameters.originY = keyY;
     this.transformParameters.originXButton = undefined;
     this.transformParameters.originYButton = undefined;
-    this.update();
+    this.infoForm.setValue("originXButton", null);
+    this.infoForm.setValue("originYButton", null);
   }
 
   _splitSelection(layerGlyphController, selection) {

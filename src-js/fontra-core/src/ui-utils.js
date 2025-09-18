@@ -1,4 +1,5 @@
 import { PopupMenu } from "@fontra/web-components/popup-menu.js";
+import { DefaultFormatter } from "./formatters.js";
 import * as html from "./html-utils.js";
 import { uniqueID, zip } from "./utils.js";
 
@@ -234,44 +235,6 @@ export function labeledPopupSelect(label, controller, key, popupItems, options) 
   const inputElement = popupSelect(controller, key, popupItems, options);
   return [labelForElement(label, inputElement, options), inputElement];
 }
-
-export const DefaultFormatter = {
-  toString: (value) => (value !== undefined && value !== null ? value.toString() : ""),
-  fromString: (value) => {
-    return {
-      value: value,
-    };
-  },
-};
-
-// TODO: Move to formatters.js
-// (As a follow up, because of lots of dependencies)
-export const NumberFormatter = {
-  toString: (value) => value.toString(),
-  fromString: (value) => {
-    const number = Number(value);
-    if (isNaN(number) || !value) {
-      return { error: "not a number" };
-    } else {
-      return { value: number };
-    }
-  },
-};
-
-export const OptionalNumberFormatter = {
-  toString: (value) => (value != undefined ? value.toString() : ""),
-  fromString: (value) => {
-    if (!value) {
-      return { value: null };
-    }
-    const number = Number(value);
-    if (isNaN(number)) {
-      return { error: "not a number" };
-    } else {
-      return { value: number };
-    }
-  },
-};
 
 export function checkboxListCell(item, colDesc) {
   const value = item[colDesc.key];

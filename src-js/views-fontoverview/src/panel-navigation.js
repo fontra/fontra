@@ -640,7 +640,7 @@ class AddPresetGlyphSetDialog {
       html.div(),
       html.a(
         {
-          href: "https://github.com/googlefonts/fontra/discussions/1943",
+          href: "https://github.com/fontra/fontra/discussions/1943",
           target: "_blank",
           class: "suggest-link",
         },

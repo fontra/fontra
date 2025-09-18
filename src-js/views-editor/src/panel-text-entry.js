@@ -224,7 +224,7 @@ export default class TextEntryPanel extends Panel {
       }
       this.textEntryElement.value = event.newValue;
 
-      // https://github.com/googlefonts/fontra/issues/754
+      // https://github.com/fontra/fontra/issues/754
       // In Safari, setSelectionRange() changes the focus. We don't want that,
       // so we make sure to restore the focus to whatever it was.
       const savedActiveElement = findNestedActiveElement();

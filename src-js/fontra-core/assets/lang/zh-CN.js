@@ -14,6 +14,7 @@ export const strings = {
   "action.add-anchor": "添加锚点",
   "action.add-component": "添加部件",
   "action.add-guideline": "添加参考线",
+  "action.add-guideline-between-points": "Add Guideline Between Points",
   "action.break-contour": "断开轮廓",
   "action.break-contour.plural": "断开轮廓",
   "action.close-contour": "闭合轮廓",
