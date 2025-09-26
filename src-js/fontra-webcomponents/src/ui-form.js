@@ -76,6 +76,10 @@ export class Form extends SimpleElement {
       font-size: 100%;
     }
 
+    .ui-form-value {
+      line-height: 1.6em;
+    }
+
     .ui-form-value input {
       width: min(100%, 9.5em);
       height: 1.6em;
@@ -99,6 +103,7 @@ export class Form extends SimpleElement {
       width: 4em;
     }
 
+    .ui-form-value.edit-number,
     .ui-form-value.edit-number-x-y,
     .ui-form-value.edit-text-double,
     .ui-form-value.universal-row {
