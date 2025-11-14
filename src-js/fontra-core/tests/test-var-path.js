@@ -2,7 +2,7 @@ import { expect } from "chai";
 
 import { parametrize } from "./test-support.js";
 
-import { Transform } from "@fontra/core/transform.js";
+import { Transform } from "@fontra/core/transform.ts";
 import { enumerate } from "@fontra/core/utils.js";
 import VarArray from "@fontra/core/var-array.js";
 import {

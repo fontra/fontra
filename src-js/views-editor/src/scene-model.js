@@ -1,7 +1,7 @@
 import {
   pointInConvexPolygon,
   rectIntersectsPolygon,
-} from "@fontra/core/convex-hull.js";
+} from "@fontra/core/convex-hull.ts";
 import { loaderSpinner } from "@fontra/core/loader-spinner.js";
 import {
   centeredRect,
@@ -16,7 +16,7 @@ import {
   unionRect,
 } from "@fontra/core/rectangle.js";
 import { difference, isEqualSet, union, updateSet } from "@fontra/core/set-ops.js";
-import { decomposedToTransform } from "@fontra/core/transform.js";
+import { decomposedToTransform } from "@fontra/core/transform.ts";
 import {
   consolidateCalls,
   enumerate,
@@ -25,7 +25,7 @@ import {
   reversed,
   valueInRange,
 } from "@fontra/core/utils.js";
-import * as vector from "@fontra/core/vector.js";
+import * as vector from "@fontra/core/vector.ts";
 
 export class SceneModel {
   constructor(

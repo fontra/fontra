@@ -1,5 +1,5 @@
 import { PopupMenu } from "@fontra/web-components/popup-menu.js";
-import { DefaultFormatter } from "./formatters.js";
+import { DefaultFormatter } from "./formatters.ts";
 import * as html from "./html-utils.js";
 import { uniqueID, zip } from "./utils.js";
 

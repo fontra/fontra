@@ -1,9 +1,13 @@
 import { assert } from "./utils.js";
-export function isString(value) {
+export function isString(value: string | String): value is string {
   return typeof value === "string" || value instanceof String;
 }
 
-export const DefaultFormatter = {
+interface Formatter {
+  toString: (value: any) => string;
+  fromString: (value: string, ...args: any[]) => { value?: any; error?: string };
+}
+export const DefaultFormatter: Formatter = {
   toString: (value) => (value !== undefined && value !== null ? value.toString() : ""),
   fromString: (value) => {
     return {
@@ -12,7 +16,7 @@ export const DefaultFormatter = {
   },
 };
 
-export const NumberFormatter = {
+export const NumberFormatter: Formatter = {
   toString: (value) => value.toString(),
   fromString: (value) => {
     const number = Number(value);
@@ -24,7 +28,7 @@ export const NumberFormatter = {
   },
 };
 
-export const OptionalNumberFormatter = {
+export const OptionalNumberFormatter: Formatter = {
   toString: (value) => (value != undefined ? value.toString() : ""),
   fromString: (value) => {
     if (!value) {
@@ -39,7 +43,7 @@ export const OptionalNumberFormatter = {
   },
 };
 
-export const IntegerFormatter = {
+export const IntegerFormatter: Formatter = {
   toString: (value) => value.toString(),
   fromString: (
     value,
@@ -58,12 +62,15 @@ export const IntegerFormatter = {
   },
 };
 
-export const IntegerFormatterMinMax = (minValue, maxValue) => ({
+export const IntegerFormatterMinMax: (
+  minValue: number,
+  maxValue: number
+) => Formatter = (minValue, maxValue) => ({
   toString: (value) => IntegerFormatter.toString(value),
   fromString: (value) => IntegerFormatter.fromString(value, minValue, maxValue),
 });
 
-export const UnsignedIntegerFormatter = {
+export const UnsignedIntegerFormatter: Formatter = {
   toString: (value) => value.toString(),
   fromString: (value) => {
     assert(isString(value), "input value not a string");
@@ -78,7 +85,7 @@ export const UnsignedIntegerFormatter = {
   },
 };
 
-export const UnsignedNumberFormatter = {
+export const UnsignedNumberFormatter: Formatter = {
   toString: (value) => value.toString(),
   fromString: (value) => {
     assert(isString(value), "input value not a string");
@@ -93,7 +100,7 @@ export const UnsignedNumberFormatter = {
   },
 };
 
-export const BooleanFormatter = {
+export const BooleanFormatter: Formatter = {
   toString: (value) => value.toString(),
   fromString: (value) => {
     assert(isString(value), `input value not a string`);
@@ -107,7 +114,7 @@ export const BooleanFormatter = {
   },
 };
 
-export const ArrayFormatter = {
+export const ArrayFormatter: Formatter = {
   toString: (value) => value.toString(),
   fromString: (value, arrayLength) => {
     assert(isString(value), `input value not a string`);
@@ -128,12 +135,14 @@ export const ArrayFormatter = {
   },
 };
 
-export const FixedLengthArrayFormatter = (arrayLength) => ({
-  toString: (value) => ArrayFormatter.toString(value, arrayLength),
+export const FixedLengthArrayFormatter: (arrayLength: number) => Formatter = (
+  arrayLength
+) => ({
+  toString: (value) => ArrayFormatter.toString(value),
   fromString: (value) => ArrayFormatter.fromString(value, arrayLength),
 });
 
-export const DateTimeFormatter = {
+export const DateTimeFormatter: Formatter = {
   toString: (value) => value.toString(),
   fromString: (value) => {
     assert(isString(value), `input value not a string`);

@@ -1,4 +1,4 @@
-import { normalizeRect, rectCenter, validateRect } from "./rectangle.js";
+import { normalizeRect, rectCenter, validateRect } from "./rectangle.ts";
 import { assert, consolidateCalls, isNumber, withSavedState } from "./utils.js";
 
 const MIN_MAGNIFICATION = 0.005;

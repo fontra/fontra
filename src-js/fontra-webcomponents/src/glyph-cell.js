@@ -3,7 +3,7 @@ import { SVGPath2D } from "@fontra/core/glyph-svg.js";
 import * as html from "@fontra/core/html-utils.js";
 import { UnlitElement } from "@fontra/core/html-utils.js";
 import * as svg from "@fontra/core/svg-utils.js";
-import { Transform } from "@fontra/core/transform.js";
+import { Transform } from "@fontra/core/transform.ts";
 import { assert, rgbaToCSS, throttleCalls } from "@fontra/core/utils.js";
 import { InlineSVG } from "./inline-svg.js";
 import { themeColorCSS } from "./theme-support.js";

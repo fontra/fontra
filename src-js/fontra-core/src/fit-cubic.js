@@ -7,7 +7,7 @@ import {
   mulVectorVector,
   subVectors,
   vectorLength,
-} from "./vector.js";
+} from "./vector.ts";
 
 function zeros(length, ...rest) {
   if (rest.length === 0) {

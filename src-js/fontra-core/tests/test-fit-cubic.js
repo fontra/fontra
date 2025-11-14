@@ -7,7 +7,7 @@ import {
 } from "@fontra/core/fit-cubic.js";
 import { expect } from "chai";
 
-import { normalizeVector } from "@fontra/core/vector.js";
+import { normalizeVector } from "@fontra/core/vector.ts";
 import { Bezier } from "bezier-js";
 
 describe("chordLengthParameterize", () => {

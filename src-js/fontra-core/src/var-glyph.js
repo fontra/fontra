@@ -1,4 +1,4 @@
-import { getDecomposedIdentity } from "./transform.js";
+import { getDecomposedIdentity } from "./transform.ts";
 import { deepCopyObject, mapObjectValues, normalizeGuidelines, zip } from "./utils.js";
 import { VarPackedPath } from "./var-path.js";
 
