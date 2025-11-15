@@ -3260,7 +3260,14 @@ export class EditorController extends ViewController {
       // Legacy URL format
       viewInfo = {};
       for (const key of url.searchParams.keys()) {
-        viewInfo[key] = JSON.parse(url.searchParams.get(key));
+        if (key == "project") {
+          continue;
+        }
+        try {
+          viewInfo[key] = JSON.parse(url.searchParams.get(key));
+        } catch (e) {
+          console.log("failed to parse legacy url format", e.toString());
+        }
       }
     }
     this.sceneSettings.align = viewInfo["align"] || "center";

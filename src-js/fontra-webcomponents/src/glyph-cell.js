@@ -9,7 +9,8 @@ import { InlineSVG } from "./inline-svg.js";
 import { themeColorCSS } from "./theme-support.js";
 
 const colors = {
-  "cell-background-color": ["#EEEEEE", "#585858"],
+  "cell-background-color": ["#ECECEC", "#585858"],
+  "cell-missing-color": ["#0000", "#0000"],
   "cell-hover-color": ["#E5E5E5", "#606060"],
   "cell-active-color": ["#D8D8D8", "#6F6F6F"],
   "cell-selected-color": ["#C8C8C8", "#8F8F8F"],
@@ -60,7 +61,8 @@ export class GlyphCell extends UnlitElement {
   }
 
   #glyph-cell-container {
-    background-color: var(--cell-background-color);
+    --this-background-color: var(--cell-background-color);
+    background-color: var(--this-background-color);
     display: inline-block;
     margin: 1px;
     border-radius: 0.3rem;
@@ -70,15 +72,25 @@ export class GlyphCell extends UnlitElement {
   }
 
   #glyph-cell-container:hover {
-    background-color: var(--cell-hover-color);
+    --this-background-color: var(--cell-hover-color);
   }
 
   #glyph-cell-container:active {
-    background-color: var(--cell-active-color);
+    --this-background-color: var(--cell-active-color);
   }
 
   #glyph-cell-container.selected {
-    background-color: var(--cell-selected-color);
+    --this-background-color: var(--cell-selected-color);
+  }
+
+  #glyph-cell-container.missing {
+    background-color: rgb(from var(--this-background-color) r g b / 25%);
+  }
+
+  #glyph-cell-container.missing:hover,
+  #glyph-cell-container.missing:active,
+  #glyph-cell-container.missing.selected {
+    background-color: rgb(from var(--this-background-color) r g b / 80%);
   }
 
   #glyph-cell-content {
@@ -163,6 +175,12 @@ export class GlyphCell extends UnlitElement {
       return;
     }
 
+    this._glyphIsEmpty = !glyphController.controlBounds;
+    if (this._glyphIsEmpty) {
+      this.requestUpdate();
+      return;
+    }
+
     const unitsPerEm = this.fontController.unitsPerEm;
     const fontSource = this.fontController.fontSourcesInstancer.instantiate(location);
     const ascender =
@@ -210,41 +228,47 @@ export class GlyphCell extends UnlitElement {
 
   render() {
     const fallbackFontSize = this.height / 2;
-    this._glyphCellContent = html.div({ id: "glyph-cell-container" }, [
-      html.div(
-        {
-          id: "glyph-cell-content",
-          style: `width: calc(${this.width}px * var(--glyph-cell-scale-factor));`,
-        },
-        [
-          this._glyphSVG
-            ? this._glyphSVG
-            : html.div(
-                {
-                  class: "glyph-shape-placeholder",
-                  dir: this._placeholderDirection,
-                  style: `
+    this._glyphCellContent = html.div(
+      {
+        id: "glyph-cell-container",
+        class: this._glyphIsEmpty || this._glyphSVG ? "exists" : "missing",
+      },
+      [
+        html.div(
+          {
+            id: "glyph-cell-content",
+            style: `width: calc(${this.width}px * var(--glyph-cell-scale-factor));`,
+          },
+          [
+            this._glyphSVG
+              ? this._glyphSVG
+              : html.div(
+                  {
+                    class: "glyph-shape-placeholder",
+                    dir: this._placeholderDirection,
+                    style: `
                   width: calc(${this.width}px * var(--glyph-cell-scale-factor));
                   font-size: calc(${fallbackFontSize}px * var(--glyph-cell-scale-factor));
                   line-height: ${fallbackFontSize}px;
                 `,
-                },
-                [this._placeholderString]
-              ),
-          html.div(
-            {
-              class: "glyph-name-label",
-              style: `width: calc(${this.width}px * var(--glyph-cell-scale-factor));`,
-            },
-            [this.glyphName]
-          ),
-          html.div({
-            class: "glyph-status-color",
-            style: `background-color: ${this._glyphStatusColor};`,
-          }),
-        ]
-      ),
-    ]);
+                  },
+                  [this._placeholderString]
+                ),
+            html.div(
+              {
+                class: "glyph-name-label",
+                style: `width: calc(${this.width}px * var(--glyph-cell-scale-factor));`,
+              },
+              [this.glyphName]
+            ),
+            html.div({
+              class: "glyph-status-color",
+              style: `background-color: ${this._glyphStatusColor};`,
+            }),
+          ]
+        ),
+      ]
+    );
 
     // update the selected state when rebuilding the cell contents
     this._updateSelectedState();
