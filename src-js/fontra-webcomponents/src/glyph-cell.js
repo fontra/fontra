@@ -177,6 +177,7 @@ export class GlyphCell extends UnlitElement {
 
     this._glyphIsEmpty = !glyphController.controlBounds;
     if (this._glyphIsEmpty) {
+      this._glyphSVG = null;
       this.requestUpdate();
       return;
     }
