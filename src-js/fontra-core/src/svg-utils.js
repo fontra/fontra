@@ -1,4 +1,4 @@
-import { Transform } from "./transform.js";
+import { Transform } from "./transform.ts";
 
 export function createElement(tagName, attributes, children) {
   const element = document.createElementNS("http://www.w3.org/2000/svg", tagName);

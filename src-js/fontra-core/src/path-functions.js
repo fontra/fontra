@@ -18,7 +18,7 @@ import {
   VarPackedPath,
   arePathsCompatible,
 } from "./var-path.js";
-import * as vector from "./vector.js";
+import * as vector from "./vector.ts";
 
 export function insertPoint(path, intersection, ...additionalSameSegmentIntersections) {
   assert(

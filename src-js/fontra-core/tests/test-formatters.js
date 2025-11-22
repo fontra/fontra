@@ -7,7 +7,7 @@ import {
   IntegerFormatterMinMax,
   UnsignedIntegerFormatter,
   UnsignedNumberFormatter,
-} from "@fontra/core/formatters.js";
+} from "@fontra/core/formatters.ts";
 import { expect } from "chai";
 
 import { getTestData, parametrize } from "./test-support.js";

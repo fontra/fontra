@@ -1,6 +1,6 @@
 import { expect } from "chai";
 
-import { getDecomposedIdentity } from "@fontra/core/transform.js";
+import { getDecomposedIdentity } from "@fontra/core/transform.ts";
 import { enumerate } from "@fontra/core/utils.js";
 import { StaticGlyph, VariableGlyph } from "@fontra/core/var-glyph.js";
 

@@ -9,7 +9,7 @@ import { insertHandles, insertPoint, scalePoint } from "@fontra/core/path-functi
 import { isEqualSet } from "@fontra/core/set-ops.js";
 import { modulo, parseSelection } from "@fontra/core/utils.js";
 import { VarPackedPath } from "@fontra/core/var-path.js";
-import * as vector from "@fontra/core/vector.js";
+import * as vector from "@fontra/core/vector.ts";
 import { constrainHorVerDiag } from "./edit-behavior.js";
 import { BaseTool, shouldInitiateDrag } from "./edit-tools-base.js";
 

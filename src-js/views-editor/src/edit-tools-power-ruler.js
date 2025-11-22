@@ -1,6 +1,6 @@
 import { translate } from "@fontra/core/localization.js";
 import { range, round, throttleCalls } from "@fontra/core/utils.js";
-import * as vector from "@fontra/core/vector.js";
+import * as vector from "@fontra/core/vector.ts";
 import { constrainHorVerDiag } from "./edit-behavior.js";
 import { BaseTool } from "./edit-tools-base.js";
 import {

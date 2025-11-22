@@ -8,7 +8,7 @@ import {
   NumberFormatter,
   UnsignedIntegerFormatter,
   UnsignedNumberFormatter,
-} from "./formatters.js";
+} from "./formatters.ts";
 
 // NOTE: fontObject can be FontInfo or FontSource
 function getAscenderDefault(fontObject = undefined) {

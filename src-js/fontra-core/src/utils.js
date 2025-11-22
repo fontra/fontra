@@ -1,5 +1,4 @@
 import { strFromU8, strToU8, unzlibSync, zlibSync } from "fflate";
-import { Transform } from "./transform.js";
 
 export function objectsEqual(obj1, obj2) {
   // Shallow object compare. Arguments may be null or undefined

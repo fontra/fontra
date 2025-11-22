@@ -12,7 +12,7 @@ import {
   getSelectionByContour,
 } from "@fontra/core/path-functions.js";
 import { rectCenter, rectSize } from "@fontra/core/rectangle.js";
-import { Transform } from "@fontra/core/transform.js";
+import { Transform } from "@fontra/core/transform.ts";
 import {
   enumerate,
   mapObjectValuesAsync,

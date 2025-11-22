@@ -45,7 +45,7 @@ import {
 import { GlyphSource, Layer } from "@fontra/core/var-glyph.js";
 import { isLocationAtDefault } from "@fontra/core/var-model.js";
 import { VarPackedPath, packContour } from "@fontra/core/var-path.js";
-import * as vector from "@fontra/core/vector.js";
+import * as vector from "@fontra/core/vector.ts";
 import { dialog, message } from "@fontra/web-components/modal-dialog.js";
 import { EditBehaviorFactory } from "./edit-behavior.js";
 import { SceneModel, getSelectedGlyphName } from "./scene-model.js";

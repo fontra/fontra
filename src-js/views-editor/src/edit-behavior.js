@@ -1,10 +1,10 @@
 import { consolidateChanges } from "@fontra/core/changes.js";
-import { polygonIsConvex } from "@fontra/core/convex-hull.js";
+import { polygonIsConvex } from "@fontra/core/convex-hull.ts";
 import {
   Transform,
   decomposedToTransform,
   prependTransformToDecomposed,
-} from "@fontra/core/transform.js";
+} from "@fontra/core/transform.ts";
 import {
   assert,
   enumerate,
@@ -13,7 +13,7 @@ import {
   unionIndexSets,
 } from "@fontra/core/utils.js";
 import { copyBackgroundImage, copyComponent } from "@fontra/core/var-glyph.js";
-import * as vector from "@fontra/core/vector.js";
+import * as vector from "@fontra/core/vector.ts";
 import {
   ANY,
   NIL,

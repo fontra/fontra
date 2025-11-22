@@ -32,7 +32,7 @@ import {
 import { SceneView } from "@fontra/core/scene-view.js";
 import { isSuperset } from "@fontra/core/set-ops.js";
 import { themeController } from "@fontra/core/theme-settings.js";
-import { getDecomposedIdentity } from "@fontra/core/transform.js";
+import { getDecomposedIdentity } from "@fontra/core/transform.ts";
 import { labeledCheckbox, labeledTextInput, pickFile } from "@fontra/core/ui-utils.js";
 import {
   commandKeyProperty,
@@ -85,7 +85,7 @@ import {
   translate,
   translatePlural,
 } from "@fontra/core/localization.js";
-import { subVectors } from "@fontra/core/vector.js";
+import { subVectors } from "@fontra/core/vector.ts";
 import { ViewController } from "@fontra/core/view-controller.js";
 import DesignspaceNavigationPanel from "./panel-designspace-navigation.js";
 import GlyphNotePanel from "./panel-glyph-note.js";

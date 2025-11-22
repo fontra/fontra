@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "checkJs": true,
+    "noEmit": true,
+    "downlevelIteration": true,
+    "lib": ["es2019", "dom"],
+    "typeRoots": ["./types"],
+    "baseUrl": "./src-js"
+  },
+  "include": ["src/**/*.js", "types/**/*.d.ts"],
+  "exclude": ["node_modules"]
+}
