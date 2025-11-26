@@ -3148,7 +3148,7 @@ export class EditorController extends ViewController {
       // receive a keyup event for the space key. So let's also respond to any
       // keyup for the Meta key.
       // Oddly, event.metaKey is false at keyup, so we check event.key instead.
-      (this._matchingKeyUpHandler.code == event.code)
+      this._matchingKeyUpHandler.code == event.code
     ) {
       this._matchingKeyUpHandler.callback(event);
       delete this._matchingKeyUpHandler;
