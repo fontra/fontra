@@ -60,6 +60,23 @@ export default class TextEntryPanel extends Panel {
       overflow-x: auto;
       box-sizing: content-box;
     }
+
+    #text-size-menu {
+      display: flex;
+      gap: 0.5em;
+    }
+
+    #text-size-menu > icon-button {
+      overflow-x: unset;
+      width: 1.5em;
+      height: 1.5em;
+      white-space: nowrap;
+      flex: none;
+    }
+
+    #text-size-menu > range-slider {
+      flex: auto;
+    }
   `;
 
   constructor(editorController) {
@@ -72,6 +89,7 @@ export default class TextEntryPanel extends Panel {
     this.setupTextEntryElement();
     this.setupTextAlignElement();
     this.setupApplyKerningElement();
+    this.setupTextSizeMenuElement();
     this.setupIntersectionObserver();
   }
 
@@ -109,6 +127,15 @@ export default class TextEntryPanel extends Panel {
                   "data-align": "right",
                   "src": "/images/alignright.svg",
                 }),
+              ]
+            ),
+            html.div(
+              {
+                id: "text-size-menu",
+              },
+              [
+                html.div({ id: "text-size-button" }),
+                html.div({ id: "text-size-slider" }),
               ]
             ),
             html.div({ id: "apply-kerning-checkbox" }),
@@ -152,6 +179,39 @@ export default class TextEntryPanel extends Panel {
 
     const placeHolder = this.contentElement.querySelector("#apply-kerning-checkbox");
     placeHolder.replaceWith(this.applyKerningCheckBox);
+  }
+
+  setupTextSizeMenuElement() {
+    this.textSizeSlider = html.createDomElement("range-slider", {
+      minValue: 6,
+      maxValue: 144,
+      defaultValue: 12,
+      value: this.textSettings.textSize,
+      step: 1,
+      onChangeCallback: (event) => {
+        if (!event.isDragging) {
+          this.textSettings.textSize = event.value;
+        }
+      },
+    });
+
+    this.textSettingsController.addKeyListener("textSize", (event) => {
+      this.textSizeSlider.value = event.newValue;
+    });
+
+    const buttonSet = html.createDomElement("icon-button", {
+      "src": "/tabler-icons/resize.svg",
+      "onclick": (event) => {
+        this.editorController.zoomToFontSize(this.textSettings.textSize);
+      },
+      "data-tooltip": "Set text size", // TODO: translate
+      "data-tooltipposition": "top",
+    });
+
+    const buttonPlaceHolder = this.contentElement.querySelector("#text-size-button");
+    buttonPlaceHolder.replaceWith(buttonSet);
+    const sliderPlaceHolder = this.contentElement.querySelector("#text-size-slider");
+    sliderPlaceHolder.replaceWith(this.textSizeSlider);
   }
 
   setupTextEntryElement() {
