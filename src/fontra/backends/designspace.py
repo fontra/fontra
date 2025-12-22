@@ -205,6 +205,26 @@ ufoInfoAttributesToRoundTrip = [
 #     "postscriptNominalWidthX", # Nominal width for glyphs.
 
 
+featuresWarning = """\
+#
+# FONTRA WARNING! Fontra had to alter the feature code when it was read from the UFO.
+#
+# If you are editing a .designspace/UFO project that was not originally authored with
+# Fontra, please beware of the following.
+#
+# Fontra is not a general purpose UFO features editor, and has limitations that affect
+# how the features are written back to the UFO(s) when edited:
+# - 'Included files' are resolved and are inlined
+# - Only the UFO at the default designspace location will contain features
+# - Variable GPOS features currently lose their variability, unless they use
+#   fonttools variable feature syntax: https://github.com/fontra/fontra/issues/2185
+#   In a future version of Fontra, variable GPOS features that are spread out over
+#   the source UFOs will likely be converted to single-file variable feature syntax.
+#
+
+"""
+
+
 class DesignspaceBackend:
     @classmethod
     def fromPath(cls, path: PathLike) -> WritableFontBackend:
@@ -1286,10 +1306,12 @@ class DesignspaceBackend:
                     )
 
     async def getFeatures(self) -> OpenTypeFeatures:
-        featureText = self.defaultReader.readFeatures()
+        ufoFeatureText = self.defaultReader.readFeatures()
         featureText = resolveFeatureIncludes(
-            featureText, self.ufoDir, set(self.glyphMap)
+            ufoFeatureText, self.ufoDir, set(self.glyphMap)
         )
+        if featureText != ufoFeatureText:
+            featureText = featuresWarning + featureText
         return OpenTypeFeatures(language="fea", text=featureText)
 
     async def putFeatures(self, features: OpenTypeFeatures) -> None:
@@ -1299,15 +1321,11 @@ class DesignspaceBackend:
             )
             return
 
-        # Once this https://github.com/googlefonts/ufo2ft/pull/833 gets merged:
-        # Write feature text to default UFO, write empty feature text to others
-        # Until then: write features to all UFOs
         paths = sorted(set(self.ufoLayers.iterAttrs("path")))
-        # defaultPath = self.defaultUFOLayer.path
+        defaultPath = self.defaultUFOLayer.path if paths else None
         for path in paths:
             writer = self.ufoManager.getReader(path)
-            # featureText = features.text if path == defaultPath else ""
-            featureText = features.text
+            featureText = features.text if path == defaultPath else ""
             writer.writeFeatures(featureText)
 
     async def getBackgroundImage(self, imageIdentifier: str) -> ImageData | None:
