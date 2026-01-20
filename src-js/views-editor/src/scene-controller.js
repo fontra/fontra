@@ -7,10 +7,13 @@ import {
   hasChange,
 } from "@fontra/core/changes.js";
 import {
+  characterLinesFromString,
+  textFromGlyphLines,
+} from "@fontra/core/character-lines.js";
+import {
   decomposeComponents,
   roundComponentOrigins,
 } from "@fontra/core/glyph-controller.js";
-import { glyphLinesFromText, textFromGlyphLines } from "@fontra/core/glyph-lines.js";
 import { translate, translatePlural } from "@fontra/core/localization.js";
 import { MouseTracker } from "@fontra/core/mouse-tracker.js";
 import { ObservableController } from "@fontra/core/observable-object.js";
@@ -122,7 +125,7 @@ export class SceneController {
         return;
       }
       await this.fontController.ensureInitialized;
-      const glyphLines = glyphLinesFromText(
+      const glyphLines = characterLinesFromString(
         event.newValue,
         this.fontController.characterMap,
         this.fontController.glyphMap,
@@ -615,7 +618,7 @@ export class SceneController {
       return;
     }
 
-    const glyphLines = glyphLinesFromText(
+    const glyphLines = characterLinesFromString(
       this.sceneSettings.text,
       this.fontController.characterMap,
       this.fontController.glyphMap,
