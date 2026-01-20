@@ -426,8 +426,8 @@ export class SceneModel {
         lineIndex == selectedLineIndex ? selectedGlyphIndex : undefined,
         selectedGlyphIsEditing,
         editLayerName,
-        cancelSignal,
-        kerningInstance
+        kerningInstance,
+        cancelSignal
       );
 
       if (!positionedLine) {
@@ -449,8 +449,8 @@ export class SceneModel {
     selectedGlyphIndex,
     selectedGlyphIsEditing,
     editLayerName,
-    cancelSignal,
-    kerningInstance
+    kerningInstance,
+    cancelSignal
   ) {
     const fontController = this.fontController;
     const glyphs = [];
