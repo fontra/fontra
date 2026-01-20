@@ -29,7 +29,8 @@ function characterLineFromSingleLineString(
   glyphMap,
   substituteGlyphName
 ) {
-  const glyphNames = [];
+  const characterInfo = [];
+
   for (let i = 0; i < text.length; i++) {
     let glyphName;
     let char = text[i];
@@ -106,7 +107,8 @@ function characterLineFromSingleLineString(
       } else if (glyphName) {
         isUndefined = !(glyphName in glyphMap);
       }
-      glyphNames.push({
+
+      characterInfo.push({
         character: char,
         glyphName: glyphName,
         isUndefined: isUndefined,
@@ -114,7 +116,8 @@ function characterLineFromSingleLineString(
       });
     }
   }
-  return glyphNames;
+
+  return characterInfo;
 }
 
 export function stringFromCharacterLines(characterLines) {
