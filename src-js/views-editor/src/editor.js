@@ -1279,15 +1279,15 @@ export class EditorController extends ViewController {
     // where == 1: insert after selected glyph
     // where == -1: insert before selected glyph
     const selectedGlyphInfo = this.sceneSettings.selectedGlyph;
-    const glyphLines = [...this.sceneSettings.glyphLines];
+    const characterLines = [...this.sceneSettings.characterLines];
 
     const insertIndex = selectedGlyphInfo.glyphIndex + (where == 1 ? 1 : 0);
-    glyphLines[selectedGlyphInfo.lineIndex].splice(
+    characterLines[selectedGlyphInfo.lineIndex].splice(
       insertIndex,
       where ? 0 : 1,
       ...glyphInfos
     );
-    this.sceneSettings.glyphLines = glyphLines;
+    this.sceneSettings.characterLines = characterLines;
 
     const glyphIndex =
       selectedGlyphInfo.glyphIndex +
@@ -3018,13 +3018,13 @@ export class EditorController extends ViewController {
           this.fontController.glyphInfoFromGlyphName(glyphName)
         );
         const selectedGlyphInfo = this.sceneSettings.selectedGlyph;
-        const glyphLines = [...this.sceneSettings.glyphLines];
-        glyphLines[selectedGlyphInfo.lineIndex].splice(
+        const characterLines = [...this.sceneSettings.characterLines];
+        characterLines[selectedGlyphInfo.lineIndex].splice(
           selectedGlyphInfo.glyphIndex + 1,
           0,
           ...glyphInfos
         );
-        this.sceneSettings.glyphLines = glyphLines;
+        this.sceneSettings.characterLines = characterLines;
         if (truncate) {
           await message(
             `The number of added glyphs was truncated to ${MAX_NUM_GLYPHS}`,
@@ -3228,9 +3228,9 @@ export class EditorController extends ViewController {
 
     if (viewInfo["text"]) {
       this.sceneSettings.text = viewInfo["text"];
-      // glyphLines is computed from text asynchronously, but its result is needed
+      // characterLines is computed from text asynchronously, but its result is needed
       // to for selectedGlyphName, so we'll wait until it's done
-      await this.sceneSettingsController.waitForKeyChange("glyphLines");
+      await this.sceneSettingsController.waitForKeyChange("characterLines");
     }
     this._previousURLText = viewInfo["text"];
 

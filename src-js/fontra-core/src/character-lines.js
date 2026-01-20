@@ -7,9 +7,9 @@ export function characterLinesFromString(
   glyphMap,
   substituteGlyphName
 ) {
-  const glyphLines = [];
+  const characterLines = [];
   for (const line of text.split(/\r?\n/)) {
-    glyphLines.push(
+    characterLines.push(
       characterLineFromSingleLineString(
         line,
         characterMap,
@@ -18,7 +18,7 @@ export function characterLinesFromString(
       )
     );
   }
-  return glyphLines;
+  return characterLines;
 }
 
 const glyphNameRE = /[//\s]/g;
@@ -117,12 +117,12 @@ function characterLineFromSingleLineString(
   return glyphNames;
 }
 
-export function textFromGlyphLines(glyphLines) {
+export function stringFromCharacterLines(characterLines) {
   const textLines = [];
-  for (const glyphLine of glyphLines) {
+  for (const characterLine of characterLines) {
     let textLine = "";
-    for (let i = 0; i < glyphLine.length; i++) {
-      const glyphInfo = glyphLine[i];
+    for (let i = 0; i < characterLine.length; i++) {
+      const glyphInfo = characterLine[i];
       if (glyphInfo.isPlaceholder) {
         textLine += "/?";
       } else if (glyphInfo.character === "/") {
@@ -133,7 +133,7 @@ export function textFromGlyphLines(glyphLines) {
         textLine += glyphInfo.character;
       } else {
         textLine += "/" + glyphInfo.glyphName;
-        if (glyphLine[i + 1]?.character) {
+        if (characterLine[i + 1]?.character) {
           textLine += " ";
         }
       }

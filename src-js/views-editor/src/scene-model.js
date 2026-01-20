@@ -47,7 +47,7 @@ export class SceneModel {
     this.updateSceneCancelSignal = {};
 
     this.sceneSettingsController.addKeyListener(
-      ["glyphLines", "align", "applyKerning", "selectedGlyph", "editLayerName"],
+      ["characterLines", "align", "applyKerning", "selectedGlyph", "editLayerName"],
       (event) => {
         this.updateScene();
       }
@@ -79,8 +79,8 @@ export class SceneModel {
     );
   }
 
-  get glyphLines() {
-    return this.sceneSettings.glyphLines;
+  get characterLines() {
+    return this.sceneSettings.characterLines;
   }
 
   get selectedGlyph() {
@@ -125,11 +125,11 @@ export class SceneModel {
   }
 
   getSelectedGlyphInfo() {
-    return getSelectedGlyphInfo(this.selectedGlyph, this.glyphLines);
+    return getSelectedGlyphInfo(this.selectedGlyph, this.characterLines);
   }
 
   getSelectedGlyphName() {
-    return getSelectedGlyphName(this.selectedGlyph, this.glyphLines);
+    return getSelectedGlyphName(this.selectedGlyph, this.characterLines);
   }
 
   isSelectedGlyphLocked() {
@@ -160,8 +160,8 @@ export class SceneModel {
     let glyphLocations;
     if (filterShownGlyphs) {
       glyphLocations = {};
-      for (const glyphLine of this.glyphLines) {
-        for (const glyphInfo of glyphLine) {
+      for (const characterLine of this.characterLines) {
+        for (const glyphInfo of characterLine) {
           if (
             !glyphLocations[glyphInfo.glyphName] &&
             this._glyphLocations[glyphInfo.glyphName]
@@ -235,11 +235,11 @@ export class SceneModel {
     }
   }
 
-  updateGlyphLinesCharacterMapping() {
+  updateCharacterLinesCharacterMapping() {
     // Call this when the cmap changed: previously missing characters may now be
     // available, but may have a different glyph name, or a character may no longer
     // be available, in which case we set the isUndefined flag
-    this.sceneSettings.glyphLines = this.glyphLines.map((line) =>
+    this.sceneSettings.characterLines = this.characterLines.map((line) =>
       line.map((glyphInfo) => {
         const glyphName = glyphInfo.character
           ? this.fontController.characterMap[glyphInfo.character.codePointAt(0)]
@@ -380,7 +380,7 @@ export class SceneModel {
       ? await this.getKerningInstance("kern")
       : null;
 
-    const glyphLines = this.glyphLines;
+    const characterLines = this.characterLines;
     const {
       lineIndex: selectedLineIndex,
       glyphIndex: selectedGlyphIndex,
@@ -395,8 +395,8 @@ export class SceneModel {
 
     const neededGlyphs = [
       ...new Set(
-        glyphLines
-          .map((glyphLine) => glyphLine.map((glyphInfo) => glyphInfo.glyphName))
+        characterLines
+          .map((characterLine) => characterLine.map((glyphInfo) => glyphInfo.glyphName))
           .flat()
       ),
     ];
@@ -411,10 +411,10 @@ export class SceneModel {
       return;
     }
 
-    for (const [lineIndex, glyphLine] of enumerate(glyphLines)) {
+    for (const [lineIndex, characterLine] of enumerate(characterLines)) {
       const positionedLine = await this._buildLine(
         { x: 0, y },
-        glyphLine,
+        characterLine,
         lineIndex == selectedLineIndex ? selectedGlyphIndex : undefined,
         selectedGlyphIsEditing,
         editLayerName,
@@ -437,7 +437,7 @@ export class SceneModel {
 
   async _buildLine(
     origin,
-    glyphLine,
+    characterLine,
     selectedGlyphIndex,
     selectedGlyphIsEditing,
     editLayerName,
@@ -450,7 +450,7 @@ export class SceneModel {
     let previousGlyphName = null;
     let { x, y } = origin;
 
-    for (const [glyphIndex, glyphInfo] of enumerate(glyphLine)) {
+    for (const [glyphIndex, glyphInfo] of enumerate(characterLine)) {
       const isSelectedGlyph = glyphIndex == selectedGlyphIndex;
 
       const thisGlyphEditLayerName =
@@ -1183,14 +1183,14 @@ function makeGlyphNamesPattern(glyphNames) {
   return { glyphs: glyphsObj };
 }
 
-function getSelectedGlyphInfo(selectedGlyph, glyphLines) {
+function getSelectedGlyphInfo(selectedGlyph, characterLines) {
   if (selectedGlyph) {
-    return glyphLines[selectedGlyph.lineIndex]?.[selectedGlyph.glyphIndex];
+    return characterLines[selectedGlyph.lineIndex]?.[selectedGlyph.glyphIndex];
   }
 }
 
-function getSelectedGlyphName(selectedGlyph, glyphLines) {
-  return getSelectedGlyphInfo(selectedGlyph, glyphLines)?.glyphName;
+function getSelectedGlyphName(selectedGlyph, characterLines) {
+  return getSelectedGlyphInfo(selectedGlyph, characterLines)?.glyphName;
 }
 
 function sorted(v) {

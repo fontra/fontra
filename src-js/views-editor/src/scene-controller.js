@@ -8,7 +8,7 @@ import {
 } from "@fontra/core/changes.js";
 import {
   characterLinesFromString,
-  textFromGlyphLines,
+  stringFromCharacterLines,
 } from "@fontra/core/character-lines.js";
 import {
   decomposeComponents,
@@ -97,7 +97,7 @@ export class SceneController {
       align: "center",
       applyKerning: true,
       editLayerName: null,
-      glyphLines: [],
+      characterLines: [],
       fontLocationUser: {},
       fontLocationSource: {},
       fontLocationSourceMapped: {},
@@ -119,30 +119,30 @@ export class SceneController {
     });
     this.sceneSettings = this.sceneSettingsController.model;
 
-    // Set up the mutual relationship between text and glyphLines
+    // Set up the mutual relationship between text and characterLines
     this.sceneSettingsController.addKeyListener("text", async (event) => {
       if (event.senderInfo?.senderID === this) {
         return;
       }
       await this.fontController.ensureInitialized;
-      const glyphLines = characterLinesFromString(
+      const characterLines = characterLinesFromString(
         event.newValue,
         this.fontController.characterMap,
         this.fontController.glyphMap,
         this.sceneSettings.substituteGlyphName
       );
-      this.sceneSettingsController.setItem("glyphLines", glyphLines, {
+      this.sceneSettingsController.setItem("characterLines", characterLines, {
         senderID: this,
       });
     });
 
     this.sceneSettingsController.addKeyListener(
-      "glyphLines",
+      "characterLines",
       (event) => {
         if (event.senderInfo?.senderID === this) {
           return;
         }
-        const text = textFromGlyphLines(event.newValue);
+        const text = stringFromCharacterLines(event.newValue);
         this.sceneSettingsController.setItem("text", text, { senderID: this });
       },
       true
@@ -248,7 +248,7 @@ export class SceneController {
 
     // Set up convenience property "selectedGlyphName"
     this.sceneSettingsController.addKeyListener(
-      ["selectedGlyph", "glyphLines"],
+      ["selectedGlyph", "characterLines"],
       (event) => {
         this.sceneSettings.selectedGlyphName = this.getSelectedGlyphName();
         if (this.sceneSettings.selectedGlyphName) {
@@ -352,7 +352,7 @@ export class SceneController {
 
   setupChangeListeners() {
     this.fontController.addChangeListener({ glyphMap: null }, () => {
-      this.sceneModel.updateGlyphLinesCharacterMapping();
+      this.sceneModel.updateCharacterLinesCharacterMapping();
 
       const selectedGlyph = this.sceneSettings.selectedGlyph;
       if (
@@ -607,7 +607,7 @@ export class SceneController {
 
   _updateSubstituteGlyph() {
     if (
-      !this.sceneSettings.glyphLines.some((line) =>
+      !this.sceneSettings.characterLines.some((line) =>
         line.some((glyphInfo) => glyphInfo.isPlaceholder)
       )
     ) {
@@ -615,13 +615,13 @@ export class SceneController {
       return;
     }
 
-    const glyphLines = characterLinesFromString(
+    const characterLines = characterLinesFromString(
       this.sceneSettings.text,
       this.fontController.characterMap,
       this.fontController.glyphMap,
       this.sceneSettings.substituteGlyphName
     );
-    this.sceneSettingsController.setItem("glyphLines", glyphLines, {
+    this.sceneSettingsController.setItem("characterLines", characterLines, {
       senderID: this,
     });
   }

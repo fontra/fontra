@@ -35,7 +35,7 @@ class MetricsBaseTool extends BaseTool {
     this.handleContainer = document.querySelector("#metric-handle-container");
     assert(this.handleContainer);
 
-    this.sceneSettingsController.addKeyListener("glyphLines", (event) => {
+    this.sceneSettingsController.addKeyListener("characterLines", (event) => {
       if (event.senderInfo?.senderID !== this) {
         const positionedLines = this.sceneSettings.positionedLines;
         this.metricSelection = this.metricSelection.filter(
@@ -233,7 +233,7 @@ class MetricsBaseTool extends BaseTool {
     super.activate();
     this.sceneSettings.selectedGlyph = null;
     this.sceneController.hoveredGlyph = null;
-    if (this._selectionState?.glyphLines === this.sceneSettings.glyphLines) {
+    if (this._selectionState?.characterLines === this.sceneSettings.characterLines) {
       this.metricSelection = this._selectionState.selectors;
     }
 
@@ -243,7 +243,7 @@ class MetricsBaseTool extends BaseTool {
   deactivate() {
     super.deactivate();
     this._selectionState = {
-      glyphLines: this.sceneSettings.glyphLines,
+      characterLines: this.sceneSettings.characterLines,
       selectors: this.metricSelection,
     };
     delete this.hoveredMetric;
@@ -296,9 +296,13 @@ class MetricsBaseTool extends BaseTool {
 
     this.fontController.notifyEditListeners("editFinal", this);
 
-    this.sceneSettingsController.setItem("glyphLines", undoRecord.info.glyphLines, {
-      senderID: this,
-    });
+    this.sceneSettingsController.setItem(
+      "characterLines",
+      undoRecord.info.characterLines,
+      {
+        senderID: this,
+      }
+    );
     this.sceneSettings.fontLocationSourceMapped = undoRecord.info.location;
     this.metricSelection = undoRecord.info.metricSelection;
   }
@@ -309,7 +313,7 @@ class MetricsBaseTool extends BaseTool {
       rollbackChange: changes.rollbackChange,
       info: {
         label: undoLabel,
-        glyphLines: this.sceneSettings.glyphLines,
+        characterLines: this.sceneSettings.characterLines,
         location: this.sceneSettings.fontLocationSourceMapped,
         metricSelection: this.metricSelection,
       },

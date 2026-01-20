@@ -52,27 +52,27 @@ export default class GlyphSearchPanel extends Panel {
       this.editorController.fontController.glyphInfoFromGlyphName(glyphName);
 
     let selectedGlyphState = this.editorController.sceneSettings.selectedGlyph;
-    const glyphLines = [...this.editorController.sceneSettings.glyphLines];
+    const characterLines = [...this.editorController.sceneSettings.characterLines];
 
     if (selectedGlyphState && !isDoubleClick) {
       if (
-        !glyphLines[selectedGlyphState.lineIndex][selectedGlyphState.glyphIndex]
+        !characterLines[selectedGlyphState.lineIndex][selectedGlyphState.glyphIndex]
           .isPlaceholder
       ) {
-        glyphLines[selectedGlyphState.lineIndex][selectedGlyphState.glyphIndex] =
+        characterLines[selectedGlyphState.lineIndex][selectedGlyphState.glyphIndex] =
           glyphInfo;
-        this.editorController.sceneSettings.glyphLines = glyphLines;
+        this.editorController.sceneSettings.characterLines = characterLines;
       }
     } else if (!selectedGlyphState && isDoubleClick) {
-      if (!glyphLines.length) {
-        glyphLines.push([]);
+      if (!characterLines.length) {
+        characterLines.push([]);
       }
-      const lineIndex = glyphLines.length - 1;
-      glyphLines[lineIndex].push(glyphInfo);
-      this.editorController.sceneSettings.glyphLines = glyphLines;
+      const lineIndex = characterLines.length - 1;
+      characterLines[lineIndex].push(glyphInfo);
+      this.editorController.sceneSettings.characterLines = characterLines;
       selectedGlyphState = {
         lineIndex: lineIndex,
-        glyphIndex: glyphLines[lineIndex].length - 1,
+        glyphIndex: characterLines[lineIndex].length - 1,
         isEditing: false,
       };
     }
