@@ -51,7 +51,7 @@ import { VarPackedPath, packContour } from "@fontra/core/var-path.js";
 import * as vector from "@fontra/core/vector.js";
 import { dialog, message } from "@fontra/web-components/modal-dialog.js";
 import { EditBehaviorFactory } from "./edit-behavior.js";
-import { SceneModel, getSelectedGlyphName } from "./scene-model.js";
+import { SceneModel } from "./scene-model.js";
 
 export class SceneController {
   constructor(
@@ -250,10 +250,7 @@ export class SceneController {
     this.sceneSettingsController.addKeyListener(
       ["selectedGlyph", "glyphLines"],
       (event) => {
-        this.sceneSettings.selectedGlyphName = getSelectedGlyphName(
-          this.sceneSettings.selectedGlyph,
-          this.sceneSettings.glyphLines
-        );
+        this.sceneSettings.selectedGlyphName = this.getSelectedGlyphName();
         if (this.sceneSettings.selectedGlyphName) {
           this.sceneSettings.substituteGlyphName = this.sceneSettings.selectedGlyphName;
         }
@@ -1119,7 +1116,7 @@ export class SceneController {
       return;
     }
     if (!glyphName) {
-      glyphName = this.sceneModel.getSelectedGlyphName();
+      glyphName = this.getSelectedGlyphName();
     }
     const varGlyph = await this.fontController.getGlyph(glyphName);
     const baseChangePath = ["glyphs", glyphName];

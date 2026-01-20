@@ -1183,13 +1183,13 @@ function makeGlyphNamesPattern(glyphNames) {
   return { glyphs: glyphsObj };
 }
 
-export function getSelectedGlyphInfo(selectedGlyph, glyphLines) {
+function getSelectedGlyphInfo(selectedGlyph, glyphLines) {
   if (selectedGlyph) {
     return glyphLines[selectedGlyph.lineIndex]?.[selectedGlyph.glyphIndex];
   }
 }
 
-export function getSelectedGlyphName(selectedGlyph, glyphLines) {
+function getSelectedGlyphName(selectedGlyph, glyphLines) {
   return getSelectedGlyphInfo(selectedGlyph, glyphLines)?.glyphName;
 }
 
