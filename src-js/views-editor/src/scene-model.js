@@ -529,7 +529,7 @@ export class SceneModel {
 
     const bounds = unionRect(...glyphs.map((glyph) => glyph.bounds));
 
-    return { bounds, glyphs, endPoint: { x, y: origin.y } };
+    return { bounds, glyphs, origin, endPoint: { x, y: origin.y } };
   }
 
   getLocationForGlyph(glyphName) {
