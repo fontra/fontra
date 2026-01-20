@@ -457,6 +457,7 @@ export class SceneModel {
 
     let previousGlyphName = null;
     let { x, y } = origin;
+
     for (const [glyphIndex, glyphInfo] of enumerate(glyphLine)) {
       const isSelectedGlyph = glyphIndex == selectedGlyphIndex;
 
