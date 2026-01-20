@@ -156,6 +156,24 @@ export class SceneModel {
     );
   }
 
+  _resetKerningInstance() {
+    delete this._kerningInstance;
+  }
+
+  async getKerningInstance(kernTag) {
+    if (!this._kerningInstance) {
+      const controller = await this.fontController.getKerningController(kernTag);
+      if (controller) {
+        this._kerningInstance = controller.instantiate(
+          this.sceneSettings.fontLocationSourceMapped
+        );
+      } else {
+        this._kerningInstance = { getGlyphPairValue: (leftGlyph, rightGlyph) => null };
+      }
+    }
+    return this._kerningInstance;
+  }
+
   getGlyphLocations(filterShownGlyphs = false) {
     let glyphLocations;
     if (filterShownGlyphs) {
@@ -178,24 +196,6 @@ export class SceneModel {
       glyphLocations = this._glyphLocations;
     }
     return glyphLocations;
-  }
-
-  _resetKerningInstance() {
-    delete this._kerningInstance;
-  }
-
-  async getKerningInstance(kernTag) {
-    if (!this._kerningInstance) {
-      const controller = await this.fontController.getKerningController(kernTag);
-      if (controller) {
-        this._kerningInstance = controller.instantiate(
-          this.sceneSettings.fontLocationSourceMapped
-        );
-      } else {
-        this._kerningInstance = { getGlyphPairValue: (leftGlyph, rightGlyph) => null };
-      }
-    }
-    return this._kerningInstance;
   }
 
   _syncGlyphLocations() {
