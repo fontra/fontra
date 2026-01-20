@@ -22,7 +22,6 @@ import {
 import { dialog, message } from "@fontra/web-components/modal-dialog.js";
 import "@fontra/web-components/range-slider.js";
 import { UIList } from "@fontra/web-components/ui-list.js";
-import { getSelectedGlyphInfo } from "./scene-model.js";
 
 import { Font } from "lib-font";
 
@@ -339,10 +338,7 @@ export default class ReferenceFontPanel extends Panel {
     const container = this.contentElement.querySelector(".reference-font-preview");
     container.innerHTML = "";
 
-    const selectedGlyphInfo = getSelectedGlyphInfo(
-      this.editorController.sceneSettings.selectedGlyph,
-      this.editorController.sceneSettings.glyphLines
-    );
+    const selectedGlyphInfo = this.editorController.sceneModel.getSelectedGlyphInfo();
 
     let textToDisplay;
 
