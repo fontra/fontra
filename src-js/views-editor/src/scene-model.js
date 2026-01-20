@@ -520,30 +520,12 @@ export class SceneModel {
       });
     }
 
-    // Add bounding boxes
-    glyphs.forEach((item) => {
-      let bounds = item.glyph.controlBounds;
-      if (!bounds || isEmptyRect(bounds) || item.glyph.isEmptyIsh) {
-        // Empty glyph, make up box based on advance so it can still be clickable/hoverable
-        // TODO: use font's ascender/descender values
-        // If the advance is very small, add a bit of extra space on both sides so it'll be
-        // clickable even with a zero advance width
-        const extraSpace = item.glyph.xAdvance < 30 ? 20 : 0;
-        bounds = insetRect(
-          normalizeRect({
-            xMin: 0,
-            yMin: -0.2 * fontController.unitsPerEm,
-            xMax: item.glyph.xAdvance,
-            yMax: 0.8 * fontController.unitsPerEm,
-          }),
-          -extraSpace,
-          0
-        );
-        item.isEmpty = true;
-      }
-      item.bounds = offsetRect(bounds, item.x, item.y);
-      item.unpositionedBounds = bounds;
-    });
+    // TODO: use font's ascender/descender values
+    addBoundingBoxes(
+      glyphs,
+      -0.2 * fontController.unitsPerEm,
+      0.8 * fontController.unitsPerEm
+    );
 
     const bounds = unionRect(...glyphs.map((glyph) => glyph.bounds));
 
@@ -1222,4 +1204,29 @@ function sorted(v) {
   v = [...v];
   v.sort((a, b) => a - b);
   return v;
+}
+
+function addBoundingBoxes(glyphs, descender, ascender) {
+  glyphs.forEach((item) => {
+    let bounds = item.glyph.controlBounds;
+    if (!bounds || isEmptyRect(bounds) || item.glyph.isEmptyIsh) {
+      // Empty glyph, make up box based on advance so it can still be clickable/hoverable
+      // If the advance is very small, add a bit of extra space on both sides so it'll be
+      // clickable even with a zero advance width
+      const extraSpace = item.glyph.xAdvance < 30 ? 20 : 0;
+      bounds = insetRect(
+        normalizeRect({
+          xMin: 0,
+          yMin: descender,
+          xMax: item.glyph.xAdvance,
+          yMax: ascender,
+        }),
+        -extraSpace,
+        0
+      );
+      item.isEmpty = true;
+    }
+    item.bounds = offsetRect(bounds, item.x, item.y);
+    item.unpositionedBounds = bounds;
+  });
 }
