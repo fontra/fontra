@@ -178,8 +178,8 @@ export class SceneModel {
     let glyphLocations;
     if (filterShownGlyphs) {
       glyphLocations = {};
-      for (const characterLine of this.characterLines) {
-        for (const glyphInfo of characterLine) {
+      for (const positionedLine of this.positionedLines) {
+        for (const glyphInfo of positionedLine.glyphs) {
           if (
             !glyphLocations[glyphInfo.glyphName] &&
             this._glyphLocations[glyphInfo.glyphName]
