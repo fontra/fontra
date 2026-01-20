@@ -245,17 +245,9 @@ export class SceneModel {
           ? this.fontController.characterMap[glyphInfo.character.codePointAt(0)]
           : undefined;
         if (glyphInfo.isUndefined && glyphName) {
-          glyphInfo = {
-            character: glyphInfo.character,
-            glyphName: glyphName,
-            isUndefined: false,
-          };
+          glyphInfo = { ...glyphInfo, glyphName, isUndefined: false };
         } else if (!glyphName) {
-          glyphInfo = {
-            character: glyphInfo.character,
-            glyphName: glyphInfo.glyphName,
-            isUndefined: true,
-          };
+          glyphInfo = { ...glyphInfo, isUndefined: true };
         }
         return glyphInfo;
       })
