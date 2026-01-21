@@ -21,8 +21,6 @@ export function characterLinesFromString(
   return characterLines;
 }
 
-const glyphNameRE = /[//\s]/g;
-
 function characterLineFromSingleLineString(
   string,
   characterMap,
@@ -48,21 +46,10 @@ function characterLineFromSingleLineString(
       } else {
         // /glyphname
         // Find the first character that is a slash or a space as the end of the glyph name
-        glyphNameRE.lastIndex = i;
-        glyphNameRE.test(string);
-        let j = glyphNameRE.lastIndex;
-        if (j == 0) {
-          glyphName = string.slice(i);
-          i = string.length - 1;
-        } else {
-          j--;
-          glyphName = string.slice(i, j);
-          if (string[j] == "/") {
-            i = j - 1;
-          } else {
-            i = j;
-          }
-        }
+        const result = parseGlyphName(string, i);
+        glyphName = result.glyphName;
+        i = result.i;
+
         character = characterFromGlyphName(glyphName, characterMap, glyphMap);
         if (glyphName && !character && !glyphMap[glyphName]) {
           const result = expandGlyphName(glyphName, characterMap);
@@ -133,6 +120,31 @@ function characterFromGlyphName(glyphName, characterMap, glyphMap) {
     }
   }
   return character;
+}
+
+const glyphNameEndRE = /[//\s]/g;
+
+function parseGlyphName(string, i) {
+  let glyphName;
+
+  glyphNameEndRE.lastIndex = i;
+  glyphNameEndRE.test(string);
+  let j = glyphNameEndRE.lastIndex;
+
+  if (j == 0) {
+    glyphName = string.slice(i);
+    i = string.length - 1;
+  } else {
+    j--;
+    glyphName = string.slice(i, j);
+    if (string[j] == "/") {
+      i = j - 1;
+    } else {
+      i = j;
+    }
+  }
+
+  return { glyphName, i };
 }
 
 function expandGlyphName(glyphName, characterMap) {
