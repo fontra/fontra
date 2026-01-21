@@ -41,7 +41,7 @@ function characterLineFromSingleLineString(
         glyphName = characterMap[character.charCodeAt(0)];
       } else if (string[i] == "?") {
         glyphName = substituteGlyphName || "--placeholder--";
-        character = charFromGlyphName(glyphName, characterMap, glyphMap);
+        character = characterFromGlyphName(glyphName, characterMap, glyphMap);
         isPlaceholder = true;
       } else {
         glyphNameRE.lastIndex = i;
@@ -59,7 +59,7 @@ function characterLineFromSingleLineString(
             i = j;
           }
         }
-        character = charFromGlyphName(glyphName, characterMap, glyphMap);
+        character = characterFromGlyphName(glyphName, characterMap, glyphMap);
         if (glyphName && !character && !glyphMap[glyphName]) {
           // See if the "glyph name" after stripping the extension (if any)
           // happens to be a character that we know a glyph name for.
@@ -145,13 +145,13 @@ function isPlainLatinLetter(glyphName) {
   return glyphName.match(/^[A-Za-z]$/);
 }
 
-function charFromGlyphName(glyphName, characterMap, glyphMap) {
-  var char = undefined;
+function characterFromGlyphName(glyphName, characterMap, glyphMap) {
+  var character = undefined;
   for (const codePoint of glyphMap[glyphName] || []) {
     if (characterMap[codePoint] === glyphName) {
-      char = String.fromCodePoint(codePoint);
+      character = String.fromCodePoint(codePoint);
       break;
     }
   }
-  return char;
+  return character;
 }
