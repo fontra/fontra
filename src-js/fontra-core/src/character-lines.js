@@ -33,15 +33,15 @@ function characterLineFromSingleLineString(
 
   for (let i = 0; i < string.length; i++) {
     let glyphName;
-    let char = string[i];
+    let character = string[i];
     let isPlaceholder = false;
-    if (char == "/") {
+    if (character == "/") {
       i++;
       if (string[i] == "/") {
-        glyphName = characterMap[char.charCodeAt(0)];
+        glyphName = characterMap[character.charCodeAt(0)];
       } else if (string[i] == "?") {
         glyphName = substituteGlyphName || "--placeholder--";
-        char = charFromGlyphName(glyphName, characterMap, glyphMap);
+        character = charFromGlyphName(glyphName, characterMap, glyphMap);
         isPlaceholder = true;
       } else {
         glyphNameRE.lastIndex = i;
@@ -59,26 +59,26 @@ function characterLineFromSingleLineString(
             i = j;
           }
         }
-        char = charFromGlyphName(glyphName, characterMap, glyphMap);
-        if (glyphName && !char && !glyphMap[glyphName]) {
+        character = charFromGlyphName(glyphName, characterMap, glyphMap);
+        if (glyphName && !character && !glyphMap[glyphName]) {
           // See if the "glyph name" after stripping the extension (if any)
           // happens to be a character that we know a glyph name for.
           // This allows us to write /Å.alt instead of /Aring.alt in the
           // text entry field.
           const [baseGlyphName, extension] = splitGlyphNameExtension(glyphName);
-          const baseCharCode = baseGlyphName.codePointAt(0);
-          const charString = String.fromCodePoint(baseCharCode);
+          const baseCodePoint = baseGlyphName.codePointAt(0);
+          const charString = String.fromCodePoint(baseCodePoint);
           if (baseGlyphName === charString && !isPlainLatinLetter(baseGlyphName)) {
             // The base glyph name is a single character, let's see if there's
             // a glyph name associated with that character
-            let properBaseGlyphName = characterMap[baseCharCode];
+            let properBaseGlyphName = characterMap[baseCodePoint];
             if (!properBaseGlyphName) {
-              properBaseGlyphName = getSuggestedGlyphName(baseCharCode);
+              properBaseGlyphName = getSuggestedGlyphName(baseCodePoint);
             }
             if (properBaseGlyphName) {
               glyphName = properBaseGlyphName + extension;
               if (!extension) {
-                char = charString;
+                character = charString;
               }
             }
           } else {
@@ -86,30 +86,30 @@ function characterLineFromSingleLineString(
             // Try to see if there's a code point associated with it.
             const codePoint = getCodePointFromGlyphName(glyphName);
             if (codePoint) {
-              char = String.fromCodePoint(codePoint);
+              character = String.fromCodePoint(codePoint);
             }
           }
         }
       }
     } else {
-      const charCode = string.codePointAt(i);
-      glyphName = characterMap[charCode];
-      if (charCode >= 0x10000) {
+      const codePoint = string.codePointAt(i);
+      glyphName = characterMap[codePoint];
+      if (codePoint >= 0x10000) {
         i++;
       }
-      char = String.fromCodePoint(charCode);
+      character = String.fromCodePoint(codePoint);
     }
     if (glyphName !== "") {
       let isUndefined = false;
-      if (!glyphName && char) {
-        glyphName = getSuggestedGlyphName(char.codePointAt(0));
+      if (!glyphName && character) {
+        glyphName = getSuggestedGlyphName(character.codePointAt(0));
         isUndefined = true;
       } else if (glyphName) {
         isUndefined = !(glyphName in glyphMap);
       }
 
       characterInfo.push({
-        character: char,
+        character: character,
         glyphName: glyphName,
         isUndefined: isUndefined,
         isPlaceholder: isPlaceholder,
