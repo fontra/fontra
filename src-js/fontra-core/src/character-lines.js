@@ -38,12 +38,16 @@ function characterLineFromSingleLineString(
     if (character == "/") {
       i++;
       if (string[i] == "/") {
+        // Literal "//", this is the slash character
         glyphName = characterMap[character.charCodeAt(0)];
       } else if (string[i] == "?") {
+        // /? placeholder substitution
         glyphName = substituteGlyphName || "--placeholder--";
         character = characterFromGlyphName(glyphName, characterMap, glyphMap);
         isPlaceholder = true;
       } else {
+        // /glyphname
+        // Find the first character that is a slash or a space as the end of the glyph name
         glyphNameRE.lastIndex = i;
         glyphNameRE.test(string);
         let j = glyphNameRE.lastIndex;
@@ -61,34 +65,9 @@ function characterLineFromSingleLineString(
         }
         character = characterFromGlyphName(glyphName, characterMap, glyphMap);
         if (glyphName && !character && !glyphMap[glyphName]) {
-          // See if the "glyph name" after stripping the extension (if any)
-          // happens to be a character that we know a glyph name for.
-          // This allows us to write /Å.alt instead of /Aring.alt in the
-          // text entry field.
-          const [baseGlyphName, extension] = splitGlyphNameExtension(glyphName);
-          const baseCodePoint = baseGlyphName.codePointAt(0);
-          const charString = String.fromCodePoint(baseCodePoint);
-          if (baseGlyphName === charString && !isPlainLatinLetter(baseGlyphName)) {
-            // The base glyph name is a single character, let's see if there's
-            // a glyph name associated with that character
-            let properBaseGlyphName = characterMap[baseCodePoint];
-            if (!properBaseGlyphName) {
-              properBaseGlyphName = getSuggestedGlyphName(baseCodePoint);
-            }
-            if (properBaseGlyphName) {
-              glyphName = properBaseGlyphName + extension;
-              if (!extension) {
-                character = charString;
-              }
-            }
-          } else {
-            // This is a regular glyph name, but it doesn't exist in the font.
-            // Try to see if there's a code point associated with it.
-            const codePoint = getCodePointFromGlyphName(glyphName);
-            if (codePoint) {
-              character = String.fromCodePoint(codePoint);
-            }
-          }
+          const result = expandGlyphName(glyphName, characterMap);
+          glyphName = result.glyphName;
+          character = result.character;
         }
       }
     } else {
@@ -154,4 +133,39 @@ function characterFromGlyphName(glyphName, characterMap, glyphMap) {
     }
   }
   return character;
+}
+
+function expandGlyphName(glyphName, characterMap) {
+  // See if the "glyph name" after stripping the extension (if any)
+  // happens to be a character that we know a glyph name for.
+  // This allows us to write /Å.alt instead of /Aring.alt in the
+  // text entry field.
+  let character;
+
+  const [baseGlyphName, extension] = splitGlyphNameExtension(glyphName);
+  const baseCodePoint = baseGlyphName.codePointAt(0);
+  const charString = String.fromCodePoint(baseCodePoint);
+  if (baseGlyphName === charString && !isPlainLatinLetter(baseGlyphName)) {
+    // The base glyph name is a single character, let's see if there's
+    // a glyph name associated with that character
+    let properBaseGlyphName = characterMap[baseCodePoint];
+    if (!properBaseGlyphName) {
+      properBaseGlyphName = getSuggestedGlyphName(baseCodePoint);
+    }
+    if (properBaseGlyphName) {
+      glyphName = properBaseGlyphName + extension;
+      if (!extension) {
+        character = charString;
+      }
+    }
+  } else {
+    // This is a regular glyph name, but it doesn't exist in the font.
+    // Try to see if there's a code point associated with it.
+    const codePoint = getCodePointFromGlyphName(glyphName);
+    if (codePoint) {
+      character = String.fromCodePoint(codePoint);
+    }
+  }
+
+  return { glyphName, character };
 }
