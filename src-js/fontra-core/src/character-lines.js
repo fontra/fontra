@@ -108,12 +108,7 @@ function characterLineFromSingleLineString(
         isUndefined = !(glyphName in glyphMap);
       }
 
-      characterInfo.push({
-        character: character,
-        glyphName: glyphName,
-        isUndefined: isUndefined,
-        isPlaceholder: isPlaceholder,
-      });
+      characterInfo.push({ character, glyphName, isUndefined, isPlaceholder });
     }
   }
 
