@@ -2,13 +2,13 @@ import { getCodePointFromGlyphName, getSuggestedGlyphName } from "./glyph-data.j
 import { splitGlyphNameExtension } from "./utils.js";
 
 export function characterLinesFromString(
-  text,
+  string,
   characterMap,
   glyphMap,
   substituteGlyphName
 ) {
   const characterLines = [];
-  for (const line of text.split(/\r?\n/)) {
+  for (const line of string.split(/\r?\n/)) {
     characterLines.push(
       characterLineFromSingleLineString(
         line,
@@ -24,36 +24,36 @@ export function characterLinesFromString(
 const glyphNameRE = /[//\s]/g;
 
 function characterLineFromSingleLineString(
-  text,
+  string,
   characterMap,
   glyphMap,
   substituteGlyphName
 ) {
   const characterInfo = [];
 
-  for (let i = 0; i < text.length; i++) {
+  for (let i = 0; i < string.length; i++) {
     let glyphName;
-    let char = text[i];
+    let char = string[i];
     let isPlaceholder = false;
     if (char == "/") {
       i++;
-      if (text[i] == "/") {
+      if (string[i] == "/") {
         glyphName = characterMap[char.charCodeAt(0)];
-      } else if (text[i] == "?") {
+      } else if (string[i] == "?") {
         glyphName = substituteGlyphName || "--placeholder--";
         char = charFromGlyphName(glyphName, characterMap, glyphMap);
         isPlaceholder = true;
       } else {
         glyphNameRE.lastIndex = i;
-        glyphNameRE.test(text);
+        glyphNameRE.test(string);
         let j = glyphNameRE.lastIndex;
         if (j == 0) {
-          glyphName = text.slice(i);
-          i = text.length - 1;
+          glyphName = string.slice(i);
+          i = string.length - 1;
         } else {
           j--;
-          glyphName = text.slice(i, j);
-          if (text[j] == "/") {
+          glyphName = string.slice(i, j);
+          if (string[j] == "/") {
             i = j - 1;
           } else {
             i = j;
@@ -92,7 +92,7 @@ function characterLineFromSingleLineString(
         }
       }
     } else {
-      const charCode = text.codePointAt(i);
+      const charCode = string.codePointAt(i);
       glyphName = characterMap[charCode];
       if (charCode >= 0x10000) {
         i++;
