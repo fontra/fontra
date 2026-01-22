@@ -1,4 +1,7 @@
-import { characterLinesFromString } from "@fontra/core/character-lines.js";
+import {
+  characterLinesFromString,
+  stringFromCharacterLines,
+} from "@fontra/core/character-lines.js";
 import { getSuggestedGlyphName } from "@fontra/core/glyph-data.js";
 import { expect } from "chai";
 
@@ -22,7 +25,7 @@ describe("character-lines", () => {
     ])
   );
 
-  const testData = [
+  const characterLinesFromStringTestData = [
     {
       input: "AÄBC",
       expectedLines: [
@@ -79,17 +82,48 @@ describe("character-lines", () => {
 
   const defaultGlyphInfo = { isPlaceholder: false, isUndefined: false };
 
-  parametrize("characterLinesFromString tests", testData, (testItem) => {
-    let { input, expectedLines } = testItem;
+  parametrize(
+    "characterLinesFromString tests",
+    characterLinesFromStringTestData,
+    (testItem) => {
+      let { input, expectedLines } = testItem;
 
-    expectedLines = expectedLines.map((line) =>
-      line.map((glyphInfo) => ({ ...defaultGlyphInfo, ...glyphInfo }))
-    );
+      expectedLines = expectedLines.map((line) =>
+        line.map((glyphInfo) => ({ ...defaultGlyphInfo, ...glyphInfo }))
+      );
 
-    expect(
-      characterLinesFromString(input, characterMap, glyphMap, placeholderGlyphName)
-    ).to.deep.equal(expectedLines);
-  });
+      expect(
+        characterLinesFromString(input, characterMap, glyphMap, placeholderGlyphName)
+      ).to.deep.equal(expectedLines);
+    }
+  );
+
+  const stringFromCharacterLinesTestData = [
+    { input: [[{ character: "A" }]], expectedOutput: "A" },
+    { input: [[{ character: "/" }]], expectedOutput: "//" },
+    { input: [[{ glyphName: "A" }]], expectedOutput: "/A" },
+    { input: [[{ glyphName: "A" }, { glyphName: "A" }]], expectedOutput: "/A/A" },
+    { input: [[{ glyphName: "A" }, { character: "A" }]], expectedOutput: "/A A" },
+    { input: [[{ character: "A" }, { glyphName: "A" }]], expectedOutput: "A/A" },
+    {
+      input: [[{ character: "A", isPlaceholder: true }, { character: "A" }]],
+      expectedOutput: "/?A",
+    },
+    {
+      input: [[{ character: "A", isPlaceholder: true }, { glyphName: "A" }]],
+      expectedOutput: "/?/A",
+    },
+  ];
+
+  parametrize(
+    "stringFromCharacterLines tests",
+    stringFromCharacterLinesTestData,
+    (testItem) => {
+      const { input, expectedOutput } = testItem;
+
+      expect(stringFromCharacterLines(input)).to.deep.equal(expectedOutput);
+    }
+  );
 });
 
 function chr(s) {
