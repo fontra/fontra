@@ -8,7 +8,7 @@ import { expect } from "chai";
 import { parametrize } from "./test-support.js";
 
 describe("character-lines", () => {
-  const codePoints = [..." /AÄBCQ"].map((char) => chr(char));
+  const codePoints = [..." /AÄBCQ"].map((char) => ord(char));
 
   const glyphMap = Object.fromEntries(
     codePoints.map((codePoint) => [getSuggestedGlyphName(codePoint), [codePoint]])
@@ -126,6 +126,6 @@ describe("character-lines", () => {
   );
 });
 
-function chr(s) {
+function ord(s) {
   return s.codePointAt(0);
 }
