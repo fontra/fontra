@@ -54,6 +54,13 @@ describe("shaper tests", () => {
     expect(glyphs).to.deep.equal(expectedGlyphs);
   });
 
+  // it("test HBShaper getFeatureTags", async () => {
+  //   const fontData = new Uint8Array(fs.readFileSync(testFontPath));
+  //   const shaper = await getShaper(fontData);
+  //   expect(shaper.getFeatureTags("GSUB")).to.deep.equal(["rvrn"]);
+  //   expect(shaper.getFeatureTags("GPOS")).to.deep.equal(["kern"]);
+  // });
+
   const characterMap = {
     [ord("A")]: "A",
     [ord("Ä")]: "Adieresis",
