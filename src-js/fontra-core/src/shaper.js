@@ -1,13 +1,12 @@
-import harfbuzz from "harfbuzzjs";
+import hbPromise from "harfbuzzjs";
 import { range } from "./utils.js";
 
-let hb;
+const hb = await hbPromise;
 
-export async function getShaper(fontData) {
+export function getShaper(fontData) {
   let shaper;
 
   if (fontData) {
-    hb = await harfbuzz;
     shaper = new HBShaper(hb, fontData);
   } else {
     return new DumbShaper();
@@ -18,7 +17,6 @@ export async function getShaper(fontData) {
 
 class HBShaper {
   constructor(hb, fontData) {
-    this.hb = hb;
     this.blob = hb.createBlob(fontData);
     this.face = hb.createFace(this.blob, 0);
     this.font = hb.createFont(this.face);
