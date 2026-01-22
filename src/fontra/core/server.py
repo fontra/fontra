@@ -40,6 +40,7 @@ mimeTypes = {
     "svg": "image/svg+xml",
     "txt": "text/plain",
     "woff2": "font/woff2",
+    "wasm": "application/wasm",
 }
 
 
