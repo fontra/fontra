@@ -14,6 +14,7 @@ import { StaticGlyphController, VariableGlyphController } from "./glyph-controll
 import { KerningController } from "./kerning-controller.js";
 import { LRUCache } from "./lru-cache.js";
 import { setPopFirst } from "./set-ops.js";
+import { getShaper } from "./shaper.js";
 import { TaskPool } from "./task-pool.js";
 import {
   assert,
@@ -1024,6 +1025,18 @@ export class FontController {
   async _getKerningController(kernTag) {
     // Do not inline: the this.getKerning() call must be part of the promise
     return new KerningController(kernTag, await this.getKerning(), this);
+  }
+
+  async getShaper() {
+    if (!this._shaper) {
+      this._shaper = await this._getShaper();
+    }
+    return this._shaper;
+  }
+
+  async _getShaper() {
+    // fetch font data
+    return getShaper(/* ... */);
   }
 
   get defaultSourceLocation() {
