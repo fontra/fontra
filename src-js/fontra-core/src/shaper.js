@@ -4,11 +4,11 @@ let hb;
 
 export async function getShaper(fontData) {
   hb = await harfbuzz;
-  const shaper = new Shaper(hb, fontData);
+  const shaper = new HBShaper(hb, fontData);
   return shaper;
 }
 
-class Shaper {
+class HBShaper {
   constructor(hb, fontData) {
     this.hb = hb;
     this.blob = hb.createBlob(fontData);
