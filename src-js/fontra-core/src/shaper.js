@@ -116,10 +116,8 @@ class DumbShaper {
     let previousGlyphName = null;
 
     for (let i = 0; i < text.length; i++) {
-      const codePoint = text.charCodeAt(i);
-      if (codePoint >= 0x10000) {
-        i++;
-      }
+      const codePoint = text.codePointAt(i);
+
       const glyphName = characterMap[codePoint] ?? ".notdef";
 
       const xAdvance = glyphObjects[glyphName]?.xAdvance ?? 500;
@@ -133,6 +131,11 @@ class DumbShaper {
         dy: 0,
         flags: 0,
       });
+
+      if (codePoint >= 0x10000) {
+        // UTF-16: this code point uses two two-bute chars
+        i++;
+      }
 
       previousGlyphName = glyphName;
     }
