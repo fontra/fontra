@@ -113,8 +113,6 @@ class DumbShaper {
   shape(text, variations, features, characterMap, glyphObjects, kerning) {
     const output = [];
 
-    let previousGlyphName = null;
-
     for (let i = 0; i < text.length; i++) {
       const codePoint = text.codePointAt(i);
 
@@ -136,8 +134,6 @@ class DumbShaper {
         // UTF-16: this code point uses two two-bute chars
         i++;
       }
-
-      previousGlyphName = glyphName;
     }
 
     if (kerning) {
