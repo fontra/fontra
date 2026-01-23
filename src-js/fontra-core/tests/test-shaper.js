@@ -20,14 +20,17 @@ describe("shaper tests", () => {
     "MutatorSans.ttf"
   );
 
+  const testInputString = "😻VABCÄS";
+
   const expectedGlyphs = [
-    { g: 24, cl: 0, ax: 301, ay: 0, dx: 0, dy: 0, flags: 0, gn: "V" },
-    { g: 1, cl: 1, ax: 396, ay: 0, dx: 0, dy: 0, flags: 0, gn: "A", flags: 1 },
-    { g: 4, cl: 2, ax: 443, ay: 0, dx: 0, dy: 0, flags: 0, gn: "B" },
-    { g: 5, cl: 3, ax: 499, ay: 0, dx: 0, dy: 0, flags: 0, gn: "C" },
+    { g: 0, cl: 0, ax: 500, ay: 0, dx: 0, dy: 0, flags: 0, gn: ".notdef" },
+    { g: 24, cl: 2, ax: 301, ay: 0, dx: 0, dy: 0, flags: 0, gn: "V" },
+    { g: 1, cl: 3, ax: 396, ay: 0, dx: 0, dy: 0, flags: 0, gn: "A", flags: 1 },
+    { g: 4, cl: 4, ax: 443, ay: 0, dx: 0, dy: 0, flags: 0, gn: "B" },
+    { g: 5, cl: 5, ax: 499, ay: 0, dx: 0, dy: 0, flags: 0, gn: "C" },
     {
       g: 3,
-      cl: 4,
+      cl: 6,
       ax: 396,
       ay: 0,
       dx: 0,
@@ -37,7 +40,7 @@ describe("shaper tests", () => {
     },
     {
       g: 21,
-      cl: 5,
+      cl: 7,
       ax: 393,
       ay: 0,
       dx: 0,
@@ -75,7 +78,7 @@ describe("shaper tests", () => {
       useMetricsHooks: true,
     });
     const glyphs = shaper.shape(
-      "VABCÄS",
+      testInputString,
       { wght: 0, wdth: 0 },
       "-kern,-rvrn",
       characterMap,
@@ -95,7 +98,7 @@ describe("shaper tests", () => {
   it("test DumbShaper", async () => {
     const shaper = await getShaper(null);
     const glyphs = shaper.shape(
-      "VABCÄS",
+      testInputString,
       { wght: 0, wdth: 0 },
       "kern",
       characterMap,
