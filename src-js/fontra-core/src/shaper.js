@@ -131,7 +131,7 @@ class DumbShaper {
       });
 
       if (codePoint >= 0x10000) {
-        // UTF-16: this code point uses two two-bute chars
+        // UTF-16: this code point uses two two-byte chars
         i++;
       }
     }
