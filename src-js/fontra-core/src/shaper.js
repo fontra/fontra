@@ -23,11 +23,19 @@ class HBShaper {
 
     if (options?.useCharacterMapHook || options?.useMetricsHooks) {
       this.fontFuncs = hb.createFontFuncs();
+
       if (options.useCharacterMapHook) {
         this.fontFuncs.setNominalGlyphFunc((font, codePoint) =>
           this._getNominalGlyph(font, codePoint)
         );
       }
+
+      if (options.useMetricsHooks) {
+        this.fontFuncs.setGlyphHAdvanceFunc((font, glyphID) =>
+          this._getHAdvanceFunc(font, glyphID)
+        );
+      }
+
       const subFont = this.font.subFont();
       subFont.setFuncs(this.fontFuncs);
       this.font.destroy();
@@ -43,10 +51,12 @@ class HBShaper {
     this.font.setVariations(variations || {});
 
     this._characterMap = characterMap;
+    this._glyphObjects = glyphObjects;
 
     hb.shape(this.font, buffer, features);
 
     delete this._characterMap;
+    delete this._glyphObjects;
 
     const output = buffer.json();
     buffer.destroy();
@@ -55,12 +65,21 @@ class HBShaper {
       glyph.gn = this.font.glyphName(glyph.g);
     }
 
+    if (kerning) {
+      applyKerning(output, kerning);
+    }
+
     return output;
   }
 
   _getNominalGlyph(font, codePoint) {
     const glyphName = this._characterMap?.[codePoint];
     return glyphName ? this.font.glyphFromName(glyphName) : 0;
+  }
+
+  _getHAdvanceFunc(font, glyphID) {
+    const glyphName = this.font.glyphName(glyphID);
+    return this._glyphObjects[glyphName]?.xAdvance ?? 500;
   }
 
   getFeatureTags(otTableTag) {
