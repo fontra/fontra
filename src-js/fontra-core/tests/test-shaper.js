@@ -77,9 +77,10 @@ describe("shaper tests", () => {
     const glyphs = shaper.shape(
       "VABCÄS",
       { wght: 0, wdth: 0 },
-      "kern,-rvrn",
+      "-kern,-rvrn",
       characterMap,
-      glyphObjects
+      glyphObjects,
+      kerning
     );
     expect(glyphs).to.deep.equal(expectedGlyphs);
   });
