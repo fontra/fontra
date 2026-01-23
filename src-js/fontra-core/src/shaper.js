@@ -79,11 +79,6 @@ class DumbShaper {
       const glyphName = characterMap[codePoint] ?? ".notdef";
 
       const xAdvance = glyphObjects[glyphName]?.xAdvance ?? 500;
-      const kernValue = kerning?.getGlyphPairValue(previousGlyphName, glyphName) ?? 0;
-
-      if (kernValue) {
-        output.at(-1).ax += kernValue;
-      }
 
       output.push({
         cl: i, // cluster
@@ -92,10 +87,14 @@ class DumbShaper {
         ay: 0,
         dx: 0,
         dy: 0,
-        flags: kernValue ? 1 : 0,
+        flags: 0,
       });
 
       previousGlyphName = glyphName;
+    }
+
+    if (kerning) {
+      applyKerning(output, kerning);
     }
 
     return output;
@@ -103,5 +102,15 @@ class DumbShaper {
 
   getFeatureTags(otTableTag) {
     return [];
+  }
+}
+
+function applyKerning(glyphs, kerning) {
+  for (let i = 1; i < glyphs.length; i++) {
+    const kernValue = kerning.getGlyphPairValue(glyphs[i - 1].gn, glyphs[i].gn);
+    if (kernValue) {
+      glyphs[i - 1].ax += kernValue;
+      glyphs[i].flags |= 1;
+    }
   }
 }
