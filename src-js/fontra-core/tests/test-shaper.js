@@ -47,20 +47,6 @@ describe("shaper tests", () => {
     },
   ];
 
-  it("test HBShaper", async () => {
-    const fontData = new Uint8Array(fs.readFileSync(testFontPath));
-    const shaper = await getShaper(fontData);
-    const glyphs = shaper.shape("VABCÄS", { wght: 0, wdth: 0 }, "kern,-rvrn");
-    expect(glyphs).to.deep.equal(expectedGlyphs);
-  });
-
-  it("test HBShaper getFeatureTags", async () => {
-    const fontData = new Uint8Array(fs.readFileSync(testFontPath));
-    const shaper = await getShaper(fontData);
-    expect(shaper.getFeatureTags("GSUB")).to.deep.equal(["rvrn"]);
-    expect(shaper.getFeatureTags("GPOS")).to.deep.equal(["kern"]);
-  });
-
   const characterMap = {
     [ord("A")]: "A",
     [ord("Ä")]: "Adieresis",
@@ -81,6 +67,26 @@ describe("shaper tests", () => {
 
   const kerningData = { V: { A: -100 } };
   const kerning = { getGlyphPairValue: (g1, g2) => kerningData[g1]?.[g2] ?? 0 };
+
+  it("test HBShaper", async () => {
+    const fontData = new Uint8Array(fs.readFileSync(testFontPath));
+    const shaper = await getShaper(fontData, { useCharacterMapHook: true });
+    const glyphs = shaper.shape(
+      "VABCÄS",
+      { wght: 0, wdth: 0 },
+      "kern,-rvrn",
+      characterMap,
+      glyphObjects
+    );
+    expect(glyphs).to.deep.equal(expectedGlyphs);
+  });
+
+  it("test HBShaper getFeatureTags", async () => {
+    const fontData = new Uint8Array(fs.readFileSync(testFontPath));
+    const shaper = await getShaper(fontData);
+    expect(shaper.getFeatureTags("GSUB")).to.deep.equal(["rvrn"]);
+    expect(shaper.getFeatureTags("GPOS")).to.deep.equal(["kern"]);
+  });
 
   it("test DumbShaper", async () => {
     const shaper = await getShaper(null);
