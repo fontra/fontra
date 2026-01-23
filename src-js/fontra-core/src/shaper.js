@@ -3,11 +3,11 @@ import { range } from "./utils.js";
 
 const hb = await hbPromise;
 
-export function getShaper(fontData) {
+export function getShaper(fontData, options) {
   let shaper;
 
   if (fontData) {
-    shaper = new HBShaper(hb, fontData);
+    shaper = new HBShaper(fontData, options);
   } else {
     return new DumbShaper();
   }
@@ -16,20 +16,38 @@ export function getShaper(fontData) {
 }
 
 class HBShaper {
-  constructor(hb, fontData) {
+  constructor(fontData, options) {
     this.blob = hb.createBlob(fontData);
     this.face = hb.createFace(this.blob, 0);
     this.font = hb.createFont(this.face);
+
+    if (options?.useCharacterMapHook || options?.useMetricsHooks) {
+      this.fontFuncs = hb.createFontFuncs();
+      if (options.useCharacterMapHook) {
+        this.fontFuncs.setNominalGlyphFunc((font, codePoint) =>
+          this._getNominalGlyph(font, codePoint)
+        );
+      }
+      const subFont = this.font.subFont();
+      subFont.setFuncs(this.fontFuncs);
+      this.font.destroy();
+      this.font = subFont;
+    }
   }
 
-  shape(text, variations = null, features = null) {
+  shape(text, variations, features, characterMap, glyphObjects, kerning) {
     const buffer = hb.createBuffer();
     buffer.addText(text);
     buffer.guessSegmentProperties(); // Set script, language and direction
 
     this.font.setVariations(variations || {});
 
+    this._characterMap = characterMap;
+
     hb.shape(this.font, buffer, features);
+
+    delete this._characterMap;
+
     const output = buffer.json();
     buffer.destroy();
 
@@ -38,6 +56,11 @@ class HBShaper {
     }
 
     return output;
+  }
+
+  _getNominalGlyph(font, codePoint) {
+    const glyphName = this._characterMap?.[codePoint];
+    return glyphName ? this.font.glyphFromName(glyphName) : 0;
   }
 
   getFeatureTags(otTableTag) {
