@@ -66,6 +66,7 @@ class HBShaper {
   getFeatureTags(otTableTag) {
     const features = new Set();
     const numScripts = this.face.getTableScriptTags(otTableTag).length;
+
     for (const scriptIndex of range(numScripts)) {
       const numLanguages = this.face.getScriptLanguageTags(
         otTableTag,
@@ -78,6 +79,7 @@ class HBShaper {
           .forEach((tag) => features.add(tag));
       }
     }
+
     return [...features].sort();
   }
 
