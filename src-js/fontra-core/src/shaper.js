@@ -103,6 +103,10 @@ class DumbShaper {
   getFeatureTags(otTableTag) {
     return [];
   }
+
+  close() {
+    // noop
+  }
 }
 
 function applyKerning(glyphs, kerning) {
