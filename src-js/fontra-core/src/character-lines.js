@@ -37,7 +37,7 @@ function characterLineFromSingleLineString(
       i++;
       if (string[i] == "/") {
         // Literal "//", this is the slash character
-        glyphName = characterMap[character.charCodeAt(0)];
+        glyphName = characterMap["/".codePointAt(0)];
       } else if (string[i] == "?") {
         // /? placeholder substitution
         glyphName = substituteGlyphName || "--placeholder--";
