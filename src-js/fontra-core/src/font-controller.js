@@ -1027,11 +1027,11 @@ export class FontController {
     return new KerningController(kernTag, await this.getKerning(), this);
   }
 
-  async getShaper() {
-    if (!this._shaper) {
-      this._shaper = await this._getShaper();
+  getShaper() {
+    if (!this._shaperPromise) {
+      this._shaperPromise = this._getShaper();
     }
-    return this._shaper;
+    return this._shaperPromise;
   }
 
   async _getShaper() {
