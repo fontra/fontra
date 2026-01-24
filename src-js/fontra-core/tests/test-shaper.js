@@ -7,7 +7,7 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-import { getShaper } from "@fontra/core/shaper.js";
+import { applyKerning, getShaper } from "@fontra/core/shaper.js";
 
 describe("shaper tests", () => {
   const testFontPath = join(
@@ -82,9 +82,10 @@ describe("shaper tests", () => {
       { wght: 0, wdth: 0 },
       "-kern,-rvrn",
       characterMap,
-      glyphObjects,
-      kerning
+      glyphObjects
     );
+    applyKerning(glyphs, (g1, g2) => kerning.getGlyphPairValue(g1, g2));
+
     expect(glyphs).to.deep.equal(expectedGlyphs);
   });
 
@@ -102,9 +103,10 @@ describe("shaper tests", () => {
       { wght: 0, wdth: 0 },
       "kern",
       characterMap,
-      glyphObjects,
-      kerning
+      glyphObjects
     );
+    applyKerning(glyphs, (g1, g2) => kerning.getGlyphPairValue(g1, g2));
+
     expect(glyphs).to.deep.equal(removeGIDs(expectedGlyphs));
   });
 });

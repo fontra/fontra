@@ -43,7 +43,7 @@ class HBShaper {
     }
   }
 
-  shape(text, variations, features, characterMap, glyphObjects, kerning) {
+  shape(text, variations, features, characterMap, glyphObjects) {
     const buffer = hb.createBuffer();
     buffer.addText(text);
     buffer.guessSegmentProperties(); // Set script, language and direction
@@ -63,10 +63,6 @@ class HBShaper {
 
     for (const glyph of output) {
       glyph.gn = this.font.glyphName(glyph.g);
-    }
-
-    if (kerning) {
-      applyKerning(output, kerning);
     }
 
     return output;
@@ -110,7 +106,7 @@ class HBShaper {
 }
 
 class DumbShaper {
-  shape(text, variations, features, characterMap, glyphObjects, kerning) {
+  shape(text, variations, features, characterMap, glyphObjects) {
     const output = [];
 
     for (let i = 0; i < text.length; i++) {
@@ -136,10 +132,6 @@ class DumbShaper {
       }
     }
 
-    if (kerning) {
-      applyKerning(output, kerning);
-    }
-
     return output;
   }
 
@@ -152,9 +144,9 @@ class DumbShaper {
   }
 }
 
-function applyKerning(glyphs, kerning) {
+export function applyKerning(glyphs, pairFunc) {
   for (let i = 1; i < glyphs.length; i++) {
-    const kernValue = kerning.getGlyphPairValue(glyphs[i - 1].gn, glyphs[i].gn);
+    const kernValue = pairFunc(glyphs[i - 1].gn, glyphs[i].gn);
     if (kernValue) {
       glyphs[i - 1].ax += kernValue;
       glyphs[i].flags |= 1;
