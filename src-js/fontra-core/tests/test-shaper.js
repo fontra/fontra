@@ -74,14 +74,13 @@ describe("shaper tests", () => {
   it("test HBShaper", async () => {
     const fontData = new Uint8Array(fs.readFileSync(testFontPath));
     const shaper = await getShaper(fontData, {
-      useCharacterMapHook: true,
+      nominalGlyphFunc: (codePoint) => characterMap[codePoint],
       useMetricsHooks: true,
     });
     const glyphs = shaper.shape(
       testInputString,
       { wght: 0, wdth: 0 },
       "-kern,-rvrn",
-      characterMap,
       glyphObjects
     );
     applyKerning(glyphs, (g1, g2) => kerning.getGlyphPairValue(g1, g2));
@@ -97,12 +96,13 @@ describe("shaper tests", () => {
   });
 
   it("test DumbShaper", async () => {
-    const shaper = await getShaper(null);
+    const shaper = await getShaper(null, {
+      nominalGlyphFunc: (codePoint) => characterMap[codePoint],
+    });
     const glyphs = shaper.shape(
       testInputString,
       { wght: 0, wdth: 0 },
       "kern",
-      characterMap,
       glyphObjects
     );
     applyKerning(glyphs, (g1, g2) => kerning.getGlyphPairValue(g1, g2));

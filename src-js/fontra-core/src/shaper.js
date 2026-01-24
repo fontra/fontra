@@ -9,7 +9,7 @@ export function getShaper(fontData, options) {
   if (fontData) {
     shaper = new HBShaper(fontData, options);
   } else {
-    return new DumbShaper();
+    return new DumbShaper(options);
   }
 
   return shaper;
@@ -20,11 +20,12 @@ class HBShaper {
     this.blob = hb.createBlob(fontData);
     this.face = hb.createFace(this.blob, 0);
     this.font = hb.createFont(this.face);
+    this._nominalGlyphFunc = options?.nominalGlyphFunc;
 
-    if (options?.useCharacterMapHook || options?.useMetricsHooks) {
+    if (options?.nominalGlyphFunc || options?.useMetricsHooks) {
       this.fontFuncs = hb.createFontFuncs();
 
-      if (options.useCharacterMapHook) {
+      if (options.nominalGlyphFunc) {
         this.fontFuncs.setNominalGlyphFunc((font, codePoint) =>
           this._getNominalGlyph(font, codePoint)
         );
@@ -43,19 +44,17 @@ class HBShaper {
     }
   }
 
-  shape(text, variations, features, characterMap, glyphObjects) {
+  shape(text, variations, features, glyphObjects) {
     const buffer = hb.createBuffer();
     buffer.addText(text);
     buffer.guessSegmentProperties(); // Set script, language and direction
 
     this.font.setVariations(variations || {});
 
-    this._characterMap = characterMap;
     this._glyphObjects = glyphObjects;
 
     hb.shape(this.font, buffer, features);
 
-    delete this._characterMap;
     delete this._glyphObjects;
 
     const glyphs = buffer.json();
@@ -69,7 +68,7 @@ class HBShaper {
   }
 
   _getNominalGlyph(font, codePoint) {
-    const glyphName = this._characterMap?.[codePoint];
+    const glyphName = this._nominalGlyphFunc?.(codePoint);
     return glyphName ? this.font.glyphFromName(glyphName) : 0;
   }
 
@@ -106,13 +105,17 @@ class HBShaper {
 }
 
 class DumbShaper {
-  shape(text, variations, features, characterMap, glyphObjects) {
+  constructor(options) {
+    this._nominalGlyphFunc = options.nominalGlyphFunc;
+  }
+
+  shape(text, variations, features, glyphObjects) {
     const glyphs = [];
 
     for (let i = 0; i < text.length; i++) {
       const codePoint = text.codePointAt(i);
 
-      const glyphName = characterMap[codePoint] ?? ".notdef";
+      const glyphName = this._nominalGlyphFunc(codePoint) ?? ".notdef";
 
       const xAdvance = glyphObjects[glyphName]?.xAdvance ?? 500;
 
