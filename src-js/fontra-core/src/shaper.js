@@ -58,14 +58,14 @@ class HBShaper {
     delete this._characterMap;
     delete this._glyphObjects;
 
-    const output = buffer.json();
+    const glyphs = buffer.json();
     buffer.destroy();
 
-    for (const glyph of output) {
+    for (const glyph of glyphs) {
       glyph.gn = this.font.glyphName(glyph.g);
     }
 
-    return output;
+    return glyphs;
   }
 
   _getNominalGlyph(font, codePoint) {
@@ -107,7 +107,7 @@ class HBShaper {
 
 class DumbShaper {
   shape(text, variations, features, characterMap, glyphObjects) {
-    const output = [];
+    const glyphs = [];
 
     for (let i = 0; i < text.length; i++) {
       const codePoint = text.codePointAt(i);
@@ -116,7 +116,7 @@ class DumbShaper {
 
       const xAdvance = glyphObjects[glyphName]?.xAdvance ?? 500;
 
-      output.push({
+      glyphs.push({
         cl: i, // cluster
         gn: glyphName,
         ax: xAdvance,
@@ -132,7 +132,7 @@ class DumbShaper {
       }
     }
 
-    return output;
+    return glyphs;
   }
 
   getFeatureTags(otTableTag) {
