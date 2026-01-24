@@ -147,7 +147,7 @@ describe("shaper tests", () => {
     ({ inputGlyphNames, expectedCodePoints, nominalGlyphFunc }) => {
       const m = new PUADispenser(nominalGlyphFunc);
       const codePoints = inputGlyphNames.map((glyphName) =>
-        m.addGlyphName(glyphName).codePointAt(0)
+        m.getPUACodePoint(glyphName).codePointAt(0)
       );
       expect(codePoints).to.deep.equal(expectedCodePoints);
 
