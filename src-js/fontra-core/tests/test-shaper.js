@@ -3,11 +3,12 @@ import { expect } from "chai";
 import fs from "fs";
 import { dirname, join } from "path";
 import { fileURLToPath } from "url";
+import { parametrize } from "./test-support.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-import { applyKerning, getShaper } from "@fontra/core/shaper.js";
+import { PUADispenser, applyKerning, getShaper } from "@fontra/core/shaper.js";
 
 describe("shaper tests", () => {
   const testFontPath = join(
@@ -59,6 +60,8 @@ describe("shaper tests", () => {
     [ord("V")]: "V",
   };
 
+  const nominalGlyphFunc = (codePoint) => characterMap[codePoint];
+
   const glyphObjects = {
     A: { xAdvance: 396 },
     Adieresis: { xAdvance: 396 },
@@ -74,7 +77,7 @@ describe("shaper tests", () => {
   it("test HBShaper", async () => {
     const fontData = new Uint8Array(fs.readFileSync(testFontPath));
     const shaper = await getShaper(fontData, {
-      nominalGlyphFunc: (codePoint) => characterMap[codePoint],
+      nominalGlyphFunc,
       useMetricsHooks: true,
     });
     const glyphs = shaper.shape(
@@ -97,7 +100,7 @@ describe("shaper tests", () => {
 
   it("test DumbShaper", async () => {
     const shaper = await getShaper(null, {
-      nominalGlyphFunc: (codePoint) => characterMap[codePoint],
+      nominalGlyphFunc,
     });
     const glyphs = shaper.shape(
       testInputString,
@@ -109,6 +112,49 @@ describe("shaper tests", () => {
 
     expect(glyphs).to.deep.equal(removeGIDs(expectedGlyphs));
   });
+
+  const puaTestData = [
+    {
+      inputGlyphNames: ["a", "b", "c"],
+      expectedCodePoints: [0xe000, 0xe001, 0xe002],
+      nominalGlyphFunc: (codePoint) => null,
+    },
+    {
+      inputGlyphNames: ["a", "b", "a"],
+      expectedCodePoints: [0xe000, 0xe001, 0xe000],
+      nominalGlyphFunc: (codePoint) => null,
+    },
+    {
+      inputGlyphNames: ["a", "b", "a"],
+      expectedCodePoints: [0xf0000, 0xf0001, 0xf0000],
+      nominalGlyphFunc: (codePoint) => (codePoint < 0xf0000 ? "x" : null),
+    },
+    {
+      inputGlyphNames: ["a", "b", "a"],
+      expectedCodePoints: [0xf5000, 0xf5001, 0xf5000],
+      nominalGlyphFunc: (codePoint) => (codePoint < 0xf5000 ? "x" : null),
+    },
+    {
+      inputGlyphNames: ["a", "b", "a"],
+      expectedCodePoints: [0x100500, 0x100501, 0x100500],
+      nominalGlyphFunc: (codePoint) => (codePoint < 0x100500 ? "x" : null),
+    },
+  ];
+
+  parametrize(
+    "test PUADispenser",
+    puaTestData,
+    ({ inputGlyphNames, expectedCodePoints, nominalGlyphFunc }) => {
+      const m = new PUADispenser(nominalGlyphFunc);
+      const codePoints = inputGlyphNames.map((glyphName) =>
+        m.addGlyphName(glyphName).codePointAt(0)
+      );
+      expect(codePoints).to.deep.equal(expectedCodePoints);
+
+      const glyphNames = codePoints.map((codePoint) => m.nominalGlyph(codePoint));
+      expect(glyphNames).to.deep.equal(inputGlyphNames);
+    }
+  );
 });
 
 function removeGIDs(glyphs) {

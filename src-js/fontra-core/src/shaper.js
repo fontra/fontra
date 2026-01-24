@@ -156,3 +156,59 @@ export function applyKerning(glyphs, pairFunc) {
     }
   }
 }
+
+const PUA_BLOCKS = [
+  [0xe000, 0xf8ff],
+  [0xf0000, 0xffffd],
+  [0x100000, 0x10fffd],
+];
+
+export class PUADispenser {
+  // This class helps to assign arbitrary (but available) PUA code points for
+  // unencoded glyphs, so we can use them in text we can feed the shaper.
+  // This is because harfbuzzjs does not yet support hb_buffer_add_codepoints.
+  // TODO: perhaps it is better to add support for hb_buffer_add_codepoints?
+
+  constructor(nominalGlyphFunc) {
+    this._baseNominalGlyphFunc = nominalGlyphFunc;
+    this.puaCharacterMap = {};
+    this.puaGlyphMapMap = {};
+    this.nominalGlyph = (codePoint) =>
+      this._baseNominalGlyphFunc(codePoint) ?? this.puaCharacterMap[codePoint];
+    this._previousPUACodePoint = null;
+  }
+
+  addGlyphName(glyphName) {
+    // Return a PUA character
+
+    if (glyphName in this.puaGlyphMapMap) {
+      return this.puaGlyphMapMap[glyphName];
+    }
+
+    let codePoint = this._previousPUACodePoint ? this._previousPUACodePoint + 1 : 0;
+
+    for (const [low, high] of PUA_BLOCKS) {
+      if (codePoint < low) {
+        codePoint = low;
+      } else if (codePoint < low || codePoint > high) {
+        continue;
+      }
+
+      while (this._baseNominalGlyphFunc(codePoint)) {
+        codePoint++;
+        if (codePoint > high) {
+          continue;
+        }
+      }
+
+      this._previousPUACodePoint = codePoint;
+      this.puaCharacterMap[codePoint] = glyphName;
+
+      const character = String.fromCodePoint(codePoint);
+      this.puaGlyphMapMap[glyphName] = character;
+      return character;
+    }
+
+    throw new Error("unable to find free PUA code point");
+  }
+}
