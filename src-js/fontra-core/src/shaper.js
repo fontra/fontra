@@ -178,7 +178,7 @@ export class PUADispenser {
     this._previousPUACodePoint = null;
   }
 
-  getPUACodePoint(glyphName) {
+  getPUACharacter(glyphName) {
     // Return a PUA character
 
     if (glyphName in this.puaGlyphMapMap) {
