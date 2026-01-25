@@ -76,10 +76,7 @@ describe("shaper tests", () => {
 
   it("test HBShaper", async () => {
     const fontData = new Uint8Array(fs.readFileSync(testFontPath));
-    const shaper = await getShaper(fontData, {
-      nominalGlyphFunc,
-      useMetricsHooks: true,
-    });
+    const shaper = await getShaper(fontData, nominalGlyphFunc);
     const glyphs = shaper.shape(
       testInputString,
       { wght: 0, wdth: 0 },
@@ -93,15 +90,13 @@ describe("shaper tests", () => {
 
   it("test HBShaper getFeatureTags", async () => {
     const fontData = new Uint8Array(fs.readFileSync(testFontPath));
-    const shaper = await getShaper(fontData);
+    const shaper = await getShaper(fontData, nominalGlyphFunc);
     expect(shaper.getFeatureTags("GSUB")).to.deep.equal(["rvrn"]);
     expect(shaper.getFeatureTags("GPOS")).to.deep.equal(["kern"]);
   });
 
   it("test DumbShaper", async () => {
-    const shaper = await getShaper(null, {
-      nominalGlyphFunc,
-    });
+    const shaper = await getShaper(null, nominalGlyphFunc);
     const glyphs = shaper.shape(
       testInputString,
       { wght: 0, wdth: 0 },
