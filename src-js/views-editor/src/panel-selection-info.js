@@ -144,19 +144,20 @@ export default class SelectionInfoPanel extends Panel {
     const instance = glyphController?.instance;
     this.haveInstance = !!instance;
 
-    const selectedGlyphInfo = this.sceneController.sceneModel.getSelectedGlyphInfo();
+    const positionedGlyph =
+      this.sceneController.sceneModel.getSelectedPositionedGlyph();
     const varGlyphController =
       await this.sceneController.sceneModel.getSelectedVariableGlyphController();
     const glyphLocked = !!varGlyphController?.glyph.customData["fontra.glyph.locked"];
 
     if (
-      selectedGlyphInfo?.isUndefined &&
-      selectedGlyphInfo.character &&
+      positionedGlyph?.isUndefined &&
+      positionedGlyph.character &&
       !codePoints.length
     ) {
       // Glyph does not yet exist in the font, but we can grab the unicode from
-      // selectedGlyphInfo.character anyway
-      codePoints = [selectedGlyphInfo.character.codePointAt(0)];
+      // positionedGlyph.character anyway
+      codePoints = [positionedGlyph.character.codePointAt(0)];
     }
 
     const codePointsStr = makeCodePointsString(codePoints);

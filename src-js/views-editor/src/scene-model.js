@@ -126,12 +126,8 @@ export class SceneModel {
     ];
   }
 
-  getSelectedGlyphInfo() {
-    return getSelectedGlyphInfo(this.selectedGlyph, this.characterLines);
-  }
-
   getSelectedGlyphName() {
-    return getSelectedGlyphName(this.selectedGlyph, this.characterLines);
+    return this.getSelectedPositionedGlyph()?.glyphName;
   }
 
   isSelectedGlyphLocked() {
@@ -1101,16 +1097,6 @@ function makeGlyphNamesPattern(glyphNames) {
     glyphsObj[glyphName] = null;
   }
   return { glyphs: glyphsObj };
-}
-
-function getSelectedGlyphInfo(selectedGlyph, characterLines) {
-  if (selectedGlyph) {
-    return characterLines[selectedGlyph.lineIndex]?.[selectedGlyph.glyphIndex];
-  }
-}
-
-function getSelectedGlyphName(selectedGlyph, characterLines) {
-  return getSelectedGlyphInfo(selectedGlyph, characterLines)?.glyphName;
 }
 
 function sorted(v) {
