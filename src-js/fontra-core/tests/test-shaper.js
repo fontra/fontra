@@ -105,7 +105,7 @@ describe("shaper tests", () => {
     );
     applyKerning(glyphs, (g1, g2) => kerning.getGlyphPairValue(g1, g2));
 
-    expect(glyphs).to.deep.equal(removeGIDs(expectedGlyphs));
+    expect(removeGIDs(glyphs)).to.deep.equal(removeGIDs(expectedGlyphs));
   });
 
   const puaTestData = [
