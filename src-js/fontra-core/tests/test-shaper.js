@@ -112,12 +112,12 @@ describe("shaper tests", () => {
     {
       inputGlyphNames: ["a", "b", "c"],
       expectedCodePoints: [0xe000, 0xe001, 0xe002],
-      nominalGlyphFunc: (codePoint) => null,
+      nominalGlyphFunc: (codePoint) => (codePoint < 0x100 ? "x" : null),
     },
     {
       inputGlyphNames: ["a", "b", "a"],
       expectedCodePoints: [0xe000, 0xe001, 0xe000],
-      nominalGlyphFunc: (codePoint) => null,
+      nominalGlyphFunc: (codePoint) => (codePoint < 0x100 ? "x" : null),
     },
     {
       inputGlyphNames: ["a", "b", "a"],
@@ -137,7 +137,7 @@ describe("shaper tests", () => {
   ];
 
   parametrize(
-    "test getPUACharacter",
+    "test PUA dispenser",
     puaTestData,
     ({ inputGlyphNames, expectedCodePoints, nominalGlyphFunc }) => {
       const m = getShaper(null, nominalGlyphFunc);
@@ -148,6 +148,12 @@ describe("shaper tests", () => {
 
       const glyphNames = codePoints.map((codePoint) => m.nominalGlyph(codePoint));
       expect(glyphNames).to.deep.equal(inputGlyphNames);
+
+      const glyphNames2 = codePoints.map((codePoint) => m.getPUAGlyphName(codePoint));
+      expect(glyphNames2).to.deep.equal(inputGlyphNames);
+
+      expect(m.getPUAGlyphName(65)).to.equal(undefined);
+      expect(m.nominalGlyph(65)).to.not.equal(undefined);
     }
   );
 });
