@@ -1160,7 +1160,10 @@ class LineSetter {
     let shapedGlyphs = this.shaper.shape(text, null, null, this.glyphInstances);
     let needsReshape = false;
     for (const glyphInfo of shapedGlyphs) {
-      if (!(glyphInfo.gn in this.glyphInstances)) {
+      if (
+        !(glyphInfo.gn in this.glyphInstances) &&
+        glyphInfo.gn in fontController.glyphMap
+      ) {
         this.glyphInstances[glyphInfo.gn] = await this.getGlyphInstanceFunc(
           glyphInfo.gn
         );
