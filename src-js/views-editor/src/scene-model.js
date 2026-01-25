@@ -2,6 +2,7 @@ import {
   pointInConvexPolygon,
   rectIntersectsPolygon,
 } from "@fontra/core/convex-hull.js";
+import { getSuggestedGlyphName } from "@fontra/core/glyph-data.js";
 import { loaderSpinner } from "@fontra/core/loader-spinner.js";
 import {
   centeredRect,
@@ -16,6 +17,7 @@ import {
   unionRect,
 } from "@fontra/core/rectangle.js";
 import { difference, isEqualSet, union, updateSet } from "@fontra/core/set-ops.js";
+import { applyKerning } from "@fontra/core/shaper.js";
 import { decomposedToTransform } from "@fontra/core/transform.js";
 import {
   consolidateCalls,
@@ -416,9 +418,7 @@ export class SceneModel {
       fontController,
       shaper,
       (glyphName, layerName) => this.getGlyphInstance(glyphName, layerName),
-      kerningInstance
-        ? (g1, g2) => kerningInstance.getGlyphPairValue(g1, g1)
-        : (g1, g2) => 0,
+      kerningInstance ? (g1, g2) => kerningInstance.getGlyphPairValue(g1, g2) : null,
       this.sceneSettings.align,
       cancelSignal
     );
@@ -1134,6 +1134,7 @@ class LineSetter {
     this.kerningPairFunc = kerningPairFunc;
     this.align = align;
     this.cancelSignal = cancelSignal;
+    this.glyphInstances = {};
   }
 
   async setLine(
@@ -1146,20 +1147,52 @@ class LineSetter {
     const fontController = this.fontController;
     const glyphs = [];
 
-    let previousGlyphName = null;
     let { x, y } = origin;
 
-    for (const [glyphIndex, glyphInfo] of enumerate(characterLine)) {
+    const text = characterLine
+      .map(
+        (characterInfo) =>
+          characterInfo.character ??
+          this.shaper.getPUACharacter(characterInfo.glyphName)
+      )
+      .join("");
+
+    let shapedGlyphs = this.shaper.shape(text, null, null, this.glyphInstances);
+    let needsReshape = false;
+    for (const glyphInfo of shapedGlyphs) {
+      if (!(glyphInfo.gn in this.glyphInstances)) {
+        this.glyphInstances[glyphInfo.gn] = await this.getGlyphInstanceFunc(
+          glyphInfo.gn
+        );
+        needsReshape = true;
+      }
+    }
+
+    if (needsReshape) {
+      shapedGlyphs = this.shaper.shape(text, null, null, this.glyphInstances);
+    }
+
+    if (this.kerningPairFunc) {
+      applyKerning(shapedGlyphs, this.kerningPairFunc);
+    }
+
+    for (const [glyphIndex, glyphInfo] of enumerate(shapedGlyphs)) {
+      let codePoint = text.codePointAt(glyphInfo.cl);
+      if (this.shaper.getPUAGlyphName(codePoint)) {
+        codePoint = undefined;
+      }
+      const glyphName =
+        glyphInfo.g != 0 ? glyphInfo.gn : getSuggestedGlyphName(codePoint);
+
       const isSelectedGlyph = glyphIndex == selectedGlyphIndex;
 
       const thisGlyphEditLayerName =
         editLayerName && isSelectedGlyph ? editLayerName : undefined;
 
-      const varGlyph = await fontController.getGlyph(glyphInfo.glyphName);
-      let glyphInstance = await this.getGlyphInstanceFunc(
-        glyphInfo.glyphName,
-        thisGlyphEditLayerName
-      );
+      const varGlyph = await fontController.getGlyph(glyphName);
+      let glyphInstance = thisGlyphEditLayerName
+        ? await this.getGlyphInstanceFunc(glyphName, thisGlyphEditLayerName)
+        : this.glyphInstances[glyphName];
 
       if (this.cancelSignal.shouldCancel) {
         return;
@@ -1167,29 +1200,32 @@ class LineSetter {
 
       const isUndefined = !glyphInstance;
       if (isUndefined) {
-        glyphInstance = fontController.getDummyGlyphInstanceController(
-          glyphInfo.glyphName
-        );
+        glyphInstance = fontController.getDummyGlyphInstanceController(glyphName);
       }
 
-      const kernValue = this.kerningPairFunc(previousGlyphName, glyphInfo.glyphName);
+      const kernValue =
+        glyphInfo.flags & 0x01
+          ? shapedGlyphs[glyphIndex - 1].ax - glyphs.at(-1).glyph.xAdvance
+          : 0;
 
-      x += kernValue;
       glyphs.push({
-        x,
-        y,
+        x: x + glyphInfo.dx,
+        y: y + glyphInfo.dy,
         kernValue,
         glyph: glyphInstance,
         varGlyph,
-        glyphName: glyphInfo.glyphName,
-        character: glyphInfo.character,
+        glyphName: isUndefined
+          ? this.shaper.getPUAGlyphName(codePoint) ?? glyphName
+          : glyphName,
+        character: isUndefined && codePoint ? String.fromCodePoint(codePoint) : null,
         isUndefined,
         isSelected: isSelectedGlyph,
         isEditing: !!(isSelectedGlyph && selectedGlyphIsEditing),
         isEmpty: !glyphInstance.controlBounds,
       });
-      x += glyphInstance.xAdvance;
-      previousGlyphName = glyphInfo.glyphName;
+
+      x += glyphInfo.ax;
+      y += glyphInfo.ay;
     }
 
     let offset = 0;
