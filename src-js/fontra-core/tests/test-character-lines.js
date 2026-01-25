@@ -42,6 +42,14 @@ describe("character-lines", () => {
       expectedLines: [[{ character: undefined, glyphName: "A.alt" }]],
     },
     {
+      input: "/A.alt/",
+      expectedLines: [[{ character: undefined, glyphName: "A.alt" }]],
+    },
+    {
+      input: "/",
+      expectedLines: [[]],
+    },
+    {
       input: "Ä",
       expectedLines: [[{ character: "Ä", glyphName: "Adieresis" }]],
     },
