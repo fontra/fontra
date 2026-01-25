@@ -36,6 +36,10 @@ class ShaperBase {
     this._previousPUACodePoint = null;
   }
 
+  getPUAGlyphName(codePoint) {
+    return this.puaCharacterMap[codePoint];
+  }
+
   getPUACharacter(glyphName) {
     // Return a PUA character
 
@@ -165,13 +169,14 @@ class DumbShaper extends ShaperBase {
     for (let i = 0; i < text.length; i++) {
       const codePoint = text.codePointAt(i);
 
-      const glyphName = this.nominalGlyph(codePoint) ?? ".notdef";
+      const glyphName = this.nominalGlyph(codePoint);
 
       const xAdvance = glyphObjects[glyphName]?.xAdvance ?? 500;
 
       glyphs.push({
+        g: glyphName ? -1 : 0,
         cl: i, // cluster
-        gn: glyphName,
+        gn: glyphName ?? ".notdef",
         ax: xAdvance,
         ay: 0,
         dx: 0,
