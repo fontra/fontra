@@ -376,9 +376,6 @@ export class SceneModel {
 
   async buildScene(cancelSignal) {
     const fontController = this.fontController;
-    const kerningInstance = this.sceneSettings.applyKerning
-      ? await this.getKerningInstance("kern")
-      : null;
 
     const characterLines = this.characterLines;
     const {
@@ -411,15 +408,28 @@ export class SceneModel {
       return;
     }
 
+    const kerningInstance = this.sceneSettings.applyKerning
+      ? await this.getKerningInstance("kern")
+      : null;
+    const shaper = await fontController.getShaper();
+    const lineSetter = new LineSetter(
+      fontController,
+      shaper,
+      (glyphName, layerName) => this.getGlyphInstance(glyphName, layerName),
+      kerningInstance
+        ? (g1, g2) => kerningInstance.getGlyphPairValue(g1, g1)
+        : (g1, g2) => 0,
+      this.sceneSettings.align,
+      cancelSignal
+    );
+
     for (const [lineIndex, characterLine] of enumerate(characterLines)) {
-      const positionedLine = await this._buildLine(
+      const positionedLine = await lineSetter.setLine(
         { x: 0, y },
         characterLine,
         lineIndex == selectedLineIndex ? selectedGlyphIndex : undefined,
         selectedGlyphIsEditing,
-        editLayerName,
-        kerningInstance,
-        cancelSignal
+        editLayerName
       );
 
       if (!positionedLine) {
@@ -433,96 +443,6 @@ export class SceneModel {
     }
 
     return { longestLineLength, positionedLines };
-  }
-
-  async _buildLine(
-    origin,
-    characterLine,
-    selectedGlyphIndex,
-    selectedGlyphIsEditing,
-    editLayerName,
-    kerningInstance,
-    cancelSignal
-  ) {
-    const fontController = this.fontController;
-    const glyphs = [];
-
-    let previousGlyphName = null;
-    let { x, y } = origin;
-
-    for (const [glyphIndex, glyphInfo] of enumerate(characterLine)) {
-      const isSelectedGlyph = glyphIndex == selectedGlyphIndex;
-
-      const thisGlyphEditLayerName =
-        editLayerName && isSelectedGlyph ? editLayerName : undefined;
-
-      const varGlyph = await fontController.getGlyph(glyphInfo.glyphName);
-      let glyphInstance = await this.getGlyphInstance(
-        glyphInfo.glyphName,
-        thisGlyphEditLayerName
-      );
-
-      if (cancelSignal.shouldCancel) {
-        return;
-      }
-
-      const isUndefined = !glyphInstance;
-      if (isUndefined) {
-        glyphInstance = fontController.getDummyGlyphInstanceController(
-          glyphInfo.glyphName
-        );
-      }
-
-      const kernValue =
-        kerningInstance && previousGlyphName
-          ? kerningInstance.getGlyphPairValue(previousGlyphName, glyphInfo.glyphName)
-          : 0;
-
-      x += kernValue;
-      glyphs.push({
-        x,
-        y,
-        kernValue,
-        glyph: glyphInstance,
-        varGlyph,
-        glyphName: glyphInfo.glyphName,
-        character: glyphInfo.character,
-        isUndefined,
-        isSelected: isSelectedGlyph,
-        isEditing: !!(isSelectedGlyph && selectedGlyphIsEditing),
-        isEmpty: !glyphInstance.controlBounds,
-      });
-      x += glyphInstance.xAdvance;
-      previousGlyphName = glyphInfo.glyphName;
-    }
-
-    let offset = 0;
-
-    switch (this.sceneSettings.align) {
-      case "center":
-        offset = -x / 2;
-        break;
-      case "right":
-        offset = -x;
-        break;
-    }
-
-    if (offset) {
-      glyphs.forEach((item) => {
-        item.x += offset;
-      });
-    }
-
-    // TODO: use font's ascender/descender values
-    addBoundingBoxes(
-      glyphs,
-      -0.2 * fontController.unitsPerEm,
-      0.8 * fontController.unitsPerEm
-    );
-
-    const bounds = unionRect(...glyphs.map((glyph) => glyph.bounds));
-
-    return { bounds, glyphs, origin, endPoint: { x, y: origin.y } };
   }
 
   getLocationForGlyph(glyphName) {
@@ -1197,6 +1117,109 @@ function sorted(v) {
   v = [...v];
   v.sort((a, b) => a - b);
   return v;
+}
+
+class LineSetter {
+  constructor(
+    fontController,
+    shaper,
+    getGlyphInstanceFunc,
+    kerningPairFunc,
+    align,
+    cancelSignal
+  ) {
+    this.fontController = fontController;
+    this.shaper = shaper;
+    this.getGlyphInstanceFunc = getGlyphInstanceFunc;
+    this.kerningPairFunc = kerningPairFunc;
+    this.align = align;
+    this.cancelSignal = cancelSignal;
+  }
+
+  async setLine(
+    origin,
+    characterLine,
+    selectedGlyphIndex,
+    selectedGlyphIsEditing,
+    editLayerName
+  ) {
+    const fontController = this.fontController;
+    const glyphs = [];
+
+    let previousGlyphName = null;
+    let { x, y } = origin;
+
+    for (const [glyphIndex, glyphInfo] of enumerate(characterLine)) {
+      const isSelectedGlyph = glyphIndex == selectedGlyphIndex;
+
+      const thisGlyphEditLayerName =
+        editLayerName && isSelectedGlyph ? editLayerName : undefined;
+
+      const varGlyph = await fontController.getGlyph(glyphInfo.glyphName);
+      let glyphInstance = await this.getGlyphInstanceFunc(
+        glyphInfo.glyphName,
+        thisGlyphEditLayerName
+      );
+
+      if (this.cancelSignal.shouldCancel) {
+        return;
+      }
+
+      const isUndefined = !glyphInstance;
+      if (isUndefined) {
+        glyphInstance = fontController.getDummyGlyphInstanceController(
+          glyphInfo.glyphName
+        );
+      }
+
+      const kernValue = this.kerningPairFunc(previousGlyphName, glyphInfo.glyphName);
+
+      x += kernValue;
+      glyphs.push({
+        x,
+        y,
+        kernValue,
+        glyph: glyphInstance,
+        varGlyph,
+        glyphName: glyphInfo.glyphName,
+        character: glyphInfo.character,
+        isUndefined,
+        isSelected: isSelectedGlyph,
+        isEditing: !!(isSelectedGlyph && selectedGlyphIsEditing),
+        isEmpty: !glyphInstance.controlBounds,
+      });
+      x += glyphInstance.xAdvance;
+      previousGlyphName = glyphInfo.glyphName;
+    }
+
+    let offset = 0;
+
+    switch (this.align) {
+      case "center":
+        offset = -x / 2;
+        break;
+      case "right":
+        offset = -x;
+        break;
+    }
+
+    if (offset) {
+      glyphs.forEach((item) => {
+        item.x += offset;
+      });
+    }
+
+    // TODO: use font's ascender/descender values
+    addBoundingBoxes(
+      glyphs,
+      -0.2 * fontController.unitsPerEm,
+      0.8 * fontController.unitsPerEm
+    );
+
+    const bounds = unionRect(...glyphs.map((glyph) => glyph.bounds));
+
+    return { bounds, glyphs, origin, endPoint: { x, y: origin.y } };
+  }
 }
 
 function addBoundingBoxes(glyphs, descender, ascender) {
