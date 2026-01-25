@@ -3,45 +3,39 @@ import { range } from "./utils.js";
 
 const hb = await hbPromise;
 
-export function getShaper(fontData, options) {
+export function getShaper(fontData, nominalGlyphFunc) {
   let shaper;
 
   if (fontData) {
-    shaper = new HBShaper(fontData, options);
+    shaper = new HBShaper(fontData, nominalGlyphFunc);
   } else {
-    return new DumbShaper(options);
+    return new DumbShaper(nominalGlyphFunc);
   }
 
   return shaper;
 }
 
 class HBShaper {
-  constructor(fontData, options) {
+  constructor(fontData, nominalGlyphFunc) {
     this.blob = hb.createBlob(fontData);
     this.face = hb.createFace(this.blob, 0);
     this.font = hb.createFont(this.face);
-    this._nominalGlyphFunc = options?.nominalGlyphFunc;
+    this._nominalGlyphFunc = nominalGlyphFunc;
 
-    if (options?.nominalGlyphFunc || options?.useMetricsHooks) {
-      this.fontFuncs = hb.createFontFuncs();
+    this.fontFuncs = hb.createFontFuncs();
 
-      if (options.nominalGlyphFunc) {
-        this.fontFuncs.setNominalGlyphFunc((font, codePoint) =>
-          this._getNominalGlyph(font, codePoint)
-        );
-      }
+    this.fontFuncs.setNominalGlyphFunc((font, codePoint) =>
+      this._getNominalGlyph(font, codePoint)
+    );
 
-      if (options.useMetricsHooks) {
-        this.fontFuncs.setGlyphHAdvanceFunc((font, glyphID) =>
-          this._getHAdvanceFunc(font, glyphID)
-        );
-      }
+    this.fontFuncs.setGlyphHAdvanceFunc((font, glyphID) =>
+      this._getHAdvanceFunc(font, glyphID)
+    );
 
-      const subFont = this.font.subFont();
-      subFont.setFuncs(this.fontFuncs);
-      this.font.destroy();
-      this.font = subFont;
-    }
+    const subFont = this.font.subFont();
+    subFont.setFuncs(this.fontFuncs);
+    this.font.destroy();
+    this.font = subFont;
   }
 
   shape(text, variations, features, glyphObjects) {
@@ -105,8 +99,8 @@ class HBShaper {
 }
 
 class DumbShaper {
-  constructor(options) {
-    this._nominalGlyphFunc = options.nominalGlyphFunc;
+  constructor(nominalGlyphFunc) {
+    this._nominalGlyphFunc = nominalGlyphFunc;
   }
 
   shape(text, variations, features, glyphObjects) {
