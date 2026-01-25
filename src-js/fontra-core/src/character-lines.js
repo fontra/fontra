@@ -1,5 +1,5 @@
 import { getCodePointFromGlyphName, getSuggestedGlyphName } from "./glyph-data.js";
-import { splitGlyphNameExtension } from "./utils.js";
+import { assert, splitGlyphNameExtension } from "./utils.js";
 
 export function characterLinesFromString(
   string,
@@ -45,10 +45,16 @@ function characterLineFromSingleLineString(
         isPlaceholder = true;
       } else {
         // /glyphname
-        // Find the first character that is a slash or a space as the end of the glyph name
+        // Find the first character that is a slash or a space as the end of the glyph name,
+        // or else the glyph name goes until the end of the string
         const result = parseGlyphName(string, i);
         glyphName = result.glyphName;
         i = result.i;
+
+        if (!glyphName) {
+          // Incomplete glyph name at the end of the input string. Ignore.
+          continue;
+        }
 
         character = characterFromGlyphName(glyphName, characterMap, glyphMap);
         if (glyphName && !character && !glyphMap[glyphName]) {
@@ -65,17 +71,10 @@ function characterLineFromSingleLineString(
       }
       character = String.fromCodePoint(codePoint);
     }
-    if (glyphName !== "") {
-      let isUndefined = false;
-      if (!glyphName && character) {
-        glyphName = getSuggestedGlyphName(character.codePointAt(0));
-        isUndefined = true;
-      } else if (glyphName) {
-        isUndefined = !(glyphName in glyphMap);
-      }
 
-      characterInfo.push({ character, glyphName, isUndefined, isPlaceholder });
-    }
+    // glyphName may be undefined *or* a non-empty string.
+    assert(glyphName !== "");
+    characterInfo.push({ character, glyphName, isPlaceholder });
   }
 
   return characterInfo;
