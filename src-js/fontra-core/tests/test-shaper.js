@@ -8,7 +8,7 @@ import { parametrize } from "./test-support.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-import { PUADispenser, applyKerning, getShaper } from "@fontra/core/shaper.js";
+import { applyKerning, getShaper } from "@fontra/core/shaper.js";
 
 describe("shaper tests", () => {
   const testFontPath = join(
@@ -137,10 +137,10 @@ describe("shaper tests", () => {
   ];
 
   parametrize(
-    "test PUADispenser",
+    "test getPUACharacter",
     puaTestData,
     ({ inputGlyphNames, expectedCodePoints, nominalGlyphFunc }) => {
-      const m = new PUADispenser(nominalGlyphFunc);
+      const m = getShaper(null, nominalGlyphFunc);
       const codePoints = inputGlyphNames.map((glyphName) =>
         m.getPUACharacter(glyphName).codePointAt(0)
       );
