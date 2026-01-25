@@ -248,7 +248,7 @@ export class SceneController {
 
     // Set up convenience property "selectedGlyphName"
     this.sceneSettingsController.addKeyListener(
-      ["selectedGlyph", "characterLines"],
+      ["selectedGlyph", "positionedLines"],
       (event) => {
         this.sceneSettings.selectedGlyphName = this.getSelectedGlyphName();
         if (this.sceneSettings.selectedGlyphName) {
