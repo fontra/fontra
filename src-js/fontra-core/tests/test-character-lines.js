@@ -59,7 +59,7 @@ describe("character-lines", () => {
         [
           { character: "A", glyphName: "A" },
           { character: undefined, glyphName: "A.alt" },
-          { character: undefined, glyphName: "B.alt", isUndefined: true },
+          { character: undefined, glyphName: "B.alt" },
           { character: "C", glyphName: "C" },
           { character: " ", glyphName: "space" },
           { character: "/", glyphName: "slash" },
@@ -80,7 +80,7 @@ describe("character-lines", () => {
 
   const placeholderGlyphName = "Q";
 
-  const defaultGlyphInfo = { isPlaceholder: false, isUndefined: false };
+  const defaultGlyphInfo = { isPlaceholder: false };
 
   parametrize(
     "characterLinesFromString tests",
