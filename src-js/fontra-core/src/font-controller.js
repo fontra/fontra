@@ -1036,7 +1036,8 @@ export class FontController {
 
   async _getShaper() {
     // fetch font data
-    return getShaper(/* ... */);
+    const characterMap = this.characterMap;
+    return getShaper(null, (codePoint) => characterMap[codePoint]);
   }
 
   get defaultSourceLocation() {
