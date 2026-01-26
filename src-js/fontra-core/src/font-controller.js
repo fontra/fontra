@@ -1037,7 +1037,9 @@ export class FontController {
   async _getShaper() {
     // fetch font data
     const characterMap = this.characterMap;
-    return getShaper(null, (codePoint) => characterMap[codePoint]);
+    const glyphOrder = Object.keys(this.glyphMap);
+    glyphOrder.sort();
+    return getShaper(null, (codePoint) => characterMap[codePoint], glyphOrder);
   }
 
   get defaultSourceLocation() {
