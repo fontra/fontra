@@ -82,7 +82,7 @@ class HBShaper extends ShaperBase {
     buffer.destroy();
 
     for (const glyph of glyphs) {
-      glyph.gn = this.font.glyphName(glyph.g);
+      glyph.gn = this.glyphOrder[glyph.g];
     }
 
     return glyphs;
