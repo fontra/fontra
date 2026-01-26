@@ -21,7 +21,7 @@ describe("shaper tests", () => {
     "MutatorSans.ttf"
   );
 
-  const testInputCopePoints = [..."😻VABCÄS"].map((c) => c.codePointAt(0));
+  const testInputCodePoints = [..."😻VABCÄS"].map((c) => c.codePointAt(0));
 
   const expectedGlyphs = [
     { g: 0, cl: 0, ax: 500, ay: 0, dx: 0, dy: 0, flags: 0, gn: ".notdef" },
@@ -51,6 +51,60 @@ describe("shaper tests", () => {
     },
   ];
 
+  const glyphOrder = [
+    ".notdef",
+    "A",
+    "Aacute",
+    "Adieresis",
+    "B",
+    "C",
+    "D",
+    "E",
+    "F",
+    "G",
+    "H",
+    "I",
+    "J",
+    "K",
+    "L",
+    "M",
+    "N",
+    "O",
+    "P",
+    "Q",
+    "R",
+    "S",
+    "T",
+    "U",
+    "V",
+    "W",
+    "X",
+    "Y",
+    "Z",
+    "S.closed",
+    "I.narrow",
+    "J.narrow",
+    "quotesinglbase",
+    "quotedblbase",
+    "quotedblleft",
+    "quotedblright",
+    "comma",
+    "period",
+    "colon",
+    "semicolon",
+    "arrowleft",
+    "arrowup",
+    "arrowright",
+    "arrowdown",
+    "dot",
+    "dieresis",
+    "acute",
+    "space",
+    "IJ",
+    "em",
+    "tenttest",
+  ];
+
   const characterMap = {
     [ord("A")]: "A",
     [ord("Ä")]: "Adieresis",
@@ -74,11 +128,11 @@ describe("shaper tests", () => {
   const kerningData = { V: { A: -100 } };
   const kerning = { getGlyphPairValue: (g1, g2) => kerningData[g1]?.[g2] ?? 0 };
 
-  it("test HBShaper", async () => {
+  it("test HBShaper", () => {
     const fontData = new Uint8Array(fs.readFileSync(testFontPath));
-    const shaper = await getShaper(fontData, nominalGlyphFunc);
+    const shaper = getShaper(fontData, nominalGlyphFunc, glyphOrder);
     const glyphs = shaper.shape(
-      testInputCopePoints,
+      testInputCodePoints,
       { wght: 0, wdth: 0 },
       "-kern,-rvrn",
       glyphObjects
@@ -88,17 +142,17 @@ describe("shaper tests", () => {
     expect(glyphs).to.deep.equal(expectedGlyphs);
   });
 
-  it("test HBShaper getFeatureTags", async () => {
+  it("test HBShaper getFeatureTags", () => {
     const fontData = new Uint8Array(fs.readFileSync(testFontPath));
-    const shaper = await getShaper(fontData, nominalGlyphFunc);
+    const shaper = getShaper(fontData, nominalGlyphFunc, glyphOrder);
     expect(shaper.getFeatureTags("GSUB")).to.deep.equal(["rvrn"]);
     expect(shaper.getFeatureTags("GPOS")).to.deep.equal(["kern"]);
   });
 
-  it("test DumbShaper", async () => {
-    const shaper = await getShaper(null, nominalGlyphFunc);
+  it("test DumbShaper", () => {
+    const shaper = getShaper(null, nominalGlyphFunc, glyphOrder);
     const glyphs = shaper.shape(
-      testInputCopePoints,
+      testInputCodePoints,
       { wght: 0, wdth: 0 },
       "kern",
       glyphObjects
@@ -108,54 +162,24 @@ describe("shaper tests", () => {
     expect(removeGIDs(glyphs)).to.deep.equal(removeGIDs(expectedGlyphs));
   });
 
-  const puaTestData = [
-    {
-      inputGlyphNames: ["a", "b", "c"],
-      expectedCodePoints: [0xe000, 0xe001, 0xe002],
-      nominalGlyphFunc: (codePoint) => (codePoint < 0x100 ? "x" : null),
-    },
-    {
-      inputGlyphNames: ["a", "b", "a"],
-      expectedCodePoints: [0xe000, 0xe001, 0xe000],
-      nominalGlyphFunc: (codePoint) => (codePoint < 0x100 ? "x" : null),
-    },
-    {
-      inputGlyphNames: ["a", "b", "a"],
-      expectedCodePoints: [0xf0000, 0xf0001, 0xf0000],
-      nominalGlyphFunc: (codePoint) => (codePoint < 0xf0000 ? "x" : null),
-    },
-    {
-      inputGlyphNames: ["a", "b", "a"],
-      expectedCodePoints: [0xf5000, 0xf5001, 0xf5000],
-      nominalGlyphFunc: (codePoint) => (codePoint < 0xf5000 ? "x" : null),
-    },
-    {
-      inputGlyphNames: ["a", "b", "a"],
-      expectedCodePoints: [0x100500, 0x100501, 0x100500],
-      nominalGlyphFunc: (codePoint) => (codePoint < 0x100500 ? "x" : null),
-    },
-  ];
+  it("test getGlyphNameCodePoint", () => {
+    const inputGlyphNames = ["A", "B", "C"];
+    const expectedCodePoints = [0x110001, 0x110004, 0x110005];
 
-  parametrize(
-    "test PUA dispenser",
-    puaTestData,
-    ({ inputGlyphNames, expectedCodePoints, nominalGlyphFunc }) => {
-      const m = getShaper(null, nominalGlyphFunc);
-      const codePoints = inputGlyphNames.map((glyphName) =>
-        m.getPUACharacter(glyphName).codePointAt(0)
-      );
-      expect(codePoints).to.deep.equal(expectedCodePoints);
+    const shaper = getShaper(null, nominalGlyphFunc, glyphOrder);
 
-      const glyphNames = codePoints.map((codePoint) => m.nominalGlyph(codePoint));
-      expect(glyphNames).to.deep.equal(inputGlyphNames);
+    const codePoints = inputGlyphNames.map((glyphName) =>
+      shaper.getGlyphNameCodePoint(glyphName)
+    );
+    expect(codePoints).to.deep.equal(expectedCodePoints);
 
-      const glyphNames2 = codePoints.map((codePoint) => m.getPUAGlyphName(codePoint));
-      expect(glyphNames2).to.deep.equal(inputGlyphNames);
+    const glyphNames = codePoints.map((codePoint) => shaper.nominalGlyph(codePoint));
+    expect(glyphNames).to.deep.equal(inputGlyphNames);
 
-      expect(m.getPUAGlyphName(65)).to.equal(undefined);
-      expect(m.nominalGlyph(65)).to.not.equal(undefined);
-    }
-  );
+    const glyphs = shaper.shape(codePoints, null, null, glyphObjects);
+    const glyphNames2 = glyphs.map((g) => g.gn);
+    expect(glyphNames2).to.deep.equal(inputGlyphNames);
+  });
 });
 
 function removeGIDs(glyphs) {

@@ -1,83 +1,46 @@
 import hbPromise from "harfbuzzjs";
-import { enumerate, range } from "./utils.js";
+import { assert, enumerate, range } from "./utils.js";
 
 const hb = await hbPromise;
 
-export function getShaper(fontData, nominalGlyphFunc) {
+export function getShaper(fontData, nominalGlyphFunc, glyphOrder) {
   let shaper;
 
   if (fontData) {
-    shaper = new HBShaper(fontData, nominalGlyphFunc);
+    shaper = new HBShaper(fontData, nominalGlyphFunc, glyphOrder);
   } else {
-    return new DumbShaper(nominalGlyphFunc);
+    return new DumbShaper(nominalGlyphFunc, glyphOrder);
   }
 
   return shaper;
 }
 
-const PUA_BLOCKS = [
-  [0xe000, 0xf8ff],
-  [0xf0000, 0xffffd],
-  [0x100000, 0x10fffd],
-];
+const MAX_UNICODE = 0x0110000;
 
 class ShaperBase {
-  // This base class helps to assign arbitrary (but available) PUA code points
-  // for unencoded glyphs, so we can use them in text we can feed the shaper.
-  // This is because harfbuzzjs does not yet support hb_buffer_add_codepoints.
-  // TODO: perhaps it is better to add support for hb_buffer_add_codepoints?
-
-  constructor(nominalGlyphFunc) {
+  constructor(nominalGlyphFunc, glyphOrder) {
     this._baseNominalGlyphFunc = nominalGlyphFunc;
-    this.puaCharacterMap = {};
-    this.puaGlyphMapMap = {};
+    this.glyphOrder = glyphOrder;
+    this.glyphNameToID = {};
+    for (const [i, glyphName] of enumerate(glyphOrder)) {
+      this.glyphNameToID[glyphName] = i;
+    }
     this.nominalGlyph = (codePoint) =>
-      this._baseNominalGlyphFunc(codePoint) ?? this.puaCharacterMap[codePoint];
-    this._previousPUACodePoint = null;
+      codePoint >= MAX_UNICODE
+        ? this.glyphOrder[codePoint - MAX_UNICODE]
+        : this._baseNominalGlyphFunc(codePoint);
   }
 
-  getPUAGlyphName(codePoint) {
-    return this.puaCharacterMap[codePoint];
-  }
-
-  getPUACharacter(glyphName) {
-    // Return a PUA character
-
-    if (glyphName in this.puaGlyphMapMap) {
-      return this.puaGlyphMapMap[glyphName];
-    }
-
-    let codePoint = this._previousPUACodePoint ? this._previousPUACodePoint + 1 : 0;
-
-    for (const [low, high] of PUA_BLOCKS) {
-      if (codePoint < low) {
-        codePoint = low;
-      } else if (codePoint < low || codePoint > high) {
-        continue;
-      }
-
-      while (this._baseNominalGlyphFunc(codePoint)) {
-        codePoint++;
-        if (codePoint > high) {
-          continue;
-        }
-      }
-
-      this._previousPUACodePoint = codePoint;
-      this.puaCharacterMap[codePoint] = glyphName;
-
-      const character = String.fromCodePoint(codePoint);
-      this.puaGlyphMapMap[glyphName] = character;
-      return character;
-    }
-
-    throw new Error("unable to find free PUA code point");
+  getGlyphNameCodePoint(glyphName) {
+    const glyphID = this.glyphNameToID[glyphName];
+    assert(glyphID != undefined);
+    return glyphID + MAX_UNICODE;
   }
 }
 
 class HBShaper extends ShaperBase {
-  constructor(fontData, nominalGlyphFunc) {
-    super(nominalGlyphFunc);
+  constructor(fontData, nominalGlyphFunc, glyphOrder) {
+    super(nominalGlyphFunc, glyphOrder);
     this.blob = hb.createBlob(fontData);
     this.face = hb.createFace(this.blob, 0);
     this.font = hb.createFont(this.face);
@@ -159,8 +122,8 @@ class HBShaper extends ShaperBase {
 }
 
 class DumbShaper extends ShaperBase {
-  constructor(nominalGlyphFunc) {
-    super(nominalGlyphFunc);
+  constructor(nominalGlyphFunc, glyphOrder) {
+    super(nominalGlyphFunc, glyphOrder);
   }
 
   shape(codePoints, variations, features, glyphObjects) {
