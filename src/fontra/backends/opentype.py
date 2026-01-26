@@ -34,7 +34,7 @@ from .base import ReadableBaseBackend
 from .filewatcher import Change
 from .watchable import WatchableBackend
 
-shaperFontTables = {"head", "GDEF", "GSUB", "GPOS", "BASE"}
+shaperFontTables = {"fvar", "head", "name", "GDEF", "GSUB", "GPOS", "BASE", "post"}
 
 
 class OTFBackend(WatchableBackend, ReadableBaseBackend):
@@ -210,9 +210,10 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
             if tableTag not in shaperFontTables:
                 del font[tableTag]
 
-        f = io.BytesIO()
-        font.save(f)
-        data = f.getvalue()
+        with io.BytesIO() as f:
+            font.save(f)
+            data = f.getvalue()
+
         return ShaperFontData(
             glyphOrderSorting=ShaperFontGlyphOrderSorting.FROMGLYPHMAP, data=data
         )
