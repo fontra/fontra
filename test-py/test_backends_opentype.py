@@ -199,7 +199,16 @@ async def test_getShaperFontData_ttf():
     assert shaperFontData is not None
     f = io.BytesIO(shaperFontData.data)
     font = TTFont(f)
-    assert sorted(font.keys()) == ["GDEF", "GPOS", "GSUB", "GlyphOrder", "head"]
+    assert sorted(font.keys()) == [
+        "GDEF",
+        "GPOS",
+        "GSUB",
+        "GlyphOrder",
+        "fvar",
+        "head",
+        "name",
+        "post",
+    ]
 
 
 async def test_getShaperFontData_ttx():
@@ -209,4 +218,13 @@ async def test_getShaperFontData_ttx():
     assert shaperFontData is not None
     f = io.BytesIO(shaperFontData.data)
     font = TTFont(f)
-    assert sorted(font.keys()) == ["GDEF", "GPOS", "GSUB", "GlyphOrder", "head"]
+    assert sorted(font.keys()) == [
+        "GDEF",
+        "GPOS",
+        "GSUB",
+        "GlyphOrder",
+        "fvar",
+        "head",
+        "name",
+        "post",
+    ]
