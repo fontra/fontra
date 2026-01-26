@@ -1,5 +1,5 @@
 import hbPromise from "harfbuzzjs";
-import { range } from "./utils.js";
+import { enumerate, range } from "./utils.js";
 
 const hb = await hbPromise;
 
@@ -98,9 +98,9 @@ class HBShaper extends ShaperBase {
     this.font = subFont;
   }
 
-  shape(text, variations, features, glyphObjects) {
+  shape(codePoints, variations, features, glyphObjects) {
     const buffer = hb.createBuffer();
-    buffer.addText(text);
+    buffer.addCodePoints(codePoints);
     buffer.guessSegmentProperties(); // Set script, language and direction
 
     this.font.setVariations(variations || {});
@@ -163,12 +163,10 @@ class DumbShaper extends ShaperBase {
     super(nominalGlyphFunc);
   }
 
-  shape(text, variations, features, glyphObjects) {
+  shape(codePoints, variations, features, glyphObjects) {
     const glyphs = [];
 
-    for (let i = 0; i < text.length; i++) {
-      const codePoint = text.codePointAt(i);
-
+    for (const [i, codePoint] of enumerate(codePoints)) {
       const glyphName = this.nominalGlyph(codePoint);
 
       const xAdvance = glyphObjects[glyphName]?.xAdvance ?? 500;
@@ -183,11 +181,6 @@ class DumbShaper extends ShaperBase {
         dy: 0,
         flags: 0,
       });
-
-      if (codePoint >= 0x10000) {
-        // UTF-16: this code point uses two two-byte chars
-        i++;
-      }
     }
 
     return glyphs;

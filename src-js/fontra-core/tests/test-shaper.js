@@ -21,17 +21,17 @@ describe("shaper tests", () => {
     "MutatorSans.ttf"
   );
 
-  const testInputString = "😻VABCÄS";
+  const testInputCopePoints = [..."😻VABCÄS"].map((c) => c.codePointAt(0));
 
   const expectedGlyphs = [
     { g: 0, cl: 0, ax: 500, ay: 0, dx: 0, dy: 0, flags: 0, gn: ".notdef" },
-    { g: 24, cl: 2, ax: 301, ay: 0, dx: 0, dy: 0, flags: 0, gn: "V" },
-    { g: 1, cl: 3, ax: 396, ay: 0, dx: 0, dy: 0, flags: 0, gn: "A", flags: 1 },
-    { g: 4, cl: 4, ax: 443, ay: 0, dx: 0, dy: 0, flags: 0, gn: "B" },
-    { g: 5, cl: 5, ax: 499, ay: 0, dx: 0, dy: 0, flags: 0, gn: "C" },
+    { g: 24, cl: 1, ax: 301, ay: 0, dx: 0, dy: 0, flags: 0, gn: "V" },
+    { g: 1, cl: 2, ax: 396, ay: 0, dx: 0, dy: 0, flags: 0, gn: "A", flags: 1 },
+    { g: 4, cl: 3, ax: 443, ay: 0, dx: 0, dy: 0, flags: 0, gn: "B" },
+    { g: 5, cl: 4, ax: 499, ay: 0, dx: 0, dy: 0, flags: 0, gn: "C" },
     {
       g: 3,
-      cl: 6,
+      cl: 5,
       ax: 396,
       ay: 0,
       dx: 0,
@@ -41,7 +41,7 @@ describe("shaper tests", () => {
     },
     {
       g: 21,
-      cl: 7,
+      cl: 6,
       ax: 393,
       ay: 0,
       dx: 0,
@@ -78,7 +78,7 @@ describe("shaper tests", () => {
     const fontData = new Uint8Array(fs.readFileSync(testFontPath));
     const shaper = await getShaper(fontData, nominalGlyphFunc);
     const glyphs = shaper.shape(
-      testInputString,
+      testInputCopePoints,
       { wght: 0, wdth: 0 },
       "-kern,-rvrn",
       glyphObjects
@@ -98,7 +98,7 @@ describe("shaper tests", () => {
   it("test DumbShaper", async () => {
     const shaper = await getShaper(null, nominalGlyphFunc);
     const glyphs = shaper.shape(
-      testInputString,
+      testInputCopePoints,
       { wght: 0, wdth: 0 },
       "kern",
       glyphObjects
