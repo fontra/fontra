@@ -309,6 +309,16 @@ class FontHandler:
             type=imageData.type, data=base64.b64encode(imageData.data).decode("ascii")
         )
 
+    @remoteMethod
+    async def getShaperFontData(self, *, connection=None) -> dict | None:
+        shaperFontData = await self.backend.getShaperFontData()
+        if shaperFontData is None:
+            return None
+        return dict(
+            type=shaperFontData.glyphOrderSorting,
+            data=base64.b64encode(shaperFontData.data).decode("ascii"),
+        )
+
     def _getClientData(self, connection, key, default=None):
         return self.clientData[connection.clientUUID].get(key, default)
 
