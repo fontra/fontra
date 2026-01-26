@@ -216,8 +216,8 @@ class BackgroundImage:
     customData: CustomData = field(default_factory=dict)
 
 
-# The ImageType and ImageData classes aren't part of the Font data structure,
-# but are used in the backend protocol.
+# The ImageType, ImageData, ShaperFontGlyphOrderSorting and ShaperFontData classes aren't part of
+# the Font data structure, but are used in the backend protocol.
 
 
 class ImageType(str, Enum):
@@ -229,6 +229,18 @@ class ImageType(str, Enum):
 @dataclass(kw_only=True)
 class ImageData:
     type: ImageType
+    data: bytes
+
+
+class ShaperFontGlyphOrderSorting(str, Enum):
+    # TODO: use StrEnum once we drop support for Python 3.10
+    FROMGLYPHMAP = "from-glyph-map"
+    SORTING = "sorted"
+
+
+@dataclass(kw_only=True)
+class ShaperFontData:
+    glyphOrderSorting: ShaperFontGlyphOrderSorting
     data: bytes
 
 

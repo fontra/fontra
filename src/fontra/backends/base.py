@@ -6,6 +6,7 @@ from ..core.classes import (
     FontSource,
     Kerning,
     OpenTypeFeatures,
+    ShaperFontData,
     VariableGlyph,
 )
 
@@ -41,3 +42,6 @@ class ReadableBaseBackend:
 
     async def getUnitsPerEm(self) -> int:
         return 1000
+
+    async def getShaperFontData(self) -> ShaperFontData | None:
+        return None
