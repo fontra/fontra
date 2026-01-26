@@ -419,13 +419,17 @@ export class SceneModel {
       cancelSignal
     );
 
+    const features = kerningInstance ? "-kern" : ""; // TODO from features UI
+
     for (const [lineIndex, characterLine] of enumerate(characterLines)) {
       const positionedLine = await lineSetter.setLine(
         { x: 0, y },
         characterLine,
         lineIndex == selectedLineIndex ? selectedGlyphIndex : undefined,
         selectedGlyphIsEditing,
-        editLayerName
+        editLayerName,
+        this.sceneSettings.fontLocationSourceMapped,
+        features
       );
 
       if (!positionedLine) {
@@ -1128,7 +1132,9 @@ class LineSetter {
     characterLine,
     selectedGlyphIndex,
     selectedGlyphIsEditing,
-    editLayerName
+    editLayerName,
+    variations,
+    features
   ) {
     const fontController = this.fontController;
     const glyphs = [];
@@ -1141,7 +1147,12 @@ class LineSetter {
         : this.shaper.getGlyphNameCodePoint(characterInfo.glyphName)
     );
 
-    let shapedGlyphs = this.shaper.shape(codePoints, null, null, this.glyphInstances);
+    let shapedGlyphs = this.shaper.shape(
+      codePoints,
+      variations,
+      features,
+      this.glyphInstances
+    );
     let needsReshape = false;
     for (const glyphInfo of shapedGlyphs) {
       if (
@@ -1156,7 +1167,12 @@ class LineSetter {
     }
 
     if (needsReshape) {
-      shapedGlyphs = this.shaper.shape(codePoints, null, null, this.glyphInstances);
+      shapedGlyphs = this.shaper.shape(
+        codePoints,
+        variations,
+        features,
+        this.glyphInstances
+      );
     }
 
     if (this.kerningPairFunc) {
@@ -1192,8 +1208,9 @@ class LineSetter {
         glyphInstance = fontController.getDummyGlyphInstanceController(glyphName);
       }
 
+      // TODO: figure out the true meaning of the .flags field
       const kernValue =
-        glyphInfo.flags & 0x01
+        glyphIndex && glyphInfo.flags & 0x01
           ? shapedGlyphs[glyphIndex - 1].ax - glyphs.at(-1).glyph.xAdvance
           : 0;
 
