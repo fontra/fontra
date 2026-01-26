@@ -1,3 +1,4 @@
+import { getGlyphInfoFromCodePoint } from "@fontra/core/glyph-data.js";
 import * as html from "@fontra/core/html-utils.js";
 import { labeledCheckbox } from "@fontra/core/ui-utils.js";
 import { findNestedActiveElement } from "@fontra/core/utils.js";
@@ -189,7 +190,10 @@ export default class TextEntryPanel extends Panel {
 
     this.textSettingsController.addKeyListener(
       "text",
-      (event) => this.fixTextEntryHeight(),
+      (event) => {
+        this.adjustTextEntryAlignment();
+        this.fixTextEntryHeight();
+      },
       false
     );
   }
@@ -198,6 +202,17 @@ export default class TextEntryPanel extends Panel {
     // This adapts the text entry height to its content
     this.textEntryElement.style.height = "auto";
     this.textEntryElement.style.height = this.textEntryElement.scrollHeight + 14 + "px";
+  }
+
+  adjustTextEntryAlignment() {
+    if (!this.textEntryElement.value) {
+      return;
+    }
+    // If the first character is RTL, do align right
+    const codePoint = this.textEntryElement.value.codePointAt(0);
+    const info = getGlyphInfoFromCodePoint(codePoint);
+    const align = info.direction == "RTL" ? "end" : "start";
+    this.textEntryElement.style = `text-align: ${align}`;
   }
 
   setupIntersectionObserver() {
