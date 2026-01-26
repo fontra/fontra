@@ -1183,6 +1183,11 @@ class LineSetter {
         ? await this.getGlyphInstanceFunc(glyphName, thisGlyphEditLayerName)
         : this.glyphInstances[glyphName];
 
+      const xAdvanceLayerDifference = thisGlyphEditLayerName
+        ? glyphInstance.xAdvance - this.glyphInstances[glyphName].xAdvance
+        : 0;
+      const yAdvanceLayerDifference = 0;
+
       if (this.cancelSignal.shouldCancel) {
         return;
       }
@@ -1213,8 +1218,8 @@ class LineSetter {
         isEmpty: !glyphInstance.controlBounds,
       });
 
-      x += glyphInfo.ax;
-      y += glyphInfo.ay;
+      x += glyphInfo.ax + xAdvanceLayerDifference;
+      y += glyphInfo.ay + yAdvanceLayerDifference;
     }
 
     let offset = 0;
