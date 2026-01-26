@@ -343,6 +343,21 @@ export class FontController {
     });
   }
 
+  async getShaperFontData() {
+    const shaperFontData = await this.font.getShaperFontData();
+    if (!shaperFontData) {
+      return {};
+    }
+    const blob = await (
+      await fetch(`data:font/opentype;base64,${shaperFontData.data}`)
+    ).blob();
+
+    return {
+      glyphOrderSorting: shaperFontData.glyphOrderSorting,
+      fontData: await blob.arrayBuffer(),
+    };
+  }
+
   getCachedGlyphNames() {
     return this._glyphsPromiseCache.keys();
   }
@@ -1035,11 +1050,13 @@ export class FontController {
   }
 
   async _getShaper() {
-    // fetch font data
+    const { glyphOrderSorting, fontData } = await this.getShaperFontData();
     const characterMap = this.characterMap;
     const glyphOrder = Object.keys(this.glyphMap);
-    glyphOrder.sort();
-    return getShaper(null, (codePoint) => characterMap[codePoint], glyphOrder);
+    if (glyphOrderSorting == "sorted") {
+      glyphOrder.sort();
+    }
+    return getShaper(fontData, (codePoint) => characterMap[codePoint], glyphOrder);
   }
 
   get defaultSourceLocation() {
