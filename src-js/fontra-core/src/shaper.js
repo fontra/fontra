@@ -15,7 +15,7 @@ export function getShaper(fontData, nominalGlyphFunc, glyphOrder) {
   return shaper;
 }
 
-const MAX_UNICODE = 0x0110000;
+export const MAX_UNICODE = 0x0110000;
 
 class ShaperBase {
   constructor(nominalGlyphFunc, glyphOrder) {
@@ -32,8 +32,12 @@ class ShaperBase {
   }
 
   getGlyphNameCodePoint(glyphName) {
-    const glyphID = this.glyphNameToID[glyphName];
-    assert(glyphID != undefined);
+    let glyphID = this.glyphNameToID[glyphName];
+    if (glyphID === undefined) {
+      glyphID = this.glyphOrder.length;
+      this.glyphOrder.push(glyphName);
+      this.glyphNameToID[glyphName] = glyphID;
+    }
     return glyphID + MAX_UNICODE;
   }
 }
