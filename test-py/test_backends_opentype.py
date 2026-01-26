@@ -1,4 +1,5 @@
 import asyncio
+import io
 import pathlib
 import shutil
 from contextlib import aclosing
@@ -189,3 +190,23 @@ async def test_readTTX():
     font = getFileSystemBackend(path)
     glyph = await font.getGlyph("A")
     assert isinstance(glyph, VariableGlyph)
+
+
+async def test_getShaperFontData_ttf():
+    path = dataDir / "mutatorsans" / "MutatorSans.ttf"
+    font = getFileSystemBackend(path)
+    shaperFontData = await font.getShaperFontData()
+    assert shaperFontData is not None
+    f = io.BytesIO(shaperFontData.data)
+    font = TTFont(f)
+    assert sorted(font.keys()) == ["GDEF", "GPOS", "GSUB", "GlyphOrder", "head"]
+
+
+async def test_getShaperFontData_ttx():
+    path = dataDir / "mutatorsans" / "MutatorSans.subset.ttx"
+    font = getFileSystemBackend(path)
+    shaperFontData = await font.getShaperFontData()
+    assert shaperFontData is not None
+    f = io.BytesIO(shaperFontData.data)
+    font = TTFont(f)
+    assert sorted(font.keys()) == ["GDEF", "GPOS", "GSUB", "GlyphOrder", "head"]
