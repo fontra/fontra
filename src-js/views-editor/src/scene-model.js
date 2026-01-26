@@ -17,7 +17,7 @@ import {
   unionRect,
 } from "@fontra/core/rectangle.js";
 import { difference, isEqualSet, union, updateSet } from "@fontra/core/set-ops.js";
-import { applyKerning } from "@fontra/core/shaper.js";
+import { MAX_UNICODE, applyKerning } from "@fontra/core/shaper.js";
 import { decomposedToTransform } from "@fontra/core/transform.js";
 import {
   consolidateCalls,
@@ -1135,15 +1135,13 @@ class LineSetter {
 
     let { x, y } = origin;
 
-    const text = characterLine
-      .map(
-        (characterInfo) =>
-          characterInfo.character ??
-          this.shaper.getPUACharacter(characterInfo.glyphName)
-      )
-      .join("");
+    const codePoints = characterLine.map((characterInfo) =>
+      characterInfo.character
+        ? characterInfo.character.codePointAt(0)
+        : this.shaper.getGlyphNameCodePoint(characterInfo.glyphName)
+    );
 
-    let shapedGlyphs = this.shaper.shape(text, null, null, this.glyphInstances);
+    let shapedGlyphs = this.shaper.shape(codePoints, null, null, this.glyphInstances);
     let needsReshape = false;
     for (const glyphInfo of shapedGlyphs) {
       if (
@@ -1158,7 +1156,7 @@ class LineSetter {
     }
 
     if (needsReshape) {
-      shapedGlyphs = this.shaper.shape(text, null, null, this.glyphInstances);
+      shapedGlyphs = this.shaper.shape(codePoints, null, null, this.glyphInstances);
     }
 
     if (this.kerningPairFunc) {
@@ -1166,10 +1164,7 @@ class LineSetter {
     }
 
     for (const [glyphIndex, glyphInfo] of enumerate(shapedGlyphs)) {
-      let codePoint = text.codePointAt(glyphInfo.cl);
-      if (this.shaper.getPUAGlyphName(codePoint)) {
-        codePoint = undefined;
-      }
+      const codePoint = codePoints[glyphInfo.cl];
       const glyphName =
         glyphInfo.g != 0 ? glyphInfo.gn : getSuggestedGlyphName(codePoint);
 
@@ -1208,10 +1203,12 @@ class LineSetter {
         kernValue,
         glyph: glyphInstance,
         varGlyph,
-        glyphName: isUndefined
-          ? this.shaper.getPUAGlyphName(codePoint) ?? glyphName
-          : glyphName,
-        character: isUndefined && codePoint ? String.fromCodePoint(codePoint) : null,
+        glyphName,
+        character:
+          isUndefined && codePoint && codePoint < MAX_UNICODE
+            ? String.fromCodePoint(codePoint)
+            : null,
+        cluster: glyphInfo.cl,
         isUndefined,
         isSelected: isSelectedGlyph,
         isEditing: !!(isSelectedGlyph && selectedGlyphIsEditing),
