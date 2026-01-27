@@ -1,5 +1,6 @@
 import { getGlyphInfoFromCodePoint } from "@fontra/core/glyph-data.js";
 import * as html from "@fontra/core/html-utils.js";
+import { features } from "@fontra/core/opentype-tags.js";
 import { labeledCheckbox } from "@fontra/core/ui-utils.js";
 import { findNestedActiveElement } from "@fontra/core/utils.js";
 import { Accordion } from "@fontra/web-components/ui-accordion.js";
@@ -123,6 +124,8 @@ export default class TextEntryPanel extends Panel {
       }
 
       .feature-tag-label {
+        color: var(--text-color);
+        text-decoration-color: lightgray;
         cursor: pointer;
       }
     `);
@@ -219,8 +222,9 @@ export default class TextEntryPanel extends Panel {
     gsubFeaturesElement.innerHTML = "";
     gposFeaturesElement.innerHTML = "";
 
-    function labelForFeatureTag(featureTag) {
-      return `label for ${featureTag}`;
+    function labelAndURLForFeatureTag(featureTag) {
+      const [label, url] = features[featureTag] ?? ["", null];
+      return { label, url };
     }
 
     gsubFeatures.forEach((featureTag) => {
@@ -228,7 +232,7 @@ export default class TextEntryPanel extends Panel {
         ...featureTagButton(
           this.textSettingsController,
           featureTag,
-          labelForFeatureTag(featureTag)
+          labelAndURLForFeatureTag(featureTag)
         )
       );
     });
@@ -238,7 +242,7 @@ export default class TextEntryPanel extends Panel {
         ...featureTagButton(
           this.textSettingsController,
           featureTag,
-          labelForFeatureTag(featureTag)
+          labelAndURLForFeatureTag(featureTag)
         )
       );
     });
@@ -370,7 +374,8 @@ export default class TextEntryPanel extends Panel {
   }
 }
 
-function featureTagButton(controller, featureTag, label, options) {
+function featureTagButton(controller, featureTag, labelAndURL, options) {
+  const { label, url } = labelAndURL;
   const controllerKey = options?.key ?? "features";
   let state = controller.model[controllerKey]?.[featureTag];
   const id = options?.id ?? `features-button-${featureTag}`;
@@ -420,8 +425,8 @@ function featureTagButton(controller, featureTag, label, options) {
     [featureTag]
   );
 
-  const labelElement = html.div(
-    { class: "feature-tag-label", onclick: (event) => buttonElement.click() },
+  const labelElement = (url ? html.a : html.div)(
+    { class: "feature-tag-label", href: url, target: "_blank" },
     [label]
   );
 
