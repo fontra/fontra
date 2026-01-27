@@ -2,6 +2,7 @@ import { getGlyphInfoFromCodePoint } from "@fontra/core/glyph-data.js";
 import * as html from "@fontra/core/html-utils.js";
 import { labeledCheckbox } from "@fontra/core/ui-utils.js";
 import { findNestedActiveElement } from "@fontra/core/utils.js";
+import { Accordion } from "@fontra/web-components/ui-accordion.js";
 import Panel from "./panel.js";
 
 export default class TextEntryPanel extends Panel {
@@ -70,6 +71,10 @@ export default class TextEntryPanel extends Panel {
     this.sceneController = this.editorController.sceneController;
     this.textSettings = this.editorController.sceneSettingsController.model;
 
+    this.textSettingsController.addKeyListener("features", (event) =>
+      this.fontController.getShaper().then((shaper) => this.updateFeatures(shaper))
+    );
+
     this.setupTextEntryElement();
     this.setupTextAlignElement();
     this.setupApplyKerningElement();
@@ -77,6 +82,62 @@ export default class TextEntryPanel extends Panel {
   }
 
   getContentElement() {
+    this.fontController.getShaper().then((shaper) => this.updateFeatures(shaper));
+    this.accordion = new Accordion();
+    this.accordion.appendStyle(`
+      .features-container {
+        display: grid;
+        grid-template-columns: min-content auto;
+        align-items: center;
+        gap: 0.5em;
+      }
+
+      .feature-tag-button {
+        background-color: gray;
+        color: white;
+        padding: 0.25em 1em 0.25em 1em;
+        border-radius: 0.5em;
+        font-family: monospace;
+        font-size: 1.15em;
+        cursor: pointer;
+      }
+
+      .feature-tag-button.on {
+        background-color: green;
+      }
+
+      .feature-tag-button.off {
+        background-color: red;
+      }
+
+      .feature-tag-label {
+        cursor: pointer;
+      }
+    `);
+
+    this.accordion.items = [
+      {
+        id: "gsub-features-accordion-item",
+        label: "Substitution features",
+        open: true,
+        hidden: true,
+        content: html.div(
+          { class: "features-container", id: "gsub-features-contents" },
+          []
+        ),
+      },
+      {
+        id: "gpos-features-accordion-item",
+        label: "Positioning features",
+        open: true,
+        hidden: true,
+        content: html.div(
+          { class: "features-container", id: "gpos-features-contents" },
+          []
+        ),
+      },
+    ];
+
     return html.div(
       {
         class: "panel",
@@ -113,10 +174,65 @@ export default class TextEntryPanel extends Panel {
               ]
             ),
             html.div({ id: "apply-kerning-checkbox" }),
+            this.accordion,
           ]
         ),
       ]
     );
+  }
+
+  get gsubFeaturesItem() {
+    return this.accordion.querySelector("#gsub-features-accordion-item");
+  }
+
+  get gposFeaturesItem() {
+    return this.accordion.querySelector("#gpos-features-accordion-item");
+  }
+
+  get gsubFeaturesElement() {
+    return this.accordion.querySelector("#gsub-features-contents");
+  }
+
+  get gposFeaturesElement() {
+    return this.accordion.querySelector("#gpos-features-contents");
+  }
+
+  updateFeatures(shaper) {
+    const gsubFeatures = shaper.getFeatureTags("GSUB");
+    const gposFeatures = shaper.getFeatureTags("GPOS");
+
+    const gsubFeaturesElement = this.gsubFeaturesElement;
+    const gposFeaturesElement = this.gposFeaturesElement;
+
+    gsubFeaturesElement.innerHTML = "";
+    gposFeaturesElement.innerHTML = "";
+
+    function labelForFeatureTag(featureTag) {
+      return `label for ${featureTag}`;
+    }
+
+    gsubFeatures.forEach((featureTag) => {
+      gsubFeaturesElement.append(
+        ...featureTagButton(
+          this.textSettingsController,
+          featureTag,
+          labelForFeatureTag(featureTag)
+        )
+      );
+    });
+
+    gposFeatures.forEach((featureTag) => {
+      gposFeaturesElement.append(
+        ...featureTagButton(
+          this.textSettingsController,
+          featureTag,
+          labelForFeatureTag(featureTag)
+        )
+      );
+    });
+
+    this.gsubFeaturesItem.hidden = !gsubFeatures.length;
+    this.gposFeaturesItem.hidden = !gposFeatures.length;
   }
 
   updateAlignElement(align) {
@@ -240,6 +356,66 @@ export default class TextEntryPanel extends Panel {
       this.focusTextEntry();
     }
   }
+}
+
+function featureTagButton(controller, featureTag, label, options) {
+  const controllerKey = options?.key ?? "features";
+  let state = controller.model[controllerKey]?.[featureTag];
+  const id = options?.id ?? `features-button-${featureTag}`;
+
+  const updateState = () => {
+    buttonElement.classList.remove("on");
+    buttonElement.classList.remove("off");
+    switch (state) {
+      case undefined:
+        break;
+      case false:
+        buttonElement.classList.add("off");
+        break;
+      default:
+        buttonElement.classList.add("on");
+    }
+  };
+
+  const toggleState = () => {
+    switch (state) {
+      case undefined:
+        state = true;
+        break;
+      case false:
+        state = undefined;
+        break;
+      default:
+        state = false;
+    }
+
+    const features = { ...controller.model[controllerKey] };
+
+    if (state !== undefined) {
+      features[featureTag] = state;
+    } else {
+      delete features[featureTag];
+    }
+
+    controller.model[controllerKey] = features;
+  };
+
+  const buttonElement = html.div(
+    {
+      class: "feature-tag-button",
+      onclick: (event) => toggleState(),
+    },
+    [featureTag]
+  );
+
+  const labelElement = html.div(
+    { class: "feature-tag-label", onclick: (event) => buttonElement.click() },
+    [label]
+  );
+
+  updateState();
+
+  return [buttonElement, labelElement];
 }
 
 customElements.define("panel-text-entry", TextEntryPanel);
