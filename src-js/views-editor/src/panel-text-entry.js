@@ -93,7 +93,7 @@ export default class TextEntryPanel extends Panel {
       }
 
       .feature-tag-button {
-        background-color: gray;
+        background-color: #999;
         color: white;
         padding: 0.25em 1em 0.25em 1em;
         border-radius: 0.5em;
@@ -102,12 +102,24 @@ export default class TextEntryPanel extends Panel {
         cursor: pointer;
       }
 
+      .feature-tag-button:active {
+        background-color: #888;
+      }
+
       .feature-tag-button.on {
-        background-color: green;
+        background-color: #00BB00;
+      }
+
+      .feature-tag-button.on:active {
+        background-color: #009900;
       }
 
       .feature-tag-button.off {
-        background-color: red;
+        background-color: #FF0022;
+      }
+
+      .feature-tag-button.off:active {
+        background-color: #DD0011;
       }
 
       .feature-tag-label {
