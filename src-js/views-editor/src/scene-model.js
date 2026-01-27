@@ -433,7 +433,7 @@ export class SceneModel {
 
     const featuresString = Object.entries(features ?? {})
       .filter(([k, v]) => v != undefined)
-      .map(([k, v]) => (v ? k : `-${k}`))
+      .map(([k, v]) => (v ? (v > 1 ? `${k}=${v}` : k) : `-${k}`))
       .join(",");
 
     for (const [lineIndex, characterLine] of enumerate(characterLines)) {
