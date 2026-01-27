@@ -99,23 +99,7 @@ class HBShaper extends ShaperBase {
   }
 
   getFeatureTags(otTableTag) {
-    const features = new Set();
-    const numScripts = this.face.getTableScriptTags(otTableTag).length;
-
-    for (const scriptIndex of range(numScripts)) {
-      const numLanguages = this.face.getScriptLanguageTags(
-        otTableTag,
-        scriptIndex
-      ).length;
-      const langIdices = [...range(numLanguages), 0xffff];
-      for (const langIndex of [...range(numLanguages), 0xffff]) {
-        this.face
-          .getLanguageFeatureTags(otTableTag, 0, 0xffff)
-          .forEach((tag) => features.add(tag));
-      }
-    }
-
-    return [...features].sort();
+    return Array.from(new Set(this.face.getTableFeatureTags(otTableTag))).sort();
   }
 
   close() {
