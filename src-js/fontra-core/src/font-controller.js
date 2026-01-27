@@ -1050,6 +1050,7 @@ export class FontController {
   }
 
   async _getShaper() {
+    await this.ensureInitialized;
     const { glyphOrderSorting, fontData } = await this.getShaperFontData();
     const characterMap = this.characterMap;
     const glyphOrder = Object.keys(this.glyphMap);
