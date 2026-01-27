@@ -339,7 +339,7 @@ export default class TextEntryPanel extends Panel {
     // If the first character is RTL, do align right
     const codePoint = this.textEntryElement.value.codePointAt(0);
     const info = getGlyphInfoFromCodePoint(codePoint);
-    const align = info.direction == "RTL" ? "end" : "start";
+    const align = info?.direction == "RTL" ? "end" : "start";
     this.textEntryElement.style = `text-align: ${align}`;
   }
 
