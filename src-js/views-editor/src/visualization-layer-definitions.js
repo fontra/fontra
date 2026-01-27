@@ -1679,12 +1679,23 @@ export const allGlyphsCleanVisualizationLayerDefinition = {
 
 function fillNode(context, pt, cornerNodeSize, smoothNodeSize, handleNodeSize) {
   if (!pt.type && !pt.smooth) {
-    fillSquareNode(context, pt, cornerNodeSize);
+    fillDiamondNode(context, pt, cornerNodeSize);
   } else if (!pt.type) {
-    fillRoundNode(context, pt, smoothNodeSize);
+    fillSquareNode(context, pt, smoothNodeSize);
   } else {
     fillRoundNode(context, pt, handleNodeSize);
   }
+}
+
+function fillDiamondNode(context, pt, nodeSize) {
+  const offset = nodeSize / 1.4;
+  context.beginPath();
+  context.moveTo(pt.x, pt.y - offset);
+  context.lineTo(pt.x + offset, pt.y);
+  context.lineTo(pt.x, pt.y + offset);
+  context.lineTo(pt.x - offset, pt.y);
+  context.closePath();
+  context.fill();
 }
 
 function fillSquareNode(context, pt, nodeSize) {
