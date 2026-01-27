@@ -116,6 +116,7 @@ export class SceneController {
       backgroundImagesAreLocked: true,
       backgroundLayers: {},
       editingLayers: {},
+      features: {},
     });
     this.sceneSettings = this.sceneSettingsController.model;
 

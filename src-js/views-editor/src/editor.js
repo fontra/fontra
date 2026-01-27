@@ -160,6 +160,7 @@ export class EditorController extends ViewController {
         "applyKerning",
         "editLayerName",
         "editingLayers",
+        "features",
         "fontLocationUser",
         "glyphLocation",
         "fontAxesUseSourceCoordinates",
@@ -3218,6 +3219,8 @@ export class EditorController extends ViewController {
     }
     this.sceneSettings.align = viewInfo["align"] || "center";
     this.sceneSettings.applyKerning = viewInfo["applyKerning"] === false ? false : true;
+    this.sceneSettings.features = viewInfo["features"] ?? {};
+
     if (viewInfo["viewBox"]) {
       this.sceneController.autoViewBox = false;
       const viewBox = viewInfo["viewBox"];
@@ -3350,6 +3353,9 @@ export class EditorController extends ViewController {
     }
     if (!this.sceneSettings.applyKerning) {
       viewInfo["applyKerning"] = this.sceneSettings.applyKerning;
+    }
+    if (!isObjectEmpty(this.sceneSettings.features)) {
+      viewInfo["features"] = this.sceneSettings.features;
     }
 
     const url = new URL(window.location);
