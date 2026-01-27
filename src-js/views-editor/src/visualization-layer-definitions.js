@@ -1243,15 +1243,31 @@ registerVisualizationLayerDefinition({
   name: "Nodes",
   selectionFunc: glyphSelector("editing"),
   zIndex: 500,
-  screenParameters: { cornerSize: 8, smoothSize: 8, handleSize: 6.5 },
-  colors: { color: "#BBB" },
-  colorsDarkMode: { color: "#BBB" },
+  screenParameters: { cornerSize: 8, smoothSize: 8, handleSize: 6.5, borderSize: 1.5 },
+  colors: { color: "#BBB", strokeColorInner: "#000", strokeColorOuter: "#FFF" },
+  colorsDarkMode: { color: "#BBB", strokeColorInner: "#000", strokeColorOuter: "#FFF" },
   draw: (context, positionedGlyph, parameters, model, controller) => {
     const glyph = positionedGlyph.glyph;
     const cornerSize = parameters.cornerSize;
     const smoothSize = parameters.smoothSize;
     const handleSize = parameters.handleSize;
+    const innerBorderOffset = parameters.borderSize;
+    const outerBorderOffset = 2 * parameters.borderSize;
 
+    // Draw a double border around all nodes similar to how other vector drawing editors do this
+    // to prevent the nodes from blending in with any user set background image.
+
+    // Outer border.
+    context.fillStyle = parameters.strokeColorOuter;
+    for (const pt of glyph.path.iterPoints()) {
+      fillNode(context, pt, cornerSize + outerBorderOffset, smoothSize + outerBorderOffset, handleSize + outerBorderOffset);
+    }
+    // Inner border.
+    context.fillStyle = parameters.strokeColorInner;
+    for (const pt of glyph.path.iterPoints()) {
+      fillNode(context, pt, cornerSize + innerBorderOffset, smoothSize + innerBorderOffset, handleSize + innerBorderOffset);
+    }
+    // Node fill.
     context.fillStyle = parameters.color;
     for (const pt of glyph.path.iterPoints()) {
       fillNode(context, pt, cornerSize, smoothSize, handleSize);
@@ -1270,10 +1286,9 @@ registerVisualizationLayerDefinition({
     handleSize: 6.5,
     strokeWidth: 1,
     hoverStrokeOffset: 4,
-    underlayOffset: 2,
   },
-  colors: { hoveredColor: "#BBB", selectedColor: "#000", underColor: "#FFFA" },
-  colorsDarkMode: { hoveredColor: "#BBB", selectedColor: "#FFF", underColor: "#0008" },
+  colors: { hoveredColor: "#7088CF", selectedColor: "#4472FF" },
+  colorsDarkMode: { hoveredColor: "#AAE3E1", selectedColor: "#5EFFFA" },
   draw: (context, positionedGlyph, parameters, model, controller) => {
     const glyph = positionedGlyph.glyph;
     const cornerSize = parameters.cornerSize;
@@ -1283,35 +1298,15 @@ registerVisualizationLayerDefinition({
     const { point: hoveredPointIndices } = parseSelection(model.hoverSelection);
     const { point: selectedPointIndices } = parseSelection(model.selection);
 
-    // Under layer
-    const underlayOffset = parameters.underlayOffset;
-    context.fillStyle = parameters.underColor;
-    for (const pt of iterPointsByIndex(glyph.path, selectedPointIndices)) {
-      fillNode(
-        context,
-        pt,
-        cornerSize + underlayOffset,
-        smoothSize + underlayOffset,
-        handleSize + underlayOffset
-      );
-    }
     // Selected nodes
     context.fillStyle = parameters.selectedColor;
     for (const pt of iterPointsByIndex(glyph.path, selectedPointIndices)) {
       fillNode(context, pt, cornerSize, smoothSize, handleSize);
     }
     // Hovered nodes
-    context.strokeStyle = parameters.hoveredColor;
-    context.lineWidth = parameters.strokeWidth;
-    const hoverStrokeOffset = parameters.hoverStrokeOffset;
+    context.fillStyle = parameters.hoveredColor;
     for (const pt of iterPointsByIndex(glyph.path, hoveredPointIndices)) {
-      strokeNode(
-        context,
-        pt,
-        cornerSize + hoverStrokeOffset,
-        smoothSize + hoverStrokeOffset,
-        handleSize + hoverStrokeOffset
-      );
+      fillNode(context, pt, cornerSize, smoothSize, handleSize);
     }
   },
 });
@@ -1689,16 +1684,6 @@ function fillNode(context, pt, cornerNodeSize, smoothNodeSize, handleNodeSize) {
     fillRoundNode(context, pt, smoothNodeSize);
   } else {
     fillRoundNode(context, pt, handleNodeSize);
-  }
-}
-
-function strokeNode(context, pt, cornerNodeSize, smoothNodeSize, handleNodeSize) {
-  if (!pt.type && !pt.smooth) {
-    strokeSquareNode(context, pt, cornerNodeSize);
-  } else if (!pt.type) {
-    strokeRoundNode(context, pt, smoothNodeSize);
-  } else {
-    strokeRoundNode(context, pt, handleNodeSize);
   }
 }
 
