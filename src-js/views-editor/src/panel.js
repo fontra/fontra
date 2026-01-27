@@ -35,6 +35,7 @@ export default class Panel extends SimpleElement {
   constructor(editorController) {
     super();
     this.editorController = editorController;
+    this.fontController = editorController.fontController;
     this._appendStyle(this.panelStyles);
     this.contentElement = this.getContentElement();
     this.shadowRoot.appendChild(this.contentElement);
