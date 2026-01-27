@@ -204,15 +204,15 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
         return {}
 
     async def getShaperFontData(self) -> ShaperFontData | None:
-        font = self._getShaperFont()
+        with self._getShaperFont() as font:
+            for tableTag in font.keys():
+                if tableTag not in shaperFontTables:
+                    del font[tableTag]
 
-        for tableTag in font.keys():
-            if tableTag not in shaperFontTables:
-                del font[tableTag]
-
-        with io.BytesIO() as f:
+            f = io.BytesIO()
             font.save(f)
-            data = f.getvalue()
+
+        data = f.getvalue()
 
         return ShaperFontData(
             glyphOrderSorting=ShaperFontGlyphOrderSorting.FROMGLYPHMAP, data=data
