@@ -12,11 +12,12 @@ export default class TextEntryPanel extends Panel {
 
   static styles = `
     .text-entry-section {
-      display: flex;
-      flex-direction: column;
+      display: grid;
+      grid-template-columns: auto;
       gap: 0.5em;
-      max-height: 100%;
-      overflow-y: auto;
+      height: 100%;
+      overflow: hidden;
+      align-content: start;
     }
 
     #text-align-menu {
@@ -62,6 +63,10 @@ export default class TextEntryPanel extends Panel {
       resize: none;
       overflow-x: auto;
       box-sizing: content-box;
+    }
+
+    ui-accordion {
+      min-height: 0;
     }
   `;
 
