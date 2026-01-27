@@ -49,7 +49,14 @@ export class SceneModel {
     this.updateSceneCancelSignal = {};
 
     this.sceneSettingsController.addKeyListener(
-      ["characterLines", "align", "applyKerning", "selectedGlyph", "editLayerName"],
+      [
+        "characterLines",
+        "align",
+        "applyKerning",
+        "features",
+        "selectedGlyph",
+        "editLayerName",
+      ],
       (event) => {
         this.updateScene();
       }
@@ -419,7 +426,15 @@ export class SceneModel {
       cancelSignal
     );
 
-    const features = kerningInstance ? "-kern" : ""; // TODO from features UI
+    const features = { ...this.sceneSettings.features };
+    if (kerningInstance) {
+      features["kern"] = false;
+    }
+
+    const featuresString = Object.entries(features ?? {})
+      .filter(([k, v]) => v != undefined)
+      .map(([k, v]) => (v ? k : `-${k}`))
+      .join(",");
 
     for (const [lineIndex, characterLine] of enumerate(characterLines)) {
       const positionedLine = await lineSetter.setLine(
@@ -429,7 +444,7 @@ export class SceneModel {
         selectedGlyphIsEditing,
         editLayerName,
         this.sceneSettings.fontLocationSourceMapped,
-        features
+        featuresString
       );
 
       if (!positionedLine) {
