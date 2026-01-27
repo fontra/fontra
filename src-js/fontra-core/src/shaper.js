@@ -94,7 +94,7 @@ class HBShaper extends ShaperBase {
   }
 
   _getHAdvanceFunc(font, glyphID) {
-    const glyphName = this.font.glyphName(glyphID);
+    const glyphName = this.glyphOrder[glyphID];
     return this._glyphObjects[glyphName]?.xAdvance ?? 500;
   }
 
