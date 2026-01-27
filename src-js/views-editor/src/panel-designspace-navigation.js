@@ -72,7 +72,6 @@ export default class DesignspaceNavigationPanel extends Panel {
 
   constructor(editorController) {
     super(editorController);
-    this.fontController = this.editorController.fontController;
     this.sceneSettingsController = this.editorController.sceneSettingsController;
     this.sceneSettings = this.editorController.sceneSettingsController.model;
     this.sceneModel = this.editorController.sceneController.sceneModel;

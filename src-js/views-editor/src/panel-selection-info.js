@@ -29,7 +29,6 @@ export default class SelectionInfoPanel extends Panel {
   constructor(editorController) {
     super(editorController);
     this.throttledUpdate = throttleCalls((senderID) => this.update(senderID), 100);
-    this.fontController = this.editorController.fontController;
     this.sceneController = this.editorController.sceneController;
 
     this.sceneController.sceneSettingsController.addKeyListener(
