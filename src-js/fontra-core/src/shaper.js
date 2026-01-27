@@ -90,7 +90,7 @@ class HBShaper extends ShaperBase {
 
   _getNominalGlyph(font, codePoint) {
     const glyphName = this.nominalGlyph(codePoint);
-    return glyphName ? this.font.glyphFromName(glyphName) : 0;
+    return glyphName ? this.glyphNameToID[glyphName] ?? 0 : 0;
   }
 
   _getHAdvanceFunc(font, glyphID) {
