@@ -1042,20 +1042,35 @@ export class FontController {
     return new KerningController(kernTag, await this.getKerning(), this);
   }
 
-  getShaper() {
-    if (!this._shaperPromise) {
-      this._shaperPromise = this._getShaper();
+  getShaper(textShaping = true) {
+    if (textShaping) {
+      if (!this._shaperPromise) {
+        this._shaperPromise = this._getShaper(true);
+      }
+      return this._shaperPromise;
     }
-    return this._shaperPromise;
+
+    if (!this._dumbShaperPromise) {
+      this._dumbShaperPromise = this._getShaper(false);
+    }
+    return this._dumbShaperPromise;
   }
 
-  async _getShaper() {
+  async _getShaper(textShaping) {
+    let glyphOrderSorting = "sorted";
+    let fontData = null;
+
     await this.ensureInitialized;
-    const { glyphOrderSorting, fontData } = await this.getShaperFontData();
+
+    if (textShaping) {
+      ({ glyphOrderSorting, fontData } = await this.getShaperFontData());
+    }
+
     const glyphOrder = Object.keys(this.glyphMap);
     if (glyphOrderSorting == "sorted") {
       glyphOrder.sort();
     }
+
     {
       // characterMap closure
       const characterMap = this.characterMap;
