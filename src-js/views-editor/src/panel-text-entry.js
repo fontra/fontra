@@ -133,6 +133,11 @@ export default class TextEntryPanel extends Panel {
         text-decoration-color: lightgray;
         cursor: pointer;
       }
+
+      icon-button {
+        width: 1.3em;
+        height: 1.3em;
+      }
     `);
 
     this.accordion.items = [
@@ -145,6 +150,7 @@ export default class TextEntryPanel extends Panel {
           { class: "features-container", id: "gsub-features-contents" },
           []
         ),
+        auxiliaryHeaderElement: this._makeResetFeaturesButton("GSUB"),
       },
       {
         id: "gpos-features-accordion-item",
@@ -155,6 +161,7 @@ export default class TextEntryPanel extends Panel {
           { class: "features-container", id: "gpos-features-contents" },
           []
         ),
+        auxiliaryHeaderElement: this._makeResetFeaturesButton("GPOS"),
       },
     ];
 
@@ -199,6 +206,23 @@ export default class TextEntryPanel extends Panel {
         ),
       ]
     );
+  }
+
+  _makeResetFeaturesButton(tableTag) {
+    return html.createDomElement("icon-button", {
+      "src": "/tabler-icons/refresh.svg",
+      "onclick": async (event) => {
+        const shaper = await this.fontController.getShaper();
+        const info = shaper.getFeatureInfo(tableTag);
+        const features = { ...this.textSettings.features };
+        Object.keys(info).forEach((featureTag) => {
+          delete features[featureTag];
+        });
+        this.textSettings.features = features;
+      },
+      "data-tooltip": `Reset ${tableTag} features`,
+      "data-tooltipposition": "left",
+    });
   }
 
   get gsubFeaturesItem() {
