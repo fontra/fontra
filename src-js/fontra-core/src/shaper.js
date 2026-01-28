@@ -136,7 +136,7 @@ class DumbShaper extends ShaperBase {
       const xAdvance = glyphObjects[glyphName]?.xAdvance ?? 500;
 
       glyphs.push({
-        g: glyphName ? -1 : 0,
+        g: glyphName ? this.glyphNameToID[glyphName] : 0,
         cl: i, // cluster
         gn: glyphName ?? ".notdef",
         ax: xAdvance,

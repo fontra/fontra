@@ -15,7 +15,7 @@ describe("shaper tests", () => {
   const mutatorSansPath = join(testDataDir, "mutatorsans", "MutatorSans.ttf");
   const notoSansPath = join(testDataDir, "noto", "NotoSans-Regular.otf");
 
-  const testInputCodePoints = [..."😻VABCÄS"].map((c) => c.codePointAt(0));
+  const testInputCodePoints = [..."😻VABCÄS"].map((c) => ord(c));
 
   const expectedGlyphs = [
     { g: 0, cl: 0, ax: 500, ay: 0, dx: 0, dy: 0, flags: 0, gn: ".notdef" },
@@ -186,7 +186,7 @@ describe("shaper tests", () => {
     );
     applyKerning(glyphs, (g1, g2) => kerning.getGlyphPairValue(g1, g2));
 
-    expect(removeGIDs(glyphs)).to.deep.equal(removeGIDs(expectedGlyphs));
+    expect(glyphs).to.deep.equal(expectedGlyphs);
   });
 
   it("test getGlyphNameCodePoint", () => {
@@ -208,14 +208,6 @@ describe("shaper tests", () => {
     expect(glyphNames2).to.deep.equal(inputGlyphNames);
   });
 });
-
-function removeGIDs(glyphs) {
-  return glyphs.map((glyph) => {
-    glyph = { ...glyph };
-    delete glyph.g;
-    return glyph;
-  });
-}
 
 function ord(s) {
   return s.codePointAt(0);
