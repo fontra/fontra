@@ -77,8 +77,9 @@ export default class TextEntryPanel extends Panel {
     this.sceneController = this.editorController.sceneController;
     this.textSettings = this.editorController.sceneSettingsController.model;
 
-    this.textSettingsController.addKeyListener("features", (event) =>
-      this.fontController.getShaper().then((shaper) => this.updateFeatures(shaper))
+    this.textSettingsController.addKeyListener(
+      ["features", "applyTextShaping"],
+      async (event) => this.updateFeatures(await this.getShaper())
     );
 
     this.setupTextEntryElement();
@@ -130,11 +131,15 @@ export default class TextEntryPanel extends Panel {
     );
   }
 
+  async getShaper() {
+    return await this.fontController.getShaper(this.textSettings.applyTextShaping);
+  }
+
   _makeResetFeaturesButton(tableTag) {
     return html.createDomElement("icon-button", {
       "src": "/tabler-icons/refresh.svg",
       "onclick": async (event) => {
-        const shaper = await this.fontController.getShaper();
+        const shaper = await this.getShaper();
         const info = shaper.getFeatureInfo(tableTag);
         const features = { ...this.textSettings.features };
         Object.keys(info).forEach((featureTag) => {
@@ -254,7 +259,7 @@ export default class TextEntryPanel extends Panel {
   }
 
   setupAccordionElement() {
-    this.fontController.getShaper().then((shaper) => this.updateFeatures(shaper));
+    this.getShaper().then((shaper) => this.updateFeatures(shaper));
     this.accordion = new Accordion();
     this.accordion.appendStyle(`
       .features-container {
