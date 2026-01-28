@@ -134,6 +134,24 @@ describe("shaper tests", () => {
     expect(glyphs).to.deep.equal(expectedGlyphs);
   });
 
+  it("test HBShaper RTL", () => {
+    const fontData = new Uint8Array(fs.readFileSync(mutatorSansPath));
+    const shaper = getShaper(fontData, nominalGlyphFunc, glyphOrder);
+    const glyphs = shaper.shape(testInputCodePoints, glyphObjects, {
+      direction: "rtl",
+    });
+
+    expect(glyphs.map((g) => g.gn)).to.deep.equal([
+      "S.closed",
+      "Adieresis",
+      "C",
+      "B",
+      "A",
+      "V",
+      ".notdef",
+    ]);
+  });
+
   it("test HBShaper getFeatureInfo", () => {
     const expectedGSUBInfo = {
       aalt: {},
@@ -200,6 +218,23 @@ describe("shaper tests", () => {
     applyKerning(glyphs, (g1, g2) => kerning.getGlyphPairValue(g1, g2));
 
     expect(glyphs).to.deep.equal(expectedGlyphs);
+  });
+
+  it("test DumbShaper RTL", () => {
+    const shaper = getShaper(null, nominalGlyphFunc, glyphOrder);
+    const glyphs = shaper.shape(testInputCodePoints, glyphObjects, {
+      direction: "rtl",
+    });
+
+    expect(glyphs.map((g) => g.gn)).to.deep.equal([
+      "S",
+      "Adieresis",
+      "C",
+      "B",
+      "A",
+      "V",
+      ".notdef",
+    ]);
   });
 
   it("test getGlyphNameCodePoint", () => {
