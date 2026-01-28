@@ -218,42 +218,26 @@ export default class TextEntryPanel extends Panel {
   }
 
   updateFeatures(shaper) {
-    const gsubFeatures = shaper.getFeatureTags("GSUB");
-    const gposFeatures = shaper.getFeatureTags("GPOS");
+    const gsubFeatureInfo = shaper.getFeatureInfo("GSUB");
+    const gposFeatureInfo = shaper.getFeatureInfo("GPOS");
 
-    const gsubFeaturesElement = this.gsubFeaturesElement;
-    const gposFeaturesElement = this.gposFeaturesElement;
+    for (const [info, element, accordionItem] of [
+      [gsubFeatureInfo, this.gsubFeaturesElement, this.gsubFeaturesItem],
+      [gposFeatureInfo, this.gposFeaturesElement, this.gposFeaturesItem],
+    ]) {
+      const tags = Object.keys(info).sort();
+      accordionItem.hidden = !tags.length;
 
-    gsubFeaturesElement.innerHTML = "";
-    gposFeaturesElement.innerHTML = "";
+      element.innerHTML = "";
 
-    function labelAndURLForFeatureTag(featureTag) {
-      const [label, url] = features[featureTag] ?? ["", null];
-      return { label, url };
+      tags.forEach((tag) => {
+        const [featureDescription, url] = features[tag] ?? ["", null];
+        const label = info[tag]?.uiLabelName || featureDescription;
+        element.append(
+          ...featureTagButton(this.textSettingsController, tag, label, url)
+        );
+      });
     }
-
-    gsubFeatures.forEach((featureTag) => {
-      gsubFeaturesElement.append(
-        ...featureTagButton(
-          this.textSettingsController,
-          featureTag,
-          labelAndURLForFeatureTag(featureTag)
-        )
-      );
-    });
-
-    gposFeatures.forEach((featureTag) => {
-      gposFeaturesElement.append(
-        ...featureTagButton(
-          this.textSettingsController,
-          featureTag,
-          labelAndURLForFeatureTag(featureTag)
-        )
-      );
-    });
-
-    this.gsubFeaturesItem.hidden = !gsubFeatures.length;
-    this.gposFeaturesItem.hidden = !gposFeatures.length;
   }
 
   updateAlignElement(align) {
@@ -379,8 +363,7 @@ export default class TextEntryPanel extends Panel {
   }
 }
 
-function featureTagButton(controller, featureTag, labelAndURL, options) {
-  const { label, url } = labelAndURL;
+function featureTagButton(controller, featureTag, label, url, options) {
   const controllerKey = options?.key ?? "features";
   let state = controller.model[controllerKey]?.[featureTag];
   const id = options?.id ?? `features-button-${featureTag}`;
