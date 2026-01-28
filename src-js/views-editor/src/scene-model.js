@@ -54,7 +54,7 @@ export class SceneModel {
         "align",
         "applyKerning",
         "features",
-        "textShaping",
+        "applyTextShaping",
         "selectedGlyph",
         "editLayerName",
       ],
@@ -417,7 +417,7 @@ export class SceneModel {
     const kerningInstance = this.sceneSettings.applyKerning
       ? await this.getKerningInstance("kern")
       : null;
-    const shaper = await fontController.getShaper(this.sceneSettings.textShaping);
+    const shaper = await fontController.getShaper(this.sceneSettings.applyTextShaping);
     const lineSetter = new LineSetter(
       fontController,
       shaper,

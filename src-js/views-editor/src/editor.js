@@ -171,7 +171,7 @@ export class EditorController extends ViewController {
         "selection",
         "substituteGlyphName",
         "text",
-        "textShaping",
+        "applyTextShaping",
         "viewBox",
       ],
       (event) => {
@@ -3221,7 +3221,8 @@ export class EditorController extends ViewController {
     this.sceneSettings.align = viewInfo["align"] || "center";
     this.sceneSettings.applyKerning = viewInfo["applyKerning"] === false ? false : true;
     this.sceneSettings.features = viewInfo["features"] ?? {};
-    this.sceneSettings.textShaping = viewInfo["textShaping"] === false ? false : true;
+    this.sceneSettings.applyTextShaping =
+      viewInfo["applyTextShaping"] === false ? false : true;
 
     if (viewInfo["viewBox"]) {
       this.sceneController.autoViewBox = false;
@@ -3359,8 +3360,8 @@ export class EditorController extends ViewController {
     if (!isObjectEmpty(this.sceneSettings.features)) {
       viewInfo["features"] = this.sceneSettings.features;
     }
-    if (!this.sceneSettings.textShaping) {
-      viewInfo["textShaping"] = this.sceneSettings.textShaping;
+    if (!this.sceneSettings.applyTextShaping) {
+      viewInfo["applyTextShaping"] = this.sceneSettings.applyTextShaping;
     }
 
     const url = new URL(window.location);

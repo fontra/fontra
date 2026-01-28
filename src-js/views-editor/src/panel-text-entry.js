@@ -83,7 +83,6 @@ export default class TextEntryPanel extends Panel {
 
     this.setupTextEntryElement();
     this.setupTextAlignElement();
-    this.setupApplyKerningElement();
     this.setupAccordionElement();
     this.setupIntersectionObserver();
   }
@@ -124,7 +123,6 @@ export default class TextEntryPanel extends Panel {
                 }),
               ]
             ),
-            html.div({ id: "apply-kerning-checkbox" }),
             html.div({ id: "text-settings-accordion" }),
           ]
         ),
@@ -210,18 +208,6 @@ export default class TextEntryPanel extends Panel {
         this.textSettings.align = el.dataset.align;
       };
     }
-  }
-
-  setupApplyKerningElement() {
-    this.applyKerningCheckBox = labeledCheckbox(
-      "Apply kerning", // TODO: translate
-      this.textSettingsController,
-      "applyKerning",
-      {}
-    );
-
-    const placeHolder = this.contentElement.querySelector("#apply-kerning-checkbox");
-    placeHolder.replaceWith(this.applyKerningCheckBox);
   }
 
   setupTextEntryElement() {
@@ -321,6 +307,25 @@ export default class TextEntryPanel extends Panel {
     `);
 
     this.accordion.items = [
+      {
+        id: "shaping-options-accordion-item",
+        label: "Text shaping options",
+        open: true,
+        content: html.div({ id: "shaping-options-contents" }, [
+          labeledCheckbox(
+            "Apply text shaping", // TODO: translate
+            this.textSettingsController,
+            "applyTextShaping",
+            {}
+          ),
+          labeledCheckbox(
+            "Apply kerning", // TODO: translate
+            this.textSettingsController,
+            "applyKerning",
+            {}
+          ),
+        ]),
+      },
       {
         id: "gsub-features-accordion-item",
         label: "Substitution features",
