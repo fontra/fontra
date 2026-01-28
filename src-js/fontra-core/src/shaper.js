@@ -108,7 +108,7 @@ class HBShaper extends ShaperBase {
       }
       const nameIds = this.face.getFeatureNameIds(otTableTag, featureIndex);
       info[tag] = nameIds?.uiLabelNameId
-        ? { uiLabelNameId: this.face.getName(nameIds.uiLabelNameId, "en") }
+        ? { uiLabelName: this.face.getName(nameIds.uiLabelNameId, "en") }
         : {};
     }
 
