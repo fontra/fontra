@@ -11,15 +11,9 @@ const __dirname = dirname(__filename);
 import { applyKerning, getShaper } from "@fontra/core/shaper.js";
 
 describe("shaper tests", () => {
-  const testFontPath = join(
-    dirname(__dirname),
-    "..",
-    "..",
-    "test-py",
-    "data",
-    "mutatorsans",
-    "MutatorSans.ttf"
-  );
+  const testDataDir = join(dirname(__dirname), "..", "..", "test-py", "data");
+  const mutatorSansPath = join(testDataDir, "mutatorsans", "MutatorSans.ttf");
+  const notoSansPath = join(testDataDir, "noto", "NotoSans-Regular.otf");
 
   const testInputCodePoints = [..."😻VABCÄS"].map((c) => c.codePointAt(0));
 
@@ -129,7 +123,7 @@ describe("shaper tests", () => {
   const kerning = { getGlyphPairValue: (g1, g2) => kerningData[g1]?.[g2] ?? 0 };
 
   it("test HBShaper", () => {
-    const fontData = new Uint8Array(fs.readFileSync(testFontPath));
+    const fontData = new Uint8Array(fs.readFileSync(mutatorSansPath));
     const shaper = getShaper(fontData, nominalGlyphFunc, glyphOrder);
     const glyphs = shaper.shape(
       testInputCodePoints,
@@ -143,10 +137,43 @@ describe("shaper tests", () => {
   });
 
   it("test HBShaper getFeatureInfo", () => {
-    const fontData = new Uint8Array(fs.readFileSync(testFontPath));
+    const expectedGSUBInfo = {
+      aalt: {},
+      c2sc: {},
+      case: {},
+      ccmp: {},
+      dnom: {},
+      frac: {},
+      liga: {},
+      lnum: {},
+      locl: {},
+      numr: {},
+      onum: {},
+      ordn: {},
+      pnum: {},
+      rtlm: {},
+      salt: {},
+      sinf: {},
+      smcp: {},
+      ss03: { uiLabelName: "florin symbol" },
+      ss04: {
+        uiLabelName: "Titling Alternates I and J for titling and all cap settings",
+      },
+      ss06: { uiLabelName: "Accented Greek SC" },
+      ss07: { uiLabelName: "iota adscript" },
+      subs: {},
+      sups: {},
+      tnum: {},
+      zero: {},
+    };
+
+    const expectedGPOSInfo = { kern: {}, mark: {}, mkmk: {} };
+
+    const fontData = new Uint8Array(fs.readFileSync(notoSansPath));
     const shaper = getShaper(fontData, nominalGlyphFunc, glyphOrder);
-    expect(shaper.getFeatureInfo("GSUB")).to.deep.equal({ rvrn: {} });
-    expect(shaper.getFeatureInfo("GPOS")).to.deep.equal({ kern: {} });
+
+    expect(shaper.getFeatureInfo("GSUB")).to.deep.equal(expectedGSUBInfo);
+    expect(shaper.getFeatureInfo("GPOS")).to.deep.equal(expectedGPOSInfo);
   });
 
   it("test DumbShaper", () => {
