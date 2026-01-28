@@ -132,6 +132,7 @@ class HBShaper extends ShaperBase {
 
     // Merge GSUB and GPOS
     const result = results[0];
+
     for (const [script, languages] of Object.entries(results[1])) {
       if (results[script]) {
         languages.forEach((language) => {
@@ -186,6 +187,10 @@ class DumbShaper extends ShaperBase {
   }
 
   getFeatureInfo(otTableTag) {
+    return {};
+  }
+
+  getScriptAndLanguageInfo() {
     return {};
   }
 
