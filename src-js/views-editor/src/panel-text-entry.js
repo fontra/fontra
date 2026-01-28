@@ -1,6 +1,6 @@
 import { getGlyphInfoFromCodePoint } from "@fontra/core/glyph-data.js";
 import * as html from "@fontra/core/html-utils.js";
-import { features, scripts } from "@fontra/core/opentype-tags.js";
+import { features, languages, scripts } from "@fontra/core/opentype-tags.js";
 import { labeledCheckbox, labeledPopupSelect } from "@fontra/core/ui-utils.js";
 import { findNestedActiveElement } from "@fontra/core/utils.js";
 import { Accordion } from "@fontra/web-components/ui-accordion.js";
@@ -168,40 +168,6 @@ export default class TextEntryPanel extends Panel {
     return this.accordion.querySelector("#gpos-features-contents");
   }
 
-  updateFeatures(shaper) {
-    const gsubFeatureInfo = shaper.getFeatureInfo("GSUB");
-    const gposFeatureInfo = shaper.getFeatureInfo("GPOS");
-    const scriptAndLanguageInfo = shaper.getScriptAndLanguageInfo();
-
-    this.textScriptOptions.splice(
-      0,
-      Infinity,
-      { label: "Automatic", value: null },
-      ...Object.keys(scriptAndLanguageInfo).map((script) => ({
-        label: `${scripts[script] ?? script} (${script})`,
-        value: script,
-      }))
-    );
-
-    for (const [info, element, accordionItem] of [
-      [gsubFeatureInfo, this.gsubFeaturesElement, this.gsubFeaturesItem],
-      [gposFeatureInfo, this.gposFeaturesElement, this.gposFeaturesItem],
-    ]) {
-      const tags = Object.keys(info).sort();
-      accordionItem.hidden = !tags.length;
-
-      element.innerHTML = "";
-
-      tags.forEach((tag) => {
-        const [featureDescription, url] = features[tag] ?? ["", null];
-        const label = info[tag]?.uiLabelName || featureDescription;
-        element.append(
-          ...featureTagButton(this.textSettingsController, tag, label, url)
-        );
-      });
-    }
-  }
-
   updateAlignElement(align) {
     for (const el of this.textAlignElement.children) {
       el.classList.toggle("selected", align === el.dataset.align);
@@ -270,7 +236,13 @@ export default class TextEntryPanel extends Panel {
   }
 
   setupAccordionElement() {
-    this.getShaper().then((shaper) => this.updateFeatures(shaper));
+    this.getShaper().then((shaper) => {
+      this.textSettingsController.addKeyListener("textScript", (event) => {
+        this.updateLanguages(shaper.getScriptAndLanguageInfo());
+      });
+
+      this.updateFeatures(shaper);
+    });
     this.accordion = new Accordion();
     this.accordion.appendStyle(`
       .features-container {
@@ -334,7 +306,7 @@ export default class TextEntryPanel extends Panel {
     `);
 
     this.textScriptOptions = [{ label: "Automatic", value: null }];
-    this.textLanguageOptions = [{ label: "Automatic", value: null }];
+    this.textLanguageOptions = [{ label: "Default (dflt)", value: null }];
 
     this.accordion.items = [
       {
@@ -404,6 +376,57 @@ export default class TextEntryPanel extends Panel {
 
     const placeHolder = this.contentElement.querySelector("#text-settings-accordion");
     placeHolder.replaceWith(this.accordion);
+  }
+
+  updateFeatures(shaper) {
+    const gsubFeatureInfo = shaper.getFeatureInfo("GSUB");
+    const gposFeatureInfo = shaper.getFeatureInfo("GPOS");
+    const scriptAndLanguageInfo = shaper.getScriptAndLanguageInfo();
+
+    this.textScriptOptions.splice(
+      0,
+      Infinity,
+      { label: "Automatic", value: null },
+      ...Object.keys(scriptAndLanguageInfo).map((script) => ({
+        label: `${scripts[script] ?? script} (${script.trim()})`,
+        value: script,
+      }))
+    );
+
+    this.updateLanguages(scriptAndLanguageInfo);
+
+    for (const [info, element, accordionItem] of [
+      [gsubFeatureInfo, this.gsubFeaturesElement, this.gsubFeaturesItem],
+      [gposFeatureInfo, this.gposFeaturesElement, this.gposFeaturesItem],
+    ]) {
+      const tags = Object.keys(info).sort();
+      accordionItem.hidden = !tags.length;
+
+      element.innerHTML = "";
+
+      tags.forEach((tag) => {
+        const [featureDescription, url] = features[tag] ?? ["", null];
+        const label = info[tag]?.uiLabelName || featureDescription;
+        element.append(
+          ...featureTagButton(this.textSettingsController, tag, label, url)
+        );
+      });
+    }
+  }
+
+  updateLanguages(scriptAndLanguageInfo) {
+    const { textScript, textLanguage } = this.textSettingsController.model;
+    const languages = textScript ? scriptAndLanguageInfo[textScript] || [] : [];
+    const languageOptions = languages.map((language) => ({
+      label: `${languages[language] || language} (${language.trim()})`,
+      value: language,
+    }));
+
+    if (textLanguage && !languages.includes(textLanguage)) {
+      this.textSettingsController.model.textLanguage = null;
+    }
+
+    this.textLanguageOptions.splice(1, Infinity, ...languageOptions);
   }
 
   fixTextEntryHeight() {
