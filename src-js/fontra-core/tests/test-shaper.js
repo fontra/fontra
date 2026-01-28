@@ -176,6 +176,23 @@ describe("shaper tests", () => {
     expect(shaper.getFeatureInfo("GPOS")).to.deep.equal(expectedGPOSInfo);
   });
 
+  it("test HBShaper getScriptAndLanguageInfo", () => {
+    const fontData = new Uint8Array(fs.readFileSync(notoSansPath));
+    const shaper = getShaper(fontData, nominalGlyphFunc, glyphOrder);
+
+    const expectedScriptAndLanguageInfo = {
+      DFLT: ["dflt"],
+      cyrl: ["dflt", "MKD ", "SRB "],
+      dev2: ["dflt"],
+      grek: ["dflt"],
+      latn: ["dflt", "APPH", "CAT ", "IPPH", "MAH ", "MOL ", "NAV ", "ROM "],
+    };
+
+    expect(shaper.getScriptAndLanguageInfo()).to.deep.equal(
+      expectedScriptAndLanguageInfo
+    );
+  });
+
   it("test DumbShaper", () => {
     const shaper = getShaper(null, nominalGlyphFunc, glyphOrder);
     const glyphs = shaper.shape(

@@ -115,6 +115,41 @@ class HBShaper extends ShaperBase {
     return info;
   }
 
+  getScriptAndLanguageInfo() {
+    const results = [];
+
+    for (const otTableTag of ["GSUB", "GPOS"]) {
+      const tableResults = {};
+      this.face.getTableScriptTags(otTableTag).forEach((script, scriptIndex) => {
+        tableResults[script] = [];
+        this.face.getScriptLanguageTags(otTableTag, scriptIndex).forEach((language) => {
+          tableResults[script].push(language);
+        });
+      });
+
+      results.push(tableResults);
+    }
+
+    // Merge GSUB and GPOS
+    const result = results[0];
+    for (const [script, languages] of Object.entries(results[1])) {
+      if (results[script]) {
+        languages.forEach((language) => {
+          if (!result[script].includes(language)) {
+            result[script].push(language);
+          }
+        });
+      } else {
+        results[script] = languages;
+      }
+      results[script].sort();
+    }
+
+    Object.values(result).forEach((languages) => languages.unshift("dflt"));
+
+    return result;
+  }
+
   close() {
     this.font.destroy();
     this.face.destroy();
