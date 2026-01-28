@@ -158,6 +158,7 @@ export class EditorController extends ViewController {
       [
         "align",
         "applyKerning",
+        "applyTextShaping",
         "editLayerName",
         "editingLayers",
         "features",
@@ -171,8 +172,10 @@ export class EditorController extends ViewController {
         "selection",
         "substituteGlyphName",
         "text",
-        "applyTextShaping",
         "viewBox",
+        "textDirection",
+        "textScript",
+        "textLanguage",
       ],
       (event) => {
         if (event.senderInfo?.senderID !== this && !event.senderInfo?.adjustViewBox) {
@@ -3223,6 +3226,9 @@ export class EditorController extends ViewController {
     this.sceneSettings.features = viewInfo["features"] ?? {};
     this.sceneSettings.applyTextShaping =
       viewInfo["applyTextShaping"] === false ? false : true;
+    for (const key of ["textDirection", "textScript", "textScript"]) {
+      this.sceneSettings[key] = viewInfo[key] ?? null;
+    }
 
     if (viewInfo["viewBox"]) {
       this.sceneController.autoViewBox = false;
@@ -3362,6 +3368,11 @@ export class EditorController extends ViewController {
     }
     if (!this.sceneSettings.applyTextShaping) {
       viewInfo["applyTextShaping"] = this.sceneSettings.applyTextShaping;
+    }
+    for (const key of ["textDirection", "textScript", "textScript"]) {
+      if (this.sceneSettings[key]) {
+        viewInfo[key] = this.sceneSettings[key];
+      }
     }
 
     const url = new URL(window.location);

@@ -1,7 +1,7 @@
 import { getGlyphInfoFromCodePoint } from "@fontra/core/glyph-data.js";
 import * as html from "@fontra/core/html-utils.js";
 import { features } from "@fontra/core/opentype-tags.js";
-import { labeledCheckbox } from "@fontra/core/ui-utils.js";
+import { labeledCheckbox, labeledPopupSelect } from "@fontra/core/ui-utils.js";
 import { findNestedActiveElement } from "@fontra/core/utils.js";
 import { Accordion } from "@fontra/web-components/ui-accordion.js";
 import Panel from "./panel.js";
@@ -309,6 +309,17 @@ export default class TextEntryPanel extends Panel {
         width: 1.3em;
         height: 1.3em;
       }
+
+      #shaping-options-contents {
+        display: grid;
+        grid-template-columns: min-content auto;
+        align-items: center;
+        gap: 0.5em;
+      }
+
+      #shaping-options-contents > .labeled-checkbox {
+        grid-column: 1 / span 2;
+      }
     `);
 
     this.accordion.items = [
@@ -321,13 +332,35 @@ export default class TextEntryPanel extends Panel {
             "Apply text shaping", // TODO: translate
             this.textSettingsController,
             "applyTextShaping",
-            {}
+            { class: "labeled-checkbox" }
           ),
           labeledCheckbox(
             "Apply kerning", // TODO: translate
             this.textSettingsController,
             "applyKerning",
-            {}
+            { class: "labeled-checkbox" }
+          ),
+          ...labeledPopupSelect(
+            "Direction:",
+            this.textSettingsController,
+            "textDirection",
+            [
+              { value: null, label: "Automatic" },
+              { value: "ltr", label: "Left-to-Right" },
+              { value: "rtl", label: "Right-to-Left" },
+            ]
+          ),
+          ...labeledPopupSelect(
+            "Script:",
+            this.textSettingsController,
+            "textScript",
+            [] // fill in later
+          ),
+          ...labeledPopupSelect(
+            "Language:",
+            this.textSettingsController,
+            "textLanguage",
+            [] // fill in later
           ),
         ]),
       },

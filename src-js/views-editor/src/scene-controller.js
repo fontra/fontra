@@ -118,6 +118,9 @@ export class SceneController {
       editingLayers: {},
       features: {},
       textShaping: true,
+      textDirection: null,
+      textScript: null,
+      textLanguage: null,
     });
     this.sceneSettings = this.sceneSettingsController.model;
 
