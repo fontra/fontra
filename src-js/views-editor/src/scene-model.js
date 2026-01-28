@@ -57,6 +57,9 @@ export class SceneModel {
         "applyTextShaping",
         "selectedGlyph",
         "editLayerName",
+        "textDirection",
+        "textScript",
+        "textLanguage",
       ],
       (event) => {
         this.updateScene();
@@ -437,6 +440,14 @@ export class SceneModel {
       .map(([k, v]) => (v ? (v > 1 ? `${k}=${v}` : k) : `-${k}`))
       .join(",");
 
+    const shaperOptions = {
+      variations: this.sceneSettings.fontLocationSourceMapped,
+      features: featuresString,
+      direction: this.sceneSettings.textDirection,
+      script: this.sceneSettings.textScript,
+      language: this.sceneSettings.textLanguage,
+    };
+
     for (const [lineIndex, characterLine] of enumerate(characterLines)) {
       const positionedLine = await lineSetter.setLine(
         { x: 0, y },
@@ -444,8 +455,7 @@ export class SceneModel {
         lineIndex == selectedLineIndex ? selectedGlyphIndex : undefined,
         selectedGlyphIsEditing,
         editLayerName,
-        this.sceneSettings.fontLocationSourceMapped,
-        featuresString
+        shaperOptions
       );
 
       if (!positionedLine) {
@@ -1149,8 +1159,7 @@ class LineSetter {
     selectedGlyphIndex,
     selectedGlyphIsEditing,
     editLayerName,
-    variations,
-    features
+    shaperOptions
   ) {
     const fontController = this.fontController;
     const glyphs = [];
@@ -1165,9 +1174,8 @@ class LineSetter {
 
     let shapedGlyphs = this.shaper.shape(
       codePoints,
-      variations,
-      features,
-      this.glyphInstances
+      this.glyphInstances,
+      shaperOptions
     );
     let needsReshape = false;
     for (const glyphInfo of shapedGlyphs) {
@@ -1183,12 +1191,7 @@ class LineSetter {
     }
 
     if (needsReshape) {
-      shapedGlyphs = this.shaper.shape(
-        codePoints,
-        variations,
-        features,
-        this.glyphInstances
-      );
+      shapedGlyphs = this.shaper.shape(codePoints, this.glyphInstances, shaperOptions);
     }
 
     if (this.kerningPairFunc) {
