@@ -382,16 +382,16 @@ function featureTagButton(controller, featureTag, label, url, options) {
     }
   };
 
-  const toggleState = () => {
+  const toggleState = (reverse = false) => {
     switch (state) {
       case undefined:
-        state = true;
+        state = reverse ? false : true;
         break;
       case false:
-        state = undefined;
+        state = reverse ? true : undefined;
         break;
       default:
-        state = false;
+        state = reverse ? undefined : false;
     }
 
     const features = { ...controller.model[controllerKey] };
@@ -408,7 +408,7 @@ function featureTagButton(controller, featureTag, label, url, options) {
   const buttonElement = html.div(
     {
       class: "feature-tag-button",
-      onclick: (event) => toggleState(),
+      onclick: (event) => toggleState(event.altKey),
     },
     [featureTag]
   );
