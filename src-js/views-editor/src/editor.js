@@ -3226,7 +3226,7 @@ export class EditorController extends ViewController {
     this.sceneSettings.features = viewInfo["features"] ?? {};
     this.sceneSettings.applyTextShaping =
       viewInfo["applyTextShaping"] === false ? false : true;
-    for (const key of ["textDirection", "textScript", "textScript"]) {
+    for (const key of ["textDirection", "textScript", "textLanguage"]) {
       this.sceneSettings[key] = viewInfo[key] ?? null;
     }
 
@@ -3369,7 +3369,7 @@ export class EditorController extends ViewController {
     if (!this.sceneSettings.applyTextShaping) {
       viewInfo["applyTextShaping"] = this.sceneSettings.applyTextShaping;
     }
-    for (const key of ["textDirection", "textScript", "textScript"]) {
+    for (const key of ["textDirection", "textScript", "textLanguage"]) {
       if (this.sceneSettings[key]) {
         viewInfo[key] = this.sceneSettings[key];
       }
