@@ -1052,12 +1052,15 @@ export class FontController {
   async _getShaper() {
     await this.ensureInitialized;
     const { glyphOrderSorting, fontData } = await this.getShaperFontData();
-    const characterMap = this.characterMap;
     const glyphOrder = Object.keys(this.glyphMap);
     if (glyphOrderSorting == "sorted") {
       glyphOrder.sort();
     }
-    return getShaper(fontData, (codePoint) => characterMap[codePoint], glyphOrder);
+    {
+      // characterMap closure
+      const characterMap = this.characterMap;
+      return getShaper(fontData, (codePoint) => characterMap[codePoint], glyphOrder);
+    }
   }
 
   get defaultSourceLocation() {
