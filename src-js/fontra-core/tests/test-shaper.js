@@ -181,11 +181,11 @@ describe("shaper tests", () => {
     const shaper = getShaper(fontData, nominalGlyphFunc, glyphOrder);
 
     const expectedScriptAndLanguageInfo = {
-      DFLT: ["dflt"],
-      cyrl: ["dflt", "MKD ", "SRB "],
-      dev2: ["dflt"],
-      grek: ["dflt"],
-      latn: ["dflt", "APPH", "CAT ", "IPPH", "MAH ", "MOL ", "NAV ", "ROM "],
+      DFLT: [],
+      cyrl: ["MKD ", "SRB "],
+      dev2: [],
+      grek: [],
+      latn: ["APPH", "CAT ", "IPPH", "MAH ", "MOL ", "NAV ", "ROM "],
     };
 
     expect(shaper.getScriptAndLanguageInfo()).to.deep.equal(

@@ -146,8 +146,6 @@ class HBShaper extends ShaperBase {
       results[script].sort();
     }
 
-    Object.values(result).forEach((languages) => languages.unshift("dflt"));
-
     return result;
   }
 
