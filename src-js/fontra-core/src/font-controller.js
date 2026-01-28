@@ -85,6 +85,9 @@ export class FontController {
     this.backendInfo = await this.font.getBackEndInfo();
     this.readOnly = await this.font.isReadOnly();
 
+    delete this._shaperPromise;
+    delete this._dumbShaperPromise;
+
     if (initListener) {
       this.addChangeListener(
         { axes: null, sources: null },
