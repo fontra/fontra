@@ -84,87 +84,11 @@ export default class TextEntryPanel extends Panel {
     this.setupTextEntryElement();
     this.setupTextAlignElement();
     this.setupApplyKerningElement();
+    this.setupAccordionElement();
     this.setupIntersectionObserver();
   }
 
   getContentElement() {
-    this.fontController.getShaper().then((shaper) => this.updateFeatures(shaper));
-    this.accordion = new Accordion();
-    this.accordion.appendStyle(`
-      .features-container {
-        display: grid;
-        grid-template-columns: min-content auto;
-        align-items: center;
-        gap: 0.5em;
-      }
-
-      .feature-tag-button {
-        background-color: #999;
-        color: white;
-        padding: 0.25em 1em 0.25em 1em;
-        border-radius: 0.5em;
-        font-family: monospace;
-        font-size: 1.15em;
-        cursor: pointer;
-      }
-
-      .feature-tag-button:active {
-        background-color: #888;
-      }
-
-      .feature-tag-button.on {
-        background-color: #00BB00;
-      }
-
-      .feature-tag-button.on:active {
-        background-color: #009900;
-      }
-
-      .feature-tag-button.off {
-        background-color: #FF0022;
-      }
-
-      .feature-tag-button.off:active {
-        background-color: #DD0011;
-      }
-
-      .feature-tag-label {
-        color: var(--text-color);
-        text-decoration-color: lightgray;
-        cursor: pointer;
-      }
-
-      icon-button {
-        width: 1.3em;
-        height: 1.3em;
-      }
-    `);
-
-    this.accordion.items = [
-      {
-        id: "gsub-features-accordion-item",
-        label: "Substitution features",
-        open: true,
-        hidden: true,
-        content: html.div(
-          { class: "features-container", id: "gsub-features-contents" },
-          []
-        ),
-        auxiliaryHeaderElement: this._makeResetFeaturesButton("GSUB"),
-      },
-      {
-        id: "gpos-features-accordion-item",
-        label: "Positioning features",
-        open: true,
-        hidden: true,
-        content: html.div(
-          { class: "features-container", id: "gpos-features-contents" },
-          []
-        ),
-        auxiliaryHeaderElement: this._makeResetFeaturesButton("GPOS"),
-      },
-    ];
-
     return html.div(
       {
         class: "panel",
@@ -201,7 +125,7 @@ export default class TextEntryPanel extends Panel {
               ]
             ),
             html.div({ id: "apply-kerning-checkbox" }),
-            this.accordion,
+            html.div({ id: "text-settings-accordion" }),
           ]
         ),
       ]
@@ -341,6 +265,88 @@ export default class TextEntryPanel extends Panel {
       },
       false
     );
+  }
+
+  setupAccordionElement() {
+    this.fontController.getShaper().then((shaper) => this.updateFeatures(shaper));
+    this.accordion = new Accordion();
+    this.accordion.appendStyle(`
+      .features-container {
+        display: grid;
+        grid-template-columns: min-content auto;
+        align-items: center;
+        gap: 0.5em;
+      }
+
+      .feature-tag-button {
+        background-color: #999;
+        color: white;
+        padding: 0.25em 1em 0.25em 1em;
+        border-radius: 0.5em;
+        font-family: monospace;
+        font-size: 1.15em;
+        cursor: pointer;
+      }
+
+      .feature-tag-button:active {
+        background-color: #888;
+      }
+
+      .feature-tag-button.on {
+        background-color: #00BB00;
+      }
+
+      .feature-tag-button.on:active {
+        background-color: #009900;
+      }
+
+      .feature-tag-button.off {
+        background-color: #FF0022;
+      }
+
+      .feature-tag-button.off:active {
+        background-color: #DD0011;
+      }
+
+      .feature-tag-label {
+        color: var(--text-color);
+        text-decoration-color: lightgray;
+        cursor: pointer;
+      }
+
+      icon-button {
+        width: 1.3em;
+        height: 1.3em;
+      }
+    `);
+
+    this.accordion.items = [
+      {
+        id: "gsub-features-accordion-item",
+        label: "Substitution features",
+        open: true,
+        hidden: true,
+        content: html.div(
+          { class: "features-container", id: "gsub-features-contents" },
+          []
+        ),
+        auxiliaryHeaderElement: this._makeResetFeaturesButton("GSUB"),
+      },
+      {
+        id: "gpos-features-accordion-item",
+        label: "Positioning features",
+        open: true,
+        hidden: true,
+        content: html.div(
+          { class: "features-container", id: "gpos-features-contents" },
+          []
+        ),
+        auxiliaryHeaderElement: this._makeResetFeaturesButton("GPOS"),
+      },
+    ];
+
+    const placeHolder = this.contentElement.querySelector("#text-settings-accordion");
+    placeHolder.replaceWith(this.accordion);
   }
 
   fixTextEntryHeight() {
