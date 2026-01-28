@@ -175,7 +175,7 @@ class DumbShaper extends ShaperBase {
   }
 
   shape(codePoints, glyphObjects, options) {
-    const { variations, features } = options;
+    const { direction } = options;
     const glyphs = [];
 
     for (const [i, codePoint] of enumerate(codePoints)) {
@@ -193,6 +193,10 @@ class DumbShaper extends ShaperBase {
         dy: 0,
         flags: 0,
       });
+    }
+
+    if (direction === "rtl") {
+      glyphs.reverse();
     }
 
     return glyphs;
