@@ -322,6 +322,9 @@ export default class TextEntryPanel extends Panel {
       }
     `);
 
+    this.textScriptOptions = [{ label: "Automatic", value: null }];
+    this.textLanguageOptions = [{ label: "Automatic", value: null }];
+
     this.accordion.items = [
       {
         id: "shaping-options-accordion-item",
@@ -354,13 +357,13 @@ export default class TextEntryPanel extends Panel {
             "Script:",
             this.textSettingsController,
             "textScript",
-            [] // fill in later
+            this.textScriptOptions
           ),
           ...labeledPopupSelect(
             "Language:",
             this.textSettingsController,
             "textLanguage",
-            [] // fill in later
+            this.textLanguageOptions
           ),
         ]),
       },
