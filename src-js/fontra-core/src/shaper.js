@@ -65,10 +65,23 @@ class HBShaper extends ShaperBase {
     this.font = subFont;
   }
 
-  shape(codePoints, variations, features, glyphObjects) {
+  shape(codePoints, glyphObjects, options) {
+    const { variations, features, direction, script, language } = options;
+
     const buffer = hb.createBuffer();
     buffer.addCodePoints(codePoints);
     buffer.guessSegmentProperties(); // Set script, language and direction
+
+    buffer.setClusterLevel(1); // HB_BUFFER_CLUSTER_LEVEL_MONOTONE_CHARACTERS
+    if (direction) {
+      buffer.setDirection(direction);
+    }
+    if (script) {
+      buffer.setScript(hb.otTagToScript(script));
+    }
+    if (language) {
+      buffer.setLanguage(hb.otTagToLanguage(language));
+    }
 
     this.font.setVariations(variations || {});
 
@@ -161,7 +174,8 @@ class DumbShaper extends ShaperBase {
     super(nominalGlyphFunc, glyphOrder);
   }
 
-  shape(codePoints, variations, features, glyphObjects) {
+  shape(codePoints, glyphObjects, options) {
+    const { variations, features } = options;
     const glyphs = [];
 
     for (const [i, codePoint] of enumerate(codePoints)) {

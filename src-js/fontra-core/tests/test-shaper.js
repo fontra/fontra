@@ -125,12 +125,10 @@ describe("shaper tests", () => {
   it("test HBShaper", () => {
     const fontData = new Uint8Array(fs.readFileSync(mutatorSansPath));
     const shaper = getShaper(fontData, nominalGlyphFunc, glyphOrder);
-    const glyphs = shaper.shape(
-      testInputCodePoints,
-      { wght: 0, wdth: 0 },
-      "-kern,-rvrn",
-      glyphObjects
-    );
+    const glyphs = shaper.shape(testInputCodePoints, glyphObjects, {
+      variations: { wght: 0, wdth: 0 },
+      features: "-kern,-rvrn",
+    });
     applyKerning(glyphs, (g1, g2) => kerning.getGlyphPairValue(g1, g2));
 
     expect(glyphs).to.deep.equal(expectedGlyphs);
@@ -195,12 +193,10 @@ describe("shaper tests", () => {
 
   it("test DumbShaper", () => {
     const shaper = getShaper(null, nominalGlyphFunc, glyphOrder);
-    const glyphs = shaper.shape(
-      testInputCodePoints,
-      { wght: 0, wdth: 0 },
-      "kern",
-      glyphObjects
-    );
+    const glyphs = shaper.shape(testInputCodePoints, glyphObjects, {
+      variations: { wght: 0, wdth: 0 },
+      features: "kern",
+    });
     applyKerning(glyphs, (g1, g2) => kerning.getGlyphPairValue(g1, g2));
 
     expect(glyphs).to.deep.equal(expectedGlyphs);
@@ -220,7 +216,7 @@ describe("shaper tests", () => {
     const glyphNames = codePoints.map((codePoint) => shaper.nominalGlyph(codePoint));
     expect(glyphNames).to.deep.equal(inputGlyphNames);
 
-    const glyphs = shaper.shape(codePoints, null, null, glyphObjects);
+    const glyphs = shaper.shape(codePoints, glyphObjects);
     const glyphNames2 = glyphs.map((g) => g.gn);
     expect(glyphNames2).to.deep.equal(inputGlyphNames);
   });
