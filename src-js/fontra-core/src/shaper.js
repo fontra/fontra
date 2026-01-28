@@ -98,8 +98,21 @@ class HBShaper extends ShaperBase {
     return this._glyphObjects[glyphName]?.xAdvance ?? 500;
   }
 
-  getFeatureTags(otTableTag) {
-    return Array.from(new Set(this.face.getTableFeatureTags(otTableTag))).sort();
+  getFeatureInfo(otTableTag) {
+    const tags = this.face.getTableFeatureTags(otTableTag);
+    const info = {};
+
+    for (const [featureIndex, tag] of enumerate(tags)) {
+      if (tag in info) {
+        continue;
+      }
+      const nameIds = this.face.getFeatureNameIds(otTableTag, featureIndex);
+      info[tag] = nameIds?.uiLabelNameId
+        ? { uiLabelNameId: this.face.getName(nameIds.uiLabelNameId, "en") }
+        : {};
+    }
+
+    return info;
   }
 
   close() {
@@ -137,8 +150,8 @@ class DumbShaper extends ShaperBase {
     return glyphs;
   }
 
-  getFeatureTags(otTableTag) {
-    return [];
+  getFeatureInfo(otTableTag) {
+    return {};
   }
 
   close() {

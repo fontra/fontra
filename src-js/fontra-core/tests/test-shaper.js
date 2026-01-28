@@ -142,11 +142,11 @@ describe("shaper tests", () => {
     expect(glyphs).to.deep.equal(expectedGlyphs);
   });
 
-  it("test HBShaper getFeatureTags", () => {
+  it("test HBShaper getFeatureInfo", () => {
     const fontData = new Uint8Array(fs.readFileSync(testFontPath));
     const shaper = getShaper(fontData, nominalGlyphFunc, glyphOrder);
-    expect(shaper.getFeatureTags("GSUB")).to.deep.equal(["rvrn"]);
-    expect(shaper.getFeatureTags("GPOS")).to.deep.equal(["kern"]);
+    expect(shaper.getFeatureInfo("GSUB")).to.deep.equal({ rvrn: {} });
+    expect(shaper.getFeatureInfo("GPOS")).to.deep.equal({ kern: {} });
   });
 
   it("test DumbShaper", () => {
