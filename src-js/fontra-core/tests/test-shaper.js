@@ -216,7 +216,7 @@ describe("shaper tests", () => {
     const glyphNames = codePoints.map((codePoint) => shaper.nominalGlyph(codePoint));
     expect(glyphNames).to.deep.equal(inputGlyphNames);
 
-    const glyphs = shaper.shape(codePoints, glyphObjects);
+    const glyphs = shaper.shape(codePoints, glyphObjects, {});
     const glyphNames2 = glyphs.map((g) => g.gn);
     expect(glyphNames2).to.deep.equal(inputGlyphNames);
   });
