@@ -1,6 +1,6 @@
 import { getGlyphInfoFromCodePoint } from "@fontra/core/glyph-data.js";
 import * as html from "@fontra/core/html-utils.js";
-import { features } from "@fontra/core/opentype-tags.js";
+import { features, scripts } from "@fontra/core/opentype-tags.js";
 import { labeledCheckbox, labeledPopupSelect } from "@fontra/core/ui-utils.js";
 import { findNestedActiveElement } from "@fontra/core/utils.js";
 import { Accordion } from "@fontra/web-components/ui-accordion.js";
@@ -171,6 +171,17 @@ export default class TextEntryPanel extends Panel {
   updateFeatures(shaper) {
     const gsubFeatureInfo = shaper.getFeatureInfo("GSUB");
     const gposFeatureInfo = shaper.getFeatureInfo("GPOS");
+    const scriptAndLanguageInfo = shaper.getScriptAndLanguageInfo();
+
+    this.textScriptOptions.splice(
+      0,
+      Infinity,
+      { label: "Automatic", value: null },
+      ...Object.keys(scriptAndLanguageInfo).map((script) => ({
+        label: `${scripts[script] ?? script} (${script})`,
+        value: script,
+      }))
+    );
 
     for (const [info, element, accordionItem] of [
       [gsubFeatureInfo, this.gsubFeaturesElement, this.gsubFeaturesItem],
