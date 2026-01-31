@@ -261,6 +261,11 @@ class StaticGlyph:
     def convertToPaths(self):
         return replace(self, path=self.path.asPath())
 
+    @property
+    def packedPath(self) -> PackedPath:
+        assert isinstance(self.path, PackedPath)
+        return self.path
+
 
 @dataclass(kw_only=True)
 class Component:

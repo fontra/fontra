@@ -7,12 +7,26 @@ from contextlib import aclosing
 import pytest
 from fontTools.ttLib import TTFont
 
-from fontra.backends import getFileSystemBackend
-from fontra.core.classes import Axes, CrossAxisMapping, FontAxis, VariableGlyph
+from fontra.backends import getFileSystemBackend, opentype
+from fontra.core.classes import (
+    Axes,
+    CrossAxisMapping,
+    FontAxis,
+    FontSource,
+    LineMetric,
+    VariableGlyph,
+)
 from fontra.core.fonthandler import FontHandler
 from fontra.filesystem.projectmanager import FileSystemProjectManager
 
+opentype._USE_SOURCE_INDEX_INSTEAD_OF_UUID = True
+
 dataDir = pathlib.Path(__file__).resolve().parent / "data"
+
+
+@pytest.fixture
+def testFontMutatorSans():
+    return getFileSystemBackend(dataDir / "mutatorsans" / "MutatorSans.ttf")
 
 
 @pytest.fixture
@@ -171,7 +185,7 @@ async def test_externalChanges(tmpdir):
         await handler.startTasks()
 
         glyph = await handler.getGlyph("A")
-        assert glyph.layers["default"].glyph.xAdvance == 396
+        assert glyph.layers["font-source-0"].glyph.xAdvance == 396
 
         ttFont = TTFont(destPath)
         assert ttFont["hmtx"]["A"] == (396, 20)
@@ -182,7 +196,7 @@ async def test_externalChanges(tmpdir):
 
         modifiedGlyph = await handler.getGlyph("A")
 
-        assert modifiedGlyph.layers["default"].glyph.xAdvance == 999
+        assert modifiedGlyph.layers["font-source-0"].glyph.xAdvance == 999
 
 
 async def test_readTTX():
@@ -228,3 +242,71 @@ async def test_getShaperFontData_ttx():
         "name",
         "post",
     ]
+
+
+async def test_getSources(testFontMutatorSans):
+    sources = await testFontMutatorSans.getSources()
+    assert len(sources) == 4
+
+    expectedSourceValues = [
+        FontSource(
+            name="LightCondensed",
+            lineMetricsHorizontalLayout={
+                "ascender": LineMetric(value=700),
+                "baseline": LineMetric(value=0),
+                "capHeight": LineMetric(value=700),
+                "descender": LineMetric(value=-200),
+                "xHeight": LineMetric(value=500),
+            },
+        ),
+        FontSource(
+            name="wdth=1000",
+            location={"wdth": 1000.0},
+            lineMetricsHorizontalLayout={
+                "ascender": LineMetric(value=700),
+                "baseline": LineMetric(value=0),
+                "capHeight": LineMetric(value=700),
+                "descender": LineMetric(value=-200),
+                "xHeight": LineMetric(value=500),
+            },
+        ),
+        FontSource(
+            name="wdth=1000,wght=900",
+            location={"wdth": 1000.0, "wght": 900.0},
+            lineMetricsHorizontalLayout={
+                "ascender": LineMetric(value=800),
+                "baseline": LineMetric(value=0),
+                "capHeight": LineMetric(value=800),
+                "descender": LineMetric(value=-200),
+                "xHeight": LineMetric(value=500),
+            },
+        ),
+        FontSource(
+            name="wght=900",
+            location={"wght": 900.0},
+            lineMetricsHorizontalLayout={
+                "ascender": LineMetric(value=800),
+                "baseline": LineMetric(value=0),
+                "capHeight": LineMetric(value=800),
+                "descender": LineMetric(value=-200),
+                "xHeight": LineMetric(value=500),
+            },
+        ),
+    ]
+    assert list(sources.values()) == expectedSourceValues
+
+
+fontSourceNamesTestData = [
+    (
+        dataDir / "sourcesans" / "SourceSans3VF-Upright.subset.otf",
+        ["ExtraLight", "Semibold", "Black"],
+    )
+]
+
+
+@pytest.mark.parametrize("fontPath, expectedNames", fontSourceNamesTestData)
+async def test_font_sources_names(fontPath, expectedNames):
+    font = getFileSystemBackend(fontPath)
+    sources = await font.getSources()
+    sourceNames = [s.name for s in sources.values()]
+    assert sourceNames == expectedNames
