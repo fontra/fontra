@@ -2,6 +2,7 @@
 
 ## 2026-02-?? [version 2026.2.0]
 
+- [designspace/ufo] Fix regression in editing OpenType features, caused by unneeded reloading. [PR 2404](https://github.com/fontra/fontra/pull/2404)
 - [opentype backend] When reading TrueType or OpenType, setup font sources, so we can see the line metrics in the editor, and so that glyph sources will reference font sources where possible. [Issue 2399](https://github.com/fontra/fontra/issues/2399), [PR 2401](https://github.com/fontra/fontra/pull/2401)
 - [opentype backend] When reading TrueType or OpenType, use the user-visible axis ranges instead of normalized values for glyph source locations. [PR 2398](https://github.com/fontra/fontra/pull/2398)
 

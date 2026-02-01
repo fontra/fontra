@@ -30,6 +30,7 @@ from fontTools.ufoLib import (
     FONTINFO_FILENAME,
     GROUPS_FILENAME,
     KERNING_FILENAME,
+    LIB_FILENAME,
     UFOLibError,
     UFOReader,
     UFOReaderWriter,
@@ -475,6 +476,7 @@ class DesignspaceBackend(WatchableBackend, ReadableBaseBackend):
                 key=lambda gn: originalGlyphOrderMapping.get(gn, 0xFFFFFFFF)
             )
             reader.writeLib(lib)
+            self.fileWatcherIgnoreNextChange(os.path.join(layer.path, LIB_FILENAME))
 
     def ensureGlyphNotInGlyphOrder(self, layer, glyphName):
         reader = layer.reader
@@ -488,6 +490,7 @@ class DesignspaceBackend(WatchableBackend, ReadableBaseBackend):
         if glyphOrder is not None and glyphName in glyphOrder:
             glyphOrder.remove(glyphName)
             reader.writeLib(lib)
+            self.fileWatcherIgnoreNextChange(os.path.join(layer.path, LIB_FILENAME))
 
     async def getGlyphMap(self) -> dict[str, list[int]]:
         return dict(self.glyphMap)
@@ -1198,6 +1201,9 @@ class DesignspaceBackend(WatchableBackend, ReadableBaseBackend):
                 self.fileWatcherIgnoreNextChange(
                     os.path.join(dsSource.layer.path, FONTINFO_FILENAME)
                 )
+                self.fileWatcherIgnoreNextChange(
+                    os.path.join(dsSource.layer.path, LIB_FILENAME)
+                )
 
             newDSSources.append(dsSource)
 
@@ -1370,6 +1376,7 @@ class DesignspaceBackend(WatchableBackend, ReadableBaseBackend):
             writer = self.ufoManager.getReader(path)
             featureText = features.text if path == defaultPath else ""
             writer.writeFeatures(featureText)
+            self.fileWatcherIgnoreNextChange(os.path.join(path, FEATURES_FILENAME))
 
     async def getBackgroundImage(self, imageIdentifier: str) -> ImageData | None:
         imageInfo = self._imageMapping.reverse.get(imageIdentifier)
@@ -1712,6 +1719,9 @@ class UFOBackend(DesignspaceBackend):
 
     async def putCustomData(self, lib):
         self.defaultReader.writeLib(lib)
+        self.fileWatcherIgnoreNextChange(
+            os.path.join(self.defaultUFOLayer.path, LIB_FILENAME)
+        )
 
     async def putAxes(self, axes):
         if axes.axes or axes.mappings:
