@@ -1283,7 +1283,7 @@ export class EditorController extends ViewController {
     // where == 0: replace selected glyph
     // where == 1: insert after selected glyph
     // where == -1: insert before selected glyph
-    const { lineIndex, glyphIndex } = this.sceneSettings.selectedGlyph;
+    const { lineIndex } = this.sceneSettings.selectedGlyph;
     const { cluster: characterIndex } = this.sceneModel.getSelectedPositionedGlyph();
 
     const characterLines = [...this.sceneSettings.characterLines];
@@ -1296,17 +1296,17 @@ export class EditorController extends ViewController {
     this.sceneSettings.characterLines = characterLines;
 
     await this.sceneSettingsController.waitForKeyChange("positionedLines");
-    const positionedLines = this.sceneSettings.positionedLines;
 
-    const newGlyphIndex = positionedLines[lineIndex].glyphs.findIndex(
-      (positionedGlyph) => positionedGlyph.cluster === selectionCharacterIndex
-    );
+    const { glyphIndex } = this.sceneModel.characterSelectionToGlyphSelection({
+      lineIndex,
+      characterIndex: selectionCharacterIndex,
+    });
 
     const glyphExists = !!this.fontController.glyphMap[glyphInfos[0]?.glyphName];
 
     this.sceneSettings.selectedGlyph = {
       lineIndex: lineIndex,
-      glyphIndex: newGlyphIndex,
+      glyphIndex: glyphIndex,
       isEditing:
         glyphExists &&
         (where && select ? false : this.sceneSettings.selectedGlyph.isEditing),
