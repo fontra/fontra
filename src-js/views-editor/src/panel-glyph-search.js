@@ -55,12 +55,12 @@ export default class GlyphSearchPanel extends Panel {
     const characterLines = [...this.editorController.sceneSettings.characterLines];
 
     if (selectedGlyphState && !isDoubleClick) {
-      if (
-        !characterLines[selectedGlyphState.lineIndex][selectedGlyphState.glyphIndex]
-          .isPlaceholder
-      ) {
-        characterLines[selectedGlyphState.lineIndex][selectedGlyphState.glyphIndex] =
-          glyphInfo;
+      const { lineIndex } = selectedGlyphState;
+      const { cluster: characterIndex } =
+        this.editorController.sceneModel.getSelectedPositionedGlyph();
+
+      if (!characterLines[lineIndex][characterIndex].isPlaceholder) {
+        characterLines[lineIndex][characterIndex] = glyphInfo;
         this.editorController.sceneSettings.characterLines = characterLines;
       }
     } else if (!selectedGlyphState && isDoubleClick) {
@@ -70,6 +70,7 @@ export default class GlyphSearchPanel extends Panel {
       const lineIndex = characterLines.length - 1;
       characterLines[lineIndex].push(glyphInfo);
       this.editorController.sceneSettings.characterLines = characterLines;
+
       selectedGlyphState = {
         lineIndex: lineIndex,
         glyphIndex: characterLines[lineIndex].length - 1,
