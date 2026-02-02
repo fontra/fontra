@@ -165,6 +165,20 @@ export class SceneModel {
     );
   }
 
+  glyphSelectionToCharacterSelection({ lineIndex, glyphIndex }) {
+    const line = this.sceneSettings.positionedLines[lineIndex].glyphs;
+    const characterIndex = line[glyphIndex].cluster;
+    return { lineIndex, characterIndex };
+  }
+
+  characterSelectionToGlyphSelection({ lineIndex, characterIndex }) {
+    const line = this.sceneSettings.positionedLines[lineIndex].glyphs;
+    const glyphIndex = line.findIndex(
+      (positionedGlyph) => positionedGlyph.cluster === characterIndex
+    );
+    return { lineIndex, glyphIndex };
+  }
+
   _resetKerningInstance() {
     delete this._kerningInstance;
   }
