@@ -67,6 +67,27 @@ export class SceneModel {
     );
 
     this.sceneSettingsController.addKeyListener(
+      "applyTextShaping",
+      async (event) => {
+        if (!this.sceneSettings.selectedGlyph) {
+          return;
+        }
+
+        // Try to keep the same glyph selection after toggling applyTextShaping
+
+        const selectedCharacter = this.glyphSelectionToCharacterSelection(
+          this.sceneSettings.selectedGlyph
+        );
+
+        await this.sceneSettingsController.waitForKeyChange("positionedLines");
+
+        this.sceneSettings.selectedGlyph =
+          this.characterSelectionToGlyphSelection(selectedCharacter);
+      },
+      true // immediately
+    );
+
+    this.sceneSettingsController.addKeyListener(
       ["fontLocationSourceMapped", "glyphLocation"],
       (event) => {
         this._resetKerningInstance();
@@ -173,9 +194,24 @@ export class SceneModel {
 
   characterSelectionToGlyphSelection({ lineIndex, characterIndex }) {
     const line = this.sceneSettings.positionedLines[lineIndex].glyphs;
-    const glyphIndex = line.findIndex(
-      (positionedGlyph) => positionedGlyph.cluster === characterIndex
-    );
+    let glyphIndex = -1;
+
+    // Not every cluster/character index is guaranteed to exist, for example
+    // when f i translates to an fi ligature, then the fi ligature has a single
+    // cluster, and we won't find a glyph index for i's character index.
+    // In that case we try the previous character index, and on, until we find
+    // a match.
+    while (glyphIndex === -1 && characterIndex >= 0) {
+      glyphIndex = line.findIndex(
+        (positionedGlyph) => positionedGlyph.cluster === characterIndex
+      );
+      characterIndex--;
+    }
+
+    if (glyphIndex === -1) {
+      glyphIndex = 0; // last resort
+    }
+
     return { lineIndex, glyphIndex };
   }
 
