@@ -43,7 +43,7 @@ export default class GlyphSearchPanel extends Panel {
     );
   }
 
-  glyphNameChangedCallback(glyphName, isDoubleClick) {
+  async glyphNameChangedCallback(glyphName, isDoubleClick) {
     if (!glyphName) {
       return;
     }
@@ -52,23 +52,30 @@ export default class GlyphSearchPanel extends Panel {
       this.editorController.fontController.glyphInfoFromGlyphName(glyphName);
 
     let selectedGlyphState = this.editorController.sceneSettings.selectedGlyph;
-    const characterLines = [...this.editorController.sceneSettings.characterLines];
 
     if (selectedGlyphState && !isDoubleClick) {
       this.editorController.insertGlyphInfos([glyphInfo], 0, true);
     } else if (!selectedGlyphState && isDoubleClick) {
+      const characterLines = [...this.editorController.sceneSettings.characterLines];
+
       if (!characterLines.length) {
         characterLines.push([]);
       }
+
       const lineIndex = characterLines.length - 1;
+      const characterIndex = characterLines[lineIndex].length;
       characterLines[lineIndex].push(glyphInfo);
       this.editorController.sceneSettings.characterLines = characterLines;
 
-      selectedGlyphState = {
-        lineIndex: lineIndex,
-        glyphIndex: characterLines[lineIndex].length - 1,
-        isEditing: false,
-      };
+      await this.editorController.sceneSettingsController.waitForKeyChange(
+        "positionedLines"
+      );
+
+      selectedGlyphState =
+        this.editorController.sceneModel.characterSelectionToGlyphSelection({
+          lineIndex,
+          characterIndex,
+        });
     }
 
     this.editorController.sceneSettings.selectedGlyph = selectedGlyphState;
