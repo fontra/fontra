@@ -85,9 +85,6 @@ export class FontController {
     this.backendInfo = await this.font.getBackEndInfo();
     this.readOnly = await this.font.isReadOnly();
 
-    delete this._shaperPromise;
-    delete this._dumbShaperPromise;
-
     if (initListener) {
       this.addChangeListener(
         { axes: null, sources: null },
@@ -923,6 +920,15 @@ export class FontController {
     this._glyphsPromiseCache.clear();
     this._glyphInstancePromiseCache.clear();
     this._glyphInstancePromiseCacheKeys = {};
+
+    if (this._shaperPromise) {
+      this._shaperPromise.then((shaper) => {
+        shaper.close();
+      });
+    }
+    delete this._shaperPromise;
+    delete this._dumbShaperPromise;
+
     await this.initialize(false);
     this.notifyChangeListeners(null, false, true);
   }
