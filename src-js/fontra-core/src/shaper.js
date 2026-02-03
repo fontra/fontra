@@ -252,8 +252,11 @@ export function applyCursiveAttachments(glyphs, glyphObjects, rightToLeft = fals
         const entryAnchor = entryAnchors[suffix];
 
         // Horizontal adjustment
-        previousGlyph.ax += exitAnchor.x - previousXAdvance;
-        glyph.ax -= entryAnchor.x;
+        previousGlyph.ax = Math.max(
+          0,
+          previousGlyph.ax + exitAnchor.x - previousXAdvance
+        );
+        glyph.ax = Math.max(0, glyph.ax - entryAnchor.x);
         glyph.dx -= entryAnchor.x;
 
         // Vertical adjustment

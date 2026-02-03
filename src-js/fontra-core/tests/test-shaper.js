@@ -285,6 +285,7 @@ describe("shaper tests", () => {
   };
 
   const testDataCursiveAttachmentsLTR = [
+    // LTR
     { inputGlyphs: [], expectedGlyphs: [], rightToLeft: false },
     {
       inputGlyphs: [
@@ -310,7 +311,7 @@ describe("shaper tests", () => {
       ],
       rightToLeft: false,
     },
-
+    // RTL
     {
       inputGlyphs: [
         { gn: "teh-ar", ax: 500, ay: 0, dx: 0, dy: 0 },
@@ -323,6 +324,21 @@ describe("shaper tests", () => {
         { gn: "alef-ar", ax: 450, ay: 0, dx: -50, dy: -300 },
       ],
       rightToLeft: true,
+    },
+    // Wrong direction applied, nonsnese, output, but at least
+    // ensure we don't get negative advances
+    {
+      inputGlyphs: [
+        { gn: "alef-ar", ax: 500, ay: 0, dx: 0, dy: 0 },
+        { gn: "beh-ar", ax: 500, ay: 0, dx: 0, dy: 0 },
+        { gn: "teh-ar", ax: 500, ay: 0, dx: 0, dy: 0 },
+      ],
+      expectedGlyphs: [
+        { gn: "alef-ar", ax: 50, ay: 0, dx: 0, dy: 0 },
+        { gn: "beh-ar", ax: 0, ay: 0, dx: -475, dy: 150 },
+        { gn: "teh-ar", ax: 25, ay: 0, dx: -475, dy: 300 },
+      ],
+      rightToLeft: false,
     },
   ];
 
