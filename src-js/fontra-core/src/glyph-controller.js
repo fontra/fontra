@@ -1036,10 +1036,11 @@ function* iterFlattenedComponentPaths(
   if (transformation) {
     t = transformation.transform(t);
   }
-  const componentPaths = {};
+
   if (inst.path.numPoints) {
     yield { path: inst.path.transformed(t), errors: instErrors };
   }
+
   for (const subCompo of inst.components) {
     yield* iterFlattenedComponentPaths(
       subCompo,
