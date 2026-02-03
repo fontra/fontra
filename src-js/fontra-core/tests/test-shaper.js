@@ -1,5 +1,6 @@
 import { expect } from "chai";
 
+import { deepCopyObject } from "@fontra/core/utils.js";
 import fs from "fs";
 import { dirname, join } from "path";
 import { fileURLToPath } from "url";
@@ -8,7 +9,11 @@ import { parametrize } from "./test-support.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-import { applyKerning, getShaper } from "@fontra/core/shaper.js";
+import {
+  applyCursiveAttachments,
+  applyKerning,
+  getShaper,
+} from "@fontra/core/shaper.js";
 
 describe("shaper tests", () => {
   const testDataDir = join(dirname(__dirname), "..", "..", "test-py", "data");
@@ -255,6 +260,84 @@ describe("shaper tests", () => {
     const glyphNames2 = glyphs.map((g) => g.gn);
     expect(glyphNames2).to.deep.equal(inputGlyphNames);
   });
+
+  const cursiveGlyphObjects = {
+    "A": { xAdvance: 500, propagatedAnchors: [{ name: "exit", x: 450, y: 300 }] },
+    "B": {
+      xAdvance: 500,
+      propagatedAnchors: [
+        { name: "entry", x: 25, y: 150 },
+        { name: "exit", x: 450, y: 300 },
+        { name: "exit", x: -100, y: -100 }, // duplicate, to be ignored
+      ],
+    },
+    "C": { xAdvance: 500, propagatedAnchors: [{ name: "entry", x: 25, y: 150 }] },
+    "alef-ar": { xAdvance: 500, propagatedAnchors: [{ name: "exit", x: 50, y: 300 }] },
+    "beh-ar": {
+      xAdvance: 500,
+      propagatedAnchors: [
+        { name: "entry", x: 475, y: 150 },
+        { name: "exit", x: 50, y: 300 },
+        { name: "exit", x: -100, y: -100 }, // duplicate, to be ignored
+      ],
+    },
+    "teh-ar": { xAdvance: 500, propagatedAnchors: [{ name: "entry", x: 475, y: 150 }] },
+  };
+
+  const testDataCursiveAttachmentsLTR = [
+    { inputGlyphs: [], expectedGlyphs: [], rightToLeft: false },
+    {
+      inputGlyphs: [
+        { gn: "A", ax: 500, ay: 0, dx: 0, dy: 0 },
+        { gn: "B", ax: 500, ay: 0, dx: 0, dy: 0 },
+      ],
+      expectedGlyphs: [
+        { gn: "A", ax: 450, ay: 0, dx: 0, dy: 0 },
+        { gn: "B", ax: 475, ay: 0, dx: -25, dy: 150 },
+      ],
+      rightToLeft: false,
+    },
+    {
+      inputGlyphs: [
+        { gn: "A", ax: 500, ay: 0, dx: 0, dy: 0 },
+        { gn: "B", ax: 500, ay: 0, dx: 0, dy: 0 },
+        { gn: "C", ax: 500, ay: 0, dx: 0, dy: 0 },
+      ],
+      expectedGlyphs: [
+        { gn: "A", ax: 450, ay: 0, dx: 0, dy: 0 },
+        { gn: "B", ax: 425, ay: 0, dx: -25, dy: 150 },
+        { gn: "C", ax: 475, ay: 0, dx: -25, dy: 300 },
+      ],
+      rightToLeft: false,
+    },
+
+    {
+      inputGlyphs: [
+        { gn: "teh-ar", ax: 500, ay: 0, dx: 0, dy: 0 },
+        { gn: "beh-ar", ax: 500, ay: 0, dx: 0, dy: 0 },
+        { gn: "alef-ar", ax: 500, ay: 0, dx: 0, dy: 0 },
+      ],
+      expectedGlyphs: [
+        { gn: "teh-ar", ax: 475, ay: 0, dx: 0, dy: 0 },
+        { gn: "beh-ar", ax: 425, ay: 0, dx: -50, dy: -150 },
+        { gn: "alef-ar", ax: 450, ay: 0, dx: -50, dy: -300 },
+      ],
+      rightToLeft: true,
+    },
+  ];
+
+  parametrize(
+    "applyCursiveAttachments tests",
+    testDataCursiveAttachmentsLTR,
+    (testCase) => {
+      const { inputGlyphs, expectedGlyphs, rightToLeft } = testCase;
+      const outputGlyphs = deepCopyObject(inputGlyphs);
+
+      applyCursiveAttachments(outputGlyphs, cursiveGlyphObjects, rightToLeft);
+
+      expect(outputGlyphs).to.deep.equal(expectedGlyphs);
+    }
+  );
 });
 
 function ord(s) {

@@ -224,3 +224,66 @@ export function applyKerning(glyphs, pairFunc) {
     }
   }
 }
+
+export function applyCursiveAttachments(glyphs, glyphObjects, rightToLeft = false) {
+  const [leftPrefix, rightPrefix] = rightToLeft ? ["exit", "entry"] : ["entry", "exit"];
+
+  let previousGlyph;
+  let previousXAdvance;
+  let previousExitAnchors = {};
+
+  for (const glyph of glyphs) {
+    // TODO: figure out how to determine a glyph is a mark
+    // if (isMark(glyph)) {
+    //   continue;
+    // }
+
+    const glyphObject = glyphObjects[glyph.gn];
+    if (!glyphObject) {
+      previousExitAnchors = {};
+      continue;
+    }
+
+    const entryAnchors = collectAnchors(leftPrefix, glyphObject.propagatedAnchors);
+
+    for (const suffix of Object.keys(entryAnchors)) {
+      const exitAnchor = previousExitAnchors[suffix];
+      if (exitAnchor) {
+        const entryAnchor = entryAnchors[suffix];
+
+        // Horizontal adjustment
+        previousGlyph.ax += exitAnchor.x - previousXAdvance;
+        glyph.ax -= entryAnchor.x;
+        glyph.dx -= entryAnchor.x;
+
+        // Vertical adjustment
+        glyph.dy = previousGlyph.dy + exitAnchor.y - entryAnchor.y;
+
+        break;
+      }
+    }
+
+    previousGlyph = glyph;
+    previousXAdvance = glyphObject.xAdvance;
+    previousExitAnchors = collectAnchors(
+      rightPrefix,
+      glyphObjects[glyph.gn].propagatedAnchors
+    );
+  }
+}
+
+function collectAnchors(prefix, anchors) {
+  const lenPrefix = prefix.length;
+  const anchorsBySuffix = {};
+
+  for (const anchor of anchors || []) {
+    if (anchor.name.startsWith(prefix)) {
+      const suffix = anchor.name.slice(lenPrefix);
+      if (!(suffix in anchorsBySuffix)) {
+        anchorsBySuffix[suffix] = anchor;
+      }
+    }
+  }
+
+  return anchorsBySuffix;
+}
