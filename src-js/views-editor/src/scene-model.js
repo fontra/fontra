@@ -17,7 +17,11 @@ import {
   unionRect,
 } from "@fontra/core/rectangle.js";
 import { difference, isEqualSet, union, updateSet } from "@fontra/core/set-ops.js";
-import { MAX_UNICODE, applyKerning } from "@fontra/core/shaper.js";
+import {
+  MAX_UNICODE,
+  applyCursiveAttachments,
+  applyKerning,
+} from "@fontra/core/shaper.js";
 import { decomposedToTransform } from "@fontra/core/transform.js";
 import {
   consolidateCalls,
@@ -53,6 +57,7 @@ export class SceneModel {
         "characterLines",
         "align",
         "applyKerning",
+        "applyCursiveAttachments",
         "features",
         "applyTextShaping",
         "selectedGlyph",
@@ -476,6 +481,7 @@ export class SceneModel {
       shaper,
       (glyphName, layerName) => this.getGlyphInstance(glyphName, layerName),
       kerningInstance ? (g1, g2) => kerningInstance.getGlyphPairValue(g1, g2) : null,
+      this.sceneSettings.applyCursiveAttachments,
       this.sceneSettings.align,
       cancelSignal
     );
@@ -1191,6 +1197,7 @@ class LineSetter {
     shaper,
     getGlyphInstanceFunc,
     kerningPairFunc,
+    applyCursiveAttachments,
     align,
     cancelSignal
   ) {
@@ -1198,6 +1205,7 @@ class LineSetter {
     this.shaper = shaper;
     this.getGlyphInstanceFunc = getGlyphInstanceFunc;
     this.kerningPairFunc = kerningPairFunc;
+    this.applyCursiveAttachments = applyCursiveAttachments;
     this.align = align;
     this.cancelSignal = cancelSignal;
     this.glyphInstances = {};
@@ -1242,6 +1250,14 @@ class LineSetter {
 
     if (needsReshape) {
       shapedGlyphs = this.shaper.shape(codePoints, this.glyphInstances, shaperOptions);
+    }
+
+    if (this.applyCursiveAttachments) {
+      applyCursiveAttachments(
+        shapedGlyphs,
+        this.glyphInstances,
+        shaperOptions.direction == "rtl"
+      );
     }
 
     if (this.kerningPairFunc) {

@@ -96,6 +96,7 @@ export class SceneController {
       text: "",
       align: "center",
       applyKerning: true,
+      applyCursiveAttachments: true,
       editLayerName: null,
       characterLines: [],
       fontLocationUser: {},
@@ -396,7 +397,7 @@ export class SceneController {
     );
 
     this.sceneSettingsController.addKeyListener(
-      "applyKerning",
+      ["applyKerning", "applyCursiveAttachments"],
       (event) => {
         this.scrollAdjustBehavior = "pin-glyph-center";
       },

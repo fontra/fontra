@@ -326,6 +326,12 @@ export default class TextEntryPanel extends Panel {
             "applyKerning",
             { class: "labeled-checkbox" }
           ),
+          labeledCheckbox(
+            "Apply cursive attachments", // TODO: translate
+            this.textSettingsController,
+            "applyCursiveAttachments",
+            { class: "labeled-checkbox" }
+          ),
           ...labeledPopupSelect(
             "Direction:",
             this.textSettingsController,
