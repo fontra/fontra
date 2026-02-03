@@ -439,11 +439,15 @@ export default class TextEntryPanel extends Panel {
     if (!this.textEntryElement.value) {
       return;
     }
-    // If the first character is RTL, do align right
-    const codePoint = this.textEntryElement.value.codePointAt(0);
-    const info = getGlyphInfoFromCodePoint(codePoint);
-    const align = info?.direction == "RTL" ? "end" : "start";
-    this.textEntryElement.style = `text-align: ${align}`;
+    // Set the writing direction based on the first Letter in the text
+    for (const char of this.textEntryElement.value) {
+      const codePoint = char.codePointAt(0);
+      const info = getGlyphInfoFromCodePoint(codePoint);
+      if (info?.category === "Letter") {
+        this.textEntryElement.dir = info?.direction == "RTL" ? "rtl" : "ltr";
+        break;
+      }
+    }
   }
 
   setupIntersectionObserver() {
