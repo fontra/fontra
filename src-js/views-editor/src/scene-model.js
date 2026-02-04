@@ -599,15 +599,6 @@ export class SceneModel {
       ? parseSelection(currentSelection)
       : undefined;
 
-    const pointSelection = this.pointSelectionAtPoint(
-      point,
-      size,
-      parsedCurrentSelection
-    );
-    if (pointSelection.size) {
-      return { selection: pointSelection };
-    }
-
     const anchorSelection = this.anchorSelectionAtPoint(
       point,
       size,
@@ -615,6 +606,15 @@ export class SceneModel {
     );
     if (anchorSelection.size) {
       return { selection: anchorSelection };
+    }
+
+    const pointSelection = this.pointSelectionAtPoint(
+      point,
+      size,
+      parsedCurrentSelection
+    );
+    if (pointSelection.size) {
+      return { selection: pointSelection };
     }
 
     const guidelineSelection = this.guidelineSelectionAtPoint(
