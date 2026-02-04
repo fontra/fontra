@@ -243,7 +243,7 @@ export function applyCursiveAttachments(glyphs, glyphObjects, rightToLeft = fals
       continue;
     }
 
-    const entryAnchors = collectAnchors(leftPrefix, glyphObject.propagatedAnchors);
+    const entryAnchors = collectAnchors(glyphObject.propagatedAnchors, leftPrefix);
 
     for (const suffix of Object.keys(entryAnchors)) {
       const exitAnchor = previousExitAnchors[suffix];
@@ -267,14 +267,48 @@ export function applyCursiveAttachments(glyphs, glyphObjects, rightToLeft = fals
 
     previousGlyph = glyph;
     previousXAdvance = glyphObject.xAdvance;
-    previousExitAnchors = collectAnchors(
-      rightPrefix,
-      glyphObjects[glyph.gn].propagatedAnchors
-    );
+    previousExitAnchors = collectAnchors(glyphObject.propagatedAnchors, rightPrefix);
   }
 }
 
-function collectAnchors(prefix, anchors) {
+export function applyMarkPositioning(glyphs, glyphObjects) {
+  let previousXAdvance;
+  let baseAnchors = {};
+
+  for (const glyph of glyphs) {
+    const glyphObject = glyphObjects[glyph.gn];
+    if (!glyphObject) {
+      baseAnchors = {};
+      continue;
+    }
+
+    if (glyph.mark) {
+      const markBaseAnchors = collectAnchors(glyphObject.propagatedAnchors);
+      const markAnchors = collectAnchors(glyphObject.propagatedAnchors, "_");
+      for (const anchorName of Object.keys(markAnchors)) {
+        const baseAnchor = baseAnchors[anchorName];
+        if (baseAnchor) {
+          const markAnchor = markAnchors[anchorName];
+          glyph.dx = markAnchor.x - baseAnchor.x - previousXAdvance;
+          glyph.dy = baseAnchor.y - markAnchor.y;
+          for (const [anchorName, markAnchor] of Object.entries(markBaseAnchors)) {
+            baseAnchors[anchorName] = {
+              name: anchorName,
+              x: previousXAdvance + markAnchor.x + glyph.dx,
+              y: markAnchor.y + glyph.dy,
+            };
+          }
+          break;
+        }
+      }
+    } else {
+      baseAnchors = collectAnchors(glyphObject.propagatedAnchors);
+      previousXAdvance = glyphObject.xAdvance;
+    }
+  }
+}
+
+function collectAnchors(anchors, prefix = "") {
   const lenPrefix = prefix.length;
   const anchorsBySuffix = {};
 
