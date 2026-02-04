@@ -1,5 +1,5 @@
 import hbPromise from "harfbuzzjs";
-import { assert, enumerate, range } from "./utils.js";
+import { assert, enumerate, range, reversed } from "./utils.js";
 
 const hb = await hbPromise;
 
@@ -275,7 +275,9 @@ export function applyMarkPositioning(glyphs, glyphObjects, rightToLeft = false) 
   let previousXAdvance;
   let baseAnchors = {};
 
-  for (const glyph of glyphs) {
+  const ordered = rightToLeft ? reversed : (v) => v;
+
+  for (const glyph of ordered(glyphs)) {
     const glyphObject = glyphObjects[glyph.gn];
     if (!glyphObject) {
       baseAnchors = {};
@@ -289,12 +291,14 @@ export function applyMarkPositioning(glyphs, glyphObjects, rightToLeft = false) 
         const baseAnchor = baseAnchors[anchorName];
         if (baseAnchor) {
           const markAnchor = markAnchors[anchorName];
-          glyph.dx = markAnchor.x - baseAnchor.x - previousXAdvance;
+          glyph.dx = rightToLeft
+            ? baseAnchor.x - markAnchor.x
+            : markAnchor.x - baseAnchor.x - previousXAdvance;
           glyph.dy = baseAnchor.y - markAnchor.y;
           for (const [anchorName, markAnchor] of Object.entries(markBaseAnchors)) {
             baseAnchors[anchorName] = {
               name: anchorName,
-              x: previousXAdvance + markAnchor.x + glyph.dx,
+              x: markAnchor.x + glyph.dx + (rightToLeft ? 0 : previousXAdvance),
               y: markAnchor.y + glyph.dy,
             };
           }
