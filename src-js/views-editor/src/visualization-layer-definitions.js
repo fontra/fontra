@@ -331,8 +331,8 @@ registerVisualizationLayerDefinition({
     strokeWidth: 1,
     originMarkerRadius: 4,
   },
-  colors: { strokeColor: "#0006" },
-  colorsDarkMode: { strokeColor: "#FFF8" },
+  colors: { strokeColor: "#999" },
+  colorsDarkMode: { strokeColor: "#999" },
 
   draw: (context, positionedGlyph, parameters, model, controller) => {
     context.strokeStyle = parameters.strokeColor;
