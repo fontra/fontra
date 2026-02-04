@@ -3286,6 +3286,7 @@ export class EditorController extends ViewController {
     }
 
     if (viewInfo["selection"]) {
+      await this.sceneSettingsController.waitForKeyChange("positionedLines");
       this.sceneSettings.selection = new Set(viewInfo["selection"]);
     }
 
