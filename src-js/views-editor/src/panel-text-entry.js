@@ -321,19 +321,19 @@ export default class TextEntryPanel extends Panel {
             { class: "labeled-checkbox" }
           ),
           labeledCheckbox(
-            "Apply kerning", // TODO: translate
-            this.textSettingsController,
-            "applyKerning",
-            { class: "labeled-checkbox" }
-          ),
-          labeledCheckbox(
-            "Apply cursive attachments", // TODO: translate
+            "Emulate cursive attachments", // TODO: translate
             this.textSettingsController,
             "applyCursiveAttachments",
             { class: "labeled-checkbox" }
           ),
           labeledCheckbox(
-            "Apply mark positioning", // TODO: translate
+            "Emulate kerning", // TODO: translate
+            this.textSettingsController,
+            "applyKerning",
+            { class: "labeled-checkbox" }
+          ),
+          labeledCheckbox(
+            "Emulate mark positioning", // TODO: translate
             this.textSettingsController,
             "applyMarkPositioning",
             { class: "labeled-checkbox" }

@@ -1273,16 +1273,16 @@ class LineSetter {
       );
     }
 
+    if (this.kerningPairFunc) {
+      applyKerning(shapedGlyphs, this.kerningPairFunc);
+    }
+
     if (this.applyMarkPositioning) {
       applyMarkPositioning(
         shapedGlyphs,
         this.glyphInstances,
         shaperOptions.direction == "rtl"
       );
-    }
-
-    if (this.kerningPairFunc) {
-      applyKerning(shapedGlyphs, this.kerningPairFunc);
     }
 
     for (const [glyphIndex, glyphInfo] of enumerate(shapedGlyphs)) {
