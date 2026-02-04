@@ -889,6 +889,13 @@ export class SceneModel {
       }
     }
 
+    const anchors = positionedGlyph.glyph.anchors;
+    for (let i = 0; i < anchors.length; i++) {
+      if (pointInRect(anchors[i].x, anchors[i].y, selRect)) {
+        selection.add(`anchor/${i}`);
+      }
+    }
+
     const backgroundImageSelection = this.backgroundImageSelectionAtRect(selRect);
     if (backgroundImageSelection.size) {
       // As long as we don't have multiple background images,
