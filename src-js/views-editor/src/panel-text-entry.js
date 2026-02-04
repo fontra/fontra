@@ -332,6 +332,12 @@ export default class TextEntryPanel extends Panel {
             "applyCursiveAttachments",
             { class: "labeled-checkbox" }
           ),
+          labeledCheckbox(
+            "Apply mark positioning", // TODO: translate
+            this.textSettingsController,
+            "applyMarkPositioning",
+            { class: "labeled-checkbox" }
+          ),
           ...labeledPopupSelect(
             "Direction:",
             this.textSettingsController,

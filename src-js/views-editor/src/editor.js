@@ -159,6 +159,7 @@ export class EditorController extends ViewController {
         "align",
         "applyKerning",
         "applyCursiveAttachments",
+        "applyMarkPositioning",
         "applyTextShaping",
         "editLayerName",
         "editingLayers",
@@ -3230,6 +3231,8 @@ export class EditorController extends ViewController {
     this.sceneSettings.applyKerning = viewInfo["applyKerning"] === false ? false : true;
     this.sceneSettings.applyCursiveAttachments =
       viewInfo["applyCursiveAttachments"] === false ? false : true;
+    this.sceneSettings.applyMarkPositioning =
+      viewInfo["applyMarkPositioning"] === false ? false : true;
     this.sceneSettings.features = viewInfo["features"] ?? {};
     this.sceneSettings.applyTextShaping =
       viewInfo["applyTextShaping"] === false ? false : true;
@@ -3372,6 +3375,9 @@ export class EditorController extends ViewController {
     }
     if (!this.sceneSettings.applyCursiveAttachments) {
       viewInfo["applyCursiveAttachments"] = this.sceneSettings.applyCursiveAttachments;
+    }
+    if (!this.sceneSettings.applyMarkPositioning) {
+      viewInfo["applyMarkPositioning"] = this.sceneSettings.applyMarkPositioning;
     }
     if (!isObjectEmpty(this.sceneSettings.features)) {
       viewInfo["features"] = this.sceneSettings.features;

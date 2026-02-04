@@ -21,6 +21,7 @@ import {
   MAX_UNICODE,
   applyCursiveAttachments,
   applyKerning,
+  applyMarkPositioning,
 } from "@fontra/core/shaper.js";
 import { decomposedToTransform } from "@fontra/core/transform.js";
 import {
@@ -58,6 +59,7 @@ export class SceneModel {
         "align",
         "applyKerning",
         "applyCursiveAttachments",
+        "applyMarkPositioning",
         "features",
         "applyTextShaping",
         "selectedGlyph",
@@ -482,6 +484,7 @@ export class SceneModel {
       (glyphName, layerName) => this.getGlyphInstance(glyphName, layerName),
       kerningInstance ? (g1, g2) => kerningInstance.getGlyphPairValue(g1, g2) : null,
       this.sceneSettings.applyCursiveAttachments,
+      this.sceneSettings.applyMarkPositioning,
       this.sceneSettings.align,
       cancelSignal
     );
@@ -1198,6 +1201,7 @@ class LineSetter {
     getGlyphInstanceFunc,
     kerningPairFunc,
     applyCursiveAttachments,
+    applyMarkPositioning,
     align,
     cancelSignal
   ) {
@@ -1206,6 +1210,7 @@ class LineSetter {
     this.getGlyphInstanceFunc = getGlyphInstanceFunc;
     this.kerningPairFunc = kerningPairFunc;
     this.applyCursiveAttachments = applyCursiveAttachments;
+    this.applyMarkPositioning = applyMarkPositioning;
     this.align = align;
     this.cancelSignal = cancelSignal;
     this.glyphInstances = {};
@@ -1266,6 +1271,10 @@ class LineSetter {
         this.glyphInstances,
         shaperOptions.direction == "rtl"
       );
+    }
+
+    if (this.applyMarkPositioning) {
+      applyMarkPositioning(shapedGlyphs, this.glyphInstances);
     }
 
     if (this.kerningPairFunc) {
