@@ -291,14 +291,12 @@ export function applyMarkPositioning(glyphs, glyphObjects, rightToLeft = false) 
         const baseAnchor = baseAnchors[anchorName];
         if (baseAnchor) {
           const markAnchor = markAnchors[anchorName];
-          glyph.dx = rightToLeft
-            ? baseAnchor.x - markAnchor.x
-            : markAnchor.x - baseAnchor.x - previousXAdvance;
+          glyph.dx = baseAnchor.x - markAnchor.x - previousXAdvance;
           glyph.dy = baseAnchor.y - markAnchor.y;
           for (const [anchorName, markAnchor] of Object.entries(markBaseAnchors)) {
             baseAnchors[anchorName] = {
               name: anchorName,
-              x: markAnchor.x + glyph.dx + (rightToLeft ? 0 : previousXAdvance),
+              x: markAnchor.x + glyph.dx + previousXAdvance,
               y: markAnchor.y + glyph.dy,
             };
           }
@@ -312,7 +310,7 @@ export function applyMarkPositioning(glyphs, glyphObjects, rightToLeft = false) 
         glyph.dx,
         glyph.dy
       );
-      previousXAdvance = glyphObject.xAdvance;
+      previousXAdvance = rightToLeft ? 0 : glyphObject.xAdvance;
     }
   }
 }
