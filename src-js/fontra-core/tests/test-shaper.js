@@ -457,13 +457,31 @@ describe("shaper tests", () => {
         { gn: "dotbelowcomb", ax: 0, ay: 0, dx: -350, dy: -170, mark: true },
       ],
     },
+    // RTL
+    {
+      inputGlyphs: [
+        { gn: "dotaccentcomb", ax: 0, ay: 0, dx: 0, dy: 0, mark: true },
+        { gn: "dotaccentcomb", ax: 0, ay: 0, dx: 0, dy: 0, mark: true },
+        { gn: "dotbelowcomb", ax: 0, ay: 0, dx: 0, dy: 0, mark: true },
+        { gn: "dotbelowcomb", ax: 0, ay: 0, dx: 0, dy: 0, mark: true },
+        { gn: "H", ax: 500, ay: 0, dx: 0, dy: 0 },
+      ],
+      expectedGlyphs: [
+        { gn: "dotaccentcomb", ax: 0, ay: 0, dx: 150, dy: 160, mark: true },
+        { gn: "dotaccentcomb", ax: 0, ay: 0, dx: 150, dy: -10, mark: true },
+        { gn: "dotbelowcomb", ax: 0, ay: 0, dx: 150, dy: -170, mark: true },
+        { gn: "dotbelowcomb", ax: 0, ay: 0, dx: 150, dy: 0, mark: true },
+        { gn: "H", ax: 500, ay: 0, dx: 0, dy: 0 },
+      ],
+      rightToLeft: true,
+    },
   ];
 
   parametrize("applyMarkPositioning tests", testDataMarkPositioning, (testCase) => {
-    const { inputGlyphs, expectedGlyphs } = testCase;
+    const { inputGlyphs, expectedGlyphs, rightToLeft } = testCase;
     const outputGlyphs = deepCopyObject(inputGlyphs);
 
-    applyMarkPositioning(outputGlyphs, markGlyphObjects);
+    applyMarkPositioning(outputGlyphs, markGlyphObjects, rightToLeft);
 
     expect(outputGlyphs).to.deep.equal(expectedGlyphs);
   });
