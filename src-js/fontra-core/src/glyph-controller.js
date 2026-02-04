@@ -37,6 +37,7 @@ import {
   normalizeGuidelines,
   parseSelection,
   range,
+  reversed,
   zip,
 } from "./utils.js";
 import { addItemwise } from "./var-funcs.js";
@@ -896,7 +897,8 @@ registerRepresentationFactory(
 
 registerRepresentationFactory(StaticGlyphController, "propagatedAnchors", (glyph) => {
   // TODO: analyze the component traversal strategy and see what we really need.
-  return glyph.anchors.concat(glyph.components.map((compo) => compo.anchors).flat());
+  const components = [...reversed(glyph.components)];
+  return glyph.anchors.concat(components.map((compo) => compo.anchors).flat());
 });
 
 class ComponentController {
