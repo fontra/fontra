@@ -193,13 +193,13 @@ export class SceneModel {
     );
   }
 
-  glyphSelectionToCharacterSelection({ lineIndex, glyphIndex }) {
+  glyphSelectionToCharacterSelection({ lineIndex, glyphIndex, isEditing }) {
     const line = this.sceneSettings.positionedLines[lineIndex].glyphs;
     const characterIndex = line[glyphIndex].cluster;
-    return { lineIndex, characterIndex };
+    return { lineIndex, characterIndex, isEditing };
   }
 
-  characterSelectionToGlyphSelection({ lineIndex, characterIndex }) {
+  characterSelectionToGlyphSelection({ lineIndex, characterIndex, isEditing }) {
     const line = this.sceneSettings.positionedLines[lineIndex].glyphs;
     let glyphIndex = -1;
 
@@ -219,7 +219,7 @@ export class SceneModel {
       glyphIndex = 0; // last resort
     }
 
-    return { lineIndex, glyphIndex };
+    return { lineIndex, glyphIndex, isEditing };
   }
 
   _resetKerningInstance() {
