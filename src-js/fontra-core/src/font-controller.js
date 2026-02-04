@@ -11,6 +11,7 @@ import { getGlyphMapProxy, makeCharacterMapFromGlyphMap } from "./cmap.js";
 import { CrossAxisMapping } from "./cross-axis-mapping.js";
 import { FontSourcesInstancer } from "./font-sources-instancer.js";
 import { StaticGlyphController, VariableGlyphController } from "./glyph-controller.js";
+import { getGlyphInfoFromCodePoint, getGlyphInfoFromGlyphName } from "./glyph-data.js";
 import { KerningController } from "./kerning-controller.js";
 import { LRUCache } from "./lru-cache.js";
 import { setPopFirst } from "./set-ops.js";
@@ -84,12 +85,22 @@ export class FontController {
     this._rootClassDef = (await getClassSchema())["Font"];
     this.backendInfo = await this.font.getBackEndInfo();
     this.readOnly = await this.font.isReadOnly();
+    this._isMarkCache = {};
 
     if (initListener) {
       this.addChangeListener(
         { axes: null, sources: null },
         (change, isExternalChange) => {
           this._purgeCachesRelatedToAxesAndSourcesChanges();
+        },
+        false,
+        true // immediate
+      );
+
+      this.addChangeListener(
+        { glyphMap: null },
+        (change, isExternalChange) => {
+          this._isMarkCache = {};
         },
         false,
         true // immediate
@@ -1274,6 +1285,33 @@ export class FontController {
     );
 
     return { glyphs, backgroundImageData };
+  }
+
+  isMark(glyphName) {
+    let isMark = this._isMarkCache[glyphName];
+    if (isMark === undefined) {
+      isMark = this._isMark(glyphName);
+      this._isMarkCache[glyphName] = isMark;
+    }
+    return isMark;
+  }
+
+  _isMark(glyphName) {
+    const codePoints = this.glyphMap[glyphName] || [];
+    if (!codePoints.length) {
+      const info = getGlyphInfoFromGlyphName(glyphName);
+      if (info?.category === "Mark") {
+        return true;
+      }
+    } else {
+      for (const codePoint of codePoints) {
+        const info = getGlyphInfoFromCodePoint(codePoint);
+        if (info?.category === "Mark") {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 }
 
