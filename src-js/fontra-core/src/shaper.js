@@ -271,7 +271,7 @@ export function applyCursiveAttachments(glyphs, glyphObjects, rightToLeft = fals
   }
 }
 
-export function applyMarkPositioning(glyphs, glyphObjects) {
+export function applyMarkPositioning(glyphs, glyphObjects, rightToLeft = false) {
   let previousXAdvance;
   let baseAnchors = {};
 
@@ -302,21 +302,26 @@ export function applyMarkPositioning(glyphs, glyphObjects) {
         }
       }
     } else {
-      baseAnchors = collectAnchors(glyphObject.propagatedAnchors);
+      baseAnchors = collectAnchors(
+        glyphObject.propagatedAnchors,
+        "",
+        glyph.dx,
+        glyph.dy
+      );
       previousXAdvance = glyphObject.xAdvance;
     }
   }
 }
 
-function collectAnchors(anchors, prefix = "") {
+function collectAnchors(anchors, prefix = "", dx = 0, dy = 0) {
   const lenPrefix = prefix.length;
   const anchorsBySuffix = {};
 
-  for (const anchor of anchors || []) {
-    if (anchor.name.startsWith(prefix)) {
-      const suffix = anchor.name.slice(lenPrefix);
+  for (const { name, x, y } of anchors || []) {
+    if (name.startsWith(prefix)) {
+      const suffix = name.slice(lenPrefix);
       if (!(suffix in anchorsBySuffix)) {
-        anchorsBySuffix[suffix] = anchor;
+        anchorsBySuffix[suffix] = { name, x: x + dx, y: y + dy };
       }
     }
   }
