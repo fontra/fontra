@@ -233,10 +233,9 @@ export function applyCursiveAttachments(glyphs, glyphObjects, rightToLeft = fals
   let previousExitAnchors = {};
 
   for (const glyph of glyphs) {
-    // TODO: figure out how to determine a glyph is a mark
-    // if (isMark(glyph)) {
-    //   continue;
-    // }
+    if (glyph.mark) {
+      continue;
+    }
 
     const glyphObject = glyphObjects[glyph.gn];
     if (!glyphObject) {

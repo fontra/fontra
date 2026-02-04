@@ -311,6 +311,21 @@ describe("shaper tests", () => {
       ],
       rightToLeft: false,
     },
+    {
+      inputGlyphs: [
+        { gn: "A", ax: 500, ay: 0, dx: 0, dy: 0 },
+        { gn: "mark", ax: 0, ay: 0, dx: 0, dy: 0, mark: true },
+        { gn: "B", ax: 500, ay: 0, dx: 0, dy: 0 },
+        { gn: "C", ax: 500, ay: 0, dx: 0, dy: 0 },
+      ],
+      expectedGlyphs: [
+        { gn: "A", ax: 450, ay: 0, dx: 0, dy: 0 },
+        { gn: "mark", ax: 0, ay: 0, dx: 0, dy: 0, mark: true },
+        { gn: "B", ax: 425, ay: 0, dx: -25, dy: 150 },
+        { gn: "C", ax: 475, ay: 0, dx: -25, dy: 300 },
+      ],
+      rightToLeft: false,
+    },
     // RTL
     {
       inputGlyphs: [
