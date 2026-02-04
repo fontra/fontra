@@ -380,17 +380,17 @@ describe("shaper tests", () => {
       ],
     },
     dotaccentcomb: {
-      xAdvance: 500,
+      xAdvance: 200,
       propagatedAnchors: [
-        { name: "_top", x: 250, y: 730 },
-        { name: "top", x: 250, y: 900 },
+        { name: "_top", x: 100, y: 730 },
+        { name: "top", x: 100, y: 900 },
       ],
     },
     dotbelowcomb: {
-      xAdvance: 500,
+      xAdvance: 200,
       propagatedAnchors: [
-        { name: "_bottom", x: 250, y: -20 },
-        { name: "bottom", x: 250, y: -190 },
+        { name: "_bottom", x: 100, y: -20 },
+        { name: "bottom", x: 100, y: -190 },
       ],
     },
   };
@@ -410,9 +410,9 @@ describe("shaper tests", () => {
       ],
       expectedGlyphs: [
         { gn: "H", ax: 500, ay: 0, dx: 0, dy: 0 },
-        { gn: "dotaccentcomb", ax: 0, ay: 0, dx: -500, dy: -10, mark: true },
+        { gn: "dotaccentcomb", ax: 0, ay: 0, dx: -350, dy: -10, mark: true },
         { gn: "H", ax: 500, ay: 0, dx: 0, dy: 0 },
-        { gn: "dotaccentcomb", ax: 0, ay: 0, dx: -500, dy: -10, mark: true },
+        { gn: "dotaccentcomb", ax: 0, ay: 0, dx: -350, dy: -10, mark: true },
       ],
     },
     {
@@ -423,8 +423,8 @@ describe("shaper tests", () => {
       ],
       expectedGlyphs: [
         { gn: "H", ax: 500, ay: 0, dx: 0, dy: 0 },
-        { gn: "dotaccentcomb", ax: 0, ay: 0, dx: -500, dy: -10, mark: true },
-        { gn: "dotbelowcomb", ax: 0, ay: 0, dx: -500, dy: 0, mark: true },
+        { gn: "dotaccentcomb", ax: 0, ay: 0, dx: -350, dy: -10, mark: true },
+        { gn: "dotbelowcomb", ax: 0, ay: 0, dx: -350, dy: 0, mark: true },
       ],
     },
     {
@@ -436,9 +436,9 @@ describe("shaper tests", () => {
       ],
       expectedGlyphs: [
         { gn: "H", ax: 500, ay: 0, dx: 0, dy: 0 },
-        { gn: "dotaccentcomb", ax: 0, ay: 0, dx: -500, dy: -10, mark: true },
-        { gn: "dotaccentcomb", ax: 0, ay: 0, dx: -500, dy: 160, mark: true },
-        { gn: "dotaccentcomb", ax: 0, ay: 0, dx: -500, dy: 330, mark: true },
+        { gn: "dotaccentcomb", ax: 0, ay: 0, dx: -350, dy: -10, mark: true },
+        { gn: "dotaccentcomb", ax: 0, ay: 0, dx: -350, dy: 160, mark: true },
+        { gn: "dotaccentcomb", ax: 0, ay: 0, dx: -350, dy: 330, mark: true },
       ],
     },
     {
@@ -451,10 +451,10 @@ describe("shaper tests", () => {
       ],
       expectedGlyphs: [
         { gn: "H", ax: 500, ay: 0, dx: 0, dy: 0 },
-        { gn: "dotaccentcomb", ax: 0, ay: 0, dx: -500, dy: -10, mark: true },
-        { gn: "dotaccentcomb", ax: 0, ay: 0, dx: -500, dy: 160, mark: true },
-        { gn: "dotbelowcomb", ax: 0, ay: 0, dx: -500, dy: 0, mark: true },
-        { gn: "dotbelowcomb", ax: 0, ay: 0, dx: -500, dy: -170, mark: true },
+        { gn: "dotaccentcomb", ax: 0, ay: 0, dx: -350, dy: -10, mark: true },
+        { gn: "dotaccentcomb", ax: 0, ay: 0, dx: -350, dy: 160, mark: true },
+        { gn: "dotbelowcomb", ax: 0, ay: 0, dx: -350, dy: 0, mark: true },
+        { gn: "dotbelowcomb", ax: 0, ay: 0, dx: -350, dy: -170, mark: true },
       ],
     },
   ];
