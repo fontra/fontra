@@ -338,7 +338,7 @@ export class PointerTool extends BaseTool {
     this._selectionBeforeSingleClick = undefined;
     const sceneController = this.sceneController;
     await sceneController.editGlyph(async (sendIncrementalChange, glyph) => {
-      const initialPoint = sceneController.localPoint(initialEvent);
+      const initialPoint = sceneController.selectedGlyphPoint(initialEvent);
       let behaviorName = getBehaviorName(initialEvent);
 
       const layerInfo = Object.entries(
@@ -365,6 +365,7 @@ export class PointerTool extends BaseTool {
 
       layerInfo[0].isPrimaryLayer = true;
 
+      this.sceneController.scrollAdjustBehavior = "pin-glyph-origin";
       let editChange;
 
       for await (const event of eventStream) {
@@ -382,7 +383,7 @@ export class PointerTool extends BaseTool {
           }
           await sendIncrementalChange(consolidateChanges(rollbackChanges));
         }
-        const currentPoint = sceneController.localPoint(event);
+        const currentPoint = sceneController.selectedGlyphPoint(event);
         const delta = {
           x: currentPoint.x - initialPoint.x,
           y: currentPoint.y - initialPoint.y,
@@ -399,6 +400,7 @@ export class PointerTool extends BaseTool {
         }
 
         editChange = consolidateChanges(deepEditChanges);
+
         await sendIncrementalChange(editChange, true); // true: "may drop"
       }
       let changes = ChangeCollector.fromChanges(
@@ -528,7 +530,9 @@ export class PointerTool extends BaseTool {
         };
       });
 
+      this.sceneController.scrollAdjustBehavior = "pin-glyph-origin";
       let editChange;
+
       for await (const event of eventStream) {
         const currentPoint = sceneController.selectedGlyphPoint(event);
 

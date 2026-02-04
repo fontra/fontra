@@ -541,6 +541,7 @@ export class SceneController {
 
   _adjustScrollPosition() {
     let originXDelta = 0;
+    let originYDelta = 0;
 
     const glyphPosition = positionedGlyphPosition(
       this.sceneModel.getSelectedPositionedGlyph()
@@ -560,19 +561,28 @@ export class SceneController {
         this._previousGlyphPosition.x + this._previousGlyphPosition.xAdvance / 2;
       const glyphCenter = glyphPosition.x + glyphPosition.xAdvance / 2;
       originXDelta = glyphCenter - previousGlyphCenter;
+      originYDelta = glyphPosition.y - this._previousGlyphPosition.y;
+    } else if (
+      this.scrollAdjustBehavior === "pin-glyph-origin" &&
+      this._previousGlyphPosition &&
+      glyphPosition
+    ) {
+      originXDelta = glyphPosition.x - this._previousGlyphPosition.x;
+      originYDelta = glyphPosition.y - this._previousGlyphPosition.y;
     } else if (this.scrollAdjustBehavior?.behavior === "tool-pin-point") {
       originXDelta = this.scrollAdjustBehavior.getPinPointDelta();
     }
 
-    if (originXDelta) {
+    if (originXDelta || originYDelta) {
       this.sceneSettings.viewBox = offsetRect(
         this.sceneSettings.viewBox,
         originXDelta,
-        0
+        originYDelta
       );
     }
 
-    this.scrollAdjustBehavior = null;
+    this.scrollAdjustBehavior =
+      this.scrollAdjustBehavior === "pin-glyph-origin" ? "pin-glyph-origin" : null;
     this._previousTextExtents = [minX, maxX];
     this._previousGlyphPosition = glyphPosition;
   }
@@ -1688,7 +1698,11 @@ function positionedGlyphPosition(positionedGlyph) {
   if (!positionedGlyph) {
     return undefined;
   }
-  return { x: positionedGlyph.x, xAdvance: positionedGlyph.glyph.xAdvance };
+  return {
+    x: positionedGlyph.x,
+    y: positionedGlyph.y,
+    xAdvance: positionedGlyph.glyph.xAdvance,
+  };
 }
 
 export function equalGlyphSelection(glyphSelectionA, glyphSelectionB) {
