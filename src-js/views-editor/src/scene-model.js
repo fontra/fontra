@@ -1274,7 +1274,11 @@ class LineSetter {
     }
 
     if (this.applyMarkPositioning) {
-      applyMarkPositioning(shapedGlyphs, this.glyphInstances);
+      applyMarkPositioning(
+        shapedGlyphs,
+        this.glyphInstances,
+        shaperOptions.direction == "rtl"
+      );
     }
 
     if (this.kerningPairFunc) {
