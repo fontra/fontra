@@ -1,4 +1,6 @@
-from . import clipboard, pathops
+import base64
+
+from . import clipboard, pathops, shaperfont
 from .classes import structure, unstructure
 from .path import PackedPath
 
@@ -39,3 +41,15 @@ def excludePath(pathA, pathB):
     pathA = structure(pathA, PackedPath)
     pathB = structure(pathB, PackedPath)
     return unstructure(pathops.excludePath(pathA, pathB))
+
+
+@api
+def buildShaperFont(unitsPerEm, glyphOrder, featureText, axes, rules):
+    result = shaperfont.buildShaperFont(
+        unitsPerEm, glyphOrder, featureText, axes, rules
+    )
+    fontData = result["fontData"]
+    if fontData:
+        fontData = base64.b64encode(fontData).decode("ascii")
+
+    return {"fontData": fontData, "error": result["error"]}

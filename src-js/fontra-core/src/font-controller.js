@@ -1,3 +1,4 @@
+import { Backend } from "./backend-api.js";
 import { recordChanges } from "./change-recorder.js";
 import {
   applyChange,
@@ -354,19 +355,51 @@ export class FontController {
     });
   }
 
-  async getShaperFontData() {
-    const shaperFontData = await this.font.getShaperFontData();
-    if (!shaperFontData) {
-      return {};
+  async getShaperFontData(textShaping) {
+    let fontData = null;
+    let error = null;
+
+    const glyphOrder = Object.keys(this.glyphMap);
+
+    if (textShaping) {
+      let shaperFontData = await this.font.getShaperFontData();
+
+      if (shaperFontData) {
+        const fontDataBase64 = shaperFontData.data;
+        if (shaperFontData.glyphOrderSorting == "sorted") {
+          glyphOrder.sort();
+        }
+        if (fontDataBase64) {
+          const blob = await (
+            await fetch(`data:font/opentype;base64,${fontDataBase64}`)
+          ).blob();
+          fontData = await blob.arrayBuffer();
+        }
+      } else {
+        glyphOrder.sort();
+        ({ fontData, error } = await this.buildShaperFont(glyphOrder));
+      }
+    } else {
+      glyphOrder.sort();
     }
-    const blob = await (
-      await fetch(`data:font/opentype;base64,${shaperFontData.data}`)
-    ).blob();
 
     return {
-      glyphOrderSorting: shaperFontData.glyphOrderSorting,
-      fontData: await blob.arrayBuffer(),
+      fontData,
+      glyphOrder,
+      error,
     };
+  }
+
+  async buildShaperFont(glyphOrder) {
+    const features = await this.getFeatures();
+    const { fontData, error } = await Backend.buildShaperFont(
+      this.unitsPerEm,
+      glyphOrder,
+      features.text,
+      [], // TODO: axes
+      [] // TODO: ds-style fea-var rules
+    );
+    return { fontData, error };
   }
 
   getCachedGlyphNames() {
@@ -1077,24 +1110,19 @@ export class FontController {
   }
 
   async _getShaper(textShaping) {
-    let glyphOrderSorting = "sorted";
-    let fontData = null;
-
     await this.ensureInitialized;
 
-    if (textShaping) {
-      ({ glyphOrderSorting, fontData } = await this.getShaperFontData());
-    }
-
-    const glyphOrder = Object.keys(this.glyphMap);
-    if (glyphOrderSorting == "sorted") {
-      glyphOrder.sort();
-    }
+    const { glyphOrder, fontData, error } = await this.getShaperFontData(textShaping);
 
     {
       // characterMap closure
       const characterMap = this.characterMap;
-      return getShaper(fontData, (codePoint) => characterMap[codePoint], glyphOrder);
+      const shaper = getShaper(
+        fontData,
+        (codePoint) => characterMap[codePoint],
+        glyphOrder
+      );
+      return { shaper, error };
     }
   }
 
