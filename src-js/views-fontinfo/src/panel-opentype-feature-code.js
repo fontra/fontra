@@ -72,14 +72,15 @@ addStyleSheet(`
 .font-info-opentype-feature-code-header {
   display: grid;
   grid-template-columns: max-content auto;
-  align-items: start;
+  align-items: center;
   gap: 1em;
-  padding: 0.75em 1em 0.5em 1em;
+  padding: 0em 1em 0em 1em;
 }
 
 .font-info-opentype-feature-code-header > .title {
   font-weight: bold;
-  height: 2em;
+  padding: 0.6em 0em 0.6em 0em;
+
 }
 
 #font-info-opentype-feature-code-error-box {
