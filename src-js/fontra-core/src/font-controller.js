@@ -377,10 +377,12 @@ export class FontController {
         }
       } else {
         glyphOrder.sort();
+        ensureNotdef(glyphOrder);
         ({ fontData, error } = await this.buildShaperFont(glyphOrder));
       }
     } else {
       glyphOrder.sort();
+      ensureNotdef(glyphOrder);
     }
 
     return {
@@ -1588,4 +1590,15 @@ function remapBackgroundImageData(backgroundImageData, backgroundImageMapping) {
         (identifier) => backgroundImageMapping[identifier] || identifier
       )
     : undefined;
+}
+
+function ensureNotdef(glyphOrder) {
+  if (glyphOrder[0] === ".notdef") {
+    return;
+  }
+  const index = glyphOrder.indexOf(".notdef");
+  if (index != -1) {
+    glyphOrder.splice(index, 1);
+  }
+  glyphOrder.unshift(".notdef");
 }
