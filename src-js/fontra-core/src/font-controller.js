@@ -965,14 +965,6 @@ export class FontController {
     this._glyphInstancePromiseCache.clear();
     this._glyphInstancePromiseCacheKeys = {};
 
-    if (this._shaperPromise) {
-      this._shaperPromise.then((shaper) => {
-        shaper.close();
-      });
-    }
-    delete this._shaperPromise;
-    delete this._dumbShaperPromise;
-
     await this.initialize(false);
     this.notifyChangeListeners(null, false, true);
   }
@@ -1095,21 +1087,7 @@ export class FontController {
     return new KerningController(kernTag, await this.getKerning(), this);
   }
 
-  getShaper(textShaping = true) {
-    if (textShaping) {
-      if (!this._shaperPromise) {
-        this._shaperPromise = this._getShaper(true);
-      }
-      return this._shaperPromise;
-    }
-
-    if (!this._dumbShaperPromise) {
-      this._dumbShaperPromise = this._getShaper(false);
-    }
-    return this._dumbShaperPromise;
-  }
-
-  async _getShaper(textShaping) {
+  async getShaper(textShaping) {
     await this.ensureInitialized;
 
     const { glyphOrder, fontData, error } = await this.getShaperFontData(textShaping);
