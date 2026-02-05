@@ -118,13 +118,22 @@ export class SceneController {
       backgroundImagesAreLocked: true,
       backgroundLayers: {},
       editingLayers: {},
-      features: {},
+      featureSettings: {},
       textShaping: true,
       textDirection: null,
       textScript: null,
       textLanguage: null,
+      shaper: null,
+      shaperError: null,
+      dumbShaper: null,
     });
     this.sceneSettings = this.sceneSettingsController.model;
+
+    this.fontController.ensureInitialized.then(() => {
+      this.sceneSettingsController.model.shaper = this.fontController.getShaper(true);
+      this.sceneSettingsController.model.dumbShaper =
+        this.fontController.getShaper(false);
+    });
 
     // Set up the mutual relationship between text and characterLines
     this.sceneSettingsController.addKeyListener("text", async (event) => {
