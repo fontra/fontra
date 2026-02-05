@@ -372,6 +372,8 @@ export class SceneController {
 
   setupChangeListeners() {
     this.fontController.addChangeListener({ glyphMap: null }, () => {
+      this.updateShaper();
+
       const selectedGlyph = this.sceneSettings.selectedGlyph;
       if (
         selectedGlyph?.isEditing &&
