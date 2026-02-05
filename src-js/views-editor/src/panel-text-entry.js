@@ -256,6 +256,14 @@ export default class TextEntryPanel extends Panel {
       this.updateLanguages(shaper?.getScriptAndLanguageInfo() ?? {});
     });
 
+    this.textSettingsController.addKeyListener("shaperError", async (event) => {
+      const error = this.textSettings.shaperError;
+      const errorElement = this.accordion.querySelector("#features-error");
+      const messageElement = this.accordion.querySelector("#features-error-message");
+      errorElement.classList.toggle("hidden", !error);
+      messageElement.innerText = error ?? "";
+    });
+
     this.accordion = new Accordion();
     this.accordion.appendStyle(`
       .features-container {
@@ -316,6 +324,27 @@ export default class TextEntryPanel extends Panel {
       #shaping-options-contents > .labeled-checkbox {
         grid-column: 1 / span 2;
       }
+
+      #features-error {
+        grid-column: 1 / span 2;
+        display: grid;
+        grid-template-columns: auto auto;
+        justify-content: start;
+        align-items: center;
+        gap: 0.5em;
+      }
+
+      #features-error.hidden {
+        display: none;
+      }
+
+      #features-error > inline-svg {
+        display: inline-block;
+        width: 1.5em;
+        height: 1.5em;
+        color: var(--fontra-red-color);
+      }
+
     `);
 
     this.textScriptOptions = [{ label: "Automatic", value: null }];
@@ -373,6 +402,12 @@ export default class TextEntryPanel extends Panel {
             "textLanguage",
             this.textLanguageOptions
           ),
+          html.div({ id: "features-error", class: "hidden" }, [
+            html.createDomElement("inline-svg", {
+              src: "/tabler-icons/bug.svg",
+            }),
+            html.div({ id: "features-error-message" }, [""]),
+          ]),
         ]),
       },
       {
