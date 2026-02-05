@@ -306,25 +306,6 @@ export class SceneModel {
     }
   }
 
-  updateCharacterLinesCharacterMapping() {
-    // Call this when the cmap changed: previously missing characters may now be
-    // available, but may have a different glyph name, or a character may no longer
-    // be available, in which case we set the isUndefined flag
-    this.sceneSettings.characterLines = this.characterLines.map((line) =>
-      line.map((glyphInfo) => {
-        const glyphName = glyphInfo.character
-          ? this.fontController.characterMap[glyphInfo.character.codePointAt(0)]
-          : undefined;
-        if (glyphInfo.isUndefined && glyphName) {
-          glyphInfo = { ...glyphInfo, glyphName, isUndefined: false };
-        } else if (!glyphName) {
-          glyphInfo = { ...glyphInfo, isUndefined: true };
-        }
-        return glyphInfo;
-      })
-    );
-  }
-
   async updateBackgroundGlyphs() {
     this.backgroundLayerGlyphs = [];
     this.editingLayerGlyphs = [];
