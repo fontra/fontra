@@ -130,9 +130,7 @@ export class SceneController {
     this.sceneSettings = this.sceneSettingsController.model;
 
     this.fontController.ensureInitialized.then(() => {
-      this.sceneSettingsController.model.shaper = this.fontController.getShaper(true);
-      this.sceneSettingsController.model.dumbShaper =
-        this.fontController.getShaper(false);
+      this.updateShaper();
     });
 
     // Set up the mutual relationship between text and characterLines
@@ -331,6 +329,12 @@ export class SceneController {
         this.canvasController.requestUpdate();
       }
     );
+  }
+
+  updateShaper() {
+    this.sceneSettingsController.model.shaper = this.fontController.getShaper(true);
+    this.sceneSettingsController.model.dumbShaper =
+      this.fontController.getShaper(false);
   }
 
   async setLocationFromSourceIndex(sourceIndex) {
