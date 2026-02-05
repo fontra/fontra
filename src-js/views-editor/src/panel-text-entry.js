@@ -407,6 +407,7 @@ export default class TextEntryPanel extends Panel {
     if (!shaper) {
       return;
     }
+
     const gsubFeatureInfo = shaper.getFeatureInfo("GSUB");
     const gposFeatureInfo = shaper.getFeatureInfo("GPOS");
     const scriptAndLanguageInfo = shaper.getScriptAndLanguageInfo();
@@ -420,6 +421,15 @@ export default class TextEntryPanel extends Panel {
         value: script,
       }))
     );
+
+    if (
+      this.textSettings.textScript &&
+      !this.textScriptOptions.find(
+        (item) => item.value === this.textSettings.textScript
+      )
+    ) {
+      this.textSettings.textScript = null;
+    }
 
     this.updateLanguages(scriptAndLanguageInfo);
 
