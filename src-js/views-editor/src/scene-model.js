@@ -2,7 +2,10 @@ import {
   pointInConvexPolygon,
   rectIntersectsPolygon,
 } from "@fontra/core/convex-hull.js";
-import { getSuggestedGlyphName } from "@fontra/core/glyph-data.js";
+import {
+  getGlyphInfoFromCodePoint,
+  getSuggestedGlyphName,
+} from "@fontra/core/glyph-data.js";
 import { loaderSpinner } from "@fontra/core/loader-spinner.js";
 import {
   centeredRect,
@@ -1244,6 +1247,11 @@ class LineSetter {
         : this.shaper.getGlyphNameCodePoint(characterInfo.glyphName)
     );
 
+    if (!shaperOptions.direction) {
+      const direction = guessDirectionFromCodePoints(codePoints);
+      shaperOptions = { ...shaperOptions, direction };
+    }
+
     let shapedGlyphs = this.shaper.shape(
       codePoints,
       this.glyphInstances,
@@ -1404,4 +1412,14 @@ function addBoundingBoxes(glyphs, descender, ascender) {
     item.bounds = offsetRect(bounds, item.x, item.y);
     item.unpositionedBounds = bounds;
   });
+}
+
+function guessDirectionFromCodePoints(codePoints) {
+  for (const codePoint of codePoints) {
+    const info = getGlyphInfoFromCodePoint(codePoint);
+    if (info?.category === "Letter") {
+      return info.direction === "RTL" ? "rtl" : "ltr";
+    }
+  }
+  return undefined;
 }
