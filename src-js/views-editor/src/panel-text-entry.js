@@ -78,7 +78,7 @@ export default class TextEntryPanel extends Panel {
     this.textSettings = this.editorController.sceneSettingsController.model;
 
     this.textSettingsController.addKeyListener(
-      ["features", "applyTextShaping"],
+      ["featureSettings", "applyTextShaping", "shaper", "dumbShaper"],
       async (event) => this.updateFeatures(await this.getShaper())
     );
 
@@ -132,9 +132,18 @@ export default class TextEntryPanel extends Panel {
   }
 
   async getShaper() {
-    const { shaper, error } = await this.fontController.getShaper(
-      this.textSettings.applyTextShaping
-    );
+    const shaperPromise = this.textSettings.applyTextShaping
+      ? this.textSettings.shaper
+      : this.textSettings.dumbShaper;
+
+    if (!shaperPromise) {
+      return null;
+    }
+
+    const { shaper, error } = await shaperPromise;
+
+    this.textSettings.shaperError = error ?? null;
+
     return shaper;
   }
 
@@ -143,14 +152,17 @@ export default class TextEntryPanel extends Panel {
       "src": "/tabler-icons/refresh.svg",
       "onclick": async (event) => {
         const shaper = await this.getShaper();
+        if (!shaper) {
+          return;
+        }
         const info = shaper.getFeatureInfo(tableTag);
-        const features = { ...this.textSettings.features };
+        const featureSettings = { ...this.textSettings.featureSettings };
         Object.keys(info).forEach((featureTag) => {
-          delete features[featureTag];
+          delete featureSettings[featureTag];
         });
-        this.textSettings.features = features;
+        this.textSettings.featureSettings = featureSettings;
       },
-      "data-tooltip": `Reset ${tableTag} features`,
+      "data-tooltip": `Reset ${tableTag} feature settings`,
       "data-tooltipposition": "left",
     });
   }
@@ -239,13 +251,11 @@ export default class TextEntryPanel extends Panel {
   }
 
   setupAccordionElement() {
-    this.getShaper().then((shaper) => {
-      this.textSettingsController.addKeyListener("textScript", (event) => {
-        this.updateLanguages(shaper.getScriptAndLanguageInfo());
-      });
-
-      this.updateFeatures(shaper);
+    this.textSettingsController.addKeyListener("textScript", async (event) => {
+      const shaper = await this.getShaper();
+      this.updateLanguages(shaper?.getScriptAndLanguageInfo() ?? {});
     });
+
     this.accordion = new Accordion();
     this.accordion.appendStyle(`
       .features-container {
@@ -394,6 +404,9 @@ export default class TextEntryPanel extends Panel {
   }
 
   updateFeatures(shaper) {
+    if (!shaper) {
+      return;
+    }
     const gsubFeatureInfo = shaper.getFeatureInfo("GSUB");
     const gposFeatureInfo = shaper.getFeatureInfo("GPOS");
     const scriptAndLanguageInfo = shaper.getScriptAndLanguageInfo();
@@ -493,7 +506,7 @@ export default class TextEntryPanel extends Panel {
 }
 
 function featureTagButton(controller, featureTag, label, url, options) {
-  const controllerKey = options?.key ?? "features";
+  const controllerKey = options?.key ?? "featureSettings";
   let state = controller.model[controllerKey]?.[featureTag];
   const id = options?.id ?? `features-button-${featureTag}`;
 
