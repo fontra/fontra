@@ -132,7 +132,10 @@ export default class TextEntryPanel extends Panel {
   }
 
   async getShaper() {
-    return await this.fontController.getShaper(this.textSettings.applyTextShaping);
+    const { shaper, error } = await this.fontController.getShaper(
+      this.textSettings.applyTextShaping
+    );
+    return shaper;
   }
 
   _makeResetFeaturesButton(tableTag) {
