@@ -395,6 +395,10 @@ export class SceneController {
       },
       true
     );
+
+    this.fontController.addChangeListener({ features: null }, () => {
+      this.updateShaper();
+    });
   }
 
   setupSettingsListeners() {
