@@ -163,7 +163,7 @@ export class EditorController extends ViewController {
         "applyTextShaping",
         "editLayerName",
         "editingLayers",
-        "features",
+        "featureSettings",
         "fontLocationUser",
         "glyphLocation",
         "fontAxesUseSourceCoordinates",
@@ -3233,7 +3233,7 @@ export class EditorController extends ViewController {
       viewInfo["applyCursiveAttachments"] === false ? false : true;
     this.sceneSettings.applyMarkPositioning =
       viewInfo["applyMarkPositioning"] === false ? false : true;
-    this.sceneSettings.features = viewInfo["features"] ?? {};
+    this.sceneSettings.featureSettings = viewInfo["featureSettings"] ?? {};
     this.sceneSettings.applyTextShaping =
       viewInfo["applyTextShaping"] === false ? false : true;
     for (const key of ["textDirection", "textScript", "textLanguage"]) {
@@ -3380,8 +3380,8 @@ export class EditorController extends ViewController {
     if (!this.sceneSettings.applyMarkPositioning) {
       viewInfo["applyMarkPositioning"] = this.sceneSettings.applyMarkPositioning;
     }
-    if (!isObjectEmpty(this.sceneSettings.features)) {
-      viewInfo["features"] = this.sceneSettings.features;
+    if (!isObjectEmpty(this.sceneSettings.featureSettings)) {
+      viewInfo["featureSettings"] = this.sceneSettings.featureSettings;
     }
     if (!this.sceneSettings.applyTextShaping) {
       viewInfo["applyTextShaping"] = this.sceneSettings.applyTextShaping;
