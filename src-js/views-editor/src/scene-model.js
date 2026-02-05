@@ -63,13 +63,15 @@ export class SceneModel {
         "applyKerning",
         "applyCursiveAttachments",
         "applyMarkPositioning",
-        "features",
+        "featureSettings",
         "applyTextShaping",
         "selectedGlyph",
         "editLayerName",
         "textDirection",
         "textScript",
         "textLanguage",
+        "shaper",
+        "dumbShaper",
       ],
       (event) => {
         this.updateScene();
@@ -393,6 +395,9 @@ export class SceneModel {
 
     // const startTime = performance.now();
     const result = await this.buildScene(cancelSignal);
+    if (!result) {
+      return;
+    }
     // const elapsed = performance.now() - startTime;
     // console.log("buildScene", elapsed);
 
@@ -444,6 +449,13 @@ export class SceneModel {
   }
 
   async buildScene(cancelSignal) {
+    const shaperPromise = this.sceneSettings.applyTextShaping
+      ? this.sceneSettings.shaper
+      : this.sceneSettings.dumShaper;
+    if (!shaperPromise) {
+      return;
+    }
+
     const fontController = this.fontController;
 
     const characterLines = this.characterLines;
@@ -480,9 +492,9 @@ export class SceneModel {
     const kerningInstance = this.sceneSettings.applyKerning
       ? await this.getKerningInstance("kern")
       : null;
-    const { shaper } = await fontController.getShaper(
-      this.sceneSettings.applyTextShaping
-    );
+
+    const { shaper } = await shaperPromise;
+
     const lineSetter = new LineSetter(
       fontController,
       shaper,
@@ -494,12 +506,12 @@ export class SceneModel {
       cancelSignal
     );
 
-    const features = { ...this.sceneSettings.features };
+    const featureSettings = { ...this.sceneSettings.featureSettings };
     if (kerningInstance) {
-      features["kern"] = false;
+      featureSettings["kern"] = false;
     }
 
-    const featuresString = Object.entries(features ?? {})
+    const featuresString = Object.entries(featureSettings ?? {})
       .filter(([k, v]) => v != undefined)
       .map(([k, v]) => (v ? (v > 1 ? `${k}=${v}` : k) : `-${k}`))
       .join(",");
