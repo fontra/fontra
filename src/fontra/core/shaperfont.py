@@ -1,5 +1,6 @@
 import io
 
+from fontTools.feaLib.error import FeatureLibError
 from fontTools.fontBuilder import FontBuilder
 
 
@@ -36,6 +37,8 @@ def buildShaperFont(
         f = io.BytesIO()
         fb.save(f)
         fontData = f.getvalue()
+    except FeatureLibError as e:
+        error = str(e)
     except Exception as e:
         error = repr(e)
 
