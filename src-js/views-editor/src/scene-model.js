@@ -432,7 +432,7 @@ export class SceneModel {
   async buildScene(cancelSignal) {
     const shaperPromise = this.sceneSettings.applyTextShaping
       ? this.sceneSettings.shaper
-      : this.sceneSettings.dumShaper;
+      : this.sceneSettings.dumbShaper;
     if (!shaperPromise) {
       return;
     }
@@ -1298,7 +1298,9 @@ class LineSetter {
     for (const [glyphIndex, glyphInfo] of enumerate(shapedGlyphs)) {
       const codePoint = codePoints[glyphInfo.cl];
       const glyphName =
-        glyphInfo.g != 0 ? glyphInfo.gn : getSuggestedGlyphName(codePoint);
+        glyphInfo.g != 0 || codePoint >= MAX_UNICODE
+          ? glyphInfo.gn
+          : getSuggestedGlyphName(codePoint);
 
       const isSelectedGlyph = glyphIndex == selectedGlyphIndex;
 
