@@ -43,28 +43,21 @@ import {
 import * as html from "@fontra/core/html-utils.js";
 import { addStyleSheet } from "@fontra/core/html-utils.js";
 import { scheduleCalls } from "@fontra/core/utils.js";
+import { themeColorCSS } from "@fontra/web-components/theme-support.js";
 import { Tag } from "@lezer/highlight";
 import { BaseInfoPanel } from "./panel-base.js";
 
-addStyleSheet(`
-:root {
-  --comment-color-light: var(--fontra-theme-marker) #676e78;
-  --comment-color-dark: #a2a2a2;
-  --keyword-color-light: var(--fontra-theme-marker) #0b57d0;
-  --keyword-color-dark: #75bfff;
-  --glyph-class-color-light: var(--fontra-theme-marker) #b90063;
-  --glyph-class-color-dark: #ff7de9;
-  --glyph-range-color-light: var(--fontra-theme-marker) #b95a00;
-  --glyph-range-color-dark: #ffbe7d;
-  --named-glyph-class-color-light: var(--fontra-theme-marker) #198639;
-  --named-glyph-class-color-dark: #86de74;
+const colors = {
+  "comment-color": ["#676e78", "#a2a2a2"],
+  "keyword-color": ["#0b57d0", "#75bfff"],
+  "glyph-class-color": ["#b90063", "#ff7de9"],
+  "named-glyph-class-color": ["#198639", "#86de74"],
+  "glyph-range-color": ["#b95a00", "#ffbe7d"],
+  "feature-error-box-color": ["#fdc", "#843"],
+};
 
-  --comment-color: var(--comment-color-light, var(--comment-color-dark));
-  --keyword-color: var(--keyword-color-light, var(--keyword-color-dark));
-  --glyph-class-color: var(--glyph-class-color-light, var(--glyph-class-color-dark));
-  --glyph-range-color: var(--glyph-range-color-light, var(--glyph-range-color-dark));
-  --named-glyph-class-color: var(--named-glyph-class-color-light, var(--named-glyph-class-color-dark));
-}
+addStyleSheet(`
+  ${themeColorCSS(colors, ":root")}
 
 #opentype-feature-code-panel {
   height: 100%;
@@ -77,9 +70,38 @@ addStyleSheet(`
 }
 
 .font-info-opentype-feature-code-header {
+  display: grid;
+  grid-template-columns: max-content auto;
+  align-items: start;
+  gap: 1em;
+  padding: 0.75em 1em 0.5em 1em;
+}
+
+.font-info-opentype-feature-code-header > .title {
   font-weight: bold;
-  padding: 1em;
-  padding-bottom: 0.5em;
+  height: 2em;
+}
+
+#font-info-opentype-feature-code-error-box {
+  justify-self: center;
+  display: grid;
+  grid-template-columns: auto auto;
+  align-items: center;
+  gap: 0.5em;
+  padding: 0.1em 0.4em 0.2em 0.4em;
+  border-radius: 0.5em;
+  background-color: var(--feature-error-box-color);
+}
+
+#font-info-opentype-feature-code-error-box.hidden {
+  display: none;
+}
+
+#font-info-opentype-feature-code-error-box > inline-svg {
+  display: inline-block;
+  width: 1.4em;
+  height: 1.4em;
+  color: var(--fontra-red-color);
 }
 
 #font-info-opentype-feature-code-text-entry-textarea {
@@ -110,12 +132,12 @@ const openTypeFeatureCodeSimpleMode = simpleMode({
       token: "keyword",
     },
     {
-      regex: /\[\s*\\?[a-zA-Z0-9_.-]+(?:\s+\\?[a-zA-Z0-9_.-]+)*\s*\]/,
-      token: "glyphClass",
-    },
-    {
       regex: /\[\s*(\\?[a-zA-Z0-9_.]+)\s*-\s*(\\?[a-zA-Z0-9_.]+)\s*\]/,
       token: "glyphRange",
+    },
+    {
+      regex: /\[\s*\\?[a-zA-Z0-9_.-]+(?:\s+\\?[a-zA-Z0-9_.-]+)*\s*\]/,
+      token: "glyphClass",
     },
     { regex: /@[a-zA-Z0-9_.-]+/, token: "namedGlyphClass" },
   ],
@@ -223,7 +245,13 @@ export class OpenTypeFeatureCodePanel extends BaseInfoPanel {
     );
     container.appendChild(
       html.div({ class: "font-info-opentype-feature-code-header" }, [
-        "OpenType Feature Code", // TODO: translation
+        html.div({ class: "title" }, [
+          "OpenType Feature Code", // TODO: translation
+        ]),
+        html.div({ id: "font-info-opentype-feature-code-error-box", class: "hidden" }, [
+          html.createDomElement("inline-svg", { src: "/tabler-icons/bug.svg" }),
+          html.div({ id: "font-info-opentype-feature-code-error-message" }, [""]),
+        ]),
       ])
     );
     const editorContainer = html.div(
@@ -289,6 +317,21 @@ export class OpenTypeFeatureCodePanel extends BaseInfoPanel {
         root.features.text = update.state.doc.toString();
       }
     );
+
+    await this.checkCompileErrors();
+  }
+
+  async checkCompileErrors() {
+    const { error } = await this.fontController.getShaper(true);
+    const errorElement = document.querySelector(
+      "#font-info-opentype-feature-code-error-box"
+    );
+    const messageElement = document.querySelector(
+      "#font-info-opentype-feature-code-error-message"
+    );
+
+    messageElement.innerText = error ?? "";
+    errorElement.classList.toggle("hidden", !error);
   }
 
   getUndoRedoLabel(isRedo) {
