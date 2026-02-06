@@ -236,7 +236,7 @@ export class OpenTypeFeatureCodePanel extends BaseInfoPanel {
   async setupUI() {
     this.updateFeatureCode = scheduleCalls(
       (update) => this._updateFeatureCode(update),
-      500
+      350
     );
     const features = await this.fontController.getFeatures();
     this.panelElement.innerHTML = "";
