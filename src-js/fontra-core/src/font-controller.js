@@ -183,7 +183,7 @@ export class FontController {
   }
 
   async getFeatures() {
-    return await this.getData("features");
+    return { language: "fea", text: "", ...(await this.getData("features")) };
   }
 
   async getKerning() {
