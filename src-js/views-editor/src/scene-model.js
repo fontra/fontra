@@ -35,6 +35,7 @@ import {
   reversed,
   valueInRange,
 } from "@fontra/core/utils.js";
+import { normalizeLocation, unnormalizeLocation } from "@fontra/core/var-model.js";
 import * as vector from "@fontra/core/vector.js";
 
 export class SceneModel {
@@ -497,8 +498,20 @@ export class SceneModel {
       .map(([k, v]) => (v ? (v > 1 ? `${k}=${v}` : k) : `-${k}`))
       .join(",");
 
+    // The shaper font works with user coordinates, but does not do avar mapping,
+    // so we want to feed it our fontLocationSourceMapped location, but with user
+    // coordinates. We need to filter out discrete axes, as they are not properly
+    // supported here yet.
+    const shaperLocation = unnormalizeLocation(
+      normalizeLocation(
+        this.sceneSettings.fontLocationSourceMapped,
+        this.fontController.fontAxesSourceSpace.filter((axis) => !axis.values)
+      ),
+      this.fontController.axes.axes.filter((axis) => !axis.values)
+    );
+
     const shaperOptions = {
-      variations: this.sceneSettings.fontLocationSourceMapped,
+      variations: shaperLocation,
       features: featuresString,
       direction: this.sceneSettings.textDirection,
       script: this.sceneSettings.textScript,
