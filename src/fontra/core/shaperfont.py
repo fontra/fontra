@@ -16,6 +16,7 @@ def buildShaperFont(
     try:
         fb = FontBuilder(unitsPerEm=unitsPerEm)
         fb.setupGlyphOrder(glyphOrder)
+        fb.setupNameTable({}, mac=False)
         fb.setupPost(keepGlyphNames=False)
         if axes:
             fb.setupFvar(
