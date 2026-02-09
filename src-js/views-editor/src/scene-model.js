@@ -1353,10 +1353,12 @@ class LineSetter {
         glyphInstance = fontController.getDummyGlyphInstanceController(glyphName);
       }
 
-      // TODO: figure out the true meaning of the .flags field
       const kernValue =
-        glyphIndex && glyphInfo.flags & 0x01
-          ? shapedGlyphs[glyphIndex - 1].ax - glyphs.at(-1).glyph.xAdvance
+        this.kerningPairFunc && glyphIndex > 0
+          ? this.kerningPairFunc(
+              shapedGlyphs[glyphIndex - 1].gn,
+              shapedGlyphs[glyphIndex].gn
+            )
           : 0;
 
       glyphs.push({
