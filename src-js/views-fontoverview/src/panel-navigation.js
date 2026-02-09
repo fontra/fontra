@@ -787,7 +787,7 @@ async function runEditGlyphSetDialog(glyphSetInfo) {
   }
 
   .code-point-popup {
-    width: 8em;
+    width: max-content;
   }
 
   .tsv-csv-only {
