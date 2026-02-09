@@ -398,7 +398,7 @@ export class FontController {
       this.unitsPerEm,
       glyphOrder,
       features.text,
-      [], // TODO: axes
+      this.axes.axes.filter((axis) => !axis.values), // Filter out discrete axes
       [] // TODO: ds-style fea-var rules
     );
     return { fontData, error };
