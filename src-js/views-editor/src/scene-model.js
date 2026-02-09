@@ -30,6 +30,7 @@ import { decomposedToTransform } from "@fontra/core/transform.js";
 import {
   consolidateCalls,
   enumerate,
+  mapObjectKeys,
   parseSelection,
   range,
   reversed,
@@ -498,16 +499,8 @@ export class SceneModel {
       .map(([k, v]) => (v ? (v > 1 ? `${k}=${v}` : k) : `-${k}`))
       .join(",");
 
-    // The shaper font works with user coordinates, but does not do avar mapping,
-    // so we want to feed it our fontLocationSourceMapped location, but with user
-    // coordinates. We need to filter out discrete axes, as they are not properly
-    // supported here yet.
-    const shaperLocation = unnormalizeLocation(
-      normalizeLocation(
-        this.sceneSettings.fontLocationSourceMapped,
-        this.fontController.fontAxesSourceSpace.filter((axis) => !axis.values)
-      ),
-      this.fontController.axes.axes.filter((axis) => !axis.values)
+    const shaperLocation = this.getShaperLocation(
+      this.sceneSettings.fontLocationSourceMapped
     );
 
     const shaperOptions = {
@@ -539,6 +532,27 @@ export class SceneModel {
     }
 
     return { longestLineLength, positionedLines };
+  }
+
+  getShaperLocation(sourceLocation) {
+    // The shaper font works with user coordinates, but does not do avar mapping,
+    // so we want to feed it our fontLocationSourceMapped location, but with user
+    // coordinates. We need to filter out discrete axes, as they are not properly
+    // supported here yet.
+
+    const nameToTagMapping = Object.fromEntries(
+      this.fontController.axes.axes.map((axis) => [axis.name, axis.tag])
+    );
+
+    const shaperLocation = unnormalizeLocation(
+      normalizeLocation(
+        sourceLocation,
+        this.fontController.fontAxesSourceSpace.filter((axis) => !axis.values)
+      ),
+      this.fontController.axes.axes.filter((axis) => !axis.values)
+    );
+
+    return mapObjectKeys(shaperLocation, (key) => nameToTagMapping[key]);
   }
 
   getLocationForGlyph(glyphName) {
