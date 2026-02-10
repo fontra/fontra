@@ -306,6 +306,8 @@ export class OpenTypeFeatureCodePanel extends BaseInfoPanel {
         html.div({ id: "font-info-opentype-feature-code-error-message" }, [""]),
       ])
     );
+
+    await this.checkCompileErrors();
   }
 
   async _updateFeatureCode(update) {
