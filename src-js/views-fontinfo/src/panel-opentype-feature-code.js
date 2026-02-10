@@ -53,7 +53,7 @@ const colors = {
   "glyph-class-color": ["#b90063", "#ff7de9"],
   "named-glyph-class-color": ["#198639", "#86de74"],
   "glyph-range-color": ["#b95a00", "#ffbe7d"],
-  "feature-error-box-color": ["#fdc", "#843"],
+  "feature-error-box-color": ["#f885", "#f885"],
 };
 
 addStyleSheet(`
@@ -64,6 +64,8 @@ addStyleSheet(`
 }
 
 .font-info-opentype-feature-code-container {
+  display: grid;
+  grid-template-rows: min-content auto min-content;
   background-color: var(--ui-element-background-color);
   border-radius: 0.5em;
   overflow: hidden;
@@ -74,22 +76,16 @@ addStyleSheet(`
   grid-template-columns: max-content auto;
   align-items: center;
   gap: 1em;
-  padding: 0em 1em 0em 1em;
-}
-
-.font-info-opentype-feature-code-header > .title {
   font-weight: bold;
-  padding: 0.6em 0em 0.6em 0em;
-
+  padding: 0.6em 1em 0.6em 1em;
 }
 
 #font-info-opentype-feature-code-error-box {
-  justify-self: center;
   display: grid;
   grid-template-columns: auto auto;
-  align-items: center;
+  justify-content: start;
   gap: 0.5em;
-  padding: 0.1em 0.4em 0.2em 0.4em;
+  padding: 0.5em 0.5em 0.5em 0.5em;
   border-radius: 0.5em;
   background-color: var(--feature-error-box-color);
 }
@@ -107,7 +103,7 @@ addStyleSheet(`
 
 #font-info-opentype-feature-code-text-entry-textarea {
   font-size: 1.1em;
-  height: calc(100% - 2.4em);
+  height: 100%;
 }
 
 #font-info-opentype-feature-code-text-entry-textarea > .cm-editor {
@@ -246,15 +242,10 @@ export class OpenTypeFeatureCodePanel extends BaseInfoPanel {
     );
     container.appendChild(
       html.div({ class: "font-info-opentype-feature-code-header" }, [
-        html.div({ class: "title" }, [
-          "OpenType Feature Code", // TODO: translation
-        ]),
-        html.div({ id: "font-info-opentype-feature-code-error-box", class: "hidden" }, [
-          html.createDomElement("inline-svg", { src: "/tabler-icons/bug.svg" }),
-          html.div({ id: "font-info-opentype-feature-code-error-message" }, [""]),
-        ]),
+        "OpenType Feature Code", // TODO: translation
       ])
     );
+
     const editorContainer = html.div(
       { id: "font-info-opentype-feature-code-text-entry-textarea" },
       []
@@ -306,7 +297,15 @@ export class OpenTypeFeatureCodePanel extends BaseInfoPanel {
     });
 
     container.appendChild(editorContainer);
+
     this.panelElement.appendChild(container);
+
+    container.appendChild(
+      html.div({ id: "font-info-opentype-feature-code-error-box", class: "hidden" }, [
+        html.createDomElement("inline-svg", { src: "/tabler-icons/bug.svg" }),
+        html.div({ id: "font-info-opentype-feature-code-error-message" }, [""]),
+      ])
+    );
   }
 
   async _updateFeatureCode(update) {
