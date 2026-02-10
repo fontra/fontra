@@ -322,7 +322,7 @@ export class OpenTypeFeatureCodePanel extends BaseInfoPanel {
   }
 
   async checkCompileErrors() {
-    const { error } = await this.fontController.getShaper(true);
+    const { error } = await this.fontController.getShaperFontData(true);
     const errorElement = document.querySelector(
       "#font-info-opentype-feature-code-error-box"
     );
