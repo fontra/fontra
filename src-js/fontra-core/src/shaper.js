@@ -66,6 +66,9 @@ class HBShaper extends ShaperBase {
   }
 
   shape(codePoints, glyphObjects, options) {
+    if (!codePoints.length) {
+      return [];
+    }
     const { variations, features, direction, script, language } = options;
 
     const buffer = hb.createBuffer();
