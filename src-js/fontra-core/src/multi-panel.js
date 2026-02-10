@@ -1,3 +1,4 @@
+import { Accordion } from "@fontra/web-components/ui-accordion.js";
 import * as html from "./html-utils.js";
 import { translate } from "./localization.js";
 
@@ -10,6 +11,40 @@ export class MultiPanelController {
 
     const panelContainer = document.querySelector("#multi-panel-panel-container");
     const headerContainer = document.querySelector("#multi-panel-header-container");
+    const headerItems = html.div({ id: "multi-panel-header-items" });
+
+    this.headerAccordion = new Accordion();
+    this.headerAccordion.appendStyle(`
+      .multi-panel-header {
+        cursor: pointer;
+        font-size: 1.15em;
+        font-weight: bold;
+        text-underline-offset: 0.15em;
+      }
+
+      .multi-panel-header:hover {
+        text-decoration: underline dotted;
+      }
+
+      .multi-panel-header.selected {
+        text-decoration: underline;
+      }
+
+      #multi-panel-header-items {
+        display: grid;
+        gap: 0.5em;
+      }
+    `);
+
+    this.headerAccordion.items = [
+      {
+        label: "",
+        content: headerItems,
+        open: true,
+      },
+    ];
+
+    headerContainer.appendChild(this.headerAccordion);
 
     const observer = setupIntersectionObserver(panelContainer, this.panels);
 
@@ -27,7 +62,7 @@ export class MultiPanelController {
         headerElement.classList.add("selected");
       }
       headerElement.setAttribute("for", panelClass.id);
-      headerContainer.appendChild(headerElement);
+      headerItems.appendChild(headerElement);
 
       const panelElement = html.div({
         class: "multi-panel-panel",
@@ -47,11 +82,11 @@ export class MultiPanelController {
   }
 
   selectPanel(panelIdentifier) {
-    document
+    this.headerAccordion
       .querySelector(".multi-panel-header.selected")
       ?.classList.remove("selected");
 
-    const selectedHeader = document.querySelector(
+    const selectedHeader = this.headerAccordion.querySelector(
       `.multi-panel-header[for=${panelIdentifier}]`
     );
     selectedHeader?.classList.add("selected");
