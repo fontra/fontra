@@ -2,8 +2,12 @@ import { Accordion } from "@fontra/web-components/ui-accordion.js";
 import * as html from "./html-utils.js";
 import { translate } from "./localization.js";
 
+const foldingStateKey = "";
+
 export class MultiPanelController {
-  constructor(panelClasses, viewController) {
+  constructor(panelClasses, viewController, panelIdentifier) {
+    this.panelIdentifier = panelIdentifier;
+    this.foldingStateLocalStorageKey = `multi-panel-${panelIdentifier}-folded`;
     this.panels = {};
 
     this.selectedPanelIdentifier =
@@ -40,9 +44,13 @@ export class MultiPanelController {
       {
         label: "",
         content: headerItems,
-        open: true,
+        open: localStorage.getItem(this.foldingStateLocalStorageKey) === "true",
       },
     ];
+
+    this.headerAccordion.onItemOpenClose = (item, openClose) => {
+      localStorage.setItem(this.foldingStateLocalStorageKey, `${!!openClose}`);
+    };
 
     headerContainer.appendChild(this.headerAccordion);
 
