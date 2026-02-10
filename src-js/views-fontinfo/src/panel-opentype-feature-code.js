@@ -104,6 +104,7 @@ addStyleSheet(`
 #font-info-opentype-feature-code-text-entry-textarea {
   font-size: 1.1em;
   height: 100%;
+  overflow: hidden;
 }
 
 #font-info-opentype-feature-code-text-entry-textarea > .cm-editor {
