@@ -16,8 +16,8 @@ PROJECT_GLYPH_SETS_CUSTOM_DATA_KEY = "fontra.projectGlyphSets"
 async def populateBackend(backend: WritableFontBackend) -> None:
     import secrets
 
-    if len(await backend.getSources()) != 0:
-        raise TypeError("font sources must be empty")
+    if len(await backend.getSources()) > 1:
+        raise TypeError("backend already populated with multiple sources")
 
     sources = {
         secrets.token_hex(4): FontSource(

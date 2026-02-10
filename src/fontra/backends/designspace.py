@@ -1697,7 +1697,7 @@ class UFOBackend(DesignspaceBackend):
     def fromPath(cls, path):
         dsDoc = DesignSpaceDocument()
         dsDoc.addSourceDescriptor(
-            name="default", path=os.fspath(path), styleName="default"
+            name="default", path=os.fspath(path), styleName="Regular"
         )
         return cls(dsDoc)
 
@@ -1708,7 +1708,7 @@ class UFOBackend(DesignspaceBackend):
             shutil.rmtree(path)
         elif path.exists():
             path.unlink()
-        dsDoc = createDSDocFromUFOPath(path, "default")
+        dsDoc = createDSDocFromUFOPath(path, "Regular")
         return cls(dsDoc)
 
     def _reloadEverything(self) -> None:

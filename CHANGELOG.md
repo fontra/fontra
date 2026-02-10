@@ -1,7 +1,13 @@
 # Changelog for Fontra
 
-## 2026-02-?? [version 2026.2.0]
+## 2026-02-?? [version 2026.3.0]
 
+- Make the topic list of the application settings and font info views foldable. [PR 2408](https://github.com/fontra/fontra/pull/2408)
+- Fix minor layout bug in glyph sets UI. [Commit b292d8ee](https://github.com/fontra/fontra/commit/b292d8ee980438a4152da8d3af1b8fb5408f2f75)
+
+## 2026-02-03 [version 2026.2.0]
+
+- [ufo] Fix creating a single-UFO project. [PR 2405](https://github.com/fontra/fontra/pull/2405)
 - [designspace/ufo] Fix regression in editing OpenType features, caused by unneeded reloading. [PR 2404](https://github.com/fontra/fontra/pull/2404)
 - [opentype backend] When reading TrueType or OpenType, setup font sources, so we can see the line metrics in the editor, and so that glyph sources will reference font sources where possible. [Issue 2399](https://github.com/fontra/fontra/issues/2399), [PR 2401](https://github.com/fontra/fontra/pull/2401)
 - [opentype backend] When reading TrueType or OpenType, use the user-visible axis ranges instead of normalized values for glyph source locations. [PR 2398](https://github.com/fontra/fontra/pull/2398)

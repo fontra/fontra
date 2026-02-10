@@ -1,56 +1,54 @@
 import pathlib
 
-from fontra.backends.fontra import FontraBackend
-from fontra.backends.populate import populateBackend
-from fontra.core.classes import unstructure
+import pytest
 
-expectedFontData = {
-    "sources": {
-        "c793bc16": {
-            "name": "Regular",
-            "lineMetricsHorizontalLayout": {
-                "ascender": {"value": 750, "zone": 16},
-                "descender": {"value": -250, "zone": -16},
-                "xHeight": {"value": 500, "zone": 16},
-                "capHeight": {"value": 750, "zone": 16},
-                "baseline": {"value": 0, "zone": -16},
-            },
+from fontra.backends import getFileSystemBackend, newFileSystemBackend
+from fontra.backends.populate import populateBackend
+from fontra.core.classes import FontSource, LineMetric
+
+expectedSource = FontSource(
+    name="Regular",
+    lineMetricsHorizontalLayout={
+        "ascender": LineMetric(value=750, zone=16),
+        "descender": LineMetric(value=-250, zone=-16),
+        "xHeight": LineMetric(value=500, zone=16),
+        "capHeight": LineMetric(value=750, zone=16),
+        "baseline": LineMetric(value=0, zone=-16),
+    },
+)
+
+
+expectedCustomData = {
+    "fontra.projectGlyphSets": [
+        {
+            "commentChars": "#",
+            "dataFormat": "glyph-names",
+            "name": "GF Latin Kernel",
+            "url": "https://cdn.jsdelivr.net/gh/googlefonts/glyphsets/"
+            + "data/results/txt/nice-names/GF_Latin_Kernel.txt",
         }
-    },
-    "customData": {
-        "fontra.projectGlyphSets": [
-            {
-                "commentChars": "#",
-                "dataFormat": "glyph-names",
-                "name": "GF Latin Kernel",
-                "url": "https://cdn.jsdelivr.net/gh/googlefonts/glyphsets/"
-                + "data/results/txt/nice-names/GF_Latin_Kernel.txt",
-            }
-        ]
-    },
+    ]
 }
 
 
-async def test_populate(tmpdir):
+@pytest.mark.parametrize("extension", [".fontra", ".designspace", ".ufo"])
+async def test_populate(tmpdir, extension):
     tmpdir = pathlib.Path(tmpdir)
 
-    backendPath = tmpdir / "test.fontra"
+    backendPath = tmpdir / f"test{extension}"
 
-    backend = FontraBackend.createFromPath(backendPath)
+    backend = newFileSystemBackend(backendPath)
 
     await populateBackend(backend)
 
     await backend.aclose()
 
-    reopenedBackend = FontraBackend.fromPath(backendPath)
-    fontData = unstructure(reopenedBackend.fontData)
+    reopenedBackend = getFileSystemBackend(backendPath)
+    sources = await reopenedBackend.getSources()
+    customData = await reopenedBackend.getCustomData()
 
-    assert len(fontData["sources"]) == 1
+    assert len(sources) == 1
+    [source] = sources.values()
+    assert source == expectedSource
 
-    [expectedKey] = expectedFontData["sources"].keys()
-    [sourceKey] = fontData["sources"].keys()
-
-    fontData["sources"][expectedKey] = fontData["sources"][sourceKey]
-    del fontData["sources"][sourceKey]
-
-    assert expectedFontData == fontData
+    assert customData == expectedCustomData
