@@ -8,7 +8,6 @@ import shutil
 from collections import defaultdict
 from copy import deepcopy
 from dataclasses import dataclass, field
-from functools import partial
 from typing import Any, Callable, Sequence
 
 from ..core.async_property import async_property
@@ -617,9 +616,7 @@ class Scheduler:
 async def extractGlyphDependenciesFromFontra(
     glyphsDir: pathlib.Path,
 ) -> GlyphDependencies:
-    componentInfo = await runInSubProcess(
-        partial(_extractComponentInfoFromFontra, glyphsDir)
-    )
+    componentInfo = await runInSubProcess(_extractComponentInfoFromFontra, glyphsDir)
 
     dependencies = GlyphDependencies()
     for glyphName, componentNames in componentInfo.items():
