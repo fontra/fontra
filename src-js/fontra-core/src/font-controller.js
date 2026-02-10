@@ -394,16 +394,21 @@ export class FontController {
 
   async buildShaperFont(glyphOrder) {
     const features = await this.getFeatures();
-    const { fontData, error } = await Backend.buildShaperFont(
-      this.unitsPerEm,
-      glyphOrder,
-      features.text,
-      this.axes.axes
-        .filter((axis) => !axis.values) // Filter out discrete axes
-        .map((axis) => [axis.tag, axis.minValue, axis.defaultValue, axis.maxValue]),
-      [] // TODO: ds-style fea-var rules
-    );
-    return { fontData, error };
+
+    try {
+      const { fontData, error } = await Backend.buildShaperFont(
+        this.unitsPerEm,
+        glyphOrder,
+        features.text,
+        this.axes.axes
+          .filter((axis) => !axis.values) // Filter out discrete axes
+          .map((axis) => [axis.tag, axis.minValue, axis.defaultValue, axis.maxValue]),
+        [] // TODO: ds-style fea-var rules
+      );
+      return { fontData, error };
+    } catch (e) {
+      return { fontData: null, error: e.toString() };
+    }
   }
 
   getCachedGlyphNames() {
