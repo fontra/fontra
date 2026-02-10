@@ -8,7 +8,7 @@ def buildShaperFont(
     unitsPerEm: int,
     glyphOrder: list[str],
     featureText: str,
-    axes: list[dict],
+    axes: list[list],
     rules: list,
 ):
     error = None
@@ -21,14 +21,8 @@ def buildShaperFont(
         if axes:
             fb.setupFvar(
                 [
-                    (
-                        axis["tag"],
-                        axis["minValue"],
-                        axis["defaultValue"],
-                        axis["maxValue"],
-                        axis["name"],
-                    )
-                    for axis in axes
+                    (tag, minValue, defaultValue, maxValue, tag)
+                    for tag, minValue, defaultValue, maxValue in axes
                 ],
                 [],
             )
