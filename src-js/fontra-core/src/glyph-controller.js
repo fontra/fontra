@@ -1226,7 +1226,7 @@ function ensureGlyphCompatibility(layers, glyphDependencies) {
         ...glyph,
         components: componentsAreCompatible
           ? normalizeComponents(glyph, sourceLocation, componentLocationFallbackValues)
-          : glyph.components,
+          : stripComponentCustomData(glyph.components),
         anchors: glyph.anchors.slice().sort((a, b) => compare(a.name > b.name)),
         guidelines: guidelinesAreCompatible
           ? normalizeGuidelines(glyph.guidelines, true)
@@ -1322,10 +1322,22 @@ function normalizeComponents(glyph, sourceLocation, componentLocationFallbackVal
         fallbackValues.hasOwnProperty(axisName)
       ),
     };
-    normalizedComponents.push({ ...compo, location });
+    normalizedComponents.push({
+      name: compo.name,
+      transformation: compo.transformation,
+      location,
+    });
   }
 
   return normalizedComponents;
+}
+
+function stripComponentCustomData(components) {
+  return components.map((component) => ({
+    name: component.name,
+    transformation: component.transformation,
+    location: component.location,
+  }));
 }
 
 function stripNonInterpolatablesAndSortAnchors(glyph) {
@@ -1334,8 +1346,10 @@ function stripNonInterpolatablesAndSortAnchors(glyph) {
       ...glyph,
       components: glyph.components.map((component) => {
         return {
-          ...component,
+          name: component.name,
+          transformation: component.transformation,
           location: {},
+          customData: {},
         };
       }),
       anchors: glyph.anchors.slice().sort((a, b) => compare(a.name, b.name)),
