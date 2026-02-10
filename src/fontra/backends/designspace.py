@@ -10,7 +10,7 @@ from collections import defaultdict
 from copy import deepcopy
 from dataclasses import asdict, dataclass, field, replace
 from datetime import datetime
-from functools import cache, cached_property, partial, singledispatch
+from functools import cache, cached_property, singledispatch
 from os import PathLike
 from types import SimpleNamespace
 from typing import Any, Callable
@@ -2280,7 +2280,7 @@ async def extractGlyphDependenciesFromUFO(
     ufoPath: str, layerName: str
 ) -> GlyphDependencies:
     componentInfo = await runInSubProcess(
-        partial(_extractComponentInfoFromUFO, ufoPath, layerName)
+        _extractComponentInfoFromUFO, ufoPath, layerName
     )
     dependencies = GlyphDependencies()
     for glyphName, componentNames in componentInfo.items():
