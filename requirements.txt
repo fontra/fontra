@@ -4,6 +4,7 @@ cattrs==25.3.0
 fonttools[ufo,unicode]==4.61.1
 pillow==12.1.1
 pyyaml==6.0.3
+ufo2ft==3.7.0
 ufoLib2==0.18.1
 ufomerge==1.9.6
 watchfiles==1.1.1
