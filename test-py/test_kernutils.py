@@ -134,3 +134,39 @@ def test_splitKerningByDirection():
 def test_mergeKerning():
     mergedKerning = mergeKerning(expectedLTRKerning, expectedRTLKerning)
     assert mergedKerning == kerningData
+
+
+kerningDataA = Kerning(
+    groupsSide1={"A": ["A", "A.alt"], "O": ["O", "O.alt", "D"]},
+    groupsSide2={"A": ["A", "A.alt"], "O": ["O", "O.alt", "C"]},
+    sourceIdentifiers=["-"],
+    values={"@A": {"@O": [-15], "V": [-20]}, "F": {"@O": [-10], "period": [-13]}},
+)
+
+
+kerningDataB = Kerning(
+    groupsSide1={"A": ["A", "A.alt"], "O": ["O", "O.alt", "D"]},
+    groupsSide2={"A": ["A", "A.alt"], "O": ["O", "O.alt", "C", "G"]},
+    sourceIdentifiers=["-"],
+    values={"@A": {"@O": [-15], "V": [-20]}, "F": {"@O": [-10], "period": [-13]}},
+)
+
+
+expectedMergedKerningData = Kerning(
+    groupsSide1={"A": ["A", "A.alt"], "O": ["O", "O.alt", "D"]},
+    groupsSide2={
+        "A": ["A", "A.alt"],
+        "O": ["O", "O.alt", "C"],
+        "O.1": ["O", "O.alt", "C", "G"],
+    },
+    sourceIdentifiers=["-"],
+    values={
+        "@A": {"@O": [-15], "V": [-20], "@O.1": [-15]},
+        "F": {"@O": [-10], "period": [-13], "@O.1": [-10]},
+    },
+)
+
+
+def test_mergeKerning_with_group_conflict():
+    mergedKerning = mergeKerning(kerningDataA, kerningDataB)
+    assert mergedKerning == expectedMergedKerningData
