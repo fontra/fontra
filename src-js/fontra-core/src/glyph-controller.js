@@ -1227,7 +1227,7 @@ function ensureGlyphCompatibility(layers, glyphDependencies) {
         components: componentsAreCompatible
           ? normalizeComponents(glyph, sourceLocation, componentLocationFallbackValues)
           : stripComponentCustomData(glyph.components),
-        anchors: glyph.anchors.slice().sort((a, b) => compare(a.name > b.name)),
+        anchors: glyph.anchors.slice().sort((a, b) => compare(a.name, b.name)),
         guidelines: guidelinesAreCompatible
           ? normalizeGuidelines(glyph.guidelines, true)
           : [],
