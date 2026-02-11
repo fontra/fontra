@@ -336,7 +336,7 @@ def _mergeKernTable(kernTableA, kernTableB):
 
 def _disambiguateKerningGroupNames(kernTableA, kernTableB):
     groupSide1NameMap, pairSide1NameMap = _getConflictResolutionMappings(
-        kernTableA.groupsSide1, kernTableB.groupsSide2
+        kernTableA.groupsSide1, kernTableB.groupsSide1
     )
 
     groupSide2NameMap, pairSide2NameMap = _getConflictResolutionMappings(

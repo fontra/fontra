@@ -2,6 +2,7 @@
 
 ## 2026-02-?? [version 2026.3.0]
 
+- [fontra-glyphs] When reading OpenType features, expand include statements and Glyphs-specific dynamic feature syntax into traditional feature syntax. [fontra-glyphs PR 123](https://github.com/fontra/fontra-glyphs/pull/123)
 - [fontra-glyphs] Accept invalid OpenType feature code, as this is inevitable when editing, given Fontra's autosave nature. [fontra-glyphs PR 122](https://github.com/fontra/fontra-glyphs/pull/122)
 - Ignore component custom data when interpolating. This fixes interpolation for .glyphs files that have inconsistent component align settings. [PR 2409](https://github.com/fontra/fontra/pull/2409)
 - Make the topic list of the application settings and font info views foldable. [PR 2408](https://github.com/fontra/fontra/pull/2408)
