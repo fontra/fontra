@@ -1369,9 +1369,7 @@ class LineSetter {
         varGlyph,
         glyphName,
         character:
-          isUndefined && codePoint && codePoint < MAX_UNICODE
-            ? String.fromCodePoint(codePoint)
-            : null,
+          codePoint && codePoint < MAX_UNICODE ? String.fromCodePoint(codePoint) : null,
         cluster: glyphInfo.cl,
         isUndefined,
         isSelected: isSelectedGlyph,
