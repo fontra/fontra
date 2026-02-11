@@ -2,6 +2,7 @@ from fontra.core.classes import FontAxis, Kerning
 from fontra.core.kernutils import (
     classifyGlyphsByDirection,
     flipKerningDirection,
+    mergeKerning,
     splitKerningByDirection,
 )
 
@@ -128,3 +129,8 @@ def test_splitKerningByDirection():
 
     assert ltrKerning == expectedLTRKerning
     assert rtlKerning == expectedRTLKerning
+
+
+def test_mergeKerning():
+    mergedKerning = mergeKerning(expectedLTRKerning, expectedRTLKerning)
+    assert mergedKerning == kerningData

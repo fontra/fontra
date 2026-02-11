@@ -72,6 +72,19 @@ def splitKerningByDirection(
     return ltrKerning, rtlKerning
 
 
+def mergeKerning(kerningA, kerningB):
+    assert kerningA.sourceIdentifiers == kerningB.sourceIdentifiers
+    return Kerning(
+        groupsSide1=kerningA.groupsSide1 | kerningB.groupsSide1,
+        groupsSide2=kerningA.groupsSide2 | kerningB.groupsSide2,
+        sourceIdentifiers=kerningA.sourceIdentifiers,
+        values=_nestKerningValues(
+            _unnestKerningValues(kerningA.values)
+            | _unnestKerningValues(kerningB.values)
+        ),
+    )
+
+
 def classifyGroupsByDirection(
     groups: KerningGroups, ltrGlyphs: set[str], rtlGlyphs: set[str]
 ) -> tuple[KerningGroups, KerningGroups, KerningGroups]:
