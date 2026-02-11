@@ -72,39 +72,6 @@ def splitKerningByDirection(
     return ltrKerning, rtlKerning
 
 
-def mergeKerning(kerningA, kerningB):
-    assert kerningA.sourceIdentifiers == kerningB.sourceIdentifiers
-    return Kerning(
-        groupsSide1=kerningA.groupsSide1 | kerningB.groupsSide1,
-        groupsSide2=kerningA.groupsSide2 | kerningB.groupsSide2,
-        sourceIdentifiers=kerningA.sourceIdentifiers,
-        values=_nestKerningValues(
-            _unnestKerningValues(kerningA.values)
-            | _unnestKerningValues(kerningB.values)
-        ),
-    )
-
-
-def classifyGroupsByDirection(
-    groups: KerningGroups, ltrGlyphs: set[str], rtlGlyphs: set[str]
-) -> tuple[KerningGroups, KerningGroups, KerningGroups]:
-    ltrGroups: KerningGroups = {}
-    neutralGroups: KerningGroups = {}
-    rtlGroups: KerningGroups = {}
-
-    for groupName, glyphNames in groups.items():
-        isLTR = any(glyphName in ltrGlyphs for glyphName in glyphNames)
-        isRTL = any(glyphName in rtlGlyphs for glyphName in glyphNames)
-        if isLTR and not isRTL:
-            ltrGroups[groupName] = glyphNames
-        elif isRTL and not isLTR:
-            rtlGroups[groupName] = glyphNames
-        else:
-            neutralGroups[groupName] = glyphNames
-
-    return ltrGroups, neutralGroups, rtlGroups
-
-
 def flipKerningDirection(kerning: Kerning) -> Kerning:
     unnestedValues = _unnestKerningValues(kerning.values)
     flippedValues = {
@@ -116,6 +83,19 @@ def flipKerningDirection(kerning: Kerning) -> Kerning:
         groupsSide2=kerning.groupsSide1,
         sourceIdentifiers=kerning.sourceIdentifiers,
         values=_nestKerningValues(flippedValues),
+    )
+
+
+def mergeKerning(kerningA, kerningB):
+    assert kerningA.sourceIdentifiers == kerningB.sourceIdentifiers
+    return Kerning(
+        groupsSide1=kerningA.groupsSide1 | kerningB.groupsSide1,
+        groupsSide2=kerningA.groupsSide2 | kerningB.groupsSide2,
+        sourceIdentifiers=kerningA.sourceIdentifiers,
+        values=_nestKerningValues(
+            _unnestKerningValues(kerningA.values)
+            | _unnestKerningValues(kerningB.values)
+        ),
     )
 
 
@@ -137,6 +117,26 @@ def classifyGlyphsByDirection(
     rtlGlyphs = classifications.get("R", set())
 
     return ltrGlyphs, rtlGlyphs
+
+
+def classifyGroupsByDirection(
+    groups: KerningGroups, ltrGlyphs: set[str], rtlGlyphs: set[str]
+) -> tuple[KerningGroups, KerningGroups, KerningGroups]:
+    ltrGroups: KerningGroups = {}
+    neutralGroups: KerningGroups = {}
+    rtlGroups: KerningGroups = {}
+
+    for groupName, glyphNames in groups.items():
+        isLTR = any(glyphName in ltrGlyphs for glyphName in glyphNames)
+        isRTL = any(glyphName in rtlGlyphs for glyphName in glyphNames)
+        if isLTR and not isRTL:
+            ltrGroups[groupName] = glyphNames
+        elif isRTL and not isLTR:
+            rtlGroups[groupName] = glyphNames
+        else:
+            neutralGroups[groupName] = glyphNames
+
+    return ltrGroups, neutralGroups, rtlGroups
 
 
 def compileGSUB(
