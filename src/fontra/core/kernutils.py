@@ -140,7 +140,9 @@ def classifyGroupsByDirection(
     return ltrGroups, neutralGroups, rtlGroups
 
 
-def disambiguateKerningGroupNames(kernTableA, kernTableB, allowSameGroupContents=False):
+def disambiguateKerningGroupNames(
+    kernTableA: Kerning, kernTableB: Kerning, allowSameGroupContents: bool = False
+) -> Kerning:
     groupSide1NameMap, pairSide1NameMap = _getConflictResolutionMappings(
         kernTableA.groupsSide1, kernTableB.groupsSide1, allowSameGroupContents
     )
@@ -168,7 +170,9 @@ def disambiguateKerningGroupNames(kernTableA, kernTableB, allowSameGroupContents
     )
 
 
-def _getConflictResolutionMappings(groupsA, groupsB, allowSameGroupContents):
+def _getConflictResolutionMappings(
+    groupsA: KerningGroups, groupsB: KerningGroups, allowSameGroupContents: bool
+) -> tuple[dict[str, str], dict[str, str]]:
     groupsNamesA = set(groupsA)
     groupsNamesB = set(groupsB)
 
@@ -196,7 +200,7 @@ def _getConflictResolutionMappings(groupsA, groupsB, allowSameGroupContents):
     return groupNameMap, pairNameMap
 
 
-def _renameGroups(groups, renameMap):
+def _renameGroups(groups: KerningGroups, renameMap: dict[str, str]) -> KerningGroups:
     return {renameMap.get(name, name): group for name, group in groups.items()}
 
 
