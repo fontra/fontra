@@ -10,7 +10,7 @@
     "copy-webpack-plugin": "^13.0.1",
     "css-loader": "^7.1.2",
     "html-bundler-webpack-plugin": "^4.22.0",
-    "npm": "^11.7.0",
+    "npm": "^11.9.0",
     "prettier-plugin-organize-imports": "^4.3.0",
     "prettier-plugin-sort-json": "^4.1.1",
     "ts-loader": "^9.5.4",
