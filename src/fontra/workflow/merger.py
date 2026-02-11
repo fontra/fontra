@@ -19,6 +19,7 @@ from ..core.classes import (
     VariableGlyph,
     unstructure,
 )
+from ..core.kernutils import disambiguateKerningGroupNames
 from ..core.protocols import ReadableFontBackend, ReadBackgroundImage
 from ..core.varutils import locationToTuple
 from .actions.axes import mapFontSourceLocationsAndFilter
@@ -307,7 +308,7 @@ def _mergeAxes(axisA, axisB):
 
 
 def _mergeKernTable(kernTableA, kernTableB):
-    kernTableA = _disambiguateKerningGroupNames(kernTableA, kernTableB)
+    kernTableA = disambiguateKerningGroupNames(kernTableA, kernTableB)
 
     assert set(kernTableA.groupsSide1).isdisjoint(set(kernTableB.groupsSide1))
     assert set(kernTableA.groupsSide2).isdisjoint(set(kernTableB.groupsSide2))
@@ -332,64 +333,6 @@ def _mergeKernTable(kernTableA, kernTableB):
         sourceIdentifiers=mergedSourceIdentifiers,
         values=mappedValuesA | mappedValuesB,
     )
-
-
-def _disambiguateKerningGroupNames(kernTableA, kernTableB):
-    groupSide1NameMap, pairSide1NameMap = _getConflictResolutionMappings(
-        kernTableA.groupsSide1, kernTableB.groupsSide1
-    )
-
-    groupSide2NameMap, pairSide2NameMap = _getConflictResolutionMappings(
-        kernTableA.groupsSide2, kernTableB.groupsSide2
-    )
-
-    if not groupSide1NameMap and not groupSide2NameMap:
-        return kernTableA
-
-    groupsSide1 = _renameGroups(kernTableA.groupsSide1, groupSide1NameMap)
-    groupsSide2 = _renameGroups(kernTableA.groupsSide2, groupSide2NameMap)
-
-    values = {
-        pairSide1NameMap.get(left, left): {
-            pairSide2NameMap.get(right, right): values
-            for right, values in rightDict.items()
-        }
-        for left, rightDict in kernTableA.values.items()
-    }
-
-    return replace(
-        kernTableA, groupsSide1=groupsSide1, groupsSide2=groupsSide2, values=values
-    )
-
-
-def _getConflictResolutionMappings(groupsA, groupsB):
-    groupsNamesA = set(groupsA)
-    groupsNamesB = set(groupsB)
-
-    if groupsNamesA.isdisjoint(groupsNamesB):
-        return {}, {}
-
-    conflictingNames = groupsNamesA & groupsNamesB
-    usedNames = groupsNamesA | groupsNamesB
-
-    groupNameMap = {}
-    for name in sorted(conflictingNames):
-        count = 1
-        while True:
-            newName = f"{name}.{count}"
-            if newName not in usedNames:
-                break
-            count += 1
-        usedNames.add(newName)
-        groupNameMap[name] = newName
-
-    pairNameMap = {"@" + k: "@" + v for k, v in groupNameMap.items()}
-
-    return groupNameMap, pairNameMap
-
-
-def _renameGroups(groups, renameMap):
-    return {renameMap.get(name, name): group for name, group in groups.items()}
 
 
 def _remapKernValuesBySourceIdentifiers(kerningValues, sidMap):
