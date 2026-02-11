@@ -37,6 +37,7 @@ feature init {
 
 expectedLTRGlyphs = {"A", "A.alt", "C", "D", "F", "O", "O.alt", "V", "zero"}
 expectedRTLGlyphs = {"alef-ar", "alef-ar.init", "beh-ar", "beh-ar.init"}
+expectedNeutralGlyphs = {"comma", "period"}
 
 
 def test_classifyGlyphsByDirection():
@@ -56,6 +57,7 @@ def test_classifyGlyphsByDirection():
     )
     assert ltrGlyphs == expectedLTRGlyphs
     assert rtlGlyphs == expectedRTLGlyphs
+    assert set(glyphMap) - ltrGlyphs - rtlGlyphs == expectedNeutralGlyphs
 
 
 kerningData = Kerning(
