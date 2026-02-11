@@ -140,13 +140,13 @@ def classifyGroupsByDirection(
     return ltrGroups, neutralGroups, rtlGroups
 
 
-def disambiguateKerningGroupNames(kernTableA, kernTableB):
+def disambiguateKerningGroupNames(kernTableA, kernTableB, allowSameGroupContents=False):
     groupSide1NameMap, pairSide1NameMap = _getConflictResolutionMappings(
-        kernTableA.groupsSide1, kernTableB.groupsSide1
+        kernTableA.groupsSide1, kernTableB.groupsSide1, allowSameGroupContents
     )
 
     groupSide2NameMap, pairSide2NameMap = _getConflictResolutionMappings(
-        kernTableA.groupsSide2, kernTableB.groupsSide2
+        kernTableA.groupsSide2, kernTableB.groupsSide2, allowSameGroupContents
     )
 
     if not groupSide1NameMap and not groupSide2NameMap:
@@ -168,7 +168,7 @@ def disambiguateKerningGroupNames(kernTableA, kernTableB):
     )
 
 
-def _getConflictResolutionMappings(groupsA, groupsB):
+def _getConflictResolutionMappings(groupsA, groupsB, allowSameGroupContents):
     groupsNamesA = set(groupsA)
     groupsNamesB = set(groupsB)
 
@@ -180,6 +180,8 @@ def _getConflictResolutionMappings(groupsA, groupsB):
 
     groupNameMap = {}
     for name in sorted(conflictingNames):
+        if allowSameGroupContents and groupsA[name] == groupsB[name]:
+            continue
         count = 1
         while True:
             newName = f"{name}.{count}"
