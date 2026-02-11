@@ -58,6 +58,7 @@ def test_classifyGlyphsByDirection():
     assert ltrGlyphs == expectedLTRGlyphs
     assert rtlGlyphs == expectedRTLGlyphs
     assert set(glyphMap) - ltrGlyphs - rtlGlyphs == expectedNeutralGlyphs
+    assert ltrGlyphs.isdisjoint(rtlGlyphs)
 
 
 kerningData = Kerning(
