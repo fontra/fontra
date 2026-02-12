@@ -22,6 +22,7 @@ from fontTools.designspaceLib import (
     DiscreteAxisDescriptor,
     SourceDescriptor,
 )
+from fontTools.feaLib.error import FeatureLibError
 from fontTools.misc.transform import DecomposedTransform, Transform
 from fontTools.pens.pointPen import AbstractPointPen
 from fontTools.pens.recordingPen import RecordingPointPen
@@ -393,7 +394,7 @@ class DesignspaceBackend(WatchableBackend, ReadableBaseBackend):
 
     def _classifyGlyphsByDirection(self):
         features = self._getFeaturesSync()
-        self._ltrGlyphs, self.rtlGlyphs = kernutils.classifyGlyphsByDirection(
+        self._ltrGlyphs, self._rtlGlyphs = kernutils.classifyGlyphsByDirection(
             self.glyphMap, features.text, self.axes
         )
 
@@ -1379,12 +1380,16 @@ class DesignspaceBackend(WatchableBackend, ReadableBaseBackend):
         return self._getFeaturesSync()
 
     def _getFeaturesSync(self) -> OpenTypeFeatures:
-        ufoFeatureText = self.defaultReader.readFeatures()
-        featureText = resolveFeatureIncludes(
-            ufoFeatureText, self.ufoDir, set(self.glyphMap)
-        )
-        if featureText != ufoFeatureText:
-            featureText = featuresWarning + featureText
+        featureText = self.defaultReader.readFeatures()
+        try:
+            resolvedFeatureText = resolveFeatureIncludes(
+                featureText, self.ufoDir, set(self.glyphMap)
+            )
+        except FeatureLibError as e:
+            logger.info(f"can't resolve included feature files: {e}")
+        else:
+            if resolvedFeatureText != featureText:
+                featureText = featuresWarning + resolvedFeatureText
         return OpenTypeFeatures(language="fea", text=featureText)
 
     async def putFeatures(self, features: OpenTypeFeatures) -> None:
