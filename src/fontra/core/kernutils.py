@@ -32,40 +32,39 @@ def splitKerningByDirection(
         leftGroup = left[1:] if left.startswith("@") else None
         rightGroup = right[1:] if right.startswith("@") else None
 
-        leftIsLTR = (
-            leftGroup in ltrGroupsSide1 if leftGroup is not None else left in ltrGlyphs
-        )
         leftIsRTL = (
             leftGroup in rtlGroupsSide1 if leftGroup is not None else left in rtlGlyphs
         )
 
-        rightIsLTR = (
-            rightGroup in ltrGroupsSide2
-            if rightGroup is not None
-            else right in ltrGlyphs
-        )
         rightIsRTL = (
             rightGroup in rtlGroupsSide2
             if rightGroup is not None
             else right in rtlGlyphs
         )
 
-        if leftIsLTR or rightIsLTR:
-            ltrValues[left, right] = values
-
         if leftIsRTL or rightIsRTL:
             rtlValues[left, right] = values
+        else:
+            ltrValues[left, right] = values
+
+    ltrNeutralGroupsSide1, ltrNeutralGroupsSide2 = _filterGroupsByValueUsage(
+        neutralGroupsSide1, neutralGroupsSide2, ltrValues
+    )
 
     ltrKerning = Kerning(
-        groupsSide1=ltrGroupsSide1 | neutralGroupsSide1,
-        groupsSide2=ltrGroupsSide2 | neutralGroupsSide2,
+        groupsSide1=ltrGroupsSide1 | ltrNeutralGroupsSide1,
+        groupsSide2=ltrGroupsSide2 | ltrNeutralGroupsSide2,
         sourceIdentifiers=kerning.sourceIdentifiers,
         values=_nestKerningValues(ltrValues),
     )
 
+    rtlNeutralGroupsSide1, rtlNeutralGroupsSide2 = _filterGroupsByValueUsage(
+        neutralGroupsSide1, neutralGroupsSide2, rtlValues
+    )
+
     rtlKerning = Kerning(
-        groupsSide1=rtlGroupsSide1 | neutralGroupsSide1,
-        groupsSide2=rtlGroupsSide2 | neutralGroupsSide2,
+        groupsSide1=rtlGroupsSide1 | rtlNeutralGroupsSide1,
+        groupsSide2=rtlGroupsSide2 | rtlNeutralGroupsSide2,
         sourceIdentifiers=kerning.sourceIdentifiers,
         values=_nestKerningValues(rtlValues),
     )
@@ -241,3 +240,23 @@ def _nestKerningValues(unnestedValues: FlatKerningValues) -> NestedKerningValues
         nestedValues[left][right] = values
 
     return nestedValues
+
+
+def _filterGroupsByValueUsage(groupsSide1, groupsSide2, unnestedValues):
+    leftUsedGroupNames = set()
+    rightUsedGroupNames = set()
+
+    for left, right in unnestedValues.keys():
+        if left.startswith("@"):
+            leftUsedGroupNames.add(left[1:])
+        if right.startswith("@"):
+            rightUsedGroupNames.add(right[1:])
+
+    filteredGroupsSide1 = {
+        k: v for k, v in groupsSide1.items() if k in leftUsedGroupNames
+    }
+    filteredGroupsSide2 = {
+        k: v for k, v in groupsSide2.items() if k in rightUsedGroupNames
+    }
+
+    return filteredGroupsSide1, filteredGroupsSide2
