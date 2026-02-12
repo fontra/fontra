@@ -280,6 +280,10 @@ class DesignspaceBackend(WatchableBackend, ReadableBaseBackend):
         self._ltrGlyphs: set | None = None
         self._rtlGlyphs: set | None = None
 
+    def resetGlyphDirections(self):
+        self._ltrGlyphs = None
+        self._rtlGlyphs = None
+
     def startOptionalBackgroundTasks(self) -> None:
         self._backgroundTasksTask = asyncio.create_task(self.glyphDependencies)
 
@@ -667,7 +671,9 @@ class DesignspaceBackend(WatchableBackend, ReadableBaseBackend):
     ) -> None:
         assert isinstance(codePoints, list)
         assert all(isinstance(cp, int) for cp in codePoints)
-        self.glyphMap[glyphName] = codePoints
+        if self.glyphMap.get(glyphName) != codePoints:
+            self.glyphMap[glyphName] = codePoints
+            self.resetGlyphDirections()
 
         if self._glyphDependencies is not None:
             self._glyphDependencies.update(glyphName, componentNamesFromGlyph(glyph))
@@ -1084,6 +1090,8 @@ class DesignspaceBackend(WatchableBackend, ReadableBaseBackend):
         self.savedGlyphModificationTimes[glyphName] = {None}
         if self._glyphDependencies is not None:
             self._glyphDependencies.update(glyphName, ())
+
+        self.resetGlyphDirections()
 
     async def getFontInfo(self) -> FontInfo:
         ufoInfo = self.defaultFontInfo
@@ -1522,6 +1530,7 @@ class DesignspaceBackend(WatchableBackend, ReadableBaseBackend):
                     del self.glyphMap[glyphName]
                 else:
                     self.glyphMap[glyphName] = updatedCodePoints
+            self.resetGlyphDirections()
 
         return reloadPattern
 
