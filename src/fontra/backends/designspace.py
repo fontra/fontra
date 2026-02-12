@@ -22,6 +22,7 @@ from fontTools.designspaceLib import (
     DiscreteAxisDescriptor,
     SourceDescriptor,
 )
+from fontTools.feaLib.error import FeatureLibError
 from fontTools.misc.transform import DecomposedTransform, Transform
 from fontTools.pens.pointPen import AbstractPointPen
 from fontTools.pens.recordingPen import RecordingPointPen
@@ -37,6 +38,7 @@ from fontTools.ufoLib import (
 )
 from fontTools.ufoLib.glifLib import GlyphSet
 
+from ..core import kernutils
 from ..core.async_property import async_property
 from ..core.classes import (
     Anchor,
@@ -275,6 +277,12 @@ class DesignspaceBackend(WatchableBackend, ReadableBaseBackend):
         )
         self.savedGlyphModificationTimes: dict[str, set] = {}
         self.zombieDSSources: dict[str, DSSource] = {}
+        self._ltrGlyphs: set | None = None
+        self._rtlGlyphs: set | None = None
+
+    def resetGlyphDirections(self):
+        self._ltrGlyphs = None
+        self._rtlGlyphs = None
 
     def startOptionalBackgroundTasks(self) -> None:
         self._backgroundTasksTask = asyncio.create_task(self.glyphDependencies)
@@ -375,6 +383,24 @@ class DesignspaceBackend(WatchableBackend, ReadableBaseBackend):
                 self.defaultReader.readInfo(fontInfo)
             self._defaultFontInfo = fontInfo
         return self._defaultFontInfo
+
+    @property
+    def ltrGlyphs(self):
+        if self._ltrGlyphs is None:
+            self._classifyGlyphsByDirection()
+        return self._ltrGlyphs
+
+    @property
+    def rtlGlyphs(self):
+        if self._rtlGlyphs is None:
+            self._classifyGlyphsByDirection()
+        return self._rtlGlyphs
+
+    def _classifyGlyphsByDirection(self):
+        features = self._getFeaturesSync()
+        self._ltrGlyphs, self._rtlGlyphs = kernutils.classifyGlyphsByDirection(
+            self.glyphMap, features.text, self.axes
+        )
 
     def loadUFOLayers(self) -> None:
         manager = self.ufoManager
@@ -645,7 +671,9 @@ class DesignspaceBackend(WatchableBackend, ReadableBaseBackend):
     ) -> None:
         assert isinstance(codePoints, list)
         assert all(isinstance(cp, int) for cp in codePoints)
-        self.glyphMap[glyphName] = codePoints
+        if self.glyphMap.get(glyphName) != codePoints:
+            self.glyphMap[glyphName] = codePoints
+            self.resetGlyphDirections()
 
         if self._glyphDependencies is not None:
             self._glyphDependencies.update(glyphName, componentNamesFromGlyph(glyph))
@@ -1063,6 +1091,8 @@ class DesignspaceBackend(WatchableBackend, ReadableBaseBackend):
         if self._glyphDependencies is not None:
             self._glyphDependencies.update(glyphName, ())
 
+        self.resetGlyphDirections()
+
     async def getFontInfo(self) -> FontInfo:
         ufoInfo = self.defaultFontInfo
         info = {}
@@ -1261,9 +1291,6 @@ class DesignspaceBackend(WatchableBackend, ReadableBaseBackend):
         sourceIdentifiers = [dsSource.identifier for dsSource in dsSources]
         valueDicts: dict[str, dict[str, dict]] = defaultdict(lambda: defaultdict(dict))
 
-        # TODO: fixup RTL kerning
-        # Context: UFO3's kern direction is "writing direction", but I want kerning
-        # in Fontra to be "visial left to right", as that is much easier to manage.
         for dsSource in dsSources:
             groups = mergeKernGroups(groups, dsSource.layer.reader.readGroups())
             sourceKerning = dsSource.layer.reader.readKerning()
@@ -1283,17 +1310,22 @@ class DesignspaceBackend(WatchableBackend, ReadableBaseBackend):
 
         groupsSide1, groupsSide2 = splitGroups(groups)
 
-        return {
-            "kern": Kerning(
-                groupsSide1=groupsSide1,
-                groupsSide2=groupsSide2,
-                sourceIdentifiers=sourceIdentifiers,
-                values=values,
-            )
-        }
+        kerning = Kerning(
+            groupsSide1=groupsSide1,
+            groupsSide2=groupsSide2,
+            sourceIdentifiers=sourceIdentifiers,
+            values=values,
+        )
+
+        kerning = self._flipRTLKerning(kerning)
+
+        return {"kern": kerning}
 
     async def putKerning(self, kerning: dict[str, Kerning]) -> None:
         for kernType, kerningTable in kerning.items():
+            if kernType == "kern":
+                kerningTable = self._flipRTLKerning(kerningTable)
+
             sourceIdentifiers = kerningTable.sourceIdentifiers
 
             dsSources = [
@@ -1354,13 +1386,35 @@ class DesignspaceBackend(WatchableBackend, ReadableBaseBackend):
                         "kerning types other than 'kern' are not yet implemented for UFO"
                     )
 
-    async def getFeatures(self) -> OpenTypeFeatures:
-        ufoFeatureText = self.defaultReader.readFeatures()
-        featureText = resolveFeatureIncludes(
-            ufoFeatureText, self.ufoDir, set(self.glyphMap)
+    def _flipRTLKerning(self, kerning: Kerning) -> Kerning:
+        ufoVersionMajor, _ = self.defaultReader.formatVersionTuple
+
+        if ufoVersionMajor != 3 or not self.rtlGlyphs:
+            return kerning
+
+        # UFO3's kerning direction is "writing direction", but kerning in Fontra
+        # is "visual left to right", so let's flip any right-to-left kerning.
+        # We do this on read *and* on write
+        ltrKerning, rtlKerning = kernutils.splitKerningByDirection(
+            kerning, self.ltrGlyphs, self.rtlGlyphs
         )
-        if featureText != ufoFeatureText:
-            featureText = featuresWarning + featureText
+        rtlKerning = kernutils.flipKerningDirection(rtlKerning)
+        return kernutils.mergeKerning(ltrKerning, rtlKerning)
+
+    async def getFeatures(self) -> OpenTypeFeatures:
+        return self._getFeaturesSync()
+
+    def _getFeaturesSync(self) -> OpenTypeFeatures:
+        featureText = self.defaultReader.readFeatures()
+        try:
+            resolvedFeatureText = resolveFeatureIncludes(
+                featureText, self.ufoDir, set(self.glyphMap)
+            )
+        except FeatureLibError as e:
+            logger.info(f"can't resolve included feature files: {e}")
+        else:
+            if resolvedFeatureText != featureText:
+                featureText = featuresWarning + resolvedFeatureText
         return OpenTypeFeatures(language="fea", text=featureText)
 
     async def putFeatures(self, features: OpenTypeFeatures) -> None:
@@ -1485,6 +1539,7 @@ class DesignspaceBackend(WatchableBackend, ReadableBaseBackend):
                     del self.glyphMap[glyphName]
                 else:
                     self.glyphMap[glyphName] = updatedCodePoints
+            self.resetGlyphDirections()
 
         return reloadPattern
 

@@ -7,6 +7,7 @@ from dataclasses import asdict, replace
 
 import pytest
 from fontTools.designspaceLib import DesignSpaceDocument
+from fontTools.ufoLib import UFOReaderWriter
 
 from fontra.backends import getFileSystemBackend, newFileSystemBackend
 from fontra.backends.copy import copyFont
@@ -66,6 +67,21 @@ def writableTestFont(tmpdir):
         else:
             shutil.copy(sourcePath, destPath)
     return DesignspaceBackend.fromPath(tmpdir / "MutatorSans.designspace")
+
+
+@pytest.fixture
+def rtlTestFont():
+    return UFOBackend.fromPath(
+        dataDir / "right-to-left-kerning-ufo" / "right-to-left-kerning.ufo"
+    )
+
+
+@pytest.fixture
+def writableRTLTestFont(tmpdir):
+    sourcePath = dataDir / "right-to-left-kerning-ufo" / "right-to-left-kerning.ufo"
+    destPath = tmpdir / sourcePath.name
+    shutil.copytree(sourcePath, destPath)
+    return UFOBackend.fromPath(destPath)
 
 
 @pytest.fixture
@@ -1359,6 +1375,261 @@ async def test_write_italicAngle(writableTestFont):
     reopenedFont = getFileSystemBackend(writableTestFont.dsDoc.path)
     reopenedSources = await reopenedFont.getSources()
     assert reopenedSources["light-condensed"].italicAngle == -15
+
+
+async def test_rtl_kerning(writableRTLTestFont):
+    ufoPath = writableRTLTestFont.dsDoc.sources[0].path
+    reader = UFOReaderWriter(ufoPath)
+    ufoGroups = reader.readGroups()
+    ufoKerning = reader.readKerning()
+
+    allFontraKerning = await writableRTLTestFont.getKerning()
+    fontraKerning = allFontraKerning["kern"]
+
+    ltrPairs = [("V", "@A"), ("@T", "@o")]
+    rtlPairs = [("@yeh.isol", "@heh.fina"), ("tehArabic.isol", "@jim.isol.alt")]
+
+    _modifyFontraPairs(fontraKerning.values, ltrPairs, -10)
+    _modifyFontraPairs(fontraKerning.values, rtlPairs, -20)
+
+    _modifyUFOPairs(ufoKerning, ltrPairs, -10, False)
+    _modifyUFOPairs(ufoKerning, rtlPairs, -20, True)
+
+    await writableRTLTestFont.putKerning(allFontraKerning)
+
+    ufoGroupsAfter = reader.readGroups()
+    ufoKerningAfter = reader.readKerning()
+
+    assert ufoGroups == ufoGroupsAfter
+    assert ufoKerning == ufoKerningAfter
+
+
+def _modifyFontraPairs(kerningValues, pairs, delta):
+    for left, right in pairs:
+        kerningValues[left][right][0] += delta
+
+
+def _modifyUFOPairs(kerning, pairs, delta, swap):
+    if swap:
+        pairs = [(right, left) for left, right in pairs]
+
+    pairs = [(_toUfoGroup(left, 1), _toUfoGroup(right, 2)) for left, right in pairs]
+
+    for pair in pairs:
+        kerning[pair] += delta
+
+
+def _toUfoGroup(name, side):
+    return f"public.kern{side}.{name[1:]}" if name[0] == "@" else name
+
+
+async def test_glyphClassifications(rtlTestFont):
+    expectedLTRGlyphs = {
+        "A",
+        "B",
+        "C",
+        "O",
+        "T",
+        "V",
+        "W",
+        "a",
+        "b",
+        "c",
+        "d",
+        "e",
+        "four",
+        "four.denominator",
+        "four.numerator",
+        "four.tlf",
+        "fourinferior",
+        "foursuperior",
+        "o",
+        "one",
+        "one.denominator",
+        "one.numerator",
+        "one.tlf",
+        "oneinferior",
+        "onesuperior",
+        "ordfeminine",
+        "ordmasculine",
+        "three",
+        "three.denominator",
+        "three.numerator",
+        "three.tlf",
+        "threeinferior",
+        "threesuperior",
+        "two",
+        "two.denominator",
+        "two.numerator",
+        "two.tlf",
+        "twoinferior",
+        "twosuperior",
+        "v",
+        "w",
+        "z",
+        "zero",
+        "zero.denominator",
+        "zero.numerator",
+        "zero.tlf",
+        "zeroinferior",
+        "zerosuperior",
+    }
+    expectedRTLGlyphs = {
+        "alef",
+        "alef.fina",
+        "alef.isol",
+        "alefHamzeAbove",
+        "alefHamzeAbove.fina",
+        "alefHamzeAbove.isol",
+        "alefHamzeBelow",
+        "alefHamzeBelow.fina",
+        "alefHamzeBelow.isol",
+        "alefMaghsureh",
+        "alefMaghsureh.alt",
+        "alefMaghsureh.fina",
+        "alefMaghsureh.fina.alt",
+        "alefMaghsureh.isol",
+        "alefMaghsureh.isol.alt",
+        "allah",
+        "beh",
+        "beh.fina",
+        "beh.init",
+        "beh.isol",
+        "beh.medi",
+        "dal",
+        "dal.fina",
+        "dal.isol",
+        "eyn",
+        "eyn.alt",
+        "eyn.fina",
+        "eyn.fina.alt",
+        "eyn.fina.jump.alt",
+        "eyn.init",
+        "eyn.init.alt",
+        "eyn.isol",
+        "eyn.isol.alt",
+        "eyn.medi",
+        "feh",
+        "feh.fina",
+        "feh.init",
+        "feh.isol",
+        "feh.medi",
+        "ghaf",
+        "ghaf.fina",
+        "ghaf.init",
+        "ghaf.isol",
+        "ghaf.medi",
+        "hah",
+        "hah.alt",
+        "hah.fina",
+        "hah.fina.alt",
+        "hah.init",
+        "hah.init.alt",
+        "hah.isol",
+        "hah.isol.alt",
+        "hah.medi",
+        "hah.medi.alt",
+        "heh",
+        "heh.fina",
+        "heh.init",
+        "heh.isol",
+        "heh.medi",
+        "jim",
+        "jim.alt",
+        "jim.fina",
+        "jim.fina.alt",
+        "jim.init",
+        "jim.init.alt",
+        "jim.isol",
+        "jim.isol.alt",
+        "jim.medi",
+        "jim.medi.alt",
+        "kafArabic",
+        "kafArabic.fina",
+        "kafArabic.init",
+        "kafArabic.isol",
+        "kafArabic.medi",
+        "kheh",
+        "kheh.fina",
+        "kheh.init",
+        "kheh.isol",
+        "kheh.medi",
+        "lam",
+        "lam.fina",
+        "lam.init",
+        "lam.init_alef.fina",
+        "lam.init_alefHamzeAbove.fina",
+        "lam.init_alefHamzeBelow.fina",
+        "lam.isol",
+        "lam.medi",
+        "lam.medi_alef.fina",
+        "lam.medi_alefHamzeAbove.fina",
+        "lam.medi_alefHamzeBelow.fina",
+        "mim",
+        "mim.fina",
+        "mim.init",
+        "mim.isol",
+        "mim.medi",
+        "noon",
+        "noon.fina",
+        "noon.init",
+        "noon.isol",
+        "noon.medi",
+        "reh",
+        "reh.fina",
+        "reh.isol",
+        "sad",
+        "sad.fina",
+        "sad.init",
+        "sad.isol",
+        "sad.medi",
+        "shin",
+        "shin.fina",
+        "shin.init",
+        "shin.isol",
+        "shin.medi",
+        "sin",
+        "sin.fina",
+        "sin.init",
+        "sin.isol",
+        "sin.medi",
+        "ta",
+        "ta.fina",
+        "ta.init",
+        "ta.isol",
+        "ta.medi",
+        "teh",
+        "teh.fina",
+        "teh.init",
+        "teh.isol",
+        "teh.medi",
+        "tehArabic",
+        "tehArabic.fina",
+        "tehArabic.isol",
+        "vav",
+        "vav.fina",
+        "vav.isol",
+        "yehArabic",
+        "yehArabic.fina",
+        "yehArabic.init",
+        "yehArabic.isol",
+        "yehArabic.medi",
+        "zad",
+        "zad.fina",
+        "zad.init",
+        "zad.isol",
+        "zad.medi",
+        "zal",
+        "zal.fina",
+        "zal.isol",
+        "zeh",
+        "zeh.fina",
+        "zeh.isol",
+    }
+    assert (rtlTestFont.ltrGlyphs, rtlTestFont.rtlGlyphs) == (
+        expectedLTRGlyphs,
+        expectedRTLGlyphs,
+    )
 
 
 def fileNamesFromDir(path):

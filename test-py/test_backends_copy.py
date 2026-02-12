@@ -2,6 +2,7 @@ import pathlib
 import subprocess
 
 import pytest
+from fontTools.ufoLib import UFOReaderWriter
 from test_backends_designspace import fileNamesFromDir
 
 from fontra.backends import UnknownFileType, getFileSystemBackend, newFileSystemBackend
@@ -81,3 +82,32 @@ def test_newFileSystemBackend_unknown_filetype():
         UnknownFileType, match="Can't find backend for files with extension"
     ):
         _ = newFileSystemBackend("test.someunknownextension")
+
+
+def test_fontra_copy_ufo_rtl_kerning(tmpdir):
+    # Round-tripping UFO LTR/RTL kerning via Fontra
+    sourcePath = (
+        pathlib.Path(__file__).resolve().parent
+        / "data"
+        / "right-to-left-kerning-ufo"
+        / "right-to-left-kerning.ufo"
+    )
+
+    destPath = tmpdir / sourcePath.name
+
+    result = subprocess.run(
+        ["fontra-copy", sourcePath, destPath],
+        capture_output=True,
+        text=True,
+    )
+
+    if result.returncode:
+        print(result.stderr)
+        print(result.stdout)
+        assert 0, f"subprocess error {result.returncode}"
+
+    sourceReader = UFOReaderWriter(sourcePath)
+    destReader = UFOReaderWriter(destPath)
+
+    assert sourceReader.readGroups() == destReader.readGroups()
+    assert sourceReader.readKerning() == destReader.readKerning()
