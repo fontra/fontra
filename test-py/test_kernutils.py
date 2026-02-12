@@ -2,6 +2,7 @@ from fontra.core.classes import FontAxis, Kerning
 from fontra.core.kernutils import (
     classifyGlyphsByDirection,
     flipKerningDirection,
+    makeNameBasedSubstitutions,
     mergeKerning,
     splitKerningByDirection,
 )
@@ -170,3 +171,30 @@ expectedMergedKerningData = Kerning(
 def test_mergeKerning_with_group_conflict():
     mergedKerning = mergeKerning(kerningDataA, kerningDataB)
     assert mergedKerning == expectedMergedKerningData
+
+
+def test_makeNameBasedSubstitutions():
+    glyphNames = {
+        "A",
+        "A.alt",
+        "A.alt2",
+        "B",
+        "B.alt",
+        "A_B",
+        "A_B.alt",
+        "C.alt",
+        "alef-ar",
+        "beh-ar",
+        "alef_beh-ar",
+        "alef_beh-ar.alt",
+    }
+
+    expectedSubstitutions = {
+        "A": {"A.alt", "A_B", "A_B.alt", "A.alt2"},
+        "B": {"B.alt", "A_B", "A_B.alt"},
+        "alef-ar": {"alef_beh-ar", "alef_beh-ar.alt"},
+        "beh-ar": {"alef_beh-ar", "alef_beh-ar.alt"},
+    }
+
+    substitutions = makeNameBasedSubstitutions(glyphNames)
+    assert substitutions == expectedSubstitutions

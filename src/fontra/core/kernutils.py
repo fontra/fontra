@@ -1,3 +1,5 @@
+from collections import defaultdict
+from collections.abc import Collection
 from dataclasses import replace
 from typing import Any
 
@@ -108,11 +110,21 @@ def classifyGlyphsByDirection(
         for glyphName, codePoints in glyphMap.items()
         for codePoint in codePoints
     }
-    classifications = classifyGlyphs(unicodeBidiType, cmap=cmap)
+
+    nameBasedSubstitutions = makeNameBasedSubstitutions(glyphMap.keys())
+
+    classifications = classifyGlyphs(
+        unicodeBidiType, cmap=cmap, extra_substitutions=nameBasedSubstitutions
+    )
     if classifications.get("R"):
         glyphOrder = sorted({".notdef"} | set(glyphMap))
         gsub = compileGSUB(featureText, glyphOrder, fontraAxes)
-        classifications = classifyGlyphs(unicodeBidiType, cmap=cmap, gsub=gsub)
+        classifications = classifyGlyphs(
+            unicodeBidiType,
+            cmap=cmap,
+            gsub=gsub,
+            extra_substitutions=nameBasedSubstitutions,
+        )
 
     ltrGlyphs = classifications.get("L", set())
     rtlGlyphs = classifications.get("R", set())
@@ -168,6 +180,30 @@ def disambiguateKerningGroupNames(
     return replace(
         kernTableA, groupsSide1=groupsSide1, groupsSide2=groupsSide2, values=values
     )
+
+
+def makeNameBasedSubstitutions(glyphNames: Collection) -> dict[str, set[str]]:
+    """
+    Create an "extra_substitutions" dict for ufo2ft's classifyGlyphs(), based
+    on glyph name extensions and ligature glyph names. Takes dashed language
+    extensions into account as well.
+    Normally, such glyphs should be found via GSUB closure, but this heuristic
+    approach is useful for work-in-progress fonts.
+    """
+    substitutions = defaultdict(set)
+
+    for glyphName in glyphNames:
+        baseGlyphName = glyphName.split(".", 1)[0] if "." in glyphName else glyphName
+        langExt = ""
+        if "-" in baseGlyphName:
+            baseGlyphName, langExt = baseGlyphName.rsplit("-", 1)
+            langExt = "-" + langExt
+        for partGlyphName in baseGlyphName.split("_"):
+            partGlyphName += langExt
+            if partGlyphName != glyphName and partGlyphName in glyphNames:
+                substitutions[partGlyphName].add(glyphName)
+
+    return dict(substitutions)
 
 
 def _getConflictResolutionMappings(
