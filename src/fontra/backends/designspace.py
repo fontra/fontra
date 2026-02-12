@@ -1313,7 +1313,7 @@ class DesignspaceBackend(WatchableBackend, ReadableBaseBackend):
 
         if ufoVersionMajor == 3 and self.rtlGlyphs:
             # UFO3's kerning direction is "writing direction", but kerning in Fontra
-            # is "visial left to right", so let's flip any right-to-left kerning.
+            # is "visual left to right", so let's flip any right-to-left kerning.
             ltrKerning, rtlKerning = kernutils.splitKerningByDirection(
                 kerning, self.ltrGlyphs, self.rtlGlyphs
             )
