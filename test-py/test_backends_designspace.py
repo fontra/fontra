@@ -7,6 +7,7 @@ from dataclasses import asdict, replace
 
 import pytest
 from fontTools.designspaceLib import DesignSpaceDocument
+from fontTools.ufoLib import UFOReaderWriter
 
 from fontra.backends import getFileSystemBackend, newFileSystemBackend
 from fontra.backends.copy import copyFont
@@ -66,6 +67,14 @@ def writableTestFont(tmpdir):
         else:
             shutil.copy(sourcePath, destPath)
     return DesignspaceBackend.fromPath(tmpdir / "MutatorSans.designspace")
+
+
+@pytest.fixture
+def writableRTLTestFont(tmpdir):
+    sourcePath = dataDir / "right-to-left-kerning-ufo" / "right-to-left-kerning.ufo"
+    destPath = tmpdir / sourcePath.name
+    shutil.copytree(sourcePath, destPath)
+    return UFOBackend.fromPath(destPath)
 
 
 @pytest.fixture
@@ -1359,6 +1368,52 @@ async def test_write_italicAngle(writableTestFont):
     reopenedFont = getFileSystemBackend(writableTestFont.dsDoc.path)
     reopenedSources = await reopenedFont.getSources()
     assert reopenedSources["light-condensed"].italicAngle == -15
+
+
+async def test_rtl_kerning(writableRTLTestFont):
+    ufoPath = writableRTLTestFont.dsDoc.sources[0].path
+    reader = UFOReaderWriter(ufoPath)
+    ufoGroups = reader.readGroups()
+    ufoKerning = reader.readKerning()
+
+    allFontraKerning = await writableRTLTestFont.getKerning()
+    fontraKerning = allFontraKerning["kern"]
+
+    ltrPairs = [("V", "@A"), ("@T", "@o")]
+    rtlPairs = [("@yeh.isol", "@heh.fina"), ("tehArabic.isol", "@jim.isol.alt")]
+
+    _modifyFontraPairs(fontraKerning.values, ltrPairs, -10)
+    _modifyFontraPairs(fontraKerning.values, rtlPairs, -20)
+
+    _modifyUFOPairs(ufoKerning, ltrPairs, -10, False)
+    _modifyUFOPairs(ufoKerning, rtlPairs, -20, True)
+
+    await writableRTLTestFont.putKerning(allFontraKerning)
+
+    ufoGroupsAfter = reader.readGroups()
+    ufoKerningAfter = reader.readKerning()
+
+    assert ufoGroups == ufoGroupsAfter
+    assert ufoKerning == ufoKerningAfter
+
+
+def _modifyFontraPairs(kerningValues, pairs, delta):
+    for left, right in pairs:
+        kerningValues[left][right][0] += delta
+
+
+def _modifyUFOPairs(kerning, pairs, delta, swap):
+    if swap:
+        pairs = [(right, left) for left, right in pairs]
+
+    pairs = [(_toUfoGroup(left, 1), _toUfoGroup(right, 2)) for left, right in pairs]
+
+    for pair in pairs:
+        kerning[pair] += delta
+
+
+def _toUfoGroup(name, side):
+    return f"public.kern{side}.{name[1:]}" if name[0] == "@" else name
 
 
 def fileNamesFromDir(path):
