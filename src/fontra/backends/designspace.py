@@ -1283,9 +1283,6 @@ class DesignspaceBackend(WatchableBackend, ReadableBaseBackend):
         sourceIdentifiers = [dsSource.identifier for dsSource in dsSources]
         valueDicts: dict[str, dict[str, dict]] = defaultdict(lambda: defaultdict(dict))
 
-        # TODO: fixup RTL kerning
-        # Context: UFO3's kern direction is "writing direction", but I want kerning
-        # in Fontra to be "visial left to right", as that is much easier to manage.
         for dsSource in dsSources:
             groups = mergeKernGroups(groups, dsSource.layer.reader.readGroups())
             sourceKerning = dsSource.layer.reader.readKerning()
@@ -1311,6 +1308,17 @@ class DesignspaceBackend(WatchableBackend, ReadableBaseBackend):
             sourceIdentifiers=sourceIdentifiers,
             values=values,
         )
+
+        ufoVersionMajor, _ = self.defaultReader.formatVersionTuple
+
+        if ufoVersionMajor == 3 and self.rtlGlyphs:
+            # UFO3's kerning direction is "writing direction", but kerning in Fontra
+            # is "visial left to right", so let's flip any right-to-left kerning.
+            ltrKerning, rtlKerning = kernutils.splitKerningByDirection(
+                kerning, self.ltrGlyphs, self.rtlGlyphs
+            )
+            rtlKerning = kernutils.flipKerningDirection(rtlKerning)
+            kerning = kernutils.mergeKerning(ltrKerning, rtlKerning)
 
         return {"kern": kerning}
 
