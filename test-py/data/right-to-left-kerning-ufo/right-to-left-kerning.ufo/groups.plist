@@ -26,7 +26,7 @@
     <array>
       <string>a</string>
     </array>
-    <key>public.kern1.alefHamzeAbove.fina.RTL</key>
+    <key>public.kern1.alefHamzeAbove.fina</key>
     <array>
       <string>alefHamzeAbove.fina</string>
     </array>
@@ -38,7 +38,7 @@
     <array>
       <string>d</string>
     </array>
-    <key>public.kern1.dotlessBeh.RTL</key>
+    <key>public.kern1.dotlessBeh</key>
     <array>
       <string>beh.isol</string>
       <string>beh.fina</string>
@@ -49,34 +49,34 @@
     <array>
       <string>e</string>
     </array>
-    <key>public.kern1.eyn.fina.RTL</key>
+    <key>public.kern1.eyn.fina</key>
     <array>
       <string>eyn.fina</string>
     </array>
-    <key>public.kern1.eyn.fina.alt.RTL</key>
+    <key>public.kern1.eyn.fina.alt</key>
     <array>
       <string>eyn.fina.jump.alt</string>
       <string>eyn.fina.alt</string>
     </array>
-    <key>public.kern1.eyn.isol.RTL</key>
+    <key>public.kern1.eyn.isol</key>
     <array>
       <string>eyn.isol</string>
     </array>
-    <key>public.kern1.eyn.isol.alt.RTL</key>
+    <key>public.kern1.eyn.isol.alt</key>
     <array>
       <string>eyn.isol.alt</string>
     </array>
-    <key>public.kern1.feh.isol.RTL</key>
+    <key>public.kern1.feh.isol</key>
     <array>
       <string>feh.isol</string>
       <string>feh.fina</string>
     </array>
-    <key>public.kern1.heh.fina.RTL</key>
+    <key>public.kern1.heh.fina</key>
     <array>
       <string>heh.fina</string>
       <string>tehArabic.fina</string>
     </array>
-    <key>public.kern1.heh.isol.RTL</key>
+    <key>public.kern1.heh.isol</key>
     <array>
       <string>heh.isol</string>
     </array>
@@ -88,7 +88,7 @@
     <array>
       <string>hyphen.case</string>
     </array>
-    <key>public.kern1.jim.isol.RTL</key>
+    <key>public.kern1.jim.isol</key>
     <array>
       <string>jim.isol</string>
       <string>jim.fina</string>
@@ -97,29 +97,29 @@
       <string>kheh.isol</string>
       <string>kheh.fina</string>
     </array>
-    <key>public.kern1.jim.isol.alt.RTL</key>
+    <key>public.kern1.jim.isol.alt</key>
     <array>
       <string>hah.isol.alt</string>
       <string>hah.fina.alt</string>
       <string>jim.fina.alt</string>
       <string>jim.isol.alt</string>
     </array>
-    <key>public.kern1.kafArabic.isol.RTL</key>
+    <key>public.kern1.kafArabic.isol</key>
     <array>
       <string>kafArabic.isol</string>
       <string>kafArabic.fina</string>
     </array>
-    <key>public.kern1.lam.init_alef.fina.RTL</key>
+    <key>public.kern1.lam.init_alef.fina</key>
     <array>
       <string>lam.medi_alef.fina</string>
       <string>lam.init_alef.fina</string>
     </array>
-    <key>public.kern1.lam.init_alefHamzeAbove.fina.RTL</key>
+    <key>public.kern1.lam.init_alefHamzeAbove.fina</key>
     <array>
       <string>lam.init_alefHamzeAbove.fina</string>
       <string>lam.medi_alefHamzeAbove.fina</string>
     </array>
-    <key>public.kern1.lam.init_alefHamzeBelow.fina.RTL</key>
+    <key>public.kern1.lam.init_alefHamzeBelow.fina</key>
     <array>
       <string>lam.init_alefHamzeBelow.fina</string>
       <string>lam.medi_alefHamzeBelow.fina</string>
@@ -133,7 +133,7 @@
     <array>
       <string>period</string>
     </array>
-    <key>public.kern1.reh.isol.RTL</key>
+    <key>public.kern1.reh.isol</key>
     <array>
       <string>reh.fina</string>
       <string>reh.isol</string>
@@ -142,14 +142,14 @@
     <array>
       <string>w</string>
     </array>
-    <key>public.kern1.yeh.isol.RTL</key>
+    <key>public.kern1.yeh.isol</key>
     <array>
       <string>yehArabic.isol</string>
       <string>yehArabic.fina</string>
       <string>alefMaghsureh.isol</string>
       <string>alefMaghsureh.fina</string>
     </array>
-    <key>public.kern1.yeh.isol.alt.RTL</key>
+    <key>public.kern1.yeh.isol.alt</key>
     <array>
       <string>yeh.isol.alt</string>
       <string>alefMaghsureh.isol.alt</string>
@@ -160,7 +160,7 @@
     <array>
       <string>z</string>
     </array>
-    <key>public.kern1.zeh.isol.RTL</key>
+    <key>public.kern1.zeh.isol</key>
     <array>
       <string>zeh.isol</string>
       <string>zeh.fina</string>
@@ -182,25 +182,25 @@
     <array>
       <string>W</string>
     </array>
-    <key>public.kern2.dal.isol.RTL</key>
+    <key>public.kern2.dal.isol</key>
     <array>
       <string>zal.isol</string>
       <string>dal.isol</string>
     </array>
-    <key>public.kern2.dotlessBeh.RTL</key>
+    <key>public.kern2.dotlessBeh</key>
     <array>
       <string>beh.isol</string>
       <string>teh.isol</string>
     </array>
-    <key>public.kern2.eyn.init.RTL</key>
+    <key>public.kern2.eyn.init</key>
     <array>
       <string>eyn.init</string>
     </array>
-    <key>public.kern2.eyn.init.alt.RTL</key>
+    <key>public.kern2.eyn.init.alt</key>
     <array>
       <string>eyn.init.alt</string>
     </array>
-    <key>public.kern2.feh.isol.RTL</key>
+    <key>public.kern2.feh.isol</key>
     <array>
       <string>feh.init</string>
       <string>feh.isol</string>
@@ -209,11 +209,11 @@
     <array>
       <string>b</string>
     </array>
-    <key>public.kern2.heh.init.RTL</key>
+    <key>public.kern2.heh.init</key>
     <array>
       <string>heh.init</string>
     </array>
-    <key>public.kern2.heh.isol.RTL</key>
+    <key>public.kern2.heh.isol</key>
     <array>
       <string>heh.isol</string>
     </array>
@@ -225,38 +225,38 @@
     <array>
       <string>hyphen.case</string>
     </array>
-    <key>public.kern2.jim.init.RTL</key>
+    <key>public.kern2.jim.init</key>
     <array>
       <string>hah.init</string>
       <string>jim.init</string>
       <string>kheh.init</string>
     </array>
-    <key>public.kern2.jim.init.alt.RTL</key>
+    <key>public.kern2.jim.init.alt</key>
     <array>
       <string>jim.init.alt</string>
       <string>hah.init.alt</string>
     </array>
-    <key>public.kern2.jim.isol.RTL</key>
+    <key>public.kern2.jim.isol</key>
     <array>
       <string>jim.isol</string>
       <string>hah.isol</string>
       <string>kheh.isol</string>
     </array>
-    <key>public.kern2.jim.isol.alt.RTL</key>
+    <key>public.kern2.jim.isol.alt</key>
     <array>
       <string>hah.isol.alt</string>
       <string>jim.isol.alt</string>
     </array>
-    <key>public.kern2.kafArabic.init.RTL</key>
+    <key>public.kern2.kafArabic.init</key>
     <array>
       <string>kafArabic.init</string>
     </array>
-    <key>public.kern2.mim.isol.RTL</key>
+    <key>public.kern2.mim.isol</key>
     <array>
       <string>mim.isol</string>
       <string>mim.init</string>
     </array>
-    <key>public.kern2.noonGhuna.isol.RTL</key>
+    <key>public.kern2.noonGhuna.isol</key>
     <array>
       <string>noon.isol</string>
     </array>
@@ -272,26 +272,26 @@
     <array>
       <string>period</string>
     </array>
-    <key>public.kern2.sad.isol.RTL</key>
+    <key>public.kern2.sad.isol</key>
     <array>
       <string>zad.isol</string>
       <string>sad.isol</string>
       <string>zad.init</string>
       <string>sad.init</string>
     </array>
-    <key>public.kern2.sin.isol.RTL</key>
+    <key>public.kern2.sin.isol</key>
     <array>
       <string>sin.init</string>
       <string>shin.isol</string>
       <string>shin.init</string>
       <string>sin.isol</string>
     </array>
-    <key>public.kern2.ta.isol.RTL</key>
+    <key>public.kern2.ta.isol</key>
     <array>
       <string>ta.init</string>
       <string>ta.isol</string>
     </array>
-    <key>public.kern2.theh.init.RTL</key>
+    <key>public.kern2.theh.init</key>
     <array>
       <string>teh.init</string>
     </array>
@@ -299,12 +299,12 @@
     <array>
       <string>w</string>
     </array>
-    <key>public.kern2.yeh.isol.RTL</key>
+    <key>public.kern2.yeh.isol</key>
     <array>
       <string>alefMaghsureh.isol</string>
       <string>yehArabic.isol</string>
     </array>
-    <key>public.kern2.yeh.isol.alt.RTL</key>
+    <key>public.kern2.yeh.isol.alt</key>
     <array>
       <string>yeh.isol.alt</string>
       <string>alefMaghsureh.isol.alt</string>

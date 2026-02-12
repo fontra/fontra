@@ -10,7 +10,7 @@
     <key>V</key>
     <dict>
       <key>public.kern2.A</key>
-      <integer>-33</integer>
+      <integer>-53</integer>
       <key>public.kern2.hyphen</key>
       <integer>-59</integer>
       <key>public.kern2.hyphen.case</key>
@@ -70,7 +70,7 @@
       <key>public.kern2.hyphen.case</key>
       <integer>-63</integer>
       <key>public.kern2.o</key>
-      <integer>-82</integer>
+      <integer>-102</integer>
       <key>public.kern2.period</key>
       <integer>-94</integer>
       <key>public.kern2.w</key>
@@ -108,11 +108,11 @@
       <key>v</key>
       <integer>-12</integer>
     </dict>
-    <key>public.kern1.alefHamzeAbove.fina.RTL</key>
+    <key>public.kern1.alefHamzeAbove.fina</key>
     <dict>
-      <key>public.kern2.jim.isol.alt.RTL</key>
+      <key>public.kern2.jim.isol.alt</key>
       <integer>-12</integer>
-      <key>public.kern2.yeh.isol.RTL</key>
+      <key>public.kern2.yeh.isol</key>
       <integer>-35</integer>
     </dict>
     <key>public.kern1.c</key>
@@ -137,9 +137,9 @@
       <key>v</key>
       <integer>-25</integer>
     </dict>
-    <key>public.kern1.dotlessBeh.RTL</key>
+    <key>public.kern1.dotlessBeh</key>
     <dict>
-      <key>public.kern2.yeh.isol.RTL</key>
+      <key>public.kern2.yeh.isol</key>
       <integer>-79</integer>
     </dict>
     <key>public.kern1.e</key>
@@ -153,95 +153,95 @@
       <key>v</key>
       <integer>-18</integer>
     </dict>
-    <key>public.kern1.eyn.fina.RTL</key>
+    <key>public.kern1.eyn.fina</key>
     <dict>
       <key>lam.init</key>
       <integer>-13</integer>
       <key>noon.init</key>
       <integer>-23</integer>
-      <key>public.kern2.heh.isol.RTL</key>
+      <key>public.kern2.heh.isol</key>
       <integer>-28</integer>
-      <key>public.kern2.mim.isol.RTL</key>
+      <key>public.kern2.mim.isol</key>
       <integer>-27</integer>
-      <key>public.kern2.sad.isol.RTL</key>
+      <key>public.kern2.sad.isol</key>
       <integer>-22</integer>
-      <key>public.kern2.theh.init.RTL</key>
+      <key>public.kern2.theh.init</key>
       <integer>-29</integer>
       <key>tehArabic.isol</key>
       <integer>-37</integer>
     </dict>
-    <key>public.kern1.eyn.fina.alt.RTL</key>
+    <key>public.kern1.eyn.fina.alt</key>
     <dict>
-      <key>public.kern2.eyn.init.RTL</key>
+      <key>public.kern2.eyn.init</key>
       <integer>-26</integer>
-      <key>public.kern2.jim.init.RTL</key>
+      <key>public.kern2.jim.init</key>
       <integer>-101</integer>
-      <key>public.kern2.jim.init.alt.RTL</key>
+      <key>public.kern2.jim.init.alt</key>
       <integer>-75</integer>
-      <key>public.kern2.jim.isol.RTL</key>
+      <key>public.kern2.jim.isol</key>
       <integer>-96</integer>
-      <key>public.kern2.jim.isol.alt.RTL</key>
+      <key>public.kern2.jim.isol.alt</key>
       <integer>-128</integer>
-      <key>public.kern2.yeh.isol.RTL</key>
+      <key>public.kern2.yeh.isol</key>
       <integer>-228</integer>
-      <key>public.kern2.yeh.isol.alt.RTL</key>
+      <key>public.kern2.yeh.isol.alt</key>
       <integer>-63</integer>
       <key>reh.isol</key>
       <integer>-103</integer>
       <key>zeh.isol</key>
       <integer>-19</integer>
     </dict>
-    <key>public.kern1.eyn.isol.RTL</key>
+    <key>public.kern1.eyn.isol</key>
     <dict>
       <key>lam.init</key>
       <integer>-18</integer>
       <key>noon.init</key>
       <integer>-10</integer>
-      <key>public.kern2.heh.isol.RTL</key>
+      <key>public.kern2.heh.isol</key>
       <integer>-26</integer>
-      <key>public.kern2.mim.isol.RTL</key>
+      <key>public.kern2.mim.isol</key>
       <integer>-36</integer>
-      <key>public.kern2.theh.init.RTL</key>
+      <key>public.kern2.theh.init</key>
       <integer>-32</integer>
       <key>tehArabic.isol</key>
       <integer>-24</integer>
     </dict>
-    <key>public.kern1.eyn.isol.alt.RTL</key>
+    <key>public.kern1.eyn.isol.alt</key>
     <dict>
       <key>lam.init</key>
       <integer>-35</integer>
       <key>noon.init</key>
       <integer>-13</integer>
-      <key>public.kern2.heh.isol.RTL</key>
+      <key>public.kern2.heh.isol</key>
       <integer>-21</integer>
-      <key>public.kern2.mim.isol.RTL</key>
+      <key>public.kern2.mim.isol</key>
       <integer>-18</integer>
-      <key>public.kern2.theh.init.RTL</key>
+      <key>public.kern2.theh.init</key>
       <integer>-31</integer>
       <key>tehArabic.isol</key>
       <integer>-29</integer>
     </dict>
-    <key>public.kern1.feh.isol.RTL</key>
+    <key>public.kern1.feh.isol</key>
     <dict>
-      <key>public.kern2.yeh.isol.RTL</key>
+      <key>public.kern2.yeh.isol</key>
       <integer>-89</integer>
     </dict>
-    <key>public.kern1.heh.fina.RTL</key>
+    <key>public.kern1.heh.fina</key>
     <dict>
-      <key>public.kern2.jim.isol.alt.RTL</key>
+      <key>public.kern2.jim.isol.alt</key>
       <integer>-28</integer>
-      <key>public.kern2.yeh.isol.RTL</key>
-      <integer>-168</integer>
+      <key>public.kern2.yeh.isol</key>
+      <integer>-208</integer>
       <key>reh.isol</key>
       <integer>-29</integer>
       <key>zeh.isol</key>
       <integer>-14</integer>
     </dict>
-    <key>public.kern1.heh.isol.RTL</key>
+    <key>public.kern1.heh.isol</key>
     <dict>
-      <key>public.kern2.jim.isol.alt.RTL</key>
+      <key>public.kern2.jim.isol.alt</key>
       <integer>-21</integer>
-      <key>public.kern2.yeh.isol.RTL</key>
+      <key>public.kern2.yeh.isol</key>
       <integer>-142</integer>
     </dict>
     <key>public.kern1.hyphen</key>
@@ -266,64 +266,64 @@
       <key>public.kern2.W</key>
       <integer>-50</integer>
     </dict>
-    <key>public.kern1.jim.isol.RTL</key>
+    <key>public.kern1.jim.isol</key>
     <dict>
-      <key>public.kern2.mim.isol.RTL</key>
+      <key>public.kern2.mim.isol</key>
       <integer>-13</integer>
     </dict>
-    <key>public.kern1.jim.isol.alt.RTL</key>
+    <key>public.kern1.jim.isol.alt</key>
     <dict>
-      <key>public.kern2.heh.isol.RTL</key>
+      <key>public.kern2.heh.isol</key>
       <integer>-20</integer>
-      <key>public.kern2.mim.isol.RTL</key>
+      <key>public.kern2.mim.isol</key>
       <integer>-7</integer>
       <key>tehArabic.isol</key>
-      <integer>-8</integer>
+      <integer>-48</integer>
     </dict>
-    <key>public.kern1.kafArabic.isol.RTL</key>
+    <key>public.kern1.kafArabic.isol</key>
     <dict>
-      <key>public.kern2.jim.isol.alt.RTL</key>
+      <key>public.kern2.jim.isol.alt</key>
       <integer>-27</integer>
-      <key>public.kern2.yeh.isol.RTL</key>
+      <key>public.kern2.yeh.isol</key>
       <integer>-155</integer>
       <key>reh.isol</key>
       <integer>-11</integer>
       <key>zeh.isol</key>
       <integer>-20</integer>
     </dict>
-    <key>public.kern1.lam.init_alef.fina.RTL</key>
+    <key>public.kern1.lam.init_alef.fina</key>
     <dict>
-      <key>public.kern2.heh.isol.RTL</key>
+      <key>public.kern2.heh.isol</key>
       <integer>-17</integer>
-      <key>public.kern2.jim.init.alt.RTL</key>
+      <key>public.kern2.jim.init.alt</key>
       <integer>-33</integer>
-      <key>public.kern2.jim.isol.alt.RTL</key>
+      <key>public.kern2.jim.isol.alt</key>
       <integer>-94</integer>
-      <key>public.kern2.mim.isol.RTL</key>
+      <key>public.kern2.mim.isol</key>
       <integer>-11</integer>
-      <key>public.kern2.yeh.isol.RTL</key>
+      <key>public.kern2.yeh.isol</key>
       <integer>-74</integer>
       <key>tehArabic.isol</key>
       <integer>-26</integer>
     </dict>
-    <key>public.kern1.lam.init_alefHamzeAbove.fina.RTL</key>
+    <key>public.kern1.lam.init_alefHamzeAbove.fina</key>
     <dict>
-      <key>public.kern2.heh.isol.RTL</key>
+      <key>public.kern2.heh.isol</key>
       <integer>-14</integer>
-      <key>public.kern2.jim.init.alt.RTL</key>
+      <key>public.kern2.jim.init.alt</key>
       <integer>-36</integer>
-      <key>public.kern2.jim.isol.alt.RTL</key>
+      <key>public.kern2.jim.isol.alt</key>
       <integer>-86</integer>
-      <key>public.kern2.mim.isol.RTL</key>
+      <key>public.kern2.mim.isol</key>
       <integer>-22</integer>
-      <key>public.kern2.yeh.isol.RTL</key>
+      <key>public.kern2.yeh.isol</key>
       <integer>-78</integer>
     </dict>
-    <key>public.kern1.lam.init_alefHamzeBelow.fina.RTL</key>
+    <key>public.kern1.lam.init_alefHamzeBelow.fina</key>
     <dict>
-      <key>public.kern2.heh.isol.RTL</key>
+      <key>public.kern2.heh.isol</key>
       <integer>-30</integer>
-      <key>public.kern2.mim.isol.RTL</key>
+      <key>public.kern2.mim.isol</key>
       <integer>-8</integer>
       <key>tehArabic.isol</key>
       <integer>-10</integer>
@@ -360,7 +360,7 @@
       <key>v</key>
       <integer>-80</integer>
     </dict>
-    <key>public.kern1.reh.isol.RTL</key>
+    <key>public.kern1.reh.isol</key>
     <dict>
       <key>beh.init</key>
       <integer>-27</integer>
@@ -376,39 +376,39 @@
       <integer>-38</integer>
       <key>noon.init</key>
       <integer>-33</integer>
-      <key>public.kern2.dal.isol.RTL</key>
+      <key>public.kern2.dal.isol</key>
       <integer>-21</integer>
-      <key>public.kern2.dotlessBeh.RTL</key>
+      <key>public.kern2.dotlessBeh</key>
       <integer>-28</integer>
-      <key>public.kern2.eyn.init.RTL</key>
+      <key>public.kern2.eyn.init</key>
       <integer>-31</integer>
-      <key>public.kern2.eyn.init.alt.RTL</key>
+      <key>public.kern2.eyn.init.alt</key>
       <integer>-46</integer>
-      <key>public.kern2.feh.isol.RTL</key>
+      <key>public.kern2.feh.isol</key>
       <integer>-36</integer>
-      <key>public.kern2.heh.init.RTL</key>
+      <key>public.kern2.heh.init</key>
       <integer>-35</integer>
-      <key>public.kern2.heh.isol.RTL</key>
+      <key>public.kern2.heh.isol</key>
       <integer>-20</integer>
-      <key>public.kern2.jim.init.RTL</key>
+      <key>public.kern2.jim.init</key>
       <integer>-44</integer>
-      <key>public.kern2.jim.init.alt.RTL</key>
+      <key>public.kern2.jim.init.alt</key>
       <integer>-65</integer>
-      <key>public.kern2.kafArabic.init.RTL</key>
+      <key>public.kern2.kafArabic.init</key>
       <integer>-12</integer>
-      <key>public.kern2.mim.isol.RTL</key>
+      <key>public.kern2.mim.isol</key>
       <integer>-26</integer>
-      <key>public.kern2.noonGhuna.isol.RTL</key>
+      <key>public.kern2.noonGhuna.isol</key>
       <integer>-21</integer>
-      <key>public.kern2.sad.isol.RTL</key>
+      <key>public.kern2.sad.isol</key>
       <integer>-34</integer>
-      <key>public.kern2.sin.isol.RTL</key>
+      <key>public.kern2.sin.isol</key>
       <integer>-51</integer>
-      <key>public.kern2.ta.isol.RTL</key>
+      <key>public.kern2.ta.isol</key>
       <integer>-21</integer>
-      <key>public.kern2.theh.init.RTL</key>
+      <key>public.kern2.theh.init</key>
       <integer>-22</integer>
-      <key>public.kern2.yeh.isol.alt.RTL</key>
+      <key>public.kern2.yeh.isol.alt</key>
       <integer>-42</integer>
       <key>tehArabic.isol</key>
       <integer>-30</integer>
@@ -428,12 +428,12 @@
       <key>public.kern2.period</key>
       <integer>-47</integer>
     </dict>
-    <key>public.kern1.yeh.isol.RTL</key>
+    <key>public.kern1.yeh.isol</key>
     <dict>
-      <key>public.kern2.yeh.isol.RTL</key>
+      <key>public.kern2.yeh.isol</key>
       <integer>-47</integer>
     </dict>
-    <key>public.kern1.yeh.isol.alt.RTL</key>
+    <key>public.kern1.yeh.isol.alt</key>
     <dict>
       <key>ghaf.init</key>
       <integer>-222</integer>
@@ -447,39 +447,39 @@
       <integer>-244</integer>
       <key>noon.init</key>
       <integer>-137</integer>
-      <key>public.kern2.dal.isol.RTL</key>
+      <key>public.kern2.dal.isol</key>
       <integer>-227</integer>
-      <key>public.kern2.dotlessBeh.RTL</key>
+      <key>public.kern2.dotlessBeh</key>
       <integer>-223</integer>
-      <key>public.kern2.eyn.init.RTL</key>
+      <key>public.kern2.eyn.init</key>
       <integer>-246</integer>
-      <key>public.kern2.eyn.init.alt.RTL</key>
+      <key>public.kern2.eyn.init.alt</key>
       <integer>-253</integer>
-      <key>public.kern2.feh.isol.RTL</key>
+      <key>public.kern2.feh.isol</key>
       <integer>-234</integer>
-      <key>public.kern2.heh.init.RTL</key>
+      <key>public.kern2.heh.init</key>
       <integer>-211</integer>
-      <key>public.kern2.heh.isol.RTL</key>
+      <key>public.kern2.heh.isol</key>
       <integer>-226</integer>
-      <key>public.kern2.jim.init.RTL</key>
+      <key>public.kern2.jim.init</key>
       <integer>-236</integer>
-      <key>public.kern2.jim.init.alt.RTL</key>
+      <key>public.kern2.jim.init.alt</key>
       <integer>-191</integer>
-      <key>public.kern2.kafArabic.init.RTL</key>
+      <key>public.kern2.kafArabic.init</key>
       <integer>-238</integer>
-      <key>public.kern2.mim.isol.RTL</key>
+      <key>public.kern2.mim.isol</key>
       <integer>-229</integer>
-      <key>public.kern2.noonGhuna.isol.RTL</key>
+      <key>public.kern2.noonGhuna.isol</key>
       <integer>-97</integer>
-      <key>public.kern2.sad.isol.RTL</key>
+      <key>public.kern2.sad.isol</key>
       <integer>-232</integer>
-      <key>public.kern2.sin.isol.RTL</key>
+      <key>public.kern2.sin.isol</key>
       <integer>-221</integer>
-      <key>public.kern2.ta.isol.RTL</key>
+      <key>public.kern2.ta.isol</key>
       <integer>-218</integer>
-      <key>public.kern2.theh.init.RTL</key>
+      <key>public.kern2.theh.init</key>
       <integer>-66</integer>
-      <key>public.kern2.yeh.isol.alt.RTL</key>
+      <key>public.kern2.yeh.isol.alt</key>
       <integer>-156</integer>
       <key>tehArabic.isol</key>
       <integer>-214</integer>
@@ -493,7 +493,7 @@
       <key>public.kern2.o</key>
       <integer>-22</integer>
     </dict>
-    <key>public.kern1.zeh.isol.RTL</key>
+    <key>public.kern1.zeh.isol</key>
     <dict>
       <key>lam.init_alef.fina</key>
       <integer>-29</integer>
@@ -501,24 +501,24 @@
       <integer>-39</integer>
       <key>lam.init_alefHamzeBelow.fina</key>
       <integer>-29</integer>
-      <key>public.kern2.dal.isol.RTL</key>
+      <key>public.kern2.dal.isol</key>
       <integer>-29</integer>
-      <key>public.kern2.eyn.init.RTL</key>
+      <key>public.kern2.eyn.init</key>
       <integer>-31</integer>
-      <key>public.kern2.eyn.init.alt.RTL</key>
+      <key>public.kern2.eyn.init.alt</key>
       <integer>-36</integer>
-      <key>public.kern2.jim.init.RTL</key>
+      <key>public.kern2.jim.init</key>
       <integer>-39</integer>
-      <key>public.kern2.jim.init.alt.RTL</key>
+      <key>public.kern2.jim.init.alt</key>
       <integer>-58</integer>
-      <key>public.kern2.yeh.isol.alt.RTL</key>
+      <key>public.kern2.yeh.isol.alt</key>
       <integer>-32</integer>
     </dict>
     <key>tehArabic.isol</key>
     <dict>
-      <key>public.kern2.jim.isol.alt.RTL</key>
+      <key>public.kern2.jim.isol.alt</key>
       <integer>-17</integer>
-      <key>public.kern2.yeh.isol.RTL</key>
+      <key>public.kern2.yeh.isol</key>
       <integer>-156</integer>
     </dict>
     <key>two</key>
