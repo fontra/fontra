@@ -1,0 +1,130 @@
+languagesystem DFLT dflt;
+languagesystem latn dflt;
+languagesystem latn AZE;
+languagesystem latn TRK;
+languagesystem latn KAZ;
+languagesystem latn TAT;
+languagesystem latn CRT;
+languagesystem latn MOL;
+languagesystem latn ROM;
+languagesystem latn CAT;
+languagesystem latn NLD;
+languagesystem latn GRN;
+languagesystem latn AFK;
+languagesystem cyrl dflt;
+languagesystem arab dflt;
+@NINE = [];
+@SEVEN = [];
+@EIGHT = [];
+@SIX = [];
+@FIVE = [];
+@THREE = [three three.denominator three.numerator three.tlf threeinferior threesuperior];
+@TWO = [two two.denominator two.numerator two.tlf twoinferior twosuperior];
+@FOUR = [four four.denominator four.numerator four.tlf fourinferior foursuperior];
+@ONE = [one one.denominator one.numerator one.tlf oneinferior onesuperior];
+@FIG_DFLT = [four one three two zero];
+# Script and language coverage
+# Case sensitive
+feature case {
+    sub hyphen by hyphen.case;
+} case;
+
+# Ligature formation
+# Localized Forms
+# Ordinals
+feature ordn {
+    sub @FIG_DFLT [A a]' by [ordfeminine ordfeminine];
+    sub @FIG_DFLT [O o]' by [ordmasculine ordmasculine];
+    sub @FIG_DFLT period [A a]' by [ordfeminine ordfeminine];
+    sub @FIG_DFLT period [O o]' by [ordmasculine ordmasculine];
+} ordn;
+
+# Ligature fraction glyphs
+feature frac {
+    # This part for dynamic fractions:
+    sub [zero one two three four] by [zero.numerator one.numerator two.numerator three.numerator four.numerator];
+    sub [zero.tlf one.tlf two.tlf three.tlf four.tlf] by [zero.numerator one.numerator two.numerator three.numerator four.numerator];
+    sub [zero.denominator one.denominator two.denominator three.denominator four.denominator] by [zero.numerator one.numerator two.numerator three.numerator four.numerator];
+    sub [zero.denominator one.denominator two.denominator three.denominator four.denominator] [zero.numerator one.numerator two.numerator three.numerator four.numerator]' by [zero.denominator one.denominator two.denominator three.denominator four.denominator];
+} frac;
+
+# Lining Figures
+feature lnum {
+    sub [zero.tlf one.tlf two.tlf three.tlf four.tlf] by [zero one two three four];
+} lnum;
+
+# Proportional Figures
+feature pnum {
+    sub [zero.tlf one.tlf two.tlf three.tlf four.tlf] by [zero one two three four];
+} pnum;
+
+# Tabular Figures
+feature tnum {
+    sub [zero one two three four] by [zero.tlf one.tlf two.tlf three.tlf four.tlf];
+} tnum;
+
+feature subs {
+    sub [zero one two three four] by [zeroinferior oneinferior twoinferior threeinferior fourinferior];
+    sub [zero.tlf one.tlf two.tlf three.tlf four.tlf] by [zeroinferior oneinferior twoinferior threeinferior fourinferior];
+} subs;
+
+feature sinf {
+    sub [zero one two three four] by [zeroinferior oneinferior twoinferior threeinferior fourinferior];
+    sub [zero.tlf one.tlf two.tlf three.tlf four.tlf] by [zeroinferior oneinferior twoinferior threeinferior fourinferior];
+} sinf;
+
+feature sups {
+    sub [zero one two three four] by [zerosuperior onesuperior twosuperior threesuperior foursuperior];
+    sub [zero.tlf one.tlf two.tlf three.tlf four.tlf] by [zerosuperior onesuperior twosuperior threesuperior foursuperior];
+} sups;
+
+feature dnom {
+    sub [zero one two three four] by [zero.denominator one.denominator two.denominator three.denominator four.denominator];
+    sub [zero.tlf one.tlf two.tlf three.tlf four.tlf] by [zero.denominator one.denominator two.denominator three.denominator four.denominator];
+} dnom;
+
+feature numr {
+    sub [zero one two three four] by [zero.numerator one.numerator two.numerator three.numerator four.numerator];
+    sub [zero.tlf one.tlf two.tlf three.tlf four.tlf] by [zero.numerator one.numerator two.numerator three.numerator four.numerator];
+} numr;
+
+feature rlig {
+    lookupflag RightToLeft IgnoreMarks;
+    sub lam.medi alefHamzeBelow.fina by lam.medi_alefHamzeBelow.fina;
+    sub lam.init alefHamzeBelow.fina by lam.init_alefHamzeBelow.fina;
+    sub lam.medi alefHamzeAbove.fina by lam.medi_alefHamzeAbove.fina;
+    sub lam.init alefHamzeAbove.fina by lam.init_alefHamzeAbove.fina;
+    sub lam.medi alef.fina by lam.medi_alef.fina;
+    sub lam.init alef.fina by lam.init_alef.fina;
+} rlig;
+
+feature liga {
+    lookup allah {
+        lookupflag RightToLeft IgnoreMarks;
+        sub alef.isol lam.init lam.medi heh.fina by allah;
+    } allah;
+
+} liga;
+
+feature init {
+    sub [beh teh jim hah kheh sin shin sad zad ta eyn feh ghaf kafArabic lam mim noon heh yehArabic] by [beh.init teh.init jim.init hah.init kheh.init sin.init shin.init sad.init zad.init ta.init eyn.init feh.init ghaf.init kafArabic.init lam.init mim.init noon.init heh.init yehArabic.init];
+} init;
+
+feature medi {
+    sub [beh teh jim hah kheh sin shin sad zad ta eyn feh ghaf kafArabic lam mim noon heh yehArabic] by [beh.medi teh.medi jim.medi hah.medi kheh.medi sin.medi shin.medi sad.medi zad.medi ta.medi eyn.medi feh.medi ghaf.medi kafArabic.medi lam.medi mim.medi noon.medi heh.medi yehArabic.medi];
+} medi;
+
+feature fina {
+    sub [alef alefHamzeAbove alefHamzeBelow beh teh jim hah kheh dal zal reh zeh sin shin sad zad ta eyn feh ghaf kafArabic lam mim noon vav heh tehArabic yehArabic alefMaghsureh] by [alef.fina alefHamzeAbove.fina alefHamzeBelow.fina beh.fina teh.fina jim.fina hah.fina kheh.fina dal.fina zal.fina reh.fina zeh.fina sin.fina shin.fina sad.fina zad.fina ta.fina eyn.fina feh.fina ghaf.fina kafArabic.fina lam.fina mim.fina noon.fina vav.fina heh.fina tehArabic.fina yehArabic.fina alefMaghsureh.fina];
+} fina;
+
+feature isol {
+    sub [alef alefHamzeAbove alefHamzeBelow beh teh jim hah kheh dal zal reh zeh sin shin sad zad ta eyn feh ghaf kafArabic lam mim noon vav heh tehArabic yehArabic alefMaghsureh] by [alef.isol alefHamzeAbove.isol alefHamzeBelow.isol beh.isol teh.isol jim.isol hah.isol kheh.isol dal.isol zal.isol reh.isol zeh.isol sin.isol shin.isol sad.isol zad.isol ta.isol eyn.isol feh.isol ghaf.isol kafArabic.isol lam.isol mim.isol noon.isol vav.isol heh.isol tehArabic.isol yehArabic.isol alefMaghsureh.isol];
+} isol;
+
+#table GDEF {
+#GlyphClassDef
+#        @GDEF_base,
+#        @GDEF_ligature,
+#        @GDEF_mark,
+#        ;} GDEF;
