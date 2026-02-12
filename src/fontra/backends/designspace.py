@@ -37,6 +37,7 @@ from fontTools.ufoLib import (
 )
 from fontTools.ufoLib.glifLib import GlyphSet
 
+from ..core import kernutils
 from ..core.async_property import async_property
 from ..core.classes import (
     Anchor,
@@ -275,6 +276,8 @@ class DesignspaceBackend(WatchableBackend, ReadableBaseBackend):
         )
         self.savedGlyphModificationTimes: dict[str, set] = {}
         self.zombieDSSources: dict[str, DSSource] = {}
+        self._ltrGlyphs: set | None = None
+        self._rtlGlyphs: set | None = None
 
     def startOptionalBackgroundTasks(self) -> None:
         self._backgroundTasksTask = asyncio.create_task(self.glyphDependencies)
@@ -375,6 +378,24 @@ class DesignspaceBackend(WatchableBackend, ReadableBaseBackend):
                 self.defaultReader.readInfo(fontInfo)
             self._defaultFontInfo = fontInfo
         return self._defaultFontInfo
+
+    @property
+    def ltrGlyphs(self):
+        if self._ltrGlyphs is None:
+            self._classifyGlyphsByDirection()
+        return self._ltrGlyphs
+
+    @property
+    def rtlGlyphs(self):
+        if self._rtlGlyphs is None:
+            self._classifyGlyphsByDirection()
+        return self._rtlGlyphs
+
+    def _classifyGlyphsByDirection(self):
+        features = self._getFeaturesSync()
+        self._ltrGlyphs, self.rtlGlyphs = kernutils.classifyGlyphsByDirection(
+            self.glyphMap, features.text, self.axes
+        )
 
     def loadUFOLayers(self) -> None:
         manager = self.ufoManager
@@ -1283,14 +1304,14 @@ class DesignspaceBackend(WatchableBackend, ReadableBaseBackend):
 
         groupsSide1, groupsSide2 = splitGroups(groups)
 
-        return {
-            "kern": Kerning(
-                groupsSide1=groupsSide1,
-                groupsSide2=groupsSide2,
-                sourceIdentifiers=sourceIdentifiers,
-                values=values,
-            )
-        }
+        kerning = Kerning(
+            groupsSide1=groupsSide1,
+            groupsSide2=groupsSide2,
+            sourceIdentifiers=sourceIdentifiers,
+            values=values,
+        )
+
+        return {"kern": kerning}
 
     async def putKerning(self, kerning: dict[str, Kerning]) -> None:
         for kernType, kerningTable in kerning.items():
@@ -1355,6 +1376,9 @@ class DesignspaceBackend(WatchableBackend, ReadableBaseBackend):
                     )
 
     async def getFeatures(self) -> OpenTypeFeatures:
+        return self._getFeaturesSync()
+
+    def _getFeaturesSync(self) -> OpenTypeFeatures:
         ufoFeatureText = self.defaultReader.readFeatures()
         featureText = resolveFeatureIncludes(
             ufoFeatureText, self.ufoDir, set(self.glyphMap)
