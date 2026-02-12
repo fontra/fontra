@@ -87,7 +87,7 @@ def flipKerningDirection(kerning: Kerning) -> Kerning:
     )
 
 
-def mergeKerning(kerningA, kerningB):
+def mergeKerning(kerningA: Kerning, kerningB: Kerning) -> Kerning:
     assert kerningA.sourceIdentifiers == kerningB.sourceIdentifiers
     kerningB = disambiguateKerningGroupNames(kerningB, kerningA, True)
     return Kerning(
