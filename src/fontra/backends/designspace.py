@@ -1317,21 +1317,15 @@ class DesignspaceBackend(WatchableBackend, ReadableBaseBackend):
             values=values,
         )
 
-        ufoVersionMajor, _ = self.defaultReader.formatVersionTuple
-
-        if ufoVersionMajor == 3 and self.rtlGlyphs:
-            # UFO3's kerning direction is "writing direction", but kerning in Fontra
-            # is "visual left to right", so let's flip any right-to-left kerning.
-            ltrKerning, rtlKerning = kernutils.splitKerningByDirection(
-                kerning, self.ltrGlyphs, self.rtlGlyphs
-            )
-            rtlKerning = kernutils.flipKerningDirection(rtlKerning)
-            kerning = kernutils.mergeKerning(ltrKerning, rtlKerning)
+        kerning = self._flipRTLKerning(kerning)
 
         return {"kern": kerning}
 
     async def putKerning(self, kerning: dict[str, Kerning]) -> None:
         for kernType, kerningTable in kerning.items():
+            if kernType == "kern":
+                kerningTable = self._flipRTLKerning(kerningTable)
+
             sourceIdentifiers = kerningTable.sourceIdentifiers
 
             dsSources = [
@@ -1391,6 +1385,21 @@ class DesignspaceBackend(WatchableBackend, ReadableBaseBackend):
                     logger.error(
                         "kerning types other than 'kern' are not yet implemented for UFO"
                     )
+
+    def _flipRTLKerning(self, kerning: Kerning) -> Kerning:
+        ufoVersionMajor, _ = self.defaultReader.formatVersionTuple
+
+        if ufoVersionMajor != 3 or not self.rtlGlyphs:
+            return kerning
+
+        # UFO3's kerning direction is "writing direction", but kerning in Fontra
+        # is "visual left to right", so let's flip any right-to-left kerning.
+        # We do this on read *and* on write
+        ltrKerning, rtlKerning = kernutils.splitKerningByDirection(
+            kerning, self.ltrGlyphs, self.rtlGlyphs
+        )
+        rtlKerning = kernutils.flipKerningDirection(rtlKerning)
+        return kernutils.mergeKerning(ltrKerning, rtlKerning)
 
     async def getFeatures(self) -> OpenTypeFeatures:
         return self._getFeaturesSync()
