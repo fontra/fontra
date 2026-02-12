@@ -2,6 +2,7 @@
 
 ## 2026-02-?? [version 2026.3.0]
 
+- [designspace/ufo] Fix reading and writing of right-to-left kerning. [PR 2416](https://github.com/fontra/fontra/pull/2416)
 - Fix a bug in anchor sorting, so inconsistently ordered anchors can now really be interpolated. This fixes a bug in the previous attempt to fix this. [PR 2415](https://github.com/fontra/fontra/pull/2415)
 - [fontra-glyphs] When reading OpenType features, expand include statements and Glyphs-specific dynamic feature syntax into traditional feature syntax. [fontra-glyphs PR 123](https://github.com/fontra/fontra-glyphs/pull/123)
 - [fontra-glyphs] Accept invalid OpenType feature code, as this is inevitable when editing, given Fontra's autosave nature. [fontra-glyphs PR 122](https://github.com/fontra/fontra-glyphs/pull/122)

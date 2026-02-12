@@ -1,3 +1,5 @@
+from collections import defaultdict
+from collections.abc import Collection
 from dataclasses import replace
 from typing import Any
 
@@ -32,40 +34,39 @@ def splitKerningByDirection(
         leftGroup = left[1:] if left.startswith("@") else None
         rightGroup = right[1:] if right.startswith("@") else None
 
-        leftIsLTR = (
-            leftGroup in ltrGroupsSide1 if leftGroup is not None else left in ltrGlyphs
-        )
         leftIsRTL = (
             leftGroup in rtlGroupsSide1 if leftGroup is not None else left in rtlGlyphs
         )
 
-        rightIsLTR = (
-            rightGroup in ltrGroupsSide2
-            if rightGroup is not None
-            else right in ltrGlyphs
-        )
         rightIsRTL = (
             rightGroup in rtlGroupsSide2
             if rightGroup is not None
             else right in rtlGlyphs
         )
 
-        if leftIsLTR or rightIsLTR:
-            ltrValues[left, right] = values
-
         if leftIsRTL or rightIsRTL:
             rtlValues[left, right] = values
+        else:
+            ltrValues[left, right] = values
+
+    ltrNeutralGroupsSide1, ltrNeutralGroupsSide2 = _filterGroupsByValueUsage(
+        neutralGroupsSide1, neutralGroupsSide2, ltrValues
+    )
 
     ltrKerning = Kerning(
-        groupsSide1=ltrGroupsSide1 | neutralGroupsSide1,
-        groupsSide2=ltrGroupsSide2 | neutralGroupsSide2,
+        groupsSide1=ltrGroupsSide1 | ltrNeutralGroupsSide1,
+        groupsSide2=ltrGroupsSide2 | ltrNeutralGroupsSide2,
         sourceIdentifiers=kerning.sourceIdentifiers,
         values=_nestKerningValues(ltrValues),
     )
 
+    rtlNeutralGroupsSide1, rtlNeutralGroupsSide2 = _filterGroupsByValueUsage(
+        neutralGroupsSide1, neutralGroupsSide2, rtlValues
+    )
+
     rtlKerning = Kerning(
-        groupsSide1=rtlGroupsSide1 | neutralGroupsSide1,
-        groupsSide2=rtlGroupsSide2 | neutralGroupsSide2,
+        groupsSide1=rtlGroupsSide1 | rtlNeutralGroupsSide1,
+        groupsSide2=rtlGroupsSide2 | rtlNeutralGroupsSide2,
         sourceIdentifiers=kerning.sourceIdentifiers,
         values=_nestKerningValues(rtlValues),
     )
@@ -87,7 +88,7 @@ def flipKerningDirection(kerning: Kerning) -> Kerning:
     )
 
 
-def mergeKerning(kerningA, kerningB):
+def mergeKerning(kerningA: Kerning, kerningB: Kerning) -> Kerning:
     assert kerningA.sourceIdentifiers == kerningB.sourceIdentifiers
     kerningB = disambiguateKerningGroupNames(kerningB, kerningA, True)
     return Kerning(
@@ -109,11 +110,21 @@ def classifyGlyphsByDirection(
         for glyphName, codePoints in glyphMap.items()
         for codePoint in codePoints
     }
-    classifications = classifyGlyphs(unicodeBidiType, cmap=cmap)
+
+    nameBasedSubstitutions = makeNameBasedSubstitutions(glyphMap.keys())
+
+    classifications = classifyGlyphs(
+        unicodeBidiType, cmap=cmap, extra_substitutions=nameBasedSubstitutions
+    )
     if classifications.get("R"):
         glyphOrder = sorted({".notdef"} | set(glyphMap))
         gsub = compileGSUB(featureText, glyphOrder, fontraAxes)
-        classifications = classifyGlyphs(unicodeBidiType, cmap=cmap, gsub=gsub)
+        classifications = classifyGlyphs(
+            unicodeBidiType,
+            cmap=cmap,
+            gsub=gsub,
+            extra_substitutions=nameBasedSubstitutions,
+        )
 
     ltrGlyphs = classifications.get("L", set())
     rtlGlyphs = classifications.get("R", set())
@@ -142,14 +153,14 @@ def classifyGroupsByDirection(
 
 
 def disambiguateKerningGroupNames(
-    kernTableA: Kerning, kernTableB: Kerning, allowSameGroupContents: bool = False
+    kernTableA: Kerning, kernTableB: Kerning, mergeSameContent: bool = False
 ) -> Kerning:
     groupSide1NameMap, pairSide1NameMap = _getConflictResolutionMappings(
-        kernTableA.groupsSide1, kernTableB.groupsSide1, allowSameGroupContents
+        kernTableA.groupsSide1, kernTableB.groupsSide1, mergeSameContent
     )
 
     groupSide2NameMap, pairSide2NameMap = _getConflictResolutionMappings(
-        kernTableA.groupsSide2, kernTableB.groupsSide2, allowSameGroupContents
+        kernTableA.groupsSide2, kernTableB.groupsSide2, mergeSameContent
     )
 
     if not groupSide1NameMap and not groupSide2NameMap:
@@ -171,22 +182,57 @@ def disambiguateKerningGroupNames(
     )
 
 
+def makeNameBasedSubstitutions(glyphNames: Collection) -> dict[str, set[str]]:
+    """
+    Create an "extra_substitutions" dict for ufo2ft's classifyGlyphs(), based
+    on glyph name extensions and ligature glyph names. Takes dashed language
+    extensions into account as well.
+    Normally, such glyphs should be found via GSUB closure, but this heuristic
+    approach is useful for work-in-progress fonts.
+    """
+    substitutions = defaultdict(set)
+
+    for glyphName in glyphNames:
+        baseGlyphName = glyphName.split(".", 1)[0] if "." in glyphName else glyphName
+        langExt = ""
+        if "-" in baseGlyphName:
+            baseGlyphName, langExt = baseGlyphName.rsplit("-", 1)
+            langExt = "-" + langExt
+        for partGlyphName in baseGlyphName.split("_"):
+            partGlyphName += langExt
+            if partGlyphName != glyphName and partGlyphName in glyphNames:
+                substitutions[partGlyphName].add(glyphName)
+
+    return dict(substitutions)
+
+
 def _getConflictResolutionMappings(
-    groupsA: KerningGroups, groupsB: KerningGroups, allowSameGroupContents: bool
+    groupsA: KerningGroups, groupsB: KerningGroups, mergeSameContent: bool
 ) -> tuple[dict[str, str], dict[str, str]]:
     groupsNamesA = set(groupsA)
     groupsNamesB = set(groupsB)
 
+    groupsBByContent = (
+        {tuple(v): k for k, v in groupsB.items()} if mergeSameContent else {}
+    )
+
     if groupsNamesA.isdisjoint(groupsNamesB):
         return {}, {}
 
-    conflictingNames = groupsNamesA & groupsNamesB
     usedNames = groupsNamesA | groupsNamesB
 
     groupNameMap = {}
-    for name in sorted(conflictingNames):
-        if allowSameGroupContents and groupsA[name] == groupsB[name]:
+    for name, glyphNames in sorted(groupsA.items()):
+        if mergeSameContent:
+            nameB = groupsBByContent.get(tuple(glyphNames))
+            if nameB is not None:
+                if name != nameB:
+                    groupNameMap[name] = nameB
+                continue
+
+        if name not in groupsNamesB:
             continue
+
         count = 1
         while True:
             newName = f"{name}.{count}"
@@ -241,3 +287,23 @@ def _nestKerningValues(unnestedValues: FlatKerningValues) -> NestedKerningValues
         nestedValues[left][right] = values
 
     return nestedValues
+
+
+def _filterGroupsByValueUsage(groupsSide1, groupsSide2, unnestedValues):
+    leftUsedGroupNames = set()
+    rightUsedGroupNames = set()
+
+    for left, right in unnestedValues.keys():
+        if left.startswith("@"):
+            leftUsedGroupNames.add(left[1:])
+        if right.startswith("@"):
+            rightUsedGroupNames.add(right[1:])
+
+    filteredGroupsSide1 = {
+        k: v for k, v in groupsSide1.items() if k in leftUsedGroupNames
+    }
+    filteredGroupsSide2 = {
+        k: v for k, v in groupsSide2.items() if k in rightUsedGroupNames
+    }
+
+    return filteredGroupsSide1, filteredGroupsSide2
