@@ -141,14 +141,14 @@ def classifyGroupsByDirection(
 
 
 def disambiguateKerningGroupNames(
-    kernTableA: Kerning, kernTableB: Kerning, allowSameGroupContents: bool = False
+    kernTableA: Kerning, kernTableB: Kerning, mergeSameContent: bool = False
 ) -> Kerning:
     groupSide1NameMap, pairSide1NameMap = _getConflictResolutionMappings(
-        kernTableA.groupsSide1, kernTableB.groupsSide1, allowSameGroupContents
+        kernTableA.groupsSide1, kernTableB.groupsSide1, mergeSameContent
     )
 
     groupSide2NameMap, pairSide2NameMap = _getConflictResolutionMappings(
-        kernTableA.groupsSide2, kernTableB.groupsSide2, allowSameGroupContents
+        kernTableA.groupsSide2, kernTableB.groupsSide2, mergeSameContent
     )
 
     if not groupSide1NameMap and not groupSide2NameMap:
@@ -171,21 +171,32 @@ def disambiguateKerningGroupNames(
 
 
 def _getConflictResolutionMappings(
-    groupsA: KerningGroups, groupsB: KerningGroups, allowSameGroupContents: bool
+    groupsA: KerningGroups, groupsB: KerningGroups, mergeSameContent: bool
 ) -> tuple[dict[str, str], dict[str, str]]:
     groupsNamesA = set(groupsA)
     groupsNamesB = set(groupsB)
 
+    groupsBByContent = (
+        {tuple(v): k for k, v in groupsB.items()} if mergeSameContent else {}
+    )
+
     if groupsNamesA.isdisjoint(groupsNamesB):
         return {}, {}
 
-    conflictingNames = groupsNamesA & groupsNamesB
     usedNames = groupsNamesA | groupsNamesB
 
     groupNameMap = {}
-    for name in sorted(conflictingNames):
-        if allowSameGroupContents and groupsA[name] == groupsB[name]:
+    for name, glyphNames in sorted(groupsA.items()):
+        if mergeSameContent:
+            nameB = groupsBByContent.get(tuple(glyphNames))
+            if nameB is not None:
+                if name != nameB:
+                    groupNameMap[name] = nameB
+                continue
+
+        if name not in groupsNamesB:
             continue
+
         count = 1
         while True:
             newName = f"{name}.{count}"
