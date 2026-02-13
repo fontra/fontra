@@ -405,9 +405,10 @@ export class FontController {
         features.text,
         this.axes.axes
           .filter((axis) => !axis.values) // Filter out discrete axes
-          .map((axis) => [
-            new AxisInfo(axis.tag, axis.minValue, axis.defaultValue, axis.maxValue),
-          ]),
+          .map(
+            (axis) =>
+              new AxisInfo(axis.tag, axis.minValue, axis.defaultValue, axis.maxValue)
+          ),
         [] // TODO: ds-style fea-var rules
       );
 
