@@ -82,8 +82,8 @@ addStyleSheet(`
 
 #font-info-opentype-feature-code-error-box {
   display: grid;
-  grid-template-columns: auto auto;
-  justify-content: start;
+  grid-template-columns: min-content auto;
+  justify-content: stretch;
   gap: 0.5em;
   padding: 0.5em 0.5em 0.5em 0.5em;
   border-radius: 0.5em;
