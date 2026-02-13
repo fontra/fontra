@@ -332,6 +332,9 @@ export default class TextEntryPanel extends Panel {
         justify-content: start;
         align-items: start;
         gap: 0.5em;
+        border-radius: 0.5em;
+        background-color: #f885;
+        padding: 0.25em;
       }
 
       #features-error.hidden {
