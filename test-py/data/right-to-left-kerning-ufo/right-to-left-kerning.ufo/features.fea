@@ -113,3 +113,7 @@ feature fina {
 feature isol {
     sub [alef alefHamzeAbove alefHamzeBelow beh teh jim hah kheh dal zal reh zeh sin shin sad zad ta eyn feh ghaf kafArabic lam mim noon vav heh tehArabic yehArabic alefMaghsureh] by [alef.isol alefHamzeAbove.isol alefHamzeBelow.isol beh.isol teh.isol jim.isol hah.isol kheh.isol dal.isol zal.isol reh.isol zeh.isol sin.isol shin.isol sad.isol zad.isol ta.isol eyn.isol feh.isol ghaf.isol kafArabic.isol lam.isol mim.isol noon.isol vav.isol heh.isol tehArabic.isol yehArabic.isol alefMaghsureh.isol];
 } isol;
+
+feature ss01 {
+    sub alef by unencodedrtlglyph;
+} ss01;

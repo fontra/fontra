@@ -1606,6 +1606,7 @@ async def test_glyphClassifications(rtlTestFont):
         "tehArabic",
         "tehArabic.fina",
         "tehArabic.isol",
+        "unencodedrtlglyph",
         "vav",
         "vav.fina",
         "vav.isol",
