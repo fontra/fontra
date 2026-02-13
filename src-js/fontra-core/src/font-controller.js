@@ -415,7 +415,7 @@ export class FontController {
       // console.log(insertMarkers, messages);
       return { fontData };
     } catch (e) {
-      return { fontData: null, error: e.toString() };
+      return { fontData: null, error: e.message || e.toString() };
     }
   }
 
