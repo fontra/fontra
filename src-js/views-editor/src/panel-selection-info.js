@@ -10,6 +10,7 @@ import {
   enumerate,
   getCharFromCodePoint,
   makeUPlusStringFromCodePoint,
+  modulo,
   parseSelection,
   range,
   rgbaToHex,
@@ -718,6 +719,10 @@ export default class SelectionInfoPanel extends Panel {
   }
 
   _getDimensionsString(glyphController, pointIndices, componentIndices) {
+    if (pointIndices.length === 1 && componentIndices.length === 0) {
+      return this._getHandleDeltaString(glyphController, pointIndices);
+    }
+
     const selectionRects = [];
     if (pointIndices.length) {
       const instance = glyphController.instance;
@@ -744,6 +749,42 @@ export default class SelectionInfoPanel extends Panel {
       width = round(width, 1);
       height = round(height, 1);
       return `↔ ${width} ↕ ${height}`;
+    }
+  }
+
+  _getHandleDeltaString(glyphController, pointIndices) {
+    if (pointIndices?.length !== 1) {
+      return null;
+    }
+    const path = glyphController.path;
+    const point = path.getPoint(pointIndices[0]);
+    if (!point) {
+      return null;
+    }
+    const { x, y, type } = point;
+    if (!type) {
+      return null;
+    }
+    const [contourIndex, pointIndex] = path.getContourAndPointIndex(pointIndices[0]);
+    const numPoints = path.getNumPointsOfContour(contourIndex);
+    const { isClosed } = path.contourInfo[contourIndex];
+
+    const wrap = isClosed ? modulo : (i, n) => (i >= 0 && i < n ? i : null);
+
+    const neighborIndices = [
+      wrap(pointIndex - 1, numPoints),
+      wrap(pointIndex + 1, numPoints),
+    ].filter((i) => i !== null);
+
+    const neighborPoints = neighborIndices
+      .map((i) => path.getContourPoint(contourIndex, i))
+      .filter((point) => !point.type);
+
+    if (neighborPoints.length === 1) {
+      const { x: baseX, y: baseY } = neighborPoints[0];
+      const dx = x - baseX;
+      const dy = y - baseY;
+      return `↔ ${dx} ↕ ${dy}`;
     }
   }
 
