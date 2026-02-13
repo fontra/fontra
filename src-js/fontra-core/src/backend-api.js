@@ -109,26 +109,6 @@ class PythonBackend extends AbstractBackend {
     return VarPackedPath.fromObject(newPath);
   }
 
-  static async buildShaperFont(unitsPerEm, glyphOrder, featureText, axes, rules) {
-    const { fontData: fontDataBase64, error } = await this._callServerAPI(
-      "buildShaperFont",
-      {
-        unitsPerEm,
-        glyphOrder,
-        featureText,
-        axes,
-        rules,
-      }
-    );
-
-    const blob = await (
-      await fetch(`data:font/opentype;base64,${fontDataBase64}`)
-    ).blob();
-    const fontData = await blob.arrayBuffer();
-
-    return { fontData, error };
-  }
-
   /**
    *
    * @param {string} projectIdentifier
