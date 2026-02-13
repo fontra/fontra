@@ -101,6 +101,13 @@ addStyleSheet(`
   color: var(--fontra-red-color);
 }
 
+#font-info-opentype-feature-code-error-message {
+  font-family: monospace;
+  margin: 0;
+  max-height: 7em;
+  overflow-y: auto;
+}
+
 #font-info-opentype-feature-code-text-entry-textarea {
   font-size: 1.1em;
   height: 100%;
@@ -304,7 +311,7 @@ export class OpenTypeFeatureCodePanel extends BaseInfoPanel {
     container.appendChild(
       html.div({ id: "font-info-opentype-feature-code-error-box", class: "hidden" }, [
         html.createDomElement("inline-svg", { src: "/tabler-icons/bug.svg" }),
-        html.div({ id: "font-info-opentype-feature-code-error-message" }, [""]),
+        html.pre({ id: "font-info-opentype-feature-code-error-message" }, [""]),
       ])
     );
 
