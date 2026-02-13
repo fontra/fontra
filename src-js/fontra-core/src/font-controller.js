@@ -360,7 +360,8 @@ export class FontController {
 
   async getShaperFontData(textShaping) {
     let fontData = null;
-    let error = null;
+    let errors = null;
+    let warnings = null;
 
     const glyphOrder = Object.keys(this.glyphMap);
 
@@ -381,7 +382,7 @@ export class FontController {
       } else {
         glyphOrder.sort();
         ensureNotdef(glyphOrder);
-        ({ fontData, error } = await this.buildShaperFont(glyphOrder));
+        ({ fontData, errors, warnings } = await this.buildShaperFont(glyphOrder));
       }
     } else {
       glyphOrder.sort();
@@ -391,7 +392,8 @@ export class FontController {
     return {
       fontData,
       glyphOrder,
-      error,
+      errors,
+      warnings,
     };
   }
 
@@ -412,10 +414,13 @@ export class FontController {
         [] // TODO: ds-style fea-var rules
       );
 
-      // console.log(insertMarkers, messages);
-      return { fontData };
+      console.log(
+        "insertMarkers:",
+        JSON.stringify(insertMarkers.map(({ tag, lookupId }) => [tag, lookupId]))
+      );
+      return { fontData, warnings: messages };
     } catch (e) {
-      return { fontData: null, error: e.message || e.toString() };
+      return { fontData: null, errors: e.message || e.toString() };
     }
   }
 
@@ -1107,7 +1112,8 @@ export class FontController {
   async getShaper(textShaping) {
     await this.ensureInitialized;
 
-    const { glyphOrder, fontData, error } = await this.getShaperFontData(textShaping);
+    const { glyphOrder, fontData, errors, warnings } =
+      await this.getShaperFontData(textShaping);
 
     {
       // characterMap closure
@@ -1117,7 +1123,7 @@ export class FontController {
         (codePoint) => characterMap[codePoint],
         glyphOrder
       );
-      return { shaper, error };
+      return { shaper, errors, warnings };
     }
   }
 
