@@ -13,15 +13,7 @@ languagesystem latn GRN;
 languagesystem latn AFK;
 languagesystem cyrl dflt;
 languagesystem arab dflt;
-@NINE = [];
-@SEVEN = [];
-@EIGHT = [];
-@SIX = [];
-@FIVE = [];
-@THREE = [three three.denominator three.numerator three.tlf threeinferior threesuperior];
-@TWO = [two two.denominator two.numerator two.tlf twoinferior twosuperior];
-@FOUR = [four four.denominator four.numerator four.tlf fourinferior foursuperior];
-@ONE = [one one.denominator one.numerator one.tlf oneinferior onesuperior];
+
 @FIG_DFLT = [four one three two zero];
 # Script and language coverage
 # Case sensitive
