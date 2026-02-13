@@ -330,7 +330,7 @@ export default class TextEntryPanel extends Panel {
         display: grid;
         grid-template-columns: auto auto;
         justify-content: start;
-        align-items: center;
+        align-items: start;
         gap: 0.5em;
       }
 
@@ -343,6 +343,11 @@ export default class TextEntryPanel extends Panel {
         width: 1.5em;
         height: 1.5em;
         color: var(--fontra-red-color);
+      }
+
+      #features-error-message {
+        overflow: auto;
+        margin: 0;
       }
 
     `);
@@ -406,7 +411,7 @@ export default class TextEntryPanel extends Panel {
             html.createDomElement("inline-svg", {
               src: "/tabler-icons/bug.svg",
             }),
-            html.div({ id: "features-error-message" }, [""]),
+            html.pre({ id: "features-error-message" }, [""]),
           ]),
         ]),
       },
