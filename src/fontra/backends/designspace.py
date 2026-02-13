@@ -1432,6 +1432,8 @@ class DesignspaceBackend(WatchableBackend, ReadableBaseBackend):
             writer.writeFeatures(featureText)
             self.fileWatcherIgnoreNextChange(os.path.join(path, FEATURES_FILENAME))
 
+        self.resetGlyphDirections()
+
     async def getBackgroundImage(self, imageIdentifier: str) -> ImageData | None:
         imageInfo = self._imageMapping.reverse.get(imageIdentifier)
         if imageInfo is None:
@@ -1575,6 +1577,7 @@ class DesignspaceBackend(WatchableBackend, ReadableBaseBackend):
 
             if fileName == FEATURES_FILENAME:
                 changedItems.reloadPattern["features"] = None
+                self.resetGlyphDirections()
 
         if changedItems.rebuildGlyphSetContents:
             #
