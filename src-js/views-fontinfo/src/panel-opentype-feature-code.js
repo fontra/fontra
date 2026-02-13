@@ -27,7 +27,7 @@ import {
 import { simpleMode } from "@codemirror/legacy-modes/mode/simple-mode";
 import { lintKeymap } from "@codemirror/lint";
 import { highlightSelectionMatches, searchKeymap } from "@codemirror/search";
-import { EditorState } from "@codemirror/state";
+import { EditorSelection, EditorState } from "@codemirror/state";
 import {
   crosshairCursor,
   drawSelection,
@@ -111,6 +111,10 @@ addStyleSheet(`
   margin: 0;
   max-height: 7em;
   overflow-y: auto;
+}
+
+#font-info-opentype-feature-code-error-message > .clickable-fea-message {
+  cursor: pointer;
 }
 
 #font-info-opentype-feature-code-text-entry-textarea {
@@ -351,9 +355,25 @@ export class OpenTypeFeatureCodePanel extends BaseInfoPanel {
       "#font-info-opentype-feature-code-error-icon"
     );
 
-    const message = errors || warnings;
+    const messages = errors || warnings;
 
-    messageElement.innerText = message ?? "";
+    messageElement.innerText = "";
+
+    for (const chunk of parseFeaMessages(messages)) {
+      const message = messages.slice(chunk.startIndex, chunk.endIndex);
+      messageElement.appendChild(
+        html.div(
+          chunk.lineNumber != undefined
+            ? {
+                class: "clickable-fea-message",
+                onclick: () => this.goToLine(chunk.lineNumber, chunk.charNumber),
+              }
+            : {},
+          [message]
+        )
+      );
+    }
+
     errorElement.classList.toggle("hidden", !(errors || warnings));
     errorElement.classList.toggle("warning", !!warnings);
 
@@ -361,7 +381,20 @@ export class OpenTypeFeatureCodePanel extends BaseInfoPanel {
       "src",
       warnings ? "/tabler-icons/alert-triangle.svg" : "/tabler-icons/bug.svg"
     );
-    console.log(iconElement);
+  }
+
+  goToLine(lineNumber, charNumber) {
+    const lineInfo = this.editorView.state.doc.line(lineNumber);
+
+    this.editorView.dispatch({
+      selection: EditorSelection.create(
+        [EditorSelection.cursor(lineInfo.from + charNumber)],
+        0
+      ),
+      scrollIntoView: true,
+    });
+
+    this.editorView.focus();
   }
 
   getUndoRedoLabel(isRedo) {
@@ -463,4 +496,26 @@ function myCompletions(context) {
     options: completions,
     validFor: /^\w*$/,
   };
+}
+
+function parseFeaMessages(messages) {
+  const feaErrorRegex = /^in .+? at (\d+):(\d+)$/gm;
+
+  const chunks = [{ startIndex: 0 }];
+
+  while (true) {
+    const result = feaErrorRegex.exec(messages);
+    if (!result) {
+      chunks.at(-1).endIndex = messages.length;
+      break;
+    }
+    chunks.at(-1).endIndex = result.index;
+    chunks.push({
+      startIndex: result.index,
+      lineNumber: parseInt(result[1]),
+      charNumber: parseInt(result[2]),
+    });
+  }
+
+  return chunks;
 }
