@@ -54,6 +54,7 @@ const colors = {
   "named-glyph-class-color": ["#198639", "#86de74"],
   "glyph-range-color": ["#b95a00", "#ffbe7d"],
   "feature-error-box-color": ["#f885", "#f885"],
+  "feature-warning-box-color": ["#bf84", "#bf84"],
 };
 
 addStyleSheet(`
@@ -88,6 +89,10 @@ addStyleSheet(`
   padding: 0.5em 0.5em 0.5em 0.5em;
   border-radius: 0.5em;
   background-color: var(--feature-error-box-color);
+}
+
+#font-info-opentype-feature-code-error-box.warning {
+  background-color: var(--feature-warning-box-color);
 }
 
 #font-info-opentype-feature-code-error-box.hidden {
@@ -332,7 +337,7 @@ export class OpenTypeFeatureCodePanel extends BaseInfoPanel {
   }
 
   async checkCompileErrors() {
-    const { error } = await this.fontController.getShaperFontData(true);
+    const { errors, warnings } = await this.fontController.getShaperFontData(true);
     const errorElement = document.querySelector(
       "#font-info-opentype-feature-code-error-box"
     );
@@ -340,8 +345,11 @@ export class OpenTypeFeatureCodePanel extends BaseInfoPanel {
       "#font-info-opentype-feature-code-error-message"
     );
 
-    messageElement.innerText = error ?? "";
-    errorElement.classList.toggle("hidden", !error);
+    const message = errors || warnings;
+
+    messageElement.innerText = message ?? "";
+    errorElement.classList.toggle("hidden", !(errors || warnings));
+    errorElement.classList.toggle("warning", !!warnings);
   }
 
   getUndoRedoLabel(isRedo) {
