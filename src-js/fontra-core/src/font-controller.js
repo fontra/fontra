@@ -1,3 +1,4 @@
+import initBuildShaperFont, { AxisInfo, buildShaperFont } from "build-shaper-font";
 import { Backend } from "./backend-api.js";
 import { recordChanges } from "./change-recorder.js";
 import {
@@ -44,6 +45,8 @@ import {
 /**
  * @import { RemoteFont, FontSource } from 'remotefont';
  * */
+
+await initBuildShaperFont();
 
 const GLYPH_CACHE_SIZE = 2000;
 const BACKGROUND_IMAGE_CACHE_SIZE = 100;
@@ -396,16 +399,20 @@ export class FontController {
     const features = await this.getFeatures();
 
     try {
-      const { fontData, error } = await Backend.buildShaperFont(
+      const { fontData, insertMarkers, messages } = buildShaperFont(
         this.unitsPerEm,
         glyphOrder,
         features.text,
         this.axes.axes
           .filter((axis) => !axis.values) // Filter out discrete axes
-          .map((axis) => [axis.tag, axis.minValue, axis.defaultValue, axis.maxValue]),
+          .map((axis) => [
+            new AxisInfo(axis.tag, axis.minValue, axis.defaultValue, axis.maxValue),
+          ]),
         [] // TODO: ds-style fea-var rules
       );
-      return { fontData, error };
+
+      // console.log(insertMarkers, messages);
+      return { fontData };
     } catch (e) {
       return { fontData: null, error: e.toString() };
     }
