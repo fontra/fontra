@@ -315,7 +315,10 @@ export class OpenTypeFeatureCodePanel extends BaseInfoPanel {
 
     container.appendChild(
       html.div({ id: "font-info-opentype-feature-code-error-box", class: "hidden" }, [
-        html.createDomElement("inline-svg", { src: "/tabler-icons/bug.svg" }),
+        html.createDomElement("inline-svg", {
+          id: "font-info-opentype-feature-code-error-icon",
+          src: "/tabler-icons/bug.svg",
+        }),
         html.pre({ id: "font-info-opentype-feature-code-error-message" }, [""]),
       ])
     );
@@ -344,12 +347,21 @@ export class OpenTypeFeatureCodePanel extends BaseInfoPanel {
     const messageElement = document.querySelector(
       "#font-info-opentype-feature-code-error-message"
     );
+    const iconElement = document.querySelector(
+      "#font-info-opentype-feature-code-error-icon"
+    );
 
     const message = errors || warnings;
 
     messageElement.innerText = message ?? "";
     errorElement.classList.toggle("hidden", !(errors || warnings));
     errorElement.classList.toggle("warning", !!warnings);
+
+    iconElement.setAttribute(
+      "src",
+      warnings ? "/tabler-icons/alert-triangle.svg" : "/tabler-icons/bug.svg"
+    );
+    console.log(iconElement);
   }
 
   getUndoRedoLabel(isRedo) {
