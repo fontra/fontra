@@ -720,7 +720,13 @@ export default class SelectionInfoPanel extends Panel {
 
   _getDimensionsString(glyphController, pointIndices, componentIndices) {
     if (pointIndices.length === 1 && componentIndices.length === 0) {
-      return this._getHandleDeltaString(glyphController, pointIndices);
+      const handleDeltaString = this._getHandleDeltaString(
+        glyphController,
+        pointIndices
+      );
+      if (handleDeltaString) {
+        return handleDeltaString;
+      }
     }
 
     const selectionRects = [];
