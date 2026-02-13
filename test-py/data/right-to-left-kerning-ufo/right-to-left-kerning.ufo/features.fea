@@ -13,15 +13,7 @@ languagesystem latn GRN;
 languagesystem latn AFK;
 languagesystem cyrl dflt;
 languagesystem arab dflt;
-@NINE = [];
-@SEVEN = [];
-@EIGHT = [];
-@SIX = [];
-@FIVE = [];
-@THREE = [three three.denominator three.numerator three.tlf threeinferior threesuperior];
-@TWO = [two two.denominator two.numerator two.tlf twoinferior twosuperior];
-@FOUR = [four four.denominator four.numerator four.tlf fourinferior foursuperior];
-@ONE = [one one.denominator one.numerator one.tlf oneinferior onesuperior];
+
 @FIG_DFLT = [four one three two zero];
 # Script and language coverage
 # Case sensitive
@@ -121,3 +113,7 @@ feature fina {
 feature isol {
     sub [alef alefHamzeAbove alefHamzeBelow beh teh jim hah kheh dal zal reh zeh sin shin sad zad ta eyn feh ghaf kafArabic lam mim noon vav heh tehArabic yehArabic alefMaghsureh] by [alef.isol alefHamzeAbove.isol alefHamzeBelow.isol beh.isol teh.isol jim.isol hah.isol kheh.isol dal.isol zal.isol reh.isol zeh.isol sin.isol shin.isol sad.isol zad.isol ta.isol eyn.isol feh.isol ghaf.isol kafArabic.isol lam.isol mim.isol noon.isol vav.isol heh.isol tehArabic.isol yehArabic.isol alefMaghsureh.isol];
 } isol;
+
+feature ss01 {
+    sub alef by unencodedrtlglyph;
+} ss01;
