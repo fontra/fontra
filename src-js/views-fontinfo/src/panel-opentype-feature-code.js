@@ -106,12 +106,12 @@ addStyleSheet(`
   gap: 0.5em;
   padding: 0.2em 0.5em 0.2em 0.5em;
   border-radius: 0.5em;
-  background-color: var(--feature-warning-box-color);
+  background-color: var(--feature-error-box-color);
   cursor: pointer;
 }
 
-.font-info-opentype-feature-code-message-box.error {
-  background-color: var(--feature-error-box-color);
+.font-info-opentype-feature-code-message-box.warning {
+  background-color: var(--feature-warning-box-color);
 }
 
 .font-info-opentype-feature-code-message-box > inline-svg {
@@ -376,12 +376,24 @@ export class OpenTypeFeatureCodePanel extends BaseInfoPanel {
       const spanInLineFrom = spanFrom - lineInfo.from;
       const spanInLineTo = spanTo - lineInfo.from;
       const isWarning = message.level == "warning";
+      const isException = message.level == "exception";
+
+      const lineNumberString = isException ? "" : `Line ${lineInfo.number}`;
+      const lineItems = isException
+        ? [""]
+        : [
+            lineInfo.text.slice(0, spanInLineFrom),
+            html.span({ class: "fea-error-highlight" }, [
+              lineInfo.text.slice(spanInLineFrom, spanInLineTo),
+            ]),
+            lineInfo.text.slice(spanInLineTo),
+          ];
 
       errorElement.appendChild(
         html.div(
           {
             class: `font-info-opentype-feature-code-message-box ${message.level}`,
-            onclick: () => this.goToSpan(spanFrom, spanTo),
+            onclick: () => (isException ? () => null : this.goToSpan(spanFrom, spanTo)),
           },
           [
             html.createDomElement("inline-svg", {
@@ -391,14 +403,8 @@ export class OpenTypeFeatureCodePanel extends BaseInfoPanel {
                 : "/tabler-icons/bug.svg",
             }),
             message.text,
-            html.div({ class: "fea-error-line-number" }, [`Line ${lineInfo.number}`]),
-            html.pre({ class: "fea-error-line" }, [
-              lineInfo.text.slice(0, spanInLineFrom),
-              html.span({ class: "fea-error-highlight" }, [
-                lineInfo.text.slice(spanInLineFrom, spanInLineTo),
-              ]),
-              lineInfo.text.slice(spanInLineTo),
-            ]),
+            html.div({ class: "fea-error-line-number" }, [lineNumberString]),
+            html.pre({ class: "fea-error-line" }, lineItems),
           ]
         )
       );

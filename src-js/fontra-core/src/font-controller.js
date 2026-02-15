@@ -422,7 +422,9 @@ export class FontController {
       console.error(e);
       return {
         fontData: null,
-        messages: [],
+        messages: [
+          { text: e.message || e.toString(), span: [0, 0], level: "exception" },
+        ],
         formattedMessages: e.message || e.toString(),
         insertMarkers: [],
       };
