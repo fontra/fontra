@@ -353,6 +353,9 @@ export class OpenTypeFeatureCodePanel extends BaseInfoPanel {
 
     errorElement.innerText = "";
 
+    // Messages don't always arrived sorted by position in fea source
+    messages.sort((a, b) => a.span[0] - b.span[0]);
+
     for (const message of messages) {
       const lineInfo = this.editorView.state.doc.lineAt(message.span[0]);
       const isWarning = message.level == "warning";
