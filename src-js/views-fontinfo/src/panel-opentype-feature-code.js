@@ -124,6 +124,7 @@ addStyleSheet(`
 }
 
 .font-info-opentype-feature-code-message-box .fea-error-highlight {
+  font-weight: bold;
   background-color: var(--feature-warning-highlight-color);
 }
 
@@ -367,16 +368,18 @@ export class OpenTypeFeatureCodePanel extends BaseInfoPanel {
     messages.sort((a, b) => a.span[0] - b.span[0]);
 
     for (const message of messages) {
-      const lineInfo = this.editorView.state.doc.lineAt(message.span[0]);
-      const spanInLineFrom = message.span[0] - lineInfo.from;
-      const spanInLineTo = message.span[1] - lineInfo.from;
+      let [spanFrom, spanTo] = message.span;
+      const lineInfo = this.editorView.state.doc.lineAt(spanFrom);
+      spanTo = Math.min(spanTo, lineInfo.to);
+      const spanInLineFrom = spanFrom - lineInfo.from;
+      const spanInLineTo = spanTo - lineInfo.from;
       const isWarning = message.level == "warning";
 
       errorElement.appendChild(
         html.div(
           {
             class: `font-info-opentype-feature-code-message-box ${message.level}`,
-            onclick: () => this.goToSpan(message.span),
+            onclick: () => this.goToSpan(spanFrom, spanTo),
           },
           [
             html.createDomElement("inline-svg", {
@@ -389,7 +392,7 @@ export class OpenTypeFeatureCodePanel extends BaseInfoPanel {
             html.div({ class: "fea-error-line-number" }, [`Line ${lineInfo.number}`]),
             html.pre({ class: "fea-error-line" }, [
               lineInfo.text.slice(0, spanInLineFrom),
-              html.b({ class: "fea-error-highlight" }, [
+              html.span({ class: "fea-error-highlight" }, [
                 lineInfo.text.slice(spanInLineFrom, spanInLineTo),
               ]),
               lineInfo.text.slice(spanInLineTo),
@@ -402,11 +405,9 @@ export class OpenTypeFeatureCodePanel extends BaseInfoPanel {
     errorElement.classList.toggle("hidden", !messages.length);
   }
 
-  goToSpan(span) {
-    const [spanStart, spanEnd] = span;
-
+  goToSpan(spanFrom, spanTo) {
     this.editorView.dispatch({
-      selection: EditorSelection.create([EditorSelection.range(spanEnd, spanStart)], 0),
+      selection: EditorSelection.create([EditorSelection.range(spanTo, spanFrom)], 0),
       scrollIntoView: true,
     });
 
