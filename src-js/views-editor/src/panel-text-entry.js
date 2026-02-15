@@ -140,10 +140,14 @@ export default class TextEntryPanel extends Panel {
       return null;
     }
 
-    const { shaper, formattedMessages } = await shaperPromise;
+    const { shaper, messages } = await shaperPromise;
 
-    this.textSettings.shaperError = formattedMessages?.startsWith("error")
-      ? formattedMessages
+    const errorMessages = messages.filter((message) => message.level != "warning");
+    const numberOfErrorsMessage =
+      errorMessages.length == 1 ? "an error" : `${errorMessages.length} errors`;
+
+    this.textSettings.shaperError = errorMessages.length
+      ? `The OpenType feature code contains ${numberOfErrorsMessage}`
       : null;
 
     return shaper;
@@ -260,8 +264,8 @@ export default class TextEntryPanel extends Panel {
 
     this.textSettingsController.addKeyListener("shaperError", async (event) => {
       const error = this.textSettings.shaperError;
-      const errorElement = this.accordion.querySelector("#features-error");
-      const messageElement = this.accordion.querySelector("#features-error-message");
+      const errorElement = this.accordion.querySelector("#features-errors");
+      const messageElement = this.accordion.querySelector("#features-errors-message");
       errorElement.classList.toggle("hidden", !error);
       messageElement.innerText = error ?? "";
     });
@@ -327,7 +331,7 @@ export default class TextEntryPanel extends Panel {
         grid-column: 1 / span 2;
       }
 
-      #features-error {
+      #features-errors {
         grid-column: 1 / span 2;
         display: grid;
         grid-template-columns: auto auto;
@@ -339,18 +343,18 @@ export default class TextEntryPanel extends Panel {
         padding: 0.25em;
       }
 
-      #features-error.hidden {
+      #features-errors.hidden {
         display: none;
       }
 
-      #features-error > inline-svg {
+      #features-errors > inline-svg {
         display: inline-block;
         width: 1.5em;
         height: 1.5em;
         color: var(--fontra-red-color);
       }
 
-      #features-error-message {
+      #features-errors-message {
         overflow: auto;
         margin: 0;
       }
@@ -412,11 +416,11 @@ export default class TextEntryPanel extends Panel {
             "textLanguage",
             this.textLanguageOptions
           ),
-          html.div({ id: "features-error", class: "hidden" }, [
+          html.div({ id: "features-errors", class: "hidden" }, [
             html.createDomElement("inline-svg", {
               src: "/tabler-icons/bug.svg",
             }),
-            html.pre({ id: "features-error-message" }, [""]),
+            html.div({ id: "features-errors-message" }, [""]),
           ]),
         ]),
       },
