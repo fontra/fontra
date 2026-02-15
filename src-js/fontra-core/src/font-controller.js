@@ -362,6 +362,7 @@ export class FontController {
     let fontData = null;
     let messages = [];
     let formattedMessages = "";
+    let insertMarkers = [];
 
     const glyphOrder = Object.keys(this.glyphMap);
 
@@ -382,7 +383,7 @@ export class FontController {
       } else {
         glyphOrder.sort();
         ensureNotdef(glyphOrder);
-        ({ fontData, messages, formattedMessages } =
+        ({ fontData, messages, formattedMessages, insertMarkers } =
           await this.buildShaperFont(glyphOrder));
       }
     } else {
@@ -395,6 +396,7 @@ export class FontController {
       glyphOrder,
       messages,
       formattedMessages,
+      insertMarkers,
     };
   }
 
@@ -402,7 +404,7 @@ export class FontController {
     const features = await this.getFeatures();
 
     try {
-      const { fontData, insertMarkers, formattedMessages, messages } = buildShaperFont(
+      return buildShaperFont(
         this.unitsPerEm,
         glyphOrder,
         features.text,
@@ -416,18 +418,13 @@ export class FontController {
           })),
         [] // TODO: ds-style fea-var rules
       );
-
-      console.log(
-        "insertMarkers:",
-        JSON.stringify(insertMarkers?.map(({ tag, lookupId }) => [tag, lookupId]))
-      );
-      return { fontData, messages, formattedMessages };
     } catch (e) {
       console.error(e);
       return {
         fontData: null,
         messages: [],
         formattedMessages: e.message || e.toString(),
+        insertMarkers: [],
       };
     }
   }
@@ -1120,7 +1117,7 @@ export class FontController {
   async getShaper(textShaping) {
     await this.ensureInitialized;
 
-    const { glyphOrder, fontData, messages, formattedMessages } =
+    const { glyphOrder, fontData, messages, formattedMessages, insertMarkers } =
       await this.getShaperFontData(textShaping);
 
     {
