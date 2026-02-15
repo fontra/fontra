@@ -143,8 +143,7 @@ export default class TextEntryPanel extends Panel {
     const { shaper, messages } = await shaperPromise;
 
     const errorMessages = messages.filter((message) => message.level != "warning");
-    const numberOfErrorsMessage =
-      errorMessages.length == 1 ? "an error" : `${errorMessages.length} errors`;
+    const numberOfErrorsMessage = errorMessages.length == 1 ? "an error" : "errors";
 
     this.textSettings.shaperError = errorMessages.length
       ? `The OpenType feature code contains ${numberOfErrorsMessage}`
