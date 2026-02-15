@@ -339,7 +339,7 @@ export default class TextEntryPanel extends Panel {
         gap: 0.5em;
         border-radius: 0.5em;
         background-color: #f885;
-        padding: 0.25em;
+        padding: 0.25em 0.25em 0.5em 0.25em;
         cursor: pointer;
         color: var(--foreground-color);
       }
