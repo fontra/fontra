@@ -341,6 +341,8 @@ export default class TextEntryPanel extends Panel {
         border-radius: 0.5em;
         background-color: #f885;
         padding: 0.25em;
+        cursor: pointer;
+        color: var(--foreground-color);
       }
 
       #features-errors.hidden {
@@ -363,6 +365,10 @@ export default class TextEntryPanel extends Panel {
 
     this.textScriptOptions = [{ label: "Automatic", value: null }];
     this.textLanguageOptions = [{ label: "Default (dflt)", value: null }];
+
+    const opentypeFeaturesURL = new URL(window.location);
+    opentypeFeaturesURL.pathname = "fontinfo.html";
+    opentypeFeaturesURL.hash = "#opentype-feature-code-panel";
 
     this.accordion.items = [
       {
@@ -416,12 +422,20 @@ export default class TextEntryPanel extends Panel {
             "textLanguage",
             this.textLanguageOptions
           ),
-          html.div({ id: "features-errors", class: "hidden" }, [
-            html.createDomElement("inline-svg", {
-              src: "/tabler-icons/bug.svg",
-            }),
-            html.div({ id: "features-errors-message" }, [""]),
-          ]),
+          html.a(
+            {
+              id: "features-errors",
+              class: "hidden",
+              href: opentypeFeaturesURL,
+              target: "_blank",
+            },
+            [
+              html.createDomElement("inline-svg", {
+                src: "/tabler-icons/bug.svg",
+              }),
+              html.div({ id: "features-errors-message" }, [""]),
+            ]
+          ),
         ]),
       },
       {
