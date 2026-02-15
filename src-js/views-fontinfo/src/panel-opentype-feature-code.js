@@ -83,38 +83,42 @@ addStyleSheet(`
 
 #font-info-opentype-feature-code-error-box {
   display: grid;
-  grid-template-columns: min-content auto;
+  grid-template-columns: auto;
   justify-content: stretch;
-  gap: 0.5em;
-  padding: 0.5em 0.5em 0.5em 0.5em;
-  border-radius: 0.5em;
-  background-color: var(--feature-error-box-color);
+  gap: 0.2em;
+  margin-top: 0.2em;
 }
 
-#font-info-opentype-feature-code-error-box.warning {
-  background-color: var(--feature-warning-box-color);
-}
 
 #font-info-opentype-feature-code-error-box.hidden {
   display: none;
 }
 
-#font-info-opentype-feature-code-error-box > inline-svg {
+.font-info-opentype-feature-code-message-box {
+  display: grid;
+  grid-template-columns: min-content minmax(max-content, 12em) minmax(max-content, 4em) auto;
+  justify-content: start;
+  align-items: center;
+  gap: 0.5em;
+  padding: 0.2em 0.5em 0.2em 0.5em;
+  border-radius: 0.5em;
+  background-color: var(--feature-warning-box-color);
+  cursor: pointer;
+}
+
+.font-info-opentype-feature-code-message-box.error {
+  background-color: var(--feature-error-box-color);
+}
+
+.font-info-opentype-feature-code-message-box > inline-svg {
   display: inline-block;
-  width: 1.4em;
-  height: 1.4em;
+  width: 1.25em;
+  height: 1.25em;
   color: var(--fontra-red-color);
 }
 
-#font-info-opentype-feature-code-error-message {
-  font-family: monospace;
+.font-info-opentype-feature-code-message-box > pre {
   margin: 0;
-  max-height: 7em;
-  overflow-y: auto;
-}
-
-#font-info-opentype-feature-code-error-message > .clickable-fea-message {
-  cursor: pointer;
 }
 
 #font-info-opentype-feature-code-text-entry-textarea {
@@ -319,11 +323,7 @@ export class OpenTypeFeatureCodePanel extends BaseInfoPanel {
 
     container.appendChild(
       html.div({ id: "font-info-opentype-feature-code-error-box", class: "hidden" }, [
-        html.createDomElement("inline-svg", {
-          id: "font-info-opentype-feature-code-error-icon",
-          src: "/tabler-icons/bug.svg",
-        }),
-        html.pre({ id: "font-info-opentype-feature-code-error-message" }, [""]),
+        "",
       ])
     );
 
@@ -346,49 +346,47 @@ export class OpenTypeFeatureCodePanel extends BaseInfoPanel {
   async checkCompileErrors() {
     const { errors, messages, formattedMessages } =
       await this.fontController.getShaperFontData(true);
+
     const errorElement = document.querySelector(
       "#font-info-opentype-feature-code-error-box"
     );
-    const messageElement = document.querySelector(
-      "#font-info-opentype-feature-code-error-message"
-    );
-    const iconElement = document.querySelector(
-      "#font-info-opentype-feature-code-error-icon"
-    );
 
-    messageElement.innerText = "";
+    errorElement.innerText = "";
 
-    for (const chunk of parseFeaMessages(formattedMessages)) {
-      const message = formattedMessages.slice(chunk.startIndex, chunk.endIndex);
-      messageElement.appendChild(
+    for (const message of messages) {
+      const lineInfo = this.editorView.state.doc.lineAt(message.span[0]);
+      const isWarning = message.level == "warning";
+
+      errorElement.appendChild(
         html.div(
-          chunk.lineNumber != undefined
-            ? {
-                class: "clickable-fea-message",
-                onclick: () => this.goToLine(chunk.lineNumber, chunk.charNumber),
-              }
-            : {},
-          [message]
+          {
+            class: `font-info-opentype-feature-code-message-box ${message.level}`,
+            onclick: () => this.goToSpan(message.span),
+          },
+          [
+            html.createDomElement("inline-svg", {
+              class: "font-info-opentype-feature-code-error-icon",
+              src: isWarning
+                ? "/tabler-icons/alert-triangle.svg"
+                : "/tabler-icons/bug.svg",
+            }),
+            message.text,
+            html.div({ class: "fea-error-line-number" }, [`Line ${lineInfo.number}`]),
+            html.pre({ class: "fea-error-line" }, [lineInfo.text]),
+          ]
         )
       );
     }
 
-    const isWarning = formattedMessages.startsWith("warning");
-    errorElement.classList.toggle("hidden", !formattedMessages);
-    errorElement.classList.toggle("warning", isWarning);
-
-    iconElement.setAttribute(
-      "src",
-      isWarning ? "/tabler-icons/alert-triangle.svg" : "/tabler-icons/bug.svg"
-    );
+    errorElement.classList.toggle("hidden", !messages.length);
   }
 
-  goToLine(lineNumber, charNumber) {
-    const lineInfo = this.editorView.state.doc.line(lineNumber);
+  goToSpan(span) {
+    const [spanStart, spanEnd] = span;
 
     this.editorView.dispatch({
       selection: EditorSelection.create(
-        [EditorSelection.cursor(lineInfo.from + charNumber)],
+        [EditorSelection.cursor(spanStart, spanEnd)],
         0
       ),
       scrollIntoView: true,
