@@ -235,8 +235,11 @@ const customTheme = EditorView.theme({
     backgroundColor: "transparent",
     color: "var(--ui-element-foreground-color)",
   },
+  ".cm-scroller > .cm-selectionLayer .cm-selectionBackground": {
+    backgroundColor: "#BBB5",
+  },
   "&.cm-focused > .cm-scroller > .cm-selectionLayer .cm-selectionBackground": {
-    backgroundColor: "#D3E3FD",
+    backgroundColor: "#A6CCF250",
   },
   ".cm-tooltip": {
     backgroundColor: "var(--background-color)",
