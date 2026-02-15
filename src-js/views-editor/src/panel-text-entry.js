@@ -140,9 +140,11 @@ export default class TextEntryPanel extends Panel {
       return null;
     }
 
-    const { shaper, errors } = await shaperPromise;
+    const { shaper, formattedMessages } = await shaperPromise;
 
-    this.textSettings.shaperError = errors ?? null;
+    this.textSettings.shaperError = formattedMessages?.startsWith("error")
+      ? formattedMessages
+      : null;
 
     return shaper;
   }

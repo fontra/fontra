@@ -1,4 +1,4 @@
-import initBuildShaperFont, { AxisInfo, buildShaperFont } from "build-shaper-font";
+import initBuildShaperFont, { buildShaperFont } from "build-shaper-font";
 import { Backend } from "./backend-api.js";
 import { recordChanges } from "./change-recorder.js";
 import {
@@ -360,8 +360,8 @@ export class FontController {
 
   async getShaperFontData(textShaping) {
     let fontData = null;
-    let errors = null;
-    let warnings = null;
+    let messages = [];
+    let formattedMessages = "";
 
     const glyphOrder = Object.keys(this.glyphMap);
 
@@ -382,7 +382,8 @@ export class FontController {
       } else {
         glyphOrder.sort();
         ensureNotdef(glyphOrder);
-        ({ fontData, errors, warnings } = await this.buildShaperFont(glyphOrder));
+        ({ fontData, messages, formattedMessages } =
+          await this.buildShaperFont(glyphOrder));
       }
     } else {
       glyphOrder.sort();
@@ -392,8 +393,8 @@ export class FontController {
     return {
       fontData,
       glyphOrder,
-      errors,
-      warnings,
+      messages,
+      formattedMessages,
     };
   }
 
@@ -401,26 +402,33 @@ export class FontController {
     const features = await this.getFeatures();
 
     try {
-      const { fontData, insertMarkers, messages } = buildShaperFont(
+      const { fontData, insertMarkers, formattedMessages, messages } = buildShaperFont(
         this.unitsPerEm,
         glyphOrder,
         features.text,
         this.axes.axes
           .filter((axis) => !axis.values) // Filter out discrete axes
-          .map(
-            (axis) =>
-              new AxisInfo(axis.tag, axis.minValue, axis.defaultValue, axis.maxValue)
-          ),
+          .map((axis) => ({
+            tag: axis.tag,
+            minValue: axis.minValue,
+            defaultValue: axis.defaultValue,
+            maxValue: axis.maxValue,
+          })),
         [] // TODO: ds-style fea-var rules
       );
 
       console.log(
         "insertMarkers:",
-        JSON.stringify(insertMarkers.map(({ tag, lookupId }) => [tag, lookupId]))
+        JSON.stringify(insertMarkers?.map(({ tag, lookupId }) => [tag, lookupId]))
       );
-      return { fontData, warnings: messages };
+      return { fontData, messages, formattedMessages };
     } catch (e) {
-      return { fontData: null, errors: e.message || e.toString() };
+      console.error(e);
+      return {
+        fontData: null,
+        messages: [],
+        formattedMessages: e.message || e.toString(),
+      };
     }
   }
 
@@ -1112,7 +1120,7 @@ export class FontController {
   async getShaper(textShaping) {
     await this.ensureInitialized;
 
-    const { glyphOrder, fontData, errors, warnings } =
+    const { glyphOrder, fontData, messages, formattedMessages } =
       await this.getShaperFontData(textShaping);
 
     {
@@ -1123,7 +1131,7 @@ export class FontController {
         (codePoint) => characterMap[codePoint],
         glyphOrder
       );
-      return { shaper, errors, warnings };
+      return { shaper, messages, formattedMessages };
     }
   }
 

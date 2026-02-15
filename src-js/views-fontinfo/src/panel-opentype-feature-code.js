@@ -344,7 +344,8 @@ export class OpenTypeFeatureCodePanel extends BaseInfoPanel {
   }
 
   async checkCompileErrors() {
-    const { errors, warnings } = await this.fontController.getShaperFontData(true);
+    const { errors, messages, formattedMessages } =
+      await this.fontController.getShaperFontData(true);
     const errorElement = document.querySelector(
       "#font-info-opentype-feature-code-error-box"
     );
@@ -355,12 +356,10 @@ export class OpenTypeFeatureCodePanel extends BaseInfoPanel {
       "#font-info-opentype-feature-code-error-icon"
     );
 
-    const messages = errors || warnings;
-
     messageElement.innerText = "";
 
-    for (const chunk of parseFeaMessages(messages)) {
-      const message = messages.slice(chunk.startIndex, chunk.endIndex);
+    for (const chunk of parseFeaMessages(formattedMessages)) {
+      const message = formattedMessages.slice(chunk.startIndex, chunk.endIndex);
       messageElement.appendChild(
         html.div(
           chunk.lineNumber != undefined
@@ -374,12 +373,13 @@ export class OpenTypeFeatureCodePanel extends BaseInfoPanel {
       );
     }
 
-    errorElement.classList.toggle("hidden", !(errors || warnings));
-    errorElement.classList.toggle("warning", !!warnings);
+    const isWarning = formattedMessages.startsWith("warning");
+    errorElement.classList.toggle("hidden", !formattedMessages);
+    errorElement.classList.toggle("warning", isWarning);
 
     iconElement.setAttribute(
       "src",
-      warnings ? "/tabler-icons/alert-triangle.svg" : "/tabler-icons/bug.svg"
+      isWarning ? "/tabler-icons/alert-triangle.svg" : "/tabler-icons/bug.svg"
     );
   }
 
