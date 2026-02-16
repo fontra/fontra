@@ -1128,7 +1128,8 @@ export class FontController {
       const shaper = getShaper(
         fontData,
         (codePoint) => characterMap[codePoint],
-        glyphOrder
+        glyphOrder,
+        insertMarkers
       );
       return { shaper, messages, formattedMessages };
     }

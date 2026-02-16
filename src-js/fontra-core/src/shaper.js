@@ -3,11 +3,11 @@ import { assert, enumerate, range, reversed } from "./utils.js";
 
 const hb = await hbPromise;
 
-export function getShaper(fontData, nominalGlyphFunc, glyphOrder) {
+export function getShaper(fontData, nominalGlyphFunc, glyphOrder, insertMarkers) {
   let shaper;
 
   if (fontData) {
-    shaper = new HBShaper(fontData, nominalGlyphFunc, glyphOrder);
+    shaper = new HBShaper(fontData, nominalGlyphFunc, glyphOrder, insertMarkers);
   } else {
     return new DumbShaper(nominalGlyphFunc, glyphOrder);
   }
@@ -43,8 +43,9 @@ class ShaperBase {
 }
 
 class HBShaper extends ShaperBase {
-  constructor(fontData, nominalGlyphFunc, glyphOrder) {
+  constructor(fontData, nominalGlyphFunc, glyphOrder, insertMarkers) {
     super(nominalGlyphFunc, glyphOrder);
+    this.insertMarkers = insertMarkers;
     this.blob = hb.createBlob(fontData);
     this.face = hb.createFace(this.blob, 0);
     this.font = hb.createFont(this.face);
