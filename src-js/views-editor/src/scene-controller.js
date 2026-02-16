@@ -332,6 +332,9 @@ export class SceneController {
   }
 
   updateShaper() {
+    if (this.sceneSettingsController.model.shaper) {
+      this.sceneSettingsController.model.shaper.then(({ shaper }) => shaper.close());
+    }
     this.sceneSettingsController.model.shaper = this.fontController.getShaper(true);
     this.sceneSettingsController.model.dumbShaper =
       this.fontController.getShaper(false);
