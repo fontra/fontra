@@ -95,7 +95,7 @@ class HBShaper extends ShaperBase {
 
     delete this._glyphObjects;
 
-    const glyphs = buffer.json();
+    const glyphs = this.getGlyphInfoFromBuffer(buffer);
     buffer.destroy();
 
     for (const glyph of glyphs) {
@@ -103,6 +103,13 @@ class HBShaper extends ShaperBase {
     }
 
     return glyphs;
+  }
+
+  getGlyphInfoFromBuffer(buffer) {
+    return buffer.json().map((glyph) => {
+      glyph.gn = this.glyphOrder[glyph.g];
+      return glyph;
+    });
   }
 
   _getNominalGlyph(font, codePoint) {
