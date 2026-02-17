@@ -42,7 +42,7 @@ import {
 } from "@codemirror/view";
 import * as html from "@fontra/core/html-utils.js";
 import { addStyleSheet } from "@fontra/core/html-utils.js";
-import { scheduleCalls } from "@fontra/core/utils.js";
+import { compare, scheduleCalls } from "@fontra/core/utils.js";
 import { themeColorCSS } from "@fontra/web-components/theme-support.js";
 import { Tag } from "@lezer/highlight";
 import { BaseInfoPanel } from "./panel-base.js";
@@ -89,7 +89,7 @@ addStyleSheet(`
   justify-content: stretch;
   gap: 0.2em;
   margin-top: 0.2em;
-  max-height: 10em;
+  max-height: 12em;
   overflow-y: auto;
 }
 
@@ -132,6 +132,12 @@ addStyleSheet(`
 
 .font-info-opentype-feature-code-message-box.error .fea-error-highlight {
   background-color: var(--feature-error-highlight-color);
+}
+
+.font-info-opentype-feature-code-show-more-less {
+  justify-self: start;
+  padding: 0em 1em 0.2em 1em;
+  cursor: pointer;
 }
 
 #font-info-opentype-feature-code-text-entry-textarea {
@@ -343,6 +349,7 @@ export class OpenTypeFeatureCodePanel extends BaseInfoPanel {
       ])
     );
 
+    this.showAllErrors = false;
     await this.checkCompileErrors();
   }
 
@@ -370,9 +377,10 @@ export class OpenTypeFeatureCodePanel extends BaseInfoPanel {
     errorElement.innerText = "";
 
     // Messages don't always arrived sorted by position in fea source
-    messages.sort((a, b) => a.span[0] - b.span[0]);
+    messages.sort(feaMessageCompare);
+    const numMessages = messages.length;
 
-    for (const message of messages) {
+    for (const message of this.showAllErrors ? messages : messages.slice(0, 1)) {
       let [spanFrom, spanTo] = message.span;
       const lineInfo = this.editorView.state.doc.lineAt(spanFrom);
       spanTo = Math.min(spanTo, lineInfo.to);
@@ -409,6 +417,21 @@ export class OpenTypeFeatureCodePanel extends BaseInfoPanel {
             html.div({ class: "fea-error-line-number" }, [lineNumberString]),
             html.pre({ class: "fea-error-line" }, lineItems),
           ]
+        )
+      );
+    }
+
+    if (numMessages > 1) {
+      errorElement.appendChild(
+        html.div(
+          {
+            class: "font-info-opentype-feature-code-show-more-less",
+            onclick: (event) => {
+              this.showAllErrors = !this.showAllErrors;
+              this.checkCompileErrors();
+            },
+          },
+          [this.showAllErrors ? "Show less..." : "Show more..."]
         )
       );
     }
@@ -546,4 +569,13 @@ function parseFeaMessages(messages) {
   }
 
   return chunks;
+}
+
+const feaMessageLevels = ["error", "warning", "info"];
+
+function feaMessageCompare(a, b) {
+  return (
+    compare(feaMessageLevels.indexOf(a.level), feaMessageLevels.indexOf(b.level)) ||
+    compare(a.span[0], b.span[0])
+  );
 }
