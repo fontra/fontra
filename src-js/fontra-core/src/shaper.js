@@ -206,9 +206,7 @@ class DumbShaper extends ShaperBase {
 
     for (const [i, codePoint] of enumerate(codePoints)) {
       const glyphName = this.nominalGlyph(codePoint);
-
       const xAdvance = glyphObjects[glyphName]?.xAdvance ?? 500;
-
       const isMark = this.isGlyphMarkFunc(glyphName);
 
       glyphs.push({
