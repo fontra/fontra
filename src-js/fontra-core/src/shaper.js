@@ -283,6 +283,19 @@ export function applyCursiveAttachments(glyphs, glyphObjects, rightToLeft = fals
 }
 
 export function applyMarkPositioning(glyphs, glyphObjects, rightToLeft = false) {
+  applyMarkToBasePositioning(glyphs, glyphObjects, rightToLeft);
+  applyMarkToMarkPositioning(glyphs, glyphObjects, rightToLeft);
+}
+
+export function applyMarkToBasePositioning(glyphs, glyphObjects, rightToLeft = false) {
+  _applyMarkPositioning(glyphs, glyphObjects, rightToLeft, false);
+}
+
+export function applyMarkToMarkPositioning(glyphs, glyphObjects, rightToLeft = false) {
+  _applyMarkPositioning(glyphs, glyphObjects, rightToLeft, true);
+}
+
+function _applyMarkPositioning(glyphs, glyphObjects, rightToLeft, markToMark) {
   let previousXAdvance;
   let baseAnchors = {};
 
@@ -304,23 +317,23 @@ export function applyMarkPositioning(glyphs, glyphObjects, rightToLeft = false) 
           const markAnchor = markAnchors[anchorName];
           glyph.dx = baseAnchor.x - markAnchor.x - previousXAdvance;
           glyph.dy = baseAnchor.y - markAnchor.y;
-          for (const [anchorName, markAnchor] of Object.entries(markBaseAnchors)) {
-            baseAnchors[anchorName] = {
-              name: anchorName,
-              x: markAnchor.x + glyph.dx + previousXAdvance,
-              y: markAnchor.y + glyph.dy,
-            };
-          }
           break;
         }
       }
+
+      if (markToMark) {
+        for (const [anchorName, markAnchor] of Object.entries(markBaseAnchors)) {
+          baseAnchors[anchorName] = {
+            name: anchorName,
+            x: markAnchor.x + glyph.dx + previousXAdvance,
+            y: markAnchor.y + glyph.dy,
+          };
+        }
+      }
     } else {
-      baseAnchors = collectAnchors(
-        glyphObject.propagatedAnchors,
-        "",
-        glyph.dx,
-        glyph.dy
-      );
+      baseAnchors = markToMark
+        ? {}
+        : collectAnchors(glyphObject.propagatedAnchors, "", glyph.dx, glyph.dy);
       previousXAdvance = rightToLeft ? 0 : glyphObject.xAdvance;
     }
   }

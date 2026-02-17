@@ -13,6 +13,8 @@ import {
   applyCursiveAttachments,
   applyKerning,
   applyMarkPositioning,
+  applyMarkToBasePositioning,
+  applyMarkToMarkPositioning,
   getShaper,
 } from "@fontra/core/shaper.js";
 
@@ -485,6 +487,90 @@ describe("shaper tests", () => {
 
     expect(outputGlyphs).to.deep.equal(expectedGlyphs);
   });
+
+  const testDataMarkToBasePositioning = [
+    {
+      inputGlyphs: [
+        { gn: "H", ax: 500, ay: 0, dx: 0, dy: 0 },
+        { gn: "dotaccentcomb", ax: 0, ay: 0, dx: 0, dy: 0, mark: true },
+        { gn: "dotbelowcomb", ax: 0, ay: 0, dx: 0, dy: 0, mark: true },
+      ],
+      expectedGlyphs: [
+        { gn: "H", ax: 500, ay: 0, dx: 0, dy: 0 },
+        { gn: "dotaccentcomb", ax: 0, ay: 0, dx: -350, dy: -10, mark: true },
+        { gn: "dotbelowcomb", ax: 0, ay: 0, dx: -350, dy: 0, mark: true },
+      ],
+    },
+    {
+      inputGlyphs: [
+        { gn: "H", ax: 500, ay: 0, dx: 0, dy: 0 },
+        { gn: "dotaccentcomb", ax: 0, ay: 0, dx: 0, dy: 0, mark: true },
+        { gn: "dotaccentcomb", ax: 0, ay: 0, dx: 0, dy: 0, mark: true },
+        { gn: "dotaccentcomb", ax: 0, ay: 0, dx: 0, dy: 0, mark: true },
+      ],
+      expectedGlyphs: [
+        { gn: "H", ax: 500, ay: 0, dx: 0, dy: 0 },
+        { gn: "dotaccentcomb", ax: 0, ay: 0, dx: -350, dy: -10, mark: true },
+        { gn: "dotaccentcomb", ax: 0, ay: 0, dx: -350, dy: -10, mark: true },
+        { gn: "dotaccentcomb", ax: 0, ay: 0, dx: -350, dy: -10, mark: true },
+      ],
+    },
+  ];
+
+  parametrize(
+    "applyMarkToBasePositioning tests",
+    testDataMarkToBasePositioning,
+    (testCase) => {
+      const { inputGlyphs, expectedGlyphs, rightToLeft } = testCase;
+      const outputGlyphs = deepCopyObject(inputGlyphs);
+
+      applyMarkToBasePositioning(outputGlyphs, markGlyphObjects, rightToLeft);
+
+      expect(outputGlyphs).to.deep.equal(expectedGlyphs);
+    }
+  );
+
+  const testDataMarkToMarkPositioning = [
+    {
+      inputGlyphs: [
+        { gn: "H", ax: 500, ay: 0, dx: 0, dy: 0 },
+        { gn: "dotaccentcomb", ax: 0, ay: 0, dx: 0, dy: 0, mark: true },
+        { gn: "dotbelowcomb", ax: 0, ay: 0, dx: 0, dy: 0, mark: true },
+      ],
+      expectedGlyphs: [
+        { gn: "H", ax: 500, ay: 0, dx: 0, dy: 0 },
+        { gn: "dotaccentcomb", ax: 0, ay: 0, dx: 0, dy: 0, mark: true },
+        { gn: "dotbelowcomb", ax: 0, ay: 0, dx: 0, dy: 0, mark: true },
+      ],
+    },
+    {
+      inputGlyphs: [
+        { gn: "H", ax: 500, ay: 0, dx: 0, dy: 0 },
+        { gn: "dotaccentcomb", ax: 0, ay: 0, dx: 0, dy: 0, mark: true },
+        { gn: "dotaccentcomb", ax: 0, ay: 0, dx: 0, dy: 0, mark: true },
+        { gn: "dotaccentcomb", ax: 0, ay: 0, dx: 0, dy: 0, mark: true },
+      ],
+      expectedGlyphs: [
+        { gn: "H", ax: 500, ay: 0, dx: 0, dy: 0 },
+        { gn: "dotaccentcomb", ax: 0, ay: 0, dx: 0, dy: 0, mark: true },
+        { gn: "dotaccentcomb", ax: 0, ay: 0, dx: 0, dy: 170, mark: true },
+        { gn: "dotaccentcomb", ax: 0, ay: 0, dx: 0, dy: 340, mark: true },
+      ],
+    },
+  ];
+
+  parametrize(
+    "applyMarkToMarkPositioning tests",
+    testDataMarkToMarkPositioning,
+    (testCase) => {
+      const { inputGlyphs, expectedGlyphs, rightToLeft } = testCase;
+      const outputGlyphs = deepCopyObject(inputGlyphs);
+
+      applyMarkToMarkPositioning(outputGlyphs, markGlyphObjects, rightToLeft);
+
+      expect(outputGlyphs).to.deep.equal(expectedGlyphs);
+    }
+  );
 });
 
 function ord(s) {
