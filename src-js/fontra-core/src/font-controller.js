@@ -1129,6 +1129,7 @@ export class FontController {
         fontData,
         (codePoint) => characterMap[codePoint],
         glyphOrder,
+        (glyphName) => this.isMark(glyphName),
         insertMarkers
       );
       return { shaper, messages, formattedMessages };

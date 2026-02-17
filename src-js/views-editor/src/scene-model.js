@@ -1294,14 +1294,6 @@ class LineSetter {
       shapedGlyphs = this.shaper.shape(codePoints, this.glyphInstances, shaperOptions);
     }
 
-    // Mark mark glyphs
-    shapedGlyphs.forEach((glyph) => {
-      glyph.mark = fontController.isMark(glyph.gn);
-      if (glyph.mark) {
-        glyph.ax = 0; // Force marks to be zero-width
-      }
-    });
-
     if (this.applyCursiveAttachments) {
       applyCursiveAttachments(
         shapedGlyphs,

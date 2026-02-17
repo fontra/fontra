@@ -3,13 +3,25 @@ import { assert, enumerate, range, reversed } from "./utils.js";
 
 const hb = await hbPromise;
 
-export function getShaper(fontData, nominalGlyphFunc, glyphOrder, insertMarkers) {
+export function getShaper(
+  fontData,
+  nominalGlyphFunc,
+  glyphOrder,
+  isGlyphMarkFunc,
+  insertMarkers
+) {
   let shaper;
 
   if (fontData) {
-    shaper = new HBShaper(fontData, nominalGlyphFunc, glyphOrder, insertMarkers);
+    shaper = new HBShaper(
+      fontData,
+      nominalGlyphFunc,
+      glyphOrder,
+      isGlyphMarkFunc,
+      insertMarkers
+    );
   } else {
-    return new DumbShaper(nominalGlyphFunc, glyphOrder);
+    return new DumbShaper(nominalGlyphFunc, glyphOrder, isGlyphMarkFunc);
   }
 
   return shaper;
@@ -18,8 +30,9 @@ export function getShaper(fontData, nominalGlyphFunc, glyphOrder, insertMarkers)
 export const MAX_UNICODE = 0x0110000;
 
 class ShaperBase {
-  constructor(nominalGlyphFunc, glyphOrder) {
+  constructor(nominalGlyphFunc, glyphOrder, isGlyphMarkFunc) {
     this._baseNominalGlyphFunc = nominalGlyphFunc;
+    this.isGlyphMarkFunc = isGlyphMarkFunc;
     this.glyphOrder = glyphOrder;
     this.glyphNameToID = {};
     for (const [i, glyphName] of enumerate(glyphOrder)) {
@@ -43,9 +56,9 @@ class ShaperBase {
 }
 
 class HBShaper extends ShaperBase {
-  constructor(fontData, nominalGlyphFunc, glyphOrder, insertMarkers) {
-    super(nominalGlyphFunc, glyphOrder);
-    this.insertMarkers = insertMarkers;
+  constructor(fontData, nominalGlyphFunc, glyphOrder, isGlyphMarkFunc, insertMarkers) {
+    super(nominalGlyphFunc, glyphOrder, isGlyphMarkFunc);
+    this.isGlyphMarkFunc = isGlyphMarkFunc;
     this.blob = hb.createBlob(fontData);
     this.face = hb.createFace(this.blob, 0);
     this.font = hb.createFont(this.face);
@@ -106,10 +119,16 @@ class HBShaper extends ShaperBase {
   }
 
   getGlyphInfoFromBuffer(buffer) {
-    return buffer.json().map((glyph) => {
+    const glyphs = buffer.json();
+    glyphs.forEach((glyph) => {
       glyph.gn = this.glyphOrder[glyph.g];
+      glyph.mark = this.isGlyphMarkFunc(glyph.gn);
+      if (glyph.mark) {
+        glyph.ax = 0; // Force marks to be zero-width
+      }
       return glyph;
     });
+    return glyphs;
   }
 
   _getNominalGlyph(font, codePoint) {
@@ -181,10 +200,6 @@ class HBShaper extends ShaperBase {
 }
 
 class DumbShaper extends ShaperBase {
-  constructor(nominalGlyphFunc, glyphOrder) {
-    super(nominalGlyphFunc, glyphOrder);
-  }
-
   shape(codePoints, glyphObjects, options) {
     const { direction } = options;
     const glyphs = [];
@@ -194,11 +209,14 @@ class DumbShaper extends ShaperBase {
 
       const xAdvance = glyphObjects[glyphName]?.xAdvance ?? 500;
 
+      const isMark = this.isGlyphMarkFunc(glyphName);
+
       glyphs.push({
         g: glyphName ? this.glyphNameToID[glyphName] : 0,
         cl: i, // cluster
         gn: glyphName ?? ".notdef",
-        ax: xAdvance,
+        mark: isMark,
+        ax: isMark ? 0 : xAdvance,
         ay: 0,
         dx: 0,
         dy: 0,
