@@ -363,6 +363,7 @@ export class FontController {
     let messages = [];
     let formattedMessages = "";
     let insertMarkers = [];
+    let canEmulateSomeGPOS = false;
 
     const glyphOrder = Object.keys(this.glyphMap);
 
@@ -385,6 +386,7 @@ export class FontController {
         ensureNotdef(glyphOrder);
         ({ fontData, messages, formattedMessages, insertMarkers } =
           await this.buildShaperFont(glyphOrder));
+        canEmulateSomeGPOS = true;
       }
     } else {
       glyphOrder.sort();
@@ -397,6 +399,7 @@ export class FontController {
       messages,
       formattedMessages,
       insertMarkers,
+      canEmulateSomeGPOS,
     };
   }
 
@@ -1119,8 +1122,14 @@ export class FontController {
   async getShaper(textShaping) {
     await this.ensureInitialized;
 
-    const { glyphOrder, fontData, messages, formattedMessages, insertMarkers } =
-      await this.getShaperFontData(textShaping);
+    const {
+      glyphOrder,
+      fontData,
+      messages,
+      formattedMessages,
+      insertMarkers,
+      canEmulateSomeGPOS,
+    } = await this.getShaperFontData(textShaping);
 
     {
       // characterMap closure
@@ -1132,7 +1141,7 @@ export class FontController {
         (glyphName) => this.isMark(glyphName),
         insertMarkers
       );
-      return { shaper, messages, formattedMessages };
+      return { shaper, messages, formattedMessages, canEmulateSomeGPOS };
     }
   }
 
