@@ -246,6 +246,9 @@ const customTheme = EditorView.theme({
   "&.cm-focused > .cm-scroller > .cm-selectionLayer .cm-selectionBackground": {
     backgroundColor: "#A6CCF250",
   },
+  ".cm-selectionMatch": {
+    backgroundColor: "#99ff7750",
+  },
   ".cm-tooltip": {
     backgroundColor: "var(--background-color)",
     border: "0.5px solid gray",
