@@ -118,7 +118,6 @@ addStyleSheet(`
   display: inline-block;
   width: 1.25em;
   height: 1.25em;
-  color: var(--fontra-red-color);
 }
 
 .font-info-opentype-feature-code-message-box > pre {
