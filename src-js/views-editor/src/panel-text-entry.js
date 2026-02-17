@@ -513,7 +513,7 @@ export default class TextEntryPanel extends Panel {
         const [featureDescription, url] = features[tag] ?? ["", null];
         const label = info[tag]?.uiLabelName || featureDescription;
         element.append(
-          ...featureTagButton(this.textSettingsController, tag, label, url)
+          ...featureTagButton(this.textSettingsController, tag, label, { url })
         );
       });
     }
@@ -582,7 +582,7 @@ export default class TextEntryPanel extends Panel {
   }
 }
 
-function featureTagButton(controller, featureTag, label, url, options) {
+function featureTagButton(controller, featureTag, label, options) {
   const controllerKey = options?.key ?? "featureSettings";
   let state = controller.model[controllerKey]?.[featureTag];
   const id = options?.id ?? `features-button-${featureTag}`;
@@ -632,8 +632,12 @@ function featureTagButton(controller, featureTag, label, url, options) {
     [featureTag]
   );
 
-  const labelElement = (url ? html.a : html.div)(
-    { class: "feature-tag-label", href: url, target: "_blank" },
+  if (options?.emulated) {
+    buttonElement.classList.add("emulated");
+  }
+
+  const labelElement = (options?.url ? html.a : html.div)(
+    { class: "feature-tag-label", href: options?.url, target: "_blank" },
     [label]
   );
 
