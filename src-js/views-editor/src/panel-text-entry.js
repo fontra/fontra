@@ -275,37 +275,43 @@ export default class TextEntryPanel extends Panel {
         display: grid;
         grid-template-columns: min-content auto;
         align-items: center;
-        gap: 0.5em;
+        gap: 0.4em;
+        padding: 2px;
       }
 
       .feature-tag-button {
-        background-color: #999;
+        --button-color: #999;
+        background-color: var(--button-color);
         color: white;
-        padding: 0.25em 1em 0.25em 1em;
+        padding: 0.1em 0.75em 0.1em 0.75em;
         border-radius: 0.5em;
-        font-family: monospace;
-        font-size: 1.15em;
+        font-family: menlo, monospace;
         cursor: pointer;
       }
 
+      .feature-tag-button.emulated {
+        outline: 1px dashed var(--button-color);
+        outline-offset: 1px;
+      }
+
       .feature-tag-button:active {
-        background-color: #888;
+        --button-color: #888;
       }
 
       .feature-tag-button.on {
-        background-color: #00BB00;
+        --button-color: #00BB00;
       }
 
       .feature-tag-button.on:active {
-        background-color: #009900;
+        --button-color: #009900;
       }
 
       .feature-tag-button.off {
-        background-color: #FF0022;
+        --button-color: #FF0022;
       }
 
       .feature-tag-button.off:active {
-        background-color: #DD0011;
+        --button-color: #DD0011;
       }
 
       .feature-tag-label {
