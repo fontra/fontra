@@ -350,9 +350,8 @@ export default class TextEntryPanel extends Panel {
 
       #features-errors > inline-svg {
         display: inline-block;
-        width: 1.5em;
-        height: 1.5em;
-        color: var(--fontra-red-color);
+        width: 1.25em;
+        height: 1.25em;
       }
 
       #features-errors-message {
