@@ -21,7 +21,7 @@ export function getShaper(
       insertMarkers
     );
   } else {
-    return new DumbShaper(nominalGlyphFunc, glyphOrder, isGlyphMarkFunc);
+    return new DumbShaper(nominalGlyphFunc, glyphOrder, isGlyphMarkFunc, insertMarkers);
   }
 
   return shaper;
@@ -30,10 +30,12 @@ export function getShaper(
 export const MAX_UNICODE = 0x0110000;
 
 class ShaperBase {
-  constructor(nominalGlyphFunc, glyphOrder, isGlyphMarkFunc) {
+  constructor(nominalGlyphFunc, glyphOrder, isGlyphMarkFunc, insertMarkers) {
     this._baseNominalGlyphFunc = nominalGlyphFunc;
-    this.isGlyphMarkFunc = isGlyphMarkFunc;
     this.glyphOrder = glyphOrder;
+    this.isGlyphMarkFunc = isGlyphMarkFunc;
+    this.insertMarkers = insertMarkers;
+
     this.glyphNameToID = {};
     for (const [i, glyphName] of enumerate(glyphOrder)) {
       this.glyphNameToID[glyphName] = i;
@@ -53,11 +55,24 @@ class ShaperBase {
     }
     return glyphID + MAX_UNICODE;
   }
+
+  getFeatureInfo(otTableTag) {
+    return otTableTag == "GPOS-emulated"
+      ? this.insertMarkers
+        ? {
+            "curs-emulated": {},
+            "kern-emulated": {},
+            "mark-emulated": {},
+            "mkmk-emulated": {},
+          }
+        : {}
+      : null;
+  }
 }
 
 class HBShaper extends ShaperBase {
   constructor(fontData, nominalGlyphFunc, glyphOrder, isGlyphMarkFunc, insertMarkers) {
-    super(nominalGlyphFunc, glyphOrder, isGlyphMarkFunc);
+    super(nominalGlyphFunc, glyphOrder, isGlyphMarkFunc, insertMarkers);
     this.isGlyphMarkFunc = isGlyphMarkFunc;
     this.blob = hb.createBlob(fontData);
     this.face = hb.createFace(this.blob, 0);
@@ -142,8 +157,13 @@ class HBShaper extends ShaperBase {
   }
 
   getFeatureInfo(otTableTag) {
+    let info = super.getFeatureInfo(otTableTag);
+    if (info) {
+      return info;
+    }
+
     const tags = this.face.getTableFeatureTags(otTableTag);
-    const info = {};
+    info = {};
 
     for (const [featureIndex, tag] of enumerate(tags)) {
       if (tag in info) {
@@ -230,7 +250,7 @@ class DumbShaper extends ShaperBase {
   }
 
   getFeatureInfo(otTableTag) {
-    return {};
+    return super.getFeatureInfo(otTableTag) ?? {};
   }
 
   getScriptAndLanguageInfo() {

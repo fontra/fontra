@@ -140,7 +140,7 @@ export default class TextEntryPanel extends Panel {
       return null;
     }
 
-    const { shaper, messages } = await shaperPromise;
+    const { shaper, messages, canEmulateSomeGPOS } = await shaperPromise;
 
     const errorMessages = messages.filter((message) => message.level != "warning");
     const numberOfErrorsMessage = errorMessages.length == 1 ? "an error" : "errors";
@@ -148,6 +148,8 @@ export default class TextEntryPanel extends Panel {
     this.textSettings.shaperError = errorMessages.length
       ? `The OpenType feature code contains ${numberOfErrorsMessage}`
       : null;
+
+    this.canEmulateSomeGPOS = canEmulateSomeGPOS;
 
     return shaper;
   }
@@ -176,12 +178,20 @@ export default class TextEntryPanel extends Panel {
     return this.accordion.querySelector("#gsub-features-accordion-item");
   }
 
+  get gposEmulatedFeaturesItem() {
+    return this.accordion.querySelector("#gpos-emulated-features-accordion-item");
+  }
+
   get gposFeaturesItem() {
     return this.accordion.querySelector("#gpos-features-accordion-item");
   }
 
   get gsubFeaturesElement() {
     return this.accordion.querySelector("#gsub-features-contents");
+  }
+
+  get gposEmulatedFeaturesElement() {
+    return this.accordion.querySelector("#gpos-emulated-features-contents");
   }
 
   get gposFeaturesElement() {
@@ -290,8 +300,7 @@ export default class TextEntryPanel extends Panel {
       }
 
       .feature-tag-button.emulated {
-        outline: 1px dashed var(--button-color);
-        outline-offset: 1px;
+        font-style: oblique;
       }
 
       .feature-tag-button:active {
@@ -454,6 +463,17 @@ export default class TextEntryPanel extends Panel {
         auxiliaryHeaderElement: this._makeResetFeaturesButton("GSUB"),
       },
       {
+        id: "gpos-emulated-features-accordion-item",
+        label: "Emulated positioning features",
+        open: true,
+        hidden: true,
+        content: html.div(
+          { class: "features-container", id: "gpos-emulated-features-contents" },
+          []
+        ),
+        auxiliaryHeaderElement: this._makeResetFeaturesButton("GPOS-emulated"),
+      },
+      {
         id: "gpos-features-accordion-item",
         label: "Positioning features",
         open: true,
@@ -476,6 +496,7 @@ export default class TextEntryPanel extends Panel {
     }
 
     const gsubFeatureInfo = shaper.getFeatureInfo("GSUB");
+    const gposEmulatedFeatureInfo = shaper.getFeatureInfo("GPOS-emulated");
     const gposFeatureInfo = shaper.getFeatureInfo("GPOS");
     const scriptAndLanguageInfo = shaper.getScriptAndLanguageInfo();
 
@@ -502,6 +523,11 @@ export default class TextEntryPanel extends Panel {
 
     for (const [info, element, accordionItem] of [
       [gsubFeatureInfo, this.gsubFeaturesElement, this.gsubFeaturesItem],
+      [
+        gposEmulatedFeatureInfo,
+        this.gposEmulatedFeaturesElement,
+        this.gposEmulatedFeaturesItem,
+      ],
       [gposFeatureInfo, this.gposFeaturesElement, this.gposFeaturesItem],
     ]) {
       const tags = Object.keys(info).sort();
@@ -510,7 +536,8 @@ export default class TextEntryPanel extends Panel {
       element.innerHTML = "";
 
       tags.forEach((tag) => {
-        const [featureDescription, url] = features[tag] ?? ["", null];
+        const cleanTag = tag.slice(0, 4); // strip "-emulated"
+        const [featureDescription, url] = features[cleanTag] ?? ["", null];
         const label = info[tag]?.uiLabelName || featureDescription;
         element.append(
           ...featureTagButton(this.textSettingsController, tag, label, { url })
@@ -532,6 +559,17 @@ export default class TextEntryPanel extends Panel {
     }
 
     this.textLanguageOptions.splice(1, Infinity, ...languageOptions);
+  }
+
+  getFeatureInfo(shaper, tableTag) {
+    const info = shaper.getFeatureInfo(tableTag);
+    if (tableTag == "GPOS" && this.canEmulateSomeGPOS) {
+      info["curs-emulated"] = {};
+      info["kern-emulated"] = {};
+      info["mark-emulated"] = {};
+      info["mkmk-emulated"] = {};
+    }
+    return info;
   }
 
   fixTextEntryHeight() {
@@ -629,10 +667,10 @@ function featureTagButton(controller, featureTag, label, options) {
       class: "feature-tag-button",
       onclick: (event) => toggleState(event.altKey),
     },
-    [featureTag]
+    [featureTag.slice(0, 4)]
   );
 
-  if (options?.emulated) {
+  if (featureTag.endsWith("-emulated")) {
     buttonElement.classList.add("emulated");
   }
 

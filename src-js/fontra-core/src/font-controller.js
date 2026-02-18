@@ -362,7 +362,7 @@ export class FontController {
     let fontData = null;
     let messages = [];
     let formattedMessages = "";
-    let insertMarkers = [];
+    let insertMarkers = null;
     let canEmulateSomeGPOS = false;
 
     const glyphOrder = Object.keys(this.glyphMap);
@@ -391,6 +391,7 @@ export class FontController {
     } else {
       glyphOrder.sort();
       ensureNotdef(glyphOrder);
+      insertMarkers = [];
     }
 
     return {
