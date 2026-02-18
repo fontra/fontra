@@ -89,7 +89,7 @@ addStyleSheet(`
   justify-content: stretch;
   gap: 0.2em;
   margin-top: 0.2em;
-  max-height: 12em;
+  max-height: 30vh;
   overflow-y: auto;
 }
 
