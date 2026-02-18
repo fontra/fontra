@@ -26,11 +26,22 @@ describe("shaper tests", () => {
   const testInputCodePoints = [..."😻VABCÄS"].map((c) => ord(c));
 
   const expectedGlyphs = [
-    { g: 0, cl: 0, ax: 500, ay: 0, dx: 0, dy: 0, flags: 0, gn: ".notdef" },
-    { g: 24, cl: 1, ax: 301, ay: 0, dx: 0, dy: 0, flags: 0, gn: "V" },
-    { g: 1, cl: 2, ax: 396, ay: 0, dx: 0, dy: 0, flags: 0, gn: "A", flags: 1 },
-    { g: 4, cl: 3, ax: 443, ay: 0, dx: 0, dy: 0, flags: 0, gn: "B" },
-    { g: 5, cl: 4, ax: 499, ay: 0, dx: 0, dy: 0, flags: 0, gn: "C" },
+    { g: 0, cl: 0, ax: 500, ay: 0, dx: 0, dy: 0, flags: 0, gn: ".notdef", mark: false },
+    { g: 24, cl: 1, ax: 301, ay: 0, dx: 0, dy: 0, flags: 0, gn: "V", mark: false },
+    {
+      g: 1,
+      cl: 2,
+      ax: 396,
+      ay: 0,
+      dx: 0,
+      dy: 0,
+      flags: 0,
+      gn: "A",
+      flags: 1,
+      mark: false,
+    },
+    { g: 4, cl: 3, ax: 443, ay: 0, dx: 0, dy: 0, flags: 0, gn: "B", mark: false },
+    { g: 5, cl: 4, ax: 499, ay: 0, dx: 0, dy: 0, flags: 0, gn: "C", mark: false },
     {
       g: 3,
       cl: 5,
@@ -40,6 +51,7 @@ describe("shaper tests", () => {
       dy: 0,
       flags: 0,
       gn: "Adieresis",
+      mark: false,
     },
     {
       g: 21,
@@ -50,6 +62,7 @@ describe("shaper tests", () => {
       dy: 0,
       flags: 0,
       gn: "S",
+      mark: false,
     },
   ];
 
@@ -116,7 +129,10 @@ describe("shaper tests", () => {
     [ord("V")]: "V",
   };
 
+  const markGlyphs = new Set([]);
+
   const nominalGlyphFunc = (codePoint) => characterMap[codePoint];
+  const isGlyphMarkFunc = (glyphName) => markGlyphs.has(glyphName);
 
   const glyphObjects = {
     A: { xAdvance: 396 },
@@ -132,7 +148,12 @@ describe("shaper tests", () => {
 
   it("test HBShaper", () => {
     const fontData = new Uint8Array(fs.readFileSync(mutatorSansPath));
-    const shaper = getShaper(fontData, nominalGlyphFunc, glyphOrder);
+    const shaper = getShaper({
+      fontData,
+      nominalGlyphFunc,
+      glyphOrder,
+      isGlyphMarkFunc,
+    });
     const glyphs = shaper.shape(testInputCodePoints, glyphObjects, {
       variations: { wght: 0, wdth: 0 },
       features: "-kern,-rvrn",
@@ -144,7 +165,12 @@ describe("shaper tests", () => {
 
   it("test HBShaper RTL", () => {
     const fontData = new Uint8Array(fs.readFileSync(mutatorSansPath));
-    const shaper = getShaper(fontData, nominalGlyphFunc, glyphOrder);
+    const shaper = getShaper({
+      fontData,
+      nominalGlyphFunc,
+      glyphOrder,
+      isGlyphMarkFunc,
+    });
     const glyphs = shaper.shape(testInputCodePoints, glyphObjects, {
       direction: "rtl",
     });
@@ -194,7 +220,12 @@ describe("shaper tests", () => {
     const expectedGPOSInfo = { kern: {}, mark: {}, mkmk: {} };
 
     const fontData = new Uint8Array(fs.readFileSync(notoSansPath));
-    const shaper = getShaper(fontData, nominalGlyphFunc, glyphOrder);
+    const shaper = getShaper({
+      fontData,
+      nominalGlyphFunc,
+      glyphOrder,
+      isGlyphMarkFunc,
+    });
 
     expect(shaper.getFeatureInfo("GSUB")).to.deep.equal(expectedGSUBInfo);
     expect(shaper.getFeatureInfo("GPOS")).to.deep.equal(expectedGPOSInfo);
@@ -202,7 +233,12 @@ describe("shaper tests", () => {
 
   it("test HBShaper getScriptAndLanguageInfo", () => {
     const fontData = new Uint8Array(fs.readFileSync(notoSansPath));
-    const shaper = getShaper(fontData, nominalGlyphFunc, glyphOrder);
+    const shaper = getShaper({
+      fontData,
+      nominalGlyphFunc,
+      glyphOrder,
+      isGlyphMarkFunc,
+    });
 
     const expectedScriptAndLanguageInfo = {
       DFLT: [],
@@ -218,7 +254,7 @@ describe("shaper tests", () => {
   });
 
   it("test DumbShaper", () => {
-    const shaper = getShaper(null, nominalGlyphFunc, glyphOrder);
+    const shaper = getShaper({ nominalGlyphFunc, glyphOrder, isGlyphMarkFunc });
     const glyphs = shaper.shape(testInputCodePoints, glyphObjects, {
       variations: { wght: 0, wdth: 0 },
       features: "kern",
@@ -229,7 +265,7 @@ describe("shaper tests", () => {
   });
 
   it("test DumbShaper RTL", () => {
-    const shaper = getShaper(null, nominalGlyphFunc, glyphOrder);
+    const shaper = getShaper({ nominalGlyphFunc, glyphOrder, isGlyphMarkFunc });
     const glyphs = shaper.shape(testInputCodePoints, glyphObjects, {
       direction: "rtl",
     });
@@ -249,7 +285,7 @@ describe("shaper tests", () => {
     const inputGlyphNames = ["A", "B", "C"];
     const expectedCodePoints = [0x110001, 0x110004, 0x110005];
 
-    const shaper = getShaper(null, nominalGlyphFunc, glyphOrder);
+    const shaper = getShaper({ nominalGlyphFunc, glyphOrder, isGlyphMarkFunc });
 
     const codePoints = inputGlyphNames.map((glyphName) =>
       shaper.getGlyphNameCodePoint(glyphName)

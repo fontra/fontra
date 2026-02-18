@@ -3,34 +3,19 @@ import { assert, enumerate, range, reversed } from "./utils.js";
 
 const hb = await hbPromise;
 
-export function getShaper(
-  fontData,
-  nominalGlyphFunc,
-  glyphOrder,
-  isGlyphMarkFunc,
-  insertMarkers
-) {
-  let shaper;
+export function getShaper(shaperSupport) {
+  const shaperClass = shaperSupport.fontData ? HBShaper : DumbShaper;
 
-  if (fontData) {
-    shaper = new HBShaper(
-      fontData,
-      nominalGlyphFunc,
-      glyphOrder,
-      isGlyphMarkFunc,
-      insertMarkers
-    );
-  } else {
-    return new DumbShaper(nominalGlyphFunc, glyphOrder, isGlyphMarkFunc, insertMarkers);
-  }
-
-  return shaper;
+  return new shaperClass(shaperSupport);
 }
 
 export const MAX_UNICODE = 0x0110000;
 
 class ShaperBase {
-  constructor(nominalGlyphFunc, glyphOrder, isGlyphMarkFunc, insertMarkers) {
+  constructor(shaperSupport) {
+    const { nominalGlyphFunc, glyphOrder, isGlyphMarkFunc, insertMarkers } =
+      shaperSupport;
+
     this._baseNominalGlyphFunc = nominalGlyphFunc;
     this.glyphOrder = glyphOrder;
     this.isGlyphMarkFunc = isGlyphMarkFunc;
@@ -71,9 +56,10 @@ class ShaperBase {
 }
 
 class HBShaper extends ShaperBase {
-  constructor(fontData, nominalGlyphFunc, glyphOrder, isGlyphMarkFunc, insertMarkers) {
-    super(nominalGlyphFunc, glyphOrder, isGlyphMarkFunc, insertMarkers);
-    this.isGlyphMarkFunc = isGlyphMarkFunc;
+  constructor(shaperSupport) {
+    super(shaperSupport);
+    const { fontData } = shaperSupport;
+
     this.blob = hb.createBlob(fontData);
     this.face = hb.createFace(this.blob, 0);
     this.font = hb.createFont(this.face);

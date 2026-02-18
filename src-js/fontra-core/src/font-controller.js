@@ -1135,13 +1135,14 @@ export class FontController {
     {
       // characterMap closure
       const characterMap = this.characterMap;
-      const shaper = getShaper(
+      const shaperSupport = {
         fontData,
-        (codePoint) => characterMap[codePoint],
+        nominalGlyphFunc: (codePoint) => characterMap[codePoint],
         glyphOrder,
-        (glyphName) => this.isMark(glyphName),
-        insertMarkers
-      );
+        isGlyphMarkFunc: (glyphName) => this.isMark(glyphName),
+        insertMarkers,
+      };
+      const shaper = getShaper(shaperSupport);
       return { shaper, messages, formattedMessages, canEmulateSomeGPOS };
     }
   }
