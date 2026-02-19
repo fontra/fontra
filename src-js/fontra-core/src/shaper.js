@@ -364,22 +364,22 @@ class DumbShaper extends ShaperBase {
 }
 
 export function applyKerning(glyphs, pairFunc) {
-  let didModifyPositions = false;
+  let didModify = false;
 
   for (let i = 1; i < glyphs.length; i++) {
     const kernValue = pairFunc(glyphs[i - 1].gn, glyphs[i].gn);
     if (kernValue) {
       glyphs[i - 1].ax += kernValue;
       glyphs[i].flags |= 1;
-      didModifyPositions = true;
+      didModify = true;
     }
   }
 
-  return didModifyPositions;
+  return didModify;
 }
 
 export function applyCursiveAttachments(glyphs, glyphObjects, rightToLeft = false) {
-  let didModifyPositions = false;
+  let didModify = false;
 
   const [leftPrefix, rightPrefix] = rightToLeft ? ["exit", "entry"] : ["entry", "exit"];
 
@@ -416,7 +416,7 @@ export function applyCursiveAttachments(glyphs, glyphObjects, rightToLeft = fals
         // Vertical adjustment
         glyph.dy = previousGlyph.dy + exitAnchor.y - entryAnchor.y;
 
-        didModifyPositions = true;
+        didModify = true;
         break;
       }
     }
@@ -426,7 +426,7 @@ export function applyCursiveAttachments(glyphs, glyphObjects, rightToLeft = fals
     previousExitAnchors = collectAnchors(glyphObject.propagatedAnchors, rightPrefix);
   }
 
-  return didModifyPositions;
+  return didModify;
 }
 
 export function applyMarkToBasePositioning(glyphs, glyphObjects, rightToLeft = false) {
@@ -440,7 +440,7 @@ export function applyMarkToMarkPositioning(glyphs, glyphObjects, rightToLeft = f
 function _applyMarkPositioning(glyphs, glyphObjects, rightToLeft, markToMark) {
   let previousXAdvance;
   let baseAnchors = {};
-  let didModifyPositions = false;
+  let didModify = false;
 
   const ordered = rightToLeft ? reversed : (v) => v;
 
@@ -460,7 +460,7 @@ function _applyMarkPositioning(glyphs, glyphObjects, rightToLeft, markToMark) {
           const markAnchor = markAnchors[anchorName];
           glyph.dx = baseAnchor.x - markAnchor.x - previousXAdvance;
           glyph.dy = baseAnchor.y - markAnchor.y;
-          didModifyPositions = true;
+          didModify = true;
           break;
         }
       }
@@ -482,7 +482,7 @@ function _applyMarkPositioning(glyphs, glyphObjects, rightToLeft, markToMark) {
     }
   }
 
-  return didModifyPositions;
+  return didModify;
 }
 
 function collectAnchors(anchors, prefix = "", dx = 0, dy = 0) {
