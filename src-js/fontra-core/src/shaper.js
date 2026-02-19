@@ -120,19 +120,19 @@ class HBShaper extends ShaperBase {
     const glyphs = this.getGlyphInfoFromBuffer(buffer);
     buffer.destroy();
 
-    if (!disabledEmulatedFeatures.has("curs")) {
+    if (!disabledEmulatedFeatures?.has("curs")) {
       applyCursiveAttachments(glyphs, glyphObjects, direction == "rtl");
     }
 
-    if (kerningPairFunc && !disabledEmulatedFeatures.has("kern")) {
+    if (kerningPairFunc && !disabledEmulatedFeatures?.has("kern")) {
       applyKerning(glyphs, kerningPairFunc);
     }
 
-    if (!disabledEmulatedFeatures.has("mark")) {
+    if (!disabledEmulatedFeatures?.has("mark")) {
       applyMarkToBasePositioning(glyphs, glyphObjects, direction == "rtl");
     }
 
-    if (!disabledEmulatedFeatures.has("mkmk")) {
+    if (!disabledEmulatedFeatures?.has("mkmk")) {
       applyMarkToMarkPositioning(glyphs, glyphObjects, direction == "rtl");
     }
 
