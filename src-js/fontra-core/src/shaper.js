@@ -21,7 +21,9 @@ class ShaperBase {
     this._baseNominalGlyphFunc = nominalGlyphFunc;
     this.glyphOrder = glyphOrder;
     this.isGlyphMarkFunc = isGlyphMarkFunc;
-    this.insertMarkers = insertMarkers;
+    this.insertMarkers = insertMarkers.filter((marker) =>
+      EMULATED_FEATURE_TAGS.has(marker.tag)
+    );
 
     this.glyphNameToID = {};
     for (const [i, glyphName] of enumerate(glyphOrder)) {
