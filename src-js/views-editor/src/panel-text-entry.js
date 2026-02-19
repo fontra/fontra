@@ -390,7 +390,7 @@ export default class TextEntryPanel extends Panel {
         open: true,
         content: html.div({ id: "shaping-options-contents" }, [
           labeledCheckbox(
-            "Apply text shaping", // TODO: translate
+            "Apply text shaping and features", // TODO: translate
             this.textSettingsController,
             "applyTextShaping",
             { class: "labeled-checkbox" }
