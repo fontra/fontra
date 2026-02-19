@@ -489,13 +489,14 @@ export class SceneModel {
       cancelSignal
     );
 
-    const featureSettings = { ...this.sceneSettings.featureSettings };
-    if (kerningInstance) {
-      featureSettings["kern"] = false;
-    }
-
-    const featuresString = Object.entries(featureSettings ?? {})
-      .filter(([k, v]) => v != undefined)
+    const featureEntries = Object.entries(this.sceneSettings.featureSettings ?? {});
+    const disabledEmulatedFeatures = new Set(
+      featureEntries
+        .filter(([k, v]) => v == false && k.endsWith("-emulated"))
+        .map(([k, v]) => k.slice(0, 4))
+    );
+    const featuresString = featureEntries
+      .filter(([k, v]) => v != undefined && !k.endsWith("-emulated"))
       .map(([k, v]) => (v ? (v > 1 ? `${k}=${v}` : k) : `-${k}`))
       .join(",");
 
@@ -509,6 +510,7 @@ export class SceneModel {
       direction: this.sceneSettings.textDirection,
       script: this.sceneSettings.textScript,
       language: this.sceneSettings.textLanguage,
+      disabledEmulatedFeatures,
     };
 
     for (const [lineIndex, characterLine] of enumerate(characterLines)) {
