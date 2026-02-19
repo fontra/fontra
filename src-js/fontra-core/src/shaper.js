@@ -84,7 +84,15 @@ class HBShaper extends ShaperBase {
     if (!codePoints.length) {
       return [];
     }
-    const { variations, features, direction, script, language } = options;
+    const {
+      variations,
+      features,
+      direction,
+      script,
+      language,
+      disabledEmulatedFeatures,
+      kerningPairFunc,
+    } = options;
 
     const buffer = hb.createBuffer();
     buffer.addCodePoints(codePoints);
@@ -111,6 +119,22 @@ class HBShaper extends ShaperBase {
 
     const glyphs = this.getGlyphInfoFromBuffer(buffer);
     buffer.destroy();
+
+    if (!disabledEmulatedFeatures.has("curs")) {
+      applyCursiveAttachments(glyphs, glyphObjects, direction == "rtl");
+    }
+
+    if (kerningPairFunc && !disabledEmulatedFeatures.has("kern")) {
+      applyKerning(glyphs, kerningPairFunc);
+    }
+
+    if (!disabledEmulatedFeatures.has("mark")) {
+      applyMarkToBasePositioning(glyphs, glyphObjects, direction == "rtl");
+    }
+
+    if (!disabledEmulatedFeatures.has("mkmk")) {
+      applyMarkToMarkPositioning(glyphs, glyphObjects, direction == "rtl");
+    }
 
     return glyphs;
   }

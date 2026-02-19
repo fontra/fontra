@@ -464,10 +464,6 @@ export class SceneModel {
       return;
     }
 
-    const kerningInstance = this.sceneSettings.applyKerning
-      ? await this.getKerningInstance("kern")
-      : null;
-
     const { shaper } = await shaperPromise;
 
     const lineSetter = new LineSetter(
@@ -493,6 +489,9 @@ export class SceneModel {
       this.sceneSettings.fontLocationSourceMapped
     );
 
+    const kerningInstance = !disabledEmulatedFeatures.has("kern")
+      ? await this.getKerningInstance("kern")
+      : null;
     const kerningPairFunc = kerningInstance
       ? (g1, g2) => kerningInstance.getGlyphPairValue(g1, g2)
       : null;
