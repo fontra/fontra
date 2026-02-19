@@ -12,7 +12,6 @@ const __dirname = dirname(__filename);
 import {
   applyCursiveAttachments,
   applyKerning,
-  applyMarkPositioning,
   applyMarkToBasePositioning,
   applyMarkToMarkPositioning,
   getShaper,
@@ -519,7 +518,8 @@ describe("shaper tests", () => {
     const { inputGlyphs, expectedGlyphs, rightToLeft } = testCase;
     const outputGlyphs = deepCopyObject(inputGlyphs);
 
-    applyMarkPositioning(outputGlyphs, markGlyphObjects, rightToLeft);
+    applyMarkToBasePositioning(outputGlyphs, markGlyphObjects, rightToLeft);
+    applyMarkToMarkPositioning(outputGlyphs, markGlyphObjects, rightToLeft);
 
     expect(outputGlyphs).to.deep.equal(expectedGlyphs);
   });
