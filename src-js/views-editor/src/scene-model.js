@@ -20,12 +20,7 @@ import {
   unionRect,
 } from "@fontra/core/rectangle.js";
 import { difference, isEqualSet, union, updateSet } from "@fontra/core/set-ops.js";
-import {
-  MAX_UNICODE,
-  applyCursiveAttachments,
-  applyKerning,
-  applyMarkPositioning,
-} from "@fontra/core/shaper.js";
+import { MAX_UNICODE } from "@fontra/core/shaper.js";
 import { decomposedToTransform } from "@fontra/core/transform.js";
 import {
   consolidateCalls,
@@ -62,9 +57,6 @@ export class SceneModel {
       [
         "characterLines",
         "align",
-        "applyKerning",
-        "applyCursiveAttachments",
-        "applyMarkPositioning",
         "featureSettings",
         "applyTextShaping",
         "selectedGlyph",
@@ -1284,26 +1276,6 @@ class LineSetter {
 
     if (needsReshape) {
       shapedGlyphs = this.shaper.shape(codePoints, this.glyphInstances, shaperOptions);
-    }
-
-    if (this.applyCursiveAttachments) {
-      applyCursiveAttachments(
-        shapedGlyphs,
-        this.glyphInstances,
-        shaperOptions.direction == "rtl"
-      );
-    }
-
-    if (this.kerningPairFunc) {
-      applyKerning(shapedGlyphs, this.kerningPairFunc);
-    }
-
-    if (this.applyMarkPositioning) {
-      applyMarkPositioning(
-        shapedGlyphs,
-        this.glyphInstances,
-        shaperOptions.direction == "rtl"
-      );
     }
 
     for (const [glyphIndex, glyphInfo] of enumerate(shapedGlyphs)) {

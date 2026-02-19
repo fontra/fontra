@@ -395,24 +395,6 @@ export default class TextEntryPanel extends Panel {
             "applyTextShaping",
             { class: "labeled-checkbox" }
           ),
-          labeledCheckbox(
-            "Emulate cursive attachments", // TODO: translate
-            this.textSettingsController,
-            "applyCursiveAttachments",
-            { class: "labeled-checkbox" }
-          ),
-          labeledCheckbox(
-            "Emulate kerning", // TODO: translate
-            this.textSettingsController,
-            "applyKerning",
-            { class: "labeled-checkbox" }
-          ),
-          labeledCheckbox(
-            "Emulate mark positioning", // TODO: translate
-            this.textSettingsController,
-            "applyMarkPositioning",
-            { class: "labeled-checkbox" }
-          ),
           ...labeledPopupSelect(
             "Direction:",
             this.textSettingsController,

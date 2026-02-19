@@ -157,9 +157,6 @@ export class EditorController extends ViewController {
     this.sceneSettingsController.addKeyListener(
       [
         "align",
-        "applyKerning",
-        "applyCursiveAttachments",
-        "applyMarkPositioning",
         "applyTextShaping",
         "editLayerName",
         "editingLayers",
@@ -3228,11 +3225,6 @@ export class EditorController extends ViewController {
       }
     }
     this.sceneSettings.align = viewInfo["align"] || "center";
-    this.sceneSettings.applyKerning = viewInfo["applyKerning"] === false ? false : true;
-    this.sceneSettings.applyCursiveAttachments =
-      viewInfo["applyCursiveAttachments"] === false ? false : true;
-    this.sceneSettings.applyMarkPositioning =
-      viewInfo["applyMarkPositioning"] === false ? false : true;
     this.sceneSettings.featureSettings = viewInfo["featureSettings"] ?? {};
     this.sceneSettings.applyTextShaping =
       viewInfo["applyTextShaping"] === false ? false : true;
@@ -3370,15 +3362,6 @@ export class EditorController extends ViewController {
     }
     if (this.sceneSettings.align !== "center") {
       viewInfo["align"] = this.sceneSettings.align;
-    }
-    if (!this.sceneSettings.applyKerning) {
-      viewInfo["applyKerning"] = this.sceneSettings.applyKerning;
-    }
-    if (!this.sceneSettings.applyCursiveAttachments) {
-      viewInfo["applyCursiveAttachments"] = this.sceneSettings.applyCursiveAttachments;
-    }
-    if (!this.sceneSettings.applyMarkPositioning) {
-      viewInfo["applyMarkPositioning"] = this.sceneSettings.applyMarkPositioning;
     }
     if (!isObjectEmpty(this.sceneSettings.featureSettings)) {
       viewInfo["featureSettings"] = this.sceneSettings.featureSettings;
