@@ -187,7 +187,7 @@ class HBShaper extends ShaperBase {
 
         let glyphs;
         const glyphObjects = this._glyphObjects;
-        let didModifyPositions = false;
+        let didModify = false;
         const beforeLookupId = parseInt(match[1]);
 
         for (const { tag, lookupId } of this.insertMarkers) {
@@ -200,37 +200,26 @@ class HBShaper extends ShaperBase {
               glyphs = this.getGlyphInfoFromBuffer(buffer);
             }
 
-            if (tag == "curs" && applyCursiveAttachments(glyphs, glyphObjects, isRTL)) {
-              didModifyPositions = true;
-            }
-
-            if (
-              kerningPairFunc &&
-              tag == "kern" &&
-              applyKerning(glyphs, kerningPairFunc)
-            ) {
-              didModifyPositions = true;
-            }
-
-            if (
-              tag == "mark" &&
-              applyMarkToBasePositioning(glyphs, glyphObjects, isRTL)
-            ) {
-              didModifyPositions = true;
-            }
-
-            if (
-              tag == "mkmk" &&
-              applyMarkToMarkPositioning(glyphs, glyphObjects, isRTL)
-            ) {
-              didModifyPositions = true;
+            switch (tag) {
+              case "curs":
+                didModify ||= applyCursiveAttachments(glyphs, glyphObjects, isRTL);
+                break;
+              case "kern":
+                didModify ||= applyKerning(glyphs, kerningPairFunc);
+                break;
+              case "mark":
+                didModify ||= applyMarkToBasePositioning(glyphs, glyphObjects, isRTL);
+                break;
+              case "mkmk":
+                didModify ||= applyMarkToMarkPositioning(glyphs, glyphObjects, isRTL);
+                break;
             }
 
             skipFeatures.add(tag);
           }
         }
 
-        if (didModifyPositions) {
+        if (didModify) {
           buffer.updateGlyphPositions(
             glyphs.map((glyph) => ({
               x_advance: glyph.ax,
