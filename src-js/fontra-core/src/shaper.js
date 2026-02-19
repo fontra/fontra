@@ -11,6 +11,8 @@ export function getShaper(shaperSupport) {
 
 export const MAX_UNICODE = 0x0110000;
 
+const EMULATED_FEATURE_TAGS = new Set(["curs", "kern", "mark", "mkmk"]);
+
 class ShaperBase {
   constructor(shaperSupport) {
     const { nominalGlyphFunc, glyphOrder, isGlyphMarkFunc, insertMarkers } =
@@ -54,23 +56,29 @@ class ShaperBase {
       : null;
   }
 
-  applyEmulatedPositioning(glyphs, glyphObjects, options) {
-    const { disabledEmulatedFeatures, kerningPairFunc, direction } = options;
+  applyEmulatedPositioning(
+    glyphs,
+    glyphObjects,
+    skipFeatures,
+    kerningPairFunc,
+    direction
+  ) {
+    const isRTL = direction == "rtl";
 
-    if (!disabledEmulatedFeatures?.has("curs")) {
-      applyCursiveAttachments(glyphs, glyphObjects, direction == "rtl");
+    if (!skipFeatures?.has("curs")) {
+      applyCursiveAttachments(glyphs, glyphObjects, isRTL);
     }
 
-    if (kerningPairFunc && !disabledEmulatedFeatures?.has("kern")) {
+    if (kerningPairFunc && !skipFeatures?.has("kern")) {
       applyKerning(glyphs, kerningPairFunc);
     }
 
-    if (!disabledEmulatedFeatures?.has("mark")) {
-      applyMarkToBasePositioning(glyphs, glyphObjects, direction == "rtl");
+    if (!skipFeatures?.has("mark")) {
+      applyMarkToBasePositioning(glyphs, glyphObjects, isRTL);
     }
 
-    if (!disabledEmulatedFeatures?.has("mkmk")) {
-      applyMarkToMarkPositioning(glyphs, glyphObjects, direction == "rtl");
+    if (!skipFeatures?.has("mkmk")) {
+      applyMarkToMarkPositioning(glyphs, glyphObjects, isRTL);
     }
   }
 }
@@ -123,6 +131,8 @@ class HBShaper extends ShaperBase {
 
     this.font.setVariations(variations || {});
 
+    const skipFeatures = this.setupInsertFeatures(buffer, options);
+
     this._glyphObjects = glyphObjects;
 
     hb.shape(this.font, buffer, features);
@@ -132,7 +142,13 @@ class HBShaper extends ShaperBase {
     const glyphs = this.getGlyphInfoFromBuffer(buffer);
     buffer.destroy();
 
-    this.applyEmulatedPositioning(glyphs, glyphObjects, options);
+    this.applyEmulatedPositioning(
+      glyphs,
+      glyphObjects,
+      skipFeatures,
+      options.kerningPairFunc,
+      options.direction
+    );
 
     return glyphs;
   }
@@ -148,6 +164,89 @@ class HBShaper extends ShaperBase {
       return glyph;
     });
     return glyphs;
+  }
+
+  setupInsertFeatures(buffer, options) {
+    const { disabledEmulatedFeatures, kerningPairFunc, direction } = options;
+
+    if (!this.insertMarkers?.length) {
+      return disabledEmulatedFeatures;
+    }
+
+    const skipFeatures = new Set(disabledEmulatedFeatures);
+    const isRTL = direction == "rtl";
+
+    let gposPhase = false;
+
+    buffer.setMessageFunc((buffer, font, message) => {
+      if (gposPhase) {
+        const match = message.match(/^start lookup (\d+)/);
+        if (!match) {
+          return true;
+        }
+
+        let glyphs;
+        const glyphObjects = this._glyphObjects;
+        let didModifyPositions = false;
+        const beforeLookupId = parseInt(match[1]);
+
+        for (const { tag, lookupId } of this.insertMarkers) {
+          if (
+            !skipFeatures.has(tag) &&
+            EMULATED_FEATURE_TAGS.has(tag) &&
+            beforeLookupId >= lookupId
+          ) {
+            if (glyphs == undefined) {
+              glyphs = this.getGlyphInfoFromBuffer(buffer);
+            }
+
+            if (tag == "curs" && applyCursiveAttachments(glyphs, glyphObjects, isRTL)) {
+              didModifyPositions = true;
+            }
+
+            if (
+              kerningPairFunc &&
+              tag == "kern" &&
+              applyKerning(glyphs, kerningPairFunc)
+            ) {
+              didModifyPositions = true;
+            }
+
+            if (
+              tag == "mark" &&
+              applyMarkToBasePositioning(glyphs, glyphObjects, isRTL)
+            ) {
+              didModifyPositions = true;
+            }
+
+            if (
+              tag == "mkmk" &&
+              applyMarkToMarkPositioning(glyphs, glyphObjects, isRTL)
+            ) {
+              didModifyPositions = true;
+            }
+
+            skipFeatures.add(tag);
+          }
+        }
+
+        if (didModifyPositions) {
+          buffer.updateGlyphPositions(
+            glyphs.map((glyph) => ({
+              x_advance: glyph.ax,
+              y_advance: glyph.ay,
+              x_offset: glyph.dx,
+              y_offset: glyph.dy,
+            }))
+          );
+        }
+      } else if (message.startsWith("start table GPOS")) {
+        gposPhase = true;
+      }
+      return true;
+    });
+
+    return skipFeatures;
   }
 
   _getNominalGlyph(font, codePoint) {
@@ -250,7 +349,14 @@ class DumbShaper extends ShaperBase {
       glyphs.reverse();
     }
 
-    this.applyEmulatedPositioning(glyphs, glyphObjects, options);
+    const skipFeatures = options.disabledEmulatedFeatures;
+    this.applyEmulatedPositioning(
+      glyphs,
+      glyphObjects,
+      skipFeatures,
+      options.kerningPairFunc,
+      options.direction
+    );
 
     return glyphs;
   }
@@ -269,16 +375,23 @@ class DumbShaper extends ShaperBase {
 }
 
 export function applyKerning(glyphs, pairFunc) {
+  let didModifyPositions = false;
+
   for (let i = 1; i < glyphs.length; i++) {
     const kernValue = pairFunc(glyphs[i - 1].gn, glyphs[i].gn);
     if (kernValue) {
       glyphs[i - 1].ax += kernValue;
       glyphs[i].flags |= 1;
+      didModifyPositions = true;
     }
   }
+
+  return didModifyPositions;
 }
 
 export function applyCursiveAttachments(glyphs, glyphObjects, rightToLeft = false) {
+  let didModifyPositions = false;
+
   const [leftPrefix, rightPrefix] = rightToLeft ? ["exit", "entry"] : ["entry", "exit"];
 
   let previousGlyph;
@@ -314,6 +427,7 @@ export function applyCursiveAttachments(glyphs, glyphObjects, rightToLeft = fals
         // Vertical adjustment
         glyph.dy = previousGlyph.dy + exitAnchor.y - entryAnchor.y;
 
+        didModifyPositions = true;
         break;
       }
     }
@@ -322,24 +436,22 @@ export function applyCursiveAttachments(glyphs, glyphObjects, rightToLeft = fals
     previousXAdvance = glyphObject.xAdvance;
     previousExitAnchors = collectAnchors(glyphObject.propagatedAnchors, rightPrefix);
   }
-}
 
-export function applyMarkPositioning(glyphs, glyphObjects, rightToLeft = false) {
-  applyMarkToBasePositioning(glyphs, glyphObjects, rightToLeft);
-  applyMarkToMarkPositioning(glyphs, glyphObjects, rightToLeft);
+  return didModifyPositions;
 }
 
 export function applyMarkToBasePositioning(glyphs, glyphObjects, rightToLeft = false) {
-  _applyMarkPositioning(glyphs, glyphObjects, rightToLeft, false);
+  return _applyMarkPositioning(glyphs, glyphObjects, rightToLeft, false);
 }
 
 export function applyMarkToMarkPositioning(glyphs, glyphObjects, rightToLeft = false) {
-  _applyMarkPositioning(glyphs, glyphObjects, rightToLeft, true);
+  return _applyMarkPositioning(glyphs, glyphObjects, rightToLeft, true);
 }
 
 function _applyMarkPositioning(glyphs, glyphObjects, rightToLeft, markToMark) {
   let previousXAdvance;
   let baseAnchors = {};
+  let didModifyPositions = false;
 
   const ordered = rightToLeft ? reversed : (v) => v;
 
@@ -359,6 +471,7 @@ function _applyMarkPositioning(glyphs, glyphObjects, rightToLeft, markToMark) {
           const markAnchor = markAnchors[anchorName];
           glyph.dx = baseAnchor.x - markAnchor.x - previousXAdvance;
           glyph.dy = baseAnchor.y - markAnchor.y;
+          didModifyPositions = true;
           break;
         }
       }
@@ -379,6 +492,8 @@ function _applyMarkPositioning(glyphs, glyphObjects, rightToLeft, markToMark) {
       previousXAdvance = rightToLeft ? 0 : glyphObject.xAdvance;
     }
   }
+
+  return didModifyPositions;
 }
 
 function collectAnchors(anchors, prefix = "", dx = 0, dy = 0) {
