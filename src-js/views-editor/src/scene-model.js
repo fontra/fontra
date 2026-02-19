@@ -1025,12 +1025,13 @@ export class SceneModel {
       const firstGlyph = line.glyphs[0];
       const lastGlyph = line.glyphs.at(-1);
       const lastGlyphRight = lastGlyph.x + lastGlyph.glyph.xAdvance;
+      const y = line.origin.y;
 
       const metricsBox = {
         xMin: line.bounds ? Math.min(firstGlyph.x, line.bounds.xMin) : firstGlyph.x,
-        yMin: firstGlyph.y + descender,
+        yMin: y + descender,
         xMax: line.bounds ? Math.max(lastGlyphRight, line.bounds.xMax) : lastGlyphRight,
-        yMax: firstGlyph.y + ascender,
+        yMax: y + ascender,
       };
       if (!pointInRect(point.x, point.y, metricsBox)) {
         continue;
