@@ -11,6 +11,7 @@ import {
   range,
   round,
   throttleCalls,
+  updateObject,
 } from "@fontra/core/utils.js";
 import { MenuItemDivider } from "@fontra/web-components/menu-panel.js";
 import { dialog } from "@fontra/web-components/modal-dialog.js";
@@ -1018,8 +1019,11 @@ class KerningTool extends MetricsBaseTool {
 
     this.kerningController = null;
 
-    this.sceneSettingsController.addKeyListener("applyKerning", (event) => {
-      if (!event.newValue && this.sceneController.selectedTool === this) {
+    this.sceneSettingsController.addKeyListener("featureSettings", (event) => {
+      if (
+        this.sceneSettings.featureSettings["kern-emulated"] == false &&
+        this.sceneController.selectedTool === this
+      ) {
         this.editor.setSelectedTool("pointer-tool");
       }
     });
@@ -1221,8 +1225,12 @@ class KerningTool extends MetricsBaseTool {
   activate() {
     super.activate();
 
-    if (!this.sceneSettings.applyKerning) {
-      this.sceneSettings.applyKerning = true;
+    if (this.sceneSettings.featureSettings["kern-emulated"] == false) {
+      this.sceneSettings.featureSettings = updateObject(
+        this.sceneSettings.featureSettings,
+        "kern-emulated",
+        undefined
+      );
     }
 
     this.fontController.getKerningController("kern").then((kerningController) => {
