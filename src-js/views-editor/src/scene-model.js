@@ -1309,8 +1309,8 @@ class LineSetter {
       }
 
       const kernValue =
-        this.kerningPairFunc && glyphIndex > 0
-          ? this.kerningPairFunc(
+        shaperOptions.kerningPairFunc && glyphIndex > 0
+          ? shaperOptions.kerningPairFunc(
               shapedGlyphs[glyphIndex - 1].gn,
               shapedGlyphs[glyphIndex].gn
             )
