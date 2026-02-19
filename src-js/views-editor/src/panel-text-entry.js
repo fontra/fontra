@@ -446,7 +446,7 @@ export default class TextEntryPanel extends Panel {
       },
       {
         id: "gpos-emulated-features-accordion-item",
-        label: "Emulated positioning",
+        label: "Positioning from font data",
         open: true,
         hidden: true,
         content: html.div(
