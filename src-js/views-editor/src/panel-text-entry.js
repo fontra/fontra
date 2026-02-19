@@ -453,7 +453,7 @@ export default class TextEntryPanel extends Panel {
       },
       {
         id: "gsub-features-accordion-item",
-        label: "Substitution features",
+        label: "Substitution",
         open: true,
         hidden: true,
         content: html.div(
@@ -464,7 +464,7 @@ export default class TextEntryPanel extends Panel {
       },
       {
         id: "gpos-emulated-features-accordion-item",
-        label: "Emulated positioning features",
+        label: "Emulated positioning",
         open: true,
         hidden: true,
         content: html.div(
@@ -475,7 +475,7 @@ export default class TextEntryPanel extends Panel {
       },
       {
         id: "gpos-features-accordion-item",
-        label: "Positioning features",
+        label: "Positioning",
         open: true,
         hidden: true,
         content: html.div(
