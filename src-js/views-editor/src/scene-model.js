@@ -482,9 +482,6 @@ export class SceneModel {
       fontController,
       shaper,
       (glyphName, layerName) => this.getGlyphInstance(glyphName, layerName),
-      kerningInstance ? (g1, g2) => kerningInstance.getGlyphPairValue(g1, g2) : null,
-      this.sceneSettings.applyCursiveAttachments,
-      this.sceneSettings.applyMarkPositioning,
       this.sceneSettings.align,
       cancelSignal
     );
@@ -504,6 +501,10 @@ export class SceneModel {
       this.sceneSettings.fontLocationSourceMapped
     );
 
+    const kerningPairFunc = kerningInstance
+      ? (g1, g2) => kerningInstance.getGlyphPairValue(g1, g2)
+      : null;
+
     const shaperOptions = {
       variations: shaperLocation,
       features: featuresString,
@@ -511,6 +512,7 @@ export class SceneModel {
       script: this.sceneSettings.textScript,
       language: this.sceneSettings.textLanguage,
       disabledEmulatedFeatures,
+      kerningPairFunc,
     };
 
     for (const [lineIndex, characterLine] of enumerate(characterLines)) {
@@ -1229,22 +1231,10 @@ function sorted(v) {
 }
 
 class LineSetter {
-  constructor(
-    fontController,
-    shaper,
-    getGlyphInstanceFunc,
-    kerningPairFunc,
-    applyCursiveAttachments,
-    applyMarkPositioning,
-    align,
-    cancelSignal
-  ) {
+  constructor(fontController, shaper, getGlyphInstanceFunc, align, cancelSignal) {
     this.fontController = fontController;
     this.shaper = shaper;
     this.getGlyphInstanceFunc = getGlyphInstanceFunc;
-    this.kerningPairFunc = kerningPairFunc;
-    this.applyCursiveAttachments = applyCursiveAttachments;
-    this.applyMarkPositioning = applyMarkPositioning;
     this.align = align;
     this.cancelSignal = cancelSignal;
     this.glyphInstances = {};
