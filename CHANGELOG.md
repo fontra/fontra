@@ -2,7 +2,7 @@
 
 ## 2026-02-?? [version 2026.3.0]
 
-- [fontra-glyphs] Add support for right-to-left kerning [fontra-glyphs PR 124](https://github.com/fontra/fontra-glyphs/pull/124)
+- [fontra-glyphs] Add support for right-to-left kerning. [fontra-glyphs PR 124](https://github.com/fontra/fontra-glyphs/pull/124)
 - [selection info / dimensions field] When a single off-curve point is selected, show the dimensions of the handle instead of (0, 0). Suggested by Aleksandra Samuļenkova. [PR 2418](https://github.com/fontra/fontra/pull/2418)
 - [designspace/ufo] Fix reading and writing of right-to-left kerning. [PR 2416](https://github.com/fontra/fontra/pull/2416), [PR 2417](https://github.com/fontra/fontra/pull/2417)
 - Fix a bug in anchor sorting, so inconsistently ordered anchors can now really be interpolated. This fixes a bug in the previous attempt to fix this. [PR 2415](https://github.com/fontra/fontra/pull/2415)
