@@ -1549,6 +1549,7 @@ export function ensureDenseSource(source) {
     ),
     guidelines: normalizeGuidelines(source.guidelines || []),
     customData: source.customData || {},
+    italicAngle: source.italicAngle ?? 0,
   };
 }
 
