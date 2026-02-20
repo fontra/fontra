@@ -357,6 +357,8 @@
       <integer>-58</integer>
       <key>public.kern2.w</key>
       <integer>-65</integer>
+      <key>unencodedrtlglyph</key>
+      <integer>-49</integer>
       <key>v</key>
       <integer>-80</integer>
     </dict>

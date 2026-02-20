@@ -358,6 +358,8 @@
     <string>twoinferior.glif</string>
     <key>twosuperior</key>
     <string>twosuperior.glif</string>
+    <key>unencodedrtlglyph</key>
+    <string>unencodedrtlglyph.glif</string>
     <key>v</key>
     <string>v.glif</string>
     <key>vav</key>
