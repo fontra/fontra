@@ -2246,7 +2246,6 @@ def getGlyphMapFromGlyphSet(glyphSet):
     for glyphName in glyphSet.keys():
         glifData = glyphSet.getGLIF(glyphName)
         gn, codePoints = extractGlyphNameAndCodePoints(glifData)
-        assert gn == glyphName, (gn, glyphName)
         glyphMap[glyphName] = codePoints
     return glyphMap
 
