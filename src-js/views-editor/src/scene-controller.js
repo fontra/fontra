@@ -91,6 +91,7 @@ export class SceneController {
   setupSceneSettings() {
     this.sceneSettingsController = new ObservableController({
       text: "",
+      textSize: 12,
       align: "center",
       applyKerning: true,
       editLayerName: null,

@@ -21,6 +21,7 @@ import {
 } from "@fontra/core/path-functions.js";
 import {
   centeredRect,
+  pointInRect,
   rectAddMargin,
   rectCenter,
   rectFromArray,
@@ -170,6 +171,7 @@ export class EditorController extends ViewController {
         "selection",
         "substituteGlyphName",
         "text",
+        "textSize",
         "viewBox",
       ],
       (event) => {
@@ -424,6 +426,15 @@ export class EditorController extends ViewController {
           }
           return !this.canvasController.isActualViewBox(viewBox);
         }
+      );
+
+      registerAction(
+        "action.zoom-to-font-size",
+        {
+          topic,
+          titleKey: "meunbar.view.zoom-to-font-size",
+        },
+        () => this.zoomToFontSize(this.sceneSettings.textSize)
       );
 
       registerAction(
@@ -3234,6 +3245,10 @@ export class EditorController extends ViewController {
     }
     this._previousURLText = viewInfo["text"];
 
+    if (viewInfo["textSize"]) {
+      this.sceneSettings.textSize = viewInfo["textSize"];
+    }
+
     this.sceneModel.setGlyphLocations(viewInfo["glyphLocations"]);
 
     if (viewInfo["fontAxesUseSourceCoordinates"]) {
@@ -3306,6 +3321,9 @@ export class EditorController extends ViewController {
     if (this.sceneSettings.text?.length) {
       viewInfo["text"] = this.sceneSettings.text;
     }
+    if (this.sceneSettings.textSize) {
+      viewInfo["textSize"] = this.sceneSettings.textSize;
+    }
     if (this.sceneSettings.selectedGlyph) {
       viewInfo["selectedGlyph"] = this.sceneSettings.selectedGlyph;
     }
@@ -3370,6 +3388,31 @@ export class EditorController extends ViewController {
 
   zoomOut() {
     this._zoom(Math.sqrt(2));
+  }
+
+  zoomToFontSize(size, animate = true) {
+    // TODO: does this function need modifications to work with vertical layout?
+    let viewBox = this.sceneSettings.viewBox;
+    const upm = this.fontController.unitsPerEm;
+    const canvasHeight = this.canvasController.canvasHeight;
+
+    const pixel_size = (4 / 3) * size; // pt to px
+    const currentHeight = (viewBox.yMax - viewBox.yMin) / upm;
+    const desiredHeight = canvasHeight / pixel_size;
+
+    const selBox = this.sceneController.getSelectionBounds();
+    let center = rectCenter(selBox || viewBox);
+    // avoid going completely off-screen when zoomed in very close
+    if (currentHeight < 1.0 || !pointInRect(center.x, center.y, viewBox)) {
+      center = rectCenter(viewBox);
+    }
+    viewBox = rectScaleAroundCenter(viewBox, desiredHeight / currentHeight, center);
+    if (animate) {
+      this.animateToViewBox(viewBox);
+    } else {
+      this.sceneSettings.viewBox = viewBox;
+    }
+    this.sceneController.autoViewBox = false;
   }
 
   _zoom(factor) {
