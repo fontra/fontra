@@ -1,4 +1,4 @@
-import initBuildShaperFont, { buildShaperFont } from "build-shaper-font";
+import { buildShaperFont } from "build-shaper-font";
 import { Backend } from "./backend-api.js";
 import { recordChanges } from "./change-recorder.js";
 import {
@@ -45,8 +45,6 @@ import {
 /**
  * @import { RemoteFont, FontSource } from 'remotefont';
  * */
-
-await initBuildShaperFont();
 
 const GLYPH_CACHE_SIZE = 2000;
 const BACKGROUND_IMAGE_CACHE_SIZE = 100;
