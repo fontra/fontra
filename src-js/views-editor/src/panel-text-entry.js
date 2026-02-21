@@ -6,6 +6,96 @@ import { findNestedActiveElement } from "@fontra/core/utils.js";
 import { Accordion } from "@fontra/web-components/ui-accordion.js";
 import Panel from "./panel.js";
 
+// These features are on by default. See hb-ot-shape.cc
+const commonOnFeatures = [
+  "abvm",
+  "blwm",
+  "ccmp",
+  "locl",
+  "mark",
+  "mark-emulated",
+  "mkmk",
+  "mkmk-emulated",
+  "rlig",
+  "rvrn",
+  "rand",
+  "Harf",
+  "HARF",
+  "Buzz",
+  "BUZZ",
+];
+
+// These features are on by default for horizontal writing. See hb-ot-shape.cc
+const horizontalOnFeatures = new Set([
+  ...commonOnFeatures,
+  "calt",
+  "clig",
+  "curs",
+  "curs-emulated",
+  "dist",
+  "kern",
+  "kern-emulated",
+  "liga",
+  "rclt",
+]);
+
+// These features are on by default for vertical writing. See hb-ot-shape.cc
+const verticalOnFeatures = new Set([...commonOnFeatures, "vert"]);
+
+// HarfBuzz may toggle these features. See hb-ot-shape.cc
+const miscDynamicFeatures = [
+  "frac", // for automatic fractions
+  "numr", // for automatic fractions
+  "dnom", // for automatic fractions
+  "ltra",
+  "ltrm",
+  "rtla",
+  "rtlm",
+  "vkrn",
+];
+
+// HarfBuzz may toggle these features. See hb-ot-shaper-*.cc
+const dynamicFeatures = new Set([
+  ...miscDynamicFeatures,
+  "abvf", // indic, khmer, use
+  "abvs", // indic, khmer, myanmar, use
+  "akhn", // indic, use
+  "blwf", // indic, khmer, myanmar, use
+  "blws", // indic, khmer, myanmar, use
+  // "calt", // arabic, hangul
+  // "ccmp", // arabic, indic, khmer, myanmar, use
+  "cfar", // khmer
+  "cjct", // indic, use
+  "clig", // arabic, khmer
+  "cswh", // arabic
+  "fin2", // arabic
+  "fin3", // arabic
+  "fina", // arabic, use
+  "half", // indic, use
+  "haln", // indic, use
+  "init", // arabic, indic, use
+  "isol", // arabic, use
+  "liga", // arabic, indic, khmer. NOTE: khmer turns liga *off*
+  "ljmo", // hangul
+  // "locl", // arabic, indic, khmer, myanmar, use
+  "med2", // arabic
+  "medi", // arabic, use
+  "mset", // arabic
+  "nukt", // indic, use
+  "pref", // indic, khmer, myanmar, use
+  "pres", // indic, khmer, myanmar, use
+  "pstf", // indic, khmer, myanmar, use
+  "psts", // indic, khmer, myanmar, use
+  // "rclt", // arabic
+  "rkrf", // indic, use
+  // "rlig", // arabic
+  "rphf", // indic, myanmar, use
+  "stch", // arabic
+  "tjmo", // hangul
+  "vatu", // indic, use
+  "vjmo", // hangul
+]);
+
 export default class TextEntryPanel extends Panel {
   identifier = "text-entry";
   iconPath = "/images/texttool.svg";
@@ -521,8 +611,18 @@ export default class TextEntryPanel extends Panel {
         const cleanTag = tag.slice(0, 4); // strip "-emulated"
         const [featureDescription, url] = features[cleanTag] ?? ["", null];
         const label = info[tag]?.uiLabelName || featureDescription;
+
+        const defaultValue = horizontalOnFeatures.has(tag)
+          ? true
+          : dynamicFeatures.has(tag)
+          ? undefined
+          : false;
+
         element.append(
-          ...featureTagButton(this.textSettingsController, tag, label, { url })
+          ...featureTagButton(this.textSettingsController, tag, label, {
+            url,
+            defaultValue,
+          })
         );
       });
     }
@@ -610,7 +710,7 @@ function featureTagButton(controller, featureTag, label, options) {
   const updateState = () => {
     buttonElement.classList.remove("on");
     buttonElement.classList.remove("off");
-    switch (state) {
+    switch (state === undefined ? options.defaultValue : state) {
       case undefined:
         break;
       case false:
@@ -622,20 +722,24 @@ function featureTagButton(controller, featureTag, label, options) {
   };
 
   const toggleState = (reverse = false) => {
-    switch (state) {
-      case undefined:
-        state = reverse ? false : true;
-        break;
-      case false:
-        state = reverse ? true : undefined;
-        break;
-      default:
-        state = reverse ? undefined : false;
+    if (options.defaultValue !== undefined) {
+      state = state === undefined ? !options.defaultValue : !state;
+    } else {
+      switch (state) {
+        case undefined:
+          state = reverse ? false : true;
+          break;
+        case false:
+          state = reverse ? true : undefined;
+          break;
+        default:
+          state = reverse ? undefined : false;
+      }
     }
 
     const features = { ...controller.model[controllerKey] };
 
-    if (state !== undefined) {
+    if (state !== options.defaultValue) {
       features[featureTag] = state;
     } else {
       delete features[featureTag];
