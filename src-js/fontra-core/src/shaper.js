@@ -200,28 +200,46 @@ class HBShaper extends ShaperBase {
           ) {
             if (glyphs == undefined) {
               glyphs = this.getGlyphInfoFromBuffer(buffer);
+              if (isRTL) {
+                glyphs.reverse();
+              }
             }
+
+            let applyDidModify = false;
 
             switch (tag) {
               case "curs":
-                didModify ||= applyCursiveAttachments(glyphs, glyphObjects, isRTL);
+                applyDidModify = applyCursiveAttachments(glyphs, glyphObjects, isRTL);
                 break;
               case "kern":
-                didModify ||= applyKerning(glyphs, kerningPairFunc);
+                applyDidModify = applyKerning(glyphs, kerningPairFunc);
                 break;
               case "mark":
-                didModify ||= applyMarkToBasePositioning(glyphs, glyphObjects, isRTL);
+                applyDidModify = applyMarkToBasePositioning(
+                  glyphs,
+                  glyphObjects,
+                  isRTL
+                );
                 break;
               case "mkmk":
-                didModify ||= applyMarkToMarkPositioning(glyphs, glyphObjects, isRTL);
+                applyDidModify = applyMarkToMarkPositioning(
+                  glyphs,
+                  glyphObjects,
+                  isRTL
+                );
                 break;
             }
+
+            didModify ||= applyDidModify;
 
             skipFeatures.add(tag);
           }
         }
 
         if (didModify) {
+          if (isRTL) {
+            glyphs.reverse();
+          }
           buffer.updateGlyphPositions(
             glyphs.map((glyph) => ({
               x_advance: glyph.ax,
