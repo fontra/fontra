@@ -1,3 +1,5 @@
+import { buildShaperFont } from "build-shaper-font";
+import { Backend } from "./backend-api.js";
 import { recordChanges } from "./change-recorder.js";
 import {
   applyChange,
@@ -11,9 +13,11 @@ import { getGlyphMapProxy, makeCharacterMapFromGlyphMap } from "./cmap.js";
 import { CrossAxisMapping } from "./cross-axis-mapping.js";
 import { FontSourcesInstancer } from "./font-sources-instancer.js";
 import { StaticGlyphController, VariableGlyphController } from "./glyph-controller.js";
+import { getGlyphInfoFromCodePoint, getGlyphInfoFromGlyphName } from "./glyph-data.js";
 import { KerningController } from "./kerning-controller.js";
 import { LRUCache } from "./lru-cache.js";
 import { setPopFirst } from "./set-ops.js";
+import { getShaper } from "./shaper.js";
 import { TaskPool } from "./task-pool.js";
 import {
   assert,
@@ -83,12 +87,22 @@ export class FontController {
     this._rootClassDef = (await getClassSchema())["Font"];
     this.backendInfo = await this.font.getBackEndInfo();
     this.readOnly = await this.font.isReadOnly();
+    this._isMarkCache = {};
 
     if (initListener) {
       this.addChangeListener(
         { axes: null, sources: null },
         (change, isExternalChange) => {
           this._purgeCachesRelatedToAxesAndSourcesChanges();
+        },
+        false,
+        true // immediate
+      );
+
+      this.addChangeListener(
+        { glyphMap: null },
+        (change, isExternalChange) => {
+          this._isMarkCache = {};
         },
         false,
         true // immediate
@@ -170,7 +184,7 @@ export class FontController {
   }
 
   async getFeatures() {
-    return await this.getData("features");
+    return { language: "fea", text: "", ...(await this.getData("features")) };
   }
 
   async getKerning() {
@@ -340,6 +354,83 @@ export class FontController {
       type: imageType,
       data,
     });
+  }
+
+  async getShaperFontData(textShaping) {
+    let fontData = null;
+    let messages = [];
+    let formattedMessages = "";
+    let insertMarkers = null;
+    let canEmulateSomeGPOS = false;
+
+    const glyphOrder = Object.keys(this.glyphMap);
+
+    if (textShaping) {
+      let shaperFontData = await this.font.getShaperFontData();
+
+      if (shaperFontData) {
+        const fontDataBase64 = shaperFontData.data;
+        if (shaperFontData.glyphOrderSorting == "sorted") {
+          glyphOrder.sort();
+        }
+        if (fontDataBase64) {
+          const blob = await (
+            await fetch(`data:font/opentype;base64,${fontDataBase64}`)
+          ).blob();
+          fontData = await blob.arrayBuffer();
+        }
+      } else {
+        glyphOrder.sort();
+        ensureNotdef(glyphOrder);
+        ({ fontData, messages, formattedMessages, insertMarkers } =
+          await this.buildShaperFont(glyphOrder));
+        canEmulateSomeGPOS = true;
+      }
+    } else {
+      glyphOrder.sort();
+      ensureNotdef(glyphOrder);
+      insertMarkers = [];
+    }
+
+    return {
+      fontData,
+      glyphOrder,
+      messages,
+      formattedMessages,
+      insertMarkers,
+      canEmulateSomeGPOS,
+    };
+  }
+
+  async buildShaperFont(glyphOrder) {
+    const features = await this.getFeatures();
+
+    try {
+      return buildShaperFont(
+        this.unitsPerEm,
+        glyphOrder,
+        features.text,
+        this.axes.axes
+          .filter((axis) => !axis.values) // Filter out discrete axes
+          .map((axis) => ({
+            tag: axis.tag,
+            minValue: axis.minValue,
+            defaultValue: axis.defaultValue,
+            maxValue: axis.maxValue,
+          })),
+        [] // TODO: ds-style fea-var rules
+      );
+    } catch (e) {
+      console.error(e);
+      return {
+        fontData: null,
+        messages: [
+          { text: e.message || e.toString(), span: [0, 0], level: "exception" },
+        ],
+        formattedMessages: e.message || e.toString(),
+        insertMarkers: [],
+      };
+    }
   }
 
   getCachedGlyphNames() {
@@ -904,6 +995,7 @@ export class FontController {
     this._glyphsPromiseCache.clear();
     this._glyphInstancePromiseCache.clear();
     this._glyphInstancePromiseCacheKeys = {};
+
     await this.initialize(false);
     this.notifyChangeListeners(null, false, true);
   }
@@ -1024,6 +1116,33 @@ export class FontController {
   async _getKerningController(kernTag) {
     // Do not inline: the this.getKerning() call must be part of the promise
     return new KerningController(kernTag, await this.getKerning(), this);
+  }
+
+  async getShaper(textShaping) {
+    await this.ensureInitialized;
+
+    const {
+      glyphOrder,
+      fontData,
+      messages,
+      formattedMessages,
+      insertMarkers,
+      canEmulateSomeGPOS,
+    } = await this.getShaperFontData(textShaping);
+
+    {
+      // characterMap closure
+      const characterMap = this.characterMap;
+      const shaperSupport = {
+        fontData,
+        nominalGlyphFunc: (codePoint) => characterMap[codePoint],
+        glyphOrder,
+        isGlyphMarkFunc: (glyphName) => this.isMark(glyphName),
+        insertMarkers,
+      };
+      const shaper = getShaper(shaperSupport);
+      return { shaper, messages, formattedMessages, canEmulateSomeGPOS };
+    }
   }
 
   get defaultSourceLocation() {
@@ -1214,6 +1333,33 @@ export class FontController {
 
     return { glyphs, backgroundImageData };
   }
+
+  isMark(glyphName) {
+    let isMark = this._isMarkCache[glyphName];
+    if (isMark === undefined) {
+      isMark = this._isMark(glyphName);
+      this._isMarkCache[glyphName] = isMark;
+    }
+    return isMark;
+  }
+
+  _isMark(glyphName) {
+    const codePoints = this.glyphMap[glyphName] || [];
+    if (!codePoints.length) {
+      const info = getGlyphInfoFromGlyphName(glyphName);
+      if (info?.category === "Mark") {
+        return true;
+      }
+    } else {
+      for (const codePoint of codePoints) {
+        const info = getGlyphInfoFromCodePoint(codePoint);
+        if (info?.category === "Mark") {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
 }
 
 export function reverseUndoRecord(undoRecord) {
@@ -1401,6 +1547,7 @@ export function ensureDenseSource(source) {
     ),
     guidelines: normalizeGuidelines(source.guidelines || []),
     customData: source.customData || {},
+    italicAngle: source.italicAngle ?? 0,
   };
 }
 
@@ -1483,4 +1630,15 @@ function remapBackgroundImageData(backgroundImageData, backgroundImageMapping) {
         (identifier) => backgroundImageMapping[identifier] || identifier
       )
     : undefined;
+}
+
+function ensureNotdef(glyphOrder) {
+  if (glyphOrder[0] === ".notdef") {
+    return;
+  }
+  const index = glyphOrder.indexOf(".notdef");
+  if (index != -1) {
+    glyphOrder.splice(index, 1);
+  }
+  glyphOrder.unshift(".notdef");
 }

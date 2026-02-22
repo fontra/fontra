@@ -1,0 +1,182 @@
+import { getCodePointFromGlyphName, getSuggestedGlyphName } from "./glyph-data.js";
+import { assert, splitGlyphNameExtension } from "./utils.js";
+
+export function characterLinesFromString(
+  string,
+  characterMap,
+  glyphMap,
+  substituteGlyphName
+) {
+  const characterLines = [];
+  for (const line of string.split(/\r?\n/)) {
+    characterLines.push(
+      characterLineFromSingleLineString(
+        line,
+        characterMap,
+        glyphMap,
+        substituteGlyphName
+      )
+    );
+  }
+  return characterLines;
+}
+
+function characterLineFromSingleLineString(
+  string,
+  characterMap,
+  glyphMap,
+  substituteGlyphName
+) {
+  const characterInfo = [];
+
+  for (let i = 0; i < string.length; i++) {
+    let glyphName;
+    let character = string[i];
+    let isPlaceholder = false;
+    if (character == "/") {
+      i++;
+      if (string[i] == "/") {
+        // Literal "//", this is the slash character
+        glyphName = characterMap["/".codePointAt(0)];
+      } else if (string[i] == "?") {
+        // /? placeholder substitution
+        glyphName = substituteGlyphName || "--placeholder--";
+        character = characterFromGlyphName(glyphName, characterMap, glyphMap);
+        isPlaceholder = true;
+      } else {
+        // /glyphname
+        // Find the first character that is a slash or a space as the end of the glyph name,
+        // or else the glyph name goes until the end of the string
+        const result = parseGlyphName(string, i);
+        glyphName = result.glyphName;
+        i = result.i;
+
+        if (!glyphName) {
+          // Incomplete glyph name at the end of the input string. Ignore.
+          continue;
+        }
+
+        character = characterFromGlyphName(glyphName, characterMap, glyphMap);
+        if (glyphName && !character && !glyphMap[glyphName]) {
+          const result = expandGlyphName(glyphName, characterMap);
+          glyphName = result.glyphName;
+          character = result.character;
+        }
+      }
+    } else {
+      const codePoint = string.codePointAt(i);
+      glyphName = characterMap[codePoint];
+      if (codePoint >= 0x10000) {
+        i++;
+      }
+      character = String.fromCodePoint(codePoint);
+    }
+
+    // glyphName may be undefined *or* a non-empty string.
+    assert(glyphName !== "");
+    characterInfo.push({ character, glyphName, isPlaceholder });
+  }
+
+  return characterInfo;
+}
+
+export function stringFromCharacterLines(characterLines) {
+  const textLines = [];
+  for (const characterLine of characterLines) {
+    let textLine = "";
+    for (let i = 0; i < characterLine.length; i++) {
+      const glyphInfo = characterLine[i];
+      if (glyphInfo.isPlaceholder) {
+        textLine += "/?";
+      } else if (glyphInfo.character === "/") {
+        // special-case slash, since it is the glyph name indicator character,
+        // and needs to be escaped
+        textLine += "//";
+      } else if (glyphInfo.character) {
+        textLine += glyphInfo.character;
+      } else {
+        textLine += "/" + glyphInfo.glyphName;
+        if (characterLine[i + 1]?.character) {
+          textLine += " ";
+        }
+      }
+    }
+    textLines.push(textLine);
+  }
+  return textLines.join("\n");
+}
+
+function isPlainLatinLetter(glyphName) {
+  return glyphName.match(/^[A-Za-z]$/);
+}
+
+function characterFromGlyphName(glyphName, characterMap, glyphMap) {
+  var character = undefined;
+  for (const codePoint of glyphMap[glyphName] || []) {
+    if (characterMap[codePoint] === glyphName) {
+      character = String.fromCodePoint(codePoint);
+      break;
+    }
+  }
+  return character;
+}
+
+const glyphNameEndRE = /[//\s]/g;
+
+function parseGlyphName(string, i) {
+  let glyphName;
+
+  glyphNameEndRE.lastIndex = i;
+  glyphNameEndRE.test(string);
+  let j = glyphNameEndRE.lastIndex;
+
+  if (j == 0) {
+    glyphName = string.slice(i);
+    i = string.length - 1;
+  } else {
+    j--;
+    glyphName = string.slice(i, j);
+    if (string[j] == "/") {
+      i = j - 1;
+    } else {
+      i = j;
+    }
+  }
+
+  return { glyphName, i };
+}
+
+function expandGlyphName(glyphName, characterMap) {
+  // See if the "glyph name" after stripping the extension (if any)
+  // happens to be a character that we know a glyph name for.
+  // This allows us to write /Å.alt instead of /Aring.alt in the
+  // text entry field.
+  let character;
+
+  const [baseGlyphName, extension] = splitGlyphNameExtension(glyphName);
+  const baseCodePoint = baseGlyphName.codePointAt(0);
+  const charString = String.fromCodePoint(baseCodePoint);
+  if (baseGlyphName === charString && !isPlainLatinLetter(baseGlyphName)) {
+    // The base glyph name is a single character, let's see if there's
+    // a glyph name associated with that character
+    let properBaseGlyphName = characterMap[baseCodePoint];
+    if (!properBaseGlyphName) {
+      properBaseGlyphName = getSuggestedGlyphName(baseCodePoint);
+    }
+    if (properBaseGlyphName) {
+      glyphName = properBaseGlyphName + extension;
+      if (!extension) {
+        character = charString;
+      }
+    }
+  } else {
+    // This is a regular glyph name, but it doesn't exist in the font.
+    // Try to see if there's a code point associated with it.
+    const codePoint = getCodePointFromGlyphName(glyphName);
+    if (codePoint) {
+      character = String.fromCodePoint(codePoint);
+    }
+  }
+
+  return { glyphName, character };
+}

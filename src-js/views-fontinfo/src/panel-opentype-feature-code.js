@@ -27,7 +27,7 @@ import {
 import { simpleMode } from "@codemirror/legacy-modes/mode/simple-mode";
 import { lintKeymap } from "@codemirror/lint";
 import { highlightSelectionMatches, searchKeymap } from "@codemirror/search";
-import { EditorState } from "@codemirror/state";
+import { EditorSelection, EditorState } from "@codemirror/state";
 import {
   crosshairCursor,
   drawSelection,
@@ -42,49 +42,107 @@ import {
 } from "@codemirror/view";
 import * as html from "@fontra/core/html-utils.js";
 import { addStyleSheet } from "@fontra/core/html-utils.js";
-import { scheduleCalls } from "@fontra/core/utils.js";
+import { compare, scheduleCalls } from "@fontra/core/utils.js";
+import { themeColorCSS } from "@fontra/web-components/theme-support.js";
 import { Tag } from "@lezer/highlight";
 import { BaseInfoPanel } from "./panel-base.js";
 
-addStyleSheet(`
-:root {
-  --comment-color-light: var(--fontra-theme-marker) #676e78;
-  --comment-color-dark: #a2a2a2;
-  --keyword-color-light: var(--fontra-theme-marker) #0b57d0;
-  --keyword-color-dark: #75bfff;
-  --glyph-class-color-light: var(--fontra-theme-marker) #b90063;
-  --glyph-class-color-dark: #ff7de9;
-  --glyph-range-color-light: var(--fontra-theme-marker) #b95a00;
-  --glyph-range-color-dark: #ffbe7d;
-  --named-glyph-class-color-light: var(--fontra-theme-marker) #198639;
-  --named-glyph-class-color-dark: #86de74;
+const colors = {
+  "comment-color": ["#676e78", "#a2a2a2"],
+  "keyword-color": ["#0b57d0", "#75bfff"],
+  "glyph-class-color": ["#b90063", "#ff7de9"],
+  "named-glyph-class-color": ["#198639", "#86de74"],
+  "glyph-range-color": ["#b95a00", "#ffbe7d"],
+  "feature-error-box-color": ["#f885", "#f885"],
+  "feature-warning-box-color": ["#bf84", "#bf84"],
+  "feature-error-highlight-color": ["#d665", "#d665"],
+  "feature-warning-highlight-color": ["#6e44", "#6e44"],
+};
 
-  --comment-color: var(--comment-color-light, var(--comment-color-dark));
-  --keyword-color: var(--keyword-color-light, var(--keyword-color-dark));
-  --glyph-class-color: var(--glyph-class-color-light, var(--glyph-class-color-dark));
-  --glyph-range-color: var(--glyph-range-color-light, var(--glyph-range-color-dark));
-  --named-glyph-class-color: var(--named-glyph-class-color-light, var(--named-glyph-class-color-dark));
-}
+addStyleSheet(`
+  ${themeColorCSS(colors, ":root")}
 
 #opentype-feature-code-panel {
   height: 100%;
 }
 
 .font-info-opentype-feature-code-container {
+  display: grid;
+  grid-template-rows: min-content auto min-content;
   background-color: var(--ui-element-background-color);
   border-radius: 0.5em;
   overflow: hidden;
 }
 
 .font-info-opentype-feature-code-header {
+  display: grid;
+  grid-template-columns: max-content auto;
+  align-items: center;
+  gap: 1em;
   font-weight: bold;
-  padding: 1em;
-  padding-bottom: 0.5em;
+  padding: 0.6em 1em 0.6em 1em;
+}
+
+#font-info-opentype-feature-code-error-box {
+  display: grid;
+  grid-template-columns: auto;
+  justify-content: stretch;
+  gap: 0.2em;
+  margin-top: 0.2em;
+  max-height: 30vh;
+  overflow-y: auto;
+}
+
+
+#font-info-opentype-feature-code-error-box.hidden {
+  display: none;
+}
+
+.font-info-opentype-feature-code-message-box {
+  display: grid;
+  grid-template-columns: min-content minmax(max-content, 12em) minmax(max-content, 4em) auto;
+  justify-content: start;
+  align-items: center;
+  gap: 0.5em;
+  padding: 0.2em 0.5em 0.2em 0.5em;
+  border-radius: 0.5em;
+  background-color: var(--feature-error-box-color);
+  cursor: pointer;
+}
+
+.font-info-opentype-feature-code-message-box.warning {
+  background-color: var(--feature-warning-box-color);
+}
+
+.font-info-opentype-feature-code-message-box > inline-svg {
+  display: inline-block;
+  width: 1.25em;
+  height: 1.25em;
+}
+
+.font-info-opentype-feature-code-message-box > pre {
+  margin: 0;
+}
+
+.font-info-opentype-feature-code-message-box .fea-error-highlight {
+  font-weight: bold;
+  background-color: var(--feature-warning-highlight-color);
+}
+
+.font-info-opentype-feature-code-message-box.error .fea-error-highlight {
+  background-color: var(--feature-error-highlight-color);
+}
+
+.font-info-opentype-feature-code-show-more-less {
+  justify-self: start;
+  padding: 0em 1em 0.2em 1em;
+  cursor: pointer;
 }
 
 #font-info-opentype-feature-code-text-entry-textarea {
   font-size: 1.1em;
-  height: calc(100% - 2.4em);
+  height: 100%;
+  overflow: hidden;
 }
 
 #font-info-opentype-feature-code-text-entry-textarea > .cm-editor {
@@ -110,12 +168,12 @@ const openTypeFeatureCodeSimpleMode = simpleMode({
       token: "keyword",
     },
     {
-      regex: /\[\s*\\?[a-zA-Z0-9_.-]+(?:\s+\\?[a-zA-Z0-9_.-]+)*\s*\]/,
-      token: "glyphClass",
-    },
-    {
       regex: /\[\s*(\\?[a-zA-Z0-9_.]+)\s*-\s*(\\?[a-zA-Z0-9_.]+)\s*\]/,
       token: "glyphRange",
+    },
+    {
+      regex: /\[\s*\\?[a-zA-Z0-9_.-]+(?:\s+\\?[a-zA-Z0-9_.-]+)*\s*\]/,
+      token: "glyphClass",
     },
     { regex: /@[a-zA-Z0-9_.-]+/, token: "namedGlyphClass" },
   ],
@@ -182,8 +240,14 @@ const customTheme = EditorView.theme({
     backgroundColor: "transparent",
     color: "var(--ui-element-foreground-color)",
   },
+  ".cm-scroller > .cm-selectionLayer .cm-selectionBackground": {
+    backgroundColor: "#BBB5",
+  },
   "&.cm-focused > .cm-scroller > .cm-selectionLayer .cm-selectionBackground": {
-    backgroundColor: "#D3E3FD",
+    backgroundColor: "#A6CCF250",
+  },
+  ".cm-selectionMatch": {
+    backgroundColor: "#99ff7750",
   },
   ".cm-tooltip": {
     backgroundColor: "var(--background-color)",
@@ -213,7 +277,7 @@ export class OpenTypeFeatureCodePanel extends BaseInfoPanel {
   async setupUI() {
     this.updateFeatureCode = scheduleCalls(
       (update) => this._updateFeatureCode(update),
-      500
+      350
     );
     const features = await this.fontController.getFeatures();
     this.panelElement.innerHTML = "";
@@ -226,6 +290,7 @@ export class OpenTypeFeatureCodePanel extends BaseInfoPanel {
         "OpenType Feature Code", // TODO: translation
       ])
     );
+
     const editorContainer = html.div(
       { id: "font-info-opentype-feature-code-text-entry-textarea" },
       []
@@ -277,7 +342,17 @@ export class OpenTypeFeatureCodePanel extends BaseInfoPanel {
     });
 
     container.appendChild(editorContainer);
+
     this.panelElement.appendChild(container);
+
+    container.appendChild(
+      html.div({ id: "font-info-opentype-feature-code-error-box", class: "hidden" }, [
+        "",
+      ])
+    );
+
+    this.showAllErrors = false;
+    await this.checkCompileErrors();
   }
 
   async _updateFeatureCode(update) {
@@ -289,6 +364,90 @@ export class OpenTypeFeatureCodePanel extends BaseInfoPanel {
         root.features.text = update.state.doc.toString();
       }
     );
+
+    await this.checkCompileErrors();
+  }
+
+  async checkCompileErrors() {
+    const { errors, messages, formattedMessages } =
+      await this.fontController.getShaperFontData(true);
+
+    const errorElement = document.querySelector(
+      "#font-info-opentype-feature-code-error-box"
+    );
+
+    errorElement.innerText = "";
+
+    // Messages don't always arrived sorted by position in fea source
+    messages.sort(feaMessageCompare);
+    const numMessages = messages.length;
+
+    for (const message of this.showAllErrors ? messages : messages.slice(0, 1)) {
+      let [spanFrom, spanTo] = message.span;
+      const lineInfo = this.editorView.state.doc.lineAt(spanFrom);
+      spanTo = Math.min(spanTo, lineInfo.to);
+      const spanInLineFrom = spanFrom - lineInfo.from;
+      const spanInLineTo = spanTo - lineInfo.from;
+      const isWarning = message.level == "warning";
+      const isException = message.level == "exception";
+
+      const lineNumberString = isException ? "" : `Line ${lineInfo.number}`;
+      const lineItems = isException
+        ? [""]
+        : [
+            lineInfo.text.slice(0, spanInLineFrom),
+            html.span({ class: "fea-error-highlight" }, [
+              lineInfo.text.slice(spanInLineFrom, spanInLineTo),
+            ]),
+            lineInfo.text.slice(spanInLineTo),
+          ];
+
+      errorElement.appendChild(
+        html.div(
+          {
+            class: `font-info-opentype-feature-code-message-box ${message.level}`,
+            onclick: () => (isException ? () => null : this.goToSpan(spanFrom, spanTo)),
+          },
+          [
+            html.createDomElement("inline-svg", {
+              class: "font-info-opentype-feature-code-error-icon",
+              src: isWarning
+                ? "/tabler-icons/alert-triangle.svg"
+                : "/tabler-icons/bug.svg",
+            }),
+            message.text,
+            html.div({ class: "fea-error-line-number" }, [lineNumberString]),
+            html.pre({ class: "fea-error-line" }, lineItems),
+          ]
+        )
+      );
+    }
+
+    if (numMessages > 1) {
+      errorElement.appendChild(
+        html.div(
+          {
+            class: "font-info-opentype-feature-code-show-more-less",
+            onclick: (event) => {
+              this.showAllErrors = !this.showAllErrors;
+              this.checkCompileErrors();
+            },
+          },
+          [this.showAllErrors ? "Show less..." : "Show more..."]
+        )
+      );
+    }
+
+    errorElement.classList.toggle("hidden", !messages.length);
+  }
+
+  goToSpan(spanFrom, spanTo) {
+    this.editorView.dispatch({
+      selection: EditorSelection.create([EditorSelection.range(spanTo, spanFrom)], 0),
+      scrollIntoView: true,
+    });
+
+    this.editorView.focus();
   }
 
   getUndoRedoLabel(isRedo) {
@@ -390,4 +549,35 @@ function myCompletions(context) {
     options: completions,
     validFor: /^\w*$/,
   };
+}
+
+function parseFeaMessages(messages) {
+  const feaErrorRegex = /^in .+? at (\d+):(\d+)$/gm;
+
+  const chunks = [{ startIndex: 0 }];
+
+  while (true) {
+    const result = feaErrorRegex.exec(messages);
+    if (!result) {
+      chunks.at(-1).endIndex = messages.length;
+      break;
+    }
+    chunks.at(-1).endIndex = result.index;
+    chunks.push({
+      startIndex: result.index,
+      lineNumber: parseInt(result[1]),
+      charNumber: parseInt(result[2]),
+    });
+  }
+
+  return chunks;
+}
+
+const feaMessageLevels = ["error", "warning", "info"];
+
+function feaMessageCompare(a, b) {
+  return (
+    compare(feaMessageLevels.indexOf(a.level), feaMessageLevels.indexOf(b.level)) ||
+    compare(a.span[0], b.span[0])
+  );
 }

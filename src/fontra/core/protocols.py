@@ -13,6 +13,7 @@ from .classes import (
     ImageData,
     Kerning,
     OpenTypeFeatures,
+    ShaperFontData,
     VariableGlyph,
 )
 
@@ -47,6 +48,9 @@ class ReadableFontBackend(Protocol):
         pass
 
     async def getUnitsPerEm(self) -> int:
+        pass
+
+    async def getShaperFontData(self) -> ShaperFontData | None:
         pass
 
 

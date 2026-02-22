@@ -37,6 +37,7 @@ import {
   normalizeGuidelines,
   parseSelection,
   range,
+  reversed,
   zip,
 } from "./utils.js";
 import { addItemwise } from "./var-funcs.js";
@@ -746,6 +747,10 @@ export class StaticGlyphController {
     return getRepresentation(this, "flattenedPathHitTester");
   }
 
+  get propagatedAnchors() {
+    return getRepresentation(this, "propagatedAnchors");
+  }
+
   getSelectionBounds(selection, getBackgroundImageBoundsFunc = undefined) {
     if (!selection.size) {
       return undefined;
@@ -890,6 +895,12 @@ registerRepresentationFactory(
   }
 );
 
+registerRepresentationFactory(StaticGlyphController, "propagatedAnchors", (glyph) => {
+  // TODO: analyze the component traversal strategy and see what we really need.
+  const components = [...reversed(glyph.components)];
+  return glyph.anchors.concat(components.map((compo) => compo.anchors).flat());
+});
+
 class ComponentController {
   constructor(
     compo,
@@ -899,7 +910,7 @@ class ComponentController {
     parentGlyphNames
   ) {
     this.compo = compo;
-    const { path, errors } = flattenComponent(
+    const { path, anchors, errors } = flattenComponent(
       compo,
       glyphDependencies,
       parentLocation,
@@ -907,6 +918,7 @@ class ComponentController {
       fontAxisNames
     );
     this.path = path;
+    this.anchors = anchors;
     this.errors = errors;
   }
 
@@ -977,7 +989,8 @@ function flattenComponent(
 ) {
   let componentErrors = [];
   const paths = [];
-  for (const { path, errors } of iterFlattenedComponentPaths(
+  const allAnchors = [];
+  for (const { path, anchors, errors } of iterFlattenedComponentPaths(
     compo,
     glyphDependencies,
     parentLocation,
@@ -985,6 +998,7 @@ function flattenComponent(
     fontAxisNames
   )) {
     paths.push(path);
+    allAnchors.push(...anchors);
     if (errors) {
       componentErrors.push(...errors);
     }
@@ -992,7 +1006,7 @@ function flattenComponent(
   if (!componentErrors.length) {
     componentErrors = undefined;
   }
-  return { path: joinPaths(paths), errors: componentErrors };
+  return { path: joinPaths(paths), anchors: allAnchors, errors: componentErrors };
 }
 
 function* iterFlattenedComponentPaths(
@@ -1036,10 +1050,18 @@ function* iterFlattenedComponentPaths(
   if (transformation) {
     t = transformation.transform(t);
   }
-  const componentPaths = {};
+
   if (inst.path.numPoints) {
-    yield { path: inst.path.transformed(t), errors: instErrors };
+    yield {
+      path: inst.path.transformed(t),
+      anchors: inst.anchors.map((anchor) => ({
+        name: anchor.name,
+        ...t.transformPointObject(anchor),
+      })),
+      errors: instErrors,
+    };
   }
+
   for (const subCompo of inst.components) {
     yield* iterFlattenedComponentPaths(
       subCompo,

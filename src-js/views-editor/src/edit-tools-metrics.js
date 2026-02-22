@@ -11,6 +11,7 @@ import {
   range,
   round,
   throttleCalls,
+  updateObject,
 } from "@fontra/core/utils.js";
 import { MenuItemDivider } from "@fontra/web-components/menu-panel.js";
 import { dialog } from "@fontra/web-components/modal-dialog.js";
@@ -35,7 +36,7 @@ class MetricsBaseTool extends BaseTool {
     this.handleContainer = document.querySelector("#metric-handle-container");
     assert(this.handleContainer);
 
-    this.sceneSettingsController.addKeyListener("glyphLines", (event) => {
+    this.sceneSettingsController.addKeyListener("characterLines", (event) => {
       if (event.senderInfo?.senderID !== this) {
         const positionedLines = this.sceneSettings.positionedLines;
         this.metricSelection = this.metricSelection.filter(
@@ -233,7 +234,7 @@ class MetricsBaseTool extends BaseTool {
     super.activate();
     this.sceneSettings.selectedGlyph = null;
     this.sceneController.hoveredGlyph = null;
-    if (this._selectionState?.glyphLines === this.sceneSettings.glyphLines) {
+    if (this._selectionState?.characterLines === this.sceneSettings.characterLines) {
       this.metricSelection = this._selectionState.selectors;
     }
 
@@ -243,7 +244,7 @@ class MetricsBaseTool extends BaseTool {
   deactivate() {
     super.deactivate();
     this._selectionState = {
-      glyphLines: this.sceneSettings.glyphLines,
+      characterLines: this.sceneSettings.characterLines,
       selectors: this.metricSelection,
     };
     delete this.hoveredMetric;
@@ -296,9 +297,13 @@ class MetricsBaseTool extends BaseTool {
 
     this.fontController.notifyEditListeners("editFinal", this);
 
-    this.sceneSettingsController.setItem("glyphLines", undoRecord.info.glyphLines, {
-      senderID: this,
-    });
+    this.sceneSettingsController.setItem(
+      "characterLines",
+      undoRecord.info.characterLines,
+      {
+        senderID: this,
+      }
+    );
     this.sceneSettings.fontLocationSourceMapped = undoRecord.info.location;
     this.metricSelection = undoRecord.info.metricSelection;
   }
@@ -309,7 +314,7 @@ class MetricsBaseTool extends BaseTool {
       rollbackChange: changes.rollbackChange,
       info: {
         label: undoLabel,
-        glyphLines: this.sceneSettings.glyphLines,
+        characterLines: this.sceneSettings.characterLines,
         location: this.sceneSettings.fontLocationSourceMapped,
         metricSelection: this.metricSelection,
       },
@@ -1014,8 +1019,11 @@ class KerningTool extends MetricsBaseTool {
 
     this.kerningController = null;
 
-    this.sceneSettingsController.addKeyListener("applyKerning", (event) => {
-      if (!event.newValue && this.sceneController.selectedTool === this) {
+    this.sceneSettingsController.addKeyListener("featureSettings", (event) => {
+      if (
+        this.sceneSettings.featureSettings["kern-emulated"] == false &&
+        this.sceneController.selectedTool === this
+      ) {
         this.editor.setSelectedTool("pointer-tool");
       }
     });
@@ -1217,8 +1225,12 @@ class KerningTool extends MetricsBaseTool {
   activate() {
     super.activate();
 
-    if (!this.sceneSettings.applyKerning) {
-      this.sceneSettings.applyKerning = true;
+    if (this.sceneSettings.featureSettings["kern-emulated"] == false) {
+      this.sceneSettings.featureSettings = updateObject(
+        this.sceneSettings.featureSettings,
+        "kern-emulated",
+        undefined
+      );
     }
 
     this.fontController.getKerningController("kern").then((kerningController) => {

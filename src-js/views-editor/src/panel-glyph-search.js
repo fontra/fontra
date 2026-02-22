@@ -43,7 +43,7 @@ export default class GlyphSearchPanel extends Panel {
     );
   }
 
-  glyphNameChangedCallback(glyphName, isDoubleClick) {
+  async glyphNameChangedCallback(glyphName, isDoubleClick) {
     if (!glyphName) {
       return;
     }
@@ -52,29 +52,30 @@ export default class GlyphSearchPanel extends Panel {
       this.editorController.fontController.glyphInfoFromGlyphName(glyphName);
 
     let selectedGlyphState = this.editorController.sceneSettings.selectedGlyph;
-    const glyphLines = [...this.editorController.sceneSettings.glyphLines];
 
     if (selectedGlyphState && !isDoubleClick) {
-      if (
-        !glyphLines[selectedGlyphState.lineIndex][selectedGlyphState.glyphIndex]
-          .isPlaceholder
-      ) {
-        glyphLines[selectedGlyphState.lineIndex][selectedGlyphState.glyphIndex] =
-          glyphInfo;
-        this.editorController.sceneSettings.glyphLines = glyphLines;
-      }
+      this.editorController.insertGlyphInfos([glyphInfo], 0, true);
     } else if (!selectedGlyphState && isDoubleClick) {
-      if (!glyphLines.length) {
-        glyphLines.push([]);
+      const characterLines = [...this.editorController.sceneSettings.characterLines];
+
+      if (!characterLines.length) {
+        characterLines.push([]);
       }
-      const lineIndex = glyphLines.length - 1;
-      glyphLines[lineIndex].push(glyphInfo);
-      this.editorController.sceneSettings.glyphLines = glyphLines;
-      selectedGlyphState = {
-        lineIndex: lineIndex,
-        glyphIndex: glyphLines[lineIndex].length - 1,
-        isEditing: false,
-      };
+
+      const lineIndex = characterLines.length - 1;
+      const characterIndex = characterLines[lineIndex].length;
+      characterLines[lineIndex].push(glyphInfo);
+      this.editorController.sceneSettings.characterLines = characterLines;
+
+      await this.editorController.sceneSettingsController.waitForKeyChange(
+        "positionedLines"
+      );
+
+      selectedGlyphState =
+        this.editorController.sceneModel.characterSelectionToGlyphSelection({
+          lineIndex,
+          characterIndex,
+        });
     }
 
     this.editorController.sceneSettings.selectedGlyph = selectedGlyphState;

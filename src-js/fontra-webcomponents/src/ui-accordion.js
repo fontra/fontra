@@ -61,10 +61,6 @@ export class Accordion extends UnlitElement {
   render() {
     const itemElements = [];
     for (const [index, item] of enumerate(this.items || [])) {
-      if (item.hidden) {
-        continue;
-      }
-
       const id = item.id || `ui-accordion-item-${index}`;
 
       const headerElement = html.div(

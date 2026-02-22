@@ -3,8 +3,9 @@
   "dependencies": {
     "@fontra/core": "file:",
     "bezier-js": "^6.1.4",
+    "build-shaper-font": "^0.1.0",
     "fflate": "^0.8.2",
-    "harfbuzzjs": "^0.8.0",
+    "harfbuzzjs": "^0.9.0",
     "lib-font": "^3.0.0",
     "tsc": "^2.0.4"
   },

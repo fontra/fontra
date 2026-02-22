@@ -157,9 +157,10 @@ export class EditorController extends ViewController {
     this.sceneSettingsController.addKeyListener(
       [
         "align",
-        "applyKerning",
+        "applyTextShaping",
         "editLayerName",
         "editingLayers",
+        "featureSettings",
         "fontLocationUser",
         "glyphLocation",
         "fontAxesUseSourceCoordinates",
@@ -171,6 +172,9 @@ export class EditorController extends ViewController {
         "substituteGlyphName",
         "text",
         "viewBox",
+        "textDirection",
+        "textScript",
+        "textLanguage",
       ],
       (event) => {
         if (event.senderInfo?.senderID !== this && !event.senderInfo?.adjustViewBox) {
@@ -785,7 +789,7 @@ export class EditorController extends ViewController {
       false
     );
 
-    await this.fontController.subscribeChanges({ kerning: null }, true);
+    await this.fontController.subscribeChanges({ kerning: null, features: null }, true);
 
     const blankFont = new FontFace("AdobeBlank", `url("/fonts/AdobeBlank.woff2")`, {});
     document.fonts.add(blankFont);
@@ -1274,29 +1278,33 @@ export class EditorController extends ViewController {
     this.insertGlyphInfos(glyphInfos, 1, true);
   }
 
-  insertGlyphInfos(glyphInfos, where = 0, select = false) {
+  async insertGlyphInfos(glyphInfos, where = 0, select = false) {
     // where == 0: replace selected glyph
     // where == 1: insert after selected glyph
     // where == -1: insert before selected glyph
-    const selectedGlyphInfo = this.sceneSettings.selectedGlyph;
-    const glyphLines = [...this.sceneSettings.glyphLines];
+    const { lineIndex } = this.sceneSettings.selectedGlyph;
+    const { cluster: characterIndex } = this.sceneModel.getSelectedPositionedGlyph();
 
-    const insertIndex = selectedGlyphInfo.glyphIndex + (where == 1 ? 1 : 0);
-    glyphLines[selectedGlyphInfo.lineIndex].splice(
-      insertIndex,
-      where ? 0 : 1,
-      ...glyphInfos
-    );
-    this.sceneSettings.glyphLines = glyphLines;
+    const characterLines = [...this.sceneSettings.characterLines];
 
-    const glyphIndex =
-      selectedGlyphInfo.glyphIndex +
-      (select ? (where == 1 ? 1 : 0) : where == -1 ? glyphInfos.length : 0);
+    const insertIndex = characterIndex + (where == 1 ? 1 : 0);
+    const selectionCharacterIndex =
+      characterIndex + (select ? (where == 1 ? 1 : 0) : where == -1 ? 1 : 0);
+
+    characterLines[lineIndex].splice(insertIndex, where ? 0 : 1, ...glyphInfos);
+    this.sceneSettings.characterLines = characterLines;
+
+    await this.sceneSettingsController.waitForKeyChange("positionedLines");
+
+    const { glyphIndex } = this.sceneModel.characterSelectionToGlyphSelection({
+      lineIndex,
+      characterIndex: selectionCharacterIndex,
+    });
 
     const glyphExists = !!this.fontController.glyphMap[glyphInfos[0]?.glyphName];
 
     this.sceneSettings.selectedGlyph = {
-      lineIndex: selectedGlyphInfo.lineIndex,
+      lineIndex: lineIndex,
       glyphIndex: glyphIndex,
       isEditing:
         glyphExists &&
@@ -3018,13 +3026,13 @@ export class EditorController extends ViewController {
           this.fontController.glyphInfoFromGlyphName(glyphName)
         );
         const selectedGlyphInfo = this.sceneSettings.selectedGlyph;
-        const glyphLines = [...this.sceneSettings.glyphLines];
-        glyphLines[selectedGlyphInfo.lineIndex].splice(
+        const characterLines = [...this.sceneSettings.characterLines];
+        characterLines[selectedGlyphInfo.lineIndex].splice(
           selectedGlyphInfo.glyphIndex + 1,
           0,
           ...glyphInfos
         );
-        this.sceneSettings.glyphLines = glyphLines;
+        this.sceneSettings.characterLines = characterLines;
         if (truncate) {
           await message(
             `The number of added glyphs was truncated to ${MAX_NUM_GLYPHS}`,
@@ -3217,7 +3225,13 @@ export class EditorController extends ViewController {
       }
     }
     this.sceneSettings.align = viewInfo["align"] || "center";
-    this.sceneSettings.applyKerning = viewInfo["applyKerning"] === false ? false : true;
+    this.sceneSettings.featureSettings = viewInfo["featureSettings"] ?? {};
+    this.sceneSettings.applyTextShaping =
+      viewInfo["applyTextShaping"] === false ? false : true;
+    for (const key of ["textDirection", "textScript", "textLanguage"]) {
+      this.sceneSettings[key] = viewInfo[key] ?? null;
+    }
+
     if (viewInfo["viewBox"]) {
       this.sceneController.autoViewBox = false;
       const viewBox = viewInfo["viewBox"];
@@ -3228,9 +3242,9 @@ export class EditorController extends ViewController {
 
     if (viewInfo["text"]) {
       this.sceneSettings.text = viewInfo["text"];
-      // glyphLines is computed from text asynchronously, but its result is needed
+      // characterLines is computed from text asynchronously, but its result is needed
       // to for selectedGlyphName, so we'll wait until it's done
-      await this.sceneSettingsController.waitForKeyChange("glyphLines");
+      await this.sceneSettingsController.waitForKeyChange("characterLines");
     }
     this._previousURLText = viewInfo["text"];
 
@@ -3264,6 +3278,7 @@ export class EditorController extends ViewController {
     }
 
     if (viewInfo["selection"]) {
+      await this.sceneSettingsController.waitForKeyChange("positionedLines");
       this.sceneSettings.selection = new Set(viewInfo["selection"]);
     }
 
@@ -3348,8 +3363,16 @@ export class EditorController extends ViewController {
     if (this.sceneSettings.align !== "center") {
       viewInfo["align"] = this.sceneSettings.align;
     }
-    if (!this.sceneSettings.applyKerning) {
-      viewInfo["applyKerning"] = this.sceneSettings.applyKerning;
+    if (!isObjectEmpty(this.sceneSettings.featureSettings)) {
+      viewInfo["featureSettings"] = this.sceneSettings.featureSettings;
+    }
+    if (!this.sceneSettings.applyTextShaping) {
+      viewInfo["applyTextShaping"] = this.sceneSettings.applyTextShaping;
+    }
+    for (const key of ["textDirection", "textScript", "textLanguage"]) {
+      if (this.sceneSettings[key]) {
+        viewInfo[key] = this.sceneSettings[key];
+      }
     }
 
     const url = new URL(window.location);

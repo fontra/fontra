@@ -1,5 +1,6 @@
+import io
 import uuid
-from copy import deepcopy
+from copy import copy, deepcopy
 from itertools import product
 from os import PathLike
 from typing import Any, Generator
@@ -24,6 +25,8 @@ from ..core.classes import (
     Layer,
     LineMetric,
     OpenTypeFeatures,
+    ShaperFontData,
+    ShaperFontGlyphOrderSorting,
     StaticGlyph,
     VariableGlyph,
 )
@@ -34,6 +37,8 @@ from ..core.varutils import locationToTuple, unnormalizeLocation, unnormalizeVal
 from .base import ReadableBaseBackend
 from .filewatcher import Change
 from .watchable import WatchableBackend
+
+shaperFontTables = {"fvar", "head", "name", "GDEF", "GSUB", "GPOS", "BASE", "post"}
 
 
 class OTFBackend(WatchableBackend, ReadableBaseBackend):
@@ -223,6 +228,24 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
     async def getCustomData(self) -> dict[str, Any]:
         return {}
 
+    async def getShaperFontData(self) -> ShaperFontData | None:
+        with self._getShaperFont() as font:
+            for tableTag in font.keys():
+                if tableTag not in shaperFontTables:
+                    del font[tableTag]
+
+            f = io.BytesIO()
+            font.save(f)
+
+        data = f.getvalue()
+
+        return ShaperFontData(
+            glyphOrderSorting=ShaperFontGlyphOrderSorting.FROMGLYPHMAP, data=data
+        )
+
+    def _getShaperFont(self):
+        return self._loadFontFromPath(self.path)
+
     async def fileWatcherProcessChanges(
         self, changes: set[tuple[Change, str]]
     ) -> dict[str, Any] | None:
@@ -237,6 +260,11 @@ class TTXBackend(OTFBackend):
     def _loadFontFromPath(self, path: PathLike) -> TTFont:
         font = TTFont()
         font.importXML(path)
+        return font
+
+    def _getShaperFont(self):
+        font = copy(self.font)  # shallow copy
+        font.tables = dict(font.tables)  # shallow copy tables dict for table subsetting
         return font
 
 

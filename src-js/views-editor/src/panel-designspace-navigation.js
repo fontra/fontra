@@ -72,7 +72,6 @@ export default class DesignspaceNavigationPanel extends Panel {
 
   constructor(editorController) {
     super(editorController);
-    this.fontController = this.editorController.fontController;
     this.sceneSettingsController = this.editorController.sceneSettingsController;
     this.sceneSettings = this.editorController.sceneSettingsController.model;
     this.sceneModel = this.editorController.sceneController.sceneModel;
@@ -309,7 +308,7 @@ export default class DesignspaceNavigationPanel extends Panel {
     this.sceneSettingsController.addKeyListener(
       ["selectedGlyph", "selectedGlyphName"],
       async (event) => {
-        await this._updateAxes();
+        await this._updateGlyphAxes();
         await this._updateSources();
         await this._updateInterpolationErrorInfo();
         await this._updateSourceLayersList();
@@ -855,6 +854,11 @@ export default class DesignspaceNavigationPanel extends Panel {
   }
 
   async _updateAxes() {
+    await this._updateFontAxes();
+    await this._updateGlyphAxes();
+  }
+
+  async _updateFontAxes() {
     const fontAxesSourceSpace = mapAxesFromUserSpaceToSourceSpace(this.fontAxes);
     const fontAxes = this.sceneSettings.fontAxesUseSourceCoordinates
       ? fontAxesSourceSpace
@@ -866,7 +870,9 @@ export default class DesignspaceNavigationPanel extends Panel {
       this.fontAxesElement.phantomAxes = [];
     }
     this._setFontLocationValues();
+  }
 
+  async _updateGlyphAxes() {
     const varGlyphController =
       await this.sceneModel.getSelectedVariableGlyphController();
 

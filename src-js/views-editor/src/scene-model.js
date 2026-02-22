@@ -2,6 +2,10 @@ import {
   pointInConvexPolygon,
   rectIntersectsPolygon,
 } from "@fontra/core/convex-hull.js";
+import {
+  getGlyphInfoFromCodePoint,
+  getSuggestedGlyphName,
+} from "@fontra/core/glyph-data.js";
 import { loaderSpinner } from "@fontra/core/loader-spinner.js";
 import {
   centeredRect,
@@ -16,15 +20,18 @@ import {
   unionRect,
 } from "@fontra/core/rectangle.js";
 import { difference, isEqualSet, union, updateSet } from "@fontra/core/set-ops.js";
+import { MAX_UNICODE } from "@fontra/core/shaper.js";
 import { decomposedToTransform } from "@fontra/core/transform.js";
 import {
   consolidateCalls,
   enumerate,
+  mapObjectKeys,
   parseSelection,
   range,
   reversed,
   valueInRange,
 } from "@fontra/core/utils.js";
+import { normalizeLocation, unnormalizeLocation } from "@fontra/core/var-model.js";
 import * as vector from "@fontra/core/vector.js";
 
 export class SceneModel {
@@ -47,10 +54,43 @@ export class SceneModel {
     this.updateSceneCancelSignal = {};
 
     this.sceneSettingsController.addKeyListener(
-      ["glyphLines", "align", "applyKerning", "selectedGlyph", "editLayerName"],
+      [
+        "characterLines",
+        "align",
+        "featureSettings",
+        "applyTextShaping",
+        "selectedGlyph",
+        "editLayerName",
+        "textDirection",
+        "textScript",
+        "textLanguage",
+        "shaper",
+        "dumbShaper",
+      ],
       (event) => {
         this.updateScene();
       }
+    );
+
+    this.sceneSettingsController.addKeyListener(
+      "applyTextShaping",
+      async (event) => {
+        if (!this.sceneSettings.selectedGlyph) {
+          return;
+        }
+
+        // Try to keep the same glyph selection after toggling applyTextShaping
+
+        const selectedCharacter = this.glyphSelectionToCharacterSelection(
+          this.sceneSettings.selectedGlyph
+        );
+
+        await this.sceneSettingsController.waitForKeyChange("positionedLines");
+
+        this.sceneSettings.selectedGlyph =
+          this.characterSelectionToGlyphSelection(selectedCharacter);
+      },
+      true // immediately
     );
 
     this.sceneSettingsController.addKeyListener(
@@ -79,8 +119,8 @@ export class SceneModel {
     );
   }
 
-  get glyphLines() {
-    return this.sceneSettings.glyphLines;
+  get characterLines() {
+    return this.sceneSettings.characterLines;
   }
 
   get selectedGlyph() {
@@ -124,12 +164,8 @@ export class SceneModel {
     ];
   }
 
-  getSelectedGlyphInfo() {
-    return getSelectedGlyphInfo(this.selectedGlyph, this.glyphLines);
-  }
-
   getSelectedGlyphName() {
-    return getSelectedGlyphName(this.selectedGlyph, this.glyphLines);
+    return this.getSelectedPositionedGlyph()?.glyphName;
   }
 
   isSelectedGlyphLocked() {
@@ -156,28 +192,33 @@ export class SceneModel {
     );
   }
 
-  getGlyphLocations(filterShownGlyphs = false) {
-    let glyphLocations;
-    if (filterShownGlyphs) {
-      glyphLocations = {};
-      for (const glyphLine of this.glyphLines) {
-        for (const glyphInfo of glyphLine) {
-          if (
-            !glyphLocations[glyphInfo.glyphName] &&
-            this._glyphLocations[glyphInfo.glyphName]
-          ) {
-            const glyphLocation = this._glyphLocations[glyphInfo.glyphName];
-            if (Object.keys(glyphLocation).length) {
-              glyphLocations[glyphInfo.glyphName] =
-                this._glyphLocations[glyphInfo.glyphName];
-            }
-          }
-        }
-      }
-    } else {
-      glyphLocations = this._glyphLocations;
+  glyphSelectionToCharacterSelection({ lineIndex, glyphIndex, isEditing }) {
+    const line = this.sceneSettings.positionedLines[lineIndex].glyphs;
+    const characterIndex = line[glyphIndex].cluster;
+    return { lineIndex, characterIndex, isEditing };
+  }
+
+  characterSelectionToGlyphSelection({ lineIndex, characterIndex, isEditing }) {
+    const line = this.sceneSettings.positionedLines[lineIndex].glyphs;
+    let glyphIndex = -1;
+
+    // Not every cluster/character index is guaranteed to exist, for example
+    // when f i translates to an fi ligature, then the fi ligature has a single
+    // cluster, and we won't find a glyph index for i's character index.
+    // In that case we try the previous character index, and on, until we find
+    // a match.
+    while (glyphIndex === -1 && characterIndex >= 0) {
+      glyphIndex = line.findIndex(
+        (positionedGlyph) => positionedGlyph.cluster === characterIndex
+      );
+      characterIndex--;
     }
-    return glyphLocations;
+
+    if (glyphIndex === -1) {
+      glyphIndex = 0; // last resort
+    }
+
+    return { lineIndex, glyphIndex, isEditing };
   }
 
   _resetKerningInstance() {
@@ -196,6 +237,30 @@ export class SceneModel {
       }
     }
     return this._kerningInstance;
+  }
+
+  getGlyphLocations(filterShownGlyphs = false) {
+    let glyphLocations;
+    if (filterShownGlyphs) {
+      glyphLocations = {};
+      for (const positionedLine of this.positionedLines) {
+        for (const glyphInfo of positionedLine.glyphs) {
+          if (
+            !glyphLocations[glyphInfo.glyphName] &&
+            this._glyphLocations[glyphInfo.glyphName]
+          ) {
+            const glyphLocation = this._glyphLocations[glyphInfo.glyphName];
+            if (Object.keys(glyphLocation).length) {
+              glyphLocations[glyphInfo.glyphName] =
+                this._glyphLocations[glyphInfo.glyphName];
+            }
+          }
+        }
+      }
+    } else {
+      glyphLocations = this._glyphLocations;
+    }
+    return glyphLocations;
   }
 
   _syncGlyphLocations() {
@@ -233,33 +298,6 @@ export class SceneModel {
       case "right":
         return [-this.longestLineLength, 0];
     }
-  }
-
-  updateGlyphLinesCharacterMapping() {
-    // Call this when the cmap changed: previously missing characters may now be
-    // available, but may have a different glyph name, or a character may no longer
-    // be available, in which case we set the isUndefined flag
-    this.sceneSettings.glyphLines = this.glyphLines.map((line) =>
-      line.map((glyphInfo) => {
-        const glyphName = glyphInfo.character
-          ? this.fontController.characterMap[glyphInfo.character.codePointAt(0)]
-          : undefined;
-        if (glyphInfo.isUndefined && glyphName) {
-          glyphInfo = {
-            character: glyphInfo.character,
-            glyphName: glyphName,
-            isUndefined: false,
-          };
-        } else if (!glyphName) {
-          glyphInfo = {
-            character: glyphInfo.character,
-            glyphName: glyphInfo.glyphName,
-            isUndefined: true,
-          };
-        }
-        return glyphInfo;
-      })
-    );
   }
 
   async updateBackgroundGlyphs() {
@@ -332,6 +370,9 @@ export class SceneModel {
 
     // const startTime = performance.now();
     const result = await this.buildScene(cancelSignal);
+    if (!result) {
+      return;
+    }
     // const elapsed = performance.now() - startTime;
     // console.log("buildScene", elapsed);
 
@@ -383,13 +424,16 @@ export class SceneModel {
   }
 
   async buildScene(cancelSignal) {
-    const fontController = this.fontController;
-    const kerningInstance = this.sceneSettings.applyKerning
-      ? await this.getKerningInstance("kern")
-      : null;
+    const shaperPromise = this.sceneSettings.applyTextShaping
+      ? this.sceneSettings.shaper
+      : this.sceneSettings.dumbShaper;
+    if (!shaperPromise) {
+      return;
+    }
 
-    const glyphLines = this.glyphLines;
-    const align = this.sceneSettings.align;
+    const fontController = this.fontController;
+
+    const characterLines = this.characterLines;
     const {
       lineIndex: selectedLineIndex,
       glyphIndex: selectedGlyphIndex,
@@ -404,8 +448,8 @@ export class SceneModel {
 
     const neededGlyphs = [
       ...new Set(
-        glyphLines
-          .map((glyphLine) => glyphLine.map((glyphInfo) => glyphInfo.glyphName))
+        characterLines
+          .map((characterLine) => characterLine.map((glyphInfo) => glyphInfo.glyphName))
           .flat()
       ),
     ];
@@ -420,106 +464,90 @@ export class SceneModel {
       return;
     }
 
-    for (const [lineIndex, glyphLine] of enumerate(glyphLines)) {
-      let previousGlyphName = null;
-      const positionedLine = { glyphs: [] };
-      let x = 0;
-      for (const [glyphIndex, glyphInfo] of enumerate(glyphLine)) {
-        const isSelectedGlyph =
-          lineIndex == selectedLineIndex && glyphIndex == selectedGlyphIndex;
+    const { shaper } = await shaperPromise;
 
-        const thisGlyphEditLayerName =
-          editLayerName && isSelectedGlyph ? editLayerName : undefined;
+    const lineSetter = new LineSetter(
+      fontController,
+      shaper,
+      (glyphName, layerName) => this.getGlyphInstance(glyphName, layerName),
+      this.sceneSettings.align,
+      cancelSignal
+    );
 
-        const varGlyph = await this.fontController.getGlyph(glyphInfo.glyphName);
-        let glyphInstance = await this.getGlyphInstance(
-          glyphInfo.glyphName,
-          thisGlyphEditLayerName
-        );
+    const featureEntries = Object.entries(this.sceneSettings.featureSettings ?? {});
+    const disabledEmulatedFeatures = new Set(
+      featureEntries
+        .filter(([k, v]) => v == false && k.endsWith("-emulated"))
+        .map(([k, v]) => k.slice(0, 4))
+    );
+    const featuresString = featureEntries
+      .filter(([k, v]) => v != undefined && !k.endsWith("-emulated"))
+      .map(([k, v]) => (v ? (v > 1 ? `${k}=${v}` : k) : `-${k}`))
+      .join(",");
 
-        if (cancelSignal.shouldCancel) {
-          return;
-        }
+    const shaperLocation = this.getShaperLocation(
+      this.sceneSettings.fontLocationSourceMapped
+    );
 
-        const isUndefined = !glyphInstance;
-        if (isUndefined) {
-          glyphInstance = fontController.getDummyGlyphInstanceController(
-            glyphInfo.glyphName
-          );
-        }
+    const kerningInstance = !disabledEmulatedFeatures.has("kern")
+      ? await this.getKerningInstance("kern")
+      : null;
+    const kerningPairFunc = kerningInstance
+      ? (g1, g2) => kerningInstance.getGlyphPairValue(g1, g2)
+      : null;
 
-        const kernValue =
-          kerningInstance && previousGlyphName
-            ? kerningInstance.getGlyphPairValue(previousGlyphName, glyphInfo.glyphName)
-            : 0;
+    const shaperOptions = {
+      variations: shaperLocation,
+      features: featuresString,
+      direction: this.sceneSettings.textDirection,
+      script: this.sceneSettings.textScript,
+      language: this.sceneSettings.textLanguage,
+      disabledEmulatedFeatures,
+      kerningPairFunc,
+    };
 
-        x += kernValue;
-        positionedLine.glyphs.push({
-          x,
-          y,
-          kernValue,
-          glyph: glyphInstance,
-          varGlyph,
-          glyphName: glyphInfo.glyphName,
-          character: glyphInfo.character,
-          isUndefined,
-          isSelected: isSelectedGlyph,
-          isEditing: !!(isSelectedGlyph && selectedGlyphIsEditing),
-          isEmpty: !glyphInstance.controlBounds,
-        });
-        x += glyphInstance.xAdvance;
-        previousGlyphName = glyphInfo.glyphName;
+    for (const [lineIndex, characterLine] of enumerate(characterLines)) {
+      const positionedLine = await lineSetter.setLine(
+        { x: 0, y },
+        characterLine,
+        lineIndex == selectedLineIndex ? selectedGlyphIndex : undefined,
+        selectedGlyphIsEditing,
+        editLayerName,
+        shaperOptions
+      );
+
+      if (!positionedLine) {
+        return;
       }
 
-      longestLineLength = Math.max(longestLineLength, x);
-
-      let offset = 0;
-      if (align === "center") {
-        offset = -x / 2;
-      } else if (align === "right") {
-        offset = -x;
-      }
-      if (offset) {
-        positionedLine.glyphs.forEach((item) => {
-          item.x += offset;
-        });
-      }
-
-      // Add bounding boxes
-      positionedLine.glyphs.forEach((item) => {
-        let bounds = item.glyph.controlBounds;
-        if (!bounds || isEmptyRect(bounds) || item.glyph.isEmptyIsh) {
-          // Empty glyph, make up box based on advance so it can still be clickable/hoverable
-          // TODO: use font's ascender/descender values
-          // If the advance is very small, add a bit of extra space on both sides so it'll be
-          // clickable even with a zero advance width
-          const extraSpace = item.glyph.xAdvance < 30 ? 20 : 0;
-          bounds = insetRect(
-            normalizeRect({
-              xMin: 0,
-              yMin: -0.2 * fontController.unitsPerEm,
-              xMax: item.glyph.xAdvance,
-              yMax: 0.8 * fontController.unitsPerEm,
-            }),
-            -extraSpace,
-            0
-          );
-          item.isEmpty = true;
-        }
-        item.bounds = offsetRect(bounds, item.x, item.y);
-        item.unpositionedBounds = bounds;
-      });
+      longestLineLength = Math.max(longestLineLength, positionedLine.endPoint.x);
 
       y -= lineDistance;
-      if (positionedLine.glyphs.length) {
-        positionedLine.bounds = unionRect(
-          ...positionedLine.glyphs.map((glyph) => glyph.bounds)
-        );
-      }
       positionedLines.push(positionedLine);
     }
 
     return { longestLineLength, positionedLines };
+  }
+
+  getShaperLocation(sourceLocation) {
+    // The shaper font works with user coordinates, but does not do avar mapping,
+    // so we want to feed it our fontLocationSourceMapped location, but with user
+    // coordinates. We need to filter out discrete axes, as they are not properly
+    // supported here yet.
+
+    const nameToTagMapping = Object.fromEntries(
+      this.fontController.axes.axes.map((axis) => [axis.name, axis.tag])
+    );
+
+    const shaperLocation = unnormalizeLocation(
+      normalizeLocation(
+        sourceLocation,
+        this.fontController.fontAxesSourceSpace.filter((axis) => !axis.values)
+      ),
+      this.fontController.axes.axes.filter((axis) => !axis.values)
+    );
+
+    return mapObjectKeys(shaperLocation, (key) => nameToTagMapping[key]);
   }
 
   getLocationForGlyph(glyphName) {
@@ -591,15 +619,6 @@ export class SceneModel {
       ? parseSelection(currentSelection)
       : undefined;
 
-    const pointSelection = this.pointSelectionAtPoint(
-      point,
-      size,
-      parsedCurrentSelection
-    );
-    if (pointSelection.size) {
-      return { selection: pointSelection };
-    }
-
     const anchorSelection = this.anchorSelectionAtPoint(
       point,
       size,
@@ -607,6 +626,15 @@ export class SceneModel {
     );
     if (anchorSelection.size) {
       return { selection: anchorSelection };
+    }
+
+    const pointSelection = this.pointSelectionAtPoint(
+      point,
+      size,
+      parsedCurrentSelection
+    );
+    if (pointSelection.size) {
+      return { selection: pointSelection };
     }
 
     const guidelineSelection = this.guidelineSelectionAtPoint(
@@ -881,6 +909,13 @@ export class SceneModel {
       }
     }
 
+    const anchors = positionedGlyph.glyph.anchors;
+    for (let i = 0; i < anchors.length; i++) {
+      if (pointInRect(anchors[i].x, anchors[i].y, selRect)) {
+        selection.add(`anchor/${i}`);
+      }
+    }
+
     const backgroundImageSelection = this.backgroundImageSelectionAtRect(selRect);
     if (backgroundImageSelection.size) {
       // As long as we don't have multiple background images,
@@ -990,12 +1025,13 @@ export class SceneModel {
       const firstGlyph = line.glyphs[0];
       const lastGlyph = line.glyphs.at(-1);
       const lastGlyphRight = lastGlyph.x + lastGlyph.glyph.xAdvance;
+      const y = line.origin.y;
 
       const metricsBox = {
         xMin: line.bounds ? Math.min(firstGlyph.x, line.bounds.xMin) : firstGlyph.x,
-        yMin: firstGlyph.y + descender,
+        yMin: y + descender,
         xMax: line.bounds ? Math.max(lastGlyphRight, line.bounds.xMax) : lastGlyphRight,
-        yMax: firstGlyph.y + ascender,
+        yMax: y + ascender,
       };
       if (!pointInRect(point.x, point.y, metricsBox)) {
         continue;
@@ -1180,18 +1216,188 @@ function makeGlyphNamesPattern(glyphNames) {
   return { glyphs: glyphsObj };
 }
 
-export function getSelectedGlyphInfo(selectedGlyph, glyphLines) {
-  if (selectedGlyph) {
-    return glyphLines[selectedGlyph.lineIndex]?.[selectedGlyph.glyphIndex];
-  }
-}
-
-export function getSelectedGlyphName(selectedGlyph, glyphLines) {
-  return getSelectedGlyphInfo(selectedGlyph, glyphLines)?.glyphName;
-}
-
 function sorted(v) {
   v = [...v];
   v.sort((a, b) => a - b);
   return v;
+}
+
+class LineSetter {
+  constructor(fontController, shaper, getGlyphInstanceFunc, align, cancelSignal) {
+    this.fontController = fontController;
+    this.shaper = shaper;
+    this.getGlyphInstanceFunc = getGlyphInstanceFunc;
+    this.align = align;
+    this.cancelSignal = cancelSignal;
+    this.glyphInstances = {};
+  }
+
+  async setLine(
+    origin,
+    characterLine,
+    selectedGlyphIndex,
+    selectedGlyphIsEditing,
+    editLayerName,
+    shaperOptions
+  ) {
+    const fontController = this.fontController;
+    const glyphs = [];
+
+    let { x, y } = origin;
+
+    const codePoints = characterLine.map((characterInfo) =>
+      characterInfo.character
+        ? characterInfo.character.codePointAt(0)
+        : this.shaper.getGlyphNameCodePoint(characterInfo.glyphName)
+    );
+
+    if (!shaperOptions.direction) {
+      const direction = guessDirectionFromCodePoints(codePoints);
+      shaperOptions = { ...shaperOptions, direction };
+    }
+
+    let shapedGlyphs = this.shaper.shape(
+      codePoints,
+      this.glyphInstances,
+      shaperOptions
+    );
+    let needsReshape = false;
+    for (const glyphInfo of shapedGlyphs) {
+      if (
+        !(glyphInfo.gn in this.glyphInstances) &&
+        glyphInfo.gn in fontController.glyphMap
+      ) {
+        this.glyphInstances[glyphInfo.gn] = await this.getGlyphInstanceFunc(
+          glyphInfo.gn
+        );
+        needsReshape = true;
+      }
+    }
+
+    if (needsReshape) {
+      shapedGlyphs = this.shaper.shape(codePoints, this.glyphInstances, shaperOptions);
+    }
+
+    for (const [glyphIndex, glyphInfo] of enumerate(shapedGlyphs)) {
+      const codePoint = codePoints[glyphInfo.cl];
+      const glyphName =
+        glyphInfo.g != 0 || codePoint >= MAX_UNICODE
+          ? glyphInfo.gn
+          : getSuggestedGlyphName(codePoint);
+
+      const isSelectedGlyph = glyphIndex == selectedGlyphIndex;
+
+      const thisGlyphEditLayerName =
+        editLayerName && isSelectedGlyph ? editLayerName : undefined;
+
+      const varGlyph = await fontController.getGlyph(glyphName);
+      let glyphInstance = thisGlyphEditLayerName
+        ? await this.getGlyphInstanceFunc(glyphName, thisGlyphEditLayerName)
+        : this.glyphInstances[glyphName];
+
+      const xAdvanceLayerDifference = thisGlyphEditLayerName
+        ? glyphInstance.xAdvance - this.glyphInstances[glyphName].xAdvance
+        : 0;
+      const yAdvanceLayerDifference = 0;
+
+      if (this.cancelSignal.shouldCancel) {
+        return;
+      }
+
+      const isUndefined = !glyphInstance;
+      if (isUndefined) {
+        glyphInstance = fontController.getDummyGlyphInstanceController(glyphName);
+      }
+
+      const kernValue =
+        shaperOptions.kerningPairFunc && glyphIndex > 0
+          ? shaperOptions.kerningPairFunc(
+              shapedGlyphs[glyphIndex - 1].gn,
+              shapedGlyphs[glyphIndex].gn
+            )
+          : 0;
+
+      glyphs.push({
+        x: x + glyphInfo.dx,
+        y: y + glyphInfo.dy,
+        kernValue,
+        glyph: glyphInstance,
+        varGlyph,
+        glyphName,
+        character:
+          codePoint && codePoint < MAX_UNICODE ? String.fromCodePoint(codePoint) : null,
+        cluster: glyphInfo.cl,
+        isUndefined,
+        isSelected: isSelectedGlyph,
+        isEditing: !!(isSelectedGlyph && selectedGlyphIsEditing),
+        isEmpty: !glyphInstance.controlBounds,
+      });
+
+      x += glyphInfo.ax + xAdvanceLayerDifference;
+      y += glyphInfo.ay + yAdvanceLayerDifference;
+    }
+
+    let offset = 0;
+
+    switch (this.align) {
+      case "center":
+        offset = -x / 2;
+        break;
+      case "right":
+        offset = -x;
+        break;
+    }
+
+    if (offset) {
+      glyphs.forEach((item) => {
+        item.x += offset;
+      });
+    }
+
+    // TODO: use font's ascender/descender values
+    addBoundingBoxes(
+      glyphs,
+      -0.2 * fontController.unitsPerEm,
+      0.8 * fontController.unitsPerEm
+    );
+
+    const bounds = unionRect(...glyphs.map((glyph) => glyph.bounds));
+
+    return { bounds, glyphs, origin, endPoint: { x, y: origin.y } };
+  }
+}
+
+function addBoundingBoxes(glyphs, descender, ascender) {
+  glyphs.forEach((item) => {
+    let bounds = item.glyph.controlBounds;
+    if (!bounds || isEmptyRect(bounds) || item.glyph.isEmptyIsh) {
+      // Empty glyph, make up box based on advance so it can still be clickable/hoverable
+      // If the advance is very small, add a bit of extra space on both sides so it'll be
+      // clickable even with a zero advance width
+      const extraSpace = item.glyph.xAdvance < 30 ? 20 : 0;
+      bounds = insetRect(
+        normalizeRect({
+          xMin: 0,
+          yMin: descender,
+          xMax: item.glyph.xAdvance,
+          yMax: ascender,
+        }),
+        -extraSpace,
+        0
+      );
+      item.isEmpty = true;
+    }
+    item.bounds = offsetRect(bounds, item.x, item.y);
+    item.unpositionedBounds = bounds;
+  });
+}
+
+function guessDirectionFromCodePoints(codePoints) {
+  for (const codePoint of codePoints) {
+    const info = getGlyphInfoFromCodePoint(codePoint);
+    if (info?.category === "Letter") {
+      return info.direction === "RTL" ? "rtl" : "ltr";
+    }
+  }
+  return undefined;
 }
