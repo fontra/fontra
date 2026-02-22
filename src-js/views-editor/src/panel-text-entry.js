@@ -415,6 +415,11 @@ export default class TextEntryPanel extends Panel {
         border-radius: 1em;
       }
 
+      .feature-tag-button.not-at-default > .fea-toggle {
+        outline: 1px solid #AAAA;
+        outline-offset: 1px;
+      }
+
       .feature-tag-button.neutral > .fea-toggle {
         background-color: #AAAA;
       }
@@ -727,6 +732,7 @@ function featureTagButton(controller, featureTag, label, options) {
     buttonElement.classList.remove("neutral");
     buttonElement.classList.remove("on");
     buttonElement.classList.remove("off");
+    buttonElement.classList.toggle("not-at-default", state !== undefined);
     switch (state === undefined ? options.defaultValue : state) {
       case undefined:
         buttonElement.classList.add("neutral");
