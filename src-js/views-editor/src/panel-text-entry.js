@@ -421,7 +421,7 @@ export default class TextEntryPanel extends Panel {
       }
 
       .feature-tag-button.neutral > .fea-toggle {
-        background-color: #AAAA;
+        background-color: #BBB9;
       }
 
       .feature-tag-button.on > .fea-toggle {
