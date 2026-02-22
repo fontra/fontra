@@ -444,6 +444,7 @@ export class PointerTool extends BaseTool {
       };
     });
     this.sceneController.sceneModel.showTransformSelection = true;
+    this.sceneController.scrollAdjustBehavior = null;
   }
 
   async handleBoundsTransformSelection(
@@ -613,6 +614,8 @@ export class PointerTool extends BaseTool {
         broadcast: true,
       };
     });
+
+    this.sceneController.scrollAdjustBehavior = null;
   }
 
   getRotationHandle(event, selection) {
