@@ -1,13 +1,17 @@
+import logging
 from collections import defaultdict
 from collections.abc import Collection
 from dataclasses import replace
 from typing import Any
 
+from fontTools.feaLib.error import FeatureLibError
 from fontTools.fontBuilder import FontBuilder
 from ufo2ft.featureWriters.kernFeatureWriter import unicodeBidiType
 from ufo2ft.util import classifyGlyphs
 
 from .classes import FontAxis, Kerning
+
+logger = logging.getLogger(__name__)
 
 NestedKerningValues = dict[str, dict[str, list[float | None]]]
 FlatKerningValues = dict[tuple[str, str], list[float | None]]
@@ -265,7 +269,11 @@ def compileGSUB(
     if axes:
         fb.setupNameTable({})
         fb.setupFvar(axes, [])
-    fb.addOpenTypeFeatures(featureText, tables={"GSUB"})
+
+    try:
+        fb.addOpenTypeFeatures(featureText, tables={"GSUB"})
+    except FeatureLibError as e:
+        logger.error(f"Can't parse features: {e}")
 
     return fb.font.get("GSUB")
 
