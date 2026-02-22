@@ -410,8 +410,8 @@ export default class TextEntryPanel extends Panel {
       }
 
       .feature-tag-button > .fea-toggle {
-        width: 0.8em;
-        height: 0.8em;
+        width: 0.65em;
+        height: 0.65em;
         border-radius: 1em;
       }
 
