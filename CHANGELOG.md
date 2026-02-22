@@ -3,7 +3,7 @@
 ## 2026-02-?? [version 2026.2.1]
 
 - [OpenType] Initial support for OpenType features has landed! This requires a longer explanation, but in short:
-  - Fontra will now apply text shaping and OpenType features. All the UI for this lives in the text entry panel.
+  - Fontra will now apply text shaping and OpenType features. The user interface for this lives in the text entry panel.
   - Fontra now uses HarfBuzz for text shaping and OpenType features, via [harfbuzzjs](https://github.com/harfbuzz/harfbuzzjs). Khaled Hosny contributed many improvements to `harfbuzzjs` to make this possible.
   - For `.otf` and `.ttf` fonts, Fontra will use the actual OpenType features from the fonts.
   - For source files (`.designspace`, `.ufo`, `.glyphs`, `.fontra`), it will compile a so called "shaper font" on the fly, using the brand new [build-shaper-font](https://github.com/fontra/build-shaper-font) functionality, written by Khaled Hosny, using parts of the `fontc` code base written in Rust. This runs in the browser using Web Assembly. It is amazing.
