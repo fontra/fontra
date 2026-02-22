@@ -380,38 +380,53 @@ export default class TextEntryPanel extends Panel {
       }
 
       .feature-tag-button {
-        --button-color: #999;
-        background-color: var(--button-color);
-        color: white;
-        padding: 0.1em 0.75em 0.1em 0.75em;
-        border-radius: 0.5em;
+        color: var(--text-color);
         font-family: menlo, monospace;
         cursor: pointer;
+        display: grid;
+        grid-template-columns: auto auto;
+        align-items: center;
+        justify-content: start;
+        gap: 0.4em;
+        width: 100%;
       }
 
       .feature-tag-button.emulated {
         font-style: oblique;
       }
 
-      .feature-tag-button:active {
-        --button-color: #888;
+      .feature-tag-button > .fea-tag {
+        background-color: #BBB4;
+        padding: 0.1em 0.5em 0.1em 0.5em;
+        border-radius: 0.5em;
       }
 
-      .feature-tag-button.on {
-        --button-color: #00BB00;
+      .feature-tag-button:hover > .fea-tag {
+        background-color: #88888848;
       }
 
-      .feature-tag-button.on:active {
-        --button-color: #009900;
+      .feature-tag-button:active > .fea-tag {
+        background-color: #88888870;
       }
 
-      .feature-tag-button.off {
-        --button-color: #FF0022;
+      .feature-tag-button > .fea-toggle {
+        width: 0.8em;
+        height: 0.8em;
+        border-radius: 1em;
       }
 
-      .feature-tag-button.off:active {
-        --button-color: #DD0011;
+      .feature-tag-button.neutral > .fea-toggle {
+        background-color: #AAAA;
       }
+
+      .feature-tag-button.on > .fea-toggle {
+        background-color: #00BB00;
+      }
+
+      .feature-tag-button.off > .fea-toggle {
+        background-color: #0000;
+      }
+
 
       .feature-tag-label {
         color: var(--text-color);
@@ -708,10 +723,13 @@ function featureTagButton(controller, featureTag, label, options) {
   const id = options?.id ?? `features-button-${featureTag}`;
 
   const updateState = () => {
+    buttonElement.classList.toggle("tri-state", options.defaultValue === undefined);
+    buttonElement.classList.remove("neutral");
     buttonElement.classList.remove("on");
     buttonElement.classList.remove("off");
     switch (state === undefined ? options.defaultValue : state) {
       case undefined:
+        buttonElement.classList.add("neutral");
         break;
       case false:
         buttonElement.classList.add("off");
@@ -753,7 +771,12 @@ function featureTagButton(controller, featureTag, label, options) {
       class: "feature-tag-button",
       onclick: (event) => toggleState(event.altKey),
     },
-    [featureTag.slice(0, 4)]
+    [
+      html.div({ class: "fea-toggle" }),
+      html.div({ class: "fea-tag" }, [
+        featureTag.slice(0, 4).replaceAll(" ", "\u00A0"), // no-break space
+      ]),
+    ]
   );
 
   if (featureTag.endsWith("-emulated")) {
