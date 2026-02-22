@@ -10,6 +10,7 @@
   - Some glyph positioning features are emulated on the fly using data in the font: `curs`, `kern`, `mark` and `mkmk`. This uses live kerning data and glyph anchors and allows the user to make edit and immediately see the effects in the rendered text.
   - The OpenType feature code editor was improved to do live error checking and reporting (also using the `build-shaper-font` functionality). You can have two windows or tabs side-by-side, and see changes in the feature code being reflected in the glyph editor virtually instantaneously.
   - There are still some open issues, and things may still be a little rough around the edges. See [Issue 2381](https://github.com/fontra/fontra/issues/2381) for past and ongoing work.
+- Fixed bug that made Fontra unable to show a glyph if the feature code was invalid. [Issue 2423](https://github.com/fontra/fontra/issues/2423), [PR 2424](https://github.com/fontra/fontra/pull/2424)
 - [fontra-glyphs] Add support for right-to-left kerning. [fontra-glyphs PR 124](https://github.com/fontra/fontra-glyphs/pull/124)
 - [selection info / dimensions field] When a single off-curve point is selected, show the dimensions of the handle instead of (0, 0). Suggested by Aleksandra Samuļenkova. [PR 2418](https://github.com/fontra/fontra/pull/2418)
 - [designspace/ufo] Fix reading and writing of right-to-left kerning. [PR 2416](https://github.com/fontra/fontra/pull/2416), [PR 2417](https://github.com/fontra/fontra/pull/2417)
