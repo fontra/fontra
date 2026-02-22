@@ -9,8 +9,7 @@
   - For .otf and .ttf fonts, Fontra will use the actual OpenType features from the fonts.
   - For source files (.designspace, .ufo, .glyphs, .fontra), it will compile a so called "shaper font" on the fly, using the brand new [build-shaper-font](https://github.com/fontra/build-shaper-font) functionality, written by Khaled Hosny, using parts of the `fontc` code base written in Rust. This runs in the browser using Web Assembly. It is amazing.
   - The OpenType feature code editor was improved to do live error checking and reporting (also using the `build-shaper-font` functionality). You can have two windows or tabs side-by-side, and see changes in the feature code being reflected in the glyph editor virtually instantaneously.
-
-  There are still some open issues, and things may still be a little rough around the edges. See [Issue 2381](https://github.com/fontra/fontra/issues/2381) for ongoing work, and related issues.
+  - There are still some open issues, and things may still be a little rough around the edges. See [Issue 2381](https://github.com/fontra/fontra/issues/2381) for ongoing work, and related issues.
 
 - [fontra-glyphs] Add support for right-to-left kerning. [fontra-glyphs PR 124](https://github.com/fontra/fontra-glyphs/pull/124)
 - [selection info / dimensions field] When a single off-curve point is selected, show the dimensions of the handle instead of (0, 0). Suggested by Aleksandra Samuļenkova. [PR 2418](https://github.com/fontra/fontra/pull/2418)
