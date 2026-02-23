@@ -472,8 +472,10 @@ function _applyMarkPositioning(glyphs, glyphObjects, rightToLeft, markToMark) {
     }
 
     if (glyph.mark) {
-      const markBaseAnchors = collectAnchors(glyphObject.propagatedAnchors);
-      const markAnchors = collectAnchors(glyphObject.propagatedAnchors, "_");
+      // NOTE: for marks, we *don't* use glyphObject.propagedAnchors, but
+      // only the anchors defined in the glyph proper.
+      const markBaseAnchors = collectAnchors(glyphObject.anchors);
+      const markAnchors = collectAnchors(glyphObject.anchors, "_");
       for (const anchorName of Object.keys(markAnchors)) {
         const baseAnchor = baseAnchors[anchorName];
         if (baseAnchor) {
