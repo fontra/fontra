@@ -484,5 +484,38 @@
         "url": "https://cdn.jsdelivr.net/gh/mitradranirban/fbf-bn-glyphset/fontra-bn-glyphset.csv"
       }
     ]
+  },
+  {
+    "name": "JustFont jf 7000 Character Set",
+    "sourceURL": "https://github.com/justfont/jf7000",
+    "dataOptions": {
+      "dataFormat": "glyph-names"
+    },
+    "glyphSets": [
+      {
+        "name": "JF Core Set",
+        "url": "https://cdn.jsdelivr.net/gh/justfont/jf7000/charset/0.9/list_base.txt"
+      },
+      {
+        "name": "JF Formosan Languages Pack",
+        "url": "https://cdn.jsdelivr.net/gh/justfont/jf7000/charset/0.9/list_ext_taiwan.txt"
+      },
+      {
+        "name": "JF Hong Kong and Macao Common Pack",
+        "url": "https://cdn.jsdelivr.net/gh/justfont/jf7000/charset/0.9/list_ext_cantonese.txt"
+      },
+      {
+        "name": "JF Japanese Common Pack",
+        "url": "https://cdn.jsdelivr.net/gh/justfont/jf7000/charset/0.9/list_ext_japan.txt"
+      },
+      {
+        "name": "JF Symbol Pack",
+        "url": "https://cdn.jsdelivr.net/gh/justfont/jf7000/charset/0.9/list_ext_symbols.txt"
+      },
+      {
+        "name": "JF Taiwan Naming Pack",
+        "url": "https://cdn.jsdelivr.net/gh/justfont/jf7000/charset/0.9/list_ext_naming.txt"
+      }
+    ]
   }
 ]

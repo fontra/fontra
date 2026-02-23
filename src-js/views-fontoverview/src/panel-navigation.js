@@ -560,7 +560,7 @@ function makeCheckboxController(settingsController, settingsKey) {
 
 let glyphSetPresets;
 
-fetchJSON("/data/glyphset-presets.json").then((result) => {
+fetchJSON("/data/glyphset-presets.json", { cache: "no-cache" }).then((result) => {
   glyphSetPresets = result;
 });
 
