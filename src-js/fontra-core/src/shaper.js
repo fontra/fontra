@@ -11,7 +11,7 @@ export function getShaper(shaperSupport) {
 
 export const MAX_UNICODE = 0x0110000;
 
-const EMULATED_FEATURE_TAGS = new Set(["curs", "kern", "mark", "mkmk"]);
+const EMULATED_FEATURE_TAGS = ["curs", "kern", "mark", "mkmk"];
 
 class ShaperBase {
   constructor(shaperSupport) {
@@ -22,7 +22,13 @@ class ShaperBase {
     this.glyphOrder = glyphOrder;
     this.isGlyphMarkFunc = isGlyphMarkFunc;
     this.insertMarkers = insertMarkers?.filter((marker) =>
-      EMULATED_FEATURE_TAGS.has(marker.tag)
+      EMULATED_FEATURE_TAGS.includes(marker.tag)
+    );
+    this.emulatedDefaultValues = Object.fromEntries(
+      EMULATED_FEATURE_TAGS.map((emulatedTag) => [
+        emulatedTag,
+        !!this.insertMarkers?.find(({ tag }) => tag === emulatedTag),
+      ])
     );
 
     this.glyphNameToID = {};
@@ -33,6 +39,14 @@ class ShaperBase {
       codePoint >= MAX_UNICODE
         ? this.glyphOrder[codePoint - MAX_UNICODE]
         : this._baseNominalGlyphFunc(codePoint);
+  }
+
+  _getInitialSkipEmulatedFeatures(emulatedFeatures) {
+    return new Set(
+      EMULATED_FEATURE_TAGS.filter(
+        (tag) => !(emulatedFeatures[tag] ?? this.emulatedDefaultValues[tag])
+      )
+    );
   }
 
   getGlyphNameCodePoint(glyphName) {
@@ -48,12 +62,14 @@ class ShaperBase {
   getFeatureInfo(otTableTag) {
     return otTableTag == "GPOS-emulated"
       ? this.insertMarkers
-        ? {
-            "curs-emulated": {},
-            "kern-emulated": {},
-            "mark-emulated": {},
-            "mkmk-emulated": {},
-          }
+        ? Object.fromEntries(
+            EMULATED_FEATURE_TAGS.map((tag) => [
+              `${tag}-emulated`,
+              {
+                defaultOn: this.emulatedDefaultValues[tag],
+              },
+            ])
+          )
         : {}
       : null;
   }
@@ -169,13 +185,17 @@ class HBShaper extends ShaperBase {
   }
 
   setupInsertFeatures(buffer, options) {
-    const { disabledEmulatedFeatures, kerningPairFunc, direction } = options;
+    const { emulatedFeatures, kerningPairFunc, direction } = options;
 
-    if (!this.insertMarkers?.length) {
-      return disabledEmulatedFeatures;
+    const skipFeatures = this._getInitialSkipEmulatedFeatures(emulatedFeatures);
+
+    if (!this.insertMarkers?.some(({ lookupId }) => lookupId !== undefined)) {
+      // An "undefined" lookupId means "do the emulation after HB is done"
+      // So if all lookupIds are undefined, we don't need to use the insertion
+      // mechanism at all.
+      return skipFeatures;
     }
 
-    const skipFeatures = new Set(disabledEmulatedFeatures);
     const isRTL = direction == "rtl";
 
     let gposPhase = false;
@@ -193,11 +213,7 @@ class HBShaper extends ShaperBase {
         const beforeLookupId = parseInt(match[1]);
 
         for (const { tag, lookupId } of this.insertMarkers) {
-          if (
-            !skipFeatures.has(tag) &&
-            EMULATED_FEATURE_TAGS.has(tag) &&
-            beforeLookupId >= lookupId
-          ) {
+          if (!skipFeatures.has(tag) && beforeLookupId >= lookupId) {
             if (glyphs == undefined) {
               glyphs = this.getGlyphInfoFromBuffer(buffer);
               if (isRTL) {
@@ -358,7 +374,7 @@ class DumbShaper extends ShaperBase {
       glyphs.reverse();
     }
 
-    const skipFeatures = options.disabledEmulatedFeatures;
+    const skipFeatures = this._getInitialSkipEmulatedFeatures(options.emulatedFeatures);
     this.applyEmulatedPositioning(
       glyphs,
       glyphObjects,
