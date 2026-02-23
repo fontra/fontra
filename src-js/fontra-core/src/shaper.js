@@ -42,6 +42,9 @@ class ShaperBase {
   }
 
   _getInitialSkipEmulatedFeatures(emulatedFeatures) {
+    if (!emulatedFeatures) {
+      emulatedFeatures = {};
+    }
     return new Set(
       EMULATED_FEATURE_TAGS.filter(
         (tag) => !(emulatedFeatures[tag] ?? this.emulatedDefaultValues[tag])
