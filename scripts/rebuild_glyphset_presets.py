@@ -237,21 +237,23 @@ def getJustFontGlyphSets():
 
     dirContents = getGitHubDirectoryInfo("justfont", "jf7000", "charset/0.9")
 
+    nameMapping = {
+        "list_base.txt": "JF Core Set",
+        "list_ext_cantonese.txt": "JF Hong Kong and Macao Common Pack",
+        "list_ext_japan.txt": "JF Japanese Common Pack",
+        "list_ext_naming.txt": "JF Taiwan Naming Pack",
+        "list_ext_symbols.txt": "JF Symbol Pack",
+        "list_ext_taiwan.txt": "JF Formosan Languages Pack",
+    }
+
     glyphSets = []
 
     for dirInfo in dirContents:
         name = dirInfo["name"]
         if not name.endswith(".txt"):
             continue
-        nameParts = name.split(".")[0].split("_")
-        assert nameParts[0] == "list"
 
-        isExt = nameParts[1] == "ext"
-
-        nameBase = nameParts[2 if isExt else 1]
-        nameExtension = " Extension" if isExt else ""
-
-        name = f"JF {nameBase.capitalize()}{nameExtension}"
+        name = nameMapping.get(name, name)
         glyphSets.append(
             {
                 "name": name,

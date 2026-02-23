@@ -493,28 +493,28 @@
     },
     "glyphSets": [
       {
-        "name": "JF Base",
+        "name": "JF Core Set",
         "url": "https://cdn.jsdelivr.net/gh/justfont/jf7000/charset/0.9/list_base.txt"
       },
       {
-        "name": "JF Cantonese Extension",
+        "name": "JF Formosan Languages Pack",
+        "url": "https://cdn.jsdelivr.net/gh/justfont/jf7000/charset/0.9/list_ext_taiwan.txt"
+      },
+      {
+        "name": "JF Hong Kong and Macao Common Pack",
         "url": "https://cdn.jsdelivr.net/gh/justfont/jf7000/charset/0.9/list_ext_cantonese.txt"
       },
       {
-        "name": "JF Japan Extension",
+        "name": "JF Japanese Common Pack",
         "url": "https://cdn.jsdelivr.net/gh/justfont/jf7000/charset/0.9/list_ext_japan.txt"
       },
       {
-        "name": "JF Naming Extension",
-        "url": "https://cdn.jsdelivr.net/gh/justfont/jf7000/charset/0.9/list_ext_naming.txt"
-      },
-      {
-        "name": "JF Symbols Extension",
+        "name": "JF Symbol Pack",
         "url": "https://cdn.jsdelivr.net/gh/justfont/jf7000/charset/0.9/list_ext_symbols.txt"
       },
       {
-        "name": "JF Taiwan Extension",
-        "url": "https://cdn.jsdelivr.net/gh/justfont/jf7000/charset/0.9/list_ext_taiwan.txt"
+        "name": "JF Taiwan Naming Pack",
+        "url": "https://cdn.jsdelivr.net/gh/justfont/jf7000/charset/0.9/list_ext_naming.txt"
       }
     ]
   }
