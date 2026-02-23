@@ -300,27 +300,29 @@ describe("shaper tests", () => {
   });
 
   const cursiveGlyphObjects = {
-    "A": { xAdvance: 500, propagatedAnchors: [{ name: "exit", x: 450, y: 300 }] },
+    "A": { xAdvance: 500, anchors: [{ name: "exit", x: 450, y: 300 }] },
     "B": {
       xAdvance: 500,
-      propagatedAnchors: [
+      anchors: [
         { name: "entry", x: 25, y: 150 },
         { name: "exit", x: 450, y: 300 },
         { name: "exit", x: -100, y: -100 }, // duplicate, to be ignored
       ],
     },
-    "C": { xAdvance: 500, propagatedAnchors: [{ name: "entry", x: 25, y: 150 }] },
-    "alef-ar": { xAdvance: 500, propagatedAnchors: [{ name: "exit", x: 50, y: 300 }] },
+    "C": { xAdvance: 500, anchors: [{ name: "entry", x: 25, y: 150 }] },
+    "alef-ar": { xAdvance: 500, anchors: [{ name: "exit", x: 50, y: 300 }] },
     "beh-ar": {
       xAdvance: 500,
-      propagatedAnchors: [
+      anchors: [
         { name: "entry", x: 475, y: 150 },
         { name: "exit", x: 50, y: 300 },
         { name: "exit", x: -100, y: -100 }, // duplicate, to be ignored
       ],
     },
-    "teh-ar": { xAdvance: 500, propagatedAnchors: [{ name: "entry", x: 475, y: 150 }] },
+    "teh-ar": { xAdvance: 500, anchors: [{ name: "entry", x: 475, y: 150 }] },
   };
+
+  propagateAnchors(cursiveGlyphObjects);
 
   const testDataCursiveAttachmentsLTR = [
     // LTR
@@ -411,26 +413,28 @@ describe("shaper tests", () => {
   const markGlyphObjects = {
     H: {
       xAdvance: 500,
-      propagatedAnchors: [
+      anchors: [
         { name: "top", x: 250, y: 720 },
         { name: "bottom", x: 250, y: -20 },
       ],
     },
     dotaccentcomb: {
       xAdvance: 200,
-      propagatedAnchors: [
+      anchors: [
         { name: "_top", x: 100, y: 730 },
         { name: "top", x: 100, y: 900 },
       ],
     },
     dotbelowcomb: {
       xAdvance: 200,
-      propagatedAnchors: [
+      anchors: [
         { name: "_bottom", x: 100, y: -20 },
         { name: "bottom", x: 100, y: -190 },
       ],
     },
   };
+
+  propagateAnchors(markGlyphObjects);
 
   const testDataMarkPositioning = [
     { inputGlyphs: [], expectedGlyphs: [] },
@@ -611,4 +615,10 @@ describe("shaper tests", () => {
 
 function ord(s) {
   return s.codePointAt(0);
+}
+
+function propagateAnchors(glyphs) {
+  for (const glyph of Object.values(glyphs)) {
+    glyph.propagatedAnchors = glyph.anchors;
+  }
 }
