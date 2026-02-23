@@ -232,6 +232,43 @@ def getBengaliGlyphSets():
     }
 
 
+def getJustFontGlyphSets():
+    sourceURL = "https://github.com/justfont/jf7000"
+
+    dirContents = getGitHubDirectoryInfo("justfont", "jf7000", "charset/0.9")
+
+    glyphSets = []
+
+    for dirInfo in dirContents:
+        name = dirInfo["name"]
+        if not name.endswith(".txt"):
+            continue
+        nameParts = name.split(".")[0].split("_")
+        assert nameParts[0] == "list"
+
+        isExt = nameParts[1] == "ext"
+
+        nameBase = nameParts[2 if isExt else 1]
+        nameExtension = " Extension" if isExt else ""
+
+        name = f"JF {nameBase.capitalize()}{nameExtension}"
+        glyphSets.append(
+            {
+                "name": name,
+                "url": jsDelivrURL("justfont", "jf7000", dirInfo["path"]),
+            }
+        )
+
+    glyphSets.sort(key=lambda glyphSet: glyphSet["name"])
+
+    return {
+        "name": "JustFont jf 7000 Character Set",
+        "sourceURL": sourceURL,
+        "dataOptions": {"dataFormat": "glyph-names"},
+        "glyphSets": glyphSets,
+    }
+
+
 def collectCollections():
     collections = []
     collections.append(getGoogleFontsGlyphSets())
@@ -240,6 +277,7 @@ def collectCollections():
     collections.append(getKoeberlinLatinGlyphSets())
     collections.append(getWickedLettersGeorgianGlyphSets())
     collections.append(getBengaliGlyphSets())
+    collections.append(getJustFontGlyphSets())
     return collections
 
 
