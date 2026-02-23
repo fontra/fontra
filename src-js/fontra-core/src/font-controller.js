@@ -405,11 +405,15 @@ export class FontController {
   async buildShaperFont(glyphOrder) {
     const features = await this.getFeatures();
 
+    const gdefFeatureCode = features.text.match(/^\s*table\s+GDEF/m)
+      ? ""
+      : this.generateGDEFFeatureCode();
+
     try {
       return buildShaperFont(
         this.unitsPerEm,
         glyphOrder,
-        features.text,
+        features.text + gdefFeatureCode,
         this.axes.axes
           .filter((axis) => !axis.values) // Filter out discrete axes
           .map((axis) => ({
@@ -431,6 +435,21 @@ export class FontController {
         insertMarkers: [],
       };
     }
+  }
+
+  generateGDEFFeatureCode() {
+    const markGlyphs = Object.keys(this.glyphMap).filter((glyphName) =>
+      this.isMark(glyphName)
+    );
+
+    return `
+table GDEF {
+  GlyphClassDef [], [],
+    [
+${markGlyphs.join("\n")}
+    ], [];
+} GDEF;
+    `;
   }
 
   getCachedGlyphNames() {
