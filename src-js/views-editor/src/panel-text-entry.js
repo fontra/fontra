@@ -632,11 +632,14 @@ export default class TextEntryPanel extends Panel {
         const [featureDescription, url] = features[cleanTag] ?? ["", null];
         const label = info[tag]?.uiLabelName || featureDescription;
 
-        const defaultValue = horizontalOnFeatures.has(tag)
-          ? true
-          : dynamicFeatures.has(tag)
-          ? undefined
-          : false;
+        // TODO: fix this for vertical layout once we support it.
+        const emulateDefaultValue = info[tag]?.defaultOn ?? true;
+        const defaultValue =
+          horizontalOnFeatures.has(tag) && emulateDefaultValue
+            ? true
+            : dynamicFeatures.has(tag)
+            ? undefined
+            : false;
 
         element.append(
           ...featureTagButton(this.textSettingsController, tag, label, {

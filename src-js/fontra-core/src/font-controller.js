@@ -389,7 +389,12 @@ export class FontController {
     } else {
       glyphOrder.sort();
       ensureNotdef(glyphOrder);
-      insertMarkers = [];
+      insertMarkers = [
+        { tag: "curs", lookupId: undefined },
+        { tag: "kern", lookupId: undefined },
+        { tag: "mark", lookupId: undefined },
+        { tag: "mkmk", lookupId: undefined },
+      ];
     }
 
     return {
