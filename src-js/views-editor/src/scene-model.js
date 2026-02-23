@@ -475,11 +475,13 @@ export class SceneModel {
     );
 
     const featureEntries = Object.entries(this.sceneSettings.featureSettings ?? {});
-    const disabledEmulatedFeatures = new Set(
+
+    const emulatedFeatures = Object.fromEntries(
       featureEntries
-        .filter(([k, v]) => v == false && k.endsWith("-emulated"))
-        .map(([k, v]) => k.slice(0, 4))
+        .filter(([k, v]) => v !== undefined && k.endsWith("-emulated"))
+        .map(([k, v]) => [k.slice(0, 4), v])
     );
+
     const featuresString = featureEntries
       .filter(([k, v]) => v != undefined && !k.endsWith("-emulated"))
       .map(([k, v]) => (v ? (v > 1 ? `${k}=${v}` : k) : `-${k}`))
@@ -489,7 +491,9 @@ export class SceneModel {
       this.sceneSettings.fontLocationSourceMapped
     );
 
-    const kerningInstance = !disabledEmulatedFeatures.has("kern")
+    const emulateKerning =
+      emulatedFeatures["kern"] ?? shaper.emulatedDefaultValues["kern"];
+    const kerningInstance = emulateKerning
       ? await this.getKerningInstance("kern")
       : null;
     const kerningPairFunc = kerningInstance
@@ -502,7 +506,7 @@ export class SceneModel {
       direction: this.sceneSettings.textDirection,
       script: this.sceneSettings.textScript,
       language: this.sceneSettings.textLanguage,
-      disabledEmulatedFeatures,
+      emulatedFeatures,
       kerningPairFunc,
     };
 
