@@ -1,6 +1,7 @@
 import { DefaultFormatter } from "@fontra/core/formatters.js";
 import * as html from "@fontra/core/html-utils.js";
 import { UnlitElement } from "@fontra/core/html-utils.js";
+import { firstItemOfSet, isEqualSet } from "@fontra/core/set-ops.js";
 import { message } from "@fontra/web-components/modal-dialog.js";
 import { themeColorCSS } from "./theme-support.js";
 
@@ -187,7 +188,7 @@ export class UIList extends UnlitElement {
       (event) => this._keyUpHandler(event),
       false
     );
-    this.selectedItemIndex = undefined;
+    this.selectedItemIndices = new Set();
     this.allowEmptySelection = true;
   }
 
@@ -290,7 +291,7 @@ export class UIList extends UnlitElement {
       const row = document.createElement("div");
       row.className = "row";
       row.dataset.rowIndex = rowIndex;
-      if (rowIndex === this.selectedItemIndex) {
+      if (this.selectedItemIndices.has(rowIndex)) {
         row.classList.add("selected");
       }
 
@@ -488,37 +489,62 @@ export class UIList extends UnlitElement {
     shouldDispatchEvent = false,
     shouldScrollInfoView = false
   ) {
-    if (rowIndex == undefined && !this.allowEmptySelection) {
-      return;
-    }
     if (!isNaN(rowIndex)) {
       rowIndex = Number(rowIndex);
     }
-    if (rowIndex === this.selectedItemIndex) {
+
+    this.setSelectedItemIndices(
+      new Set(rowIndex == undefined ? undefined : [rowIndex]),
+      shouldDispatchEvent,
+      shouldScrollInfoView
+    );
+  }
+
+  setSelectedItemIndices(
+    rowIndices,
+    shouldDispatchEvent = false,
+    shouldScrollInfoView = false
+  ) {
+    rowIndices = new Set(rowIndices);
+
+    if (!rowIndices.length && !this.allowEmptySelection) {
+      return;
+    }
+    if (isEqualSet(rowIndices, this.selectedItemIndices)) {
       // nothing to do
       return;
     }
-    if (this.selectedItemIndex !== undefined) {
-      const row = this.contents.children[this.selectedItemIndex];
+    for (const rowIndex of this.selectedItemIndices) {
+      const row = this.contents.children[rowIndex];
       row?.classList.remove("selected");
     }
-    if (rowIndex !== undefined) {
+    for (const rowIndex of rowIndices) {
       const row = this.contents.children[rowIndex];
       row?.classList.add("selected");
     }
-    this.selectedItemIndex = rowIndex;
+    this.selectedItemIndices = rowIndices;
     if (!this._isKeyRepeating && shouldDispatchEvent) {
       this._dispatchEvent("listSelectionChanged");
     }
 
-    if (shouldScrollInfoView && rowIndex !== undefined) {
+    if (shouldScrollInfoView && rowIndices.length) {
+      const rowIndex = firstItemOfSet(rowIndices);
       const row = this.contents.children[rowIndex];
       row?.scrollIntoView({ behavior: "auto", block: "nearest", inline: "nearest" });
     }
   }
 
+  get selectedItemIndex() {
+    return this.getSelectedItemIndex();
+  }
+
+  getSelectedItemIndices() {
+    return this.selectedItemIndices;
+  }
+
   getSelectedItemIndex() {
-    return this.selectedItemIndex;
+    const indices = [...this.selectedItemIndices];
+    return firstItemOfSet(this.selectedItemIndices);
   }
 
   editCell(rowIndex, columnKey) {
