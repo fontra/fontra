@@ -1,5 +1,6 @@
 import * as html from "@fontra/core/html-utils.js";
 import { translate } from "@fontra/core/localization.js";
+import { characterGlyphMapping } from "@fontra/core/shaper.js";
 import {
   makeUPlusStringFromCodePoint,
   round,
@@ -30,7 +31,6 @@ export default class CharactersGlyphsPanel extends Panel {
     this.sceneSettingsController =
       this.editorController.sceneController.sceneSettingsController;
     this.sceneSettings = this.editorController.sceneController.sceneSettings;
-    this.sceneModel = editorController.sceneModel;
 
     this.sceneSettingsController.addKeyListener(["positionedLines"], (event) =>
       this.throttledUpdate()
@@ -64,11 +64,11 @@ export default class CharactersGlyphsPanel extends Panel {
     this.characterList.minHeight = "5em";
     this.characterList.addEventListener("listSelectionChanged", (event) => {
       const characterIndex = this.characterList.getSelectedItemIndex();
-      this.sceneSettings.selectedGlyph =
-        this.sceneModel.characterSelectionToGlyphSelection({
-          lineIndex: this.selectedLineIndex,
-          characterIndex,
-        });
+      const glyphIndex = this.characterGlyphMapping.charToGlyphs[characterIndex][0];
+      this.sceneSettings.selectedGlyph = {
+        lineIndex: this.selectedLineIndex,
+        glyphIndex,
+      };
     });
 
     const glyphListColumnDescriptions = [
@@ -179,20 +179,21 @@ export default class CharactersGlyphsPanel extends Panel {
       cluster: glyph.cluster,
     }));
 
+    this.characterGlyphMapping = characterGlyphMapping(
+      positionedLine.glyphs.map(({ cluster }) => cluster),
+      charLine.length
+    );
+
     const currentSelectedCharacterIndex = this.characterList.getSelectedItemIndex();
 
     this.characterList.setItems(charItems);
     this.glyphList.setItems(glyphItems);
 
     if (selectedGlyph) {
-      const { glyphIndex: currentSelectedGlyphIndex } =
-        this.sceneModel.characterSelectionToGlyphSelection({
-          lineIndex: this.selectedLineIndex,
-          characterIndex: currentSelectedCharacterIndex,
-        });
+      const currentSelectedGlyphIndex =
+        this.characterGlyphMapping.charToGlyphs[currentSelectedCharacterIndex]?.[0];
 
-      const { characterIndex } =
-        this.sceneModel.glyphSelectionToCharacterSelection(selectedGlyph);
+      const characterIndex = this.characterGlyphMapping.glyphToChars[glyphIndex][0];
 
       this.characterList.setSelectedItemIndex(
         glyphIndex != currentSelectedGlyphIndex
