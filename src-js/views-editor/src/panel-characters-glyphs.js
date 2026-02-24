@@ -1,5 +1,6 @@
 import * as html from "@fontra/core/html-utils.js";
 import { translate } from "@fontra/core/localization.js";
+import { isDisjoint, updateSet } from "@fontra/core/set-ops.js";
 import { characterGlyphMapping } from "@fontra/core/shaper.js";
 import {
   makeUPlusStringFromCodePoint,
@@ -64,11 +65,12 @@ export default class CharactersGlyphsPanel extends Panel {
     this.characterList.minHeight = "5em";
     this.characterList.addEventListener("listSelectionChanged", (event) => {
       const characterIndex = this.characterList.getSelectedItemIndex();
-      const glyphIndex = this.characterGlyphMapping.charToGlyphs[characterIndex][0];
+      const glyphIndices = this.characterGlyphMapping.charToGlyphs[characterIndex];
       this.sceneSettings.selectedGlyph = {
         lineIndex: this.selectedLineIndex,
-        glyphIndex,
+        glyphIndex: glyphIndices[0],
       };
+      this.glyphList.setSelectedItemIndices(glyphIndices);
     });
 
     const glyphListColumnDescriptions = [
@@ -184,26 +186,29 @@ export default class CharactersGlyphsPanel extends Panel {
       charLine.length
     );
 
-    const currentSelectedCharacterIndex = this.characterList.getSelectedItemIndex();
+    const currentGlyphIndices = this.glyphList.getSelectedItemIndices();
+    const currentCharacterIndices = this.characterList.getSelectedItemIndices();
+    const sameGlyphContents = sameGlyphNames(glyphItems, this.glyphList.items);
 
     this.characterList.setItems(charItems);
     this.glyphList.setItems(glyphItems);
 
     if (selectedGlyph) {
-      const currentSelectedGlyphIndex =
-        this.characterGlyphMapping.charToGlyphs[currentSelectedCharacterIndex]?.[0];
-
-      const characterIndex = this.characterGlyphMapping.glyphToChars[glyphIndex][0];
-
-      this.characterList.setSelectedItemIndex(
-        glyphIndex != currentSelectedGlyphIndex
-          ? characterIndex
-          : currentSelectedCharacterIndex,
-        false,
-        true
+      const characterIndices = new Set(
+        this.characterGlyphMapping.glyphToChars[glyphIndex]
       );
 
-      this.glyphList.setSelectedItemIndex(glyphIndex, false, true);
+      this.glyphList.setSelectedItemIndices(
+        currentGlyphIndices.has(glyphIndex) && sameGlyphContents
+          ? currentGlyphIndices
+          : new Set([glyphIndex])
+      );
+
+      this.characterList.setSelectedItemIndices(
+        !isDisjoint(currentCharacterIndices, characterIndices) && sameGlyphContents
+          ? currentCharacterIndices
+          : characterIndices
+      );
     } else {
       this.characterList.setSelectedItemIndex(undefined);
       this.glyphList.setSelectedItemIndex(undefined);
@@ -223,5 +228,11 @@ const NumberFormatterOneDecimal = {
     return value ? round(value, 1).toString() : 0;
   },
 };
+
+function sameGlyphNames(items1, items2) {
+  const key1 = items1.map((item) => item.glyphName).join("|");
+  const key2 = items2.map((item) => item.glyphName).join("|");
+  return key1 == key2;
+}
 
 customElements.define("panel-characters-glyphs", CharactersGlyphsPanel);
