@@ -62,6 +62,14 @@ export default class CharactersGlyphsPanel extends Panel {
     this.characterList.columnDescriptions = characterListColumnDescriptions;
     this.characterList.showHeader = true;
     this.characterList.minHeight = "5em";
+    this.characterList.addEventListener("listSelectionChanged", (event) => {
+      const characterIndex = this.characterList.getSelectedItemIndex();
+      this.sceneSettings.selectedGlyph =
+        this.sceneModel.characterSelectionToGlyphSelection({
+          lineIndex: this.selectedLineIndex,
+          characterIndex,
+        });
+    });
 
     const glyphListColumnDescriptions = [
       {
@@ -101,6 +109,13 @@ export default class CharactersGlyphsPanel extends Panel {
     this.glyphList.columnDescriptions = glyphListColumnDescriptions;
     this.glyphList.showHeader = true;
     this.glyphList.minHeight = "5em";
+    this.glyphList.addEventListener("listSelectionChanged", (event) => {
+      const glyphIndex = this.glyphList.getSelectedItemIndex();
+      this.sceneSettings.selectedGlyph = {
+        lineIndex: this.selectedLineIndex,
+        glyphIndex,
+      };
+    });
 
     this.accordion = new Accordion();
     this.accordion.appendStyle(`
@@ -164,13 +179,29 @@ export default class CharactersGlyphsPanel extends Panel {
       cluster: glyph.cluster,
     }));
 
+    const currentSelectedCharacterIndex = this.characterList.getSelectedItemIndex();
+
     this.characterList.setItems(charItems);
     this.glyphList.setItems(glyphItems);
 
     if (selectedGlyph) {
+      const { glyphIndex: currentSelectedGlyphIndex } =
+        this.sceneModel.characterSelectionToGlyphSelection({
+          lineIndex: this.selectedLineIndex,
+          characterIndex: currentSelectedCharacterIndex,
+        });
+
       const { characterIndex } =
         this.sceneModel.glyphSelectionToCharacterSelection(selectedGlyph);
-      this.characterList.setSelectedItemIndex(characterIndex, false, true);
+
+      this.characterList.setSelectedItemIndex(
+        glyphIndex != currentSelectedGlyphIndex
+          ? characterIndex
+          : currentSelectedCharacterIndex,
+        false,
+        true
+      );
+
       this.glyphList.setSelectedItemIndex(glyphIndex, false, true);
     } else {
       this.characterList.setSelectedItemIndex(undefined);
