@@ -65,11 +65,16 @@ export default class CharactersGlyphsPanel extends Panel {
       {
         key: "unicodeName",
         title: "Unicode name",
-        width: "10em",
+        width: "12em",
         get: (item) =>
           item.codePoint
             ? getGlyphInfoFromCodePoint(item.codePoint)?.description?.toLowerCase()
             : "",
+      },
+      {
+        key: "index",
+        title: "Index",
+        width: "3em",
       },
     ];
     this.characterList = new UIList();
@@ -143,12 +148,12 @@ export default class CharactersGlyphsPanel extends Panel {
 
     this.accordion.items = [
       {
-        label: "Characters",
+        label: "Input characters",
         open: true,
         content: this.characterList,
       },
       {
-        label: "Glyphs",
+        label: "Output glyphs",
         open: true,
         content: this.glyphList,
       },
@@ -181,10 +186,11 @@ export default class CharactersGlyphsPanel extends Panel {
     const charLine = charLines[this.selectedLineIndex];
     const positionedLine = positionedLines[this.selectedLineIndex];
 
-    const charItems = charLine.map(({ character, glyphName }) => ({
+    const charItems = charLine.map(({ character, glyphName }, index) => ({
       character,
       codePoint: character ? character.codePointAt(0) : 0,
       glyphName,
+      index,
     }));
 
     const glyphItems = positionedLine.glyphs.map((glyph) => ({
