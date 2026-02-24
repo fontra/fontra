@@ -170,33 +170,13 @@ export default class CharactersGlyphsPanel extends Panel {
     if (selectedGlyph) {
       const { characterIndex } =
         this.sceneModel.glyphSelectionToCharacterSelection(selectedGlyph);
-      this.characterList.setSelectedItemIndex(characterIndex);
-      this.glyphList.setSelectedItemIndex(glyphIndex);
+      this.characterList.setSelectedItemIndex(characterIndex, false, true);
+      this.glyphList.setSelectedItemIndex(glyphIndex, false, true);
     } else {
       this.characterList.setSelectedItemIndex(undefined);
       this.glyphList.setSelectedItemIndex(undefined);
     }
   }
-
-  // handleContextMenu(event, glyphCell) {
-  //   event.preventDefault();
-
-  //   // const selectedGlyphInfo = this.glyphCellView.getSelectedGlyphInfo(true);
-  //   // if (!selectedGlyphInfo.length) {
-  //   //   return;
-  //   // }
-
-  //   // const items = [
-  //   //   {
-  //   //     title: translate("sidebar.related-glyphs.replace-selected-glyph"),
-  //   //     callback: () => {
-  //   //       this.insertGlyphIntoTextString(selectedGlyphInfo, 0, true);
-  //   //     },
-  //   //   },
-  //   // ];
-  //   // const { x, y } = event;
-  //   // showMenu(items, { x: x + 1, y: y - 1 });
-  // }
 
   async toggle(on, focus) {
     this.isActive = on;
