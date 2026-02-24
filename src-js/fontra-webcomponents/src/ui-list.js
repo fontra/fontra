@@ -507,7 +507,7 @@ export class UIList extends UnlitElement {
   ) {
     rowIndices = new Set(rowIndices);
 
-    if (!rowIndices.length && !this.allowEmptySelection) {
+    if (!rowIndices.size && !this.allowEmptySelection) {
       return;
     }
     if (isEqualSet(rowIndices, this.selectedItemIndices)) {
@@ -527,7 +527,7 @@ export class UIList extends UnlitElement {
       this._dispatchEvent("listSelectionChanged");
     }
 
-    if (shouldScrollInfoView && rowIndices.length) {
+    if (shouldScrollInfoView && rowIndices.size) {
       const rowIndex = firstItemOfSet(rowIndices);
       const row = this.contents.children[rowIndex];
       row?.scrollIntoView({ behavior: "auto", block: "nearest", inline: "nearest" });
