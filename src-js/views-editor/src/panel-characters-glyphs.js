@@ -56,7 +56,10 @@ export default class CharactersGlyphsPanel extends Panel {
         key: "codePoint",
         title: "Unicode",
         width: "5em",
-        get: (item) => makeUPlusStringFromCodePoint(item.codePoint),
+        get: (item) =>
+          item.codePoint
+            ? makeUPlusStringFromCodePoint(item.codePoint)
+            : item.glyphName,
       },
     ];
     this.characterList = new UIList();
@@ -168,9 +171,10 @@ export default class CharactersGlyphsPanel extends Panel {
     const charLine = charLines[this.selectedLineIndex];
     const positionedLine = positionedLines[this.selectedLineIndex];
 
-    const charItems = charLine.map(({ character }) => ({
+    const charItems = charLine.map(({ character, glyphName }) => ({
       character,
       codePoint: character ? character.codePointAt(0) : 0,
+      glyphName,
     }));
 
     const glyphItems = positionedLine.glyphs.map((glyph) => ({
