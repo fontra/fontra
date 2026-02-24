@@ -88,7 +88,7 @@ export default class CharactersGlyphsPanel extends Panel {
         lineIndex: this.selectedLineIndex,
         glyphIndex: glyphIndices[0],
       };
-      this.glyphList.setSelectedItemIndices(glyphIndices);
+      this.glyphList.setSelectedItemIndices(glyphIndices, false, true);
     });
 
     const glyphListColumnDescriptions = [
@@ -209,9 +209,13 @@ export default class CharactersGlyphsPanel extends Panel {
     const currentGlyphIndices = this.glyphList.getSelectedItemIndices();
     const currentCharacterIndices = this.characterList.getSelectedItemIndices();
     const sameGlyphContents = sameGlyphNames(glyphItems, this.glyphList.items);
+    const sameContents =
+      JSON.stringify(glyphItems) == JSON.stringify(this.glyphList.items);
 
-    this.characterList.setItems(charItems);
-    this.glyphList.setItems(glyphItems);
+    if (!sameContents) {
+      this.characterList.setItems(charItems);
+      this.glyphList.setItems(glyphItems);
+    }
 
     if (selectedGlyph) {
       const characterIndices = new Set(
@@ -221,13 +225,17 @@ export default class CharactersGlyphsPanel extends Panel {
       this.glyphList.setSelectedItemIndices(
         currentGlyphIndices.has(glyphIndex) && sameGlyphContents
           ? currentGlyphIndices
-          : new Set([glyphIndex])
+          : new Set([glyphIndex]),
+        false,
+        true
       );
 
       this.characterList.setSelectedItemIndices(
         !isDisjoint(currentCharacterIndices, characterIndices) && sameGlyphContents
           ? currentCharacterIndices
-          : characterIndices
+          : characterIndices,
+        false,
+        true
       );
     } else {
       this.characterList.setSelectedItemIndex(undefined);
