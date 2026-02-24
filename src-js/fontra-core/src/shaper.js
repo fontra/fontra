@@ -541,3 +541,44 @@ function collectAnchors(anchors, prefix = "", dx = 0, dy = 0) {
 
   return anchorsBySuffix;
 }
+
+export function characterGlyphMapping(clusters, numChars) {
+  /*
+   * This implements character to glyph mapping and vice versa, using
+   * cluster information from HarfBuzz. It should be correct for HB
+   * clustering support levels 0 and 1, see:
+   *
+   *     https://harfbuzz.github.io/working-with-harfbuzz-clusters.html
+   *
+   * "Each character belongs to the cluster that has the highest cluster
+   * value not larger than its initial cluster value.""
+   *
+   * (ported from FontGoggles)
+   */
+
+  const sortedUniqueClusters = [...new Set(clusters)].sort((a, b) => a - b);
+  assert(!sortedUniqueClusters.length || sortedUniqueClusters.at(-1) < numChars);
+  assert(!sortedUniqueClusters.length || sortedUniqueClusters[0] == 0);
+
+  const clusterToChars = new Map();
+
+  for (let i = 0; i < sortedUniqueClusters.length; i++) {
+    const cl = sortedUniqueClusters[i];
+    const clNext = sortedUniqueClusters[i + 1] ?? numChars;
+    const chars = [...range(cl, clNext)];
+    clusterToChars.set(cl, chars);
+  }
+
+  const glyphToChars = clusters.map((cl) => clusterToChars.get(cl));
+  const charToGlyphs = new Array(numChars).fill(null).map((item) => []);
+
+  glyphToChars.forEach((charIndices, glyphIndex) => {
+    charIndices.forEach((ci) => {
+      charToGlyphs[ci].push(glyphIndex);
+    });
+  });
+
+  charToGlyphs.forEach((glyphIndices) => glyphIndices.sort((a, b) => a - b));
+
+  return { glyphToChars, charToGlyphs };
+}

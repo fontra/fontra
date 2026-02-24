@@ -14,6 +14,7 @@ import {
   applyKerning,
   applyMarkToBasePositioning,
   applyMarkToMarkPositioning,
+  characterGlyphMapping,
   getShaper,
 } from "@fontra/core/shaper.js";
 
@@ -609,6 +610,91 @@ describe("shaper tests", () => {
       applyMarkToMarkPositioning(outputGlyphs, markGlyphObjects, rightToLeft);
 
       expect(outputGlyphs).to.deep.equal(expectedGlyphs);
+    }
+  );
+
+  const clusterTestData = [
+    { clusters: [], numChars: 0, expectedGlyphToChars: [], expectedCharToGlyphs: [] },
+    {
+      clusters: [0, 1, 2, 5, 6, 8],
+      numChars: 10,
+      expectedGlyphToChars: [[0], [1], [2, 3, 4], [5], [6, 7], [8, 9]],
+      expectedCharToGlyphs: [[0], [1], [2], [2], [2], [3], [4], [4], [5], [5]],
+    },
+    {
+      clusters: [0, 1],
+      numChars: 3,
+      expectedGlyphToChars: [[0], [1, 2]],
+      expectedCharToGlyphs: [[0], [1], [1]],
+    },
+    {
+      clusters: [0, 0, 1],
+      numChars: 2,
+      expectedGlyphToChars: [[0], [0], [1]],
+      expectedCharToGlyphs: [[0, 1], [2]],
+    },
+    {
+      clusters: [0, 0, 1, 1],
+      numChars: 2,
+      expectedGlyphToChars: [[0], [0], [1], [1]],
+      expectedCharToGlyphs: [
+        [0, 1],
+        [2, 3],
+      ],
+    },
+    {
+      clusters: [0, 0, 2, 2],
+      numChars: 3,
+      expectedGlyphToChars: [[0, 1], [0, 1], [2], [2]],
+      expectedCharToGlyphs: [
+        [0, 1],
+        [0, 1],
+        [2, 3],
+      ],
+    },
+    {
+      clusters: [3, 2, 1, 0],
+      numChars: 4,
+      expectedGlyphToChars: [[3], [2], [1], [0]],
+      expectedCharToGlyphs: [[3], [2], [1], [0]],
+    },
+    {
+      clusters: [3, 2, 0, 1],
+      numChars: 4,
+      expectedGlyphToChars: [[3], [2], [0], [1]],
+      expectedCharToGlyphs: [[2], [3], [1], [0]],
+    },
+    {
+      clusters: [2, 0],
+      numChars: 3,
+      expectedGlyphToChars: [[2], [0, 1]],
+      expectedCharToGlyphs: [[1], [1], [0]],
+    },
+    {
+      clusters: [1, 0],
+      numChars: 3,
+      expectedGlyphToChars: [[1, 2], [0]],
+      expectedCharToGlyphs: [[1], [0], [0]],
+    },
+    {
+      clusters: [2, 2, 0, 0],
+      numChars: 3,
+      expectedGlyphToChars: [[2], [2], [0, 1], [0, 1]],
+      expectedCharToGlyphs: [
+        [2, 3],
+        [2, 3],
+        [0, 1],
+      ],
+    },
+  ];
+
+  parametrize(
+    "characterGlyphMapping tests",
+    clusterTestData,
+    ({ clusters, numChars, expectedGlyphToChars, expectedCharToGlyphs }) => {
+      const { glyphToChars, charToGlyphs } = characterGlyphMapping(clusters, numChars);
+      expect(glyphToChars).to.deep.equal(expectedGlyphToChars);
+      expect(charToGlyphs).to.deep.equal(expectedCharToGlyphs);
     }
   );
 });
