@@ -148,7 +148,7 @@ export default class CharactersGlyphsPanel extends Panel {
     const selectedGlyph = this.sceneSettings.selectedGlyph;
 
     this.selectedLineIndex = selectedGlyph?.lineIndex ?? this.selectedLineIndex;
-    const glyphIndex = selectedGlyph?.glyphIndex ?? undefined;
+    const glyphIndex = selectedGlyph?.glyphIndex;
 
     const charLines = this.sceneSettings.characterLines;
     const positionedLines = this.sceneSettings.positionedLines;
