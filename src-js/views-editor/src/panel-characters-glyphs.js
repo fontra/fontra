@@ -1,3 +1,4 @@
+import { getGlyphInfoFromCodePoint } from "@fontra/core/glyph-data.js";
 import * as html from "@fontra/core/html-utils.js";
 import { translate } from "@fontra/core/localization.js";
 import { isDisjoint, updateSet } from "@fontra/core/set-ops.js";
@@ -60,6 +61,15 @@ export default class CharactersGlyphsPanel extends Panel {
           item.codePoint
             ? makeUPlusStringFromCodePoint(item.codePoint)
             : item.glyphName,
+      },
+      {
+        key: "unicodeName",
+        title: "Unicode name",
+        width: "10em",
+        get: (item) =>
+          item.codePoint
+            ? getGlyphInfoFromCodePoint(item.codePoint)?.description?.toLowerCase()
+            : "",
       },
     ];
     this.characterList = new UIList();
