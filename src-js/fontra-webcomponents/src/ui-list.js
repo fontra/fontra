@@ -246,7 +246,7 @@ export class UIList extends UnlitElement {
     return this.items[this.selectedItemIndex];
   }
 
-  setSelectedItem(item, shouldDispatchEvent = false) {
+  setSelectedItem(item, shouldDispatchEvent = false, shouldScrollInfoView = false) {
     if (!item) {
       this.setSelectedItemIndex(undefined, shouldDispatchEvent);
       return;
@@ -265,7 +265,7 @@ export class UIList extends UnlitElement {
       index = this.items.indexOf(item);
     }
     if (index >= 0) {
-      this.setSelectedItemIndex(index, shouldDispatchEvent);
+      this.setSelectedItemIndex(index, shouldDispatchEvent, shouldScrollInfoView);
     } else {
       this.setSelectedItemIndex(undefined, shouldDispatchEvent);
     }
@@ -483,7 +483,11 @@ export class UIList extends UnlitElement {
     return node?.dataset.rowIndex;
   }
 
-  setSelectedItemIndex(rowIndex, shouldDispatchEvent = false) {
+  setSelectedItemIndex(
+    rowIndex,
+    shouldDispatchEvent = false,
+    shouldScrollInfoView = false
+  ) {
     if (rowIndex == undefined && !this.allowEmptySelection) {
       return;
     }
@@ -505,6 +509,11 @@ export class UIList extends UnlitElement {
     this.selectedItemIndex = rowIndex;
     if (!this._isKeyRepeating && shouldDispatchEvent) {
       this._dispatchEvent("listSelectionChanged");
+    }
+
+    if (shouldScrollInfoView && rowIndex !== undefined) {
+      const row = this.contents.children[rowIndex];
+      row?.scrollIntoView({ behavior: "auto", block: "nearest", inline: "nearest" });
     }
   }
 
@@ -571,9 +580,7 @@ export class UIList extends UnlitElement {
       rowIndex = Math.min(Math.max(rowIndex, 0), this.items.length - 1);
     }
     this._isKeyRepeating = event.repeat;
-    this.setSelectedItemIndex(rowIndex, true);
-    const newRow = this.contents.children[rowIndex];
-    newRow?.scrollIntoView({ behavior: "auto", block: "nearest", inline: "nearest" });
+    this.setSelectedItemIndex(rowIndex, true, true);
   }
 
   _keyUpHandler(event) {
