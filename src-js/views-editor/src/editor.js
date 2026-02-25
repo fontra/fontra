@@ -235,13 +235,9 @@ export class EditorController extends ViewController {
       this.showDialogGlyphEditLocationNotAtSource();
     });
 
-    this.sceneController.addEventListener("doubleClickedUndefinedGlyph", () => {
-      if (this.fontController.readOnly) {
-        this.showDialogGlyphEditCannotEditReadOnly(true);
-      } else {
-        this.showDialogNewGlyph();
-      }
-    });
+    this.sceneController.addEventListener("doubleClickedUndefinedGlyph", () =>
+      this.showDialogNewGlyph()
+    );
 
     this.sidebars = [];
     this.contextMenuPosition = { x: 0, y: 0 };
@@ -814,6 +810,11 @@ export class EditorController extends ViewController {
   }
 
   async showDialogNewGlyph() {
+    if (this.fontController.readOnly) {
+      this.showDialogGlyphEditCannotEditReadOnly(true);
+      return;
+    }
+
     const positionedGlyph =
       this.sceneController.sceneModel.getSelectedPositionedGlyph();
     this.sceneSettings.selectedGlyph = {
