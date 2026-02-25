@@ -90,6 +90,9 @@ export default class CharactersGlyphsPanel extends Panel {
       };
       this.glyphList.setSelectedItemIndices(glyphIndices, false, true);
     });
+    this.characterList.addEventListener("rowDoubleClicked", (event) =>
+      this.doubleClickHandler(event)
+    );
 
     const showKern = true; // could become a toggle
 
@@ -142,6 +145,9 @@ export default class CharactersGlyphsPanel extends Panel {
         glyphIndex,
       };
     });
+    this.glyphList.addEventListener("rowDoubleClicked", (event) =>
+      this.doubleClickHandler(event)
+    );
 
     this.accordion = new Accordion();
     this.accordion.appendStyle(`
@@ -254,6 +260,15 @@ export default class CharactersGlyphsPanel extends Panel {
     this.isActive = on;
     if (on) {
       this.update();
+    }
+  }
+
+  doubleClickHandler(event) {
+    const selectedGlyph = this.sceneSettings.selectedGlyph;
+    const glyphExists =
+      !!this.fontController.glyphMap[this.sceneSettings.selectedGlyphName];
+    if (selectedGlyph && glyphExists) {
+      this.sceneSettings.selectedGlyph = { ...selectedGlyph, isEditing: true };
     }
   }
 }
