@@ -91,6 +91,8 @@ export default class CharactersGlyphsPanel extends Panel {
       this.glyphList.setSelectedItemIndices(glyphIndices, false, true);
     });
 
+    const showKern = true; // could become a toggle
+
     const glyphListColumnDescriptions = [
       {
         key: "glyphName",
@@ -100,22 +102,26 @@ export default class CharactersGlyphsPanel extends Panel {
       {
         key: "advance",
         title: "Adv",
-        width: "3em",
-        formatter: NumberFormatterOneDecimal,
+        width: "6em",
         align: "right",
+        get: (item) => {
+          const kern = item.advance - item.originalAdvance;
+          const sign = kern < 0 ? "\u2212" : "+";
+          return kern && showKern
+            ? `${item.originalAdvance}\u200A${sign}\u200A${Math.abs(kern)}`
+            : item.advance;
+        },
       },
       {
         key: "dx",
-        title: "dx",
+        title: "ΔX",
         width: "3em",
-        formatter: NumberFormatterOneDecimal,
         align: "right",
       },
       {
         key: "dy",
-        title: "dy",
+        title: "ΔY",
         width: "3em",
-        formatter: NumberFormatterOneDecimal,
         align: "right",
       },
       {
@@ -199,6 +205,7 @@ export default class CharactersGlyphsPanel extends Panel {
       dx: glyph.glyphInfo.dx,
       dy: glyph.glyphInfo.dy,
       cluster: glyph.cluster,
+      originalAdvance: Math.round(glyph.glyph.xAdvance),
     }));
 
     this.characterGlyphMapping = characterGlyphMapping(
@@ -250,12 +257,6 @@ export default class CharactersGlyphsPanel extends Panel {
     }
   }
 }
-
-const NumberFormatterOneDecimal = {
-  toString(value) {
-    return value ? round(value, 1).toString() : 0;
-  },
-};
 
 function sameGlyphNames(items1, items2) {
   const key1 = items1.map((item) => item.glyphName).join("|");
