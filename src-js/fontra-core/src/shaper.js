@@ -284,7 +284,7 @@ class HBShaper extends ShaperBase {
 
   _getHAdvanceFunc(font, glyphID) {
     const glyphName = this.glyphOrder[glyphID];
-    return this._glyphObjects[glyphName]?.xAdvance ?? 500;
+    return Math.round(this._glyphObjects[glyphName]?.xAdvance ?? 500);
   }
 
   getFeatureInfo(otTableTag) {
