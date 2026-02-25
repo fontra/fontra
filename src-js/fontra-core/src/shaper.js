@@ -357,7 +357,7 @@ class DumbShaper extends ShaperBase {
 
     for (const [i, codePoint] of enumerate(codePoints)) {
       const glyphName = this.nominalGlyph(codePoint);
-      const xAdvance = glyphObjects[glyphName]?.xAdvance ?? 500;
+      const xAdvance = Math.round(glyphObjects[glyphName]?.xAdvance ?? 500);
       const isMark = this.isGlyphMarkFunc(glyphName);
 
       glyphs.push({
@@ -408,7 +408,7 @@ export function applyKerning(glyphs, pairFunc) {
   for (let i = 1; i < glyphs.length; i++) {
     const kernValue = pairFunc(glyphs[i - 1].gn, glyphs[i].gn);
     if (kernValue) {
-      glyphs[i - 1].ax += kernValue;
+      glyphs[i - 1].ax += Math.round(kernValue);
       glyphs[i].flags |= 1;
       didModify = true;
     }
@@ -447,13 +447,13 @@ export function applyCursiveAttachments(glyphs, glyphObjects, rightToLeft = fals
         // Horizontal adjustment
         previousGlyph.ax = Math.max(
           0,
-          previousGlyph.ax + exitAnchor.x - previousXAdvance
+          Math.round(previousGlyph.ax + exitAnchor.x - previousXAdvance)
         );
-        glyph.ax = Math.max(0, glyph.ax - entryAnchor.x);
-        glyph.dx -= entryAnchor.x;
+        glyph.ax = Math.max(0, glyph.ax - Math.round(entryAnchor.x));
+        glyph.dx -= Math.round(entryAnchor.x);
 
         // Vertical adjustment
-        glyph.dy = previousGlyph.dy + exitAnchor.y - entryAnchor.y;
+        glyph.dy = Math.round(previousGlyph.dy + exitAnchor.y - entryAnchor.y);
 
         didModify = true;
         break;
@@ -499,8 +499,8 @@ function _applyMarkPositioning(glyphs, glyphObjects, rightToLeft, markToMark) {
         const baseAnchor = baseAnchors[anchorName];
         if (baseAnchor) {
           const markAnchor = markAnchors[anchorName];
-          glyph.dx = baseAnchor.x - markAnchor.x - previousXAdvance;
-          glyph.dy = baseAnchor.y - markAnchor.y;
+          glyph.dx = Math.round(baseAnchor.x - markAnchor.x - previousXAdvance);
+          glyph.dy = Math.round(baseAnchor.y - markAnchor.y);
           didModify = true;
           break;
         }
