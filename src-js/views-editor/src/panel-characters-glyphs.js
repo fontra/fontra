@@ -267,8 +267,12 @@ export default class CharactersGlyphsPanel extends Panel {
     const selectedGlyph = this.sceneSettings.selectedGlyph;
     const glyphExists =
       !!this.fontController.glyphMap[this.sceneSettings.selectedGlyphName];
-    if (selectedGlyph && glyphExists) {
-      this.sceneSettings.selectedGlyph = { ...selectedGlyph, isEditing: true };
+    if (selectedGlyph) {
+      if (glyphExists) {
+        this.sceneSettings.selectedGlyph = { ...selectedGlyph, isEditing: true };
+      } else {
+        this.editorController.showDialogNewGlyph();
+      }
     }
   }
 }
