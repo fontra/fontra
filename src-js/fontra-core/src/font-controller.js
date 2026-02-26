@@ -410,15 +410,18 @@ export class FontController {
   async buildShaperFont(glyphOrder) {
     const features = await this.getFeatures();
 
-    const gdefFeatureCode = features.text.match(/^\s*table\s+GDEF/m)
-      ? ""
-      : this.generateGDEFFeatureCode();
+    const glyphClasses = {
+      base: [],
+      ligature: [],
+      mark: Object.keys(this.glyphMap).filter((glyphName) => this.isMark(glyphName)),
+      component: [],
+    };
 
     try {
       return buildShaperFont(
         this.unitsPerEm,
         glyphOrder,
-        features.text + gdefFeatureCode,
+        features.text,
         this.axes.axes
           .filter((axis) => !axis.values) // Filter out discrete axes
           .map((axis) => ({
@@ -427,7 +430,7 @@ export class FontController {
             defaultValue: axis.defaultValue,
             maxValue: axis.maxValue,
           })),
-        [] // TODO: ds-style fea-var rules
+        glyphClasses
       );
     } catch (e) {
       console.error(e);
@@ -440,21 +443,6 @@ export class FontController {
         insertMarkers: [],
       };
     }
-  }
-
-  generateGDEFFeatureCode() {
-    const markGlyphs = Object.keys(this.glyphMap).filter((glyphName) =>
-      this.isMark(glyphName)
-    );
-
-    return `
-table GDEF {
-  GlyphClassDef [], [],
-    [
-${markGlyphs.join("\n")}
-    ], [];
-} GDEF;
-    `;
   }
 
   getCachedGlyphNames() {
