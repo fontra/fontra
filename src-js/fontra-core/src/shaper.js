@@ -175,12 +175,12 @@ class HBShaper extends ShaperBase {
   }
 
   getGlyphInfoFromBuffer(buffer) {
-    const glyphs = buffer.json();
+    const glyphs = buffer.getGlyphInfosAndPositions();
     glyphs.forEach((glyph) => {
-      glyph.gn = this.glyphOrder[glyph.g];
-      glyph.mark = this.isGlyphMarkFunc(glyph.gn);
+      glyph.glyphname = this.glyphOrder[glyph.codepoint];
+      glyph.mark = this.isGlyphMarkFunc(glyph.glyphname);
       if (glyph.mark) {
-        glyph.ax = 0; // Force marks to be zero-width
+        glyph.x_advance = 0; // Force marks to be zero-width
       }
       return glyph;
     });
@@ -259,14 +259,7 @@ class HBShaper extends ShaperBase {
           if (isRTL) {
             glyphs.reverse();
           }
-          buffer.updateGlyphPositions(
-            glyphs.map((glyph) => ({
-              x_advance: glyph.ax,
-              y_advance: glyph.ay,
-              x_offset: glyph.dx,
-              y_offset: glyph.dy,
-            }))
-          );
+          buffer.updateGlyphPositions(glyphs);
         }
       } else if (message.startsWith("start table GPOS")) {
         gposPhase = true;
@@ -361,15 +354,14 @@ class DumbShaper extends ShaperBase {
       const isMark = this.isGlyphMarkFunc(glyphName);
 
       glyphs.push({
-        g: glyphName ? this.glyphNameToID[glyphName] : 0,
-        cl: i, // cluster
-        gn: glyphName ?? ".notdef",
+        codepoint: glyphName ? this.glyphNameToID[glyphName] : 0,
+        cluster: i,
+        glyphname: glyphName ?? ".notdef",
         mark: isMark,
-        ax: isMark ? 0 : xAdvance,
-        ay: 0,
-        dx: 0,
-        dy: 0,
-        flags: 0,
+        x_advance: isMark ? 0 : xAdvance,
+        y_advance: 0,
+        x_offset: 0,
+        y_offset: 0,
       });
     }
 
@@ -406,10 +398,9 @@ export function applyKerning(glyphs, pairFunc) {
   let didModify = false;
 
   for (let i = 1; i < glyphs.length; i++) {
-    const kernValue = pairFunc(glyphs[i - 1].gn, glyphs[i].gn);
+    const kernValue = pairFunc(glyphs[i - 1].glyphname, glyphs[i].glyphname);
     if (kernValue) {
-      glyphs[i - 1].ax += Math.round(kernValue);
-      glyphs[i].flags |= 1;
+      glyphs[i - 1].x_advance += Math.round(kernValue);
       didModify = true;
     }
   }
@@ -431,7 +422,7 @@ export function applyCursiveAttachments(glyphs, glyphObjects, rightToLeft = fals
       continue;
     }
 
-    const glyphObject = glyphObjects[glyph.gn];
+    const glyphObject = glyphObjects[glyph.glyphname];
     if (!glyphObject) {
       previousExitAnchors = {};
       continue;
@@ -445,15 +436,17 @@ export function applyCursiveAttachments(glyphs, glyphObjects, rightToLeft = fals
         const entryAnchor = entryAnchors[suffix];
 
         // Horizontal adjustment
-        previousGlyph.ax = Math.max(
+        previousGlyph.x_advance = Math.max(
           0,
-          Math.round(previousGlyph.ax + exitAnchor.x - previousXAdvance)
+          Math.round(previousGlyph.x_advance + exitAnchor.x - previousXAdvance)
         );
-        glyph.ax = Math.max(0, glyph.ax - Math.round(entryAnchor.x));
-        glyph.dx -= Math.round(entryAnchor.x);
+        glyph.x_advance = Math.max(0, glyph.x_advance - Math.round(entryAnchor.x));
+        glyph.x_offset -= Math.round(entryAnchor.x);
 
         // Vertical adjustment
-        glyph.dy = Math.round(previousGlyph.dy + exitAnchor.y - entryAnchor.y);
+        glyph.y_offset = Math.round(
+          previousGlyph.y_offset + exitAnchor.y - entryAnchor.y
+        );
 
         didModify = true;
         break;
@@ -484,7 +477,7 @@ function _applyMarkPositioning(glyphs, glyphObjects, rightToLeft, markToMark) {
   const ordered = rightToLeft ? reversed : (v) => v;
 
   for (const glyph of ordered(glyphs)) {
-    const glyphObject = glyphObjects[glyph.gn];
+    const glyphObject = glyphObjects[glyph.glyphname];
     if (!glyphObject) {
       baseAnchors = {};
       continue;
@@ -499,8 +492,8 @@ function _applyMarkPositioning(glyphs, glyphObjects, rightToLeft, markToMark) {
         const baseAnchor = baseAnchors[anchorName];
         if (baseAnchor) {
           const markAnchor = markAnchors[anchorName];
-          glyph.dx = Math.round(baseAnchor.x - markAnchor.x - previousXAdvance);
-          glyph.dy = Math.round(baseAnchor.y - markAnchor.y);
+          glyph.x_offset = Math.round(baseAnchor.x - markAnchor.x - previousXAdvance);
+          glyph.y_offset = Math.round(baseAnchor.y - markAnchor.y);
           didModify = true;
           break;
         }
@@ -510,15 +503,20 @@ function _applyMarkPositioning(glyphs, glyphObjects, rightToLeft, markToMark) {
         for (const [anchorName, markAnchor] of Object.entries(markBaseAnchors)) {
           baseAnchors[anchorName] = {
             name: anchorName,
-            x: markAnchor.x + glyph.dx + previousXAdvance,
-            y: markAnchor.y + glyph.dy,
+            x: markAnchor.x + glyph.x_offset + previousXAdvance,
+            y: markAnchor.y + glyph.y_offset,
           };
         }
       }
     } else {
       baseAnchors = markToMark
         ? {}
-        : collectAnchors(glyphObject.propagatedAnchors, "", glyph.dx, glyph.dy);
+        : collectAnchors(
+            glyphObject.propagatedAnchors,
+            "",
+            glyph.x_offset,
+            glyph.y_offset
+          );
       previousXAdvance = rightToLeft ? 0 : glyphObject.xAdvance;
     }
   }

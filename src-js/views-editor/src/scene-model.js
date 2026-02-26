@@ -1268,11 +1268,11 @@ class LineSetter {
     let needsReshape = false;
     for (const glyphInfo of shapedGlyphs) {
       if (
-        !(glyphInfo.gn in this.glyphInstances) &&
-        glyphInfo.gn in fontController.glyphMap
+        !(glyphInfo.glyphname in this.glyphInstances) &&
+        glyphInfo.glyphname in fontController.glyphMap
       ) {
-        this.glyphInstances[glyphInfo.gn] = await this.getGlyphInstanceFunc(
-          glyphInfo.gn
+        this.glyphInstances[glyphInfo.glyphname] = await this.getGlyphInstanceFunc(
+          glyphInfo.glyphname
         );
         needsReshape = true;
       }
@@ -1283,10 +1283,10 @@ class LineSetter {
     }
 
     for (const [glyphIndex, glyphInfo] of enumerate(shapedGlyphs)) {
-      const codePoint = codePoints[glyphInfo.cl];
+      const codePoint = codePoints[glyphInfo.cluster];
       const glyphName =
         glyphInfo.g != 0 || codePoint >= MAX_UNICODE
-          ? glyphInfo.gn
+          ? glyphInfo.glyphname
           : getSuggestedGlyphName(codePoint);
 
       const isSelectedGlyph = glyphIndex == selectedGlyphIndex;
@@ -1316,21 +1316,21 @@ class LineSetter {
       const kernValue =
         shaperOptions.kerningPairFunc && glyphIndex > 0
           ? shaperOptions.kerningPairFunc(
-              shapedGlyphs[glyphIndex - 1].gn,
-              shapedGlyphs[glyphIndex].gn
+              shapedGlyphs[glyphIndex - 1].glyphname,
+              shapedGlyphs[glyphIndex].glyphname
             )
           : 0;
 
       glyphs.push({
-        x: x + glyphInfo.dx,
-        y: y + glyphInfo.dy,
+        x: x + glyphInfo.x_offset,
+        y: y + glyphInfo.y_offset,
         kernValue,
         glyph: glyphInstance,
         varGlyph,
         glyphName,
         character:
           codePoint && codePoint < MAX_UNICODE ? String.fromCodePoint(codePoint) : null,
-        cluster: glyphInfo.cl,
+        cluster: glyphInfo.cluster,
         isUndefined,
         isSelected: isSelectedGlyph,
         isEditing: !!(isSelectedGlyph && selectedGlyphIsEditing),
@@ -1338,8 +1338,8 @@ class LineSetter {
         glyphInfo,
       });
 
-      x += glyphInfo.ax + xAdvanceLayerDifference;
-      y += glyphInfo.ay + yAdvanceLayerDifference;
+      x += glyphInfo.x_advance + xAdvanceLayerDifference;
+      y += glyphInfo.y_advance + yAdvanceLayerDifference;
     }
 
     let offset = 0;
