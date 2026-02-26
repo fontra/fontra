@@ -72,6 +72,13 @@ export default class CharactersGlyphsPanel extends Panel {
             : "",
       },
       {
+        key: "script",
+        title: "Script",
+        width: "4em",
+        get: (item) =>
+          item.codePoint ? getGlyphInfoFromCodePoint(item.codePoint)?.script : "",
+      },
+      {
         key: "index",
         title: "Index",
         width: "3em",
