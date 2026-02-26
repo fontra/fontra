@@ -9,6 +9,9 @@
   - For source files (`.designspace`, `.ufo`, `.glyphs`, `.fontra`), it will compile a so called "shaper font" on the fly, using the brand new [build-shaper-font](https://github.com/fontra/build-shaper-font) functionality, written by Khaled Hosny, using parts of the `fontc` code base written in Rust. This runs in the browser using Web Assembly. It is amazing.
   - Some glyph positioning features are emulated on the fly using data in the font: `curs`, `kern`, `mark` and `mkmk`. This uses live kerning data and glyph anchors and allows the user to make edit and immediately see the effects in the rendered text.
   - The OpenType feature code editor was improved to do live error checking and reporting (also using the `build-shaper-font` functionality). You can have two windows or tabs side-by-side, and see changes in the feature code being reflected in the glyph editor virtually instantaneously.
+  - There is a new right sidebar panel called "Input characters and output glyphs" that contains two lists:
+    - The input characters, and a little bit of unicode information for each character
+    - The output glyphs, showing the glyph name, advance width, positioning offsets and character cluster index.
   - There are still some open issues, and things may still be a little rough around the edges. See [Issue 2381](https://github.com/fontra/fontra/issues/2381) for past and ongoing work.
 - [glyph sets] Add JustFont jf 7000 Chinese/Taiwanese character sets. Suggested by user MidnightOwl123. [PR 2428](https://github.com/fontra/fontra/pull/2428)
 - [fontra-glyphs] Fixed a bug where writing OpenType features caused internal data problems, making Fontra unable to read glyphs afterwards. [fontra-glyphs PR 125](https://github.com/fontra/fontra-glyphs/pull/125)
