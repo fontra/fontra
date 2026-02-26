@@ -1335,6 +1335,7 @@ class LineSetter {
         isSelected: isSelectedGlyph,
         isEditing: !!(isSelectedGlyph && selectedGlyphIsEditing),
         isEmpty: !glyphInstance.controlBounds,
+        glyphInfo,
       });
 
       x += glyphInfo.ax + xAdvanceLayerDifference;

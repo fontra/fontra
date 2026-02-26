@@ -1,6 +1,7 @@
 import { DefaultFormatter } from "@fontra/core/formatters.js";
 import * as html from "@fontra/core/html-utils.js";
 import { UnlitElement } from "@fontra/core/html-utils.js";
+import { firstItemOfSet, isEqualSet } from "@fontra/core/set-ops.js";
 import { message } from "@fontra/web-components/modal-dialog.js";
 import { themeColorCSS } from "./theme-support.js";
 
@@ -187,7 +188,7 @@ export class UIList extends UnlitElement {
       (event) => this._keyUpHandler(event),
       false
     );
-    this.selectedItemIndex = undefined;
+    this.selectedItemIndices = new Set();
     this.allowEmptySelection = true;
   }
 
@@ -246,7 +247,7 @@ export class UIList extends UnlitElement {
     return this.items[this.selectedItemIndex];
   }
 
-  setSelectedItem(item, shouldDispatchEvent = false) {
+  setSelectedItem(item, shouldDispatchEvent = false, shouldScrollInfoView = false) {
     if (!item) {
       this.setSelectedItemIndex(undefined, shouldDispatchEvent);
       return;
@@ -265,7 +266,7 @@ export class UIList extends UnlitElement {
       index = this.items.indexOf(item);
     }
     if (index >= 0) {
-      this.setSelectedItemIndex(index, shouldDispatchEvent);
+      this.setSelectedItemIndex(index, shouldDispatchEvent, shouldScrollInfoView);
     } else {
       this.setSelectedItemIndex(undefined, shouldDispatchEvent);
     }
@@ -290,7 +291,7 @@ export class UIList extends UnlitElement {
       const row = document.createElement("div");
       row.className = "row";
       row.dataset.rowIndex = rowIndex;
-      if (rowIndex === this.selectedItemIndex) {
+      if (this.selectedItemIndices.has(rowIndex)) {
         row.classList.add("selected");
       }
 
@@ -483,33 +484,67 @@ export class UIList extends UnlitElement {
     return node?.dataset.rowIndex;
   }
 
-  setSelectedItemIndex(rowIndex, shouldDispatchEvent = false) {
-    if (rowIndex == undefined && !this.allowEmptySelection) {
-      return;
-    }
+  setSelectedItemIndex(
+    rowIndex,
+    shouldDispatchEvent = false,
+    shouldScrollInfoView = false
+  ) {
     if (!isNaN(rowIndex)) {
       rowIndex = Number(rowIndex);
     }
-    if (rowIndex === this.selectedItemIndex) {
+
+    this.setSelectedItemIndices(
+      new Set(rowIndex == undefined ? undefined : [rowIndex]),
+      shouldDispatchEvent,
+      shouldScrollInfoView
+    );
+  }
+
+  setSelectedItemIndices(
+    rowIndices,
+    shouldDispatchEvent = false,
+    shouldScrollInfoView = false
+  ) {
+    rowIndices = new Set(rowIndices);
+
+    if (!rowIndices.size && !this.allowEmptySelection) {
+      return;
+    }
+    if (isEqualSet(rowIndices, this.selectedItemIndices)) {
       // nothing to do
       return;
     }
-    if (this.selectedItemIndex !== undefined) {
-      const row = this.contents.children[this.selectedItemIndex];
+    for (const rowIndex of this.selectedItemIndices) {
+      const row = this.contents.children[rowIndex];
       row?.classList.remove("selected");
     }
-    if (rowIndex !== undefined) {
+    for (const rowIndex of rowIndices) {
       const row = this.contents.children[rowIndex];
       row?.classList.add("selected");
     }
-    this.selectedItemIndex = rowIndex;
+    this.selectedItemIndices = rowIndices;
     if (!this._isKeyRepeating && shouldDispatchEvent) {
       this._dispatchEvent("listSelectionChanged");
     }
+
+    if (shouldScrollInfoView && rowIndices.size) {
+      const rowIndex = firstItemOfSet(rowIndices);
+      const row = this.contents.children[rowIndex];
+      row?.scrollIntoView({ behavior: "auto", block: "nearest", inline: "nearest" });
+    }
+  }
+
+  get selectedItemIndex() {
+    return this.getSelectedItemIndex();
+  }
+
+  getSelectedItemIndices() {
+    return this.selectedItemIndices;
   }
 
   getSelectedItemIndex() {
-    return this.selectedItemIndex;
+    const indices = [...this.selectedItemIndices];
+    return firstItemOfSet(this.selectedItemIndices);
   }
 
   editCell(rowIndex, columnKey) {
@@ -571,9 +606,7 @@ export class UIList extends UnlitElement {
       rowIndex = Math.min(Math.max(rowIndex, 0), this.items.length - 1);
     }
     this._isKeyRepeating = event.repeat;
-    this.setSelectedItemIndex(rowIndex, true);
-    const newRow = this.contents.children[rowIndex];
-    newRow?.scrollIntoView({ behavior: "auto", block: "nearest", inline: "nearest" });
+    this.setSelectedItemIndex(rowIndex, true, true);
   }
 
   _keyUpHandler(event) {

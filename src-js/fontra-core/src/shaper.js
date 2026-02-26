@@ -284,7 +284,7 @@ class HBShaper extends ShaperBase {
 
   _getHAdvanceFunc(font, glyphID) {
     const glyphName = this.glyphOrder[glyphID];
-    return this._glyphObjects[glyphName]?.xAdvance ?? 500;
+    return Math.round(this._glyphObjects[glyphName]?.xAdvance ?? 500);
   }
 
   getFeatureInfo(otTableTag) {
@@ -357,7 +357,7 @@ class DumbShaper extends ShaperBase {
 
     for (const [i, codePoint] of enumerate(codePoints)) {
       const glyphName = this.nominalGlyph(codePoint);
-      const xAdvance = glyphObjects[glyphName]?.xAdvance ?? 500;
+      const xAdvance = Math.round(glyphObjects[glyphName]?.xAdvance ?? 500);
       const isMark = this.isGlyphMarkFunc(glyphName);
 
       glyphs.push({
@@ -408,7 +408,7 @@ export function applyKerning(glyphs, pairFunc) {
   for (let i = 1; i < glyphs.length; i++) {
     const kernValue = pairFunc(glyphs[i - 1].gn, glyphs[i].gn);
     if (kernValue) {
-      glyphs[i - 1].ax += kernValue;
+      glyphs[i - 1].ax += Math.round(kernValue);
       glyphs[i].flags |= 1;
       didModify = true;
     }
@@ -447,13 +447,13 @@ export function applyCursiveAttachments(glyphs, glyphObjects, rightToLeft = fals
         // Horizontal adjustment
         previousGlyph.ax = Math.max(
           0,
-          previousGlyph.ax + exitAnchor.x - previousXAdvance
+          Math.round(previousGlyph.ax + exitAnchor.x - previousXAdvance)
         );
-        glyph.ax = Math.max(0, glyph.ax - entryAnchor.x);
-        glyph.dx -= entryAnchor.x;
+        glyph.ax = Math.max(0, glyph.ax - Math.round(entryAnchor.x));
+        glyph.dx -= Math.round(entryAnchor.x);
 
         // Vertical adjustment
-        glyph.dy = previousGlyph.dy + exitAnchor.y - entryAnchor.y;
+        glyph.dy = Math.round(previousGlyph.dy + exitAnchor.y - entryAnchor.y);
 
         didModify = true;
         break;
@@ -499,8 +499,8 @@ function _applyMarkPositioning(glyphs, glyphObjects, rightToLeft, markToMark) {
         const baseAnchor = baseAnchors[anchorName];
         if (baseAnchor) {
           const markAnchor = markAnchors[anchorName];
-          glyph.dx = baseAnchor.x - markAnchor.x - previousXAdvance;
-          glyph.dy = baseAnchor.y - markAnchor.y;
+          glyph.dx = Math.round(baseAnchor.x - markAnchor.x - previousXAdvance);
+          glyph.dy = Math.round(baseAnchor.y - markAnchor.y);
           didModify = true;
           break;
         }
@@ -540,4 +540,45 @@ function collectAnchors(anchors, prefix = "", dx = 0, dy = 0) {
   }
 
   return anchorsBySuffix;
+}
+
+export function characterGlyphMapping(clusters, numChars) {
+  /*
+   * This implements character to glyph mapping and vice versa, using
+   * cluster information from HarfBuzz. It should be correct for HB
+   * clustering support levels 0 and 1, see:
+   *
+   *     https://harfbuzz.github.io/working-with-harfbuzz-clusters.html
+   *
+   * "Each character belongs to the cluster that has the highest cluster
+   * value not larger than its initial cluster value.""
+   *
+   * (ported from FontGoggles)
+   */
+
+  const sortedUniqueClusters = [...new Set(clusters)].sort((a, b) => a - b);
+  assert(!sortedUniqueClusters.length || sortedUniqueClusters.at(-1) < numChars);
+  assert(!sortedUniqueClusters.length || sortedUniqueClusters[0] == 0);
+
+  const clusterToChars = new Map();
+
+  for (let i = 0; i < sortedUniqueClusters.length; i++) {
+    const cl = sortedUniqueClusters[i];
+    const clNext = sortedUniqueClusters[i + 1] ?? numChars;
+    const chars = [...range(cl, clNext)];
+    clusterToChars.set(cl, chars);
+  }
+
+  const glyphToChars = clusters.map((cl) => clusterToChars.get(cl));
+  const charToGlyphs = new Array(numChars).fill(null).map((item) => []);
+
+  glyphToChars.forEach((charIndices, glyphIndex) => {
+    charIndices.forEach((ci) => {
+      charToGlyphs[ci].push(glyphIndex);
+    });
+  });
+
+  charToGlyphs.forEach((glyphIndices) => glyphIndices.sort((a, b) => a - b));
+
+  return { glyphToChars, charToGlyphs };
 }

@@ -277,6 +277,9 @@ export const strings = {
   "shortcuts.tooltip.click-and-record": "Click and record a shortcut",
   "shortcuts.tooltip.reset-to-default": "Reset to default",
   "shortcuts.warning.exists": "Le raccourci clavier existe pour %0",
+  "sidebar.characters-glyphs": "Input characters and output glyphs",
+  "sidebar.characters-glyphs.input-characters": "Input characters",
+  "sidebar.characters-glyphs.output-glyphs": "Output glyphs",
   "sidebar.designspace-navigation": "Navigation du designspace",
   "sidebar.designspace-navigation.dialog.add-source.label.layer": "Layer:",
   "sidebar.designspace-navigation.dialog.add-source.label.source-name":
