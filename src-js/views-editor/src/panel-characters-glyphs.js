@@ -160,12 +160,12 @@ export default class CharactersGlyphsPanel extends Panel {
 
     this.accordion.items = [
       {
-        label: "Input characters",
+        label: translate("sidebar.characters-glyphs.input-characters"),
         open: true,
         content: this.characterList,
       },
       {
-        label: "Output glyphs",
+        label: translate("sidebar.characters-glyphs.output-glyphs"),
         open: true,
         content: this.glyphList,
       },
