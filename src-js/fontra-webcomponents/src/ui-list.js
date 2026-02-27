@@ -312,9 +312,14 @@ export class UIList extends UnlitElement {
       `fontra.list.${this.settingsStorageKey}`
     );
     const settings = settingsString ? JSON.parse(settingsString) : {};
-    this.columnWidths = settings.columnWidths ?? {};
-    for (const [key, columnWidth] of Object.entries(this.columnWidths)) {
-      this.setColumnWidth(key, columnWidth);
+
+    for (const colDesc of this.columnDescriptions) {
+      if (
+        colDesc.minWidth != undefined &&
+        settings.columnWidths?.[colDesc.key] != undefined
+      ) {
+        this.setColumnWidth(colDesc.key, settings.columnWidths?.[colDesc.key]);
+      }
     }
   }
 
@@ -498,7 +503,7 @@ export class UIList extends UnlitElement {
     };
 
     const mouseUpHandler = (event) => {
-      document.body.style.cursor = undefined;
+      document.body.style.cursor = null;
       document.removeEventListener("mousemove", mouseMoveHandler);
       document.removeEventListener("mouseup", mouseUpHandler);
       setColumnWidthFromEvent(event, true);
