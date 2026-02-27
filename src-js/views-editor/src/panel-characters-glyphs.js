@@ -34,8 +34,10 @@ export default class CharactersGlyphsPanel extends Panel {
       this.editorController.sceneController.sceneSettingsController;
     this.sceneSettings = this.editorController.sceneController.sceneSettings;
 
-    this.sceneSettingsController.addKeyListener(["positionedLines"], (event) =>
-      this.throttledUpdate()
+    this.sceneSettingsController.addKeyListener(
+      ["positionedLines"],
+      (event) => this.throttledUpdate(),
+      true // immediate, avoids mismatch with characterLines
     );
 
     // this.sceneSettingsController.addKeyListener(
