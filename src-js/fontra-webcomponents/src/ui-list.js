@@ -19,7 +19,7 @@ export class UIList extends UnlitElement {
   static styles = `
     ${themeColorCSS(colors)}
 
-    .list-container {
+    :host {
       --column-header-divider-thickness: 1px;
       --column-header-divider-right-margin: 2px;
       display: grid;
@@ -181,8 +181,6 @@ export class UIList extends UnlitElement {
     this.items = [];
     this.itemEqualFunc = null;
 
-    this.listContainer = html.div({ class: "list-container" });
-
     this.rowsElement = html.div({
       class: "contents",
       onclick: (event) => this._clickHandler(event),
@@ -227,15 +225,15 @@ export class UIList extends UnlitElement {
       this.rowsContainer.style.minHeight = this.minHeight;
     }
 
-    this.listContainer.innerHTML = "";
+    const contents = [];
 
     if (this.showHeader) {
-      this.listContainer.appendChild(this._makeHeader());
+      contents.push(this._makeHeader());
     }
 
-    this.listContainer.appendChild(this.rowsContainer);
+    contents.push(this.rowsContainer);
 
-    return [this.listContainer];
+    return contents;
   }
 
   static properties = {
@@ -266,7 +264,7 @@ export class UIList extends UnlitElement {
   }
 
   setColumnWidth(key, width, store = false) {
-    this.listContainer.style.setProperty(
+    this.style.setProperty(
       columnWidthProperty(key),
       typeof width == "number" ? `${width}px` : width
     );
@@ -312,9 +310,14 @@ export class UIList extends UnlitElement {
       `fontra.list.${this.settingsStorageKey}`
     );
     const settings = settingsString ? JSON.parse(settingsString) : {};
-    this.columnWidths = settings.columnWidths ?? {};
-    for (const [key, columnWidth] of Object.entries(this.columnWidths)) {
-      this.setColumnWidth(key, columnWidth);
+
+    for (const colDesc of this.columnDescriptions) {
+      if (
+        colDesc.minWidth != undefined &&
+        settings.columnWidths?.[colDesc.key] != undefined
+      ) {
+        this.setColumnWidth(colDesc.key, settings.columnWidths?.[colDesc.key]);
+      }
     }
   }
 
@@ -498,7 +501,7 @@ export class UIList extends UnlitElement {
     };
 
     const mouseUpHandler = (event) => {
-      document.body.style.cursor = undefined;
+      document.body.style.cursor = null;
       document.removeEventListener("mousemove", mouseMoveHandler);
       document.removeEventListener("mouseup", mouseUpHandler);
       setColumnWidthFromEvent(event, true);
