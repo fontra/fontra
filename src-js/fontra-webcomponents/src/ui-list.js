@@ -214,6 +214,8 @@ export class UIList extends UnlitElement {
     );
     this.selectedItemIndices = new Set();
     this.allowEmptySelection = true;
+
+    this.columnWidths = {};
   }
 
   render() {
@@ -251,15 +253,20 @@ export class UIList extends UnlitElement {
 
     for (const colDesc of columnDescriptions) {
       if (colDesc.width) {
-        this.listContainer.style.setProperty(
-          columnWidthProperty(colDesc),
-          colDesc.width
-        );
+        this.setColumnWidth(colDesc.key, colDesc.width);
       }
     }
 
     this.setItems(this.items);
     this.requestUpdate();
+  }
+
+  setColumnWidth(key, width) {
+    this.listContainer.style.setProperty(
+      columnWidthProperty(key),
+      typeof width == "number" ? `${width}px` : width
+    );
+    this.columnWidths[key] = width;
   }
 
   setItems(items, shouldDispatchEvent = false, keepScrollPosition = false) {
@@ -364,7 +371,7 @@ export class UIList extends UnlitElement {
             cell = html.div({ class: classString }, [formattedValue]);
           }
           if (colDesc.width) {
-            cell.style.width = `var(${columnWidthProperty(colDesc)})`;
+            cell.style.width = `var(${columnWidthProperty(colDesc.key)})`;
           }
         }
         row.appendChild(cell);
@@ -384,7 +391,7 @@ export class UIList extends UnlitElement {
         cell.classList.add(colDesc.align);
       }
       if (colDesc.width) {
-        cell.style.width = `var(${columnWidthProperty(colDesc)})`;
+        cell.style.width = `var(${columnWidthProperty(colDesc.key)})`;
       }
       const value = colDesc.title || colDesc.key;
       cell.append(value);
@@ -682,8 +689,8 @@ export class UIList extends UnlitElement {
   }
 }
 
-function columnWidthProperty(colDesc) {
-  return `--column-${colDesc.key}-width`;
+function columnWidthProperty(key) {
+  return `--column-${key}-width`;
 }
 
 customElements.define("ui-list", UIList);
