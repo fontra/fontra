@@ -215,6 +215,7 @@ export class UIList extends UnlitElement {
     );
     this.selectedItemIndices = new Set();
     this.allowEmptySelection = true;
+    this._settingsStorageKey = null;
 
     this.columnWidths = {};
   }
@@ -262,12 +263,57 @@ export class UIList extends UnlitElement {
     this.requestUpdate();
   }
 
-  setColumnWidth(key, width) {
+  setColumnWidth(key, width, store = false) {
     this.listContainer.style.setProperty(
       columnWidthProperty(key),
       typeof width == "number" ? `${width}px` : width
     );
     this.columnWidths[key] = width;
+    if (store) {
+      this.storeSettings();
+    }
+  }
+
+  get settingsStorageKey() {
+    return this._settingsStorageKey;
+  }
+
+  set settingsStorageKey(key) {
+    this._settingsStorageKey = key;
+    this.restoreSettings();
+  }
+
+  storeSettings() {
+    if (!this.settingsStorageKey) {
+      return;
+    }
+
+    const columnWidths = {};
+    for (const colDesc of this.columnDescriptions) {
+      const columnWidth = this.columnWidths[colDesc.key];
+      if (colDesc.minWidth != undefined && columnWidth != undefined) {
+        columnWidths[colDesc.key] = columnWidth;
+      }
+    }
+    const settings = { columnWidths };
+    localStorage.setItem(
+      `fontra.list.${this.settingsStorageKey}`,
+      JSON.stringify(settings)
+    );
+  }
+
+  restoreSettings() {
+    if (!this.settingsStorageKey) {
+      return;
+    }
+    const settingsString = localStorage.getItem(
+      `fontra.list.${this.settingsStorageKey}`
+    );
+    const settings = settingsString ? JSON.parse(settingsString) : {};
+    this.columnWidths = settings.columnWidths || {};
+    for (const [key, columnWidth] of Object.entries(settings.columnWidths)) {
+      this.setColumnWidth(key, columnWidth);
+    }
   }
 
   setItems(items, shouldDispatchEvent = false, keepScrollPosition = false) {
@@ -435,22 +481,22 @@ export class UIList extends UnlitElement {
       document.addEventListener("mouseup", mouseUpHandler);
     });
 
-    const setColumnWidthFromEvent = (event) => {
+    const setColumnWidthFromEvent = (event, store = false) => {
       const newWidth = Math.max(
         colDesc.minWidth,
         initialWidth + event.x - initialEvent.x
       );
-      this.setColumnWidth(colDesc.key, newWidth);
+      this.setColumnWidth(colDesc.key, newWidth, store);
     };
 
     const mouseMoveHandler = (event) => {
-      setColumnWidthFromEvent(event);
+      setColumnWidthFromEvent(event, false);
     };
 
     const mouseUpHandler = (event) => {
       document.removeEventListener("mousemove", mouseMoveHandler);
       document.removeEventListener("mouseup", mouseUpHandler);
-      setColumnWidthFromEvent(event);
+      setColumnWidthFromEvent(event, true);
     };
 
     return resizeHandle;
