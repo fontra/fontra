@@ -400,8 +400,8 @@ export class UIList extends UnlitElement {
 
       cellContainer.appendChild(cell);
 
-      if (false) {
-        const resizeHandle = html.div({ class: "header-resize-handle" });
+      if (colDesc.minWidth) {
+        const resizeHandle = this._setupResizeHandle(colDesc);
         cellContainer.appendChild(resizeHandle);
       }
 
@@ -414,6 +414,40 @@ export class UIList extends UnlitElement {
       false
     );
     return this.headerContainer;
+  }
+
+  _setupResizeHandle(colDesc) {
+    const resizeHandle = html.div({ class: "header-resize-handle" });
+
+    let initialEvent;
+    let initialWidth;
+
+    resizeHandle.addEventListener("mousedown", (event) => {
+      initialEvent = event;
+      initialWidth = this.columnWidths[colDesc.key];
+      document.addEventListener("mousemove", mouseMoveHandler);
+      document.addEventListener("mouseup", mouseUpHandler);
+    });
+
+    const setColumnWidthFromEvent = (event) => {
+      const newWidth = Math.max(
+        colDesc.minWidth,
+        initialWidth + event.x - initialEvent.x
+      );
+      this.setColumnWidth(colDesc.key, newWidth);
+    };
+
+    const mouseMoveHandler = (event) => {
+      setColumnWidthFromEvent(event);
+    };
+
+    const mouseUpHandler = (event) => {
+      document.removeEventListener("mousemove", mouseMoveHandler);
+      document.removeEventListener("mouseup", mouseUpHandler);
+      setColumnWidthFromEvent(event);
+    };
+
+    return resizeHandle;
   }
 
   _makeCellEditor(cell, colDesc, item) {
