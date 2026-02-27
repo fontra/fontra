@@ -482,6 +482,7 @@ export class UIList extends UnlitElement {
       initialWidth = this.columnWidths[colDesc.key] ?? colDesc.width;
       document.addEventListener("mousemove", mouseMoveHandler);
       document.addEventListener("mouseup", mouseUpHandler);
+      document.body.style.cursor = "col-resize";
     });
 
     const setColumnWidthFromEvent = (event, store = false) => {
@@ -497,6 +498,7 @@ export class UIList extends UnlitElement {
     };
 
     const mouseUpHandler = (event) => {
+      document.body.style.cursor = undefined;
       document.removeEventListener("mousemove", mouseMoveHandler);
       document.removeEventListener("mouseup", mouseUpHandler);
       setColumnWidthFromEvent(event, true);
