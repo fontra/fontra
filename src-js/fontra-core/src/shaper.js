@@ -473,7 +473,7 @@ export function applyMarkToMarkPositioning(glyphs, glyphObjects, rightToLeft = f
 const IS_LIG_BASE = 0x10;
 
 function _applyMarkPositioning(glyphs, glyphObjects, rightToLeft, markToMark) {
-  // For simplicity, we treat non-ligatures as ligatures with only one component
+  // For simplicity, we treat non-ligatures as ligatures with a single component
   let previousXAdvance = 0;
   let baseAnchors = [{}];
   let didModify = false;
@@ -489,7 +489,7 @@ function _applyMarkPositioning(glyphs, glyphObjects, rightToLeft, markToMark) {
     }
 
     // Digging into HarfBuzz internals to get ligature info so we can do
-    // mark-to-logature positioning
+    // mark-to-ligature positioning
     const ligatureProps = (glyph.var1 >> 16) & 0xff;
     const componentLigatureId = ligatureProps >> 5;
     const componentIndexOneBased = ligatureProps & 0x0f;
