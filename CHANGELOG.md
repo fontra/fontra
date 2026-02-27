@@ -13,6 +13,8 @@
     - The input characters, and a little bit of unicode information for each character
     - The output glyphs, showing the glyph name, advance width, positioning offsets and character cluster index for each glyph.
   - There are still some open issues, and things may still be a little rough around the edges. See [Issue 2381](https://github.com/fontra/fontra/issues/2381) for past and ongoing work.
+- [kerning emulation] Ignore mark glyphs when emulating kerning. [Issue 2443](https://github.com/fontra/fontra/issues/2443), [PR 2444](https://github.com/fontra/fontra/pull/2444)
+- Improve font source interpolation when custom data isn't interpolatable. [PR 2445](https://github.com/fontra/fontra/pull/2445)
 - [glyph sets] Add JustFont jf 7000 Chinese/Taiwanese character sets. Suggested by user MidnightOwl123. [PR 2428](https://github.com/fontra/fontra/pull/2428)
 - [fontra-glyphs] Fixed a bug where writing OpenType features caused internal data problems, making Fontra unable to read glyphs afterwards. [fontra-glyphs PR 125](https://github.com/fontra/fontra-glyphs/pull/125)
 - Fixed bug that made Fontra unable to show a glyph if the feature code was invalid. [Issue 2423](https://github.com/fontra/fontra/issues/2423), [PR 2424](https://github.com/fontra/fontra/pull/2424)
