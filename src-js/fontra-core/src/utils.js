@@ -600,6 +600,16 @@ export function areCustomDatasCompatible(parents) {
       if (kA != kB) {
         return false;
       }
+
+      const vA = parent.customData[kA];
+      if (typeof vA == "object") {
+        const vB = referenceCustomData[kB];
+        try {
+          const _ = addItemwise(vA, vB);
+        } catch (error) {
+          return false;
+        }
+      }
     }
   }
   return true;
