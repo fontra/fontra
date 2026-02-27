@@ -152,6 +152,7 @@ describe("shaper tests", () => {
     "IJ",
     "em",
     "tenttest",
+    "macroncomb",
   ];
 
   const characterMap = {
@@ -316,6 +317,54 @@ describe("shaper tests", () => {
       "V",
       ".notdef",
     ]);
+  });
+
+  const testInputCodePointsKerningSkipMarks = [..."V\u0304A"].map((c) => ord(c));
+  const expectedGlyphsKerningSkipMarks = [
+    {
+      codepoint: 24,
+      cluster: 0,
+      glyphname: "V",
+      mark: false,
+      x_advance: 301,
+      y_advance: 0,
+      x_offset: 0,
+      y_offset: 0,
+    },
+    {
+      codepoint: 51,
+      cluster: 1,
+      glyphname: "macroncomb",
+      mark: true,
+      x_advance: 0,
+      y_advance: 0,
+      x_offset: 0,
+      y_offset: 0,
+    },
+    {
+      codepoint: 1,
+      cluster: 2,
+      glyphname: "A",
+      mark: false,
+      x_advance: 396,
+      y_advance: 0,
+      x_offset: 0,
+      y_offset: 0,
+    },
+  ];
+
+  it("test applyKerning skip marks", () => {
+    const shaper = getShaper({
+      nominalGlyphFunc,
+      glyphOrder,
+      isGlyphMarkFunc,
+      insertMarkers: testDataMarkToLigatureInsertMarkers,
+    });
+    const glyphs = shaper.shape(testInputCodePointsKerningSkipMarks, glyphObjects, {
+      kerningPairFunc: (g1, g2) => kerning.getGlyphPairValue(g1, g2),
+    });
+
+    expect(glyphs).to.deep.equal(expectedGlyphsKerningSkipMarks);
   });
 
   it("test getGlyphNameCodePoint", () => {

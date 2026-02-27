@@ -396,13 +396,22 @@ class DumbShaper extends ShaperBase {
 
 export function applyKerning(glyphs, pairFunc) {
   let didModify = false;
+  let previousGlyph;
 
-  for (let i = 1; i < glyphs.length; i++) {
-    const kernValue = pairFunc(glyphs[i - 1].glyphname, glyphs[i].glyphname);
-    if (kernValue) {
-      glyphs[i - 1].x_advance += Math.round(kernValue);
-      didModify = true;
+  for (const glyph of glyphs) {
+    if (glyph.mark) {
+      continue;
     }
+    const glyphName = glyph.glyphname;
+    if (previousGlyph != undefined) {
+      const previousGlyphName = previousGlyph.glyphname;
+      const kernValue = pairFunc(previousGlyphName, glyphName);
+      if (kernValue) {
+        previousGlyph.x_advance += Math.round(kernValue);
+        didModify = true;
+      }
+    }
+    previousGlyph = glyph;
   }
 
   return didModify;
