@@ -1367,7 +1367,7 @@ export class FontController {
         }
       }
     }
-    return info?.category === "Mark";
+    return info?.category === "Mark" && info?.subCategory === "Nonspacing";
   }
 }
 
