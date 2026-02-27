@@ -107,7 +107,8 @@ export default class CharactersGlyphsPanel extends Panel {
       {
         key: "glyphName",
         title: "Glyph",
-        width: "10em",
+        width: 100,
+        minWidth: 50,
       },
       {
         key: "advance",
