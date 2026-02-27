@@ -1285,7 +1285,7 @@ class LineSetter {
     for (const [glyphIndex, glyphInfo] of enumerate(shapedGlyphs)) {
       const codePoint = codePoints[glyphInfo.cluster];
       const glyphName =
-        glyphInfo.g != 0 || codePoint >= MAX_UNICODE
+        glyphInfo.codepoint != 0 || codePoint >= MAX_UNICODE
           ? glyphInfo.glyphname
           : getSuggestedGlyphName(codePoint);
 
