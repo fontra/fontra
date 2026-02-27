@@ -20,6 +20,7 @@ export class UIList extends UnlitElement {
     ${themeColorCSS(colors)}
 
     .list-container {
+      --column-header-divider-thickness: 1px;
       display: grid;
       grid-template-rows: auto 1fr;
       gap: 0.2em;
@@ -67,8 +68,8 @@ export class UIList extends UnlitElement {
       user-select: none;
     }
 
-    .header-cell {
-      // outline: 0.5px solid black;
+    .header-cell.resizable {
+      border-right: var(--column-header-divider-thickness) solid #8888;
     }
 
     .header-cell-container {
@@ -391,7 +392,11 @@ export class UIList extends UnlitElement {
         cell.classList.add(colDesc.align);
       }
       if (colDesc.width) {
-        cell.style.width = `var(${columnWidthProperty(colDesc.key)})`;
+        cell.style.width = colDesc.minWidth
+          ? `calc(var(${columnWidthProperty(
+              colDesc.key
+            )}) - var(--column-header-divider-thickness))`
+          : `var(${columnWidthProperty(colDesc.key)}`;
       }
       const value = colDesc.title || colDesc.key;
       cell.append(value);
@@ -401,6 +406,7 @@ export class UIList extends UnlitElement {
       cellContainer.appendChild(cell);
 
       if (colDesc.minWidth) {
+        cell.classList.add("resizable");
         const resizeHandle = this._setupResizeHandle(colDesc);
         cellContainer.appendChild(resizeHandle);
       }
