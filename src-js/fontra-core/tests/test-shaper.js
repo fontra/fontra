@@ -6,6 +6,8 @@ import { dirname, join } from "path";
 import { fileURLToPath } from "url";
 import { parametrize } from "./test-support.js";
 
+import { buildShaperFont } from "build-shaper-font";
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
@@ -157,11 +159,14 @@ describe("shaper tests", () => {
     [ord("Ä")]: "Adieresis",
     [ord("B")]: "B",
     [ord("C")]: "C",
+    [ord("H")]: "H",
     [ord("S")]: "S",
     [ord("V")]: "V",
+    [0x0304]: "macroncomb",
+    [0x0307]: "dotaccentcomb",
   };
 
-  const markGlyphs = new Set([]);
+  const markGlyphs = new Set(["macroncomb", "dotaccentcomb"]);
 
   const nominalGlyphFunc = (codePoint) => characterMap[codePoint];
   const isGlyphMarkFunc = (glyphName) => markGlyphs.has(glyphName);
@@ -501,6 +506,13 @@ describe("shaper tests", () => {
         { name: "bottom", x: 250, y: -20 },
       ],
     },
+    H_H: {
+      xAdvance: 800,
+      anchors: [
+        { name: "top_1", x: 250, y: 720 },
+        { name: "top_2", x: 550, y: 720 },
+      ],
+    },
     dotaccentcomb: {
       xAdvance: 200,
       anchors: [
@@ -513,6 +525,13 @@ describe("shaper tests", () => {
       anchors: [
         { name: "_bottom", x: 100, y: -20 },
         { name: "bottom", x: 100, y: -190 },
+      ],
+    },
+    macroncomb: {
+      xAdvance: 350,
+      anchors: [
+        { name: "_top", x: 170, y: 734 },
+        { name: "top", x: 170, y: 884 },
       ],
     },
   };
@@ -1046,6 +1065,115 @@ describe("shaper tests", () => {
       applyMarkToMarkPositioning(outputGlyphs, markGlyphObjects, rightToLeft);
 
       expect(outputGlyphs).to.deep.equal(expectedGlyphs);
+    }
+  );
+
+  const markToLigatureInputGlyphOrder = [".notdef", ...Object.keys(markGlyphObjects)];
+  const markToLigatureGlyphClasses = {
+    base: [],
+    ligature: [],
+    mark: ["macroncomb", "dotaccentcomb"],
+    component: [],
+  };
+  const markToLigatureFeatureCode = `
+languagesystem DFLT dflt;
+languagesystem latn dflt;
+
+feature liga {
+  lookupflag IgnoreMarks;
+
+  sub H H by H_H;
+} liga;
+  `;
+
+  const { fontData } = buildShaperFont(
+    1000,
+    markToLigatureInputGlyphOrder,
+    markToLigatureFeatureCode,
+    [],
+    markToLigatureGlyphClasses
+  );
+
+  const testDataMarkToLigatureInsertMarkers = [
+    { tag: "curs", lookupId: undefined },
+    { tag: "kern", lookupId: undefined },
+    { tag: "mark", lookupId: undefined },
+    { tag: "mkmk", lookupId: undefined },
+  ];
+
+  const testDataMarkToLigaturePositioning = [
+    {
+      inputCodePoints: [ord("H"), 0x0304, 0x0307, ord("H"), 0x0307, 0x0304],
+      expectedOutputGlyphs: [
+        {
+          codepoint: 2,
+          cluster: 0,
+          x_advance: 800,
+          y_advance: 0,
+          x_offset: 0,
+          y_offset: 0,
+          glyphname: "H_H",
+          mark: false,
+        },
+        {
+          codepoint: 5,
+          cluster: 0,
+          x_advance: 0,
+          y_advance: 0,
+          x_offset: -720,
+          y_offset: -14,
+          glyphname: "macroncomb",
+          mark: true,
+        },
+        {
+          codepoint: 3,
+          cluster: 0,
+          x_advance: 0,
+          y_advance: 0,
+          x_offset: -650,
+          y_offset: 140,
+          glyphname: "dotaccentcomb",
+          mark: true,
+        },
+        {
+          codepoint: 3,
+          cluster: 4,
+          x_advance: 0,
+          y_advance: 0,
+          x_offset: -350,
+          y_offset: -10,
+          glyphname: "dotaccentcomb",
+          mark: true,
+        },
+        {
+          codepoint: 5,
+          cluster: 5,
+          x_advance: 0,
+          y_advance: 0,
+          x_offset: -420,
+          y_offset: 156,
+          glyphname: "macroncomb",
+          mark: true,
+        },
+      ],
+    },
+  ];
+
+  parametrize(
+    "mark-to-ligature tests",
+    testDataMarkToLigaturePositioning,
+    (testCase) => {
+      //
+      const shaper = getShaper({
+        fontData,
+        nominalGlyphFunc,
+        glyphOrder: markToLigatureInputGlyphOrder,
+        isGlyphMarkFunc,
+        insertMarkers: testDataMarkToLigatureInsertMarkers,
+      });
+
+      const outputGlyphs = shaper.shape(testCase.inputCodePoints, markGlyphObjects, {});
+      expect(outputGlyphs).to.deep.equal(testCase.expectedOutputGlyphs);
     }
   );
 
