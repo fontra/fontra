@@ -116,7 +116,7 @@ export default class CharactersGlyphsPanel extends Panel {
       {
         key: "advance",
         title: "Adv",
-        width: "6em",
+        width: "5em",
         align: "right",
         get: (item) => {
           const kern = item.advance - item.originalAdvance;
