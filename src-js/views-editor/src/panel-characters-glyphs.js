@@ -65,7 +65,8 @@ export default class CharactersGlyphsPanel extends Panel {
       {
         key: "unicodeName",
         title: "Unicode name",
-        width: "12em",
+        width: 170,
+        minWidth: 80,
         get: (item) =>
           item.codePoint
             ? getGlyphInfoFromCodePoint(item.codePoint)?.description?.toLowerCase()
@@ -88,6 +89,8 @@ export default class CharactersGlyphsPanel extends Panel {
     this.characterList.columnDescriptions = characterListColumnDescriptions;
     this.characterList.showHeader = true;
     this.characterList.minHeight = "5em";
+    this.characterList.settingsStorageKey = "chars-glyphs-char-list";
+
     this.characterList.addEventListener("listSelectionChanged", (event) => {
       const characterIndex = this.characterList.getSelectedItemIndex();
       const glyphIndices = this.characterGlyphMapping.charToGlyphs[characterIndex];
@@ -146,6 +149,7 @@ export default class CharactersGlyphsPanel extends Panel {
     this.glyphList.columnDescriptions = glyphListColumnDescriptions;
     this.glyphList.showHeader = true;
     this.glyphList.minHeight = "5em";
+    this.glyphList.settingsStorageKey = "chars-glyphs-glyph-list";
     this.glyphList.addEventListener("listSelectionChanged", (event) => {
       const glyphIndex = this.glyphList.getSelectedItemIndex();
       this.sceneSettings.selectedGlyph = {
