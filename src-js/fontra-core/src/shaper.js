@@ -414,7 +414,7 @@ export function applyCursiveAttachments(glyphs, glyphObjects, rightToLeft = fals
   const [leftPrefix, rightPrefix] = rightToLeft ? ["exit", "entry"] : ["entry", "exit"];
 
   let previousGlyph;
-  let previousXAdvance;
+  let previousXAdvance = 0;
   let previousExitAnchors = {};
 
   for (const glyph of glyphs) {
@@ -469,27 +469,48 @@ export function applyMarkToMarkPositioning(glyphs, glyphObjects, rightToLeft = f
   return _applyMarkPositioning(glyphs, glyphObjects, rightToLeft, true);
 }
 
+// hb-ot-layout.hh
+const IS_LIG_BASE = 0x10;
+
 function _applyMarkPositioning(glyphs, glyphObjects, rightToLeft, markToMark) {
-  let previousXAdvance;
-  let baseAnchors = {};
+  // For simplicity, we treat non-ligatures as ligatures with only one component
+  let previousXAdvance = 0;
+  let baseAnchors = [{}];
   let didModify = false;
+  let baseLigatureId = 0;
 
   const ordered = rightToLeft ? reversed : (v) => v;
 
   for (const glyph of ordered(glyphs)) {
     const glyphObject = glyphObjects[glyph.glyphname];
     if (!glyphObject) {
-      baseAnchors = {};
+      baseAnchors = [{}];
       continue;
     }
+
+    // Digging into HarfBuzz internals to get ligature info so we can do
+    // mark-to-logature positioning
+    const ligatureProps = (glyph.var1 >> 16) & 0xff;
+    const componentLigatureId = ligatureProps >> 5;
+    const componentIndexOneBased = ligatureProps & 0x0f;
 
     if (glyph.mark) {
       // NOTE: for marks, we *don't* use glyphObject.propagedAnchors, but
       // only the anchors defined in the glyph proper.
-      const markBaseAnchors = collectAnchors(glyphObject.anchors);
       const markAnchors = collectAnchors(glyphObject.anchors, "_");
+
+      // If a mark has the same ligature id as the ligature, it attaches to it
+      // and it will have a (1-based) ligature component indicating which component
+      // it attaches to. If it has a different ligature id or the component is 0,
+      // then it attaches to the last component in the ligature.
+
+      const componentIndex =
+        baseLigatureId == componentLigatureId && componentIndexOneBased
+          ? componentIndexOneBased - 1
+          : baseAnchors.length - 1;
+
       for (const anchorName of Object.keys(markAnchors)) {
-        const baseAnchor = baseAnchors[anchorName];
+        const baseAnchor = baseAnchors[componentIndex][anchorName];
         if (baseAnchor) {
           const markAnchor = markAnchors[anchorName];
           glyph.x_offset = Math.round(baseAnchor.x - markAnchor.x - previousXAdvance);
@@ -500,8 +521,10 @@ function _applyMarkPositioning(glyphs, glyphObjects, rightToLeft, markToMark) {
       }
 
       if (markToMark) {
+        // We don't use glyphObject.propagedAnchors for marks
+        const markBaseAnchors = collectAnchors(glyphObject.anchors, "", "_");
         for (const [anchorName, markAnchor] of Object.entries(markBaseAnchors)) {
-          baseAnchors[anchorName] = {
+          baseAnchors[componentIndex][anchorName] = {
             name: anchorName,
             x: markAnchor.x + glyph.x_offset + previousXAdvance,
             y: markAnchor.y + glyph.y_offset,
@@ -509,14 +532,40 @@ function _applyMarkPositioning(glyphs, glyphObjects, rightToLeft, markToMark) {
         }
       }
     } else {
-      baseAnchors = markToMark
-        ? {}
-        : collectAnchors(
-            glyphObject.propagatedAnchors,
-            "",
-            glyph.x_offset,
-            glyph.y_offset
+      baseLigatureId = ligatureProps >> 5;
+      const numLigatureComponents =
+        ligatureProps & IS_LIG_BASE ? ligatureProps & 0x0f : 1;
+
+      if (markToMark) {
+        // Set up an array with empty anchor dicts, to be populated by
+        // marks, for mark-to-mark positioning
+        baseAnchors = splitLigatureAnchors(numLigatureComponents, {});
+      } else {
+        if (ligatureProps & IS_LIG_BASE) {
+          // This glyph is a ligature
+          baseAnchors = splitLigatureAnchors(
+            numLigatureComponents,
+            collectAnchors(
+              glyphObject.propagatedAnchors,
+              "",
+              "",
+              glyph.x_offset,
+              glyph.y_offset
+            )
           );
+        } else {
+          baseLigatureId = 0;
+          baseAnchors = [
+            collectAnchors(
+              glyphObject.propagatedAnchors,
+              "",
+              "",
+              glyph.x_offset,
+              glyph.y_offset
+            ),
+          ];
+        }
+      }
       previousXAdvance = rightToLeft ? 0 : glyphObject.xAdvance;
     }
   }
@@ -524,12 +573,12 @@ function _applyMarkPositioning(glyphs, glyphObjects, rightToLeft, markToMark) {
   return didModify;
 }
 
-function collectAnchors(anchors, prefix = "", dx = 0, dy = 0) {
+function collectAnchors(anchors, prefix = "", skipPrefix = "", dx = 0, dy = 0) {
   const lenPrefix = prefix.length;
   const anchorsBySuffix = {};
 
   for (const { name, x, y } of anchors || []) {
-    if (name.startsWith(prefix)) {
+    if (name.startsWith(prefix) && (!skipPrefix || !name.startsWith(skipPrefix))) {
       const suffix = name.slice(lenPrefix);
       if (!(suffix in anchorsBySuffix)) {
         anchorsBySuffix[suffix] = { name, x: x + dx, y: y + dy };
@@ -538,6 +587,26 @@ function collectAnchors(anchors, prefix = "", dx = 0, dy = 0) {
   }
 
   return anchorsBySuffix;
+}
+
+function splitLigatureAnchors(numLigatureComponents, anchors) {
+  const ligatureAnchors = new Array(numLigatureComponents).fill(null).map(() => ({}));
+
+  for (const [anchorName, anchor] of Object.entries(anchors)) {
+    const match = anchorName.match(/^(.+)_(\d+)$/);
+    if (!match) {
+      continue;
+    }
+    const baseAnchorName = match[1];
+    const componentIndex = parseInt(match[2]) - 1; // base 1
+    if (componentIndex >= numLigatureComponents || baseAnchorName == "caret") {
+      // Invalid anchor number or caret anchor
+      continue;
+    }
+    ligatureAnchors[componentIndex][baseAnchorName] = anchor;
+  }
+
+  return ligatureAnchors;
 }
 
 export function characterGlyphMapping(clusters, numChars) {
