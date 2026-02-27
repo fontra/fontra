@@ -310,8 +310,8 @@ export class UIList extends UnlitElement {
       `fontra.list.${this.settingsStorageKey}`
     );
     const settings = settingsString ? JSON.parse(settingsString) : {};
-    this.columnWidths = settings.columnWidths || {};
-    for (const [key, columnWidth] of Object.entries(settings.columnWidths)) {
+    this.columnWidths = settings.columnWidths ?? {};
+    for (const [key, columnWidth] of Object.entries(this.columnWidths)) {
       this.setColumnWidth(key, columnWidth);
     }
   }
