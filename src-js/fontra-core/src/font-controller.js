@@ -1357,20 +1357,17 @@ export class FontController {
 
   _isMark(glyphName) {
     const codePoints = this.glyphMap[glyphName] || [];
-    if (!codePoints.length) {
-      const info = getGlyphInfoFromGlyphName(glyphName);
-      if (info?.category === "Mark") {
-        return true;
-      }
-    } else {
+    let info = getGlyphInfoFromGlyphName(glyphName);
+    if (!info && codePoints.length) {
       for (const codePoint of codePoints) {
-        const info = getGlyphInfoFromCodePoint(codePoint);
-        if (info?.category === "Mark") {
-          return true;
+        const info =
+          getGlyphInfoFromCodePoint(codePoint) ?? getGlyphInfoFromGlyphName(glyphName);
+        if (info) {
+          break;
         }
       }
     }
-    return false;
+    return info?.category === "Mark";
   }
 }
 
