@@ -494,7 +494,43 @@ function _applyMarkPositioning(glyphs, glyphObjects, rightToLeft, markToMark) {
     const componentLigatureId = ligatureProps >> 5;
     const componentIndexOneBased = ligatureProps & 0x0f;
 
-    if (glyph.mark) {
+    if (!glyph.mark) {
+      baseLigatureId = ligatureProps >> 5;
+      const numLigatureComponents =
+        ligatureProps & IS_LIG_BASE ? ligatureProps & 0x0f : 1;
+
+      if (markToMark) {
+        // Set up an array with empty anchor dicts, to be populated by
+        // marks, for mark-to-mark positioning
+        baseAnchors = splitLigatureAnchors(numLigatureComponents, {});
+      } else {
+        if (ligatureProps & IS_LIG_BASE) {
+          // This glyph is a ligature
+          baseAnchors = splitLigatureAnchors(
+            numLigatureComponents,
+            collectAnchors(
+              glyphObject.propagatedAnchors,
+              "",
+              "",
+              glyph.x_offset,
+              glyph.y_offset
+            )
+          );
+        } else {
+          baseLigatureId = 0;
+          baseAnchors = [
+            collectAnchors(
+              glyphObject.propagatedAnchors,
+              "",
+              "",
+              glyph.x_offset,
+              glyph.y_offset
+            ),
+          ];
+        }
+      }
+      previousXAdvance = rightToLeft ? 0 : glyphObject.xAdvance;
+    } else {
       // NOTE: for marks, we *don't* use glyphObject.propagedAnchors, but
       // only the anchors defined in the glyph proper.
       const markAnchors = collectAnchors(glyphObject.anchors, "_");
@@ -531,42 +567,6 @@ function _applyMarkPositioning(glyphs, glyphObjects, rightToLeft, markToMark) {
           };
         }
       }
-    } else {
-      baseLigatureId = ligatureProps >> 5;
-      const numLigatureComponents =
-        ligatureProps & IS_LIG_BASE ? ligatureProps & 0x0f : 1;
-
-      if (markToMark) {
-        // Set up an array with empty anchor dicts, to be populated by
-        // marks, for mark-to-mark positioning
-        baseAnchors = splitLigatureAnchors(numLigatureComponents, {});
-      } else {
-        if (ligatureProps & IS_LIG_BASE) {
-          // This glyph is a ligature
-          baseAnchors = splitLigatureAnchors(
-            numLigatureComponents,
-            collectAnchors(
-              glyphObject.propagatedAnchors,
-              "",
-              "",
-              glyph.x_offset,
-              glyph.y_offset
-            )
-          );
-        } else {
-          baseLigatureId = 0;
-          baseAnchors = [
-            collectAnchors(
-              glyphObject.propagatedAnchors,
-              "",
-              "",
-              glyph.x_offset,
-              glyph.y_offset
-            ),
-          ];
-        }
-      }
-      previousXAdvance = rightToLeft ? 0 : glyphObject.xAdvance;
     }
   }
 
