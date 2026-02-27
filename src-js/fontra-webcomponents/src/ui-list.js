@@ -21,6 +21,7 @@ export class UIList extends UnlitElement {
 
     .list-container {
       --column-header-divider-thickness: 1px;
+      --column-header-divider-right-margin: 2px;
       display: grid;
       grid-template-rows: auto 1fr;
       gap: 0.2em;
@@ -70,6 +71,7 @@ export class UIList extends UnlitElement {
 
     .header-cell.resizable {
       border-right: var(--column-header-divider-thickness) solid #8888;
+      margin-right: var(--column-header-divider-right-margin);
     }
 
     .header-cell-container {
@@ -441,7 +443,8 @@ export class UIList extends UnlitElement {
         cell.style.width = colDesc.minWidth
           ? `calc(var(${columnWidthProperty(
               colDesc.key
-            )}) - var(--column-header-divider-thickness))`
+            )}) - var(--column-header-divider-thickness)
+                - var(--column-header-divider-right-margin))`
           : `var(${columnWidthProperty(colDesc.key)}`;
       }
       const value = colDesc.title || colDesc.key;
