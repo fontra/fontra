@@ -1163,7 +1163,6 @@ feature liga {
     "mark-to-ligature tests",
     testDataMarkToLigaturePositioning,
     (testCase) => {
-      //
       const shaper = getShaper({
         fontData,
         nominalGlyphFunc,
