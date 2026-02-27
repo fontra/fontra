@@ -218,7 +218,7 @@ export default class CharactersGlyphsPanel extends Panel {
       dx: glyph.glyphInfo.x_offset,
       dy: glyph.glyphInfo.y_offset,
       cluster: glyph.cluster,
-      originalAdvance: Math.round(glyph.glyph.xAdvance), // TODO: yAdvance for vertical
+      originalAdvance: glyph.glyphInfo.mark ? 0 : Math.round(glyph.glyph.xAdvance), // TODO: yAdvance for vertical
     }));
 
     this.characterGlyphMapping = characterGlyphMapping(
