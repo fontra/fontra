@@ -57,47 +57,6 @@ def getGoogleFontsGlyphSets():
     }
 
 
-def getBlackFoundryGlyphSets():
-    sourceURL = "https://github.com/BlackFoundryCom/BF_font_standard"
-
-    glyphSets = []
-
-    for topInfo in getGitHubDirectoryInfo("BlackFoundryCom", "BF_font_standard", ""):
-        if topInfo["type"] != "dir":
-            continue
-
-        for dirInfo in getGitHubDirectoryInfo(
-            "BlackFoundryCom", "BF_font_standard", topInfo["name"]
-        ):
-            name = dirInfo["name"]
-            if not name.endswith(".csv"):
-                continue
-
-            name = " ".join(name[:-4].split("_"))
-            name = name.capitalize()
-            name = "BF " + name
-            glyphSets.append(
-                {
-                    "name": name,
-                    "url": jsDelivrURL(
-                        "BlackFoundryCom", "BF_font_standard", dirInfo["path"]
-                    ),
-                }
-            )
-
-    return {
-        "name": "Black Foundry",
-        "sourceURL": sourceURL,
-        "dataOptions": {
-            "dataFormat": "tsv/csv",
-            "hasHeader": True,
-            "codePointColumn": "unicode hex",
-            "glyphNameColumn": "name",
-        },
-        "glyphSets": glyphSets,
-    }
-
-
 def getAdobeLatinCyrGreekGlyphSets():
     sourceURL = "https://github.com/orgs/adobe-type-tools/repositories?q=charsets"
 
@@ -274,7 +233,6 @@ def getJustFontGlyphSets():
 def collectCollections():
     collections = []
     collections.append(getGoogleFontsGlyphSets())
-    collections.append(getBlackFoundryGlyphSets())
     collections.append(getAdobeLatinCyrGreekGlyphSets())
     collections.append(getKoeberlinLatinGlyphSets())
     collections.append(getWickedLettersGeorgianGlyphSets())
