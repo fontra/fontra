@@ -476,7 +476,7 @@ export class UIList extends UnlitElement {
 
     resizeHandle.addEventListener("mousedown", (event) => {
       initialEvent = event;
-      initialWidth = this.columnWidths[colDesc.key];
+      initialWidth = this.columnWidths[colDesc.key] ?? colDesc.width;
       document.addEventListener("mousemove", mouseMoveHandler);
       document.addEventListener("mouseup", mouseUpHandler);
     });
