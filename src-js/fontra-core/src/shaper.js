@@ -487,6 +487,7 @@ function _applyMarkPositioning(glyphs, glyphObjects, rightToLeft, markToMark) {
   let baseAnchors = [{}];
   let didModify = false;
   let baseLigatureId = 0;
+  let previousCluster = -1;
 
   const ordered = rightToLeft ? reversed : (v) => v;
 
@@ -527,15 +528,21 @@ function _applyMarkPositioning(glyphs, glyphObjects, rightToLeft, markToMark) {
           );
         } else {
           baseLigatureId = 0;
-          baseAnchors = [
-            collectAnchors(
-              glyphObject.propagatedAnchors,
-              "",
-              "",
-              glyph.x_offset,
-              glyph.y_offset
-            ),
-          ];
+
+          const newBaseAnchors = collectAnchors(
+            glyphObject.propagatedAnchors,
+            "",
+            "",
+            glyph.x_offset,
+            glyph.y_offset
+          );
+
+          if (glyph.cluster != previousCluster) {
+            baseAnchors = [newBaseAnchors];
+          } else {
+            // We're still in the same cluster, don't throw away the previous base anchors
+            baseAnchors.splice(-1, 1, { ...baseAnchors.at(-1), ...newBaseAnchors });
+          }
         }
       }
       previousXAdvance = rightToLeft ? 0 : glyphObject.xAdvance;
@@ -577,6 +584,8 @@ function _applyMarkPositioning(glyphs, glyphObjects, rightToLeft, markToMark) {
         }
       }
     }
+
+    previousCluster = glyph.cluster;
   }
 
   return didModify;
