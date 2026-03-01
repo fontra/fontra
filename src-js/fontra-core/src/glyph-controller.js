@@ -1262,9 +1262,13 @@ function ensureGlyphCompatibility(layers, glyphDependencies) {
   const layerGlyphs = layers.map(({ glyph }) => glyph);
 
   const componentsAreCompatible = areComponentsCompatible(layerGlyphs);
+  let componentCustomDatasAreCompatible = false;
 
   if (componentsAreCompatible) {
-    setupComponentLocationFallbackValues(layers, glyphDependencies);
+    componentCustomDatasAreCompatible = setupComponentLocationFallbackValues(
+      layers,
+      glyphDependencies
+    );
   }
 
   const guidelinesAreCompatible = areGuidelinesCompatible(layerGlyphs);
@@ -1274,7 +1278,12 @@ function ensureGlyphCompatibility(layers, glyphDependencies) {
       {
         ...glyph,
         components: componentsAreCompatible
-          ? normalizeComponents(glyph, sourceLocation, componentLocationFallbackValues)
+          ? normalizeComponents(
+              glyph,
+              sourceLocation,
+              componentLocationFallbackValues,
+              componentCustomDatasAreCompatible
+            )
           : stripComponentCustomData(glyph.components),
         anchors: glyph.anchors.slice().sort((a, b) => compare(a.name, b.name)),
         guidelines: guidelinesAreCompatible
@@ -1309,7 +1318,10 @@ function setupComponentLocationFallbackValues(layers, glyphDependencies) {
   const componentInfo = layers[0].glyph.components.map((compo) => ({
     name: compo.name,
     usedAxisNames: new Set(),
+    customData: compo.customData,
   }));
+
+  let customDatasCompatible = true;
 
   const baseGlyphAxesByName = Object.fromEntries(
     componentInfo.map(({ name }) => [
@@ -1329,14 +1341,21 @@ function setupComponentLocationFallbackValues(layers, glyphDependencies) {
 
   const numComponents = layers[0].glyph.components.length;
 
-  // populate usedAxisNames
+  // populate usedAxisNames, check customData
   for (const componentIndex of range(numComponents)) {
     for (const { sourceLocation, glyph } of layers) {
       const compo = glyph.components[componentIndex];
+      const info = componentInfo[componentIndex];
       for (const axisName of Object.keys(compo.location)) {
         if (baseGlyphAxisNames[compo.name]?.has(axisName)) {
-          componentInfo[componentIndex].usedAxisNames.add(axisName);
+          info.usedAxisNames.add(axisName);
         }
+      }
+
+      try {
+        const _ = addItemwise(info.customData, compo.customData);
+      } catch (error) {
+        customDatasCompatible = false;
       }
     }
   }
@@ -1356,9 +1375,16 @@ function setupComponentLocationFallbackValues(layers, glyphDependencies) {
       }
     );
   }
+
+  return customDatasCompatible;
 }
 
-function normalizeComponents(glyph, sourceLocation, componentLocationFallbackValues) {
+function normalizeComponents(
+  glyph,
+  sourceLocation,
+  componentLocationFallbackValues,
+  customDatasCompatible = true
+) {
   const normalizedComponents = [];
 
   for (const [compo, fallbackValues] of zip(
@@ -1375,6 +1401,7 @@ function normalizeComponents(glyph, sourceLocation, componentLocationFallbackVal
       name: compo.name,
       transformation: compo.transformation,
       location,
+      customData: customDatasCompatible ? compo.customData : {},
     });
   }
 
@@ -1387,6 +1414,26 @@ function stripComponentCustomData(components) {
     transformation: component.transformation,
     location: component.location,
   }));
+}
+
+function areCustomDatasCompatible(customDatas) {
+  if (customDatas.length <= 1) {
+    return true;
+  }
+
+  console.log(customDatas);
+
+  const firstCustomData = customDatas[0];
+
+  for (const customData of customDatas.slice(1)) {
+    try {
+      addItemwise(firstCustomData, customData);
+    } catch (error) {
+      return false;
+    }
+  }
+
+  return true;
 }
 
 function stripNonInterpolatablesAndSortAnchors(glyph) {
