@@ -2172,7 +2172,7 @@ def packGuidelines(guidelines, lib):
             pg["name"] = g.name
         pg["x"] = g.x
         pg["y"] = g.y
-        pg["angle"] = g.angle
+        pg["angle"] = g.angle % 360
         if g.locked:
             lib[RF_GUIDELINE_LOCK_LIB_PREFIX + identifier] = True
             pg["identifier"] = identifier
