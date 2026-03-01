@@ -917,9 +917,16 @@ class ComponentController {
       parentGlyphNames,
       fontAxisNames
     );
+
     this.path = path;
-    this.anchors = anchors;
     this.errors = errors;
+
+    const componentAnchor =
+      compo.customData?.["com.glyphsapp.component.anchor"] || undefined;
+
+    this.anchors = componentAnchor?.includes("_")
+      ? upgradeLigatureAnchors(componentAnchor, anchors)
+      : anchors;
   }
 
   get path2d() {
@@ -1126,6 +1133,26 @@ export async function decomposeComponents(
   }
   const newPath = joinPaths(newPaths);
   return { path: newPath, components: newComponents, anchors: newAnchors };
+}
+
+function upgradeLigatureAnchors(componentAnchor, anchors) {
+  // If the component was placed as a ligature mark, upgrade *it's* anchors to
+  // become ligature anchors, so subsequent marks can be attached correctly.
+  // To achieve this, change any anchor's name to that of `componentAnchor`
+  // - if the anchor is a base anchor (does not start with "_")
+  // - and if `componentAnchor` starts with the anchor's name + "_"
+  // - and if there exists a matching mark anchor: "_" + the anchor's name
+  //
+  // Example: if `componentAnchor` is "top_1", and our component has anchors
+  // named "top" and "_top", then rename the "top" anchor to "top_1".
+  anchors = anchors.map((anchor) =>
+    !anchor.name.startsWith("_") &&
+    componentAnchor.startsWith(anchor.name + "_") &&
+    anchors.find((otherAnchor) => otherAnchor.name == "_" + anchor.name)
+      ? { ...anchor, name: componentAnchor }
+      : anchor
+  );
+  return anchors;
 }
 
 export function getAxisBaseName(axisName) {
