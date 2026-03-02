@@ -1037,6 +1037,10 @@ export class EditorController extends ViewController {
           this._multiToolMouseDownTimer = (withTimeOut ? setTimeout : noTimeout)(() => {
             // Show sub tools
             for (const child of editToolsElement.children) {
+              // When shown, make sure all tooltips are shown on the right, so as
+              // to not obscure the subtool(s) with the tooltip. This will get reset
+              // in collapseSubTools().
+              child.dataset["tooltipposition"] = "right";
               child.style.visibility = "visible";
             }
             window.addEventListener("mousedown", globalListener);
