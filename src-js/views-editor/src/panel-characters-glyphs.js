@@ -117,7 +117,7 @@ export default class CharactersGlyphsPanel extends Panel {
       },
       {
         key: "advance",
-        title: "Adv",
+        title: "Advance",
         width: "5em",
         align: "right",
         get: (item) => {
