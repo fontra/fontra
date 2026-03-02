@@ -118,10 +118,12 @@ The following list of features is not complete, but gives you a rough idea of wh
 - Zoom with short-cuts ✅
 - Advanced character / glyph search
 - Display kerning ✅
-- Apply proper text shaping
+- Apply proper text shaping ✅
+- Support right-to-left text layout ✅
+- Support vertical top-to-bottom text layout
+- Apply OpenType features ✅
+- Emulate mark-to-base, mark-to-mark, mark-to-ligature and cursive positioning ✅
 - Full screen mode ✅
-- Right-to-left mode
-- Vertical top-to-bottom mode
 - Enter “edit mode” for glyph by double-clicking on a glyph in the text ✅
 
 ### Glyph editing
