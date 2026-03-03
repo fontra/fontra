@@ -874,10 +874,16 @@ class PropagateAnchors(BaseFilter):
                 instance = instancer.instantiate(
                     fontInstancer.getGlyphSourceLocation(source)
                 )
+                compoAnchorsByName = {}
                 for anchor in instance.glyph.anchors:
-                    if anchor.name not in anchorsByName:
-                        anchorsByName[anchor.name] = anchor
-                        didModify = True
+                    # Let the last one win
+                    compoAnchorsByName[anchor.name] = anchor
+
+                if compoAnchorsByName:
+                    # Existing anchors win
+                    anchorsByName = compoAnchorsByName | anchorsByName
+                    didModify = True
+
             if didModify:
                 layer = replace(
                     layer,
