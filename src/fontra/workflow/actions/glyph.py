@@ -963,7 +963,7 @@ def _boundsOrigin(glyph):
 
 def upgradeLigatureAnchors(componentAnchor: str, anchors: list[Anchor]) -> list[Anchor]:
     """
-    If the component was placed as a ligature mark, upgrade *it's* anchors to
+    If the component was placed as a ligature mark, upgrade *its* anchors to
     become ligature anchors, so subsequent marks can be attached correctly.
     To achieve this, change any anchor's name to that of `componentAnchor`
     - if the anchor is a base anchor (does not start with "_")
