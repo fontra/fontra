@@ -876,7 +876,7 @@ class PropagateAnchors(BaseFilter):
             compoAnchorsByName = {}
 
             for compo in layer.glyph.components:
-                compoGlyph = await instance.decomposeComponent(compo)
+                compoGlyph = await instance.decomposeComponent(compo, onlyAnchors=True)
 
                 for anchor in compoGlyph.anchors:
                     compoAnchorsByName[anchor.name] = anchor

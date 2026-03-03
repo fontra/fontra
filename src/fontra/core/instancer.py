@@ -496,15 +496,21 @@ class GlyphInstance:
     parentLocation: dict[str, float]  # LocationCoordinateSystem.SOURCE
     fontInstancer: FontInstancer
 
-    async def decomposed(self, transform: Transform | None = None) -> StaticGlyph:
+    async def decomposed(
+        self, transform: Transform | None = None, onlyAnchors: bool = False
+    ) -> StaticGlyph:
         assert isinstance(self.glyph.path, PackedPath)
-        paths: list[PackedPath] = [
-            (
-                self.glyph.path
-                if transform is None
-                else self.glyph.path.transformed(transform)
-            )
-        ]
+        paths: list[PackedPath] = (
+            []
+            if onlyAnchors
+            else [
+                (
+                    self.glyph.path
+                    if transform is None
+                    else self.glyph.path.transformed(transform)
+                )
+            ]
+        )
         anchors: list[Anchor] = (
             self.glyph.anchors
             if transform is None
@@ -513,11 +519,14 @@ class GlyphInstance:
 
         anchorsByName = {anchor.name: anchor for anchor in anchors}
 
-        compoAnchorsByName: dict[str, Anchor] = {}
+        compoAnchorsByName = {}
         for component in self.glyph.components:
-            compoGlyph = await self.decomposeComponent(component, transform)
+            compoGlyph = await self.decomposeComponent(
+                component, transform, onlyAnchors=onlyAnchors
+            )
             assert isinstance(compoGlyph.path, PackedPath)
-            paths.append(compoGlyph.path)
+            if not onlyAnchors:
+                paths.append(compoGlyph.path)
             for anchor in compoGlyph.anchors:
                 compoAnchorsByName[anchor.name] = anchor
 
@@ -561,7 +570,10 @@ class GlyphInstance:
                 pen.addComponent(component.name, component.transformation.toTransform())
 
     async def decomposeComponent(
-        self, component, parentTransform: Transform | None = None
+        self,
+        component,
+        parentTransform: Transform | None = None,
+        onlyAnchors: bool = False,
     ) -> StaticGlyph:
         try:
             instancer = await self.fontInstancer.getGlyphInstancer(component.name, True)
@@ -575,7 +587,7 @@ class GlyphInstance:
         transform = component.transformation.toTransform()
         if parentTransform is not None:
             transform = parentTransform.transform(transform)
-        return await instance.decomposed(transform)
+        return await instance.decomposed(transform, onlyAnchors=onlyAnchors)
 
     async def shallowDecomposeComponent(self, component: Component) -> StaticGlyph:
         try:
