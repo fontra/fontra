@@ -859,33 +859,32 @@ class RemoveOverlaps(BaseFilter):
 @registerFilterAction("propagate-anchors")
 @dataclass(kw_only=True)
 class PropagateAnchors(BaseFilter):
-    async def processGlyph(self, glyph):
+    async def getGlyph(self, glyphName):
         fontInstancer = self.fontInstancer
+        instancer = await fontInstancer.getGlyphInstancer(glyphName)
+        glyph = instancer.glyph
+
         newLayers = {}
 
-        for source in glyph.sources:
+        for source in instancer.activeSources:
             layer = glyph.layers[source.layerName]
-            anchorsByName = {anchor.name: anchor for anchor in layer.glyph.anchors}
-            didModify = False
+            instance = instancer.instantiate(
+                fontInstancer.getGlyphSourceLocation(source)
+            )
 
+            anchorsByName = {anchor.name: anchor for anchor in layer.glyph.anchors}
             compoAnchorsByName = {}
+
             for compo in layer.glyph.components:
-                instancer = await fontInstancer.getGlyphInstancer(
-                    compo.name, addToCache=True
-                )
-                instance = instancer.instantiate(
-                    fontInstancer.getGlyphSourceLocation(source)
-                )
-                for anchor in instance.glyph.anchors:
-                    # Let the last one win
+                compoGlyph = await instance.decomposeComponent(compo)
+
+                for anchor in compoGlyph.anchors:
                     compoAnchorsByName[anchor.name] = anchor
 
             if compoAnchorsByName:
                 # Existing anchors win
                 anchorsByName = compoAnchorsByName | anchorsByName
-                didModify = True
 
-            if didModify:
                 layer = replace(
                     layer,
                     glyph=replace(layer.glyph, anchors=list(anchorsByName.values())),
