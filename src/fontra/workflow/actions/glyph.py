@@ -882,9 +882,15 @@ class PropagateAnchors(BaseFilter):
                 for compo in layer.glyph.components
             ]
 
+            hasReceivingAnchors = any(
+                anchor.name and anchor.name.startswith("_")
+                for _, compoGlyph in composAndCompoGlyphs
+                for anchor in compoGlyph.anchors
+            )
+
             closestToOrigin = (
                 findClosestToOrigin(composAndCompoGlyphs)
-                if isLigature(glyphName)
+                if isLigature(glyphName) and hasReceivingAnchors
                 else None
             )
 
@@ -894,7 +900,8 @@ class PropagateAnchors(BaseFilter):
                 componentAnchor = compo.customData.get("com.glyphsapp.component.anchor")
                 if componentAnchor:
                     anchors = upgradeLigatureAnchors(componentAnchor, anchors)
-                elif compo is not closestToOrigin:
+
+                if hasReceivingAnchors and compo is not closestToOrigin:
                     # Drop any receiving anchors when we're not a possible mark
                     # ligature's main component. Trying to behave similar to
                     # glyphsLib.
@@ -962,8 +969,6 @@ def upgradeLigatureAnchors(componentAnchor: str, anchors: list[Anchor]) -> list[
 
     Example: if `componentAnchor` is "top_1", and our component has anchors
     named "top" and "_top", then rename the "top" anchor to "top_1".
-
-    Also: drop "receiving" anchors, whos name starts with "_"
     """
 
     anchorNames = {anchor.name for anchor in anchors}
@@ -976,5 +981,4 @@ def upgradeLigatureAnchors(componentAnchor: str, anchors: list[Anchor]) -> list[
             else anchor
         )
         for anchor in anchors
-        if anchor.name and not anchor.name.startswith("_")
     ]
