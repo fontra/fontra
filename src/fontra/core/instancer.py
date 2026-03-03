@@ -505,11 +505,23 @@ class GlyphInstance:
                 else self.glyph.path.transformed(transform)
             )
         ]
+        anchors: list[Anchor] = [
+            anchor if transform is None else transformAnchor(anchor, transform)
+            for anchor in self.glyph.anchors
+        ]
+        anchorsByName = {anchor.name: anchor for anchor in anchors}
+
+        compoAnchorsByName: dict[str, Anchor] = {}
         for component in self.glyph.components:
-            decomposedComponent = await self.decomposeComponent(component, transform)
-            assert isinstance(decomposedComponent.path, PackedPath)
-            paths.append(decomposedComponent.path)
-        return StaticGlyph(path=joinPaths(paths))
+            compoGlyph = await self.decomposeComponent(component, transform)
+            assert isinstance(compoGlyph.path, PackedPath)
+            paths.append(compoGlyph.path)
+            for anchor in compoGlyph.anchors:
+                compoAnchorsByName[anchor.name] = anchor
+
+        anchors = list((compoAnchorsByName | anchorsByName).values())
+
+        return StaticGlyph(path=joinPaths(paths), anchors=anchors)
 
     async def drawPoints(
         self,
@@ -528,8 +540,8 @@ class GlyphInstance:
             self.glyph.components, self.componentTypes, strict=True
         ):
             if decomposeComponents or (isVarComponent and decomposeVarComponents):
-                decomposedComponent = await self.decomposeComponent(component)
-                paths.append(decomposedComponent.path)
+                compoGlyph = await self.decomposeComponent(component)
+                paths.append(compoGlyph.path)
             else:
                 components.append((component, isVarComponent))
 
@@ -588,6 +600,11 @@ def transformComponent(component: Component, transform: Transform) -> Component:
             transform, component.transformation
         ),
     )
+
+
+def transformAnchor(anchor: Anchor, transform: Transform) -> Anchor:
+    x, y = transform.transformPoint((anchor.x, anchor.y))
+    return replace(anchor, x=x, y=y)
 
 
 @dataclass(kw_only=True)
