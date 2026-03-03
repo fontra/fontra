@@ -853,3 +853,39 @@ class RemoveOverlaps(BaseFilter):
             for layerName, layer in glyph.layers.items()
         }
         return replace(glyph, layers=newLayers)
+
+
+@registerFilterAction("propagate-anchors")
+@dataclass(kw_only=True)
+class PropagateAnchors(BaseFilter):
+    async def processGlyph(self, glyph):
+        fontInstancer = self.fontInstancer
+        newLayers = {}
+
+        for source in glyph.sources:
+            layer = glyph.layers[source.layerName]
+            anchorsByName = {anchor.name: anchor for anchor in layer.glyph.anchors}
+            didModify = False
+
+            for compo in layer.glyph.components:
+                instancer = await fontInstancer.getGlyphInstancer(
+                    compo.name, addToCache=True
+                )
+                instance = instancer.instantiate(
+                    fontInstancer.getGlyphSourceLocation(source)
+                )
+                for anchor in instance.glyph.anchors:
+                    if anchor.name not in anchorsByName:
+                        anchorsByName[anchor.name] = anchor
+                        didModify = True
+            if didModify:
+                layer = replace(
+                    layer,
+                    glyph=replace(layer.glyph, anchors=list(anchorsByName.values())),
+                )
+                newLayers[source.layerName] = layer
+
+        if newLayers:
+            glyph = replace(glyph, layers=glyph.layers | newLayers)
+
+        return glyph
