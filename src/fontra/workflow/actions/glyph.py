@@ -224,10 +224,11 @@ async def decomposeComposites(
     for source in newSources:
         instance = instancer.instantiate(fontInstancer.getGlyphSourceLocation(source))
 
+        decomposedGlyph = await instance.decomposed()
         newLayers[source.layerName] = Layer(
             glyph=replace(
                 instance.glyph,
-                path=await instance.getDecomposedPath(),
+                path=decomposedGlyph.path,
                 components=[],
             ),
         )
@@ -867,6 +868,7 @@ class PropagateAnchors(BaseFilter):
             anchorsByName = {anchor.name: anchor for anchor in layer.glyph.anchors}
             didModify = False
 
+            compoAnchorsByName = {}
             for compo in layer.glyph.components:
                 instancer = await fontInstancer.getGlyphInstancer(
                     compo.name, addToCache=True
@@ -874,15 +876,14 @@ class PropagateAnchors(BaseFilter):
                 instance = instancer.instantiate(
                     fontInstancer.getGlyphSourceLocation(source)
                 )
-                compoAnchorsByName = {}
                 for anchor in instance.glyph.anchors:
                     # Let the last one win
                     compoAnchorsByName[anchor.name] = anchor
 
-                if compoAnchorsByName:
-                    # Existing anchors win
-                    anchorsByName = compoAnchorsByName | anchorsByName
-                    didModify = True
+            if compoAnchorsByName:
+                # Existing anchors win
+                anchorsByName = compoAnchorsByName | anchorsByName
+                didModify = True
 
             if didModify:
                 layer = replace(
