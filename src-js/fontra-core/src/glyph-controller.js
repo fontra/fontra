@@ -1145,13 +1145,17 @@ function upgradeLigatureAnchors(componentAnchor, anchors) {
   //
   // Example: if `componentAnchor` is "top_1", and our component has anchors
   // named "top" and "_top", then rename the "top" anchor to "top_1".
-  anchors = anchors.map((anchor) =>
-    !anchor.name.startsWith("_") &&
-    componentAnchor.startsWith(anchor.name + "_") &&
-    anchors.find((otherAnchor) => otherAnchor.name == "_" + anchor.name)
-      ? { ...anchor, name: componentAnchor }
-      : anchor
-  );
+  //
+  // Also: drop "receiving" anchors, whos name starts with "_"
+
+  anchors = anchors
+    .filter((anchor) => anchor.name && !anchor.name.startsWith("_"))
+    .map((anchor) =>
+      componentAnchor.startsWith(anchor.name + "_") &&
+      anchors.find((otherAnchor) => otherAnchor.name == "_" + anchor.name)
+        ? { ...anchor, name: componentAnchor }
+        : anchor
+    );
   return anchors;
 }
 
