@@ -496,7 +496,7 @@ class GlyphInstance:
     parentLocation: dict[str, float]  # LocationCoordinateSystem.SOURCE
     fontInstancer: FontInstancer
 
-    async def getDecomposedPath(self, transform: Transform | None = None) -> PackedPath:
+    async def decomposed(self, transform: Transform | None = None) -> StaticGlyph:
         assert isinstance(self.glyph.path, PackedPath)
         paths: list[PackedPath] = [
             (
@@ -506,8 +506,10 @@ class GlyphInstance:
             )
         ]
         for component in self.glyph.components:
-            paths.append(await self._getComponentPath(component, transform))
-        return joinPaths(paths)
+            decomposedComponent = await self.decomposeComponent(component, transform)
+            assert isinstance(decomposedComponent.path, PackedPath)
+            paths.append(decomposedComponent.path)
+        return StaticGlyph(path=joinPaths(paths))
 
     async def drawPoints(
         self,
@@ -526,7 +528,8 @@ class GlyphInstance:
             self.glyph.components, self.componentTypes, strict=True
         ):
             if decomposeComponents or (isVarComponent and decomposeVarComponents):
-                paths.append(await self._getComponentPath(component))
+                decomposedComponent = await self.decomposeComponent(component)
+                paths.append(decomposedComponent.path)
             else:
                 components.append((component, isVarComponent))
 
@@ -543,22 +546,22 @@ class GlyphInstance:
             else:
                 pen.addComponent(component.name, component.transformation.toTransform())
 
-    async def _getComponentPath(
+    async def decomposeComponent(
         self, component, parentTransform: Transform | None = None
-    ) -> PackedPath:
+    ) -> StaticGlyph:
         try:
             instancer = await self.fontInstancer.getGlyphInstancer(component.name, True)
         except GlyphNotFoundError:
             self.fontInstancer.glyphError(
                 f"glyph {self.glyphName} references non-existing glyph: {component.name}"
             )
-            return PackedPath()
+            return StaticGlyph()
 
         instance = instancer.instantiate(self.parentLocation | component.location)
         transform = component.transformation.toTransform()
         if parentTransform is not None:
             transform = parentTransform.transform(transform)
-        return await instance.getDecomposedPath(transform)
+        return await instance.decomposed(transform)
 
     async def shallowDecomposeComponent(self, component: Component) -> StaticGlyph:
         try:
