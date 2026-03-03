@@ -2,6 +2,7 @@ glyph name;code points
 A;U+0041
 B;U+0042
 C;U+0043
+C.alt;
 D;U+0044
 E;U+0045
 F;U+0046
