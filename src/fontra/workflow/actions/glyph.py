@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import itertools
 import logging
+import math
 from collections import defaultdict
 from dataclasses import dataclass, field, replace
 from enum import Enum
@@ -876,13 +877,32 @@ class PropagateAnchors(BaseFilter):
             anchorsByName = {anchor.name: anchor for anchor in layer.glyph.anchors}
             compoAnchorsByName = {}
 
-            for compo in layer.glyph.components:
-                compoGlyph = await instance.decomposeComponent(compo, onlyAnchors=True)
+            composAndCompoGlyphs = [
+                (compo, await instance.decomposeComponent(compo))
+                for compo in layer.glyph.components
+            ]
+
+            closestToOrigin = (
+                findClosestToOrigin(composAndCompoGlyphs)
+                if isLigature(glyphName)
+                else None
+            )
+
+            for compo, compoGlyph in composAndCompoGlyphs:
                 anchors = compoGlyph.anchors
 
                 componentAnchor = compo.customData.get("com.glyphsapp.component.anchor")
                 if componentAnchor:
                     anchors = upgradeLigatureAnchors(componentAnchor, anchors)
+                elif compo is not closestToOrigin:
+                    # Drop any receiving anchors when we're not a possible mark
+                    # ligature's main component. Trying to behave similar to
+                    # glyphsLib.
+                    anchors = [
+                        anchor
+                        for anchor in anchors
+                        if anchor.name and not anchor.name.startswith("_")
+                    ]
 
                 for anchor in anchors:
                     compoAnchorsByName[anchor.name] = anchor
@@ -901,6 +921,34 @@ class PropagateAnchors(BaseFilter):
             glyph = replace(glyph, layers=glyph.layers | newLayers)
 
         return glyph
+
+
+def isLigature(glyphName):
+    return not glyphName.startswith("_") and "_" in glyphName
+
+
+def findClosestToOrigin(composAndCompoGlyphs):
+    # Weird heuristic, but matches glyphsLib
+    if not composAndCompoGlyphs:
+        return None
+
+    ordered = sorted(
+        composAndCompoGlyphs,
+        key=lambda compoAndCompoGlyph: math.hypot(
+            *_boundsOrigin(compoAndCompoGlyph[1])
+        ),
+    )
+
+    closestToOrigin = ordered[0][0]
+    assert isinstance(closestToOrigin, Component)
+
+    return closestToOrigin
+
+
+def _boundsOrigin(glyph):
+    assert not glyph.components
+    bounds = glyph.path.getControlBounds()
+    return bounds[:2] if bounds else (0, 0)
 
 
 def upgradeLigatureAnchors(componentAnchor: str, anchors: list[Anchor]) -> list[Anchor]:
