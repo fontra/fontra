@@ -14,6 +14,7 @@ from fontTools.pens.pointPen import SegmentToPointPen
 
 from ...core.async_property import async_cached_property
 from ...core.classes import (
+    Anchor,
     Component,
     FontSource,
     GlyphSource,
@@ -877,8 +878,13 @@ class PropagateAnchors(BaseFilter):
 
             for compo in layer.glyph.components:
                 compoGlyph = await instance.decomposeComponent(compo, onlyAnchors=True)
+                anchors = compoGlyph.anchors
 
-                for anchor in compoGlyph.anchors:
+                componentAnchor = compo.customData.get("com.glyphsapp.component.anchor")
+                if componentAnchor:
+                    anchors = upgradeLigatureAnchors(componentAnchor, anchors)
+
+                for anchor in anchors:
                     compoAnchorsByName[anchor.name] = anchor
 
             if compoAnchorsByName:
@@ -895,3 +901,32 @@ class PropagateAnchors(BaseFilter):
             glyph = replace(glyph, layers=glyph.layers | newLayers)
 
         return glyph
+
+
+def upgradeLigatureAnchors(componentAnchor: str, anchors: list[Anchor]) -> list[Anchor]:
+    """
+    If the component was placed as a ligature mark, upgrade *it's* anchors to
+    become ligature anchors, so subsequent marks can be attached correctly.
+    To achieve this, change any anchor's name to that of `componentAnchor`
+    - if the anchor is a base anchor (does not start with "_")
+    - and if `componentAnchor` starts with the anchor's name + "_"
+    - and if there exists a matching mark anchor: "_" + the anchor's name
+
+    Example: if `componentAnchor` is "top_1", and our component has anchors
+    named "top" and "_top", then rename the "top" anchor to "top_1".
+
+    Also: drop "receiving" anchors, whos name starts with "_"
+    """
+
+    anchorNames = {anchor.name for anchor in anchors}
+
+    return [
+        (
+            replace(anchor, name=componentAnchor)
+            if componentAnchor.startswith((anchor.name or "") + "_")
+            and "_" + (anchor.name or "") in anchorNames
+            else anchor
+        )
+        for anchor in anchors
+        if anchor.name and not anchor.name.startswith("_")
+    ]
