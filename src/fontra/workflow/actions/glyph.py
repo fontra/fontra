@@ -870,6 +870,9 @@ class PropagateAnchors(BaseFilter):
 
         for source in instancer.activeSources:
             layer = glyph.layers[source.layerName]
+            if not layer.glyph.components:
+                continue
+
             instance = instancer.instantiate(
                 fontInstancer.getGlyphSourceLocation(source)
             )
