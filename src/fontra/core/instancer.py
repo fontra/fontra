@@ -505,10 +505,12 @@ class GlyphInstance:
                 else self.glyph.path.transformed(transform)
             )
         ]
-        anchors: list[Anchor] = [
-            anchor if transform is None else transformAnchor(anchor, transform)
-            for anchor in self.glyph.anchors
-        ]
+        anchors: list[Anchor] = (
+            self.glyph.anchors
+            if transform is None
+            else [transformAnchor(anchor, transform) for anchor in self.glyph.anchors]
+        )
+
         anchorsByName = {anchor.name: anchor for anchor in anchors}
 
         compoAnchorsByName: dict[str, Anchor] = {}
