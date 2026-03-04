@@ -87,7 +87,6 @@ export class FontController {
     this._rootClassDef = (await getClassSchema())["Font"];
     this.backendInfo = await this.font.getBackEndInfo();
     this.readOnly = await this.font.isReadOnly();
-    this._isMarkCache = {};
 
     if (initListener) {
       this.addChangeListener(
@@ -102,7 +101,7 @@ export class FontController {
       this.addChangeListener(
         { glyphMap: null },
         (change, isExternalChange) => {
-          this._isMarkCache = {};
+          delete this._glyphClasses;
         },
         false,
         true // immediate
@@ -412,15 +411,52 @@ export class FontController {
     };
   }
 
-  async buildShaperFont(glyphOrder) {
-    const features = await this.getFeatures();
+  async getGlyphClasses() {
+    if (!this._glyphClasses) {
+      this._glyphClasses = await this._getGlyphClasses();
+    }
+    return this._glyphClasses;
+  }
+
+  async _getGlyphClasses() {
+    const glyphInfos = await this.getGlyphInfos();
+
+    const isMark = (glyphName) => {
+      const customInfo = glyphInfos[glyphName];
+      if (customInfo?.category === "Mark" && customInfo?.subcategory === "Nonspacing") {
+        return true;
+      }
+
+      let info = getGlyphInfoFromGlyphName(glyphName);
+      const codePoints = this.glyphMap[glyphName] || [];
+
+      if (!info && codePoints.length) {
+        for (const codePoint of codePoints) {
+          const info =
+            getGlyphInfoFromCodePoint(codePoint) ??
+            getGlyphInfoFromGlyphName(glyphName);
+          if (info) {
+            break;
+          }
+        }
+      }
+      return info?.category === "Mark" && info?.subCategory === "Nonspacing";
+    };
 
     const glyphClasses = {
       base: [],
       ligature: [],
-      mark: Object.keys(this.glyphMap).filter((glyphName) => this.isMark(glyphName)),
+      mark: Object.keys(this.glyphMap).filter((glyphName) => isMark(glyphName)),
       component: [],
     };
+
+    return glyphClasses;
+  }
+
+  async buildShaperFont(glyphOrder) {
+    const features = await this.getFeatures();
+
+    const glyphClasses = await this.getGlyphClasses();
 
     try {
       return buildShaperFont(
@@ -649,6 +685,7 @@ export class FontController {
     const glyph = (await this.getGlyph(glyphName)).glyph;
     this._purgeGlyphCache(glyphName);
     delete this.glyphMap[glyphName];
+    delete this._glyphClasses[glyphName];
 
     const change = {
       c: [
@@ -1009,6 +1046,7 @@ export class FontController {
 
   async reloadEverything() {
     delete this._crossAxisMapping;
+    delete this._glyphClasses;
     this._glyphsPromiseCache.clear();
     this._glyphInstancePromiseCache.clear();
     this._glyphInstancePromiseCacheKeys = {};
@@ -1026,6 +1064,7 @@ export class FontController {
         await sleepAsync(0);
       }
       this._purgeGlyphCache(glyphName);
+      delete this._glyphClasses;
       // The undo stack is local, so any external change invalidates it
       delete this.undoStacks[glyphName];
       this.glyphChanged(glyphName, { senderID: this });
@@ -1138,6 +1177,9 @@ export class FontController {
   async getShaper(textShaping) {
     await this.ensureInitialized;
 
+    const { mark: markGlyphs } = await this.getGlyphClasses();
+    const markGlyphsSet = new Set(markGlyphs);
+
     const {
       glyphOrder,
       fontData,
@@ -1154,7 +1196,7 @@ export class FontController {
         fontData,
         nominalGlyphFunc: (codePoint) => characterMap[codePoint],
         glyphOrder,
-        isGlyphMarkFunc: (glyphName) => this.isMark(glyphName),
+        isGlyphMarkFunc: (glyphName) => markGlyphsSet.has(glyphName),
         insertMarkers,
       };
       const shaper = getShaper(shaperSupport);
@@ -1349,30 +1391,6 @@ export class FontController {
     );
 
     return { glyphs, backgroundImageData };
-  }
-
-  isMark(glyphName) {
-    let isMark = this._isMarkCache[glyphName];
-    if (isMark === undefined) {
-      isMark = this._isMark(glyphName);
-      this._isMarkCache[glyphName] = isMark;
-    }
-    return isMark;
-  }
-
-  _isMark(glyphName) {
-    const codePoints = this.glyphMap[glyphName] || [];
-    let info = getGlyphInfoFromGlyphName(glyphName);
-    if (!info && codePoints.length) {
-      for (const codePoint of codePoints) {
-        const info =
-          getGlyphInfoFromCodePoint(codePoint) ?? getGlyphInfoFromGlyphName(glyphName);
-        if (info) {
-          break;
-        }
-      }
-    }
-    return info?.category === "Mark" && info?.subCategory === "Nonspacing";
   }
 }
 
