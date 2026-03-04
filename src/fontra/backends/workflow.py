@@ -73,3 +73,7 @@ class WorkflowBackend(ReadableBaseBackend):
     async def getUnitsPerEm(self) -> int:
         endPoint = await self._ensureSetup()
         return await endPoint.getUnitsPerEm()
+
+    async def getGlyphInfos(self) -> dict[str, Any]:
+        endPoint = await self._ensureSetup()
+        return await endPoint.getGlyphInfos()
