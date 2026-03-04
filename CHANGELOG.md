@@ -13,6 +13,8 @@
     - The input characters, and a little bit of unicode information for each character
     - The output glyphs, showing the glyph name, advance width, positioning offsets and character cluster index for each glyph.
   - There are still some open issues, and things may still be a little rough around the edges. See [Issue 2381](https://github.com/fontra/fontra/issues/2381) for past and ongoing work.
+- [fontra-workflow] Add `propagate-anchors` filter, that tries to match `glyphsLib` behavior. [Issue 2453](https://github.com/fontra/fontra/issues/2453), [PR 2457](https://github.com/fontra/fontra/pull/2457)
+- [fontra-pak] When exporting `.ttf` or `.otf`, apply the `propagate-anchors` filter. This allows us to export .glyphs files more correctly. [fontra-pak PR 226](https://github.com/fontra/fontra-pak/pull/226)
 - [designspace/ufo] Fix writing of guidelines that have angles outside of the 0..360 range. [PR 2454](https://github.com/fontra/fontra/pull/2454)
 - [glyph sets] Remove Black Foundry glyph sets, they are unmaintained. [PR 2446](https://github.com/fontra/fontra/pull/2446)
 - [kerning emulation] Ignore mark glyphs when emulating kerning. [Issue 2443](https://github.com/fontra/fontra/issues/2443), [PR 2444](https://github.com/fontra/fontra/pull/2444)
