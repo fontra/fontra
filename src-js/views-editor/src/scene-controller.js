@@ -902,7 +902,7 @@ export class SceneController {
     if (event && event.x !== undefined) {
       this._currentLocalPoint = this.canvasController.localPoint(event);
     }
-    return this._currentLocalPoint || { x: 0, y: 0 };
+    return this._currentLocalPoint || { x: Infinity, y: Infinity };
   }
 
   selectedGlyphPoint(event) {
