@@ -167,6 +167,7 @@ export class FontController {
     if (!this._rootObject[key]) {
       const methods = {
         fontInfo: "getFontInfo",
+        glyphInfos: "getGlyphInfos",
         features: "getFeatures",
         kerning: "getKerning",
       };
@@ -177,6 +178,10 @@ export class FontController {
       this._rootObject[key] = await this.font[methodName]();
     }
     return this._rootObject[key];
+  }
+
+  async getGlyphInfos() {
+    return await this.getData("glyphInfos");
   }
 
   async getFontInfo() {
