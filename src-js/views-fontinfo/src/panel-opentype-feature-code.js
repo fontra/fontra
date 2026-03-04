@@ -351,6 +351,8 @@ export class OpenTypeFeatureCodePanel extends BaseInfoPanel {
       ])
     );
 
+    this.editorView.focus();
+
     this.showAllErrors = false;
     await this.checkCompileErrors();
   }
@@ -465,6 +467,13 @@ export class OpenTypeFeatureCodePanel extends BaseInfoPanel {
       redo(this.editorView);
     } else {
       undo(this.editorView);
+    }
+  }
+
+  visibilityChanged(onOff) {
+    super.visibilityChanged(onOff);
+    if (onOff && this.editorView) {
+      this.editorView.focus();
     }
   }
 }
