@@ -76,6 +76,7 @@ class Font:
     fontInfo: FontInfo = field(default_factory=FontInfo)
     glyphs: dict[str, VariableGlyph] = field(default_factory=dict)
     glyphMap: dict[str, list[int]] = field(default_factory=dict)
+    glyphInfos: CustomData = field(default_factory=dict)
     axes: Axes = field(default_factory=Axes)
     sources: dict[str, FontSource] = field(default_factory=dict)
     kerning: dict[str, Kerning] = field(default_factory=dict)
