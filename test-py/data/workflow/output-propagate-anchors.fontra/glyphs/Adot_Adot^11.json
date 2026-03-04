@@ -1,0 +1,64 @@
+{
+"name": "Adot_Adot",
+"sources": [
+{
+"name": "",
+"layerName": "0fe08302",
+"locationBase": "0fe08302"
+}
+],
+"layers": {
+"0fe08302": {
+"glyph": {
+"components": [
+{
+"name": "A_A"
+},
+{
+"name": "dot",
+"transformation": {
+"translateX": 10,
+"translateY": 380
+},
+"customData": {
+"com.glyphsapp.component.anchor": "top_1"
+}
+},
+{
+"name": "dot",
+"transformation": {
+"translateX": 410,
+"translateY": 380
+},
+"customData": {
+"com.glyphsapp.component.anchor": "top_2"
+}
+}
+],
+"xAdvance": 650,
+"anchors": [
+{
+"name": "top_1",
+"x": 170,
+"y": 720
+},
+{
+"name": "bottom_1",
+"x": 200,
+"y": -50
+},
+{
+"name": "top_2",
+"x": 570,
+"y": 720
+},
+{
+"name": "bottom_2",
+"x": 400,
+"y": -50
+}
+]
+}
+}
+}
+}

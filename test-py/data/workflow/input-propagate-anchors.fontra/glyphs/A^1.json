@@ -1,0 +1,54 @@
+{
+"name": "A",
+"sources": [
+{
+"name": "",
+"layerName": "0fe08302",
+"locationBase": "0fe08302"
+}
+],
+"layers": {
+"0fe08302": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": 50,
+"y": 500
+},
+{
+"x": 50,
+"y": 0
+},
+{
+"x": 450,
+"y": 0
+},
+{
+"x": 450,
+"y": 500
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 500,
+"anchors": [
+{
+"name": "top",
+"x": 150,
+"y": 550
+},
+{
+"name": "bottom",
+"x": 350,
+"y": -50
+}
+]
+}
+}
+}
+}

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import itertools
 import logging
+import math
 from collections import defaultdict
 from dataclasses import dataclass, field, replace
 from enum import Enum
@@ -14,6 +15,7 @@ from fontTools.pens.pointPen import SegmentToPointPen
 
 from ...core.async_property import async_cached_property
 from ...core.classes import (
+    Anchor,
     Component,
     FontSource,
     GlyphSource,
@@ -224,10 +226,11 @@ async def decomposeComposites(
     for source in newSources:
         instance = instancer.instantiate(fontInstancer.getGlyphSourceLocation(source))
 
+        decomposedGlyph = await instance.decomposed()
         newLayers[source.layerName] = Layer(
             glyph=replace(
                 instance.glyph,
-                path=await instance.getDecomposedPath(),
+                path=decomposedGlyph.path,
                 components=[],
             ),
         )
@@ -853,3 +856,132 @@ class RemoveOverlaps(BaseFilter):
             for layerName, layer in glyph.layers.items()
         }
         return replace(glyph, layers=newLayers)
+
+
+@registerFilterAction("propagate-anchors")
+@dataclass(kw_only=True)
+class PropagateAnchors(BaseFilter):
+    async def getGlyph(self, glyphName):
+        fontInstancer = self.fontInstancer
+        instancer = await fontInstancer.getGlyphInstancer(glyphName)
+        glyph = instancer.glyph
+
+        newLayers = {}
+
+        for source in instancer.activeSources:
+            layer = glyph.layers[source.layerName]
+            if not layer.glyph.components:
+                continue
+
+            instance = instancer.instantiate(
+                fontInstancer.getGlyphSourceLocation(source)
+            )
+
+            anchorsByName = {anchor.name: anchor for anchor in layer.glyph.anchors}
+            compoAnchorsByName = {}
+
+            composAndCompoGlyphs = [
+                (compo, await instance.decomposeComponent(compo))
+                for compo in layer.glyph.components
+            ]
+
+            hasReceivingAnchors = any(
+                anchor.name and anchor.name.startswith("_")
+                for _, compoGlyph in composAndCompoGlyphs
+                for anchor in compoGlyph.anchors
+            )
+
+            closestToOrigin = (
+                findClosestToOrigin(composAndCompoGlyphs)
+                if isLigature(glyphName) and hasReceivingAnchors
+                else None
+            )
+
+            for compo, compoGlyph in composAndCompoGlyphs:
+                anchors = compoGlyph.anchors
+
+                componentAnchor = compo.customData.get("com.glyphsapp.component.anchor")
+                if componentAnchor:
+                    anchors = upgradeLigatureAnchors(componentAnchor, anchors)
+
+                if hasReceivingAnchors and compo is not closestToOrigin:
+                    # Drop any receiving anchors when we're not a possible mark
+                    # ligature's main component. Trying to behave similar to
+                    # glyphsLib.
+                    anchors = [
+                        anchor
+                        for anchor in anchors
+                        if anchor.name and not anchor.name.startswith("_")
+                    ]
+
+                for anchor in anchors:
+                    compoAnchorsByName[anchor.name] = anchor
+
+            if compoAnchorsByName:
+                # Existing anchors win
+                anchorsByName = compoAnchorsByName | anchorsByName
+
+                layer = replace(
+                    layer,
+                    glyph=replace(layer.glyph, anchors=list(anchorsByName.values())),
+                )
+                newLayers[source.layerName] = layer
+
+        if newLayers:
+            glyph = replace(glyph, layers=glyph.layers | newLayers)
+
+        return glyph
+
+
+def isLigature(glyphName):
+    return not glyphName.startswith("_") and "_" in glyphName
+
+
+def findClosestToOrigin(composAndCompoGlyphs):
+    # Weird heuristic, but matches glyphsLib
+    if not composAndCompoGlyphs:
+        return None
+
+    ordered = sorted(
+        composAndCompoGlyphs,
+        key=lambda compoAndCompoGlyph: math.hypot(
+            *_boundsOrigin(compoAndCompoGlyph[1])
+        ),
+    )
+
+    closestToOrigin = ordered[0][0]
+    assert isinstance(closestToOrigin, Component)
+
+    return closestToOrigin
+
+
+def _boundsOrigin(glyph):
+    assert not glyph.components
+    bounds = glyph.path.getControlBounds()
+    return bounds[:2] if bounds else (0, 0)
+
+
+def upgradeLigatureAnchors(componentAnchor: str, anchors: list[Anchor]) -> list[Anchor]:
+    """
+    If the component was placed as a ligature mark, upgrade *its* anchors to
+    become ligature anchors, so subsequent marks can be attached correctly.
+    To achieve this, change any anchor's name to that of `componentAnchor`
+    - if the anchor is a base anchor (does not start with "_")
+    - and if `componentAnchor` starts with the anchor's name + "_"
+    - and if there exists a matching mark anchor: "_" + the anchor's name
+
+    Example: if `componentAnchor` is "top_1", and our component has anchors
+    named "top" and "_top", then rename the "top" anchor to "top_1".
+    """
+
+    anchorNames = {anchor.name for anchor in anchors}
+
+    return [
+        (
+            replace(anchor, name=componentAnchor)
+            if componentAnchor.startswith((anchor.name or "") + "_")
+            and "_" + (anchor.name or "") in anchorNames
+            else anchor
+        )
+        for anchor in anchors
+    ]

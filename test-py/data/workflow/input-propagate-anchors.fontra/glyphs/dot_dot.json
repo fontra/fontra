@@ -1,0 +1,28 @@
+{
+"name": "dot_dot",
+"sources": [
+{
+"name": "",
+"layerName": "0fe08302",
+"locationBase": "0fe08302"
+}
+],
+"layers": {
+"0fe08302": {
+"glyph": {
+"components": [
+{
+"name": "dot"
+},
+{
+"name": "dot",
+"transformation": {
+"translateY": 160
+}
+}
+],
+"xAdvance": 300
+}
+}
+}
+}

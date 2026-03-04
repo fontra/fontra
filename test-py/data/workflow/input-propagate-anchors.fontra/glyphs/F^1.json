@@ -1,0 +1,29 @@
+{
+"name": "F",
+"sources": [
+{
+"name": "",
+"layerName": "0fe08302",
+"locationBase": "0fe08302"
+}
+],
+"layers": {
+"0fe08302": {
+"glyph": {
+"components": [
+{
+"name": "A",
+"transformation": {
+"translateX": 375,
+"translateY": 100,
+"rotation": 90,
+"scaleX": 0.5,
+"scaleY": 0.5
+}
+}
+],
+"xAdvance": 500
+}
+}
+}
+}

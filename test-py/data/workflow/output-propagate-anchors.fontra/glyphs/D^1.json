@@ -1,0 +1,34 @@
+{
+"name": "D",
+"sources": [
+{
+"name": "",
+"layerName": "0fe08302",
+"locationBase": "0fe08302"
+}
+],
+"layers": {
+"0fe08302": {
+"glyph": {
+"components": [
+{
+"name": "C"
+}
+],
+"xAdvance": 1000,
+"anchors": [
+{
+"name": "top",
+"x": 650,
+"y": 600
+},
+{
+"name": "bottom",
+"x": 850,
+"y": 0
+}
+]
+}
+}
+}
+}

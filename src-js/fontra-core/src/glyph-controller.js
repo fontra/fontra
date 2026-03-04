@@ -897,9 +897,50 @@ registerRepresentationFactory(
 
 registerRepresentationFactory(StaticGlyphController, "propagatedAnchors", (glyph) => {
   // TODO: analyze the component traversal strategy and see what we really need.
-  const components = [...reversed(glyph.components)];
-  return glyph.anchors.concat(components.map((compo) => compo.anchors).flat());
+
+  // Try to behave similar to glyphsLib, and only let "receiving anchors" through
+  // for the component that is closest to the origin. We should only do that if
+  // we are a mark ligature glyph, but we can't know that here for sure. Still,
+  // the presence of a receiving mark in the "closest" component could be a clue.
+
+  const hasReceivingAnchors = glyph.components.some((compo) =>
+    compo.anchors.some((anchor) => anchor.name?.startsWith("_"))
+  );
+
+  const closestToOrigin = hasReceivingAnchors
+    ? findClosestToOrigin(glyph.components)
+    : null;
+
+  const componentAnchors = glyph.components.map((compo) =>
+    !hasReceivingAnchors || compo === closestToOrigin
+      ? compo.anchors
+      : compo.anchors.filter((anchor) => anchor.name && !anchor.name.startsWith("_"))
+  );
+  componentAnchors.reverse();
+
+  return glyph.anchors.concat(componentAnchors.flat());
 });
+
+function findClosestToOrigin(components) {
+  // Weird heuristic, but matches glyphsLib
+  if (!components.length) {
+    return null;
+  }
+
+  const withDistance = components.map((compo) => ({
+    compo,
+    distance: Math.hypot(...boundsOrigin(compo)),
+  }));
+
+  withDistance.sort((a, b) => a.distance - b.distance);
+
+  return withDistance[0].compo;
+}
+
+function boundsOrigin(compo) {
+  const bounds = compo.controlBounds;
+  return bounds ? [bounds.xMin, bounds.yMin] : [0, 0];
+}
 
 class ComponentController {
   constructor(
@@ -1136,7 +1177,7 @@ export async function decomposeComponents(
 }
 
 function upgradeLigatureAnchors(componentAnchor, anchors) {
-  // If the component was placed as a ligature mark, upgrade *it's* anchors to
+  // If the component was placed as a ligature mark, upgrade *its* anchors to
   // become ligature anchors, so subsequent marks can be attached correctly.
   // To achieve this, change any anchor's name to that of `componentAnchor`
   // - if the anchor is a base anchor (does not start with "_")
@@ -1145,7 +1186,9 @@ function upgradeLigatureAnchors(componentAnchor, anchors) {
   //
   // Example: if `componentAnchor` is "top_1", and our component has anchors
   // named "top" and "_top", then rename the "top" anchor to "top_1".
+
   anchors = anchors.map((anchor) =>
+    anchor.name &&
     !anchor.name.startsWith("_") &&
     componentAnchor.startsWith(anchor.name + "_") &&
     anchors.find((otherAnchor) => otherAnchor.name == "_" + anchor.name)
