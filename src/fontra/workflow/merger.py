@@ -250,6 +250,11 @@ class FontBackendMerger(ReadableBaseBackend):
 
         return None  # Image not found
 
+    async def getGlyphInfos(self) -> dict[str, Any]:
+        glyphInfosA = await self.inputA.getGlyphInfos()
+        glyphInfosB = await self.inputB.getGlyphInfos()
+        return glyphInfosA | glyphInfosB
+
 
 @dataclass(kw_only=True)
 class MergedSourcesInfo:

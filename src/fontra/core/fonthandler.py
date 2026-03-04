@@ -216,6 +216,8 @@ class FontHandler:
                 value = await self.backend.getAxes()
             case "glyphMap":
                 value = await self.backend.getGlyphMap()
+            case "glyphInfos":
+                value = await self.backend.getGlyphInfos()
             case "customData":
                 value = await self.backend.getCustomData()
             case "unitsPerEm":
@@ -263,6 +265,10 @@ class FontHandler:
     async def getGlyphMap(self, *, connection=None):
         self.glyphMap = await self.getData("glyphMap")
         return self.glyphMap
+
+    @remoteMethod
+    async def getGlyphInfos(self, *, connection=None):
+        return await self.getData("glyphInfos")
 
     @remoteMethod
     async def getFontInfo(self, *, connection=None) -> FontInfo:

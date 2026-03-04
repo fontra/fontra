@@ -45,3 +45,6 @@ class ReadableBaseBackend:
 
     async def getShaperFontData(self) -> ShaperFontData | None:
         return None
+
+    async def getGlyphInfos(self) -> dict[str, Any]:
+        return {}

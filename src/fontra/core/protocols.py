@@ -53,6 +53,9 @@ class ReadableFontBackend(Protocol):
     async def getShaperFontData(self) -> ShaperFontData | None:
         pass
 
+    async def getGlyphInfos(self) -> dict[str, Any]:
+        pass
+
 
 @runtime_checkable
 class WritableFontBackend(ReadableFontBackend, Protocol):

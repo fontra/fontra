@@ -179,6 +179,10 @@ class BaseFilter(ReadableBaseBackend):
         imageData = await self.validatedInput.getBackgroundImage(imageIdentifier)
         return await self.processBackgroundImage(imageData)
 
+    async def getGlyphInfos(self) -> dict[str, Any]:
+        glyphInfos = await self.validatedInput.getGlyphInfos()
+        return await self.processGlyphInfos(glyphInfos)
+
     # Default no-op process methods, to be overridden.
 
     # These methods should *not* modify the objects, but return modified *copies*
@@ -218,6 +222,9 @@ class BaseFilter(ReadableBaseBackend):
         self, imageData: ImageData | None
     ) -> ImageData | None:
         return imageData
+
+    async def processGlyphInfos(self, glyphInfos):
+        return glyphInfos
 
 
 @registerFilterAction("memory-cache")
