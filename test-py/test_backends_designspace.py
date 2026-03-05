@@ -11,7 +11,12 @@ from fontTools.ufoLib import UFOReaderWriter
 
 from fontra.backends import getFileSystemBackend, newFileSystemBackend
 from fontra.backends.copy import copyFont
-from fontra.backends.designspace import DesignspaceBackend, UFOBackend, convertImageData
+from fontra.backends.designspace import (
+    DesignspaceBackend,
+    UFOBackend,
+    UFOFontInfo,
+    convertImageData,
+)
 from fontra.backends.null import NullBackend
 from fontra.core.classes import (
     Anchor,
@@ -117,6 +122,32 @@ async def test_roundTripGlyph(writableTestFont, glyphName):
     assert existingData == newData  # just in case the keys differ
 
 
+async def test_styleName_familyName_designspace(writableTestFont):
+    async with aclosing(writableTestFont):
+        info = await writableTestFont.getFontInfo()
+        assert info.familyName == "MutatorMathTest"
+
+        sources = await writableTestFont.getSources()
+        for source in sources.values():
+            source.name = source.name + " Testing"
+
+        info.familyName = "New Family Name"
+        await writableTestFont.putFontInfo(info)
+        await writableTestFont.putSources(sources)
+
+    for dsSource in writableTestFont.dsDoc.sources:
+        reader = UFOReaderWriter(dsSource.path)
+        ufoInfo = UFOFontInfo()
+        reader.readInfo(ufoInfo)
+
+        assert ufoInfo.familyName == "New Family Name"
+        assert ufoInfo.styleName.endswith(" Testing")
+
+    reopenedFont = getFileSystemBackend(writableTestFont.path)
+    reopenedSources = await reopenedFont.getSources()
+    assert reopenedSources == sources
+
+
 @pytest.mark.parametrize("glyphName", ["A"])
 async def test_roundTripGlyphSingleUFO(writableTestFontSingleUFO, glyphName):
     existingData = readGLIFData(glyphName, writableTestFontSingleUFO.ufoLayers)
@@ -143,6 +174,28 @@ async def test_putCustomDataSingleUFO(writableTestFontSingleUFO):
     await writableTestFontSingleUFO.putCustomData(customData)
     customData = await writableTestFontSingleUFO.getCustomData()
     assert 17 == len(customData)
+
+
+async def test_styleName_familyName_SingleUFO(writableTestFontSingleUFO):
+    async with aclosing(writableTestFontSingleUFO):
+        info = await writableTestFontSingleUFO.getFontInfo()
+        assert info.familyName == "MutatorMathTest"
+
+        sources = await writableTestFontSingleUFO.getSources()
+        [source] = sources.values()
+        assert source.name == "LightCondensed"
+
+        info.familyName = "New Family Name"
+        await writableTestFontSingleUFO.putFontInfo(info)
+        source.name = "New Style Name"
+        await writableTestFontSingleUFO.putSources(sources)
+
+    reader = UFOReaderWriter(writableTestFontSingleUFO.path)
+    ufoInfo = UFOFontInfo()
+    reader.readInfo(ufoInfo)
+
+    assert ufoInfo.familyName == "New Family Name"
+    assert ufoInfo.styleName == "New Style Name"
 
 
 @pytest.mark.parametrize(
@@ -189,7 +242,7 @@ async def test_addNewSparseSource(writableTestFont, location, expectedDSSource):
 
     await writableTestFont.putGlyph(glyphName, glyph, glyphMap[glyphName])
 
-    newDSDoc = DesignSpaceDocument.fromfile(writableTestFont.dsDoc.path)
+    newDSDoc = DesignSpaceDocument.fromfile(writableTestFont.path)
     newDSSources = unpackSources(newDSDoc.sources)
     assert dsSources == newDSSources[: len(dsSources)]
     assert len(newDSSources) == len(dsSources) + 1
@@ -199,7 +252,7 @@ async def test_addNewSparseSource(writableTestFont, location, expectedDSSource):
 
     assert {"glyphs.mid"} == ufoFileNamesPost - ufoFileNamesPre
 
-    reopenedBackend = getFileSystemBackend(writableTestFont.dsDoc.path)
+    reopenedBackend = getFileSystemBackend(writableTestFont.path)
     fontSources = await reopenedBackend.getSources()
     reopenedGlyph = await reopenedBackend.getGlyph(glyphName)
 
@@ -228,7 +281,7 @@ async def test_addNewDenseSource(writableTestFont):
 
     await writableTestFont.putGlyph(glyphName, glyph, glyphMap[glyphName])
 
-    newDSDoc = DesignSpaceDocument.fromfile(writableTestFont.dsDoc.path)
+    newDSDoc = DesignSpaceDocument.fromfile(writableTestFont.path)
     newDSSources = unpackSources(newDSDoc.sources)
     assert dsSources == newDSSources[: len(dsSources)]
     assert len(newDSSources) == len(dsSources) + 1
@@ -253,7 +306,7 @@ async def test_makeSourceDense(writableTestFont):
 
 
 async def test_makeSourceSparse(writableTestFont):
-    oldDSDoc = DesignSpaceDocument.fromfile(writableTestFont.dsDoc.path)
+    oldDSDoc = DesignSpaceDocument.fromfile(writableTestFont.path)
     [dsSource] = [
         dsSource for dsSource in oldDSDoc.sources if dsSource.name == "bold-wide"
     ]
@@ -267,12 +320,12 @@ async def test_makeSourceSparse(writableTestFont):
 
     await writableTestFont.putSources(sources)
 
-    reopenedBackend = getFileSystemBackend(writableTestFont.dsDoc.path)
+    reopenedBackend = getFileSystemBackend(writableTestFont.path)
     reopenedFontSources = await reopenedBackend.getSources()
     reopenedSource = reopenedFontSources["bold-wide"]
     assert reopenedSource.isSparse
 
-    newDSDoc = DesignSpaceDocument.fromfile(writableTestFont.dsDoc.path)
+    newDSDoc = DesignSpaceDocument.fromfile(writableTestFont.path)
     [dsSource] = [
         dsSource for dsSource in newDSDoc.sources if dsSource.name == "bold-wide"
     ]
@@ -574,7 +627,7 @@ async def test_putAxes(writableTestFont):
     )
     await writableTestFont.putAxes(axes)
 
-    path = writableTestFont.dsDoc.path
+    path = writableTestFont.path
     newFont = DesignspaceBackend.fromPath(path)
     newAxes = await newFont.getAxes()
     assert axes == newAxes
@@ -915,7 +968,7 @@ async def test_putSources(writableTestFont):
 
     await writableTestFont.putSources(sources)
 
-    reopenedBackend = getFileSystemBackend(writableTestFont.dsDoc.path)
+    reopenedBackend = getFileSystemBackend(writableTestFont.path)
     reopenedSources = await reopenedBackend.getSources()
     testSource = reopenedSources["light-condensed"]
     assert testSource.lineMetricsHorizontalLayout["ascender"].value == 800
@@ -972,7 +1025,7 @@ async def test_putSources_source_name(writableTestFont):
         source.name = f"source{i}"
     await writableTestFont.putSources(fontSources)
 
-    reopenedBackend = getFileSystemBackend(writableTestFont.dsDoc.path)
+    reopenedBackend = getFileSystemBackend(writableTestFont.path)
     reopenedFontSources = await reopenedBackend.getSources()
 
     assert [s.name for s in reopenedFontSources.values()] == [
@@ -1060,7 +1113,7 @@ async def test_putFeatures(writableTestFont):
     async with aclosing(writableTestFont):
         await writableTestFont.putFeatures(OpenTypeFeatures(text=featureText))
 
-    reopenedBackend = getFileSystemBackend(writableTestFont.dsDoc.path)
+    reopenedBackend = getFileSystemBackend(writableTestFont.path)
     features = await reopenedBackend.getFeatures()
     assert features.text == featureText
 
@@ -1146,7 +1199,7 @@ async def test_putFontInfoCustomData(writableTestFont):
     async with aclosing(writableTestFont):
         await writableTestFont.putFontInfo(info)
 
-    reopenedBackend = getFileSystemBackend(writableTestFont.dsDoc.path)
+    reopenedBackend = getFileSystemBackend(writableTestFont.path)
     reopenedInfo = await reopenedBackend.getFontInfo()
     assert reopenedInfo.customData == info.customData
 
@@ -1162,7 +1215,7 @@ async def test_putFontInfoDeleteDescription(writableTestFont):
     del info.description
     await writableTestFont.putFontInfo(info)
 
-    reopenedBackend = getFileSystemBackend(writableTestFont.dsDoc.path)
+    reopenedBackend = getFileSystemBackend(writableTestFont.path)
     reopenedInfo = await reopenedBackend.getFontInfo()
     assert reopenedInfo == info
 
@@ -1172,7 +1225,7 @@ async def test_changeUnitsPerEmCheckFontInfo(writableTestFont):
     # change UnitsPerEm
     await writableTestFont.putUnitsPerEm(999)
 
-    reopenedBackend = getFileSystemBackend(writableTestFont.dsDoc.path)
+    reopenedBackend = getFileSystemBackend(writableTestFont.path)
     reopenedInfo = await reopenedBackend.getFontInfo()
     assert reopenedInfo == info
 
@@ -1227,7 +1280,7 @@ async def test_glyphMetricsVerticalLayout(writableTestFont):
 
     await writableTestFont.putGlyph("A", glyph, [ord("A")])
 
-    reopenedFont = getFileSystemBackend(writableTestFont.dsDoc.path)
+    reopenedFont = getFileSystemBackend(writableTestFont.path)
 
     reopenedGlyph = await reopenedFont.getGlyph("A")
     assert glyph == reopenedGlyph
@@ -1242,7 +1295,7 @@ async def test_kerning_read_write(writableTestFont):
 
     await writableTestFont.putKerning(kerning)
 
-    reopenedFont = getFileSystemBackend(writableTestFont.dsDoc.path)
+    reopenedFont = getFileSystemBackend(writableTestFont.path)
     reopenedKerning = await reopenedFont.getKerning()
     assert reopenedKerning["kern"].values["A"]["J"] == [None, -25, -30, -15, None]
     assert reopenedKerning["kern"].groupsSide1["A"] == [
@@ -1323,7 +1376,7 @@ async def test_sparse_master_background_layers(writableTestFont):
 
     await writableTestFont.putGlyph(glyphName, glyph, [ord(glyphName)])
 
-    reopenedBackend = getFileSystemBackend(writableTestFont.dsDoc.path)
+    reopenedBackend = getFileSystemBackend(writableTestFont.path)
     reopenedGlyph = await reopenedBackend.getGlyph(glyphName)
 
     assert glyph == reopenedGlyph
@@ -1331,7 +1384,7 @@ async def test_sparse_master_background_layers(writableTestFont):
 
 async def test_deterministicFontSourceIdentifiers(writableTestFont):
     dsDoc = writableTestFont.dsDoc
-    dsPath = dsDoc.path
+    dsPath = writableTestFont.path
     for source in dsDoc.sources:
         source.name = None
     dsDoc.write(dsPath)
@@ -1346,7 +1399,7 @@ async def test_deterministicFontSourceIdentifiers(writableTestFont):
 
 async def test_uniqueFontSourceIdentifiers(writableTestFont):
     dsDoc = writableTestFont.dsDoc
-    dsPath = dsDoc.path
+    dsPath = writableTestFont.path
     for source in dsDoc.sources:
         source.name = "non-unique-name"
     dsDoc.write(dsPath)
@@ -1358,7 +1411,7 @@ async def test_uniqueFontSourceIdentifiers(writableTestFont):
 
 async def test_missingUFOError(writableTestFont):
     dsDoc = writableTestFont.dsDoc
-    dsPath = dsDoc.path
+    dsPath = writableTestFont.path
     dsDoc.sources[0].path += ".invalid"
     dsDoc.write(dsPath)
 
@@ -1372,7 +1425,7 @@ async def test_write_italicAngle(writableTestFont):
     sources["light-condensed"].italicAngle = -15
     await writableTestFont.putSources(sources)
 
-    reopenedFont = getFileSystemBackend(writableTestFont.dsDoc.path)
+    reopenedFont = getFileSystemBackend(writableTestFont.path)
     reopenedSources = await reopenedFont.getSources()
     assert reopenedSources["light-condensed"].italicAngle == -15
 
@@ -1645,7 +1698,7 @@ async def test_putGlyphInfos(writableTestFont):
         assert glyphInfos == {}
         await writableTestFont.putGlyphInfos(newGlyphsInfos)
 
-    reopenedFont = getFileSystemBackend(writableTestFont.dsDoc.path)
+    reopenedFont = getFileSystemBackend(writableTestFont.path)
     glyphInfos = await reopenedFont.getGlyphInfos()
     assert glyphInfos == newGlyphsInfos
 

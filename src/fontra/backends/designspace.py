@@ -264,6 +264,10 @@ class DesignspaceBackend(WatchableBackend, WritableBaseBackend):
         self._initialize(dsDoc)
         self._implicitDefaultLocationBase: str | None = None
 
+    @property
+    def path(self) -> str:
+        return self.dsDoc.path
+
     def _initialize(self, dsDoc: DesignSpaceDocument) -> None:
         self.dsDoc = ensureDSSourceNamesAreUnique(dsDoc)
 
@@ -1803,9 +1807,14 @@ def packAxisLabels(valueLabels):
 class UFOBackend(DesignspaceBackend):
     @classmethod
     def fromPath(cls, path):
+        reader = UFOReader(path)
+        info = UFOFontInfo()
+        reader.readInfo(info)
+        styleName = getattr(info, "styleName", "Regular")
+
         dsDoc = DesignSpaceDocument()
         dsDoc.addSourceDescriptor(
-            name="default", path=os.fspath(path), styleName="Regular"
+            name="default", path=os.fspath(path), styleName=styleName
         )
         return cls(dsDoc)
 
@@ -1818,6 +1827,11 @@ class UFOBackend(DesignspaceBackend):
             path.unlink()
         dsDoc = createDSDocFromUFOPath(path, "Regular")
         return cls(dsDoc)
+
+    @property
+    def path(self) -> str:
+        assert len(self.dsDoc.sources) == 1
+        return self.dsDoc.sources[0].path
 
     def _reloadEverything(self) -> None:
         self._initialize(self.dsDoc)
@@ -2505,6 +2519,8 @@ def getDefaultSourceName(
 def updateFontInfoFromFontSource(reader, fontSource):
     fontInfo = UFOFontInfo()
     reader.readInfo(fontInfo)
+
+    fontInfo.styleName = fontSource.name
 
     zones = {}
     for name, metric in fontSource.lineMetricsHorizontalLayout.items():
