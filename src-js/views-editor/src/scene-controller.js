@@ -396,7 +396,7 @@ export class SceneController {
       true
     );
 
-    this.fontController.addChangeListener({ features: null }, () => {
+    this.fontController.addChangeListener({ features: null, glyphInfos: null }, () => {
       this.updateShaper();
     });
   }
