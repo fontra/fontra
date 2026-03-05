@@ -580,7 +580,7 @@ export class SceneController {
       originXDelta = glyphCenter - previousGlyphCenter;
       originYDelta = glyphPosition.y - this._previousGlyphPosition.y;
     } else if (
-      this.scrollAdjustBehavior === "pin-glyph-origin" &&
+      this.scrollAdjustBehavior?.startsWith("pin-glyph-origin") &&
       this._previousGlyphPosition &&
       glyphPosition
     ) {
@@ -788,6 +788,8 @@ export class SceneController {
         broadcast: true,
       };
     });
+
+    this.scrollAdjustBehavior = "pin-glyph-origin-once";
   }
 
   addEventListener(eventName, handler, options) {
@@ -1311,7 +1313,7 @@ export class SceneController {
     if (undoInfo !== undefined) {
       this.selection = undoInfo.undoSelection;
       if (undoInfo.fontLocation) {
-        this.scrollAdjustBehavior = "pin-glyph-center";
+        this.scrollAdjustBehavior = "pin-glyph-origin-once";
         // Pass a copy of the location to ensure the listeners are called even
         // if the location didn't change: its dependents may vary depending on
         // the glyph data (eg. a source being there or not)
