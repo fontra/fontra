@@ -84,4 +84,4 @@ class WritableBaseBackend(ReadableBaseBackend):
         raise NotImplementedError()
 
     async def putGlyphInfos(self, glyphInfos: dict[str, Any]) -> None:
-        raise NotImplementedError()
+        pass  # Better drop the glyph infos than to crash
