@@ -1637,6 +1637,7 @@ async def test_putGlyphInfos(writableTestFont):
     newGlyphsInfos = {
         "dot": {"category": "Mark", "subcategory": "Nonspacing"},
         "A": {"subcategory": "Ligature"},
+        "B": {"custom": "anything"},
     }
 
     async with aclosing(writableTestFont):
