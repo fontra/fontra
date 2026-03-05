@@ -122,6 +122,32 @@ async def test_roundTripGlyph(writableTestFont, glyphName):
     assert existingData == newData  # just in case the keys differ
 
 
+async def test_styleName_familyName_designspace(writableTestFont):
+    async with aclosing(writableTestFont):
+        info = await writableTestFont.getFontInfo()
+        assert info.familyName == "MutatorMathTest"
+
+        sources = await writableTestFont.getSources()
+        for source in sources.values():
+            source.name = source.name + " Testing"
+
+        info.familyName = "New Family Name"
+        await writableTestFont.putFontInfo(info)
+        await writableTestFont.putSources(sources)
+
+    for dsSource in writableTestFont.dsDoc.sources:
+        reader = UFOReaderWriter(dsSource.path)
+        ufoInfo = UFOFontInfo()
+        reader.readInfo(ufoInfo)
+
+        assert ufoInfo.familyName == "New Family Name"
+        assert ufoInfo.styleName.endswith(" Testing")
+
+    reopenedFont = getFileSystemBackend(writableTestFont.path)
+    reopenedSources = await reopenedFont.getSources()
+    assert reopenedSources == sources
+
+
 @pytest.mark.parametrize("glyphName", ["A"])
 async def test_roundTripGlyphSingleUFO(writableTestFontSingleUFO, glyphName):
     existingData = readGLIFData(glyphName, writableTestFontSingleUFO.ufoLayers)
