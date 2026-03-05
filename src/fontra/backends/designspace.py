@@ -81,6 +81,7 @@ VARIABLE_COMPONENTS_LIB_KEY = "com.black-foundry.variable-components"
 GLYPH_DESIGNSPACE_LIB_KEY = "com.black-foundry.glyph-designspace"
 SOURCE_NAME_MAPPING_LIB_KEY = "xyz.fontra.source-names"
 LAYER_NAME_MAPPING_LIB_KEY = "xyz.fontra.layer-names"
+GLYPH_INFOS_LIB_KEY = "xyz.fontra.glyph-infos"
 GLYPH_CUSTOM_DATA_LIB_KEY = "xyz.fontra.customData"
 GLYPH_SOURCE_CUSTOM_DATA_LIB_KEY = "xyz.fontra.glyph.source.customData"
 LINE_METRICS_HOR_ZONES_KEY = "xyz.fontra.lineMetricsHorizontalLayout.zones"
@@ -1487,6 +1488,50 @@ class DesignspaceBackend(WatchableBackend, WritableBaseBackend):
         self.dsDoc.lib = deepcopy(lib)
         self._writeDesignSpaceDocument()
 
+    async def getGlyphInfos(self) -> dict[str, Any]:
+        lib = self.defaultReader.readLib()
+        glyphInfos = lib.get(GLYPH_INFOS_LIB_KEY, {})
+        categories = lib.get("public.openTypeCategories", {})
+
+        for glyphName, category in categories.items():
+            infos = glyphInfos.get(glyphName, {})
+            if category == "mark":
+                infos["category"] = "Mark"
+                infos["subcategory"] = "Nonspacing"
+            elif category == "ligature":
+                infos["subcategory"] = "Ligature"
+            glyphInfos[glyphName] = infos
+
+        return glyphInfos
+
+    async def putGlyphInfos(self, glyphInfos: dict[str, Any]) -> None:
+        newGlyphInfos = {}
+        categories = {}
+
+        for glyphName, infos in glyphInfos.items():
+            infos = deepcopy(infos)
+            if infos.get("subcategory") == "Ligature":
+                categories[glyphName] = "ligature"
+                del infos["subcategory"]
+            elif (
+                infos.get("category") == "Mark"
+                and infos.get("subcategory") == "Nonspacing"
+            ):
+                categories[glyphName] = "mark"
+                del infos["category"]
+                del infos["subcategory"]
+            if infos:
+                newGlyphInfos[glyphName] = infos
+
+        paths = sorted(set(self.ufoLayers.iterAttrs("path")))
+        for path in paths:
+            writer = self.ufoManager.getReader(path)
+            lib = writer.readLib()
+
+            storeInDict(lib, GLYPH_INFOS_LIB_KEY, newGlyphInfos)
+            storeInDict(lib, "public.openTypeCategories", categories)
+            writer.writeLib(lib)
+
     def _writeDesignSpaceDocument(self):
         for source in self.dsDoc.sources:
             source.location = {**self.defaultLocation, **source.location}
@@ -2308,10 +2353,14 @@ def reverseSparseDict(d):
 
 
 def storeInLib(layerGlyph, key, value):
+    storeInDict(layerGlyph.lib, key, value)
+
+
+def storeInDict(dictionary, key, value):
     if value:
-        layerGlyph.lib[key] = value
+        dictionary[key] = value
     else:
-        layerGlyph.lib.pop(key, None)
+        dictionary.pop(key, None)
 
 
 def glyphHasVariableComponents(glyph):
