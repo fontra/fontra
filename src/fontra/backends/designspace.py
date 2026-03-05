@@ -831,6 +831,8 @@ class DesignspaceBackend(WatchableBackend, WritableBaseBackend):
     def _findUFOForLayerName(self, layerName, ufoPath):
         if "^" in layerName:
             sourceIdentifier, bgLayerName = layerName.split("^", 1)
+            if not bgLayerName:
+                bgLayerName = "empty-background-layer-name"
             dsSource = self.dsSources.findItem(identifier=sourceIdentifier)
             if dsSource is not None and not dsSource.isSparse:
                 ufoPath = dsSource.layer.path
@@ -994,6 +996,7 @@ class DesignspaceBackend(WatchableBackend, WritableBaseBackend):
 
     def _createUFO(self, sourceName: str, sourceIdentifier: str) -> UFOLayer:
         dsFileName = pathlib.Path(self.dsDoc.path).stem
+        sourceName = sourceName.replace("/", "-")
         suggestedUFOFileName = f"{dsFileName}_{sourceName}"
 
         ufoPath = os.fspath(makeUniqueUFOPath(self.ufoDir, suggestedUFOFileName))
@@ -1054,6 +1057,8 @@ class DesignspaceBackend(WatchableBackend, WritableBaseBackend):
             reader.writeLayerContents()
             glyphSet = self.ufoManager.getGlyphSet(ufoPath, ufoLayerName)
             glyphSet.writeContents()
+
+        assert ufoLayerName, repr(ufoLayerName)
 
         ufoLayer = UFOLayer(
             manager=self.ufoManager,
@@ -2001,6 +2006,9 @@ class UFOLayer:
     fontraLayerName: str
     originalGlyphOrderMapping: dict[str, int] = field(default_factory=dict)
 
+    def __post_init__(self):
+        assert self.name, repr(self.name)
+
     @cached_property
     def fileName(self) -> str:
         return os.path.splitext(os.path.basename(self.path))[0]
@@ -2015,7 +2023,6 @@ class UFOLayer:
 
     @cached_property
     def isDefaultLayer(self) -> bool:
-        assert self.name
         return self.name == self.reader.getDefaultLayerName()
 
 
