@@ -11,7 +11,12 @@ from fontTools.ufoLib import UFOReaderWriter
 
 from fontra.backends import getFileSystemBackend, newFileSystemBackend
 from fontra.backends.copy import copyFont
-from fontra.backends.designspace import DesignspaceBackend, UFOBackend, convertImageData
+from fontra.backends.designspace import (
+    DesignspaceBackend,
+    UFOBackend,
+    UFOFontInfo,
+    convertImageData,
+)
 from fontra.backends.null import NullBackend
 from fontra.core.classes import (
     Anchor,
@@ -143,6 +148,29 @@ async def test_putCustomDataSingleUFO(writableTestFontSingleUFO):
     await writableTestFontSingleUFO.putCustomData(customData)
     customData = await writableTestFontSingleUFO.getCustomData()
     assert 17 == len(customData)
+
+
+async def test_styleName_familyName_SingleUFO(writableTestFontSingleUFO):
+    async with aclosing(writableTestFontSingleUFO):
+        info = await writableTestFontSingleUFO.getFontInfo()
+        assert info.familyName == "MutatorMathTest"
+
+        sources = await writableTestFontSingleUFO.getSources()
+        [source] = sources.values()
+        assert source.name == "LightCondensed"
+
+        info.familyName = "New Family Name"
+        await writableTestFontSingleUFO.putFontInfo(info)
+        source.name = "New Style Name"
+        await writableTestFontSingleUFO.putSources(sources)
+
+    ufoPath = writableTestFontSingleUFO.dsDoc.sources[0].path
+    reader = UFOReaderWriter(ufoPath)
+    ufoInfo = UFOFontInfo()
+    reader.readInfo(ufoInfo)
+
+    assert ufoInfo.familyName == "New Family Name"
+    assert ufoInfo.styleName == "New Style Name"
 
 
 @pytest.mark.parametrize(
