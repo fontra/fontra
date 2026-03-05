@@ -264,6 +264,10 @@ class DesignspaceBackend(WatchableBackend, WritableBaseBackend):
         self._initialize(dsDoc)
         self._implicitDefaultLocationBase: str | None = None
 
+    @property
+    def path(self) -> str:
+        return self.dsDoc.path
+
     def _initialize(self, dsDoc: DesignSpaceDocument) -> None:
         self.dsDoc = ensureDSSourceNamesAreUnique(dsDoc)
 
@@ -1823,6 +1827,11 @@ class UFOBackend(DesignspaceBackend):
             path.unlink()
         dsDoc = createDSDocFromUFOPath(path, "Regular")
         return cls(dsDoc)
+
+    @property
+    def path(self) -> str:
+        assert len(self.dsDoc.sources) == 1
+        return self.dsDoc.sources[0].path
 
     def _reloadEverything(self) -> None:
         self._initialize(self.dsDoc)
