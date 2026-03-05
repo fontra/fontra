@@ -91,6 +91,9 @@ class WritableFontBackend(ReadableFontBackend, Protocol):
     async def putUnitsPerEm(self, value: int) -> None:
         pass
 
+    async def putGlyphInfos(self, glyphInfos: dict[str, Any]) -> None:
+        pass
+
 
 @runtime_checkable
 class WatchableFontBackend(Protocol):

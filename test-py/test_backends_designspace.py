@@ -1633,6 +1633,23 @@ async def test_glyphClassifications(rtlTestFont):
     )
 
 
+async def test_putGlyphInfos(writableTestFont):
+    newGlyphsInfos = {
+        "dot": {"category": "Mark", "subcategory": "Nonspacing"},
+        "A": {"subcategory": "Ligature"},
+        "B": {"custom": "anything"},
+    }
+
+    async with aclosing(writableTestFont):
+        glyphInfos = await writableTestFont.getGlyphInfos()
+        assert glyphInfos == {}
+        await writableTestFont.putGlyphInfos(newGlyphsInfos)
+
+    reopenedFont = getFileSystemBackend(writableTestFont.dsDoc.path)
+    glyphInfos = await reopenedFont.getGlyphInfos()
+    assert glyphInfos == newGlyphsInfos
+
+
 def fileNamesFromDir(path):
     return sorted(p.name for p in path.iterdir())
 

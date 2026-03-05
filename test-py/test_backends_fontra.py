@@ -310,3 +310,20 @@ async def test_externalChanges(writableFontraFont):
 
         listenerGlyphMap = await listenerHandler.getGlyphMap()
         assert glyphMap == listenerGlyphMap
+
+
+async def test_putGlyphInfos(writableFontraFont):
+    newGlyphsInfos = {
+        "dot": {"category": "Mark", "subcategory": "Nonspacing"},
+        "A": {"subcategory": "Ligature"},
+        "B": {"custom": "anything"},
+    }
+
+    async with aclosing(writableFontraFont):
+        glyphInfos = await writableFontraFont.getGlyphInfos()
+        assert glyphInfos == {}
+        await writableFontraFont.putGlyphInfos(newGlyphsInfos)
+
+    reopenedFont = getFileSystemBackend(writableFontraFont.path)
+    glyphInfos = await reopenedFont.getGlyphInfos()
+    assert glyphInfos == newGlyphsInfos
