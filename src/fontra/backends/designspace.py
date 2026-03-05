@@ -69,7 +69,7 @@ from ..core.path import PackedPathPointPen
 from ..core.protocols import WritableFontBackend
 from ..core.subprocess import runInSubProcess
 from ..core.varutils import locationToTuple, makeDenseLocation, makeSparseLocation
-from .base import ReadableBaseBackend
+from .base import WritableBaseBackend
 from .filewatcher import Change
 from .ufo_utils import extractGlyphNameAndCodePoints
 from .watchable import WatchableBackend
@@ -238,7 +238,7 @@ featuresWarning = """\
 """
 
 
-class DesignspaceBackend(WatchableBackend, ReadableBaseBackend):
+class DesignspaceBackend(WatchableBackend, WritableBaseBackend):
     @classmethod
     def fromPath(cls, path: PathLike) -> WritableFontBackend:
         return cls(DesignSpaceDocument.fromfile(path))
