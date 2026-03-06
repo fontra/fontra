@@ -122,6 +122,10 @@ export default class CharactersGlyphsPanel extends Panel {
       const menuItems = this.characterList.items.length
         ? [
             {
+              title: "Replace this character...",
+              callback: () => this.replaceSelectedCharacter(),
+            },
+            {
               title: "Insert character before this character...",
               callback: () => this.insertCharacter(itemIndex),
             },
