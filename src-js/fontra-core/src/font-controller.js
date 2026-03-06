@@ -2,9 +2,9 @@ import { Backend } from "./backend-api.js";
 import { recordChanges } from "./change-recorder.js";
 import {
   applyChange,
+  collectGlyphNames,
   consolidateChanges,
   filterChangePattern,
-  iterChanges,
   matchChangePattern,
 } from "./changes.js";
 import { getClassSchema } from "./classes.js";
@@ -1341,22 +1341,6 @@ function _popUndoRedoRecord(popStack, pushStack) {
   const [undoRecord] = popStack.splice(-1, 1);
   pushStack.push(undoRecord);
   return undoRecord;
-}
-
-function collectGlyphNames(change) {
-  const glyphNames = new Set();
-
-  for (const { path, change: thisChange } of iterChanges(change)) {
-    if (path.length >= 1 && path[0] == "glyphs") {
-      if (path.length == 1) {
-        glyphNames.add(thisChange.a[0]);
-      } else {
-        glyphNames.add(path[1]);
-      }
-    }
-  }
-
-  return [...glyphNames].sort();
 }
 
 function objectPropertyTracker(obj) {
