@@ -402,6 +402,10 @@ export class SceneController {
     this.fontController.addChangeListener({ features: null, glyphInfos: null }, () => {
       this.updateShaper();
     });
+
+    this.shaperController.addInvalidateShaperListener(() => {
+      this.updateShaper();
+    });
   }
 
   setupSettingsListeners() {
