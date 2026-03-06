@@ -316,6 +316,9 @@ export default class CharactersGlyphsPanel extends Panel {
 
   async replaceSelectedCharacter(event) {
     const item = this.characterList.getSelectedItem();
+    if (!item) {
+      return;
+    }
 
     const glyphName = await this.editorController.runGlyphSearchDialog(
       "Replace selected character",
