@@ -26,13 +26,16 @@ export class ShaperController {
     const glyphOrder = Object.keys(this.fontController.glyphMap);
 
     if (textShaping) {
+      // First see if the backend has a shaper font for us
       let shaperFontData = await this.fontController.getShaperFontData();
 
       if (shaperFontData) {
         const fontDataBase64 = shaperFontData.data;
+
         if (shaperFontData.glyphOrderSorting == "sorted") {
           glyphOrder.sort();
         }
+
         if (fontDataBase64) {
           const blob = await (
             await fetch(`data:font/opentype;base64,${fontDataBase64}`)
