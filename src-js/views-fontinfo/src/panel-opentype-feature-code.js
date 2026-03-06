@@ -42,6 +42,7 @@ import {
 } from "@codemirror/view";
 import * as html from "@fontra/core/html-utils.js";
 import { addStyleSheet } from "@fontra/core/html-utils.js";
+import { ShaperController } from "@fontra/core/shaper-controller.js";
 import { compare, scheduleCalls } from "@fontra/core/utils.js";
 import { themeColorCSS } from "@fontra/web-components/theme-support.js";
 import { Tag } from "@lezer/highlight";
@@ -279,6 +280,8 @@ export class OpenTypeFeatureCodePanel extends BaseInfoPanel {
       (update) => this._updateFeatureCode(update),
       350
     );
+
+    this.shaperController = new ShaperController(this.fontController);
     const features = await this.fontController.getFeatures();
     this.panelElement.innerHTML = "";
     const container = html.div(
@@ -372,7 +375,7 @@ export class OpenTypeFeatureCodePanel extends BaseInfoPanel {
 
   async checkCompileErrors() {
     const { errors, messages, formattedMessages } =
-      await this.fontController.getShaperFontData(true);
+      await this.shaperController.getShaperFontData(true);
 
     const errorElement = document.querySelector(
       "#font-info-opentype-feature-code-error-box"
