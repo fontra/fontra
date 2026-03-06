@@ -109,9 +109,12 @@ export default class CharactersGlyphsPanel extends Panel {
     );
     this.characterList.addEventListener("contextmenu", (event) => {
       event.preventDefault();
-      const itemIndex = this.characterList.getItemIndexAtPoint(event.x, event.y);
-      this.characterList.setSelectedItemIndex(itemIndex);
-      // context menu
+      const itemIndex =
+        this.characterList.getItemIndexAtPoint(event.x, event.y) ??
+        this.characterList.getSelectedItemIndex() ??
+        0;
+
+      this.characterList.setSelectedItemIndex(itemIndex, true);
 
       const menuItems = [
         {
