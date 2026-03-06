@@ -695,6 +695,19 @@ export class UIList extends UnlitElement {
     return firstItemOfSet(this.selectedItemIndices);
   }
 
+  getItemIndexAtPoint(x, y) {
+    let element = this.shadowRoot.elementFromPoint(x, y);
+    while (!element.classList.contains("row")) {
+      element = element.parentElement;
+    }
+    if (!element) {
+      return;
+    }
+    if (element.dataset.rowIndex) {
+      return Number(element.dataset.rowIndex);
+    }
+  }
+
   editCell(rowIndex, columnKey) {
     this.setSelectedItemIndex(rowIndex, true);
     const row = this.rowsElement.children[rowIndex];
