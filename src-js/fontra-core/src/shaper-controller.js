@@ -36,7 +36,7 @@ export class ShaperController {
           }
         }
 
-        this.updateMarkSet(extendedGlyphNames);
+        this.updateAdHocMarkSet(extendedGlyphNames);
       }),
       false,
       true // immediate
@@ -44,7 +44,7 @@ export class ShaperController {
 
     this.fontController.addGlyphCacheListener(
       scheduleCalls(() => {
-        this.updateMarkSetFromCachedGlyphs([
+        this.updateAdHocMarkSetFromCachedGlyphs([
           ...this.fontController.getCachedGlyphNames(),
         ]);
       }, 10)
@@ -114,7 +114,7 @@ export class ShaperController {
     };
   }
 
-  async updateMarkSet(glyphNames) {
+  async updateAdHocMarkSet(glyphNames) {
     let didChange = false;
 
     for (const glyphName of glyphNames) {
@@ -144,9 +144,9 @@ export class ShaperController {
     }
   }
 
-  async updateMarkSetFromCachedGlyphs(glyphNames) {
+  async updateAdHocMarkSetFromCachedGlyphs(glyphNames) {
     // We only need to look at glyphs that we haven't seen before
-    this.updateMarkSet(
+    this.updateAdHocMarkSet(
       glyphNames.filter((glyphName) => !(glyphName in this._adHocMarkGlyphs))
     );
   }
