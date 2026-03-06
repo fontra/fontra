@@ -1,5 +1,9 @@
 # Changelog for Fontra
 
+## 2026-03-06 [version 2026.3.1]
+
+- Fix editing kerning and sidebearings, making the glyph list metrics update correctly when using these tools. [PR 2468](https://github.com/fontra/fontra/pull/2468)
+
 ## 2026-03-06 [version 2026.3.0]
 
 - [OpenType] Initial support for OpenType features has landed! This requires a longer explanation, but in short:
