@@ -697,7 +697,7 @@ export class UIList extends UnlitElement {
 
   getItemIndexAtPoint(x, y) {
     let element = this.shadowRoot.elementFromPoint(x, y);
-    while (!element.classList.contains("row")) {
+    while (element && !element.classList.contains("row")) {
       element = element.parentElement;
     }
     if (!element) {
