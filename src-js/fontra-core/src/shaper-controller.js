@@ -108,9 +108,19 @@ export class ShaperController {
 
     for (const glyphName of glyphNames) {
       const glyph = await this.fontController.getGlyphInstance(glyphName, {});
-      const isAdHocMark = glyph?.propagatedAnchors.some((anchor) =>
+
+      if (!glyph) {
+        if (this._adHocMarkGlyphs[glyphName]) {
+          didChange = true;
+        }
+        delete this._adHocMarkGlyphs[glyphName];
+        continue;
+      }
+
+      const isAdHocMark = glyph.propagatedAnchors.some((anchor) =>
         anchor.name?.startsWith("_")
       );
+
       if (isAdHocMark != !!this._adHocMarkGlyphs[glyphName]) {
         this._adHocMarkGlyphs[glyphName] = isAdHocMark;
         didChange = true;
