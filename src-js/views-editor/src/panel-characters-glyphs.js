@@ -115,11 +115,11 @@ export default class CharactersGlyphsPanel extends Panel {
 
       const menuItems = [
         {
-          title: "Insert character before this character",
+          title: "Insert character before this character...",
           callback: () => this.insertCharacter(itemIndex),
         },
         {
-          title: "Insert character after this character",
+          title: "Insert character after this character...",
           callback: () => this.insertCharacter(itemIndex + 1),
         },
       ];
