@@ -8,11 +8,10 @@ import {
   round,
   throttleCalls,
 } from "@fontra/core/utils.js";
-import Panel from "./panel.js";
-
-// import { showMenu } from "@fontra/web-components/menu-panel.js";
+import { showMenu } from "@fontra/web-components/menu-panel.js";
 import { Accordion } from "@fontra/web-components/ui-accordion.js";
 import { UIList } from "@fontra/web-components/ui-list.js";
+import Panel from "./panel.js";
 
 export default class CharactersGlyphsPanel extends Panel {
   identifier = "characters-glyphs";
@@ -108,6 +107,24 @@ export default class CharactersGlyphsPanel extends Panel {
     this.characterList.addEventListener("deleteKey", (event) =>
       this.deleteSelectedCharacter(event)
     );
+    this.characterList.addEventListener("contextmenu", (event) => {
+      event.preventDefault();
+      const itemIndex = this.characterList.getItemIndexAtPoint(event.x, event.y);
+      this.characterList.setSelectedItemIndex(itemIndex);
+      // context menu
+
+      const menuItems = [
+        {
+          title: "Insert character before this character",
+          callback: () => this.insertCharacter(itemIndex),
+        },
+        {
+          title: "Insert character after this character",
+          callback: () => this.insertCharacter(itemIndex + 1),
+        },
+      ];
+      showMenu(menuItems, event);
+    });
 
     const showKern = true; // could become a toggle
 
@@ -291,11 +308,7 @@ export default class CharactersGlyphsPanel extends Panel {
       return;
     }
 
-    const { lineIndex } = this.sceneSettings.selectedGlyph;
-    const glyphInfo = this.fontController.glyphInfoFromGlyphName(glyphName);
-    const characterLines = [...this.sceneSettings.characterLines];
-    characterLines[lineIndex].splice(item.index, 1, glyphInfo);
-    this.sceneSettings.characterLines = characterLines;
+    this._insertCharacter(glyphName, item.index, true);
   }
 
   deleteSelectedCharacter(event) {
@@ -304,9 +317,30 @@ export default class CharactersGlyphsPanel extends Panel {
       return;
     }
 
+    this._insertCharacter(null, item.index, true);
+    this.sceneSettings.selectedGlyph = undefined;
+  }
+
+  async insertCharacter(charIndex) {
+    const glyphName = await this.editorController.runGlyphSearchDialog(
+      "Index character",
+      "Insert"
+    );
+    if (!glyphName) {
+      return;
+    }
+
+    this._insertCharacter(glyphName, charIndex, false);
+  }
+
+  _insertCharacter(glyphName, charIndex, replace) {
     const { lineIndex } = this.sceneSettings.selectedGlyph;
+    const glyphInfo = glyphName
+      ? this.fontController.glyphInfoFromGlyphName(glyphName)
+      : null;
     const characterLines = [...this.sceneSettings.characterLines];
-    characterLines[lineIndex].splice(item.index, 1);
+    const items = glyphInfo ? [glyphInfo] : [];
+    characterLines[lineIndex].splice(charIndex, replace ? 1 : 0, ...items);
     this.sceneSettings.characterLines = characterLines;
   }
 
