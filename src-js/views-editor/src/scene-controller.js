@@ -34,6 +34,7 @@ import {
   lenientIsEqualSet,
   union,
 } from "@fontra/core/set-ops.js";
+import { ShaperController } from "@fontra/core/shaper-controller.js";
 import {
   arrowKeyDeltas,
   assert,
@@ -84,6 +85,8 @@ export class SceneController {
     this.selectedTool = undefined;
     this._currentGlyphChangeListeners = [];
     this.contextMenuState = {};
+
+    this.shaperController = new ShaperController(fontController);
 
     this.setupChangeListeners();
     this.setupSettingsListeners();
@@ -332,9 +335,9 @@ export class SceneController {
     if (this.sceneSettingsController.model.shaper) {
       this.sceneSettingsController.model.shaper.then(({ shaper }) => shaper.close());
     }
-    this.sceneSettingsController.model.shaper = this.fontController.getShaper(true);
+    this.sceneSettingsController.model.shaper = this.shaperController.getShaper(true);
     this.sceneSettingsController.model.dumbShaper =
-      this.fontController.getShaper(false);
+      this.shaperController.getShaper(false);
   }
 
   async setLocationFromSourceIndex(sourceIndex) {
