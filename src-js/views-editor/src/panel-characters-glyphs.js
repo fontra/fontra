@@ -109,23 +109,33 @@ export default class CharactersGlyphsPanel extends Panel {
     );
     this.characterList.addEventListener("contextmenu", (event) => {
       event.preventDefault();
+
       const itemIndex =
         this.characterList.getItemIndexAtPoint(event.x, event.y) ??
         this.characterList.getSelectedItemIndex() ??
         0;
 
-      this.characterList.setSelectedItemIndex(itemIndex, true);
+      if (this.characterList.items.length) {
+        this.characterList.setSelectedItemIndex(itemIndex, true);
+      }
 
-      const menuItems = [
-        {
-          title: "Insert character before this character...",
-          callback: () => this.insertCharacter(itemIndex),
-        },
-        {
-          title: "Insert character after this character...",
-          callback: () => this.insertCharacter(itemIndex + 1),
-        },
-      ];
+      const menuItems = this.characterList.items.length
+        ? [
+            {
+              title: "Insert character before this character...",
+              callback: () => this.insertCharacter(itemIndex),
+            },
+            {
+              title: "Insert character after this character...",
+              callback: () => this.insertCharacter(itemIndex + 1),
+            },
+          ]
+        : [
+            {
+              title: "Insert character...",
+              callback: () => this.insertCharacter(itemIndex),
+            },
+          ];
       showMenu(menuItems, event);
     });
 
@@ -337,7 +347,10 @@ export default class CharactersGlyphsPanel extends Panel {
   }
 
   _insertCharacter(glyphName, charIndex, replace) {
-    const { lineIndex } = this.sceneSettings.selectedGlyph;
+    let lineIndex = 0;
+    if (this.sceneSettings.selectedGlyph) {
+      ({ lineIndex } = this.sceneSettings.selectedGlyph);
+    }
     const glyphInfo = glyphName
       ? this.fontController.glyphInfoFromGlyphName(glyphName)
       : null;
