@@ -102,9 +102,12 @@ export default class CharactersGlyphsPanel extends Panel {
       };
       this.glyphList.setSelectedItemIndices(glyphIndices, false, true);
     });
-    this.characterList.addEventListener("rowDoubleClicked", (event) => {
-      this.replaceSelectedCharacter(event);
-    });
+    this.characterList.addEventListener("rowDoubleClicked", (event) =>
+      this.replaceSelectedCharacter(event)
+    );
+    this.characterList.addEventListener("deleteKey", (event) =>
+      this.deleteSelectedCharacter(event)
+    );
 
     const showKern = true; // could become a toggle
 
@@ -291,8 +294,19 @@ export default class CharactersGlyphsPanel extends Panel {
     const { lineIndex } = this.sceneSettings.selectedGlyph;
     const glyphInfo = this.fontController.glyphInfoFromGlyphName(glyphName);
     const characterLines = [...this.sceneSettings.characterLines];
-    const line = [...characterLines[lineIndex]];
     characterLines[lineIndex].splice(item.index, 1, glyphInfo);
+    this.sceneSettings.characterLines = characterLines;
+  }
+
+  deleteSelectedCharacter(event) {
+    const item = this.characterList.getSelectedItem();
+    if (!item) {
+      return;
+    }
+
+    const { lineIndex } = this.sceneSettings.selectedGlyph;
+    const characterLines = [...this.sceneSettings.characterLines];
+    characterLines[lineIndex].splice(item.index, 1);
     this.sceneSettings.characterLines = characterLines;
   }
 
