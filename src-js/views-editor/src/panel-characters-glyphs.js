@@ -104,7 +104,6 @@ export default class CharactersGlyphsPanel extends Panel {
     });
     this.characterList.addEventListener("rowDoubleClicked", (event) => {
       this.replaceSelectedCharacter(event);
-      // doPerformAction("action.replace-selected-glyph-on-canvas")
     });
 
     const showKern = true; // could become a toggle
