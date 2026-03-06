@@ -14,6 +14,7 @@ import { FontSourcesInstancer } from "./font-sources-instancer.js";
 import { StaticGlyphController, VariableGlyphController } from "./glyph-controller.js";
 import { KerningController } from "./kerning-controller.js";
 import { LRUCache } from "./lru-cache.js";
+import { ObservableController } from "./observable-object.js";
 import { setPopFirst } from "./set-ops.js";
 import { TaskPool } from "./task-pool.js";
 import {
@@ -67,6 +68,7 @@ export class FontController {
     });
     this.undoStacks = {}; // glyph name -> undo stack
     this.readOnly = true;
+    this._glyphsPromiseCacheChanged = new ObservableController({ counter: 0 });
   }
 
   async initialize(initListener = true) {
@@ -105,6 +107,10 @@ export class FontController {
 
   unsubscribeChanges(pathOrPattern, wantLiveChanges) {
     this.font.unsubscribeChanges(pathOrPattern, wantLiveChanges);
+  }
+
+  addGlyphCacheListener(listener, immediate = false) {
+    this._glyphsPromiseCacheChanged.addListener(listener, immediate);
   }
 
   getRootKeys() {
@@ -439,6 +445,7 @@ export class FontController {
     if (glyphPromise === undefined) {
       glyphPromise = this._getGlyph(glyphName);
       const purgedGlyphName = this._glyphsPromiseCache.put(glyphName, glyphPromise);
+      this._glyphsPromiseCacheChanged.model.counter++;
       // if (purgedGlyphName) {
       //   console.log("purging", purgedGlyphName);
       //   this.font.unloadGlyph(purgedGlyphName);
@@ -517,6 +524,7 @@ export class FontController {
 
     const glyphController = this.makeVariableGlyphController(glyph);
     this._glyphsPromiseCache.put(glyphName, Promise.resolve(glyphController));
+    this._glyphsPromiseCacheChanged.model.counter++;
 
     const codePoints = typeof codePoint == "number" ? [codePoint] : [];
     this.glyphMap[glyphName] = codePoints;
@@ -806,6 +814,7 @@ export class FontController {
         glyphName,
         Promise.resolve(this.makeVariableGlyphController(glyphSet[glyphName]))
       );
+      this._glyphsPromiseCacheChanged.model.counter++;
     }
 
     for (const glyphName of glyphSetTracker.deletedProperties) {
