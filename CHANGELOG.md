@@ -1,6 +1,6 @@
 # Changelog for Fontra
 
-## 2026-02-?? [version 2026.2.1]
+## 2026-03-06 [version 2026.3.0]
 
 - [OpenType] Initial support for OpenType features has landed! This requires a longer explanation, but in short:
   - Fontra will now apply text shaping and OpenType features. The user interface for this lives in the text entry panel.
