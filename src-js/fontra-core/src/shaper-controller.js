@@ -25,7 +25,18 @@ export class ShaperController {
     this.fontController.addChangeListener(
       { glyphs: null },
       consolidateCalls((change, isExternalChange) => {
-        this.updateMarkSet(collectGlyphNames(change));
+        const glyphNames = collectGlyphNames(change);
+        const extendedGlyphNames = new Set(glyphNames);
+
+        for (const glyphName of glyphNames) {
+          for (const dependentGlyphName of this.fontController.iterGlyphsUsedByRecursively(
+            glyphName
+          )) {
+            extendedGlyphNames.add(dependentGlyphName);
+          }
+        }
+
+        this.updateMarkSet(extendedGlyphNames);
       }),
       false,
       true // immediate
