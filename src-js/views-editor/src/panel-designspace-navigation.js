@@ -1262,7 +1262,7 @@ export default class DesignspaceNavigationPanel extends Panel {
       !selectedItem ||
       selectedItem.isFontSource ||
       !selectedItem.active ||
-      !varGlyphController.sources[selectedItem.sourceIndex]
+      !varGlyphController?.sources[selectedItem.sourceIndex]
     ) {
       this.sceneSettings.editingLayers = {};
     } else {

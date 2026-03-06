@@ -8,11 +8,10 @@ import {
   round,
   throttleCalls,
 } from "@fontra/core/utils.js";
-import Panel from "./panel.js";
-
-// import { showMenu } from "@fontra/web-components/menu-panel.js";
+import { showMenu } from "@fontra/web-components/menu-panel.js";
 import { Accordion } from "@fontra/web-components/ui-accordion.js";
 import { UIList } from "@fontra/web-components/ui-list.js";
+import Panel from "./panel.js";
 
 export default class CharactersGlyphsPanel extends Panel {
   identifier = "characters-glyphs";
@@ -103,8 +102,42 @@ export default class CharactersGlyphsPanel extends Panel {
       this.glyphList.setSelectedItemIndices(glyphIndices, false, true);
     });
     this.characterList.addEventListener("rowDoubleClicked", (event) =>
-      this.doubleClickHandler(event)
+      this.replaceSelectedCharacter(event)
     );
+    this.characterList.addEventListener("deleteKey", (event) =>
+      this.deleteSelectedCharacter(event)
+    );
+    this.characterList.addEventListener("contextmenu", (event) => {
+      event.preventDefault();
+
+      const itemIndex =
+        this.characterList.getItemIndexAtPoint(event.x, event.y) ??
+        this.characterList.getSelectedItemIndex() ??
+        0;
+
+      if (this.characterList.items.length) {
+        this.characterList.setSelectedItemIndex(itemIndex, true);
+      }
+
+      const menuItems = this.characterList.items.length
+        ? [
+            {
+              title: "Insert character before this character...",
+              callback: () => this.insertCharacter(itemIndex),
+            },
+            {
+              title: "Insert character after this character...",
+              callback: () => this.insertCharacter(itemIndex + 1),
+            },
+          ]
+        : [
+            {
+              title: "Insert character...",
+              callback: () => this.insertCharacter(itemIndex),
+            },
+          ];
+      showMenu(menuItems, event);
+    });
 
     const showKern = true; // could become a toggle
 
@@ -160,7 +193,7 @@ export default class CharactersGlyphsPanel extends Panel {
       };
     });
     this.glyphList.addEventListener("rowDoubleClicked", (event) =>
-      this.doubleClickHandler(event)
+      this.glyphDoubleClickHandler(event)
     );
 
     this.accordion = new Accordion();
@@ -277,7 +310,57 @@ export default class CharactersGlyphsPanel extends Panel {
     }
   }
 
-  doubleClickHandler(event) {
+  async replaceSelectedCharacter(event) {
+    const item = this.characterList.getSelectedItem();
+
+    const glyphName = await this.editorController.runGlyphSearchDialog(
+      "Replace selected character",
+      translate("dialog.replace")
+    );
+    if (!glyphName) {
+      return;
+    }
+
+    this._insertCharacter(glyphName, item.index, true);
+  }
+
+  deleteSelectedCharacter(event) {
+    const item = this.characterList.getSelectedItem();
+    if (!item) {
+      return;
+    }
+
+    this._insertCharacter(null, item.index, true);
+    this.sceneSettings.selectedGlyph = undefined;
+  }
+
+  async insertCharacter(charIndex) {
+    const glyphName = await this.editorController.runGlyphSearchDialog(
+      "Index character",
+      "Insert"
+    );
+    if (!glyphName) {
+      return;
+    }
+
+    this._insertCharacter(glyphName, charIndex, false);
+  }
+
+  _insertCharacter(glyphName, charIndex, replace) {
+    let lineIndex = 0;
+    if (this.sceneSettings.selectedGlyph) {
+      ({ lineIndex } = this.sceneSettings.selectedGlyph);
+    }
+    const glyphInfo = glyphName
+      ? this.fontController.glyphInfoFromGlyphName(glyphName)
+      : null;
+    const characterLines = [...this.sceneSettings.characterLines];
+    const items = glyphInfo ? [glyphInfo] : [];
+    characterLines[lineIndex].splice(charIndex, replace ? 1 : 0, ...items);
+    this.sceneSettings.characterLines = characterLines;
+  }
+
+  glyphDoubleClickHandler(event) {
     const selectedGlyph = this.sceneSettings.selectedGlyph;
     const glyphExists =
       !!this.fontController.glyphMap[this.sceneSettings.selectedGlyphName];
