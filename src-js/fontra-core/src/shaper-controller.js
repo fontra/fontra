@@ -1,19 +1,41 @@
 import { buildShaperFont } from "build-shaper-font";
+import { collectGlyphNames } from "./changes.js";
 import { getGlyphInfoFromCodePoint, getGlyphInfoFromGlyphName } from "./glyph-data.js";
+import { ObservableController } from "./observable-object.js";
 import { getShaper } from "./shaper.js";
+import { consolidateCalls } from "./utils.js";
 
 export class ShaperController {
   constructor(fontController) {
     this.fontController = fontController;
 
+    this.invalidateShaper = new ObservableController({ counter: 0 });
+
     this.fontController.addChangeListener(
       { glyphMap: null },
       (change, isExternalChange) => {
-        delete this._glyphClasses;
+        this.purgeGlyphClassesCache();
       },
       false,
       true // immediate
     );
+
+    this.fontController.addChangeListener(
+      { glyphs: null },
+      consolidateCalls((change, isExternalChange) => {
+        this.updateMarkSet(collectGlyphNames(change));
+      }),
+      false,
+      true // immediate
+    );
+  }
+
+  addInvalidateShaperListener(listener) {
+    this.invalidateShaper.addListener(listener);
+  }
+
+  purgeGlyphClassesCache() {
+    delete this._glyphClasses;
   }
 
   async getShaperFontData(textShaping) {
@@ -68,6 +90,11 @@ export class ShaperController {
       insertMarkers,
       canEmulateSomeGPOS,
     };
+  }
+
+  async updateMarkSet(glyphNames) {
+    // If mark set changed:
+    // this.invalidateShaper.model.counter++;
   }
 
   async getGlyphClasses() {
