@@ -3,13 +3,15 @@ import { collectGlyphNames } from "./changes.js";
 import { getGlyphInfoFromCodePoint, getGlyphInfoFromGlyphName } from "./glyph-data.js";
 import { ObservableController } from "./observable-object.js";
 import { getShaper } from "./shaper.js";
-import { consolidateCalls } from "./utils.js";
+import { consolidateCalls, scheduleCalls } from "./utils.js";
 
 export class ShaperController {
   constructor(fontController) {
     this.fontController = fontController;
 
     this.invalidateShaper = new ObservableController({ counter: 0 });
+
+    this._adHocMarkGlyphs = {};
 
     this.fontController.addChangeListener(
       { glyphMap: null },
@@ -28,6 +30,14 @@ export class ShaperController {
       false,
       true // immediate
     );
+
+    this.fontController.addGlyphCacheListener(
+      scheduleCalls(() => {
+        this.updateMarkSetFromCachedGlyphs([
+          ...this.fontController.getCachedGlyphNames(),
+        ]);
+      }, 10)
+    );
   }
 
   addInvalidateShaperListener(listener) {
@@ -36,6 +46,7 @@ export class ShaperController {
 
   purgeGlyphClassesCache() {
     delete this._glyphClasses;
+    this._adHocMarkGlyphs = {};
   }
 
   async getShaperFontData(textShaping) {
@@ -93,8 +104,30 @@ export class ShaperController {
   }
 
   async updateMarkSet(glyphNames) {
-    // If mark set changed:
-    // this.invalidateShaper.model.counter++;
+    let didChange = false;
+
+    for (const glyphName of glyphNames) {
+      const glyph = await this.fontController.getGlyphInstance(glyphName, {});
+      const isAdHocMark = glyph?.propagatedAnchors.some((anchor) =>
+        anchor.name?.startsWith("_")
+      );
+      if (isAdHocMark != !!this._adHocMarkGlyphs[glyphName]) {
+        this._adHocMarkGlyphs[glyphName] = isAdHocMark;
+        didChange = true;
+      }
+    }
+
+    if (didChange) {
+      delete this._glyphClasses;
+      this.invalidateShaper.model.counter++;
+    }
+  }
+
+  async updateMarkSetFromCachedGlyphs(glyphNames) {
+    // We only need to look at glyphs that we haven't seen before
+    this.updateMarkSet(
+      glyphNames.filter((glyphName) => !(glyphName in this._adHocMarkGlyphs))
+    );
   }
 
   async getGlyphClasses() {
@@ -107,7 +140,15 @@ export class ShaperController {
   async _getGlyphClasses() {
     const glyphInfos = await this.fontController.getGlyphInfos();
 
+    const isAdHocMark = (glyphName) => {
+      return this._adHocMarkGlyphs[glyphName];
+    };
+
     const isMark = (glyphName) => {
+      if (this._adHocMarkGlyphs[glyphName]) {
+        return true;
+      }
+
       const customInfo = glyphInfos[glyphName];
       if (customInfo?.category === "Mark" && customInfo?.subcategory === "Nonspacing") {
         return true;
