@@ -587,7 +587,8 @@ export class SceneController {
       originXDelta = glyphCenter - previousGlyphCenter;
       originYDelta = glyphPosition.y - this._previousGlyphPosition.y;
     } else if (
-      this.scrollAdjustBehavior?.startsWith("pin-glyph-origin") &&
+      typeof this.scrollAdjustBehavior == "string" &&
+      this.scrollAdjustBehavior.startsWith("pin-glyph-origin") &&
       this._previousGlyphPosition &&
       glyphPosition
     ) {
