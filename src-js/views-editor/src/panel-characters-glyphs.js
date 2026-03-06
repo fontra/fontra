@@ -102,9 +102,10 @@ export default class CharactersGlyphsPanel extends Panel {
       };
       this.glyphList.setSelectedItemIndices(glyphIndices, false, true);
     });
-    this.characterList.addEventListener("rowDoubleClicked", (event) =>
-      this.doubleClickHandler(event)
-    );
+    this.characterList.addEventListener("rowDoubleClicked", (event) => {
+      this.replaceSelectedCharacter(event);
+      // doPerformAction("action.replace-selected-glyph-on-canvas")
+    });
 
     const showKern = true; // could become a toggle
 
@@ -160,7 +161,7 @@ export default class CharactersGlyphsPanel extends Panel {
       };
     });
     this.glyphList.addEventListener("rowDoubleClicked", (event) =>
-      this.doubleClickHandler(event)
+      this.glyphDoubleClickHandler(event)
     );
 
     this.accordion = new Accordion();
@@ -277,7 +278,26 @@ export default class CharactersGlyphsPanel extends Panel {
     }
   }
 
-  doubleClickHandler(event) {
+  async replaceSelectedCharacter(event) {
+    const item = this.characterList.getSelectedItem();
+
+    const glyphName = await this.editorController.runGlyphSearchDialog(
+      "Replace selected character",
+      translate("dialog.replace")
+    );
+    if (!glyphName) {
+      return;
+    }
+
+    const { lineIndex } = this.sceneSettings.selectedGlyph;
+    const glyphInfo = this.fontController.glyphInfoFromGlyphName(glyphName);
+    const characterLines = [...this.sceneSettings.characterLines];
+    const line = [...characterLines[lineIndex]];
+    characterLines[lineIndex].splice(item.index, 1, glyphInfo);
+    this.sceneSettings.characterLines = characterLines;
+  }
+
+  glyphDoubleClickHandler(event) {
     const selectedGlyph = this.sceneSettings.selectedGlyph;
     const glyphExists =
       !!this.fontController.glyphMap[this.sceneSettings.selectedGlyphName];
