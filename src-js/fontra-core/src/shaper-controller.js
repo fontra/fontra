@@ -55,9 +55,34 @@ export class ShaperController {
     this.invalidateShaper.addListener(listener);
   }
 
-  purgeGlyphClassesCache() {
-    delete this._glyphClasses;
-    this._adHocMarkGlyphs = {};
+  async getShaper(textShaping) {
+    await this.fontController.ensureInitialized;
+
+    const { mark: markGlyphs } = await this.getGlyphClasses();
+    const markGlyphsSet = new Set(markGlyphs);
+
+    const {
+      glyphOrder,
+      fontData,
+      messages,
+      formattedMessages,
+      insertMarkers,
+      canEmulateSomeGPOS,
+    } = await this.getShaperFontData(textShaping);
+
+    {
+      // characterMap closure
+      const characterMap = this.fontController.characterMap;
+      const shaperSupport = {
+        fontData,
+        nominalGlyphFunc: (codePoint) => characterMap[codePoint],
+        glyphOrder,
+        isGlyphMarkFunc: (glyphName) => markGlyphsSet.has(glyphName),
+        insertMarkers,
+      };
+      const shaper = getShaper(shaperSupport);
+      return { shaper, messages, formattedMessages, canEmulateSomeGPOS };
+    }
   }
 
   async getShaperFontData(textShaping) {
@@ -112,6 +137,44 @@ export class ShaperController {
       insertMarkers,
       canEmulateSomeGPOS,
     };
+  }
+
+  async buildShaperFont(glyphOrder) {
+    const features = await this.fontController.getFeatures();
+
+    const glyphClasses = await this.getGlyphClasses();
+
+    try {
+      return buildShaperFont(
+        this.fontController.unitsPerEm,
+        glyphOrder,
+        features.text,
+        this.fontController.axes.axes
+          .filter((axis) => !axis.values) // Filter out discrete axes
+          .map((axis) => ({
+            tag: axis.tag,
+            minValue: axis.minValue,
+            defaultValue: axis.defaultValue,
+            maxValue: axis.maxValue,
+          })),
+        glyphClasses
+      );
+    } catch (e) {
+      console.error(e);
+      return {
+        fontData: null,
+        messages: [
+          { text: e.message || e.toString(), span: [0, 0], level: "exception" },
+        ],
+        formattedMessages: e.message || e.toString(),
+        insertMarkers: [],
+      };
+    }
+  }
+
+  purgeGlyphClassesCache() {
+    delete this._glyphClasses;
+    this._adHocMarkGlyphs = {};
   }
 
   async updateAdHocMarkSet(glyphNames) {
@@ -201,69 +264,6 @@ export class ShaperController {
     };
 
     return glyphClasses;
-  }
-
-  async buildShaperFont(glyphOrder) {
-    const features = await this.fontController.getFeatures();
-
-    const glyphClasses = await this.getGlyphClasses();
-
-    try {
-      return buildShaperFont(
-        this.fontController.unitsPerEm,
-        glyphOrder,
-        features.text,
-        this.fontController.axes.axes
-          .filter((axis) => !axis.values) // Filter out discrete axes
-          .map((axis) => ({
-            tag: axis.tag,
-            minValue: axis.minValue,
-            defaultValue: axis.defaultValue,
-            maxValue: axis.maxValue,
-          })),
-        glyphClasses
-      );
-    } catch (e) {
-      console.error(e);
-      return {
-        fontData: null,
-        messages: [
-          { text: e.message || e.toString(), span: [0, 0], level: "exception" },
-        ],
-        formattedMessages: e.message || e.toString(),
-        insertMarkers: [],
-      };
-    }
-  }
-
-  async getShaper(textShaping) {
-    await this.fontController.ensureInitialized;
-
-    const { mark: markGlyphs } = await this.getGlyphClasses();
-    const markGlyphsSet = new Set(markGlyphs);
-
-    const {
-      glyphOrder,
-      fontData,
-      messages,
-      formattedMessages,
-      insertMarkers,
-      canEmulateSomeGPOS,
-    } = await this.getShaperFontData(textShaping);
-
-    {
-      // characterMap closure
-      const characterMap = this.fontController.characterMap;
-      const shaperSupport = {
-        fontData,
-        nominalGlyphFunc: (codePoint) => characterMap[codePoint],
-        glyphOrder,
-        isGlyphMarkFunc: (glyphName) => markGlyphsSet.has(glyphName),
-        insertMarkers,
-      };
-      const shaper = getShaper(shaperSupport);
-      return { shaper, messages, formattedMessages, canEmulateSomeGPOS };
-    }
   }
 }
 
