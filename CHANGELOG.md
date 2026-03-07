@@ -1,5 +1,9 @@
 # Changelog for Fontra
 
+## 2026-03-?? [version 2026.3.2]
+
+- [fontra-pak] Add a sample text field to the launcher window. If this is empty, launch into the font overview, but if it is not, launch into the editor with the text. [fontra-pak PR 228](https://github.com/fontra/fontra-pak/pull/228)
+
 ## 2026-03-06 [version 2026.3.1]
 
 - Fix editing kerning and sidebearings, making the glyph list metrics update correctly when using these tools. [PR 2468](https://github.com/fontra/fontra/pull/2468)
