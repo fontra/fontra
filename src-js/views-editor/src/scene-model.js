@@ -65,7 +65,6 @@ export class SceneModel {
         "textScript",
         "textLanguage",
         "shaper",
-        "dumbShaper",
       ],
       (event) => {
         this.updateScene();
@@ -424,10 +423,8 @@ export class SceneModel {
   }
 
   async buildScene(cancelSignal) {
-    const shaperPromise = this.sceneSettings.applyTextShaping
-      ? this.sceneSettings.shaper
-      : this.sceneSettings.dumbShaper;
-    if (!shaperPromise) {
+    const shaper = this.sceneSettings.shaper;
+    if (!shaper) {
       return;
     }
 
@@ -463,8 +460,6 @@ export class SceneModel {
     if (cancelSignal.shouldCancel) {
       return;
     }
-
-    const { shaper } = await shaperPromise;
 
     const lineSetter = new LineSetter(
       fontController,
