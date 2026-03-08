@@ -337,11 +337,6 @@ export class SceneController {
   }
 
   updateShaperInfo() {
-    if (this.sceneSettingsController.model.shaperInfo) {
-      this.sceneSettingsController.model.shaperInfo.then(({ shaper }) =>
-        shaper.close()
-      );
-    }
     const shaperInfo = this.shaperController.getShaper(true);
     this.sceneSettingsController.model.shaperInfo = shaperInfo;
     this.sceneSettingsController.model.dumbShaperInfo =
@@ -353,7 +348,9 @@ export class SceneController {
     const shaperInfoPromise = applyTextShaping
       ? this.sceneSettings.shaperInfo
       : this.sceneSettings.dumbShaperInfo;
+
     const { shaper } = await shaperInfoPromise;
+
     this.sceneSettings.shaper = shaper;
   }
 
