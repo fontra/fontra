@@ -337,8 +337,8 @@ export class SceneController {
   }
 
   updateShaperInfo() {
-    const shaperInfo = this.shaperController.getShaper(true);
-    this.sceneSettingsController.model.shaperInfo = shaperInfo;
+    this.sceneSettingsController.model.shaperInfo =
+      this.shaperController.getShaper(true);
     this.sceneSettingsController.model.dumbShaperInfo =
       this.shaperController.getShaper(false);
     this.updateShaper(this.sceneSettings.applyTextShaping);
