@@ -8,6 +8,12 @@ export const languages = [
   { code: "fr", langEn: "French", langLang: "Français", status: "beta" },
   { code: "de", langEn: "German", langLang: "Deutsch", status: "wip" },
   { code: "nl", langEn: "Dutch", langLang: "Nederlands", status: "wip" },
+  {
+    code: "zh-TW",
+    langEn: "Traditional Chinese",
+    langLang: "繁體中文",
+    status: "beta",
+  },
 ];
 
 const debugTranslation = false;
