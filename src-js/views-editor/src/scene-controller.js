@@ -124,13 +124,13 @@ export class SceneController {
       textScript: null,
       textLanguage: null,
       shaper: null,
-      shaperError: null,
-      dumbShaper: null,
+      shaperInfo: null,
+      dumbShaperInfo: null,
     });
     this.sceneSettings = this.sceneSettingsController.model;
 
     this.fontController.ensureInitialized.then(() => {
-      this.updateShaper();
+      this.updateShaperInfo();
     });
 
     // Set up the mutual relationship between text and characterLines
@@ -329,15 +329,32 @@ export class SceneController {
         this.canvasController.requestUpdate();
       }
     );
+
+    // Switch shapers on toggling applyTextShaping
+    this.sceneSettingsController.addKeyListener("applyTextShaping", (event) =>
+      this.updateShaper(event.newValue)
+    );
   }
 
-  updateShaper() {
-    if (this.sceneSettingsController.model.shaper) {
-      this.sceneSettingsController.model.shaper.then(({ shaper }) => shaper.close());
+  updateShaperInfo() {
+    if (this.sceneSettingsController.model.shaperInfo) {
+      this.sceneSettingsController.model.shaperInfo.then(({ shaper }) =>
+        shaper.close()
+      );
     }
-    this.sceneSettingsController.model.shaper = this.shaperController.getShaper(true);
-    this.sceneSettingsController.model.dumbShaper =
+    const shaperInfo = this.shaperController.getShaper(true);
+    this.sceneSettingsController.model.shaperInfo = shaperInfo;
+    this.sceneSettingsController.model.dumbShaperInfo =
       this.shaperController.getShaper(false);
+    this.updateShaper(this.sceneSettings.applyTextShaping);
+  }
+
+  async updateShaper(applyTextShaping) {
+    const shaperInfoPromise = applyTextShaping
+      ? this.sceneSettings.shaperInfo
+      : this.sceneSettings.dumbShaperInfo;
+    const { shaper } = await shaperInfoPromise;
+    this.sceneSettings.shaper = shaper;
   }
 
   async setLocationFromSourceIndex(sourceIndex) {
@@ -375,7 +392,7 @@ export class SceneController {
 
   setupChangeListeners() {
     this.fontController.addChangeListener({ glyphMap: null }, () => {
-      this.updateShaper();
+      this.updateShaperInfo();
 
       const selectedGlyph = this.sceneSettings.selectedGlyph;
       if (
@@ -400,11 +417,11 @@ export class SceneController {
     );
 
     this.fontController.addChangeListener({ features: null, glyphInfos: null }, () => {
-      this.updateShaper();
+      this.updateShaperInfo();
     });
 
     this.shaperController.addInvalidateShaperListener(() => {
-      this.updateShaper();
+      this.updateShaperInfo();
     });
   }
 
