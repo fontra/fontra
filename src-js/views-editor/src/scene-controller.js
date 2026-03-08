@@ -332,7 +332,7 @@ export class SceneController {
 
     // Switch shapers on toggling applyTextShaping
     this.sceneSettingsController.addKeyListener("applyTextShaping", (event) =>
-      this.updateShaper(event.newValue)
+      this.updateShaper()
     );
   }
 
@@ -341,11 +341,11 @@ export class SceneController {
       this.shaperController.getShaper(true);
     this.sceneSettingsController.model.dumbShaperInfo =
       this.shaperController.getShaper(false);
-    this.updateShaper(this.sceneSettings.applyTextShaping);
+    this.updateShaper();
   }
 
-  async updateShaper(applyTextShaping) {
-    const shaperInfoPromise = applyTextShaping
+  async updateShaper() {
+    const shaperInfoPromise = this.sceneSettings.applyTextShaping
       ? this.sceneSettings.shaperInfo
       : this.sceneSettings.dumbShaperInfo;
 
