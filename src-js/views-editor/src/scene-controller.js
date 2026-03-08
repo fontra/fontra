@@ -345,11 +345,9 @@ export class SceneController {
   }
 
   async updateShaper() {
-    const shaperInfoPromise = this.sceneSettings.applyTextShaping
+    const { shaper } = await (this.sceneSettings.applyTextShaping
       ? this.sceneSettings.shaperInfo
-      : this.sceneSettings.dumbShaperInfo;
-
-    const { shaper } = await shaperInfoPromise;
+      : this.sceneSettings.dumbShaperInfo);
 
     this.sceneSettings.shaper = shaper;
   }
