@@ -168,7 +168,7 @@ export default class TextEntryPanel extends Panel {
     this.textSettings = this.editorController.sceneSettingsController.model;
 
     this.textSettingsController.addKeyListener(
-      ["featureSettings", "applyTextShaping", "shaper", "dumbShaper"],
+      ["featureSettings", "applyTextShaping", "shaperInfo", "dumbShaperInfo"],
       async (event) => this.updateFeatures(await this.getShaper())
     );
 
@@ -222,24 +222,24 @@ export default class TextEntryPanel extends Panel {
   }
 
   async getShaper() {
-    const shaperPromise = this.textSettings.applyTextShaping
-      ? this.textSettings.shaper
-      : this.textSettings.dumbShaper;
+    const shaperInfoPromise = this.textSettings.applyTextShaping
+      ? this.textSettings.shaperInfo
+      : this.textSettings.dumbShaperInfo;
 
-    if (!shaperPromise) {
+    if (!shaperInfoPromise) {
       return null;
     }
 
-    const { shaper, messages, canEmulateSomeGPOS } = await shaperPromise;
+    const { shaper, messages, canEmulateSomeGPOS } = await shaperInfoPromise;
 
     const errorMessages = messages.filter((message) => message.level != "warning");
     const numberOfErrorsMessage = errorMessages.length == 1 ? "an error" : "errors";
 
-    this.textSettings.shaperError = errorMessages.length
-      ? `The OpenType feature code contains ${numberOfErrorsMessage}`
-      : null;
-
-    this.canEmulateSomeGPOS = canEmulateSomeGPOS;
+    this.updateShaperError(
+      errorMessages.length
+        ? `The OpenType feature code contains ${numberOfErrorsMessage}`
+        : null
+    );
 
     return shaper;
   }
@@ -359,14 +359,6 @@ export default class TextEntryPanel extends Panel {
     this.textSettingsController.addKeyListener("textScript", async (event) => {
       const shaper = await this.getShaper();
       this.updateLanguages(shaper?.getScriptAndLanguageInfo() ?? {});
-    });
-
-    this.textSettingsController.addKeyListener("shaperError", async (event) => {
-      const error = this.textSettings.shaperError;
-      const errorElement = this.accordion.querySelector("#features-errors");
-      const messageElement = this.accordion.querySelector("#features-errors-message");
-      errorElement.classList.toggle("hidden", !error);
-      messageElement.innerText = error ?? "";
     });
 
     this.accordion = new Accordion();
@@ -580,6 +572,13 @@ export default class TextEntryPanel extends Panel {
 
     const placeHolder = this.contentElement.querySelector("#text-settings-accordion");
     placeHolder.replaceWith(this.accordion);
+  }
+
+  updateShaperError(error) {
+    const errorElement = this.accordion.querySelector("#features-errors");
+    const messageElement = this.accordion.querySelector("#features-errors-message");
+    errorElement.classList.toggle("hidden", !error);
+    messageElement.innerText = error ?? "";
   }
 
   updateFeatures(shaper) {

@@ -80,7 +80,20 @@ export class ShaperController {
         isGlyphMarkFunc: (glyphName) => markGlyphsSet.has(glyphName),
         insertMarkers,
       };
-      const shaper = getShaper(shaperSupport);
+
+      // If compiling the font failed (!fontData) and we have a previous
+      // working shaper, use that one.
+      const shaper =
+        textShaping && !fontData && this._previousShaper
+          ? this._previousShaper
+          : getShaper(shaperSupport);
+
+      if (textShaping && fontData) {
+        // The new shaper is good, help harfbuzzjs with GS and close the old one
+        this._previousShaper?.close();
+        this._previousShaper = shaper;
+      }
+
       return { shaper, messages, formattedMessages, canEmulateSomeGPOS };
     }
   }
