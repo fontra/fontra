@@ -31,6 +31,32 @@ export class FontOverviewNavigation extends HTMLElement {
     this._checkboxControllers = {};
     this._glyphSetErrorButtons = {};
 
+    this.groupByCheckboxGroup = new CheckboxGroup(
+      this.fontOverviewSettingsController,
+      "groupByKeys"
+    );
+    this.projectGlyphSets = new GlyphSetsController(
+      this.fontOverviewSettingsController,
+      {
+        label: "Project glyph sets", // TODO: translate
+        id: "project-glyph-sets",
+        collectionKey: "projectGlyphSets",
+        selectionKey: "projectGlyphSetSelection",
+        addGlyphSetToolTip: "Add a glyph set to the project",
+        copyToLabel: "my glyph sets",
+        otherCollectionKey: "myGlyphSets",
+      }
+    );
+    this.myGlyphSets = new GlyphSetsController(this.fontOverviewSettingsController, {
+      label: "My glyph sets", // TODO: translate
+      id: "my-glyph-sets",
+      collectionKey: "myGlyphSets",
+      selectionKey: "myGlyphSetSelection",
+      addGlyphSetToolTip: "Add a glyph set to my sets",
+      copyToLabel: "project glyph sets",
+      otherCollectionKey: "projectGlyphSets",
+    });
+
     this._setupUI();
   }
 
@@ -120,26 +146,6 @@ export class FontOverviewNavigation extends HTMLElement {
       }
     );
 
-    this._projectGlyphSetsItem = {
-      label: "Project glyph sets", // TODO: translate
-      id: "project-glyph-sets",
-      content: html.div(),
-      auxiliaryHeaderElement: this._makeAddGlyphSetButton(
-        true,
-        "Add a glyph set to the project"
-      ),
-    };
-
-    this._myGlyphSetsItem = {
-      label: "My glyph sets", // TODO: translate
-      id: "my-glyph-sets",
-      content: html.div(),
-      auxiliaryHeaderElement: this._makeAddGlyphSetButton(
-        false,
-        "Add a glyph set to my sets"
-      ),
-    };
-
     const accordionItems = [
       {
         label: translate("sources.labels.location"),
@@ -152,10 +158,10 @@ export class FontOverviewNavigation extends HTMLElement {
       {
         label: "Group by", // TODO: translate
         id: "group-by",
-        content: this._makeGroupByUI(),
+        content: this.groupByCheckboxGroup.makeCheckboxUI(groupByProperties),
       },
-      this._projectGlyphSetsItem,
-      this._myGlyphSetsItem,
+      this.projectGlyphSets.accordionItem,
+      this.myGlyphSets.accordionItem,
     ];
 
     accordionItems.forEach(
@@ -169,45 +175,8 @@ export class FontOverviewNavigation extends HTMLElement {
       html.div({ class: "font-overview-navigation-section" }, [accordion])
     );
 
-    this.fontOverviewSettingsController.addKeyListener("projectGlyphSets", (event) =>
-      this._updateProjectGlyphSets()
-    );
-    this.fontOverviewSettingsController.addKeyListener("myGlyphSets", (event) =>
-      this._updateMyGlyphSets()
-    );
-    this._updateProjectGlyphSets();
-    this._updateMyGlyphSets();
-
-    this.fontOverviewSettingsController.addKeyListener(
-      "glyphSetErrors",
-      (event) => {
-        const allKeys = union(
-          new Set(Object.keys(event.oldValue)),
-          Object.keys(event.newValue)
-        );
-        for (const key of allKeys) {
-          if (event.oldValue[key] === event.newValue[key]) {
-            continue;
-          }
-
-          const isLoading = event.newValue[key] === "...";
-
-          const errorButton = this._glyphSetErrorButtons[key];
-
-          errorButton.src = isLoading
-            ? "/tabler-icons/loader-2.svg"
-            : "/tabler-icons/alert-triangle.svg";
-
-          errorButton.classList.toggle(
-            "glyphset-error",
-            !!(event.newValue[key] && event.newValue[key] !== "...")
-          );
-
-          errorButton.classList.toggle("loading", event.newValue[key] === "...");
-        }
-      },
-      true
-    );
+    this.projectGlyphSets.updateGlyphSets();
+    this.myGlyphSets.updateGlyphSets();
   }
 
   async _makeFontSourcePopup() {
@@ -308,60 +277,166 @@ export class FontOverviewNavigation extends HTMLElement {
     return locationElement;
   }
 
-  _makeGroupByUI() {
-    return this._makeCheckboxUI("groupByKeys", groupByProperties);
+  _openGlyphSetsItem(isProjectGlyphSet) {
+    if (isProjectGlyphSet) {
+      this.accordion.openCloseAccordionItem(this._projectGlyphSetsItem, true);
+    } else {
+      this.accordion.openCloseAccordionItem(this._myGlyphSetsItem, true);
+    }
+  }
+}
+
+customElements.define("font-overview-navigation", FontOverviewNavigation);
+
+class GlyphSetsController {
+  constructor(settingsController, options) {
+    const {
+      label,
+      id,
+      collectionKey,
+      selectionKey,
+      addGlyphSetToolTip,
+      copyToLabel,
+      otherCollectionKey,
+    } = options;
+
+    this.settingsController = settingsController;
+    this.settings = settingsController.model;
+    this.collectionKey = collectionKey;
+    this.selectionKey = selectionKey;
+    this.copyToLabel = copyToLabel;
+    this.otherCollectionKey = otherCollectionKey;
+
+    this.glyphSetErrorButtons = {};
+    this.checkboxGroup = new CheckboxGroup(settingsController, selectionKey);
+    this.accordionItem = {
+      label,
+      id,
+      content: html.div(),
+      auxiliaryHeaderElement: this.makeAddGlyphSetButton(addGlyphSetToolTip),
+    };
+
+    settingsController.addKeyListener(collectionKey, (event) => this.updateGlyphSets());
+
+    settingsController.addKeyListener(
+      "glyphSetErrors",
+      (event) => {
+        const allKeys = union(
+          new Set(Object.keys(event.oldValue)),
+          Object.keys(event.newValue)
+        );
+        for (const key of allKeys) {
+          if (event.oldValue[key] === event.newValue[key]) {
+            continue;
+          }
+
+          const isLoading = event.newValue[key] === "...";
+
+          const errorButton = this.glyphSetErrorButtons[key];
+          if (!errorButton) {
+            continue;
+          }
+
+          errorButton.src = isLoading
+            ? "/tabler-icons/loader-2.svg"
+            : "/tabler-icons/alert-triangle.svg";
+
+          errorButton.classList.toggle(
+            "glyphset-error",
+            !!(event.newValue[key] && event.newValue[key] !== "...")
+          );
+
+          errorButton.classList.toggle("loading", event.newValue[key] === "...");
+        }
+      },
+      true
+    );
   }
 
-  _makeAddGlyphSetButton(isProjectGlyphSet, toolTip) {
+  updateGlyphSets() {
+    this.accordionItem.content.innerHTML = "";
+    this.accordionItem.content.appendChild(this.makeGlyphSetsUI());
+  }
+
+  makeAddGlyphSetButton(toolTip) {
     return html.createDomElement("icon-button", {
       "src": "/images/plus.svg",
-      "onclick": (event) => this._addGlyphSet(event, isProjectGlyphSet),
+      "onclick": (event) => this.addGlyphSet(event),
       "data-tooltip": toolTip,
       "data-tooltipposition": "left",
     });
   }
 
-  _updateProjectGlyphSets() {
-    this._projectGlyphSetsItem.content.innerHTML = "";
-    this._projectGlyphSetsItem.content.appendChild(this._makeProjectGlyphSetsUI());
-  }
-
-  _updateMyGlyphSets() {
-    this._myGlyphSetsItem.content.innerHTML = "";
-    this._myGlyphSetsItem.content.appendChild(this._makeMyGlyphSetsUI());
-  }
-
-  _makeProjectGlyphSetsUI() {
-    const projectGlyphSets = this._prepareGlyphSets(
-      this.fontOverviewSettings.projectGlyphSets,
-      true
+  async addGlyphSet(event) {
+    const { glyphSets, custom } = await runAddGlyphSetDialog(
+      this.settings[this.collectionKey]
     );
 
+    if (custom) {
+      await this.editGlyphSet(event);
+    } else if (glyphSets) {
+      this.settings[this.collectionKey] = glyphSets;
+    }
+
+    // console.log("ensure accordion item is OPEN");
+    // this._openGlyphSetsItem(isProjectGlyphSet);
+  }
+
+  async editGlyphSet(event, glyphSetInfo = null) {
+    const glyphSet = await runEditGlyphSetDialog(glyphSetInfo);
+    if (!glyphSet) {
+      return;
+    }
+
+    const glyphSets = {
+      ...this.settings[this.collectionKey],
+    };
+    if (glyphSetInfo?.url) {
+      delete glyphSets[glyphSetInfo.url];
+    }
+    glyphSets[glyphSet.url] = glyphSet;
+    this.settings[this.collectionKey] = glyphSets;
+  }
+
+  deleteGlyphSet(event, glyphSetInfo) {
+    const glyphSets = {
+      ...this.settings[this.collectionKey],
+    };
+    delete glyphSets[glyphSetInfo.url];
+    this.settings[this.collectionKey] = glyphSets;
+  }
+
+  reloadGlyphSet(event, glyphSet) {
+    this.settings[this.collectionKey] = {
+      ...this.settings[this.collectionKey],
+      [glyphSet.url]: { ...glyphSet },
+    };
+  }
+
+  copyGlyphSet(event, glyphSet) {
+    this.settings[this.otherCollectionKey] = {
+      ...this.settings[this.otherCollectionKey],
+      [glyphSet.url]: glyphSet,
+    };
+  }
+
+  makeGlyphSetsUI() {
+    const glyphSets = this.prepareGlyphSets(this.settings[this.collectionKey]);
+
     return html.div({ class: "glyph-set-container" }, [
-      this._makeCheckboxUI("projectGlyphSetSelection", projectGlyphSets),
+      this.checkboxGroup.makeCheckboxUI(glyphSets),
     ]);
   }
 
-  _makeMyGlyphSetsUI() {
-    const myGlyphSets = this._prepareGlyphSets(
-      this.fontOverviewSettings.myGlyphSets,
-      false
-    );
-
-    return html.div({ class: "glyph-set-container" }, [
-      this._makeCheckboxUI("myGlyphSetSelection", myGlyphSets),
-    ]);
-  }
-
-  _prepareGlyphSets(glyphSets, isProjectGlyphSet) {
+  prepareGlyphSets(glyphSets) {
     return Object.entries(glyphSets)
       .map(([key, glyphSet]) => ({
         key,
         label: glyphSet.name,
         extraItem: glyphSet.url
           ? html.div({ class: "glyphset-button-group" }, [
-              this._makeGlyphSetErrorButton(glyphSet, isProjectGlyphSet),
-              this._makeGlyphSetMenuButton(glyphSet, isProjectGlyphSet),
+              this.makeGlyphSetErrorButton(glyphSet),
+              this.makeGlyphSetMenuButton(glyphSet),
             ])
           : null,
       }))
@@ -378,7 +453,7 @@ export class FontOverviewNavigation extends HTMLElement {
       });
   }
 
-  _makeGlyphSetMenuButton(glyphSet, isProjectGlyphSet) {
+  makeGlyphSetMenuButton(glyphSet) {
     return html.createDomElement("icon-button", {
       src: "/tabler-icons/pencil.svg",
       onclick: (event) => {
@@ -388,27 +463,25 @@ export class FontOverviewNavigation extends HTMLElement {
             {
               title: "Edit",
               callback: (event) => {
-                this._editGlyphSet(event, isProjectGlyphSet, glyphSet);
+                this.editGlyphSet(event, glyphSet);
               },
             },
             {
               title: "Delete",
               callback: (event) => {
-                this._deleteGlyphSet(event, isProjectGlyphSet, glyphSet);
+                this.deleteGlyphSet(event, glyphSet);
               },
             },
             {
               title: "Reload",
               callback: (event) => {
-                this._reloadGlyphSet(event, isProjectGlyphSet, glyphSet);
+                this.reloadGlyphSet(event, glyphSet);
               },
             },
             {
-              title: `Copy to ${
-                isProjectGlyphSet ? "my glyph sets" : "project glyph sets"
-              }`,
+              title: `Copy to ${this.copyToLabel}`,
               callback: (event) => {
-                this._copyGlyphSet(event, isProjectGlyphSet, glyphSet);
+                this.copyGlyphSet(event, glyphSet);
               },
             },
           ],
@@ -423,114 +496,40 @@ export class FontOverviewNavigation extends HTMLElement {
     });
   }
 
-  _makeGlyphSetErrorButton(glyphSet, isProjectGlyphSet) {
+  makeGlyphSetErrorButton(glyphSet) {
     const errorButton = html.createDomElement("icon-button", {
       class: "glyphset-error-button",
       src: "/tabler-icons/alert-triangle.svg",
       onclick: (event) => {
-        const errorMessage = this.fontOverviewSettings.glyphSetErrors[glyphSet.url];
+        const errorMessage = this.settings.glyphSetErrors[glyphSet.url];
         if (errorMessage) {
           message(`The glyph set “${glyphSet.name}” could not be loaded`, errorMessage);
         }
       },
     });
 
-    this._glyphSetErrorButtons[glyphSet.url] = errorButton;
+    this.glyphSetErrorButtons[glyphSet.url] = errorButton;
 
     return errorButton;
   }
+}
 
-  _makeCheckboxUI(settingsKey, checkboxItems) {
-    let checkboxController = this._checkboxControllers[settingsKey];
-    if (!checkboxController) {
-      checkboxController = makeCheckboxController(
-        this.fontOverviewSettingsController,
-        settingsKey
-      );
-      this._checkboxControllers[settingsKey] = checkboxController;
-    }
+class CheckboxGroup {
+  constructor(settingsController, settingsKey) {
+    this.checkboxController = makeCheckboxController(settingsController, settingsKey);
+  }
 
+  makeCheckboxUI(checkboxItems) {
     return html.div({ class: "checkbox-group" }, [
       ...checkboxItems
         .map(({ key, label, extraItem }) => [
-          labeledCheckbox(label, checkboxController, key),
+          labeledCheckbox(label, this.checkboxController, key),
           extraItem ? extraItem : html.div(),
         ])
         .flat(),
     ]);
   }
-
-  async _addGlyphSet(event, isProjectGlyphSet) {
-    const { glyphSets, custom } = await runAddGlyphSetDialog(
-      isProjectGlyphSet
-        ? this.fontOverviewSettings.projectGlyphSets
-        : this.fontOverviewSettings.myGlyphSets
-    );
-
-    if (custom) {
-      await this._editGlyphSet(event, isProjectGlyphSet);
-    } else if (glyphSets) {
-      const key = isProjectGlyphSet ? "projectGlyphSets" : "myGlyphSets";
-      this.fontOverviewSettings[key] = glyphSets;
-    }
-
-    this._openGlyphSetsItem(isProjectGlyphSet);
-  }
-
-  async _editGlyphSet(event, isProjectGlyphSet, glyphSetInfo = null) {
-    const glyphSet = await runEditGlyphSetDialog(glyphSetInfo);
-    if (!glyphSet) {
-      return;
-    }
-
-    const key = isProjectGlyphSet ? "projectGlyphSets" : "myGlyphSets";
-    const glyphSets = {
-      ...this.fontOverviewSettings[key],
-    };
-    if (glyphSetInfo?.url) {
-      delete glyphSets[glyphSetInfo.url];
-    }
-    glyphSets[glyphSet.url] = glyphSet;
-    this.fontOverviewSettings[key] = glyphSets;
-  }
-
-  _openGlyphSetsItem(isProjectGlyphSet) {
-    if (isProjectGlyphSet) {
-      this.accordion.openCloseAccordionItem(this._projectGlyphSetsItem, true);
-    } else {
-      this.accordion.openCloseAccordionItem(this._myGlyphSetsItem, true);
-    }
-  }
-
-  _deleteGlyphSet(event, isProjectGlyphSet, glyphSetInfo) {
-    const key = isProjectGlyphSet ? "projectGlyphSets" : "myGlyphSets";
-    const glyphSets = {
-      ...this.fontOverviewSettings[key],
-    };
-    delete glyphSets[glyphSetInfo.url];
-    this.fontOverviewSettings[key] = glyphSets;
-  }
-
-  _reloadGlyphSet(event, isProjectGlyphSet, glyphSet) {
-    const key = isProjectGlyphSet ? "projectGlyphSets" : "myGlyphSets";
-
-    this.fontOverviewSettings[key] = {
-      ...this.fontOverviewSettings[key],
-      [glyphSet.url]: { ...glyphSet },
-    };
-  }
-
-  _copyGlyphSet(event, isProjectGlyphSet, glyphSet) {
-    const fromKey = isProjectGlyphSet ? "projectGlyphSets" : "myGlyphSets";
-    const toKey = isProjectGlyphSet ? "myGlyphSets" : "projectGlyphSets";
-    this.fontOverviewSettings[toKey] = {
-      ...this.fontOverviewSettings[toKey],
-      [glyphSet.url]: glyphSet,
-    };
-  }
 }
-
-customElements.define("font-overview-navigation", FontOverviewNavigation);
 
 function makeCheckboxController(settingsController, settingsKey) {
   const settings = settingsController.model;
