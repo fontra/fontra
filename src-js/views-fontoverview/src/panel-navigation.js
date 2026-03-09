@@ -43,7 +43,7 @@ export class FontOverviewNavigation extends HTMLElement {
       this.fontOverviewSettingsController,
       "groupByKeys"
     );
-    this.projectGlyphSets = new GlyphSetsController(
+    this.projectGlyphSets = new GlyphSetsUIController(
       this.fontOverviewSettingsController,
       {
         label: "Project glyph sets", // TODO: translate
@@ -56,7 +56,7 @@ export class FontOverviewNavigation extends HTMLElement {
         accordionId: "panel-navigation-accordion",
       }
     );
-    this.myGlyphSets = new GlyphSetsController(this.fontOverviewSettingsController, {
+    this.myGlyphSets = new GlyphSetsUIController(this.fontOverviewSettingsController, {
       label: "My glyph sets", // TODO: translate
       id: "my-glyph-sets",
       collectionKey: "myGlyphSets",
@@ -278,7 +278,7 @@ export class FontOverviewNavigation extends HTMLElement {
 
 customElements.define("font-overview-navigation", FontOverviewNavigation);
 
-class GlyphSetsController {
+class GlyphSetsUIController {
   constructor(settingsController, options) {
     const {
       label,
