@@ -25,8 +25,8 @@ import { labeledTextInput } from "@fontra/core/ui-utils.js";
 import {
   assert,
   asyncMap,
+  consolidateCalls,
   dumpURLFragment,
-  friendlyHttpStatus,
   glyphMapToItemList,
   isActiveElementTypeable,
   modulo,
@@ -36,7 +36,6 @@ import {
   readObjectFromURLFragment,
   scheduleCalls,
   sleepAsync,
-  throttleCalls,
   writeObjectToURLFragment,
   writeToClipboard,
 } from "@fontra/core/utils.js";
@@ -100,7 +99,7 @@ export class FontOverviewController extends ViewController {
     const myMenuBar = makeFontraMenuBar(["File", "Edit", "View", "Font"], this);
     document.querySelector(".top-bar-container").appendChild(myMenuBar);
 
-    this.updateGlyphSelection = throttleCalls(() => this._updateGlyphSelection(), 50);
+    this.updateGlyphSelection = consolidateCalls(() => this._updateGlyphSelection());
 
     this.updateWindowLocation = scheduleCalls(
       (event) => this._updateWindowLocation(),
@@ -337,7 +336,7 @@ export class FontOverviewController extends ViewController {
     this._fontGlyphItemList = this.glyphOrganizer.sortGlyphs(
       glyphMapToItemList(this.fontController.glyphMap)
     );
-    this._updateGlyphSelection();
+    this.updateGlyphSelection();
   }
 
   async _updateGlyphSelection() {
