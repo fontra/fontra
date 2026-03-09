@@ -16,7 +16,7 @@ import {
   PROJECT_GLYPH_SETS_CUSTOM_DATA_KEY,
   readProjectGlyphSets,
   THIS_FONTS_GLYPHSET,
-} from "@fontra/core/glyphset-ui.js";
+} from "@fontra/core/glyphsets-ui.js";
 import * as html from "@fontra/core/html-utils.js";
 import { loaderSpinner } from "@fontra/core/loader-spinner.js";
 import { translate } from "@fontra/core/localization.js";

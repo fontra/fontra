@@ -3,7 +3,7 @@ import {
   CheckboxGroup,
   GlyphSetsUIController,
   glyphSetsUIStyles,
-} from "@fontra/core/glyphset-ui.js";
+} from "@fontra/core/glyphsets-ui.js";
 import * as html from "@fontra/core/html-utils.js";
 import { translate } from "@fontra/core/localization.js";
 import { ObservableController } from "@fontra/core/observable-object.js";
