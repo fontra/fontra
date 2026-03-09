@@ -32,12 +32,12 @@ export class FontOverviewNavigation extends HTMLElement {
   }
 
   async _setupUI() {
-    this.searchField = new GlyphSearchField({
-      settingsController: this.fontOverviewSettingsController,
-      searchStringKey: "searchString",
-    });
-
-    this.appendChild(this.searchField);
+    this.appendChild(
+      new GlyphSearchField({
+        settingsController: this.fontOverviewSettingsController,
+        searchStringKey: "searchString",
+      })
+    );
 
     this.groupByCheckboxGroup = new CheckboxGroup(
       this.fontOverviewSettingsController,
