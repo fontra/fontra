@@ -18,7 +18,13 @@ import {
   labeledTextInput,
   popupSelect,
 } from "./ui-utils.js";
-import { assert, fetchJSON, glyphMapToItemList, sleepAsync } from "./utils.js";
+import {
+  assert,
+  fetchJSON,
+  friendlyHttpStatus,
+  glyphMapToItemList,
+  sleepAsync,
+} from "./utils.js";
 
 export const glyphSetsUIStyles = `
 .glyph-set-container {
