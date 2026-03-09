@@ -28,8 +28,16 @@ export class FontOverviewNavigation extends HTMLElement {
       fontOverviewController.fontOverviewSettingsController;
     this.fontOverviewSettings = this.fontOverviewSettingsController.model;
 
-    this._checkboxControllers = {};
-    this._glyphSetErrorButtons = {};
+    this._setupUI();
+  }
+
+  async _setupUI() {
+    this.searchField = new GlyphSearchField({
+      settingsController: this.fontOverviewSettingsController,
+      searchStringKey: "searchString",
+    });
+
+    this.appendChild(this.searchField);
 
     this.groupByCheckboxGroup = new CheckboxGroup(
       this.fontOverviewSettingsController,
@@ -45,6 +53,7 @@ export class FontOverviewNavigation extends HTMLElement {
         addGlyphSetToolTip: "Add a glyph set to the project",
         copyToLabel: "my glyph sets",
         otherCollectionKey: "myGlyphSets",
+        accordionId: "panel-navigation-accordion",
       }
     );
     this.myGlyphSets = new GlyphSetsController(this.fontOverviewSettingsController, {
@@ -55,21 +64,13 @@ export class FontOverviewNavigation extends HTMLElement {
       addGlyphSetToolTip: "Add a glyph set to my sets",
       copyToLabel: "project glyph sets",
       otherCollectionKey: "projectGlyphSets",
+      accordionId: "panel-navigation-accordion",
     });
-
-    this._setupUI();
-  }
-
-  async _setupUI() {
-    this.searchField = new GlyphSearchField({
-      settingsController: this.fontOverviewSettingsController,
-      searchStringKey: "searchString",
-    });
-
-    this.appendChild(this.searchField);
 
     const accordion = new Accordion();
     this.accordion = accordion;
+
+    accordion.id = "panel-navigation-accordion";
 
     accordion.appendStyle(`
       .glyph-set-container {
@@ -174,9 +175,6 @@ export class FontOverviewNavigation extends HTMLElement {
     this.appendChild(
       html.div({ class: "font-overview-navigation-section" }, [accordion])
     );
-
-    this.projectGlyphSets.updateGlyphSets();
-    this.myGlyphSets.updateGlyphSets();
   }
 
   async _makeFontSourcePopup() {
@@ -276,14 +274,6 @@ export class FontOverviewNavigation extends HTMLElement {
 
     return locationElement;
   }
-
-  _openGlyphSetsItem(isProjectGlyphSet) {
-    if (isProjectGlyphSet) {
-      this.accordion.openCloseAccordionItem(this._projectGlyphSetsItem, true);
-    } else {
-      this.accordion.openCloseAccordionItem(this._myGlyphSetsItem, true);
-    }
-  }
 }
 
 customElements.define("font-overview-navigation", FontOverviewNavigation);
@@ -298,6 +288,7 @@ class GlyphSetsController {
       addGlyphSetToolTip,
       copyToLabel,
       otherCollectionKey,
+      accordionId,
     } = options;
 
     this.settingsController = settingsController;
@@ -306,6 +297,7 @@ class GlyphSetsController {
     this.selectionKey = selectionKey;
     this.copyToLabel = copyToLabel;
     this.otherCollectionKey = otherCollectionKey;
+    this.accordionId = accordionId;
 
     this.glyphSetErrorButtons = {};
     this.checkboxGroup = new CheckboxGroup(settingsController, selectionKey);
@@ -351,6 +343,8 @@ class GlyphSetsController {
       },
       true
     );
+
+    this.updateGlyphSets();
   }
 
   updateGlyphSets() {
@@ -378,8 +372,8 @@ class GlyphSetsController {
       this.settings[this.collectionKey] = glyphSets;
     }
 
-    // console.log("ensure accordion item is OPEN");
-    // this._openGlyphSetsItem(isProjectGlyphSet);
+    const accordion = document.getElementById(this.accordionId);
+    accordion?.openCloseAccordionItem(this.accordionItem, true);
   }
 
   async editGlyphSet(event, glyphSetInfo = null) {
