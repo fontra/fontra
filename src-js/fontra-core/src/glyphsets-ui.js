@@ -1,0 +1,865 @@
+import { IconButton } from "@fontra/web-components/icon-button.js"; // required for "icon-button"
+import { showMenu } from "@fontra/web-components/menu-panel.js";
+import { dialogSetup, message } from "@fontra/web-components/modal-dialog.js";
+import { PopupMenu } from "@fontra/web-components/popup-menu.js";
+import { getGlyphMapProxy } from "./cmap.js";
+import * as html from "./html-utils.js";
+import { translate } from "./localization.js";
+import { ObservableController } from "./observable-object.js";
+import {
+  glyphSetDataFormats,
+  parseGlyphSet,
+  redirectGlyphSetURL,
+} from "./parse-glyphset.js";
+import { union } from "./set-ops.js";
+import {
+  labeledCheckbox,
+  labeledPopupSelect,
+  labeledTextInput,
+  popupSelect,
+} from "./ui-utils.js";
+import { assert, fetchJSON, glyphMapToItemList, sleepAsync } from "./utils.js";
+
+export const glyphSetsUIStyles = `
+.glyph-set-container {
+  display: grid;
+  justify-items: left;
+  gap: 0.5em;
+}
+
+.checkbox-group {
+  width: 100%;
+  display: grid;
+  grid-template-columns: auto auto;
+  justify-content: space-between;
+}
+
+.glyphset-button-group {
+  display: grid;
+  grid-template-columns: auto auto;
+  gap: 0.2em;
+  align-items: center;
+}
+
+icon-button {
+  width: 1.3em;
+  height: 1.3em;
+}
+
+.glyphset-error-button {
+  color: var(--fontra-light-red-color);
+  opacity: 0;
+}
+
+.glyphset-error-button.glyphset-error {
+  opacity: 1;
+}
+
+.glyphset-error-button.loading {
+  opacity: 1;
+  color: #8888;
+  animation: loading-spinner 0.8s linear infinite;
+}
+
+@keyframes loading-spinner {
+  to {
+    transform: rotate(360deg);
+  }
+}
+`;
+
+export class GlyphSetsUIController {
+  constructor(settingsController, options) {
+    const {
+      label,
+      id,
+      collectionKey,
+      selectionKey,
+      addGlyphSetToolTip,
+      copyToLabel,
+      otherCollectionKey,
+      accordionId,
+    } = options;
+
+    this.settingsController = settingsController;
+    this.settings = settingsController.model;
+    this.collectionKey = collectionKey;
+    this.selectionKey = selectionKey;
+    this.copyToLabel = copyToLabel;
+    this.otherCollectionKey = otherCollectionKey;
+    this.accordionId = accordionId;
+
+    this.glyphSetErrorButtons = {};
+    this.checkboxGroup = new CheckboxGroup(settingsController, selectionKey);
+    this.accordionItem = {
+      label,
+      id,
+      content: html.div(),
+      auxiliaryHeaderElement: this.makeAddGlyphSetButton(addGlyphSetToolTip),
+    };
+
+    settingsController.addKeyListener(collectionKey, (event) => this.updateGlyphSets());
+
+    settingsController.addKeyListener(
+      "glyphSetErrors",
+      (event) => {
+        const allKeys = union(
+          new Set(Object.keys(event.oldValue)),
+          Object.keys(event.newValue)
+        );
+        for (const key of allKeys) {
+          if (event.oldValue[key] === event.newValue[key]) {
+            continue;
+          }
+
+          const isLoading = event.newValue[key] === "...";
+
+          const errorButton = this.glyphSetErrorButtons[key];
+          if (!errorButton) {
+            continue;
+          }
+
+          errorButton.src = isLoading
+            ? "/tabler-icons/loader-2.svg"
+            : "/tabler-icons/alert-triangle.svg";
+
+          errorButton.classList.toggle(
+            "glyphset-error",
+            !!(event.newValue[key] && event.newValue[key] !== "...")
+          );
+
+          errorButton.classList.toggle("loading", event.newValue[key] === "...");
+        }
+      },
+      true
+    );
+
+    this.updateGlyphSets();
+  }
+
+  updateGlyphSets() {
+    this.accordionItem.content.innerHTML = "";
+    this.accordionItem.content.appendChild(this.makeGlyphSetsUI());
+  }
+
+  makeAddGlyphSetButton(toolTip) {
+    return html.createDomElement("icon-button", {
+      "src": "/images/plus.svg",
+      "onclick": (event) => this.addGlyphSet(event),
+      "data-tooltip": toolTip,
+      "data-tooltipposition": "left",
+    });
+  }
+
+  async addGlyphSet(event) {
+    const { glyphSets, custom } = await runAddGlyphSetDialog(
+      this.settings[this.collectionKey]
+    );
+
+    if (custom) {
+      await this.editGlyphSet(event);
+    } else if (glyphSets) {
+      this.settings[this.collectionKey] = glyphSets;
+    }
+
+    const accordion = document.getElementById(this.accordionId);
+    accordion?.openCloseAccordionItem(this.accordionItem, true);
+  }
+
+  async editGlyphSet(event, glyphSetInfo = null) {
+    const glyphSet = await runEditGlyphSetDialog(glyphSetInfo);
+    if (!glyphSet) {
+      return;
+    }
+
+    const glyphSets = {
+      ...this.settings[this.collectionKey],
+    };
+    if (glyphSetInfo?.url) {
+      delete glyphSets[glyphSetInfo.url];
+    }
+    glyphSets[glyphSet.url] = glyphSet;
+    this.settings[this.collectionKey] = glyphSets;
+  }
+
+  deleteGlyphSet(event, glyphSetInfo) {
+    const glyphSets = {
+      ...this.settings[this.collectionKey],
+    };
+    delete glyphSets[glyphSetInfo.url];
+    this.settings[this.collectionKey] = glyphSets;
+  }
+
+  reloadGlyphSet(event, glyphSet) {
+    this.settings[this.collectionKey] = {
+      ...this.settings[this.collectionKey],
+      [glyphSet.url]: { ...glyphSet },
+    };
+  }
+
+  copyGlyphSet(event, glyphSet) {
+    this.settings[this.otherCollectionKey] = {
+      ...this.settings[this.otherCollectionKey],
+      [glyphSet.url]: glyphSet,
+    };
+  }
+
+  makeGlyphSetsUI() {
+    const glyphSets = this.prepareGlyphSets(this.settings[this.collectionKey]);
+
+    return html.div({ class: "glyph-set-container" }, [
+      this.checkboxGroup.makeCheckboxUI(glyphSets),
+    ]);
+  }
+
+  prepareGlyphSets(glyphSets) {
+    return Object.entries(glyphSets)
+      .map(([key, glyphSet]) => ({
+        key,
+        label: glyphSet.name,
+        extraItem: glyphSet.url
+          ? html.div({ class: "glyphset-button-group" }, [
+              this.makeGlyphSetErrorButton(glyphSet),
+              this.makeGlyphSetMenuButton(glyphSet),
+            ])
+          : null,
+      }))
+      .sort((a, b) => {
+        if (a.label == b.label) {
+          return 0;
+        }
+        if (!a.key) {
+          return -1;
+        } else if (!b.key) {
+          return 1;
+        }
+        return a.label < b.label ? -1 : 1;
+      });
+  }
+
+  makeGlyphSetMenuButton(glyphSet) {
+    return html.createDomElement("icon-button", {
+      src: "/tabler-icons/pencil.svg",
+      onclick: (event) => {
+        const buttonRect = event.target.getBoundingClientRect();
+        showMenu(
+          [
+            {
+              title: "Edit",
+              callback: (event) => {
+                this.editGlyphSet(event, glyphSet);
+              },
+            },
+            {
+              title: "Delete",
+              callback: (event) => {
+                this.deleteGlyphSet(event, glyphSet);
+              },
+            },
+            {
+              title: "Reload",
+              callback: (event) => {
+                this.reloadGlyphSet(event, glyphSet);
+              },
+            },
+            {
+              title: `Copy to ${this.copyToLabel}`,
+              callback: (event) => {
+                this.copyGlyphSet(event, glyphSet);
+              },
+            },
+          ],
+          {
+            x: buttonRect.left,
+            y: buttonRect.bottom,
+          }
+        );
+      },
+      // "data-tooltip": "------",
+      // "data-tooltipposition": "left",
+    });
+  }
+
+  makeGlyphSetErrorButton(glyphSet) {
+    const errorButton = html.createDomElement("icon-button", {
+      class: "glyphset-error-button",
+      src: "/tabler-icons/alert-triangle.svg",
+      onclick: (event) => {
+        const errorMessage = this.settings.glyphSetErrors[glyphSet.url];
+        if (errorMessage) {
+          message(`The glyph set “${glyphSet.name}” could not be loaded`, errorMessage);
+        }
+      },
+    });
+
+    this.glyphSetErrorButtons[glyphSet.url] = errorButton;
+
+    return errorButton;
+  }
+}
+
+export class CheckboxGroup {
+  constructor(settingsController, settingsKey) {
+    this.checkboxController = makeCheckboxController(settingsController, settingsKey);
+  }
+
+  makeCheckboxUI(checkboxItems) {
+    return html.div({ class: "checkbox-group" }, [
+      ...checkboxItems
+        .map(({ key, label, extraItem }) => [
+          labeledCheckbox(label, this.checkboxController, key),
+          extraItem ? extraItem : html.div(),
+        ])
+        .flat(),
+    ]);
+  }
+}
+
+function makeCheckboxController(settingsController, settingsKey) {
+  const settings = settingsController.model;
+
+  const checkboxController = new ObservableController(
+    Object.fromEntries(settings[settingsKey].map((key) => [key, true]))
+  );
+
+  checkboxController.addListener((event) => {
+    if (!event.senderInfo?.sentFromSettings) {
+      settings[settingsKey] = Object.entries(checkboxController.model)
+        .filter(([key, value]) => value)
+        .map(([key, value]) => key);
+    }
+  });
+
+  settingsController.addKeyListener(settingsKey, (event) => {
+    checkboxController.withSenderInfo({ sentFromSettings: true }, () => {
+      Object.entries(checkboxController.model).forEach(([key, value]) => {
+        checkboxController.model[key] = event.newValue.includes(key);
+      });
+    });
+  });
+
+  return checkboxController;
+}
+
+let glyphSetPresets;
+
+fetchJSON("/data/glyphset-presets.json", { cache: "no-cache" }).then((result) => {
+  glyphSetPresets = result;
+});
+
+async function runAddGlyphSetDialog(initialGlyphSets) {
+  const dialog = new AddPresetGlyphSetDialog(initialGlyphSets);
+  return await dialog.run();
+}
+
+const CHECKBOX_PREFIX = "checkbox-";
+const SELECTED_GLYPHSET_LOCAL_STORAGE_KEY = "fontra-selected-glyphset-collection";
+
+class AddPresetGlyphSetDialog {
+  static styles = `
+    .content-container {
+      display: grid;
+      grid-template-columns: max-content auto;
+      align-items: center;
+      align-content: start;
+      gap: 0.5em;
+      height: calc(80vh - 10em); /* Nasty: the 10em value depends on the rest of the contents */
+    }
+
+    .checkbox-container {
+      height: 100%;
+      overflow: scroll;
+    }
+
+    .checkbox-group {
+      display: grid;
+    }
+
+    a {
+      color: var(--foreground-color);
+      text-decoration: underline;
+    }
+
+    a.suggest-link {
+      font-style: italic;
+    }
+
+    .collection-popup {
+      width: 18em;
+    }
+  `;
+
+  constructor(initialGlyphSets) {
+    this.initialGlyphSets = initialGlyphSets;
+    this.dialogController = new ObservableController({
+      ...Object.fromEntries(
+        Object.values(initialGlyphSets).map((glyphSet) => [
+          CHECKBOX_PREFIX + glyphSet.url,
+          true,
+        ])
+      ),
+    });
+
+    this.sourceURLElement = html.a(
+      {
+        id: "info-link",
+        target: "_blank",
+      },
+      [this.dialogController.model.sourceURL || ""]
+    );
+    this.checkboxContainer = html.div({ class: "checkbox-container" });
+
+    const collectionNames = glyphSetPresets.map((collection) => collection.name);
+    collectionNames.sort();
+
+    this.dialogContent = html.div({ class: "content-container" }, [
+      ...labeledPopupSelect(
+        "Collection",
+        this.dialogController,
+        "collectionName",
+        collectionNames.map((name) => ({ value: name, label: name })),
+        { class: "collection-popup" }
+      ),
+      html.div(),
+      html.a(
+        {
+          href: "https://github.com/fontra/fontra/discussions/1943",
+          target: "_blank",
+          class: "suggest-link",
+        },
+        ["Suggest more glyph set collections"]
+      ),
+      html.label({ for: "info-link", style: "text-align: right;" }, ["Source"]),
+      this.sourceURLElement,
+      html.div(), // grid cell filler
+      this.checkboxContainer,
+    ]);
+
+    this.dialogController.addKeyListener("collectionName", (event) => {
+      this.setSelectedGlyphsetCollection(event.newValue);
+      localStorage.setItem(SELECTED_GLYPHSET_LOCAL_STORAGE_KEY, event.newValue);
+    });
+
+    this.dialogController.model.collectionName =
+      localStorage.getItem(SELECTED_GLYPHSET_LOCAL_STORAGE_KEY) || "Google Fonts";
+  }
+
+  setSelectedGlyphsetCollection(collectionName) {
+    const collection = glyphSetPresets.find(
+      (collection) => collection.name === collectionName
+    );
+    this.sourceURLElement.href = collection.sourceURL;
+    this.sourceURLElement.innerText = collection.sourceURL;
+    this.checkboxContainer.innerHTML = "";
+    this.checkboxContainer.appendChild(this.checkboxesForCollection(collection));
+  }
+
+  checkboxesForCollection(collection) {
+    const checkboxes = collection.glyphSets.map((glyphSet) => {
+      const key = CHECKBOX_PREFIX + glyphSet.url;
+      return labeledCheckbox(glyphSet.name, this.dialogController, key);
+    });
+    return html.div({}, checkboxes);
+  }
+
+  async run() {
+    const dialog = await dialogSetup("Add/remove preset glyph sets", "", [
+      { title: "Add custom glyph set...", resultValue: "custom" }, // TODO: translate
+      { title: translate("dialog.cancel"), isCancelButton: true },
+      { title: "Save", isDefaultButton: true, resultValue: "add" }, // TODO: translate
+    ]);
+
+    dialog.appendStyle(this.constructor.styles);
+    dialog.setContent(this.dialogContent);
+
+    const result = await dialog.run();
+    if (result === "custom") {
+      return { custom: true };
+    } else if (result !== "add") {
+      return {};
+    }
+
+    const allGlyphSetsByURL = {};
+    for (const collection of glyphSetPresets) {
+      for (const glyphSet of collection.glyphSets) {
+        allGlyphSetsByURL[glyphSet.url] = { glyphSet, collection };
+      }
+    }
+    const glyphSets = { ...this.initialGlyphSets };
+    for (const [key, value] of Object.entries(this.dialogController.model)) {
+      if (!key.startsWith(CHECKBOX_PREFIX)) {
+        continue;
+      }
+      const url = key.slice(CHECKBOX_PREFIX.length);
+      if (!url) {
+        continue;
+      }
+      if (value) {
+        if (allGlyphSetsByURL[url]) {
+          const { glyphSet, collection } = allGlyphSetsByURL[url];
+          glyphSets[url] = { ...collection.dataOptions, ...glyphSet };
+        }
+      } else {
+        delete glyphSets[url];
+      }
+    }
+    return { glyphSets };
+  }
+}
+
+async function runEditGlyphSetDialog(glyphSetInfo) {
+  const isEditing = !!glyphSetInfo;
+  glyphSetInfo = {
+    dataFormat: "glyph-names",
+    codePointIsDecimal: false,
+    ...glyphSetInfo,
+  };
+  const dialogController = new ObservableController(glyphSetInfo);
+
+  const validateInput = () => {
+    let valid = true;
+    let url;
+    try {
+      url = new URL(dialogController.model.url);
+    } catch (e) {
+      valid = false;
+    }
+    if (url?.pathname.length <= 1 || !url?.hostname.includes(".")) {
+      valid = false;
+    }
+    if (!dialogController.model.name) {
+      valid;
+    }
+    // TODO: warningsElement: say what/why it's invalid
+    dialog.defaultButton.classList.toggle("disabled", !valid);
+  };
+
+  const updateDataFormat = () => {
+    dialog.style.setProperty(
+      "--glyphset-data-format-tsv-csv-display",
+      dialogController.model.dataFormat === "tsv/csv" ? "initial" : "none"
+    );
+  };
+
+  dialogController.addListener((event) => validateInput());
+  dialogController.addKeyListener("dataFormat", (event) => updateDataFormat());
+
+  const dialog = await dialogSetup(
+    isEditing ? "Edit glyph set" : "Add custom glyph set",
+    "",
+    [
+      { title: translate("dialog.cancel"), isCancelButton: true },
+      {
+        title: translate(isEditing ? "Save" : "dialog.add"), // TODO: translate dialog.save
+        isDefaultButton: true,
+        disabled: true,
+      },
+    ]
+  );
+
+  validateInput();
+  updateDataFormat();
+
+  const contentStyle = `
+  .glyph-set-dialog-content {
+    display: grid;
+    gap: 0.5em;
+    grid-template-columns: max-content auto;
+    align-items: center;
+    width: 38em;
+  }
+
+  .code-point-popup {
+    width: max-content;
+  }
+
+  .tsv-csv-only {
+    display: var(--glyphset-data-format-tsv-csv-display, initial);
+  }
+  `;
+
+  dialog.appendStyle(contentStyle);
+
+  const codePointIsDecimal = [
+    { value: false, label: "Hexadecimal" },
+    { value: true, label: "Decimal" },
+  ];
+
+  dialog.setContent(
+    html.div({ class: "glyph-set-dialog-content" }, [
+      ...labeledTextInput("Name", dialogController, "name"),
+      ...labeledTextInput("URL", dialogController, "url"),
+      ...labeledTextInput("Note", dialogController, "note"),
+      ...labeledPopupSelect(
+        "Data format",
+        dialogController,
+        "dataFormat",
+        glyphSetDataFormats
+      ),
+      ...labeledTextInput("Comment characters", dialogController, "commentChars"),
+      html.div({ class: "tsv-csv-only" }), // grid cell filler
+      labeledCheckbox("Has header", dialogController, "hasHeader", {
+        class: "tsv-csv-only",
+      }),
+      ...labeledTextInput("Glyph name column", dialogController, "glyphNameColumn", {
+        class: "tsv-csv-only",
+        labelClass: "tsv-csv-only",
+      }),
+      ...labeledTextInput("Code point column", dialogController, "codePointColumn", {
+        class: "tsv-csv-only",
+        labelClass: "tsv-csv-only",
+      }),
+      ...labeledPopupSelect(
+        "Code point",
+        dialogController,
+        "codePointIsDecimal",
+        codePointIsDecimal,
+        { class: "code-point-popup tsv-csv-only", labelClass: "tsv-csv-only" }
+      ),
+    ])
+  );
+  const result = await dialog.run();
+  return !!(result && glyphSetInfo.name && glyphSetInfo.url) ? glyphSetInfo : null;
+}
+
+export const THIS_FONTS_GLYPHSET = "";
+export const PROJECT_GLYPH_SETS_CUSTOM_DATA_KEY = "fontra.projectGlyphSets";
+
+export class GlyphSetsManager {
+  constructor(fontController, settingsController, myGlyphSetsController) {
+    this.fontController = fontController;
+    this.settingsController = settingsController;
+    this.settings = settingsController.model;
+    this.myGlyphSetsController = myGlyphSetsController;
+
+    this._loadedGlyphSets = {};
+
+    this.setupProjectGlyphSetsDependencies();
+    this.setupMyGlyphSetsDependencies();
+  }
+
+  async getCombineGlyphItemList(fontGlyphItemList) {
+    /*
+      Merge selected glyph sets. When multiple glyph sets define a character
+      but the glyph name does not match:
+      - If the font defines this character, take the font's glyph name for it
+      - Else take the glyph name from the first glyph set that defines the
+        character
+      The latter is arbitrary, but should still be deterministic, as glyph sets
+      should be sorted.
+      If the conflicting glyph name references multiple code points, we bail,
+      as it is not clear how to resolve.
+    */
+    const fontCharacterMap = this.fontController.characterMap;
+    const combinedCharacterMap = {};
+    const combinedGlyphMap = getGlyphMapProxy({}, combinedCharacterMap);
+
+    const glyphSetKeys = [
+      ...new Set([
+        ...this.settings.projectGlyphSetSelection,
+        ...this.settings.myGlyphSetSelection,
+      ]),
+    ];
+    glyphSetKeys.sort();
+
+    const glyphSets = (
+      await Promise.all(
+        glyphSetKeys.map((glyphSetKey) =>
+          glyphSetKey ? this.loadGlyphSet(glyphSetKey) : fontGlyphItemList
+        )
+      )
+    ).filter((glyphSet) => glyphSet);
+
+    for (const glyphSet of glyphSets) {
+      for (const { glyphName, codePoints } of glyphSet) {
+        const singleCodePoint = codePoints.length === 1 ? codePoints[0] : null;
+        const foundGlyphName =
+          singleCodePoint !== null
+            ? combinedCharacterMap[singleCodePoint] || fontCharacterMap[singleCodePoint]
+            : null;
+
+        if (foundGlyphName) {
+          if (!combinedGlyphMap[foundGlyphName]) {
+            combinedGlyphMap[foundGlyphName] = codePoints;
+          }
+        } else if (!combinedGlyphMap[glyphName]) {
+          combinedGlyphMap[glyphName] = codePoints;
+        }
+      }
+    }
+
+    const combinedItemList = glyphMapToItemList(combinedGlyphMap);
+    // When overlaying multiple glyph sets, sort the list, or else we
+    // may end up with a garbled mess of ordering
+    return { combinedItemList, shouldSort: glyphSetKeys.length > 1 };
+  }
+
+  async loadGlyphSet(glyphSetKey) {
+    assert(glyphSetKey);
+    await sleepAsync(0);
+
+    const glyphSetInfo =
+      this.settings.projectGlyphSets[glyphSetKey] ||
+      this.settings.myGlyphSets[glyphSetKey];
+
+    if (!glyphSetInfo) {
+      // console.log(`can't find glyph set info for ${glyphSetKey}`);
+      return;
+    }
+
+    return await this.fetchGlyphSet(glyphSetInfo);
+  }
+
+  async fetchGlyphSet(glyphSetInfo) {
+    assert(glyphSetInfo.url);
+
+    let glyphSet = this._loadedGlyphSets[glyphSetInfo.url];
+    if (!glyphSet) {
+      let glyphSetData;
+      this.setErrorMessageForGlyphSet(glyphSetInfo.url, "...");
+      const redirectedURL = redirectGlyphSetURL(glyphSetInfo.url);
+      try {
+        const response = await fetch(redirectedURL);
+        if (response.ok) {
+          glyphSetData = await response.text();
+          this.setErrorMessageForGlyphSet(glyphSetInfo.url, null);
+        } else {
+          this.setErrorMessageForGlyphSet(
+            glyphSetInfo.url,
+            `Could not fetch glyph set: ${friendlyHttpStatus[response.status]} (${
+              response.status
+            })`
+          );
+        }
+      } catch (e) {
+        console.log(`could not fetch ${glyphSetInfo.url}`);
+        console.error();
+        this.setErrorMessageForGlyphSet(
+          glyphSetInfo.url,
+          `Could not fetch glyph set: ${e.toString()}`
+        );
+      }
+
+      if (glyphSetData) {
+        try {
+          glyphSet = parseGlyphSet(glyphSetData, glyphSetInfo.dataFormat, {
+            commentChars: glyphSetInfo.commentChars,
+            hasHeader: glyphSetInfo.hasHeader,
+            glyphNameColumn: glyphSetInfo.glyphNameColumn,
+            codePointColumn: glyphSetInfo.codePointColumn,
+            codePointIsDecimal: glyphSetInfo.codePointIsDecimal,
+          });
+        } catch (e) {
+          this.setErrorMessageForGlyphSet(
+            glyphSetInfo.url,
+            `Could not parse glyph set: ${e.toString()}`
+          );
+          console.error(e);
+        }
+      }
+
+      if (glyphSet) {
+        this._loadedGlyphSets[glyphSetInfo.url] = glyphSet;
+      }
+    }
+
+    return glyphSet || [];
+  }
+
+  setErrorMessageForGlyphSet(url, message) {
+    const glyphSetErrors = { ...this.settings.glyphSetErrors };
+    if (message) {
+      glyphSetErrors[url] = message;
+    } else {
+      delete glyphSetErrors[url];
+    }
+
+    this.settings.glyphSetErrors = glyphSetErrors;
+  }
+
+  setupProjectGlyphSetsDependencies() {
+    this.fontController.addChangeListener(
+      { customData: { [PROJECT_GLYPH_SETS_CUSTOM_DATA_KEY]: null } },
+      (change, isExternalChange) => {
+        if (isExternalChange) {
+          this.settingsController.setItem(
+            "projectGlyphSets",
+            readProjectGlyphSets(this.fontController),
+            { sentFromExternalChange: true }
+          );
+        }
+      }
+    );
+
+    this.settingsController.addKeyListener("projectGlyphSets", async (event) => {
+      if (event.senderInfo?.sentFromExternalChange) {
+        return;
+      }
+      this.updateLoadedGlyphSets(event.oldValue, event.newValue);
+
+      const changes = await this.fontController.performEdit(
+        "edit glyph sets",
+        "customData",
+        (root) => {
+          const projectGlyphSets = Object.values(event.newValue).filter(
+            (glyphSet) => glyphSet.url !== THIS_FONTS_GLYPHSET
+          );
+          root.customData[PROJECT_GLYPH_SETS_CUSTOM_DATA_KEY] = projectGlyphSets;
+        },
+        this
+      );
+
+      this.settings.projectGlyphSetSelection =
+        this.settings.projectGlyphSetSelection.filter((name) => !!event.newValue[name]);
+    });
+  }
+
+  setupMyGlyphSetsDependencies() {
+    // This synchronizes the myGlyphSets object with local storage
+    this.settingsController.addKeyListener("myGlyphSets", (event) => {
+      this.updateLoadedGlyphSets(event.oldValue, event.newValue);
+
+      if (!event.senderInfo?.sentFromLocalStorage) {
+        this.myGlyphSetsController.setItem("settings", event.newValue, {
+          sentFromSettings: true,
+        });
+
+        this.settings.myGlyphSetSelection = this.settings.myGlyphSetSelection.filter(
+          (name) => !!event.newValue[name]
+        );
+      }
+    });
+
+    this.myGlyphSetsController.addKeyListener("settings", (event) => {
+      if (!event.senderInfo?.sentFromSettings) {
+        this.settingsController.setItem("myGlyphSets", event.newValue, {
+          sentFromLocalStorage: true,
+        });
+      }
+    });
+  }
+
+  updateLoadedGlyphSets(oldGlyphSets, newGlyphSets) {
+    const oldAndNewGlyphSets = { ...oldGlyphSets, ...newGlyphSets };
+
+    for (const key of Object.keys(oldAndNewGlyphSets)) {
+      if (oldGlyphSets[key] !== newGlyphSets[key]) {
+        if (oldGlyphSets[key]) {
+          delete this._loadedGlyphSets[oldGlyphSets[key].url];
+        }
+        if (newGlyphSets[key]) {
+          delete this._loadedGlyphSets[newGlyphSets[key].url];
+        }
+      }
+    }
+  }
+}
+
+export function readProjectGlyphSets(fontController) {
+  return Object.fromEntries(
+    [
+      { name: "This font's glyphs", url: THIS_FONTS_GLYPHSET },
+      ...(fontController.customData[PROJECT_GLYPH_SETS_CUSTOM_DATA_KEY] || []),
+    ].map((glyphSet) => [glyphSet.url, glyphSet])
+  );
+}
