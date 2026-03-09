@@ -35,6 +35,7 @@ class GeneratePaltVpalFeature(BaseFilter):
             return features
 
         axisList, axisTagMapping = _makeAxisListAndMapping(axes.axes)
+        defaultLocation = {axis.axisTag: axis.defaultValue for axis in axisList}
 
         w = FeatureWriter()
         for script, language in self.languageSystems:
@@ -57,9 +58,9 @@ class GeneratePaltVpalFeature(BaseFilter):
                     advanceScalar.axes = axisList
                     for location, placementAdjust, advanceAdjust in glyphAdjustments:
                         location = {axisTagMapping[k]: v for k, v in location.items()}
-                        locationTuple = locationToTuple(location)
-                        placementScalar.add_value(locationTuple, placementAdjust)
-                        advanceScalar.add_value(locationTuple, advanceAdjust)
+                        location = defaultLocation | location
+                        placementScalar.add_value(location, placementAdjust)
+                        advanceScalar.add_value(location, advanceAdjust)
                 if isHor:
                     fea.addLine(
                         f"pos {glyphName} <{placementScalar} 0 {advanceScalar} 0>"
@@ -209,6 +210,7 @@ class BaseGenerateKerningFeature(BaseFilter):
         mapLocation = _makeLocationMapFunc(axes.axes)
 
         axisList, axisTagMapping = _makeAxisListAndMapping(axes.axes)
+        defaultLocation = {axis.axisTag: axis.defaultValue for axis in axisList}
 
         locations = [
             locationToTuple(
@@ -252,7 +254,7 @@ class BaseGenerateKerningFeature(BaseFilter):
                     scalar = VariableScalar()
                     scalar.axes = axisList
                     for loc, v in zip(locations, values, strict=True):
-                        scalar.add_value(loc, v)
+                        scalar.add_value(defaultLocation | dict(loc), v)
 
                 enumStr = "enum " if leftIsClass != rightIsClass else ""
                 fea.addLine(f"{enumStr}pos {left} {right} {scalar}")
