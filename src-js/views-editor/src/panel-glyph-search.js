@@ -1,8 +1,4 @@
 import {
-  getMyGlyphSets,
-  readProjectGlyphSets,
-} from "@fontra/core/glyphsets-controller.js";
-import {
   getGlyphSetsUIControllers,
   glyphSetsUIStyles,
 } from "@fontra/core/glyphsets-ui.js";
@@ -123,11 +119,6 @@ export default class GlyphSearchPanel extends Panel {
 
   setupGlyphSetsAccordion() {
     const sceneSettingsController = this.editorController.sceneSettingsController;
-    sceneSettingsController.model.projectGlyphSets = readProjectGlyphSets(
-      this.editorController.fontController
-    );
-
-    sceneSettingsController.model.myGlyphSets = getMyGlyphSets();
 
     const accordionId = "panel-glyph-search-accordion";
     const [projectGlyphSets, myGlyphSets] = getGlyphSetsUIControllers(

@@ -14,7 +14,11 @@ import {
   decomposeComponents,
   roundComponentOrigins,
 } from "@fontra/core/glyph-controller.js";
-import { GlyphSetsController } from "@fontra/core/glyphsets-controller.js";
+import {
+  GlyphSetsController,
+  getMyGlyphSets,
+  readProjectGlyphSets,
+} from "@fontra/core/glyphsets-controller.js";
 import { translate, translatePlural } from "@fontra/core/localization.js";
 import { MouseTracker } from "@fontra/core/mouse-tracker.js";
 import { ObservableController } from "@fontra/core/observable-object.js";
@@ -129,13 +133,16 @@ export class SceneController {
       shaperInfo: null,
       dumbShaperInfo: null,
       projectGlyphSets: {},
-      myGlyphSets: {},
+      myGlyphSets: getMyGlyphSets(),
       projectGlyphSetSelection: [],
       myGlyphSetSelection: [],
     });
     this.sceneSettings = this.sceneSettingsController.model;
 
     this.fontController.ensureInitialized.then(() => {
+      this.sceneSettingsController.model.projectGlyphSets = readProjectGlyphSets(
+        this.fontController
+      );
       this.updateShaperInfo();
     });
 
