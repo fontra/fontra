@@ -869,3 +869,28 @@ export function readProjectGlyphSets(fontController) {
     ].map((glyphSet) => [glyphSet.url, glyphSet])
   );
 }
+
+export function getGlyphSetsUIControllers(settingsController, accordionId) {
+  return [
+    new GlyphSetsUIController(settingsController, {
+      label: "Project glyph sets", // TODO: translate
+      id: "project-glyph-sets",
+      collectionKey: "projectGlyphSets",
+      selectionKey: "projectGlyphSetSelection",
+      addGlyphSetToolTip: "Add a glyph set to the project",
+      copyToLabel: "my glyph sets",
+      otherCollectionKey: "myGlyphSets",
+      accordionId,
+    }),
+    new GlyphSetsUIController(settingsController, {
+      label: "My glyph sets", // TODO: translate
+      id: "my-glyph-sets",
+      collectionKey: "myGlyphSets",
+      selectionKey: "myGlyphSetSelection",
+      addGlyphSetToolTip: "Add a glyph set to my sets",
+      copyToLabel: "project glyph sets",
+      otherCollectionKey: "projectGlyphSets",
+      accordionId,
+    }),
+  ];
+}
