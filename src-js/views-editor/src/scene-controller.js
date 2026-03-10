@@ -119,7 +119,7 @@ export class SceneController {
       selection: new Set(),
       hoverSelection: new Set(),
       combinedSelection: new Set(), // dynamic: selection | hoverSelection
-      viewBox: this.canvasController.getViewBox(),
+      viewBox: null,
       positionedLines: [],
       backgroundImagesAreLocked: true,
       backgroundLayers: {},
@@ -133,11 +133,14 @@ export class SceneController {
       shaperInfo: null,
       dumbShaperInfo: null,
       projectGlyphSets: {},
-      myGlyphSets: getMyGlyphSets(),
+      myGlyphSets: {},
       projectGlyphSetSelection: [],
       myGlyphSetSelection: [],
     });
     this.sceneSettings = this.sceneSettingsController.model;
+
+    this.sceneSettings.viewBox = this.canvasController.getViewBox();
+    this.sceneSettingsController.model.myGlyphSets = getMyGlyphSets();
 
     this.fontController.ensureInitialized.then(() => {
       this.sceneSettingsController.model.projectGlyphSets = readProjectGlyphSets(
