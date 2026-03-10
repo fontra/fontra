@@ -2,6 +2,7 @@
 
 ## 2026-03-?? [version 2026.3.2]
 
+- Fix: don't draw incorrect placeholder strings for empty unencoded glyphs [PR 2486](https://github.com/fontra/fontra/pull/2486)
 - [fontra-pak] Reinstate support for macOS 11, which was accidentally dropped by unnecessarily upgrading the PyQt6 dependency. [fontra-pak PR 229](https://github.com/fontra/fontra-pak/pull/229)
 - [opentype] Use the previous working shaper font if compilation fails during editing of OpenType features. This avoids jarring text breackage during feature editing. [Issue 2469](https://github.com/fontra/fontra/issues/2469), [PR 2480](https://github.com/fontra/fontra/pull/2480)
 - [translations] Added a full Traditional Chinese set of translation strings, contributed by 湖远星（Lake桑）. They also filled some gaps in the Simplified Chinese strings. [PR 2479](https://github.com/fontra/fontra/pull/2479)
