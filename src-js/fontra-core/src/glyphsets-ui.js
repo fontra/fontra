@@ -102,6 +102,7 @@ export class GlyphSetsUIController {
       id,
       content: html.div(),
       auxiliaryHeaderElement: this.makeAddGlyphSetButton(addGlyphSetToolTip),
+      open: true,
     };
 
     settingsController.addKeyListener(collectionKey, (event) => this.updateGlyphSets());
