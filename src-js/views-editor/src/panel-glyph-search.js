@@ -19,6 +19,7 @@ export default class GlyphSearchPanel extends Panel {
       display: flex;
       gap: 0.5em;
       flex-direction: column;
+      justify-content: space-between;
     }
   `;
 
