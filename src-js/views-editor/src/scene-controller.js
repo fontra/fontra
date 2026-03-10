@@ -125,7 +125,7 @@ export class SceneController {
       backgroundLayers: {},
       editingLayers: {},
       featureSettings: {},
-      textShaping: true,
+      applyTextShaping: true,
       textDirection: null,
       textScript: null,
       textLanguage: null,
