@@ -1,5 +1,12 @@
+import {
+  getGlyphSetsUIControllers,
+  getMyGlyphSets,
+  glyphSetsUIStyles,
+  readProjectGlyphSets,
+} from "@fontra/core/glyphsets-ui.js";
 import * as html from "@fontra/core/html-utils.js";
 import "@fontra/web-components/glyph-search-list.js";
+import { Accordion } from "@fontra/web-components/ui-accordion.js";
 import Panel from "./panel.js";
 
 export default class GlyphSearchPanel extends Panel {
@@ -10,6 +17,7 @@ export default class GlyphSearchPanel extends Panel {
     .glyph-search-section {
       height: 100%;
       display: flex;
+      gap: 0.5em;
       flex-direction: column;
     }
   `;
@@ -83,6 +91,12 @@ export default class GlyphSearchPanel extends Panel {
   }
 
   getContentElement() {
+    this.accordion = html.div({});
+
+    this.editorController.fontController.ensureInitialized.then(() => {
+      this.accordion.replaceWith(this.setupGlyphSetsAccordion());
+    });
+
     return html.div(
       {
         class: "panel",
@@ -96,10 +110,37 @@ export default class GlyphSearchPanel extends Panel {
             html.createDomElement("glyph-search-list", {
               id: "glyph-search-list",
             }),
+            this.accordion,
           ]
         ),
       ]
     );
+  }
+
+  setupGlyphSetsAccordion() {
+    const sceneSettingsController = this.editorController.sceneSettingsController;
+    sceneSettingsController.model.projectGlyphSets = readProjectGlyphSets(
+      this.editorController.fontController
+    );
+
+    sceneSettingsController.model.myGlyphSets = getMyGlyphSets();
+
+    const accordionId = "panel-glyph-search-accordion";
+    const [projectGlyphSets, myGlyphSets] = getGlyphSetsUIControllers(
+      this.editorController.sceneSettingsController,
+      accordionId
+    );
+
+    const accordion = new Accordion();
+    accordion.id = accordionId;
+
+    accordion.appendStyle(glyphSetsUIStyles);
+
+    const accordionItems = [projectGlyphSets.accordionItem, myGlyphSets.accordionItem];
+
+    accordion.items = accordionItems;
+
+    return accordion;
   }
 
   async toggle(on, focus) {
