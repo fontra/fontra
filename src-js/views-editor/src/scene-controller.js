@@ -108,12 +108,10 @@ export class SceneController {
     this.sceneSettings = this.sceneSettingsController.model;
 
     this.sceneSettings.viewBox = this.canvasController.getViewBox();
-    this.sceneSettingsController.model.myGlyphSets = getMyGlyphSets();
+    this.sceneSettings.myGlyphSets = getMyGlyphSets();
 
     this.fontController.ensureInitialized.then(() => {
-      this.sceneSettingsController.model.projectGlyphSets = readProjectGlyphSets(
-        this.fontController
-      );
+      this.sceneSettings.projectGlyphSets = readProjectGlyphSets(this.fontController);
       this.updateShaperInfo();
     });
 
@@ -1713,6 +1711,8 @@ const persistentSceneSettings = [
   { key: "editLayerName" },
   { key: "editingLayers" },
   { key: "selection", waitKeyBefore: "positionedLines" },
+  { key: "projectGlyphSetSelection" },
+  { key: "myGlyphSetSelection" },
 ];
 
 export const persistentSceneSettingsKeys = persistentSceneSettings.map(
