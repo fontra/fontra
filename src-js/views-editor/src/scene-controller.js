@@ -31,7 +31,9 @@ import {
   equalRect,
   offsetRect,
   rectAddMargin,
+  rectFromArray,
   rectRound,
+  rectToArray,
 } from "@fontra/core/rectangle.js";
 import {
   difference,
@@ -45,6 +47,7 @@ import {
   assert,
   commandKeyProperty,
   enumerate,
+  isObjectEmpty,
   objectsEqual,
   parseSelection,
   reversed,
@@ -101,42 +104,7 @@ export class SceneController {
   }
 
   setupSceneSettings() {
-    this.sceneSettingsController = new ObservableController({
-      text: "",
-      align: "center",
-      editLayerName: null,
-      characterLines: [],
-      fontLocationUser: {},
-      fontLocationSource: {},
-      fontLocationSourceMapped: {},
-      fontAxesUseSourceCoordinates: false,
-      fontAxesShowEffectiveLocation: false,
-      fontAxesShowHidden: false,
-      fontAxesSkipMapping: false,
-      glyphLocation: {},
-      selectedGlyph: null,
-      selectedGlyphName: null,
-      selection: new Set(),
-      hoverSelection: new Set(),
-      combinedSelection: new Set(), // dynamic: selection | hoverSelection
-      viewBox: null,
-      positionedLines: [],
-      backgroundImagesAreLocked: true,
-      backgroundLayers: {},
-      editingLayers: {},
-      featureSettings: {},
-      applyTextShaping: true,
-      textDirection: null,
-      textScript: null,
-      textLanguage: null,
-      shaper: null,
-      shaperInfo: null,
-      dumbShaperInfo: null,
-      projectGlyphSets: {},
-      myGlyphSets: {},
-      projectGlyphSetSelection: [],
-      myGlyphSetSelection: [],
-    });
+    this.sceneSettingsController = new ObservableController(getSceneSettingsDefaults());
     this.sceneSettings = this.sceneSettingsController.model;
 
     this.sceneSettings.viewBox = this.canvasController.getViewBox();
@@ -350,6 +318,98 @@ export class SceneController {
     this.sceneSettingsController.addKeyListener("applyTextShaping", (event) =>
       this.updateShaper()
     );
+  }
+
+  async updateSceneSettingsFromViewInfo(viewInfo) {
+    const defaultSettings = getSceneSettingsDefaults();
+    const sceneSettings = this.sceneSettings;
+
+    for (let { key, infoKey, waitKeyBefore, waitKeyAfter } of persistentSceneSettings) {
+      if (!infoKey) {
+        infoKey = key;
+      }
+      assert(key in defaultSettings, key);
+
+      if (waitKeyBefore) {
+        await this.sceneSettingsController.waitForKeyChange(waitKeyBefore);
+      }
+
+      const defaultValue = defaultSettings[key];
+      const viewValue =
+        key !== "viewBox"
+          ? viewInfo[infoKey]
+          : convertViewBoxArrayToRect(viewInfo[infoKey]);
+
+      if (
+        defaultValue === null ||
+        typeof defaultValue == "number" ||
+        typeof defaultValue == "string" ||
+        typeof defaultValue == "boolean"
+      ) {
+        sceneSettings[key] = viewValue ?? defaultValue;
+      } else if (defaultValue instanceof Set) {
+        assert(defaultValue.size === 0, defaultValue);
+        sceneSettings[key] = viewValue ? new Set(viewValue) : defaultValue;
+      } else if (defaultValue instanceof Array) {
+        assert(defaultValue.length === 0, defaultValue);
+        sceneSettings[key] = viewValue ? Array.from(viewValue) : defaultValue;
+      } else if (typeof defaultValue == "object") {
+        assert(isObjectEmpty(defaultValue), defaultValue);
+        sceneSettings[key] = viewValue ?? defaultValue;
+      } else {
+        assert(false, `can't get here ${[key, defaultValue, viewValue]}`);
+      }
+
+      if (waitKeyAfter) {
+        await this.sceneSettingsController.waitForKeyChange(waitKeyAfter);
+      }
+    }
+  }
+
+  getViewInfoFromSceneSettings() {
+    const viewInfo = {};
+
+    const defaultSettings = getSceneSettingsDefaults();
+    const sceneSettings = this.sceneSettings;
+
+    for (let { key, infoKey } of persistentSceneSettings) {
+      if (!infoKey) {
+        infoKey = key;
+      }
+
+      const defaultValue = defaultSettings[key];
+      const settingsValue =
+        key !== "viewBox"
+          ? sceneSettings[key]
+          : convertViewBoxRectToArray(sceneSettings[key]);
+
+      if (
+        defaultValue === null ||
+        typeof defaultValue == "number" ||
+        typeof defaultValue == "string" ||
+        typeof defaultValue == "boolean"
+      ) {
+        if (settingsValue !== defaultValue) {
+          viewInfo[infoKey] = settingsValue;
+        }
+      } else if (defaultValue instanceof Set) {
+        if (settingsValue?.size) {
+          viewInfo[infoKey] = Array.from(settingsValue);
+        }
+      } else if (defaultValue instanceof Array) {
+        if (settingsValue?.length) {
+          viewInfo[infoKey] = Array.from(settingsValue);
+        }
+      } else if (typeof defaultValue == "object") {
+        if (settingsValue && !isObjectEmpty(settingsValue)) {
+          viewInfo[infoKey] = { ...settingsValue };
+        }
+      } else {
+        assert(false, `can't get here ${[key, defaultValue, viewValue]}`);
+      }
+    }
+
+    return viewInfo;
   }
 
   updateShaperInfo() {
@@ -1630,6 +1690,84 @@ class PathConnectDetector {
   clearConnectIndicator() {
     delete this.sceneController.sceneModel.pathConnectTargetPoint;
   }
+}
+
+const persistentSceneSettings = [
+  // Keep this order, may be important
+  { key: "align" },
+  { key: "featureSettings" },
+  { key: "applyTextShaping" },
+  { key: "textDirection" },
+  { key: "textScript" },
+  { key: "textLanguage" },
+  { key: "viewBox" },
+  { key: "text", waitKeyAfter: "characterLines" },
+  // "glyphLocations", // handled separately
+  { key: "fontAxesUseSourceCoordinates" },
+  { key: "fontAxesShowEffectiveLocation" },
+  { key: "fontAxesShowHidden" },
+  { key: "fontAxesSkipMapping" },
+  { key: "fontLocationUser", infoKey: "location" },
+  { key: "selectedGlyph" },
+  { key: "substituteGlyphName" },
+  { key: "editLayerName" },
+  { key: "editingLayers" },
+  { key: "selection", waitKeyBefore: "positionedLines" },
+];
+
+export const persistentSceneSettingsKeys = persistentSceneSettings.map(
+  ({ key }) => key
+);
+
+function getSceneSettingsDefaults() {
+  return {
+    text: "",
+    align: "center",
+    editLayerName: null,
+    characterLines: [],
+    fontLocationUser: {},
+    fontLocationSource: {},
+    fontLocationSourceMapped: {},
+    fontAxesUseSourceCoordinates: false,
+    fontAxesShowEffectiveLocation: false,
+    fontAxesShowHidden: false,
+    fontAxesSkipMapping: false,
+    glyphLocation: {},
+    selectedGlyph: null,
+    selectedGlyphName: null,
+    substituteGlyphName: null,
+    selection: new Set(),
+    hoverSelection: new Set(),
+    combinedSelection: new Set(), // dynamic: selection | hoverSelection
+    viewBox: null,
+    positionedLines: [],
+    backgroundImagesAreLocked: true,
+    backgroundLayers: {},
+    editingLayers: {},
+    featureSettings: {},
+    applyTextShaping: true,
+    textDirection: null,
+    textScript: null,
+    textLanguage: null,
+    shaper: null,
+    shaperInfo: null,
+    dumbShaperInfo: null,
+    projectGlyphSets: {},
+    myGlyphSets: {},
+    projectGlyphSetSelection: [],
+    myGlyphSetSelection: [],
+  };
+}
+
+function convertViewBoxArrayToRect(viewBox) {
+  return viewBox && viewBox.every((value) => !isNaN(value))
+    ? rectFromArray(viewBox)
+    : null;
+}
+
+function convertViewBoxRectToArray(viewBox) {
+  viewBox = viewBox ? rectToArray(viewBox) : null;
+  return viewBox && viewBox.every((value) => !isNaN(value)) ? viewBox : null;
 }
 
 function reversePointSelection(path, pointSelection) {
