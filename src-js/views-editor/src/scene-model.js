@@ -1278,11 +1278,11 @@ class LineSetter {
     }
 
     for (const [glyphIndex, glyphInfo] of enumerate(shapedGlyphs)) {
-      const codePoint = codePoints[glyphInfo.cluster];
+      const fallbackCodePoint = codePoints[glyphInfo.cluster];
       const glyphName =
-        glyphInfo.codepoint != 0 || codePoint >= MAX_UNICODE
+        glyphInfo.codepoint != 0 || fallbackCodePoint >= MAX_UNICODE
           ? glyphInfo.glyphname
-          : getSuggestedGlyphName(codePoint);
+          : getSuggestedGlyphName(fallbackCodePoint);
 
       const isSelectedGlyph = glyphIndex == selectedGlyphIndex;
 
@@ -1315,6 +1315,12 @@ class LineSetter {
               shapedGlyphs[glyphIndex].glyphname
             )
           : 0;
+
+      const codePointForGlyph = isUndefined
+        ? null
+        : fontController.glyphMap[glyphInfo.glyphname]?.[0];
+
+      const codePoint = isUndefined ? fallbackCodePoint : codePointForGlyph;
 
       glyphs.push({
         x: x + glyphInfo.x_offset,
