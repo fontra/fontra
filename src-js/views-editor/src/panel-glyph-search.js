@@ -1,9 +1,12 @@
 import {
-  getGlyphSetsUIControllers,
   getMyGlyphSets,
-  glyphSetsUIStyles,
   readProjectGlyphSets,
+} from "@fontra/core/glyphsets-controller.js";
+import {
+  getGlyphSetsUIControllers,
+  glyphSetsUIStyles,
 } from "@fontra/core/glyphsets-ui.js";
+
 import * as html from "@fontra/core/html-utils.js";
 import "@fontra/web-components/glyph-search-list.js";
 import { Accordion } from "@fontra/web-components/ui-accordion.js";
