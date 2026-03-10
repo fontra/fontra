@@ -13,11 +13,11 @@ import { GlyphOrganizer } from "@fontra/core/glyph-organizer.js";
 import { pathToSVG } from "@fontra/core/glyph-svg.js";
 import {
   getMyGlyphSets,
-  GlyphSetsManager,
+  GlyphSetsController,
   PROJECT_GLYPH_SETS_CUSTOM_DATA_KEY,
   readProjectGlyphSets,
   THIS_FONTS_GLYPHSET,
-} from "@fontra/core/glyphsets-ui.js";
+} from "@fontra/core/glyphsets-controller.js";
 import * as html from "@fontra/core/html-utils.js";
 import { loaderSpinner } from "@fontra/core/loader-spinner.js";
 import { translate } from "@fontra/core/localization.js";
@@ -152,7 +152,7 @@ export class FontOverviewController extends ViewController {
     });
     this.fontOverviewSettings = this.fontOverviewSettingsController.model;
 
-    this.glyphSetsManager = new GlyphSetsManager(
+    this.glyphSetsController = new GlyphSetsController(
       this.fontController,
       this.fontOverviewSettingsController
     );
@@ -338,7 +338,7 @@ export class FontOverviewController extends ViewController {
 
   async _updateGlyphSelection() {
     let { combinedItemList, shouldSort } =
-      await this.glyphSetsManager.getCombineGlyphItemList(this._fontGlyphItemList);
+      await this.glyphSetsController.getCombineGlyphItemList(this._fontGlyphItemList);
     if (shouldSort) {
       combinedItemList = this.glyphOrganizer.sortGlyphs(combinedItemList);
     }
