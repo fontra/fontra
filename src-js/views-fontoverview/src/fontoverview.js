@@ -12,6 +12,7 @@ import { staticGlyphToGLIF } from "@fontra/core/glyph-glif.js";
 import { GlyphOrganizer } from "@fontra/core/glyph-organizer.js";
 import { pathToSVG } from "@fontra/core/glyph-svg.js";
 import {
+  getMyGlyphSets,
   GlyphSetsManager,
   PROJECT_GLYPH_SETS_CUSTOM_DATA_KEY,
   readProjectGlyphSets,
@@ -144,20 +145,16 @@ export class FontOverviewController extends ViewController {
       this._updateFromWindowLocation();
     });
 
-    const myGlyphSetsController = new ObservableController({ settings: {} });
-    myGlyphSetsController.synchronizeWithLocalStorage("fontra-my-glyph-sets-");
-
     this.fontOverviewSettingsController = new ObservableController({
       ...getDefaultFontOverviewSettings(),
       projectGlyphSets: readProjectGlyphSets(this.fontController),
-      myGlyphSets: myGlyphSetsController.model.settings,
+      myGlyphSets: getMyGlyphSets(),
     });
     this.fontOverviewSettings = this.fontOverviewSettingsController.model;
 
     this.glyphSetsManager = new GlyphSetsManager(
       this.fontController,
-      this.fontOverviewSettingsController,
-      myGlyphSetsController
+      this.fontOverviewSettingsController
     );
 
     this.glyphOrganizer = new GlyphOrganizer();

@@ -632,11 +632,11 @@ export const THIS_FONTS_GLYPHSET = "";
 export const PROJECT_GLYPH_SETS_CUSTOM_DATA_KEY = "fontra.projectGlyphSets";
 
 export class GlyphSetsManager {
-  constructor(fontController, settingsController, myGlyphSetsController) {
+  constructor(fontController, settingsController) {
     this.fontController = fontController;
     this.settingsController = settingsController;
     this.settings = settingsController.model;
-    this.myGlyphSetsController = myGlyphSetsController;
+    this.myGlyphSetsController = getMyGlyphSetsController();
 
     this._loadedGlyphSets = {};
 
@@ -893,4 +893,15 @@ export function getGlyphSetsUIControllers(settingsController, accordionId) {
       accordionId,
     }),
   ];
+}
+
+const myGlyphSetsController = new ObservableController({ settings: {} });
+myGlyphSetsController.synchronizeWithLocalStorage("fontra-my-glyph-sets-");
+
+function getMyGlyphSetsController() {
+  return myGlyphSetsController;
+}
+
+export function getMyGlyphSets() {
+  return myGlyphSetsController.model.settings;
 }
