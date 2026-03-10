@@ -14,6 +14,7 @@ import {
   decomposeComponents,
   roundComponentOrigins,
 } from "@fontra/core/glyph-controller.js";
+import { GlyphSetsController } from "@fontra/core/glyphsets-controller.js";
 import { translate, translatePlural } from "@fontra/core/localization.js";
 import { MouseTracker } from "@fontra/core/mouse-tracker.js";
 import { ObservableController } from "@fontra/core/observable-object.js";
@@ -88,6 +89,7 @@ export class SceneController {
 
     this.shaperController = new ShaperController(fontController);
 
+    this.setupGlyphSetsController();
     this.setupChangeListeners();
     this.setupSettingsListeners();
     this.setupEventHandling();
@@ -387,6 +389,13 @@ export class SceneController {
         "backgroundImage/0",
       ]);
     }
+  }
+
+  setupGlyphSetsController() {
+    this.glyphSetsController = new GlyphSetsController(
+      this.fontController,
+      this.sceneSettingsController
+    );
   }
 
   setupChangeListeners() {
