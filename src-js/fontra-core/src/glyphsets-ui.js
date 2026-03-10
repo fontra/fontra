@@ -299,6 +299,13 @@ export class CheckboxGroup {
   }
 
   makeCheckboxUI(checkboxItems) {
+    // Ensure the checkboxController has items for every key
+    checkboxItems.forEach(({ key }) => {
+      if (this.checkboxController.model[key] === undefined) {
+        this.checkboxController.model[key] = false;
+      }
+    });
+
     return html.div({ class: "checkbox-group" }, [
       ...checkboxItems
         .map(({ key, label, extraItem }) => [
