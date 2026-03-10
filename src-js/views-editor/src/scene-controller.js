@@ -126,6 +126,10 @@ export class SceneController {
       shaper: null,
       shaperInfo: null,
       dumbShaperInfo: null,
+      projectGlyphSets: {},
+      myGlyphSets: {},
+      projectGlyphSetSelection: [],
+      myGlyphSetSelection: [],
     });
     this.sceneSettings = this.sceneSettingsController.model;
 
