@@ -72,7 +72,7 @@ export class SceneController {
     this.autoViewBox = true;
 
     this.setupSceneSettings();
-    this.sceneSettings = this.sceneSettingsController.model;
+
     this.visualizationLayersSettings = visualizationLayersSettings;
 
     // We need to do isPointInPath without having a context, we'll pass a bound method
