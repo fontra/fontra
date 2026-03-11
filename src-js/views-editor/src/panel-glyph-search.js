@@ -67,7 +67,7 @@ export default class GlyphSearchPanel extends Panel {
     }
 
     const glyphInfo =
-      this.editorController.fontController.glyphInfoFromGlyphName(glyphName);
+      this.editorController.sceneController.glyphInfoFromGlyphName(glyphName);
 
     let selectedGlyphState = this.editorController.sceneSettings.selectedGlyph;
 
