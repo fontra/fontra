@@ -84,16 +84,16 @@ describe("character-lines", () => {
       expectedLines: [[{ character: "Z", glyphName: undefined }]],
     },
     {
-      input: "R",
-      expectedLines: [[{ character: "R", glyphName: "Rrrrr" }]],
+      input: "$",
+      expectedLines: [[{ character: "$", glyphName: "outlier" }]],
     },
     {
       input: "/A",
       expectedLines: [[{ character: "A", glyphName: "A" }]],
     },
     {
-      input: "/Rrrrr",
-      expectedLines: [[{ character: "R", glyphName: "Rrrrr" }]],
+      input: "/outlier",
+      expectedLines: [[{ character: "$", glyphName: "outlier" }]],
     },
     {
       input: "/be-cy",
@@ -105,7 +105,7 @@ describe("character-lines", () => {
     },
   ];
 
-  const fallbackGlyphMap = { "Rrrrr": [ord("R")], "Nonstandard.with.ext": [] };
+  const fallbackGlyphMap = { "outlier": [ord("$")], "Nonstandard.with.ext": [] };
   const fallbackCharacterMap = characterMapFromGlyphMap(fallbackGlyphMap);
 
   const placeholderGlyphName = "Q";
@@ -150,7 +150,7 @@ describe("character-lines", () => {
       input: [[{ character: "A", isPlaceholder: true }, { glyphName: "A" }]],
       expectedOutput: "/?/A",
     },
-    { input: [[{ character: "R", glyphName: "Rrrrr" }]], expectedOutput: "R" },
+    { input: [[{ character: "R", glyphName: "outlier" }]], expectedOutput: "R" },
   ];
 
   parametrize(
