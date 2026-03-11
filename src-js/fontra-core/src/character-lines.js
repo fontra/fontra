@@ -210,8 +210,10 @@ function expandGlyphName(glyphName, characterMap, fallbackCharacterMap) {
       }
     }
   } else {
-    // This is a regular glyph name, but it doesn't exist in the font.
-    // Try to see if there's a code point associated with it.
+    // This is a regular glyph name, but it doesn't exist in the font,
+    // and the fallback glyph map also doesn't know it. As a last resort,
+    // try to see if there's a code point associated with it in the Glyphs
+    // data list.
     const codePoint = getCodePointFromGlyphName(glyphName);
     if (codePoint) {
       character = String.fromCodePoint(codePoint);
