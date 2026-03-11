@@ -373,10 +373,6 @@ export class SceneController {
       }
       assert(key in defaultSettings, key);
 
-      if (waitKeyBefore) {
-        await this.sceneSettingsController.waitForKeyChange(waitKeyBefore);
-      }
-
       const defaultValue = defaultSettings[key];
       const viewValue =
         key !== "viewBox"
@@ -385,6 +381,10 @@ export class SceneController {
 
       if (viewValue === undefined) {
         continue;
+      }
+
+      if (waitKeyBefore) {
+        await this.sceneSettingsController.waitForKeyChange(waitKeyBefore);
       }
 
       if (
