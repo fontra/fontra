@@ -1,7 +1,7 @@
 import { getGlyphMapProxy } from "./cmap.js";
 import { ObservableController } from "./observable-object.js";
 import { parseGlyphSet, redirectGlyphSetURL } from "./parse-glyphset.js";
-import { assert, friendlyHttpStatus, glyphMapToItemList, sleepAsync } from "./utils.js";
+import { assert, friendlyHttpStatus, sleepAsync } from "./utils.js";
 
 export const THIS_FONTS_GLYPHSET = "";
 export const PROJECT_GLYPH_SETS_CUSTOM_DATA_KEY = "fontra.projectGlyphSets";
@@ -19,7 +19,7 @@ export class GlyphSetsController {
     this.setupMyGlyphSetsDependencies();
   }
 
-  async getCombinedGlyphItemList(fontGlyphItemList) {
+  async getCombinedGlyphMap(fontGlyphItemList) {
     /*
       Merge selected glyph sets. When multiple glyph sets define a character
       but the glyph name does not match:
@@ -69,10 +69,13 @@ export class GlyphSetsController {
       }
     }
 
-    const combinedItemList = glyphMapToItemList(combinedGlyphMap);
-    // When overlaying multiple glyph sets, sort the list, or else we
-    // may end up with a garbled mess of ordering
-    return { combinedItemList, shouldSort: glyphSetKeys.length > 1 };
+    // When overlaying multiple glyph sets, the glyph map should be sorted,
+    // or else we may end up with a garbled mess of ordering
+    return {
+      combinedGlyphMap,
+      combinedCharacterMap,
+      shouldSort: glyphSetKeys.length > 1,
+    };
   }
 
   async loadGlyphSet(glyphSetKey) {
