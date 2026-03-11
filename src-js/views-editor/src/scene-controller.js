@@ -383,22 +383,26 @@ export class SceneController {
           ? viewInfo[infoKey]
           : convertViewBoxArrayToRect(viewInfo[infoKey]);
 
+      if (viewValue === undefined) {
+        continue;
+      }
+
       if (
         defaultValue === null ||
         typeof defaultValue == "number" ||
         typeof defaultValue == "string" ||
         typeof defaultValue == "boolean"
       ) {
-        sceneSettings[key] = viewValue ?? defaultValue;
+        sceneSettings[key] = viewValue;
       } else if (defaultValue instanceof Set) {
         assert(defaultValue.size === 0, defaultValue);
-        sceneSettings[key] = viewValue ? new Set(viewValue) : defaultValue;
+        sceneSettings[key] = new Set(viewValue);
       } else if (defaultValue instanceof Array) {
         assert(defaultValue.length === 0, defaultValue);
-        sceneSettings[key] = viewValue ? Array.from(viewValue) : defaultValue;
+        sceneSettings[key] = Array.from(viewValue);
       } else if (typeof defaultValue == "object") {
         assert(isObjectEmpty(defaultValue), defaultValue);
-        sceneSettings[key] = viewValue ?? defaultValue;
+        sceneSettings[key] = viewValue;
       } else {
         assert(false, `can't get here ${[key, defaultValue, viewValue]}`);
       }
