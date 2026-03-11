@@ -18,12 +18,7 @@ describe("character-lines", () => {
     glyphMap[glyphName] = [];
   });
 
-  const characterMap = Object.fromEntries(
-    Object.entries(glyphMap).map(([glyphName, codePoints]) => [
-      codePoints[0],
-      glyphName,
-    ])
-  );
+  const characterMap = characterMapFromGlyphMap(glyphMap);
 
   const characterLinesFromStringTestData = [
     {
@@ -105,7 +100,14 @@ describe("character-lines", () => {
       );
 
       expect(
-        characterLinesFromString(input, characterMap, glyphMap, placeholderGlyphName)
+        characterLinesFromString(
+          input,
+          characterMap,
+          glyphMap,
+          null,
+          null,
+          placeholderGlyphName
+        )
       ).to.deep.equal(expectedLines);
     }
   );
@@ -140,4 +142,13 @@ describe("character-lines", () => {
 
 function ord(s) {
   return s.codePointAt(0);
+}
+
+function characterMapFromGlyphMap(glyphMap) {
+  return Object.fromEntries(
+    Object.entries(glyphMap).map(([glyphName, codePoints]) => [
+      codePoints[0],
+      glyphName,
+    ])
+  );
 }

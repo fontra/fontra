@@ -5,6 +5,8 @@ export function characterLinesFromString(
   string,
   characterMap,
   glyphMap,
+  fallbackCharacterMap,
+  fallbackGlyphMap,
   substituteGlyphName
 ) {
   const characterLines = [];
