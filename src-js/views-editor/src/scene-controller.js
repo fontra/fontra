@@ -795,6 +795,8 @@ export class SceneController {
       this.sceneSettings.text,
       this.fontController.characterMap,
       this.fontController.glyphMap,
+      this.sceneSettings.combinedCharacterMap,
+      this.sceneSettings.combinedGlyphMap,
       this.sceneSettings.substituteGlyphName
     );
     this.sceneSettingsController.setItem("characterLines", characterLines, {
