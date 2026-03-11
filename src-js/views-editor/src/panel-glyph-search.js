@@ -31,13 +31,8 @@ export default class GlyphSearchPanel extends Panel {
     this.glyphSearch.addEventListener("selectedGlyphNameDoubleClicked", (event) =>
       this.glyphNameChangedCallback(event.detail, true)
     );
-    this.editorController.fontController.addChangeListener({ glyphMap: null }, () => {
-      this._updateFontGlyphItemList();
-      this._updateSearchListContents();
-    });
     this.editorController.fontController.ensureInitialized.then(() => {
       this.glyphSearch.glyphMap = this.editorController.fontController.glyphMap;
-      this._updateFontGlyphItemList();
     });
 
     this.editorController.sceneSettingsController.addKeyListener(
@@ -53,29 +48,13 @@ export default class GlyphSearchPanel extends Panel {
     );
 
     this.editorController.sceneSettingsController.addKeyListener(
-      ["projectGlyphSetSelection", "myGlyphSetSelection"],
-      (event) => {
-        if (!event.newValue.length && !event.oldValue.length) {
-          // Noise during startup
-          return;
-        }
-
-        this._updateSearchListContents();
-      }
-    );
-  }
-
-  _updateFontGlyphItemList() {
-    this.fontGlyphItemList = glyphMapToItemList(
-      this.editorController.fontController.glyphMap
+      "combinedGlyphMap",
+      (event) => this._updateSearchListContents()
     );
   }
 
   async _updateSearchListContents() {
-    const { combinedGlyphMap } =
-      await this.editorController.sceneController.glyphSetsController.getCombinedGlyphMap(
-        this.fontGlyphItemList
-      );
+    const combinedGlyphMap = this.editorController.sceneSettings.combinedGlyphMap;
     this.glyphSearch.glyphMap = isObjectEmpty(combinedGlyphMap)
       ? this.editorController.fontController.glyphMap
       : combinedGlyphMap;

@@ -46,7 +46,9 @@ import {
   arrowKeyDeltas,
   assert,
   commandKeyProperty,
+  consolidateCalls,
   enumerate,
+  glyphMapToItemList,
   isObjectEmpty,
   objectsEqual,
   parseSelection,
@@ -316,6 +318,39 @@ export class SceneController {
     this.sceneSettingsController.addKeyListener("applyTextShaping", (event) =>
       this.updateShaper()
     );
+
+    // Set up combinedGlyphMap and combinedCharacterMap dependencies
+    const updateCombinedGlyphAndCharacterMapping = consolidateCalls((event) =>
+      this.updateCombinedGlyphAndCharacterMapping(event)
+    );
+
+    this.sceneSettingsController.addKeyListener(
+      ["projectGlyphSetSelection", "myGlyphSetSelection"],
+      updateCombinedGlyphAndCharacterMapping
+    );
+
+    this.fontController.addChangeListener({ glyphMap: null }, (change) =>
+      updateCombinedGlyphAndCharacterMapping(null, change)
+    );
+  }
+
+  async updateCombinedGlyphAndCharacterMapping(event, change) {
+    if (
+      event &&
+      (event.key === "projectGlyphSetSelection" ||
+        event.key === "myGlyphSetSelection") &&
+      event.newValue.length === 0 &&
+      event.oldValue?.length === 0
+    ) {
+      return;
+    }
+
+    const fontGlyphItemList = glyphMapToItemList(this.fontController.glyphMap);
+    const { combinedGlyphMap, combinedCharacterMap } =
+      await this.glyphSetsController.getCombinedGlyphMap(fontGlyphItemList);
+
+    this.sceneSettings.combinedGlyphMap = combinedGlyphMap;
+    this.sceneSettings.combinedCharacterMap = combinedCharacterMap;
   }
 
   async updateSceneSettingsFromViewInfo(viewInfo) {
@@ -1756,6 +1791,8 @@ function getSceneSettingsDefaults() {
     myGlyphSets: {},
     projectGlyphSetSelection: [],
     myGlyphSetSelection: [],
+    combinedGlyphMap: {},
+    combinedCharacterMap: {},
   };
 }
 
