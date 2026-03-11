@@ -382,10 +382,13 @@ export class FontOverviewController extends ViewController {
     if (!selectedGlyphInfo.length) {
       return;
     }
+
     openGlyphsInEditor(
       selectedGlyphInfo,
       this.fontOverviewSettings.fontLocationUser,
-      this.fontController.glyphMap
+      this.fontController.glyphMap,
+      this.fontOverviewSettings.projectGlyphSetSelection,
+      this.fontOverviewSettings.myGlyphSetSelection
     );
   }
 
@@ -918,7 +921,13 @@ export class FontOverviewController extends ViewController {
   }
 }
 
-function openGlyphsInEditor(glyphsInfo, userLocation, glyphMap) {
+function openGlyphsInEditor(
+  glyphsInfo,
+  userLocation,
+  glyphMap,
+  projectGlyphSetSelection,
+  myGlyphSetSelection
+) {
   const url = new URL(window.location);
   url.pathname = url.pathname.replace("/fontoverview.html", "/editor.html");
 
@@ -942,6 +951,14 @@ function openGlyphsInEditor(glyphsInfo, userLocation, glyphMap) {
     } else {
       viewInfo.text += `/${glyphName}`;
     }
+  }
+
+  if (projectGlyphSetSelection.length) {
+    viewInfo["projectGlyphSetSelection"] = projectGlyphSetSelection;
+  }
+
+  if (myGlyphSetSelection.length) {
+    viewInfo["myGlyphSetSelection"] = myGlyphSetSelection;
   }
 
   url.hash = dumpURLFragment(viewInfo);
