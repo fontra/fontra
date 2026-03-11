@@ -280,6 +280,10 @@ export class SceneController {
         if (event.senderInfo?.senderID === this) {
           return;
         }
+        if (!event.newValue) {
+          // Ignore null-ish
+          return;
+        }
         this.canvasController.setViewBox(event.newValue);
         const actualViewBox = this.canvasController.getViewBox();
         if (!equalRect(rectRound(event.newValue), rectRound(actualViewBox))) {
