@@ -88,6 +88,14 @@ describe("character-lines", () => {
       expectedLines: [[{ character: "$", glyphName: "outlier" }]],
     },
     {
+      input: "/$",
+      expectedLines: [[{ character: "$", glyphName: "outlier" }]],
+    },
+    {
+      input: "/$.alt",
+      expectedLines: [[{ character: undefined, glyphName: "outlier.alt" }]],
+    },
+    {
       input: "/A",
       expectedLines: [[{ character: "A", glyphName: "A" }]],
     },
