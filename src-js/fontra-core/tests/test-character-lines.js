@@ -87,6 +87,14 @@ describe("character-lines", () => {
       input: "R",
       expectedLines: [[{ character: "R", glyphName: "Rrrrr" }]],
     },
+    {
+      input: "/A",
+      expectedLines: [[{ character: "A", glyphName: "A" }]],
+    },
+    {
+      input: "/Rrrrr",
+      expectedLines: [[{ character: "R", glyphName: "Rrrrr" }]],
+    },
   ];
 
   const fallbackGlyphMap = { Rrrrr: [ord("R")] };
