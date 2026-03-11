@@ -65,6 +65,7 @@ export class SceneModel {
         "textScript",
         "textLanguage",
         "shaper",
+        "combinedCharacterMap",
       ],
       (event) => {
         this.updateScene();
@@ -428,6 +429,8 @@ export class SceneModel {
       return;
     }
 
+    const fallbackCharacterMap = this.sceneSettings.combinedCharacterMap;
+
     const fontController = this.fontController;
 
     const characterLines = this.characterLines;
@@ -466,7 +469,8 @@ export class SceneModel {
       shaper,
       (glyphName, layerName) => this.getGlyphInstance(glyphName, layerName),
       this.sceneSettings.align,
-      cancelSignal
+      cancelSignal,
+      fallbackCharacterMap
     );
 
     const featureEntries = Object.entries(this.sceneSettings.featureSettings ?? {});
@@ -1222,13 +1226,21 @@ function sorted(v) {
 }
 
 class LineSetter {
-  constructor(fontController, shaper, getGlyphInstanceFunc, align, cancelSignal) {
+  constructor(
+    fontController,
+    shaper,
+    getGlyphInstanceFunc,
+    align,
+    cancelSignal,
+    fallbackCharacterMap
+  ) {
     this.fontController = fontController;
     this.shaper = shaper;
     this.getGlyphInstanceFunc = getGlyphInstanceFunc;
     this.align = align;
     this.cancelSignal = cancelSignal;
     this.glyphInstances = {};
+    this.fallbackCharacterMap = fallbackCharacterMap;
   }
 
   async setLine(
@@ -1240,6 +1252,7 @@ class LineSetter {
     shaperOptions
   ) {
     const fontController = this.fontController;
+    const fallbackCharacterMap = this.fallbackCharacterMap;
     const glyphs = [];
 
     let { x, y } = origin;
@@ -1282,7 +1295,8 @@ class LineSetter {
       const glyphName =
         glyphInfo.codepoint != 0 || fallbackCodePoint >= MAX_UNICODE
           ? glyphInfo.glyphname
-          : getSuggestedGlyphName(fallbackCodePoint);
+          : fallbackCharacterMap[fallbackCodePoint] ??
+            getSuggestedGlyphName(fallbackCodePoint);
 
       const isSelectedGlyph = glyphIndex == selectedGlyphIndex;
 
