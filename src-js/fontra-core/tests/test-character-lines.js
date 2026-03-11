@@ -142,6 +142,7 @@ describe("character-lines", () => {
       input: [[{ character: "A", isPlaceholder: true }, { glyphName: "A" }]],
       expectedOutput: "/?/A",
     },
+    { input: [[{ character: "R", glyphName: "Rrrrr" }]], expectedOutput: "R" },
   ];
 
   parametrize(
