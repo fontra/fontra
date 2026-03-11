@@ -80,7 +80,7 @@ function characterLineFromSingleLineString(
           fallbackGlyphMap
         );
         if (glyphName && !character && !glyphMap[glyphName]) {
-          const result = expandGlyphName(glyphName, characterMap);
+          const result = expandGlyphName(glyphName, characterMap, fallbackCharacterMap);
           glyphName = result.glyphName;
           character = result.character;
         }
@@ -185,7 +185,7 @@ function parseGlyphName(string, i) {
   return { glyphName, i };
 }
 
-function expandGlyphName(glyphName, characterMap) {
+function expandGlyphName(glyphName, characterMap, fallbackCharacterMap) {
   // See if the "glyph name" after stripping the extension (if any)
   // happens to be a character that we know a glyph name for.
   // This allows us to write /Å.alt instead of /Aring.alt in the
@@ -198,7 +198,8 @@ function expandGlyphName(glyphName, characterMap) {
   if (baseGlyphName === charString && !isPlainLatinLetter(baseGlyphName)) {
     // The base glyph name is a single character, let's see if there's
     // a glyph name associated with that character
-    let properBaseGlyphName = characterMap[baseCodePoint];
+    let properBaseGlyphName =
+      characterMap[baseCodePoint] ?? fallbackCharacterMap[baseCodePoint];
     if (!properBaseGlyphName) {
       properBaseGlyphName = getSuggestedGlyphName(baseCodePoint);
     }
