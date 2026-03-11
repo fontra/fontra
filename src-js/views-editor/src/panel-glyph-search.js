@@ -2,8 +2,8 @@ import {
   getGlyphSetsUIControllers,
   glyphSetsUIStyles,
 } from "@fontra/core/glyphsets-ui.js";
-
 import * as html from "@fontra/core/html-utils.js";
+import { glyphMapToItemList, isObjectEmpty } from "@fontra/core/utils.js";
 import "@fontra/web-components/glyph-search-list.js";
 import { Accordion } from "@fontra/web-components/ui-accordion.js";
 import Panel from "./panel.js";
@@ -32,10 +32,12 @@ export default class GlyphSearchPanel extends Panel {
       this.glyphNameChangedCallback(event.detail, true)
     );
     this.editorController.fontController.addChangeListener({ glyphMap: null }, () => {
-      this.glyphSearch.updateGlyphNamesListContent();
+      this._updateFontGlyphItemList();
+      this._updateSearchListContents();
     });
     this.editorController.fontController.ensureInitialized.then(() => {
       this.glyphSearch.glyphMap = this.editorController.fontController.glyphMap;
+      this._updateFontGlyphItemList();
     });
 
     this.editorController.sceneSettingsController.addKeyListener(
@@ -49,6 +51,34 @@ export default class GlyphSearchPanel extends Panel {
         }
       }
     );
+
+    this.editorController.sceneSettingsController.addKeyListener(
+      ["projectGlyphSetSelection", "myGlyphSetSelection"],
+      (event) => {
+        if (!event.newValue.length && !event.oldValue.length) {
+          // Noise during startup
+          return;
+        }
+
+        this._updateSearchListContents();
+      }
+    );
+  }
+
+  _updateFontGlyphItemList() {
+    this.fontGlyphItemList = glyphMapToItemList(
+      this.editorController.fontController.glyphMap
+    );
+  }
+
+  async _updateSearchListContents() {
+    const { combinedGlyphMap } =
+      await this.editorController.sceneController.glyphSetsController.getCombinedGlyphMap(
+        this.fontGlyphItemList
+      );
+    this.glyphSearch.glyphMap = isObjectEmpty(combinedGlyphMap)
+      ? this.editorController.fontController.glyphMap
+      : combinedGlyphMap;
   }
 
   async glyphNameChangedCallback(glyphName, isDoubleClick) {
