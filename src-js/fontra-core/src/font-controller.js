@@ -992,15 +992,6 @@ export class FontController {
     return undoRecord["info"];
   }
 
-  glyphInfoFromGlyphName(glyphName) {
-    const glyphInfo = { glyphName: glyphName };
-    const codePoint = this.codePointForGlyph(glyphName);
-    if (codePoint !== undefined) {
-      glyphInfo["character"] = getCharFromCodePoint(codePoint);
-    }
-    return glyphInfo;
-  }
-
   mapUserLocationToSourceLocation(userLocation) {
     return mapForward(userLocation, this.fontAxes);
   }
