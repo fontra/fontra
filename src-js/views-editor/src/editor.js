@@ -3216,13 +3216,13 @@ export class EditorController extends ViewController {
       this.sceneController.autoViewBox = false;
     }
 
+    // Grab the autoViewBox state here, as it may get reset via isEditing
+    const initialAutoViewBox = this.sceneController.autoViewBox;
+
     this.sceneModel.setGlyphLocations(viewInfo["glyphLocations"]);
     await this.sceneController.updateSceneSettingsFromViewInfo(viewInfo);
 
-    if (
-      this.sceneController.autoViewBox &&
-      this.sceneSettings.selectedGlyph?.isEditing
-    ) {
+    if (initialAutoViewBox && this.sceneSettings.selectedGlyph?.isEditing) {
       // This is a bit of a hack: if isEditing is true, the autoViewBox
       // doesn't work. Also, autoViewBox *needs* to be off in edit mode,
       // or the canvas behaves really weirdly (it resizes as you drag points)
