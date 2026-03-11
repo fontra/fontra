@@ -19,7 +19,7 @@ export class GlyphSetsController {
     this.setupMyGlyphSetsDependencies();
   }
 
-  async getCombineGlyphItemList(fontGlyphItemList) {
+  async getCombinedGlyphItemList(fontGlyphItemList) {
     /*
       Merge selected glyph sets. When multiple glyph sets define a character
       but the glyph name does not match:

@@ -338,7 +338,7 @@ export class FontOverviewController extends ViewController {
 
   async _updateGlyphSelection() {
     let { combinedItemList, shouldSort } =
-      await this.glyphSetsController.getCombineGlyphItemList(this._fontGlyphItemList);
+      await this.glyphSetsController.getCombinedGlyphItemList(this._fontGlyphItemList);
     if (shouldSort) {
       combinedItemList = this.glyphOrganizer.sortGlyphs(combinedItemList);
     }
