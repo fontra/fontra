@@ -11,7 +11,6 @@ const mapMenuItemKeyToFunction = {
   Edit: getEditMenuItems,
   View: getViewMenuItems,
   Glyph: getGlyphMenuItems,
-  Window: getWindowMenuItems,
 };
 
 export function makeFontraMenuBar(menuItemKeys, viewController) {
@@ -190,31 +189,6 @@ function getFontMenuItems() {
 
 function getGlyphMenuItems() {
   return [];
-}
-
-function getWindowMenuItems() {
-  return [
-    {
-      title: translate("font-overview.title"),
-      enabled: () => true,
-      callback: () => {
-        const url = new URL(window.location);
-        url.pathname = rerouteViewPath(url.pathname, "fontoverview");
-        url.hash = ""; // remove any hash
-        window.open(url.toString());
-      },
-    },
-    {
-      title: translate("editor.title"),
-      enabled: () => true,
-      callback: () => {
-        const url = new URL(window.location);
-        url.pathname = rerouteViewPath(url.pathname, "editor");
-        url.hash = ""; // remove any hash
-        window.open(url.toString());
-      },
-    },
-  ];
 }
 
 function rerouteViewPath(path, targetView) {
