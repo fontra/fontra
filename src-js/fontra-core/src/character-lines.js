@@ -16,6 +16,8 @@ export function characterLinesFromString(
         line,
         characterMap,
         glyphMap,
+        fallbackCharacterMap,
+        fallbackGlyphMap,
         substituteGlyphName
       )
     );
@@ -27,6 +29,8 @@ function characterLineFromSingleLineString(
   string,
   characterMap,
   glyphMap,
+  fallbackCharacterMap,
+  fallbackGlyphMap,
   substituteGlyphName
 ) {
   const characterInfo = [];
@@ -39,11 +43,21 @@ function characterLineFromSingleLineString(
       i++;
       if (string[i] == "/") {
         // Literal "//", this is the slash character
-        glyphName = characterMap["/".codePointAt(0)];
+        const slashCodePoint = "/".codePointAt(0);
+        glyphName =
+          characterMap[slashCodePoint] ??
+          fallbackCharacterMap[slashCodePoint] ??
+          getSuggestedGlyphName(slashCodePoint);
       } else if (string[i] == "?") {
         // /? placeholder substitution
         glyphName = substituteGlyphName || "--placeholder--";
-        character = characterFromGlyphName(glyphName, characterMap, glyphMap);
+        character = characterFromGlyphName(
+          glyphName,
+          characterMap,
+          glyphMap,
+          fallbackCharacterMap,
+          fallbackGlyphMap
+        );
         isPlaceholder = true;
       } else {
         // /glyphname
@@ -58,7 +72,13 @@ function characterLineFromSingleLineString(
           continue;
         }
 
-        character = characterFromGlyphName(glyphName, characterMap, glyphMap);
+        character = characterFromGlyphName(
+          glyphName,
+          characterMap,
+          glyphMap,
+          fallbackCharacterMap,
+          fallbackGlyphMap
+        );
         if (glyphName && !character && !glyphMap[glyphName]) {
           const result = expandGlyphName(glyphName, characterMap);
           glyphName = result.glyphName;
@@ -67,7 +87,7 @@ function characterLineFromSingleLineString(
       }
     } else {
       const codePoint = string.codePointAt(i);
-      glyphName = characterMap[codePoint];
+      glyphName = characterMap[codePoint] ?? fallbackCharacterMap[codePoint];
       if (codePoint >= 0x10000) {
         i++;
       }
@@ -112,14 +132,31 @@ function isPlainLatinLetter(glyphName) {
   return glyphName.match(/^[A-Za-z]$/);
 }
 
-function characterFromGlyphName(glyphName, characterMap, glyphMap) {
-  var character = undefined;
-  for (const codePoint of glyphMap[glyphName] || []) {
+function characterFromGlyphName(
+  glyphName,
+  characterMap,
+  glyphMap,
+  fallbackCharacterMap,
+  fallbackGlyphMap
+) {
+  let character = undefined;
+
+  for (const codePoint of glyphMap[glyphName] ?? []) {
     if (characterMap[codePoint] === glyphName) {
       character = String.fromCodePoint(codePoint);
       break;
     }
   }
+
+  if (character === undefined) {
+    for (const codePoint of fallbackGlyphMap[glyphName] ?? []) {
+      if (fallbackCharacterMap[codePoint] === glyphName) {
+        character = String.fromCodePoint(codePoint);
+        break;
+      }
+    }
+  }
+
   return character;
 }
 

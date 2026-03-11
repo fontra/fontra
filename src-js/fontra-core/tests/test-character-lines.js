@@ -83,7 +83,14 @@ describe("character-lines", () => {
       input: "Z",
       expectedLines: [[{ character: "Z", glyphName: undefined }]],
     },
+    {
+      input: "R",
+      expectedLines: [[{ character: "R", glyphName: "Rrrrr" }]],
+    },
   ];
+
+  const fallbackGlyphMap = { Rrrrr: [ord("R")] };
+  const fallbackCharacterMap = characterMapFromGlyphMap(fallbackGlyphMap);
 
   const placeholderGlyphName = "Q";
 
@@ -104,8 +111,8 @@ describe("character-lines", () => {
           input,
           characterMap,
           glyphMap,
-          null,
-          null,
+          fallbackCharacterMap,
+          fallbackGlyphMap,
           placeholderGlyphName
         )
       ).to.deep.equal(expectedLines);
