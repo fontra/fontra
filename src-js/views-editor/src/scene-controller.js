@@ -48,6 +48,7 @@ import {
   commandKeyProperty,
   consolidateCalls,
   enumerate,
+  getCharFromCodePoint,
   glyphMapToItemList,
   isObjectEmpty,
   objectsEqual,
@@ -118,23 +119,26 @@ export class SceneController {
     });
 
     // Set up the mutual relationship between text and characterLines
-    this.sceneSettingsController.addKeyListener("text", async (event) => {
-      if (event.senderInfo?.senderID === this) {
-        return;
+    this.sceneSettingsController.addKeyListener(
+      ["text", "combinedCharacterMap"],
+      async (event) => {
+        if (event.senderInfo?.senderID === this) {
+          return;
+        }
+        await this.fontController.ensureInitialized;
+        const characterLines = characterLinesFromString(
+          this.sceneSettings.text,
+          this.fontController.characterMap,
+          this.fontController.glyphMap,
+          this.sceneSettings.combinedCharacterMap,
+          this.sceneSettings.combinedGlyphMap,
+          this.sceneSettings.substituteGlyphName
+        );
+        this.sceneSettingsController.setItem("characterLines", characterLines, {
+          senderID: this,
+        });
       }
-      await this.fontController.ensureInitialized;
-      const characterLines = characterLinesFromString(
-        event.newValue,
-        this.fontController.characterMap,
-        this.fontController.glyphMap,
-        this.sceneSettings.combinedCharacterMap,
-        this.sceneSettings.combinedGlyphMap,
-        this.sceneSettings.substituteGlyphName
-      );
-      this.sceneSettingsController.setItem("characterLines", characterLines, {
-        senderID: this,
-      });
-    });
+    );
 
     this.sceneSettingsController.addKeyListener(
       "characterLines",
@@ -689,6 +693,15 @@ export class SceneController {
     }
     bounds = rectAddMargin(bounds, 0.1);
     this.sceneSettings.viewBox = bounds;
+  }
+
+  glyphInfoFromGlyphName(glyphName) {
+    const glyphInfo = { glyphName: glyphName };
+    const codePoint = this.sceneSettings.combinedGlyphMap[glyphName]?.[0];
+    if (codePoint !== undefined) {
+      glyphInfo["character"] = getCharFromCodePoint(codePoint);
+    }
+    return glyphInfo;
   }
 
   _resetStoredGlyphPosition() {
