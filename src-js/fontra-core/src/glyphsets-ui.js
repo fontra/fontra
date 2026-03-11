@@ -299,7 +299,8 @@ export class CheckboxGroup {
   }
 
   makeCheckboxUI(checkboxItems) {
-    // Ensure the checkboxController has items for every key
+    // Ensure the checkboxController has items for every key, as we need
+    // to iterate over them in response to selection changes
     checkboxItems.forEach(({ key }) => {
       if (this.checkboxController.model[key] === undefined) {
         this.checkboxController.model[key] = false;
