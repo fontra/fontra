@@ -84,6 +84,10 @@ describe("character-lines", () => {
         ],
       ],
     },
+    {
+      input: "Z",
+      expectedLines: [[{ character: "Z", glyphName: undefined }]],
+    },
   ];
 
   const placeholderGlyphName = "Q";
