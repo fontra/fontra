@@ -99,11 +99,11 @@ export class GlyphSetsUIController {
       "glyphSetErrors",
       (event) => {
         const allKeys = union(
-          new Set(Object.keys(event.oldValue)),
+          new Set(Object.keys(event.oldValue || {})),
           Object.keys(event.newValue)
         );
         for (const key of allKeys) {
-          if (event.oldValue[key] === event.newValue[key]) {
+          if (event.oldValue?.[key] === event.newValue[key]) {
             continue;
           }
 
