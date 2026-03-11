@@ -79,6 +79,7 @@ export default class GlyphSearchPanel extends Panel {
     this.glyphSearch.glyphMap = isObjectEmpty(combinedGlyphMap)
       ? this.editorController.fontController.glyphMap
       : combinedGlyphMap;
+    this.glyphSearch.fontGlyphMap = this.editorController.fontController.glyphMap;
   }
 
   async glyphNameChangedCallback(glyphName, isDoubleClick) {

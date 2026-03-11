@@ -2,6 +2,7 @@ import { GlyphOrganizer } from "@fontra/core/glyph-organizer.js";
 import * as html from "@fontra/core/html-utils.js";
 import { SimpleElement } from "@fontra/core/html-utils.js";
 import {
+  consolidateCalls,
   getCharFromCodePoint,
   glyphMapToItemList,
   guessCharFromGlyphName,
@@ -31,6 +32,7 @@ export class GlyphSearchList extends SimpleElement {
     this.glyphNamesList = this._makeGlyphNamesList();
 
     this.throttledUpdate = throttleCalls(() => this.update(), 50);
+    this.requestUpdate = consolidateCalls(() => this.updateGlyphNamesListContent());
 
     this.searchField.onSearchFieldChanged = (event) => this.throttledUpdate();
 
@@ -49,10 +51,21 @@ export class GlyphSearchList extends SimpleElement {
             return getCharFromCodePoint(item.codePoints[0]);
           }
           const guessedChar = guessCharFromGlyphName(item.glyphName);
-          return guessedChar ? html.span({ class: "guessed-char" }, [guessedChar]) : "";
+          return guessedChar ? html.span({ class: "dimmed" }, [guessedChar]) : "";
         },
       },
-      { key: "glyphName", title: "glyph name", width: "10em", isIdentifierKey: true },
+      {
+        key: "glyphName",
+        title: "glyph name",
+        width: "10em",
+        isIdentifierKey: true,
+        cellFactory: (item, description) => {
+          const glyphName = item.glyphName;
+          return !this._fontGlyphMap || this._fontGlyphMap[glyphName]
+            ? glyphName
+            : html.span({ class: "dimmed" }, [glyphName]);
+        },
+      },
       {
         key: "unicode",
         width: "fit-content",
@@ -61,7 +74,7 @@ export class GlyphSearchList extends SimpleElement {
     ];
     const glyphNamesList = new UIList();
     glyphNamesList.appendStyle(`
-      .guessed-char {
+      .dimmed {
         color: #999;
       }
     `);
@@ -90,7 +103,7 @@ export class GlyphSearchList extends SimpleElement {
   }
 
   update() {
-    this.updateGlyphNamesListContent();
+    this.requestUpdate();
   }
 
   get glyphMap() {
@@ -99,7 +112,16 @@ export class GlyphSearchList extends SimpleElement {
 
   set glyphMap(glyphMap) {
     this._glyphMap = glyphMap;
-    this.updateGlyphNamesListContent();
+    this.requestUpdate();
+  }
+
+  get fontGlyphMap() {
+    return this._fontGlyphMap;
+  }
+
+  set fontGlyphMap(fontGlyphMap) {
+    this._fontGlyphMap = fontGlyphMap;
+    this.requestUpdate();
   }
 
   updateGlyphNamesListContent() {
