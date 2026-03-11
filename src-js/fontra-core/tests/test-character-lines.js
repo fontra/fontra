@@ -95,9 +95,17 @@ describe("character-lines", () => {
       input: "/Rrrrr",
       expectedLines: [[{ character: "R", glyphName: "Rrrrr" }]],
     },
+    {
+      input: "/be-cy",
+      expectedLines: [[{ character: "б", glyphName: "be-cy" }]],
+    },
+    {
+      input: "/Nonstandard.with.ext",
+      expectedLines: [[{ character: undefined, glyphName: "Nonstandard.with.ext" }]],
+    },
   ];
 
-  const fallbackGlyphMap = { Rrrrr: [ord("R")] };
+  const fallbackGlyphMap = { "Rrrrr": [ord("R")], "Nonstandard.with.ext": [] };
   const fallbackCharacterMap = characterMapFromGlyphMap(fallbackGlyphMap);
 
   const placeholderGlyphName = "Q";
