@@ -236,9 +236,9 @@ export const strings = {
   "menubar.view.add-glyph-after-selected-glyph": "選択中のグリフの後ろにグリフを追加",
   "menubar.view.add-glyph-before-selected-glyph": "選択中のグリフの前にグリフを追加",
   "menubar.view.find-glyphs-that-use": "‘%0’を使用しているグリフを検索",
-  "menubar.view.remove-selected-glyph-from-canvas": "エディターから選択グリフを削除",
+  "menubar.view.remove-selected-glyph-from-canvas": "エディターから選択グリフを削除…",
   "menubar.view.replace-selected-glyph-on-canvas":
-    "選択中のグリフを別のグリフに切り替え",
+    "選択中のグリフを別のグリフに切り替え…",
   "menubar.view.select-glyph-source-layer": "グリフ/ソース/レイヤーを選択",
   "menubar.view.select-next-glyph": "次のグリフを選択",
   "menubar.view.select-next-source": "次のソースを選択",
