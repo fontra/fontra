@@ -334,11 +334,33 @@ export function unnormalizeValue(v, lower, dflt, upper) {
 
 export function normalizeLocation(location, axisList) {
   // Normalizes location based on axis min/default/max values from axes.
+  // 1. Ensures there is a value in the output for every axis in `axisList`
+  // 2. Ensures there are no values for axes not in `axisList`
   const out = {};
   for (const axis of axisList) {
     let v = location[axis.name];
     if (v === undefined) {
       v = axis.defaultValue;
+    }
+    out[axis.name] = normalizeValue(
+      v,
+      axis.minValue,
+      clamp(axis.defaultValue, axis.minValue, axis.maxValue),
+      clamp(axis.maxValue, axis.minValue, axis.maxValue)
+    );
+  }
+  return out;
+}
+
+export function normalizeLocationSparse(location, axisList) {
+  // Normalizes location based on axis min/default/max values from axes.
+  // 1. Does *not* fill in missing values.
+  // 2. Ensures there are no values for axes not in `axisList`
+  const out = {};
+  for (const axis of axisList) {
+    let v = location[axis.name];
+    if (v === undefined) {
+      continue;
     }
     out[axis.name] = normalizeValue(
       v,
