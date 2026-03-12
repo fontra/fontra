@@ -2,6 +2,7 @@
 
 ## 2026-03-?? [version 2026.3.4]
 
+- [cross-axis mapping/avar-2] Fix edge case where we specify an output axis value at the default, while the corresponding input value is _not_ at the default. [PR 2492](https://github.com/fontra/fontra/pull/2492)
 - Prevent unnecessary .designspace lib pollution by not writing the "project glyph sets" list if it is empty. [PR](https://github.com/fontra/fontra/pull/2491)
 
 ## 2026-03-12 [version 2026.3.3]
