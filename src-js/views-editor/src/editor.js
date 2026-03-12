@@ -2254,7 +2254,8 @@ export class EditorController extends ViewController {
   async doAddComponent() {
     const glyphName = await this.runGlyphSearchDialog(
       translate("action.add-component"),
-      translate("dialog.add")
+      translate("dialog.add"),
+      true
     );
     if (!glyphName) {
       return;
@@ -3033,10 +3034,17 @@ export class EditorController extends ViewController {
 
   async runGlyphSearchDialog(
     titleLabel = translate("dialog.glyphs.search"),
-    okLabel = translate("dialog.add")
+    okLabel = translate("dialog.add"),
+    showOnlyGlyphsInFont = false
   ) {
     const glyphSearch = document.createElement("glyph-search-list");
-    glyphSearch.glyphMap = this.fontController.glyphMap;
+
+    if (!showOnlyGlyphsInFont && !isObjectEmpty(this.sceneSettings.combinedGlyphMap)) {
+      glyphSearch.glyphMap = this.sceneSettings.combinedGlyphMap;
+      glyphSearch.fontGlyphMap = this.fontController.glyphMap;
+    } else {
+      glyphSearch.glyphMap = this.fontController.glyphMap;
+    }
 
     glyphSearch.addEventListener("selectedGlyphNameChanged", (event) => {
       dialog.defaultButton.classList.toggle(
