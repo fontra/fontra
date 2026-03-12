@@ -30,7 +30,7 @@ export class CrossAxisMapping {
           normalizeLocation(inputLocation, this.fontAxesSourceSpace)
         )
       );
-      // Output locations do NOT have to maximally sparse, as a normalized axis value
+      // Output locations do NOT have to be maximally sparse, as a normalized axis value
       // of 0 is a valid output value, and is distinct from a *missing* output value
       outputLocations.push(
         normalizeLocationSparse(outputLocation, this.fontAxesSourceSpace)
