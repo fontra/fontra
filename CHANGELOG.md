@@ -1,5 +1,9 @@
 # Changelog for Fontra
 
+## 2026-03-?? [version 2026.3.4]
+
+- Prevent unnecessary .designspace lib pollution by not writing the "project glyph sets" list if it is empty. [PR](https://github.com/fontra/fontra/pull/2491)
+
 ## 2026-03-12 [version 2026.3.3]
 
 - Fix font info navigation regression.
