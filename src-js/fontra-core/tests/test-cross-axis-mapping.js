@@ -98,6 +98,32 @@ describe("CrossAxisMapping Tests", () => {
     expect(mam.mapLocation(loc)).to.deep.equal(loc);
   });
 
+  it("Test mappings with output at default while input not at default", () => {
+    const axes = [newAxis("a"), newAxis("b")];
+    const mappings = [
+      {
+        inputLocation: { a: 100, b: 100 },
+        outputLocation: { a: 0, b: 100 },
+      },
+      {
+        inputLocation: { a: 100, b: 1e-18 }, // tiny but not zero
+        outputLocation: { a: 0, b: 0 },
+      },
+    ];
+
+    const mam = new CrossAxisMapping(axes, mappings);
+    expect(mam.mapLocation({})).to.deep.equal({ a: 0, b: 0 });
+    expect(mam.mapLocation({ a: 50 })).to.deep.equal({ a: 50, b: 0 });
+    expect(mam.mapLocation({ a: 100 })).to.deep.equal({ a: 100, b: 0 });
+    expect(mam.mapLocation({ b: 50 })).to.deep.equal({ a: 0, b: 50 });
+    expect(mam.mapLocation({ b: 100 })).to.deep.equal({ a: 0, b: 100 });
+    // Test that b wins, setting a to 0
+    expect(mam.mapLocation({ a: 100, b: 1 })).to.deep.equal({ a: 0, b: 1 });
+    expect(mam.mapLocation({ a: 10, b: 50 })).to.deep.equal({ a: 0, b: 50 });
+    expect(mam.mapLocation({ a: 50, b: 50 })).to.deep.equal({ a: 0, b: 50 });
+    expect(mam.mapLocation({ a: 50, b: 100 })).to.deep.equal({ a: 0, b: 100 });
+  });
+
   it("Test invalid mappings", () => {
     const mam = new CrossAxisMapping(axes, [
       {
@@ -113,3 +139,7 @@ describe("CrossAxisMapping Tests", () => {
     expect(mam.mapLocation(loc)).to.deep.equal(loc);
   });
 });
+
+function newAxis(name, minValue = 0, defaultValue = 0, maxValue = 100) {
+  return { name, minValue, defaultValue, maxValue };
+}
