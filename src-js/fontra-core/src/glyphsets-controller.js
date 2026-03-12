@@ -188,7 +188,11 @@ export class GlyphSetsController {
           const projectGlyphSets = Object.values(event.newValue).filter(
             (glyphSet) => glyphSet.url !== THIS_FONTS_GLYPHSET
           );
-          root.customData[PROJECT_GLYPH_SETS_CUSTOM_DATA_KEY] = projectGlyphSets;
+          if (projectGlyphSets.length) {
+            root.customData[PROJECT_GLYPH_SETS_CUSTOM_DATA_KEY] = projectGlyphSets;
+          } else if (root.customData[PROJECT_GLYPH_SETS_CUSTOM_DATA_KEY]) {
+            delete root.customData[PROJECT_GLYPH_SETS_CUSTOM_DATA_KEY];
+          }
         },
         this
       );
