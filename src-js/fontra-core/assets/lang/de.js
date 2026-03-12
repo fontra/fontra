@@ -238,9 +238,9 @@ export const strings = {
   "menubar.view.add-glyph-before-selected-glyph": "Glyphen hinzufügen (vor Auswahl) ",
   "menubar.view.find-glyphs-that-use": "Finde Glyphen die '%0' benutzen",
   "menubar.view.remove-selected-glyph-from-canvas":
-    "Entferne ausgewählten Glyphen von der Zeichenfläche",
+    "Entferne ausgewählten Glyphen von der Zeichenfläche...",
   "menubar.view.replace-selected-glyph-on-canvas":
-    "Ersetze ausgewählten Glyphen auf der Zeichenfläche",
+    "Ersetze ausgewählten Glyphen auf der Zeichenfläche...",
   "menubar.view.select-glyph-source-layer": "Select glyph/source/layer",
   "menubar.view.select-next-glyph": "Nächster Glyph",
   "menubar.view.select-next-source": "Nächste Source",

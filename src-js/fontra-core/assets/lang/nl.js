@@ -237,9 +237,9 @@ export const strings = {
     "Plaats glyph vóór de geselecteerde glyph",
   "menubar.view.find-glyphs-that-use": "Zoek glyphs die '%0' gebruiken",
   "menubar.view.remove-selected-glyph-from-canvas":
-    "Verwijder de geselecteerde glyph van het canvas",
+    "Verwijder de geselecteerde glyph van het canvas...",
   "menubar.view.replace-selected-glyph-on-canvas":
-    "Vervang de geselecteerde glyph op het canvas",
+    "Vervang de geselecteerde glyph op het canvas...",
   "menubar.view.select-glyph-source-layer": "Select glyph/source/layer",
   "menubar.view.select-next-glyph": "Select next glyph",
   "menubar.view.select-next-source": "Selecteer de volgende source",

@@ -18,12 +18,7 @@ describe("character-lines", () => {
     glyphMap[glyphName] = [];
   });
 
-  const characterMap = Object.fromEntries(
-    Object.entries(glyphMap).map(([glyphName, codePoints]) => [
-      codePoints[0],
-      glyphName,
-    ])
-  );
+  const characterMap = characterMapFromGlyphMap(glyphMap);
 
   const characterLinesFromStringTestData = [
     {
@@ -84,7 +79,42 @@ describe("character-lines", () => {
         ],
       ],
     },
+    {
+      input: "Z",
+      expectedLines: [[{ character: "Z", glyphName: undefined }]],
+    },
+    {
+      input: "$",
+      expectedLines: [[{ character: "$", glyphName: "outlier" }]],
+    },
+    {
+      input: "/$",
+      expectedLines: [[{ character: "$", glyphName: "outlier" }]],
+    },
+    {
+      input: "/$.alt",
+      expectedLines: [[{ character: undefined, glyphName: "outlier.alt" }]],
+    },
+    {
+      input: "/A",
+      expectedLines: [[{ character: "A", glyphName: "A" }]],
+    },
+    {
+      input: "/outlier",
+      expectedLines: [[{ character: "$", glyphName: "outlier" }]],
+    },
+    {
+      input: "/be-cy",
+      expectedLines: [[{ character: "б", glyphName: "be-cy" }]],
+    },
+    {
+      input: "/Nonstandard.with.ext",
+      expectedLines: [[{ character: undefined, glyphName: "Nonstandard.with.ext" }]],
+    },
   ];
+
+  const fallbackGlyphMap = { "outlier": [ord("$")], "Nonstandard.with.ext": [] };
+  const fallbackCharacterMap = characterMapFromGlyphMap(fallbackGlyphMap);
 
   const placeholderGlyphName = "Q";
 
@@ -101,7 +131,14 @@ describe("character-lines", () => {
       );
 
       expect(
-        characterLinesFromString(input, characterMap, glyphMap, placeholderGlyphName)
+        characterLinesFromString(
+          input,
+          characterMap,
+          glyphMap,
+          fallbackCharacterMap,
+          fallbackGlyphMap,
+          placeholderGlyphName
+        )
       ).to.deep.equal(expectedLines);
     }
   );
@@ -121,6 +158,7 @@ describe("character-lines", () => {
       input: [[{ character: "A", isPlaceholder: true }, { glyphName: "A" }]],
       expectedOutput: "/?/A",
     },
+    { input: [[{ character: "R", glyphName: "outlier" }]], expectedOutput: "R" },
   ];
 
   parametrize(
@@ -136,4 +174,13 @@ describe("character-lines", () => {
 
 function ord(s) {
   return s.codePointAt(0);
+}
+
+function characterMapFromGlyphMap(glyphMap) {
+  return Object.fromEntries(
+    Object.entries(glyphMap).map(([glyphName, codePoints]) => [
+      codePoints[0],
+      glyphName,
+    ])
+  );
 }

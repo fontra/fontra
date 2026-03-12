@@ -12,11 +12,12 @@ import { staticGlyphToGLIF } from "@fontra/core/glyph-glif.js";
 import { GlyphOrganizer } from "@fontra/core/glyph-organizer.js";
 import { pathToSVG } from "@fontra/core/glyph-svg.js";
 import {
-  GlyphSetsManager,
+  getMyGlyphSets,
+  GlyphSetsController,
   PROJECT_GLYPH_SETS_CUSTOM_DATA_KEY,
   readProjectGlyphSets,
   THIS_FONTS_GLYPHSET,
-} from "@fontra/core/glyphsets-ui.js";
+} from "@fontra/core/glyphsets-controller.js";
 import * as html from "@fontra/core/html-utils.js";
 import { loaderSpinner } from "@fontra/core/loader-spinner.js";
 import { translate } from "@fontra/core/localization.js";
@@ -144,20 +145,16 @@ export class FontOverviewController extends ViewController {
       this._updateFromWindowLocation();
     });
 
-    const myGlyphSetsController = new ObservableController({ settings: {} });
-    myGlyphSetsController.synchronizeWithLocalStorage("fontra-my-glyph-sets-");
-
     this.fontOverviewSettingsController = new ObservableController({
       ...getDefaultFontOverviewSettings(),
       projectGlyphSets: readProjectGlyphSets(this.fontController),
-      myGlyphSets: myGlyphSetsController.model.settings,
+      myGlyphSets: getMyGlyphSets(),
     });
     this.fontOverviewSettings = this.fontOverviewSettingsController.model;
 
-    this.glyphSetsManager = new GlyphSetsManager(
+    this.glyphSetsController = new GlyphSetsController(
       this.fontController,
-      this.fontOverviewSettingsController,
-      myGlyphSetsController
+      this.fontOverviewSettingsController
     );
 
     this.glyphOrganizer = new GlyphOrganizer();
@@ -340,8 +337,11 @@ export class FontOverviewController extends ViewController {
   }
 
   async _updateGlyphSelection() {
-    let { combinedItemList, shouldSort } =
-      await this.glyphSetsManager.getCombineGlyphItemList(this._fontGlyphItemList);
+    const { combinedGlyphMap, shouldSort } =
+      await this.glyphSetsController.getCombinedGlyphMap(this._fontGlyphItemList);
+
+    let combinedItemList = glyphMapToItemList(combinedGlyphMap);
+
     if (shouldSort) {
       combinedItemList = this.glyphOrganizer.sortGlyphs(combinedItemList);
     }
@@ -382,10 +382,13 @@ export class FontOverviewController extends ViewController {
     if (!selectedGlyphInfo.length) {
       return;
     }
+
     openGlyphsInEditor(
       selectedGlyphInfo,
       this.fontOverviewSettings.fontLocationUser,
-      this.fontController.glyphMap
+      this.fontController.glyphMap,
+      this.fontOverviewSettings.projectGlyphSetSelection,
+      this.fontOverviewSettings.myGlyphSetSelection
     );
   }
 
@@ -918,7 +921,13 @@ export class FontOverviewController extends ViewController {
   }
 }
 
-function openGlyphsInEditor(glyphsInfo, userLocation, glyphMap) {
+function openGlyphsInEditor(
+  glyphsInfo,
+  userLocation,
+  glyphMap,
+  projectGlyphSetSelection,
+  myGlyphSetSelection
+) {
   const url = new URL(window.location);
   url.pathname = url.pathname.replace("/fontoverview.html", "/editor.html");
 
@@ -942,6 +951,14 @@ function openGlyphsInEditor(glyphsInfo, userLocation, glyphMap) {
     } else {
       viewInfo.text += `/${glyphName}`;
     }
+  }
+
+  if (projectGlyphSetSelection.length) {
+    viewInfo["projectGlyphSetSelection"] = projectGlyphSetSelection;
+  }
+
+  if (myGlyphSetSelection.length) {
+    viewInfo["myGlyphSetSelection"] = myGlyphSetSelection;
   }
 
   url.hash = dumpURLFragment(viewInfo);

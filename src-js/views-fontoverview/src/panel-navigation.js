@@ -1,7 +1,7 @@
 import { groupByKeys, groupByProperties } from "@fontra/core/glyph-organizer.js";
 import {
   CheckboxGroup,
-  GlyphSetsUIController,
+  getGlyphSetsUIControllers,
   glyphSetsUIStyles,
 } from "@fontra/core/glyphsets-ui.js";
 import * as html from "@fontra/core/html-utils.js";
@@ -38,29 +38,11 @@ export class FontOverviewNavigation extends HTMLElement {
       this.fontOverviewSettingsController,
       "groupByKeys"
     );
-    this.projectGlyphSets = new GlyphSetsUIController(
+
+    [this.projectGlyphSets, this.myGlyphSets] = getGlyphSetsUIControllers(
       this.fontOverviewSettingsController,
-      {
-        label: "Project glyph sets", // TODO: translate
-        id: "project-glyph-sets",
-        collectionKey: "projectGlyphSets",
-        selectionKey: "projectGlyphSetSelection",
-        addGlyphSetToolTip: "Add a glyph set to the project",
-        copyToLabel: "my glyph sets",
-        otherCollectionKey: "myGlyphSets",
-        accordionId: "panel-navigation-accordion",
-      }
+      "panel-navigation-accordion"
     );
-    this.myGlyphSets = new GlyphSetsUIController(this.fontOverviewSettingsController, {
-      label: "My glyph sets", // TODO: translate
-      id: "my-glyph-sets",
-      collectionKey: "myGlyphSets",
-      selectionKey: "myGlyphSetSelection",
-      addGlyphSetToolTip: "Add a glyph set to my sets",
-      copyToLabel: "project glyph sets",
-      otherCollectionKey: "projectGlyphSets",
-      accordionId: "panel-navigation-accordion",
-    });
 
     const accordion = new Accordion();
     this.accordion = accordion;

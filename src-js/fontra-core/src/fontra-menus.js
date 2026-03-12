@@ -3,7 +3,12 @@ import { MenuItemDivider } from "@fontra/web-components/menu-panel.js";
 import { registerActionInfo } from "./actions.js";
 import * as html from "./html-utils.js";
 import { translate } from "./localization.js";
-import { assert } from "./utils.js";
+import {
+  assert,
+  dumpURLFragment,
+  isObjectEmpty,
+  readObjectFromURLFragment,
+} from "./utils.js";
 
 const mapMenuItemKeyToFunction = {
   File: getFileMenuItems,
@@ -11,7 +16,6 @@ const mapMenuItemKeyToFunction = {
   Edit: getEditMenuItems,
   View: getViewMenuItems,
   Glyph: getGlyphMenuItems,
-  Window: getWindowMenuItems,
 };
 
 export function makeFontraMenuBar(menuItemKeys, viewController) {
@@ -156,6 +160,13 @@ function getViewMenuItems() {
   ];
 }
 
+const fontOverviewInfoKeys = [
+  "projectGlyphSetSelection",
+  "myGlyphSetSelection",
+  "location",
+  "fontLocationUser",
+];
+
 function getFontMenuItems() {
   const menuItems = [
     ["font-info.title", "#font-info-panel"],
@@ -173,14 +184,30 @@ function getFontMenuItems() {
           title: translate(title),
           callback: () => {
             const url = new URL(window.location);
-            const openNewTab = !url.pathname.includes("fontinfo");
+            url.hash = "";
+            const openNewTab = !url.pathname.includes("fontinfo") || true;
+
             if (panelID === "fontoverview") {
+              const viewInfo = readObjectFromURLFragment();
+              if (viewInfo) {
+                const fontOverviewInfo = {};
+                for (const key of fontOverviewInfoKeys) {
+                  const value = viewInfo[key];
+                  if (value) {
+                    // TODO: fix location vs fontLocationUser (editor vs fontoverview)
+                    fontOverviewInfo[key == "location" ? "fontLocationUser" : key] =
+                      value;
+                  }
+                }
+                if (!isObjectEmpty(fontOverviewInfo)) {
+                  url.hash = dumpURLFragment(fontOverviewInfo);
+                }
+              }
               url.pathname = rerouteViewPath(url.pathname, "fontoverview");
-              url.hash = "";
             } else {
               url.pathname = rerouteViewPath(url.pathname, "fontinfo");
-              url.hash = panelID;
             }
+
             window.open(url.toString(), openNewTab ? undefined : "_self");
           },
         }
@@ -190,31 +217,6 @@ function getFontMenuItems() {
 
 function getGlyphMenuItems() {
   return [];
-}
-
-function getWindowMenuItems() {
-  return [
-    {
-      title: translate("font-overview.title"),
-      enabled: () => true,
-      callback: () => {
-        const url = new URL(window.location);
-        url.pathname = rerouteViewPath(url.pathname, "fontoverview");
-        url.hash = ""; // remove any hash
-        window.open(url.toString());
-      },
-    },
-    {
-      title: translate("editor.title"),
-      enabled: () => true,
-      callback: () => {
-        const url = new URL(window.location);
-        url.pathname = rerouteViewPath(url.pathname, "editor");
-        url.hash = ""; // remove any hash
-        window.open(url.toString());
-      },
-    },
-  ];
 }
 
 function rerouteViewPath(path, targetView) {

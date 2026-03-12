@@ -234,8 +234,10 @@ export const strings = {
   "menubar.view.add-glyph-after-selected-glyph": "Add glyph after selected glyph",
   "menubar.view.add-glyph-before-selected-glyph": "Add glyph before selected glyph",
   "menubar.view.find-glyphs-that-use": "Find glyphs that use '%0'",
-  "menubar.view.remove-selected-glyph-from-canvas": "Remove selected glyph from canvas",
-  "menubar.view.replace-selected-glyph-on-canvas": "Replace selected glyph on canvas",
+  "menubar.view.remove-selected-glyph-from-canvas":
+    "Remove selected glyph from canvas...",
+  "menubar.view.replace-selected-glyph-on-canvas":
+    "Replace selected glyph from canvas...",
   "menubar.view.select-glyph-source-layer": "Select glyph/source/layer",
   "menubar.view.select-next-glyph": "Select next glyph",
   "menubar.view.select-next-source": "Select next source",

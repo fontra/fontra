@@ -14,6 +14,11 @@ import {
   decomposeComponents,
   roundComponentOrigins,
 } from "@fontra/core/glyph-controller.js";
+import {
+  GlyphSetsController,
+  getMyGlyphSets,
+  readProjectGlyphSets,
+} from "@fontra/core/glyphsets-controller.js";
 import { translate, translatePlural } from "@fontra/core/localization.js";
 import { MouseTracker } from "@fontra/core/mouse-tracker.js";
 import { ObservableController } from "@fontra/core/observable-object.js";
@@ -26,7 +31,9 @@ import {
   equalRect,
   offsetRect,
   rectAddMargin,
+  rectFromArray,
   rectRound,
+  rectToArray,
 } from "@fontra/core/rectangle.js";
 import {
   difference,
@@ -39,7 +46,11 @@ import {
   arrowKeyDeltas,
   assert,
   commandKeyProperty,
+  consolidateCalls,
   enumerate,
+  getCharFromCodePoint,
+  glyphMapToItemList,
+  isObjectEmpty,
   objectsEqual,
   parseSelection,
   reversed,
@@ -67,7 +78,7 @@ export class SceneController {
     this.autoViewBox = true;
 
     this.setupSceneSettings();
-    this.sceneSettings = this.sceneSettingsController.model;
+
     this.visualizationLayersSettings = visualizationLayersSettings;
 
     // We need to do isPointInPath without having a context, we'll pass a bound method
@@ -88,6 +99,7 @@ export class SceneController {
 
     this.shaperController = new ShaperController(fontController);
 
+    this.setupGlyphSetsController();
     this.setupChangeListeners();
     this.setupSettingsListeners();
     this.setupEventHandling();
@@ -95,60 +107,38 @@ export class SceneController {
   }
 
   setupSceneSettings() {
-    this.sceneSettingsController = new ObservableController({
-      text: "",
-      align: "center",
-      editLayerName: null,
-      characterLines: [],
-      fontLocationUser: {},
-      fontLocationSource: {},
-      fontLocationSourceMapped: {},
-      fontAxesUseSourceCoordinates: false,
-      fontAxesShowEffectiveLocation: false,
-      fontAxesShowHidden: false,
-      fontAxesSkipMapping: false,
-      glyphLocation: {},
-      selectedGlyph: null,
-      selectedGlyphName: null,
-      selection: new Set(),
-      hoverSelection: new Set(),
-      combinedSelection: new Set(), // dynamic: selection | hoverSelection
-      viewBox: this.canvasController.getViewBox(),
-      positionedLines: [],
-      backgroundImagesAreLocked: true,
-      backgroundLayers: {},
-      editingLayers: {},
-      featureSettings: {},
-      textShaping: true,
-      textDirection: null,
-      textScript: null,
-      textLanguage: null,
-      shaper: null,
-      shaperInfo: null,
-      dumbShaperInfo: null,
-    });
+    this.sceneSettingsController = new ObservableController(getSceneSettingsDefaults());
     this.sceneSettings = this.sceneSettingsController.model;
 
+    this.sceneSettings.viewBox = this.canvasController.getViewBox();
+    this.sceneSettings.myGlyphSets = getMyGlyphSets();
+
     this.fontController.ensureInitialized.then(() => {
+      this.sceneSettings.projectGlyphSets = readProjectGlyphSets(this.fontController);
       this.updateShaperInfo();
     });
 
     // Set up the mutual relationship between text and characterLines
-    this.sceneSettingsController.addKeyListener("text", async (event) => {
-      if (event.senderInfo?.senderID === this) {
-        return;
+    this.sceneSettingsController.addKeyListener(
+      ["text", "combinedCharacterMap"],
+      async (event) => {
+        if (event.senderInfo?.senderID === this) {
+          return;
+        }
+        await this.fontController.ensureInitialized;
+        const characterLines = characterLinesFromString(
+          this.sceneSettings.text,
+          this.fontController.characterMap,
+          this.fontController.glyphMap,
+          this.sceneSettings.combinedCharacterMap,
+          this.sceneSettings.combinedGlyphMap,
+          this.sceneSettings.substituteGlyphName
+        );
+        this.sceneSettingsController.setItem("characterLines", characterLines, {
+          senderID: this,
+        });
       }
-      await this.fontController.ensureInitialized;
-      const characterLines = characterLinesFromString(
-        event.newValue,
-        this.fontController.characterMap,
-        this.fontController.glyphMap,
-        this.sceneSettings.substituteGlyphName
-      );
-      this.sceneSettingsController.setItem("characterLines", characterLines, {
-        senderID: this,
-      });
-    });
+    );
 
     this.sceneSettingsController.addKeyListener(
       "characterLines",
@@ -296,6 +286,10 @@ export class SceneController {
         if (event.senderInfo?.senderID === this) {
           return;
         }
+        if (!event.newValue) {
+          // Ignore null-ish
+          return;
+        }
         this.canvasController.setViewBox(event.newValue);
         const actualViewBox = this.canvasController.getViewBox();
         if (!equalRect(rectRound(event.newValue), rectRound(actualViewBox))) {
@@ -334,6 +328,135 @@ export class SceneController {
     this.sceneSettingsController.addKeyListener("applyTextShaping", (event) =>
       this.updateShaper()
     );
+
+    // Set up combinedGlyphMap and combinedCharacterMap dependencies
+    const updateCombinedGlyphAndCharacterMapping = consolidateCalls((event) =>
+      this.updateCombinedGlyphAndCharacterMapping(event)
+    );
+
+    this.sceneSettingsController.addKeyListener(
+      ["projectGlyphSetSelection", "myGlyphSetSelection"],
+      updateCombinedGlyphAndCharacterMapping
+    );
+
+    this.fontController.addChangeListener({ glyphMap: null }, (change) =>
+      updateCombinedGlyphAndCharacterMapping(null, change)
+    );
+  }
+
+  async updateCombinedGlyphAndCharacterMapping(event, change) {
+    if (
+      event &&
+      (event.key === "projectGlyphSetSelection" ||
+        event.key === "myGlyphSetSelection") &&
+      event.newValue.length === 0 &&
+      event.oldValue?.length === 0
+    ) {
+      return;
+    }
+
+    const fontGlyphItemList = glyphMapToItemList(this.fontController.glyphMap);
+    const { combinedGlyphMap, combinedCharacterMap } =
+      await this.glyphSetsController.getCombinedGlyphMap(fontGlyphItemList);
+
+    this.sceneSettings.combinedGlyphMap = combinedGlyphMap;
+    this.sceneSettings.combinedCharacterMap = combinedCharacterMap;
+  }
+
+  async updateSceneSettingsFromViewInfo(viewInfo) {
+    const defaultSettings = getSceneSettingsDefaults();
+    const sceneSettings = this.sceneSettings;
+
+    for (let { key, infoKey, waitKeyBefore, waitKeyAfter } of persistentSceneSettings) {
+      if (!infoKey) {
+        infoKey = key;
+      }
+      assert(key in defaultSettings, key);
+
+      const defaultValue = defaultSettings[key];
+      const viewValue =
+        key !== "viewBox"
+          ? viewInfo[infoKey]
+          : convertViewBoxArrayToRect(viewInfo[infoKey]);
+
+      if (viewValue === undefined) {
+        continue;
+      }
+
+      if (waitKeyBefore) {
+        await this.sceneSettingsController.waitForKeyChange(waitKeyBefore);
+      }
+
+      if (
+        defaultValue === null ||
+        typeof defaultValue == "number" ||
+        typeof defaultValue == "string" ||
+        typeof defaultValue == "boolean"
+      ) {
+        sceneSettings[key] = viewValue;
+      } else if (defaultValue instanceof Set) {
+        assert(defaultValue.size === 0, defaultValue);
+        sceneSettings[key] = new Set(viewValue);
+      } else if (defaultValue instanceof Array) {
+        assert(defaultValue.length === 0, defaultValue);
+        sceneSettings[key] = Array.from(viewValue);
+      } else if (typeof defaultValue == "object") {
+        assert(isObjectEmpty(defaultValue), defaultValue);
+        sceneSettings[key] = viewValue;
+      } else {
+        assert(false, `can't get here ${[key, defaultValue, viewValue]}`);
+      }
+
+      if (waitKeyAfter) {
+        await this.sceneSettingsController.waitForKeyChange(waitKeyAfter);
+      }
+    }
+  }
+
+  getViewInfoFromSceneSettings() {
+    const viewInfo = {};
+
+    const defaultSettings = getSceneSettingsDefaults();
+    const sceneSettings = this.sceneSettings;
+
+    for (let { key, infoKey } of persistentSceneSettings) {
+      if (!infoKey) {
+        infoKey = key;
+      }
+
+      const defaultValue = defaultSettings[key];
+      const settingsValue =
+        key !== "viewBox"
+          ? sceneSettings[key]
+          : convertViewBoxRectToArray(sceneSettings[key]);
+
+      if (
+        defaultValue === null ||
+        typeof defaultValue == "number" ||
+        typeof defaultValue == "string" ||
+        typeof defaultValue == "boolean"
+      ) {
+        if (settingsValue !== defaultValue) {
+          viewInfo[infoKey] = settingsValue;
+        }
+      } else if (defaultValue instanceof Set) {
+        if (settingsValue?.size) {
+          viewInfo[infoKey] = Array.from(settingsValue);
+        }
+      } else if (defaultValue instanceof Array) {
+        if (settingsValue?.length) {
+          viewInfo[infoKey] = Array.from(settingsValue);
+        }
+      } else if (typeof defaultValue == "object") {
+        if (settingsValue && !isObjectEmpty(settingsValue)) {
+          viewInfo[infoKey] = { ...settingsValue };
+        }
+      } else {
+        assert(false, `can't get here ${[key, defaultValue, viewValue]}`);
+      }
+    }
+
+    return viewInfo;
   }
 
   updateShaperInfo() {
@@ -383,6 +506,13 @@ export class SceneController {
         "backgroundImage/0",
       ]);
     }
+  }
+
+  setupGlyphSetsController() {
+    this.glyphSetsController = new GlyphSetsController(
+      this.fontController,
+      this.sceneSettingsController
+    );
   }
 
   setupChangeListeners() {
@@ -569,6 +699,15 @@ export class SceneController {
     this.sceneSettings.viewBox = bounds;
   }
 
+  glyphInfoFromGlyphName(glyphName) {
+    const glyphInfo = { glyphName: glyphName };
+    const codePoint = this.sceneSettings.combinedGlyphMap[glyphName]?.[0];
+    if (codePoint !== undefined) {
+      glyphInfo["character"] = getCharFromCodePoint(codePoint);
+    }
+    return glyphInfo;
+  }
+
   _resetStoredGlyphPosition() {
     this._previousGlyphPosition = positionedGlyphPosition(
       this.sceneModel.getSelectedPositionedGlyph()
@@ -673,6 +812,8 @@ export class SceneController {
       this.sceneSettings.text,
       this.fontController.characterMap,
       this.fontController.glyphMap,
+      this.sceneSettings.combinedCharacterMap,
+      this.sceneSettings.combinedGlyphMap,
       this.sceneSettings.substituteGlyphName
     );
     this.sceneSettingsController.setItem("characterLines", characterLines, {
@@ -1607,6 +1748,88 @@ class PathConnectDetector {
   clearConnectIndicator() {
     delete this.sceneController.sceneModel.pathConnectTargetPoint;
   }
+}
+
+const persistentSceneSettings = [
+  // Keep this order, may be important
+  { key: "align" },
+  { key: "featureSettings" },
+  { key: "applyTextShaping" },
+  { key: "textDirection" },
+  { key: "textScript" },
+  { key: "textLanguage" },
+  { key: "viewBox" },
+  { key: "text", waitKeyAfter: "characterLines" },
+  // "glyphLocations", // handled separately
+  { key: "fontAxesUseSourceCoordinates" },
+  { key: "fontAxesShowEffectiveLocation" },
+  { key: "fontAxesShowHidden" },
+  { key: "fontAxesSkipMapping" },
+  { key: "fontLocationUser", infoKey: "location" },
+  { key: "selectedGlyph" },
+  { key: "substituteGlyphName" },
+  { key: "editLayerName" },
+  { key: "editingLayers" },
+  { key: "selection", waitKeyBefore: "positionedLines" },
+  { key: "projectGlyphSetSelection" },
+  { key: "myGlyphSetSelection" },
+];
+
+export const persistentSceneSettingsKeys = persistentSceneSettings.map(
+  ({ key }) => key
+);
+
+function getSceneSettingsDefaults() {
+  return {
+    text: "",
+    align: "center",
+    editLayerName: null,
+    characterLines: [],
+    fontLocationUser: {},
+    fontLocationSource: {},
+    fontLocationSourceMapped: {},
+    fontAxesUseSourceCoordinates: false,
+    fontAxesShowEffectiveLocation: false,
+    fontAxesShowHidden: false,
+    fontAxesSkipMapping: false,
+    glyphLocation: {},
+    selectedGlyph: null,
+    selectedGlyphName: null,
+    substituteGlyphName: null,
+    selection: new Set(),
+    hoverSelection: new Set(),
+    combinedSelection: new Set(), // dynamic: selection | hoverSelection
+    viewBox: null,
+    positionedLines: [],
+    backgroundImagesAreLocked: true,
+    backgroundLayers: {},
+    editingLayers: {},
+    featureSettings: {},
+    applyTextShaping: true,
+    textDirection: null,
+    textScript: null,
+    textLanguage: null,
+    shaper: null,
+    shaperInfo: null,
+    dumbShaperInfo: null,
+    projectGlyphSets: {},
+    myGlyphSets: {},
+    projectGlyphSetSelection: [],
+    myGlyphSetSelection: [],
+    combinedGlyphMap: {},
+    combinedCharacterMap: {},
+  };
+}
+
+function convertViewBoxArrayToRect(viewBox) {
+  return viewBox && viewBox.every((value) => !isNaN(value))
+    ? rectFromArray(viewBox)
+    : null;
+}
+
+function convertViewBoxRectToArray(viewBox) {
+  viewBox = viewBox ? rectToArray(viewBox) : null;
+  return viewBox && viewBox.every((value) => !isNaN(value)) ? viewBox : null;
 }
 
 function reversePointSelection(path, pointSelection) {

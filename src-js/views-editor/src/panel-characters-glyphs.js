@@ -359,7 +359,7 @@ export default class CharactersGlyphsPanel extends Panel {
       ({ lineIndex } = this.sceneSettings.selectedGlyph);
     }
     const glyphInfo = glyphName
-      ? this.fontController.glyphInfoFromGlyphName(glyphName)
+      ? this.editorController.sceneController.glyphInfoFromGlyphName(glyphName)
       : null;
     const characterLines = [...this.sceneSettings.characterLines];
     const items = glyphInfo ? [glyphInfo] : [];
