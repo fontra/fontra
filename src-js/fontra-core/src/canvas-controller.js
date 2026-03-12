@@ -22,6 +22,8 @@ export class CanvasController {
     });
     resizeObserver.observe(this.canvas.parentElement);
 
+    this._setupScrollBlocker();
+
     canvas.addEventListener("wheel", (event) => this.handleWheel(event));
 
     // Safari pinch zoom:
@@ -48,6 +50,25 @@ export class CanvasController {
     this.setupSize();
     this.requestUpdate = consolidateCalls(() => this.draw());
     this.requestUpdate();
+  }
+
+  _setupScrollBlocker() {
+    this._initialScrollTarget = null;
+    this._scrollTimerID = null;
+
+    document.addEventListener("wheel", (event) => {
+      clearTimeout(this._scrollTimerID);
+      if (!this._initialScrollTarget) {
+        this._initialScrollTarget = event.target;
+      }
+      this._scrollTimerID = setTimeout(() => {
+        this._initialScrollTarget = null;
+      }, 100);
+    });
+  }
+
+  _shouldBlockScroll(event) {
+    return this._initialScrollTarget && this._initialScrollTarget !== this.canvas;
   }
 
   get canvasWidth() {
@@ -115,6 +136,12 @@ export class CanvasController {
 
   handleWheel(event) {
     event.preventDefault();
+
+    if (this._shouldBlockScroll(event)) {
+      // The scroll didn't start in the canvas: ignore
+      return;
+    }
+
     let { deltaX, deltaY, wheelDeltaX, wheelDeltaY } = event;
     // We try to detect whether the event comes from a "clunky" scroll wheel, one
     // that outputs rather large values for deltaY (this appears to be common on
