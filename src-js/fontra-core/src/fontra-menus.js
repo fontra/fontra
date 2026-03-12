@@ -185,7 +185,7 @@ function getFontMenuItems() {
           callback: () => {
             const url = new URL(window.location);
             url.hash = "";
-            const openNewTab = !url.pathname.includes("fontinfo") || true;
+            const openNewTab = !url.pathname.includes("fontinfo");
 
             if (panelID === "fontoverview") {
               const viewInfo = readObjectFromURLFragment();
