@@ -1,5 +1,9 @@
 # Changelog for Fontra
 
+## 2026-03-12 [version 2026.3.3]
+
+- Fix font info navigation regression.
+
 ## 2026-03-12 [version 2026.3.2]
 
 ### New features
