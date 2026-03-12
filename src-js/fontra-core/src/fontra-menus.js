@@ -206,6 +206,7 @@ function getFontMenuItems() {
               url.pathname = rerouteViewPath(url.pathname, "fontoverview");
             } else {
               url.pathname = rerouteViewPath(url.pathname, "fontinfo");
+              url.hash = panelID;
             }
 
             window.open(url.toString(), openNewTab ? undefined : "_self");
