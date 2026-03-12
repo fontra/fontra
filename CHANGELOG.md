@@ -4,6 +4,7 @@
 
 ### New features
 
+- [editor] Bring the "glyph sets" functionality from the font overview to the editor. The glyph set selection UI was added to the glyph search panel. Importantly, this _finally_ allows us to use custom glyph name/code point mappings in the editor. [PR 2489](https://github.com/fontra/fontra/pull/2489)
 - [translations] Added a full Traditional Chinese set of translation strings, contributed by 湖远星（Lake桑）. They also filled some gaps in the Simplified Chinese strings. [PR 2479](https://github.com/fontra/fontra/pull/2479)
 - [fontra-pak] Add a sample text field to the launcher window. If this is empty, launch into the font overview, but if it is not, launch into the editor with the text. [fontra-pak PR 228](https://github.com/fontra/fontra-pak/pull/228)
 
