@@ -7,6 +7,7 @@ import {
   mapBackward,
   mapForward,
   normalizeLocation,
+  normalizeLocationSparse,
   normalizeValue,
   piecewiseLinearMap,
   supportScalar,
@@ -197,6 +198,23 @@ describe("var-model tests", () => {
     it("buggy axis min/max", () => {
       const axes = [{ name: "wght", minValue: 0, defaultValue: 0, maxValue: -500 }];
       expect(normalizeLocation({ wght: 0 }, axes)).to.deep.equal({ wght: 0 });
+    });
+  });
+
+  describe("normalizeLocationSparse tests", () => {
+    it("-1,0,1", () => {
+      const axes = [{ name: "wght", minValue: 100, defaultValue: 400, maxValue: 900 }];
+      expect(normalizeLocationSparse({}, axes)).to.deep.equal({});
+      expect(normalizeLocationSparse({ wght: 400 }, axes)).to.deep.equal({ wght: 0.0 });
+      expect(normalizeLocationSparse({ wght: 100 }, axes)).to.deep.equal({
+        wght: -1.0,
+      });
+      expect(normalizeLocationSparse({ wght: 900 }, axes)).to.deep.equal({ wght: 1.0 });
+      expect(normalizeLocationSparse({ wght: 650 }, axes)).to.deep.equal({ wght: 0.5 });
+      expect(normalizeLocationSparse({ wght: 1000 }, axes)).to.deep.equal({
+        wght: 1.0,
+      });
+      expect(normalizeLocationSparse({ wght: 0 }, axes)).to.deep.equal({ wght: -1.0 });
     });
   });
 
