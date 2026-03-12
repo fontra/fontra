@@ -6,6 +6,7 @@ export const applicationSettingsController = new ObservableController({
   glyphSourcesSortOptions: "by-axis-value",
   alwaysShowGlobalAxesInComponentLocation: false,
   sortComponentLocationGlyphAxes: true,
+  disableAdHocMarks: false,
 });
 
 applicationSettingsController.synchronizeWithLocalStorage(

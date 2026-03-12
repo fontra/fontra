@@ -6,8 +6,10 @@ import { getShaper } from "./shaper.js";
 import { consolidateCalls, scheduleCalls } from "./utils.js";
 
 export class ShaperController {
-  constructor(fontController) {
+  constructor(fontController, applicationSettingsController) {
     this.fontController = fontController;
+    this.applicationSettingsController = applicationSettingsController;
+    this.applicationSettings = applicationSettingsController.model;
 
     this.invalidateShaper = new ObservableController({ counter: 0 });
 
@@ -49,6 +51,11 @@ export class ShaperController {
         ]);
       }, 10)
     );
+
+    applicationSettingsController.addKeyListener("disableAdHocMarks", (event) => {
+      delete this._glyphClasses;
+      this.invalidateShaper.model.counter++;
+    });
   }
 
   addInvalidateShaperListener(listener) {
@@ -237,12 +244,14 @@ export class ShaperController {
   async _getGlyphClasses() {
     const glyphInfos = await this.fontController.getGlyphInfos();
 
-    const isAdHocMark = (glyphName) => {
-      return this._adHocMarkGlyphs[glyphName];
-    };
+    const isAdHocMark = this.applicationSettings.disableAdHocMarks
+      ? (glyphName) => false
+      : (glyphName) => {
+          return this._adHocMarkGlyphs[glyphName];
+        };
 
     const isMark = (glyphName) => {
-      if (this._adHocMarkGlyphs[glyphName]) {
+      if (isAdHocMark(glyphName)) {
         return true;
       }
 
@@ -270,9 +279,7 @@ export class ShaperController {
     const glyphClasses = {
       base: [],
       ligature: [],
-      mark: Object.keys(this.fontController.glyphMap).filter((glyphName) =>
-        isMark(glyphName)
-      ),
+      mark: Object.keys(this.fontController.glyphMap).filter(isMark),
       component: [],
     };
 
