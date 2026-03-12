@@ -238,9 +238,9 @@ export const strings = {
     "Ajouter un glyphe avant le glyphe sélectionné",
   "menubar.view.find-glyphs-that-use": "Trouver les glyphes qui utilisent «%0»",
   "menubar.view.remove-selected-glyph-from-canvas":
-    "Retirer le glyphe sélectionné du canvas",
+    "Retirer le glyphe sélectionné du canvas...",
   "menubar.view.replace-selected-glyph-on-canvas":
-    "Remplacer le glyphe sélectionné du canvas",
+    "Remplacer le glyphe sélectionné du canvas...",
   "menubar.view.select-glyph-source-layer": "Select glyph/source/layer",
   "menubar.view.select-next-glyph": "Sélectionner le prochain glyphe",
   "menubar.view.select-next-source": "Sélectionner la source suivante ",
