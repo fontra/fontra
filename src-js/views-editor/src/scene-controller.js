@@ -97,7 +97,10 @@ export class SceneController {
     this._currentGlyphChangeListeners = [];
     this.contextMenuState = {};
 
-    this.shaperController = new ShaperController(fontController);
+    this.shaperController = new ShaperController(
+      fontController,
+      applicationSettingsController
+    );
 
     this.setupGlyphSetsController();
     this.setupChangeListeners();

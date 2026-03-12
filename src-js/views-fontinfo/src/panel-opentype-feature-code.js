@@ -40,6 +40,7 @@ import {
   lineNumbers,
   rectangularSelection,
 } from "@codemirror/view";
+import { applicationSettingsController } from "@fontra/core/application-settings.js";
 import * as html from "@fontra/core/html-utils.js";
 import { addStyleSheet } from "@fontra/core/html-utils.js";
 import { ShaperController } from "@fontra/core/shaper-controller.js";
@@ -281,7 +282,10 @@ export class OpenTypeFeatureCodePanel extends BaseInfoPanel {
       350
     );
 
-    this.shaperController = new ShaperController(this.fontController);
+    this.shaperController = new ShaperController(
+      this.fontController,
+      applicationSettingsController
+    );
     const features = await this.fontController.getFeatures();
     this.panelElement.innerHTML = "";
     const container = html.div(

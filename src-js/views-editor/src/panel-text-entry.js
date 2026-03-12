@@ -1,9 +1,14 @@
+import { applicationSettingsController } from "@fontra/core/application-settings.js";
 import { getGlyphInfoFromCodePoint } from "@fontra/core/glyph-data.js";
 import * as html from "@fontra/core/html-utils.js";
 import { features, languages, scripts } from "@fontra/core/opentype-tags.js";
 import { labeledCheckbox, labeledPopupSelect } from "@fontra/core/ui-utils.js";
 import { findNestedActiveElement } from "@fontra/core/utils.js";
-import { Accordion } from "@fontra/web-components/ui-accordion.js";
+import { showMenu } from "@fontra/web-components/menu-panel.js";
+import {
+  Accordion,
+  makeAccordionHeaderButton,
+} from "@fontra/web-components/ui-accordion.js";
 import Panel from "./panel.js";
 
 // These features are on by default. See hb-ot-shape.cc
@@ -106,7 +111,6 @@ export default class TextEntryPanel extends Panel {
       grid-template-columns: auto;
       gap: 0.5em;
       height: 100%;
-      overflow: hidden;
       align-content: start;
     }
 
@@ -153,6 +157,7 @@ export default class TextEntryPanel extends Panel {
       resize: none;
       overflow-x: auto;
       box-sizing: content-box;
+      max-height: 22vh;
     }
 
     ui-accordion {
@@ -490,6 +495,14 @@ export default class TextEntryPanel extends Panel {
         id: "shaping-options-accordion-item",
         label: "Text shaping options",
         open: true,
+
+        auxiliaryHeaderElement: makeAccordionHeaderButton({
+          icon: "menu-2",
+          id: "shaping-options-options-button",
+          tooltip: "Additional text shaping options", // TODO: translate
+          onclick: (event) => this.showTextShapingOptionsMenu(event),
+        }),
+
         content: html.div({ id: "shaping-options-contents" }, [
           labeledCheckbox(
             "Apply text shaping and features", // TODO: translate
@@ -572,6 +585,23 @@ export default class TextEntryPanel extends Panel {
 
     const placeHolder = this.contentElement.querySelector("#text-settings-accordion");
     placeHolder.replaceWith(this.accordion);
+  }
+
+  showTextShapingOptionsMenu(event) {
+    const menuItems = [
+      {
+        title: "Disable ad-hoc mark detection",
+        callback: () => {
+          applicationSettingsController.model.disableAdHocMarks =
+            !applicationSettingsController.model.disableAdHocMarks;
+        },
+        checked: applicationSettingsController.model.disableAdHocMarks,
+      },
+    ];
+
+    const button = this.accordion.querySelector("#shaping-options-options-button");
+    const buttonRect = button.getBoundingClientRect();
+    showMenu(menuItems, { x: buttonRect.left, y: buttonRect.bottom });
   }
 
   updateShaperError(error) {

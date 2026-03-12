@@ -46,7 +46,12 @@ import { IconButton } from "@fontra/web-components/icon-button.js";
 import { InlineSVG } from "@fontra/web-components/inline-svg.js";
 import { showMenu } from "@fontra/web-components/menu-panel.js";
 import { dialog, dialogSetup, message } from "@fontra/web-components/modal-dialog.js";
-import { Accordion } from "@fontra/web-components/ui-accordion.js";
+import {
+  Accordion,
+  groupAccordionHeaderButtons,
+  makeAccordionHeaderButton,
+  makeClickableIconHeader,
+} from "@fontra/web-components/ui-accordion.js";
 
 import { NumberFormatter } from "@fontra/core/formatters.js";
 import Panel from "./panel.js";
@@ -2290,57 +2295,6 @@ function statusListCell(item, colDesc) {
 
 function cellColorStyle(color) {
   return `background-color: ${rgbaToCSS(color)}; width: 100%;`;
-}
-
-function makeClickableIconHeader(iconPath, onClick) {
-  const focus = new FocusKeeper();
-  return html.div(
-    {
-      class: "clickable-icon-header",
-      style: "height: 1.2em; width: 1.2em;",
-      onmousedown: focus.save,
-      onclick: (event) => {
-        onClick(event);
-        focus.restore();
-      },
-    },
-    [
-      html.createDomElement("inline-svg", {
-        src: iconPath,
-      }),
-    ]
-  );
-}
-
-function groupAccordionHeaderButtons(buttons) {
-  return html.div(
-    {
-      style: `display: grid;
-      grid-template-columns: repeat(${buttons.length}, auto);
-      gap: 0.15em;
-      `,
-    },
-    buttons
-  );
-}
-
-function makeAccordionHeaderButton(button) {
-  const options = {
-    style: "width: 1.4em; height: 1.4em;",
-    src: `/tabler-icons/${button.icon}.svg`,
-    onclick: button.onclick,
-  };
-
-  if (button.id) {
-    options.id = button.id;
-  }
-
-  if (button.tooltip) {
-    options["data-tooltip"] = button.tooltip;
-    options["data-tooltipposition"] = "bottom";
-  }
-
-  return html.createDomElement("icon-button", options);
 }
 
 function getSourceCompareFunc(locationProperty, axisNames) {
