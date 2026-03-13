@@ -358,7 +358,7 @@ describe("shaper tests", () => {
       nominalGlyphFunc,
       glyphOrder,
       isGlyphMarkFunc,
-      insertMarkers: testDataMarkToLigatureInsertMarkers,
+      insertMarkers: markToLigatureInsertMarkers,
     });
     const glyphs = shaper.shape(testInputCodePointsKerningSkipMarks, glyphObjects, {
       kerningPairFunc: (g1, g2) => kerning.getGlyphPairValue(g1, g2),
@@ -1135,20 +1135,13 @@ feature liga {
 } liga;
   `;
 
-  const { fontData } = buildShaperFont(
+  const { fontData, insertMarkers: markToLigatureInsertMarkers } = buildShaperFont(
     1000,
     markToLigatureInputGlyphOrder,
     markToLigatureFeatureCode,
     [],
     markToLigatureGlyphClasses
   );
-
-  const testDataMarkToLigatureInsertMarkers = [
-    { tag: "curs", lookupId: undefined },
-    { tag: "kern", lookupId: undefined },
-    { tag: "mark", lookupId: undefined },
-    { tag: "mkmk", lookupId: undefined },
-  ];
 
   const testDataMarkToLigaturePositioning = [
     {
@@ -1217,7 +1210,7 @@ feature liga {
         nominalGlyphFunc,
         glyphOrder: markToLigatureInputGlyphOrder,
         isGlyphMarkFunc,
-        insertMarkers: testDataMarkToLigatureInsertMarkers,
+        insertMarkers: markToLigatureInsertMarkers,
       });
 
       const outputGlyphs = shaper.shape(testCase.inputCodePoints, markGlyphObjects, {});
