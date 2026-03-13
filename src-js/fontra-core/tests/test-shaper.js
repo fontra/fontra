@@ -353,12 +353,19 @@ describe("shaper tests", () => {
     },
   ];
 
+  const defaultInsertMarkers = [
+    { tag: "curs", lookupId: undefined },
+    { tag: "kern", lookupId: undefined },
+    { tag: "mark", lookupId: undefined },
+    { tag: "mkmk", lookupId: undefined },
+  ];
+
   it("test applyKerning skip marks", () => {
     const shaper = getShaper({
       nominalGlyphFunc,
       glyphOrder,
       isGlyphMarkFunc,
-      insertMarkers: markToLigatureInsertMarkers,
+      insertMarkers: defaultInsertMarkers,
     });
     const glyphs = shaper.shape(testInputCodePointsKerningSkipMarks, glyphObjects, {
       kerningPairFunc: (g1, g2) => kerning.getGlyphPairValue(g1, g2),
