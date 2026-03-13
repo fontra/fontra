@@ -353,12 +353,19 @@ describe("shaper tests", () => {
     },
   ];
 
+  const defaultInsertMarkers = [
+    { tag: "curs", lookupId: undefined },
+    { tag: "kern", lookupId: undefined },
+    { tag: "mark", lookupId: undefined },
+    { tag: "mkmk", lookupId: undefined },
+  ];
+
   it("test applyKerning skip marks", () => {
     const shaper = getShaper({
       nominalGlyphFunc,
       glyphOrder,
       isGlyphMarkFunc,
-      insertMarkers: testDataMarkToLigatureInsertMarkers,
+      insertMarkers: defaultInsertMarkers,
     });
     const glyphs = shaper.shape(testInputCodePointsKerningSkipMarks, glyphObjects, {
       kerningPairFunc: (g1, g2) => kerning.getGlyphPairValue(g1, g2),
@@ -1135,20 +1142,13 @@ feature liga {
 } liga;
   `;
 
-  const { fontData } = buildShaperFont(
+  const { fontData, insertMarkers: markToLigatureInsertMarkers } = buildShaperFont(
     1000,
     markToLigatureInputGlyphOrder,
     markToLigatureFeatureCode,
     [],
     markToLigatureGlyphClasses
   );
-
-  const testDataMarkToLigatureInsertMarkers = [
-    { tag: "curs", lookupId: undefined },
-    { tag: "kern", lookupId: undefined },
-    { tag: "mark", lookupId: undefined },
-    { tag: "mkmk", lookupId: undefined },
-  ];
 
   const testDataMarkToLigaturePositioning = [
     {
@@ -1217,13 +1217,71 @@ feature liga {
         nominalGlyphFunc,
         glyphOrder: markToLigatureInputGlyphOrder,
         isGlyphMarkFunc,
-        insertMarkers: testDataMarkToLigatureInsertMarkers,
+        insertMarkers: markToLigatureInsertMarkers,
       });
 
       const outputGlyphs = shaper.shape(testCase.inputCodePoints, markGlyphObjects, {});
       expect(outputGlyphs).to.deep.equal(testCase.expectedOutputGlyphs);
     }
   );
+
+  it("test glyph-classification-gdef-override", () => {
+    const gdefFeatureCode = `
+table GDEF {
+  # At least one class needs to contain a glyph
+  GlyphClassDef [H], [], [], []; # note: macroncomb is not in the "mark" class list
+} GDEF;
+  `;
+
+    const { fontData, insertMarkers } = buildShaperFont(
+      1000,
+      markToLigatureInputGlyphOrder,
+      gdefFeatureCode,
+      [],
+      markToLigatureGlyphClasses
+    );
+
+    expect(fontData).to.be.ok; // "truthy"
+
+    const shaper = getShaper({
+      fontData,
+      nominalGlyphFunc,
+      glyphOrder: markToLigatureInputGlyphOrder,
+      isGlyphMarkFunc,
+      insertMarkers,
+    });
+
+    const inputCodePoints = [ord("H"), 0x0304 /* macroncomb */];
+
+    const expectedGlyphs = [
+      {
+        cluster: 0,
+        codepoint: 1,
+        glyphname: "H",
+        mark: false,
+        x_advance: 500,
+        x_offset: 0,
+        y_advance: 0,
+        y_offset: 0,
+      },
+      {
+        cluster: 1,
+        codepoint: 5,
+        glyphname: "macroncomb",
+        mark: false,
+        x_advance: 500,
+        x_offset: 0,
+        y_advance: 0,
+        y_offset: 0,
+      },
+    ];
+
+    const glyphs = shaper.shape(inputCodePoints, glyphObjects, {
+      kerningPairFunc: (g1, g2) => kerning.getGlyphPairValue(g1, g2),
+    });
+
+    expect(glyphs).to.deep.equal(expectedGlyphs);
+  });
 
   const clusterTestData = [
     { clusters: [], numChars: 0, expectedGlyphToChars: [], expectedCharToGlyphs: [] },
