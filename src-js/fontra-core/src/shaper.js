@@ -178,7 +178,7 @@ class HBShaper extends ShaperBase {
     const glyphs = buffer.getGlyphInfosAndPositions();
     glyphs.forEach((glyph) => {
       glyph.glyphname = this.glyphOrder[glyph.codepoint];
-      glyph.mark = this.isGlyphMarkFunc(glyph.glyphname);
+      glyph.mark = this.face.getGlyphClass(glyph.codepoint) == "MARK";
       if (glyph.mark) {
         glyph.x_advance = 0; // Force marks to be zero-width
       }
