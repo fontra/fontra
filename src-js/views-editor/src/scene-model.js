@@ -23,6 +23,7 @@ import { difference, isEqualSet, union, updateSet } from "@fontra/core/set-ops.j
 import { MAX_UNICODE } from "@fontra/core/shaper.js";
 import { decomposedToTransform } from "@fontra/core/transform.js";
 import {
+  assert,
   consolidateCalls,
   enumerate,
   mapObjectKeys,
@@ -66,6 +67,7 @@ export class SceneModel {
         "textLanguage",
         "shaper",
         "combinedCharacterMap",
+        "enableShaperDebugger",
       ],
       (event) => {
         this.updateScene();
@@ -394,6 +396,10 @@ export class SceneModel {
 
     this.usedGlyphNames = usedGlyphNames;
     this.cachedGlyphNames = cachedGlyphNames;
+
+    if (result.shaperMessages) {
+      this.sceneSettings.shaperMessages = result.shaperMessages;
+    }
   }
 
   _adjustSubscriptions(currentGlyphNames, previousGlyphNames, wantLiveChanges) {
@@ -509,15 +515,22 @@ export class SceneModel {
       kerningPairFunc,
     };
 
+    let shaperMessages;
+
     for (const [lineIndex, characterLine] of enumerate(characterLines)) {
-      const positionedLine = await lineSetter.setLine(
-        { x: 0, y },
-        characterLine,
-        lineIndex == selectedLineIndex ? selectedGlyphIndex : undefined,
-        selectedGlyphIsEditing,
-        editLayerName,
-        shaperOptions
-      );
+      shaperOptions.trace =
+        this.sceneSettings.enableShaperDebugger &&
+        lineIndex == this.sceneSettings.glyphRenderInfoLineIndex;
+
+      const { positionedLine, shaperMessages: lineShaperMessages } =
+        await lineSetter.setLine(
+          { x: 0, y },
+          characterLine,
+          lineIndex == selectedLineIndex ? selectedGlyphIndex : undefined,
+          selectedGlyphIsEditing,
+          editLayerName,
+          shaperOptions
+        );
 
       if (!positionedLine) {
         return;
@@ -527,9 +540,14 @@ export class SceneModel {
 
       y -= lineDistance;
       positionedLines.push(positionedLine);
+
+      if (lineShaperMessages) {
+        assert(!shaperMessages);
+        shaperMessages = lineShaperMessages;
+      }
     }
 
-    return { longestLineLength, positionedLines };
+    return { longestLineLength, positionedLines, shaperMessages };
   }
 
   getShaperLocation(sourceLocation) {
@@ -1268,7 +1286,7 @@ class LineSetter {
       shaperOptions = { ...shaperOptions, direction };
     }
 
-    let shapedGlyphs = this.shaper.shape(
+    let { glyphs: shapedGlyphs, shaperMessages } = this.shaper.shape(
       codePoints,
       this.glyphInstances,
       shaperOptions
@@ -1287,7 +1305,11 @@ class LineSetter {
     }
 
     if (needsReshape) {
-      shapedGlyphs = this.shaper.shape(codePoints, this.glyphInstances, shaperOptions);
+      ({ glyphs: shapedGlyphs, shaperMessages } = this.shaper.shape(
+        codePoints,
+        this.glyphInstances,
+        shaperOptions
+      ));
     }
 
     for (const [glyphIndex, glyphInfo] of enumerate(shapedGlyphs)) {
@@ -1314,7 +1336,7 @@ class LineSetter {
       const yAdvanceLayerDifference = 0;
 
       if (this.cancelSignal.shouldCancel) {
-        return;
+        return {};
       }
 
       const isUndefined = !glyphInstance;
@@ -1383,7 +1405,8 @@ class LineSetter {
 
     const bounds = unionRect(...glyphs.map((glyph) => glyph.bounds));
 
-    return { bounds, glyphs, origin, endPoint: { x, y: origin.y } };
+    const positionedLine = { bounds, glyphs, origin, endPoint: { x, y: origin.y } };
+    return { positionedLine, shaperMessages };
   }
 }
 

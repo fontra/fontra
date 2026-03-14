@@ -131,7 +131,7 @@ class HBShaper extends ShaperBase {
 
   shape(codePoints, glyphObjects, options) {
     if (!codePoints.length) {
-      return [];
+      return { glyphs: [] };
     }
     const { variations, features, direction, script, language } = options;
 
@@ -152,6 +152,8 @@ class HBShaper extends ShaperBase {
 
     this.font.setVariations(variations || {});
 
+    this._messages = options.trace ? [] : null;
+
     const skipFeatures = this.setupInsertFeatures(buffer, options);
 
     this._glyphObjects = glyphObjects;
@@ -171,7 +173,7 @@ class HBShaper extends ShaperBase {
       options.direction
     );
 
-    return glyphs;
+    return { glyphs, shaperMessages: this._messages };
   }
 
   getGlyphInfoFromBuffer(buffer) {
@@ -190,9 +192,14 @@ class HBShaper extends ShaperBase {
   setupInsertFeatures(buffer, options) {
     const { emulatedFeatures, kerningPairFunc, direction } = options;
 
+    const messages = this._messages;
+
     const skipFeatures = this._getInitialSkipEmulatedFeatures(emulatedFeatures);
 
-    if (!this.insertMarkers?.some(({ lookupId }) => lookupId !== undefined)) {
+    if (
+      !messages &&
+      !this.insertMarkers?.some(({ lookupId }) => lookupId !== undefined)
+    ) {
       // An "undefined" lookupId means "do the emulation after HB is done"
       // So if all lookupIds are undefined, we don't need to use the insertion
       // mechanism at all.
@@ -204,6 +211,10 @@ class HBShaper extends ShaperBase {
     let gposPhase = false;
 
     buffer.setMessageFunc((buffer, font, message) => {
+      if (messages) {
+        messages.push(message);
+      }
+
       if (gposPhase) {
         const match = message.match(/^start lookup (\d+)/);
         if (!match) {
@@ -378,7 +389,7 @@ class DumbShaper extends ShaperBase {
       options.direction
     );
 
-    return glyphs;
+    return { glyphs };
   }
 
   getFeatureInfo(otTableTag) {

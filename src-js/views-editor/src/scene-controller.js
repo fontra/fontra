@@ -1826,6 +1826,8 @@ function getSceneSettingsDefaults() {
     shaperInfo: null,
     dumbShaperInfo: null,
     glyphRenderInfoLineIndex: 0,
+    enableShaperDebugger: false,
+    shaperMessages: null,
     projectGlyphSets: {},
     myGlyphSets: {},
     projectGlyphSetSelection: [],

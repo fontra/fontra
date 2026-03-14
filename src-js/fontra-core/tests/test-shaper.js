@@ -192,7 +192,7 @@ describe("shaper tests", () => {
       glyphOrder,
       isGlyphMarkFunc,
     });
-    const glyphs = shaper.shape(testInputCodePoints, glyphObjects, {
+    const { glyphs } = shaper.shape(testInputCodePoints, glyphObjects, {
       variations: { wght: 0, wdth: 0 },
       features: "-kern,-rvrn",
     });
@@ -209,7 +209,7 @@ describe("shaper tests", () => {
       glyphOrder,
       isGlyphMarkFunc,
     });
-    const glyphs = shaper.shape(testInputCodePoints, glyphObjects, {
+    const { glyphs } = shaper.shape(testInputCodePoints, glyphObjects, {
       direction: "rtl",
     });
 
@@ -293,7 +293,7 @@ describe("shaper tests", () => {
 
   it("test DumbShaper", () => {
     const shaper = getShaper({ nominalGlyphFunc, glyphOrder, isGlyphMarkFunc });
-    const glyphs = shaper.shape(testInputCodePoints, glyphObjects, {
+    const { glyphs } = shaper.shape(testInputCodePoints, glyphObjects, {
       variations: { wght: 0, wdth: 0 },
       features: "kern",
     });
@@ -304,7 +304,7 @@ describe("shaper tests", () => {
 
   it("test DumbShaper RTL", () => {
     const shaper = getShaper({ nominalGlyphFunc, glyphOrder, isGlyphMarkFunc });
-    const glyphs = shaper.shape(testInputCodePoints, glyphObjects, {
+    const { glyphs } = shaper.shape(testInputCodePoints, glyphObjects, {
       direction: "rtl",
     });
 
@@ -367,7 +367,7 @@ describe("shaper tests", () => {
       isGlyphMarkFunc,
       insertMarkers: defaultInsertMarkers,
     });
-    const glyphs = shaper.shape(testInputCodePointsKerningSkipMarks, glyphObjects, {
+    const { glyphs } = shaper.shape(testInputCodePointsKerningSkipMarks, glyphObjects, {
       kerningPairFunc: (g1, g2) => kerning.getGlyphPairValue(g1, g2),
     });
 
@@ -388,7 +388,7 @@ describe("shaper tests", () => {
     const glyphNames = codePoints.map((codePoint) => shaper.nominalGlyph(codePoint));
     expect(glyphNames).to.deep.equal(inputGlyphNames);
 
-    const glyphs = shaper.shape(codePoints, glyphObjects, {});
+    const { glyphs } = shaper.shape(codePoints, glyphObjects, {});
     const glyphNames2 = glyphs.map((g) => g.glyphname);
     expect(glyphNames2).to.deep.equal(inputGlyphNames);
   });
@@ -1220,8 +1220,8 @@ feature liga {
         insertMarkers: markToLigatureInsertMarkers,
       });
 
-      const outputGlyphs = shaper.shape(testCase.inputCodePoints, markGlyphObjects, {});
-      expect(outputGlyphs).to.deep.equal(testCase.expectedOutputGlyphs);
+      const { glyphs } = shaper.shape(testCase.inputCodePoints, markGlyphObjects, {});
+      expect(glyphs).to.deep.equal(testCase.expectedOutputGlyphs);
     }
   );
 
@@ -1276,7 +1276,7 @@ table GDEF {
       },
     ];
 
-    const glyphs = shaper.shape(inputCodePoints, glyphObjects, {
+    const { glyphs } = shaper.shape(inputCodePoints, glyphObjects, {
       kerningPairFunc: (g1, g2) => kerning.getGlyphPairValue(g1, g2),
     });
 

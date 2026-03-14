@@ -38,6 +38,10 @@ export default class CharactersGlyphsPanel extends Panel {
       (event) => this.throttledUpdate(),
       true // immediate, avoids mismatch with characterLines
     );
+
+    this.sceneSettingsController.addKeyListener("shaperMessages", (event) => {
+      this.updateShaperMessages(event.newValue);
+    });
   }
 
   getContentElement() {
@@ -193,6 +197,9 @@ export default class CharactersGlyphsPanel extends Panel {
       this.glyphDoubleClickHandler(event)
     );
 
+    this.shaperDebuggerList = new UIList();
+    this.shaperDebuggerList.minHeight = "5em";
+
     this.accordion = new Accordion();
     this.accordion.appendStyle(`
       ui-list {
@@ -213,11 +220,26 @@ export default class CharactersGlyphsPanel extends Panel {
         open: true,
         content: this.glyphList,
       },
+      {
+        label: translate("sidebar.characters-glyphs.shaper-debugger"),
+        open: false,
+        content: this.shaperDebuggerList,
+        id: "shaper-debugger",
+      },
     ];
+
+    this.accordion.onItemOpenClose = (item, open) =>
+      this._accordionItemOpenClose(item, open);
 
     return html.div({ class: "panel" }, [
       html.div({ class: "main-section" }, [this.accordion]),
     ]);
+  }
+
+  _accordionItemOpenClose(item, open) {
+    if (item.id == "shaper-debugger") {
+      this.sceneSettings.enableShaperDebugger = open;
+    }
   }
 
   async update() {
@@ -298,6 +320,10 @@ export default class CharactersGlyphsPanel extends Panel {
       this.characterList.setSelectedItemIndex(undefined);
       this.glyphList.setSelectedItemIndex(undefined);
     }
+  }
+
+  updateShaperMessages(shaperMessages) {
+    this.shaperDebuggerList.setItems(shaperMessages);
   }
 
   async toggle(on, focus) {
