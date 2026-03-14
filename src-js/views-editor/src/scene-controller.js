@@ -559,6 +559,16 @@ export class SceneController {
     });
 
     this.sceneSettingsController.addKeyListener(
+      "selectedGlyph",
+      (event) => {
+        if (event.newValue) {
+          this.sceneSettings.glyphRenderInfoLineIndex = event.newValue.lineIndex;
+        }
+      },
+      true // immediate
+    );
+
+    this.sceneSettingsController.addKeyListener(
       "align",
       (event) => {
         this.scrollAdjustBehavior = "text-align";
@@ -1815,6 +1825,7 @@ function getSceneSettingsDefaults() {
     shaper: null,
     shaperInfo: null,
     dumbShaperInfo: null,
+    glyphRenderInfoLineIndex: 0,
     projectGlyphSets: {},
     myGlyphSets: {},
     projectGlyphSetSelection: [],

@@ -38,13 +38,6 @@ export default class CharactersGlyphsPanel extends Panel {
       (event) => this.throttledUpdate(),
       true // immediate, avoids mismatch with characterLines
     );
-
-    // this.sceneSettingsController.addKeyListener(
-    //   ["selectedGlyph"],
-    //   (event) => console.log("sel changed")
-    // );
-
-    this.selectedLineIndex = 0;
   }
 
   getContentElement() {
@@ -96,7 +89,7 @@ export default class CharactersGlyphsPanel extends Panel {
       const characterIndex = this.characterList.getSelectedItemIndex();
       const glyphIndices = this.characterGlyphMapping.charToGlyphs[characterIndex];
       this.sceneSettings.selectedGlyph = {
-        lineIndex: this.selectedLineIndex,
+        lineIndex: this.sceneSettings.glyphRenderInfoLineIndex,
         glyphIndex: glyphIndices[0],
       };
       this.glyphList.setSelectedItemIndices(glyphIndices, false, true);
@@ -192,7 +185,7 @@ export default class CharactersGlyphsPanel extends Panel {
     this.glyphList.addEventListener("listSelectionChanged", (event) => {
       const glyphIndex = this.glyphList.getSelectedItemIndex();
       this.sceneSettings.selectedGlyph = {
-        lineIndex: this.selectedLineIndex,
+        lineIndex: this.sceneSettings.glyphRenderInfoLineIndex,
         glyphIndex,
       };
     });
@@ -230,24 +223,24 @@ export default class CharactersGlyphsPanel extends Panel {
   async update() {
     const selectedGlyph = this.sceneSettings.selectedGlyph;
 
-    this.selectedLineIndex = selectedGlyph?.lineIndex ?? this.selectedLineIndex;
     const glyphIndex = selectedGlyph?.glyphIndex;
+    const lineIndex = this.sceneSettings.glyphRenderInfoLineIndex;
 
     const charLines = this.sceneSettings.characterLines;
     const positionedLines = this.sceneSettings.positionedLines;
 
     if (
-      !this.selectedLineIndex === undefined ||
-      !charLines[this.selectedLineIndex] ||
-      !positionedLines[this.selectedLineIndex]
+      !lineIndex === undefined ||
+      !charLines[lineIndex] ||
+      !positionedLines[lineIndex]
     ) {
       this.characterList.setItems([]);
       this.glyphList.setItems([]);
       return;
     }
 
-    const charLine = charLines[this.selectedLineIndex];
-    const positionedLine = positionedLines[this.selectedLineIndex];
+    const charLine = charLines[lineIndex];
+    const positionedLine = positionedLines[lineIndex];
 
     const charItems = charLine.map(({ character, glyphName }, index) => ({
       character,
