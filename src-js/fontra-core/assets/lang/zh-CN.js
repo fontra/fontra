@@ -262,6 +262,7 @@ export const strings = {
   "sidebar.characters-glyphs": "输入字符及输出字形",
   "sidebar.characters-glyphs.input-characters": "输入字符",
   "sidebar.characters-glyphs.output-glyphs": "输出字形",
+  "sidebar.characters-glyphs.shaper-debugger": "Shaper debugger",
   "sidebar.designspace-navigation": "Designspace 导航",
   "sidebar.designspace-navigation.dialog.add-source.label.layer": "图层：",
   "sidebar.designspace-navigation.dialog.add-source.label.source-name": "源名称：",
