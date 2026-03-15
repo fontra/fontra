@@ -197,8 +197,8 @@ export default class CharactersGlyphsPanel extends Panel {
       this.glyphDoubleClickHandler(event)
     );
 
-    this.shaperDebuggerList = new UIList();
-    this.shaperDebuggerList.minHeight = "5em";
+    this.shapingDebuggerList = new UIList();
+    this.shapingDebuggerList.minHeight = "5em";
 
     this.accordion = new Accordion();
     this.accordion.appendStyle(`
@@ -223,7 +223,7 @@ export default class CharactersGlyphsPanel extends Panel {
       {
         label: translate("sidebar.characters-glyphs.shaping-debugger"),
         open: false,
-        content: this.shaperDebuggerList,
+        content: this.shapingDebuggerList,
         id: "shaper-debugger",
       },
     ];
@@ -323,7 +323,7 @@ export default class CharactersGlyphsPanel extends Panel {
   }
 
   updateShaperMessages(shaperMessages) {
-    this.shaperDebuggerList.setItems(shaperMessages);
+    this.shapingDebuggerList.setItems(shaperMessages);
   }
 
   async toggle(on, focus) {
