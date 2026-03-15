@@ -328,6 +328,7 @@ export class UIList extends UnlitElement {
     this.rowsElement.innerHTML = "";
     this.items = items;
     this._itemsBackLog = Array.from(items);
+    // TODO: the following is wrong if the list contains duplicate items
     this.setSelectedItem(selectedItem, shouldDispatchEvent);
     this._addMoreItemsIfNeeded();
     if (keepScrollPosition) {

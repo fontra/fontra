@@ -327,6 +327,7 @@ export default class CharactersGlyphsPanel extends Panel {
   }
 
   updateShapingDebuggerMessages(shaperMessages) {
+    // Set selection index explicitly as setItems() messes it up
     const breakIndex = this.shapingDebuggerList.getSelectedItemIndex();
     this.shapingDebuggerList.setItems(shaperMessages);
     this.shapingDebuggerList.setSelectedItemIndex(breakIndex);
