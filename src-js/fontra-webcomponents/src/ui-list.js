@@ -590,7 +590,15 @@ export class UIList extends UnlitElement {
   _clickHandler(event) {
     const rowIndex = this._getRowIndexFromTarget(event.target);
     if (rowIndex !== undefined) {
-      this.setSelectedItemIndex(rowIndex, true);
+      if (
+        rowIndex == this.getSelectedItemIndex() &&
+        this.allowEmptySelection &&
+        event.shiftKey
+      ) {
+        this.setSelectedItemIndex(undefined, true);
+      } else {
+        this.setSelectedItemIndex(rowIndex, true);
+      }
     }
   }
 
