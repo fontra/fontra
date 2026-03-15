@@ -637,7 +637,8 @@ export class UIList extends UnlitElement {
     while (node && node.parentNode !== this.rowsElement) {
       node = node.parentNode;
     }
-    return node?.dataset.rowIndex;
+    const rowIndex = node?.dataset.rowIndex;
+    return rowIndex ? Number(rowIndex) : undefined;
   }
 
   setSelectedItemIndex(
@@ -699,7 +700,6 @@ export class UIList extends UnlitElement {
   }
 
   getSelectedItemIndex() {
-    const indices = [...this.selectedItemIndices];
     return firstItemOfSet(this.selectedItemIndices);
   }
 
