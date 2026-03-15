@@ -39,8 +39,8 @@ export default class CharactersGlyphsPanel extends Panel {
       true // immediate, avoids mismatch with characterLines
     );
 
-    this.sceneSettingsController.addKeyListener("shaperMessages", (event) => {
-      this.updateShaperMessages(event.newValue);
+    this.sceneSettingsController.addKeyListener("shapingDebuggerMessages", (event) => {
+      this.updateShapingDebuggerMessages(event.newValue);
     });
   }
 
@@ -238,7 +238,7 @@ export default class CharactersGlyphsPanel extends Panel {
 
   _accordionItemOpenClose(item, open) {
     if (item.id == "shaper-debugger") {
-      this.sceneSettings.enableShaperDebugger = open;
+      this.sceneSettings.shapingDebuggerEnabled = open;
     }
   }
 
@@ -322,7 +322,7 @@ export default class CharactersGlyphsPanel extends Panel {
     }
   }
 
-  updateShaperMessages(shaperMessages) {
+  updateShapingDebuggerMessages(shaperMessages) {
     this.shapingDebuggerList.setItems(shaperMessages);
   }
 

@@ -67,7 +67,7 @@ export class SceneModel {
         "textLanguage",
         "shaper",
         "combinedCharacterMap",
-        "enableShaperDebugger",
+        "shapingDebuggerEnabled",
       ],
       (event) => {
         this.updateScene();
@@ -398,7 +398,7 @@ export class SceneModel {
     this.cachedGlyphNames = cachedGlyphNames;
 
     if (result.shaperMessages) {
-      this.sceneSettings.shaperMessages = result.shaperMessages;
+      this.sceneSettings.shapingDebuggerMessages = result.shaperMessages;
     }
   }
 
@@ -519,7 +519,7 @@ export class SceneModel {
 
     for (const [lineIndex, characterLine] of enumerate(characterLines)) {
       shaperOptions.trace =
-        this.sceneSettings.enableShaperDebugger &&
+        this.sceneSettings.shapingDebuggerEnabled &&
         lineIndex == this.sceneSettings.glyphRenderInfoLineIndex;
 
       const { positionedLine, shaperMessages: lineShaperMessages } =
