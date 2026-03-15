@@ -5,6 +5,7 @@ import { isDisjoint, updateSet } from "@fontra/core/set-ops.js";
 import { characterGlyphMapping } from "@fontra/core/shaper.js";
 import {
   makeUPlusStringFromCodePoint,
+  objectsEqual,
   round,
   throttleCalls,
 } from "@fontra/core/utils.js";
@@ -12,6 +13,7 @@ import { showMenu } from "@fontra/web-components/menu-panel.js";
 import { Accordion } from "@fontra/web-components/ui-accordion.js";
 import { UIList } from "@fontra/web-components/ui-list.js";
 import Panel from "./panel.js";
+import { equalGlyphSelection } from "./scene-controller.js";
 
 export default class CharactersGlyphsPanel extends Panel {
   identifier = "characters-glyphs";
@@ -199,10 +201,9 @@ export default class CharactersGlyphsPanel extends Panel {
 
     this.shapingDebuggerList = new UIList();
     this.shapingDebuggerList.minHeight = "5em";
-    this.shapingDebuggerList.addEventListener("listSelectionChanged", (event) => {
-      this.sceneSettings.shapingDebuggerBreakIndex =
-        this.shapingDebuggerList.getSelectedItemIndex() ?? null;
-    });
+    this.shapingDebuggerList.addEventListener("listSelectionChanged", (event) =>
+      this.shapingDebuggerListClickHandler(event)
+    );
 
     this.accordion = new Accordion();
     this.accordion.appendStyle(`
@@ -326,11 +327,43 @@ export default class CharactersGlyphsPanel extends Panel {
     }
   }
 
-  updateShapingDebuggerMessages(shaperMessages) {
-    // Set selection index explicitly as setItems() messes it up
+  shapingDebuggerListClickHandler(event) {
     const breakIndex = this.shapingDebuggerList.getSelectedItemIndex();
-    this.shapingDebuggerList.setItems(shaperMessages);
-    this.shapingDebuggerList.setSelectedItemIndex(breakIndex);
+
+    if (breakIndex == this.sceneSettings.shapingDebuggerBreakIndex) {
+      return;
+    }
+
+    this.sceneSettings.shapingDebuggerBreakIndex = breakIndex ?? null;
+
+    if (breakIndex == null) {
+      return;
+    }
+
+    const selectedMessage = this.sceneSettings.shapingDebuggerMessages[breakIndex];
+    if (selectedMessage) {
+      let selectedGlyph;
+      const m = selectedMessage.match(/at (\d+(,\d+)*)/);
+      if (m) {
+        const indices = m[1].split(",").map((v) => Number(v));
+        selectedGlyph = {
+          lineIndex: this.sceneSettings.glyphRenderInfoLineIndex,
+          glyphIndex: indices[0],
+        };
+      } else {
+        selectedGlyph = null;
+      }
+      if (!equalGlyphSelection(this.sceneSettings.selectedGlyph, selectedGlyph)) {
+        this.sceneSettings.selectedGlyph = selectedGlyph;
+      }
+    }
+  }
+
+  updateShapingDebuggerMessages(shaperMessages) {
+    if (!objectsEqual(shaperMessages, this.shapingDebuggerList.items)) {
+      this.shapingDebuggerList.setItems(shaperMessages);
+      this.shapingDebuggerList.setSelectedItemIndex(undefined, false);
+    }
   }
 
   async toggle(on, focus) {
