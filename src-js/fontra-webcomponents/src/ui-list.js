@@ -595,6 +595,7 @@ export class UIList extends UnlitElement {
         this.allowEmptySelection &&
         event.shiftKey
       ) {
+        // Deselect
         this.setSelectedItemIndex(undefined, true);
       } else {
         this.setSelectedItemIndex(rowIndex, true);
