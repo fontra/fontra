@@ -181,14 +181,24 @@ class HBShaper extends ShaperBase {
     };
   }
 
+  getGlyphInfoFromBufferReorderingPhase(buffer) {
+    const glyphs = buffer.getGlyphInfosAndPositions();
+    glyphs.forEach((glyph) => {
+      glyph.glyphname = this.nominalGlyph(glyph.codepoint);
+      glyph.codepoint = glyph.glyphname ? this.glyphNameToID[glyph.glyphname] ?? 0 : 0;
+      glyph.x_advance = this._glyphObjects[glyph.glyphname]?.xAdvance ?? 500;
+      glyph.y_advance = 0; // TODO
+      glyph.x_offset = 0;
+      glyph.y_offset = 0;
+    });
+    return glyphs;
+  }
+
   getGlyphInfoFromBuffer(buffer) {
     const glyphs = buffer.getGlyphInfosAndPositions();
     glyphs.forEach((glyph) => {
       glyph.glyphname = this.glyphOrder[glyph.codepoint];
       glyph.mark = this.face.getGlyphClass(glyph.codepoint) == "MARK";
-      if (glyph.mark) {
-        glyph.x_advance = 0; // Force marks to be zero-width
-      }
       if (glyph.x_advance == undefined) {
         // During the GSUB phase, positioning is stil undefined, but we need
         // it for tracing
@@ -197,7 +207,9 @@ class HBShaper extends ShaperBase {
         glyph.x_offset = 0;
         glyph.y_offset = 0;
       }
-      return glyph;
+      if (glyph.mark) {
+        glyph.x_advance = 0; // Force marks to be zero-width
+      }
     });
     return glyphs;
   }
@@ -221,12 +233,22 @@ class HBShaper extends ShaperBase {
 
     const isRTL = direction == "rtl";
 
+    let reorderingPhase = true;
     let gposPhase = false;
 
     buffer.setMessageFunc((buffer, font, message) => {
       if (messages) {
+        if (reorderingPhase && message.startsWith("start table GSUB")) {
+          reorderingPhase = false;
+        }
+
         if (options.traceBreakIndex == messages.length) {
-          this._glyphsAtBreakIndex = this.getGlyphInfoFromBuffer(buffer);
+          if (reorderingPhase) {
+            this._glyphsAtBreakIndex =
+              this.getGlyphInfoFromBufferReorderingPhase(buffer);
+          } else {
+            this._glyphsAtBreakIndex = this.getGlyphInfoFromBuffer(buffer);
+          }
         }
         messages.push(message);
       }
