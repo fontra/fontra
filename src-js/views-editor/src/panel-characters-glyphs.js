@@ -221,7 +221,7 @@ export default class CharactersGlyphsPanel extends Panel {
         content: this.glyphList,
       },
       {
-        label: translate("sidebar.characters-glyphs.shaper-debugger"),
+        label: translate("sidebar.characters-glyphs.shaping-debugger"),
         open: false,
         content: this.shaperDebuggerList,
         id: "shaper-debugger",
