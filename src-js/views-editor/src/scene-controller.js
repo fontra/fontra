@@ -1828,6 +1828,7 @@ function getSceneSettingsDefaults() {
     glyphRenderInfoLineIndex: 0,
     shapingDebuggerEnabled: false,
     shapingDebuggerMessages: null,
+    shapingDebuggerBreakIndex: null,
     projectGlyphSets: {},
     myGlyphSets: {},
     projectGlyphSetSelection: [],

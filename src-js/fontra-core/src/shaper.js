@@ -153,6 +153,7 @@ class HBShaper extends ShaperBase {
     this.font.setVariations(variations || {});
 
     this._messages = options.trace ? [] : null;
+    this._glyphsAtBreakIndex = null;
 
     const skipFeatures = this.setupInsertFeatures(buffer, options);
 
@@ -173,7 +174,11 @@ class HBShaper extends ShaperBase {
       options.direction
     );
 
-    return { glyphs, shaperMessages: this._messages };
+    return {
+      glyphs,
+      shaperMessages: this._messages,
+      glyphsAtBreakIndex: this._glyphsAtBreakIndex,
+    };
   }
 
   getGlyphInfoFromBuffer(buffer) {
@@ -183,6 +188,14 @@ class HBShaper extends ShaperBase {
       glyph.mark = this.face.getGlyphClass(glyph.codepoint) == "MARK";
       if (glyph.mark) {
         glyph.x_advance = 0; // Force marks to be zero-width
+      }
+      if (glyph.x_advance == undefined) {
+        // During the GSUB phase, positioning is stil undefined, but we need
+        // it for tracing
+        glyph.x_advance = this._glyphObjects[glyph.glyphname]?.xAdvance ?? 500;
+        glyph.y_advance = 0; // TODO
+        glyph.x_offset = 0;
+        glyph.y_offset = 0;
       }
       return glyph;
     });
@@ -212,6 +225,9 @@ class HBShaper extends ShaperBase {
 
     buffer.setMessageFunc((buffer, font, message) => {
       if (messages) {
+        if (options.traceBreakIndex == messages.length) {
+          this._glyphsAtBreakIndex = this.getGlyphInfoFromBuffer(buffer);
+        }
         messages.push(message);
       }
 

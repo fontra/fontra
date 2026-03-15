@@ -199,6 +199,10 @@ export default class CharactersGlyphsPanel extends Panel {
 
     this.shapingDebuggerList = new UIList();
     this.shapingDebuggerList.minHeight = "5em";
+    this.shapingDebuggerList.addEventListener("listSelectionChanged", (event) => {
+      this.sceneSettings.shapingDebuggerBreakIndex =
+        this.shapingDebuggerList.getSelectedItemIndex() ?? null;
+    });
 
     this.accordion = new Accordion();
     this.accordion.appendStyle(`
@@ -323,7 +327,9 @@ export default class CharactersGlyphsPanel extends Panel {
   }
 
   updateShapingDebuggerMessages(shaperMessages) {
+    const breakIndex = this.shapingDebuggerList.getSelectedItemIndex();
     this.shapingDebuggerList.setItems(shaperMessages);
+    this.shapingDebuggerList.setSelectedItemIndex(breakIndex);
   }
 
   async toggle(on, focus) {

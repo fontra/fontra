@@ -68,6 +68,7 @@ export class SceneModel {
         "shaper",
         "combinedCharacterMap",
         "shapingDebuggerEnabled",
+        "shapingDebuggerBreakIndex",
       ],
       (event) => {
         this.updateScene();
@@ -513,6 +514,7 @@ export class SceneModel {
       language: this.sceneSettings.textLanguage,
       emulatedFeatures,
       kerningPairFunc,
+      traceBreakIndex: this.sceneSettings.shapingDebuggerBreakIndex,
     };
 
     let shaperMessages;
@@ -1286,11 +1288,11 @@ class LineSetter {
       shaperOptions = { ...shaperOptions, direction };
     }
 
-    let { glyphs: shapedGlyphs, shaperMessages } = this.shaper.shape(
-      codePoints,
-      this.glyphInstances,
-      shaperOptions
-    );
+    let {
+      glyphs: shapedGlyphs,
+      shaperMessages,
+      glyphsAtBreakIndex,
+    } = this.shaper.shape(codePoints, this.glyphInstances, shaperOptions);
     let needsReshape = false;
     for (const glyphInfo of shapedGlyphs) {
       if (
@@ -1305,11 +1307,15 @@ class LineSetter {
     }
 
     if (needsReshape) {
-      ({ glyphs: shapedGlyphs, shaperMessages } = this.shaper.shape(
-        codePoints,
-        this.glyphInstances,
-        shaperOptions
-      ));
+      ({
+        glyphs: shapedGlyphs,
+        shaperMessages,
+        glyphsAtBreakIndex,
+      } = this.shaper.shape(codePoints, this.glyphInstances, shaperOptions));
+    }
+
+    if (glyphsAtBreakIndex) {
+      shapedGlyphs = glyphsAtBreakIndex;
     }
 
     for (const [glyphIndex, glyphInfo] of enumerate(shapedGlyphs)) {
