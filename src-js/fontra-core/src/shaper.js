@@ -175,9 +175,8 @@ class HBShaper extends ShaperBase {
     );
 
     return {
-      glyphs,
+      glyphs: this._glyphsAtBreakIndex ?? glyphs,
       shaperMessages: this._messages,
-      glyphsAtBreakIndex: this._glyphsAtBreakIndex,
     };
   }
 
