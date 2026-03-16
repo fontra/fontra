@@ -234,6 +234,7 @@ class HBShaper extends ShaperBase {
 
     let reorderingPhase = true;
     let gposPhase = false;
+    let glyphsFollowWritingDirection = true;
 
     buffer.setMessageFunc((buffer, font, message) => {
       if (messages) {
@@ -248,8 +249,15 @@ class HBShaper extends ShaperBase {
           } else {
             this._glyphsAtBreakIndex = this.getGlyphInfoFromBuffer(buffer);
           }
+          if (glyphsFollowWritingDirection && isRTL) {
+            this._glyphsAtBreakIndex.reverse();
+          }
         }
         messages.push(message);
+
+        if (message.startsWith("end table GPOS")) {
+          glyphsFollowWritingDirection = false;
+        }
       }
 
       if (gposPhase) {
