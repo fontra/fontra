@@ -366,6 +366,7 @@ export default class CharactersGlyphsPanel extends Panel {
   }
 
   updateShapingDebuggerMessages(shaperMessages) {
+    shaperMessages = shaperMessages.concat(["the end"]);
     if (!objectsEqual(shaperMessages, this.shapingDebuggerList.items)) {
       this.shapingDebuggerList.setItems(shaperMessages);
       this.shapingDebuggerList.setSelectedItemIndex(undefined, false);
