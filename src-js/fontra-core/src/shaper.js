@@ -82,24 +82,25 @@ class ShaperBase {
     glyphObjects,
     skipFeatures,
     kerningPairFunc,
-    direction
+    direction,
+    messageFunc = null
   ) {
     const isRTL = direction == "rtl";
 
     if (!skipFeatures?.has("curs")) {
-      applyCursiveAttachments(glyphs, glyphObjects, isRTL);
+      applyCursiveAttachments(glyphs, glyphObjects, isRTL, messageFunc);
     }
 
     if (kerningPairFunc && !skipFeatures?.has("kern")) {
-      applyKerning(glyphs, kerningPairFunc);
+      applyKerning(glyphs, kerningPairFunc, messageFunc);
     }
 
     if (!skipFeatures?.has("mark")) {
-      applyMarkToBasePositioning(glyphs, glyphObjects, isRTL);
+      applyMarkToBasePositioning(glyphs, glyphObjects, isRTL, messageFunc);
     }
 
     if (!skipFeatures?.has("mkmk")) {
-      applyMarkToMarkPositioning(glyphs, glyphObjects, isRTL);
+      applyMarkToMarkPositioning(glyphs, glyphObjects, isRTL, messageFunc);
     }
   }
 }
@@ -154,8 +155,16 @@ class HBShaper extends ShaperBase {
 
     this._messages = options.trace ? [] : null;
     this._glyphsAtBreakIndex = null;
+    const emulatedFeaturesMessageFunc = options.trace
+      ? (glyphs, message) =>
+          this._emulatedFeaturesMessageFunc(glyphs, message, options.traceBreakIndex)
+      : null;
 
-    const skipFeatures = this.setupInsertFeatures(buffer, options);
+    const skipFeatures = this.setupInsertFeatures(
+      buffer,
+      options,
+      emulatedFeaturesMessageFunc
+    );
 
     this._glyphObjects = glyphObjects;
 
@@ -171,7 +180,8 @@ class HBShaper extends ShaperBase {
       glyphObjects,
       skipFeatures,
       options.kerningPairFunc,
-      options.direction
+      options.direction,
+      emulatedFeaturesMessageFunc
     );
 
     return {
@@ -214,7 +224,7 @@ class HBShaper extends ShaperBase {
     return glyphs;
   }
 
-  setupInsertFeatures(buffer, options) {
+  setupInsertFeatures(buffer, options, emulatedFeaturesMessageFunc) {
     const { emulatedFeatures, kerningPairFunc, direction } = options;
 
     const messages = this._messages;
@@ -285,23 +295,34 @@ class HBShaper extends ShaperBase {
 
             switch (tag) {
               case "curs":
-                applyDidModify = applyCursiveAttachments(glyphs, glyphObjects, isRTL);
+                applyDidModify = applyCursiveAttachments(
+                  glyphs,
+                  glyphObjects,
+                  isRTL,
+                  emulatedFeaturesMessageFunc
+                );
                 break;
               case "kern":
-                applyDidModify = applyKerning(glyphs, kerningPairFunc);
+                applyDidModify = applyKerning(
+                  glyphs,
+                  kerningPairFunc,
+                  emulatedFeaturesMessageFunc
+                );
                 break;
               case "mark":
                 applyDidModify = applyMarkToBasePositioning(
                   glyphs,
                   glyphObjects,
-                  isRTL
+                  isRTL,
+                  emulatedFeaturesMessageFunc
                 );
                 break;
               case "mkmk":
                 applyDidModify = applyMarkToMarkPositioning(
                   glyphs,
                   glyphObjects,
-                  isRTL
+                  isRTL,
+                  emulatedFeaturesMessageFunc
                 );
                 break;
             }
@@ -325,6 +346,13 @@ class HBShaper extends ShaperBase {
     });
 
     return skipFeatures;
+  }
+
+  _emulatedFeaturesMessageFunc(glyphs, message, traceBreakIndex) {
+    if (traceBreakIndex == this._messages.length) {
+      this._glyphsAtBreakIndex = copyGlyphInfos(glyphs);
+    }
+    this._messages.push(message);
   }
 
   _getNominalGlyph(font, codePoint) {
@@ -451,30 +479,46 @@ class DumbShaper extends ShaperBase {
   }
 }
 
-export function applyKerning(glyphs, pairFunc) {
+export function applyKerning(glyphs, pairFunc, messageFunc = null) {
   let didModify = false;
   let previousGlyph;
 
-  for (const glyph of glyphs) {
+  messageFunc?.(glyphs, "start emulated feature 'kern'");
+
+  glyphs.forEach((glyph, index) => {
     if (glyph.mark) {
-      continue;
+      return;
     }
     const glyphName = glyph.glyphname;
     if (previousGlyph != undefined) {
+      messageFunc?.(glyphs, `try kerning glyphs at ${index - 1},${index}`);
       const previousGlyphName = previousGlyph.glyphname;
       const kernValue = pairFunc(previousGlyphName, glyphName);
       if (kernValue) {
         previousGlyph.x_advance += Math.round(kernValue);
+        messageFunc?.(glyphs, `kerned glyphs at ${index - 1},${index}`);
         didModify = true;
       }
+      messageFunc?.(glyphs, `tried kerning glyphs at ${index - 1},${index}`);
     }
     previousGlyph = glyph;
+  });
+
+  if (!didModify) {
+    messageFunc?.(glyphs, "skipped emulated feature 'kern' because no glyph matches");
   }
+
+  messageFunc?.(glyphs, "end emulated feature 'kern'");
 
   return didModify;
 }
 
-export function applyCursiveAttachments(glyphs, glyphObjects, rightToLeft = false) {
+export function applyCursiveAttachments(
+  glyphs,
+  glyphObjects,
+  rightToLeft = false,
+  messageFunc
+) {
   let didModify = false;
 
   const [leftPrefix, rightPrefix] = rightToLeft ? ["exit", "entry"] : ["entry", "exit"];
@@ -527,18 +571,34 @@ export function applyCursiveAttachments(glyphs, glyphObjects, rightToLeft = fals
   return didModify;
 }
 
-export function applyMarkToBasePositioning(glyphs, glyphObjects, rightToLeft = false) {
-  return _applyMarkPositioning(glyphs, glyphObjects, rightToLeft, false);
+export function applyMarkToBasePositioning(
+  glyphs,
+  glyphObjects,
+  rightToLeft = false,
+  messageFunc = null
+) {
+  return _applyMarkPositioning(glyphs, glyphObjects, rightToLeft, false, messageFunc);
 }
 
-export function applyMarkToMarkPositioning(glyphs, glyphObjects, rightToLeft = false) {
-  return _applyMarkPositioning(glyphs, glyphObjects, rightToLeft, true);
+export function applyMarkToMarkPositioning(
+  glyphs,
+  glyphObjects,
+  rightToLeft = false,
+  messageFunc = null
+) {
+  return _applyMarkPositioning(glyphs, glyphObjects, rightToLeft, true, messageFunc);
 }
 
 // hb-ot-layout.hh
 const IS_LIG_BASE = 0x10;
 
-function _applyMarkPositioning(glyphs, glyphObjects, rightToLeft, markToMark) {
+function _applyMarkPositioning(
+  glyphs,
+  glyphObjects,
+  rightToLeft,
+  markToMark,
+  messageFunc
+) {
   // For simplicity, we treat non-ligatures as ligatures with a single component
   let previousXAdvance = 0;
   let baseAnchors = [{}];
@@ -723,4 +783,8 @@ export function characterGlyphMapping(clusters, numChars) {
   charToGlyphs.forEach((glyphIndices) => glyphIndices.sort((a, b) => a - b));
 
   return { glyphToChars, charToGlyphs };
+}
+
+function copyGlyphInfos(glyphs) {
+  return glyphs.map((glyph) => ({ ...glyph }));
 }
