@@ -733,10 +733,12 @@ function _applyMarkPositioning(
     previousCluster = glyph.cluster;
   }
 
-  messageFunc?.(
-    glyphs,
-    `skipped emulated feature feature '${featureTag}' because no glyph matches`
-  );
+  if (!didModify) {
+    messageFunc?.(
+      glyphs,
+      `skipped emulated feature feature '${featureTag}' because no glyph matches`
+    );
+  }
 
   messageFunc?.(glyphs, `end emulated feature '${featureTag}'`);
 
