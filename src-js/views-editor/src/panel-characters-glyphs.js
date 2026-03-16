@@ -366,10 +366,22 @@ export default class CharactersGlyphsPanel extends Panel {
   }
 
   updateShapingDebuggerMessages(shaperMessages) {
+    const breakIndex = this.sceneSettings.shapingDebuggerBreakIndex;
     shaperMessages = shaperMessages.concat(["the end"]);
+
     if (!objectsEqual(shaperMessages, this.shapingDebuggerList.items)) {
       this.shapingDebuggerList.setItems(shaperMessages);
-      this.shapingDebuggerList.setSelectedItemIndex(undefined, false);
+      if (
+        breakIndex != null &&
+        objectsEqual(
+          shaperMessages.slice(0, breakIndex + 1),
+          this.shapingDebuggerList.items.slice(0, breakIndex + 1)
+        )
+      ) {
+        this.shapingDebuggerList.setSelectedItemIndex(breakIndex, false);
+      } else {
+        this.shapingDebuggerList.setSelectedItemIndex(undefined, false);
+      }
     }
   }
 
