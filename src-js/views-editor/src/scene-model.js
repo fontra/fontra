@@ -1288,11 +1288,11 @@ class LineSetter {
       shaperOptions = { ...shaperOptions, direction };
     }
 
-    let { glyphs: shapedGlyphs, shaperMessages } = this.shaper.shape(
-      codePoints,
-      this.glyphInstances,
-      shaperOptions
-    );
+    let {
+      glyphs: shapedGlyphs,
+      shaperMessages,
+      direction,
+    } = this.shaper.shape(codePoints, this.glyphInstances, shaperOptions);
     let needsReshape = false;
     for (const glyphInfo of shapedGlyphs) {
       if (
@@ -1307,11 +1307,11 @@ class LineSetter {
     }
 
     if (needsReshape) {
-      ({ glyphs: shapedGlyphs, shaperMessages } = this.shaper.shape(
-        codePoints,
-        this.glyphInstances,
-        shaperOptions
-      ));
+      ({
+        glyphs: shapedGlyphs,
+        shaperMessages,
+        direction,
+      } = this.shaper.shape(codePoints, this.glyphInstances, shaperOptions));
     }
 
     for (const [glyphIndex, glyphInfo] of enumerate(shapedGlyphs)) {
@@ -1407,7 +1407,13 @@ class LineSetter {
 
     const bounds = unionRect(...glyphs.map((glyph) => glyph.bounds));
 
-    const positionedLine = { bounds, glyphs, origin, endPoint: { x, y: origin.y } };
+    const positionedLine = {
+      bounds,
+      glyphs,
+      origin,
+      endPoint: { x, y: origin.y },
+      direction,
+    };
     return { positionedLine, shaperMessages };
   }
 }
