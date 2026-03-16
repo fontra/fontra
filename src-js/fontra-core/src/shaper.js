@@ -527,7 +527,7 @@ export function applyCursiveAttachments(
   let previousXAdvance = 0;
   let previousExitAnchors = {};
 
-  for (const glyph of glyphs) {
+  for (const [index, glyph] of enumerate(glyphs)) {
     if (glyph.mark) {
       continue;
     }
@@ -538,7 +538,11 @@ export function applyCursiveAttachments(
       continue;
     }
 
-    const entryAnchors = collectAnchors(glyphObject.propagatedAnchors, leftPrefix);
+    const entryAnchors = collectAnchors(
+      index,
+      glyphObject.propagatedAnchors,
+      leftPrefix
+    );
 
     for (const suffix of Object.keys(entryAnchors)) {
       const exitAnchor = previousExitAnchors[suffix];
@@ -565,7 +569,11 @@ export function applyCursiveAttachments(
 
     previousGlyph = glyph;
     previousXAdvance = glyphObject.xAdvance;
-    previousExitAnchors = collectAnchors(glyphObject.propagatedAnchors, rightPrefix);
+    previousExitAnchors = collectAnchors(
+      index,
+      glyphObject.propagatedAnchors,
+      rightPrefix
+    );
   }
 
   return didModify;
@@ -606,9 +614,13 @@ function _applyMarkPositioning(
   let baseLigatureId = 0;
   let previousCluster = -1;
 
+  const featureTag = markToMark ? "mkmk" : "mark";
+
+  messageFunc?.(glyphs, `start emulated feature '${featureTag}'`);
+
   const ordered = rightToLeft ? reversed : (v) => v;
 
-  for (const glyph of ordered(glyphs)) {
+  for (const [index, glyph] of enumerate(ordered(glyphs))) {
     const glyphObject = glyphObjects[glyph.glyphname];
     if (!glyphObject) {
       baseAnchors = [{}];
@@ -636,6 +648,7 @@ function _applyMarkPositioning(
           baseAnchors = splitLigatureAnchors(
             numLigatureComponents,
             collectAnchors(
+              index,
               glyphObject.propagatedAnchors,
               "",
               "",
@@ -647,6 +660,7 @@ function _applyMarkPositioning(
           baseLigatureId = 0;
 
           const newBaseAnchors = collectAnchors(
+            index,
             glyphObject.propagatedAnchors,
             "",
             "",
@@ -666,7 +680,7 @@ function _applyMarkPositioning(
     } else {
       // NOTE: for marks, we *don't* use glyphObject.propagedAnchors, but
       // only the anchors defined in the glyph proper.
-      const markAnchors = collectAnchors(glyphObject.anchors, "_");
+      const markAnchors = collectAnchors(index, glyphObject.anchors, "_");
 
       // If a mark has the same ligature id as the ligature, it attaches to it
       // and it will have a (1-based) ligature component indicating which component
@@ -682,21 +696,30 @@ function _applyMarkPositioning(
         const baseAnchor = baseAnchors[componentIndex][anchorName];
         if (baseAnchor) {
           const markAnchor = markAnchors[anchorName];
+          messageFunc?.(
+            glyphs,
+            `attaching mark glyph at ${index} to glyph at ${baseAnchor.index}`
+          );
           glyph.x_offset = Math.round(baseAnchor.x - markAnchor.x - previousXAdvance);
           glyph.y_offset = Math.round(baseAnchor.y - markAnchor.y);
           didModify = true;
+          messageFunc?.(
+            glyphs,
+            `attached mark glyph at ${index} to glyph at ${baseAnchor.index}`
+          );
           break;
         }
       }
 
       if (markToMark) {
         // We don't use glyphObject.propagedAnchors for marks
-        const markBaseAnchors = collectAnchors(glyphObject.anchors, "", "_");
+        const markBaseAnchors = collectAnchors(index, glyphObject.anchors, "", "_");
         for (const [anchorName, markAnchor] of Object.entries(markBaseAnchors)) {
           baseAnchors[componentIndex][anchorName] = {
             name: anchorName,
             x: markAnchor.x + glyph.x_offset + previousXAdvance,
             y: markAnchor.y + glyph.y_offset,
+            index,
           };
         }
       }
@@ -705,10 +728,17 @@ function _applyMarkPositioning(
     previousCluster = glyph.cluster;
   }
 
+  messageFunc?.(
+    glyphs,
+    `skipped emulated feature feature '${featureTag}' because no glyph matches`
+  );
+
+  messageFunc?.(glyphs, `end emulated feature '${featureTag}'`);
+
   return didModify;
 }
 
-function collectAnchors(anchors, prefix = "", skipPrefix = "", dx = 0, dy = 0) {
+function collectAnchors(index, anchors, prefix = "", skipPrefix = "", dx = 0, dy = 0) {
   const lenPrefix = prefix.length;
   const anchorsBySuffix = {};
 
@@ -716,7 +746,7 @@ function collectAnchors(anchors, prefix = "", skipPrefix = "", dx = 0, dy = 0) {
     if (name.startsWith(prefix) && (!skipPrefix || !name.startsWith(skipPrefix))) {
       const suffix = name.slice(lenPrefix);
       if (!(suffix in anchorsBySuffix)) {
-        anchorsBySuffix[suffix] = { name, x: x + dx, y: y + dy };
+        anchorsBySuffix[suffix] = { name, x: x + dx, y: y + dy, index };
       }
     }
   }
