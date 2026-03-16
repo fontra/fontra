@@ -527,7 +527,7 @@ export function applyCursiveAttachments(
   let previousXAdvance = 0;
   let previousExitAnchors = {};
 
-  for (const [index, glyph] of enumerate(glyphs)) {
+  for (const [glyphIndex, glyph] of enumerate(glyphs)) {
     if (glyph.mark) {
       continue;
     }
@@ -539,7 +539,7 @@ export function applyCursiveAttachments(
     }
 
     const entryAnchors = collectAnchors(
-      index,
+      glyphIndex,
       glyphObject.propagatedAnchors,
       leftPrefix
     );
@@ -570,7 +570,7 @@ export function applyCursiveAttachments(
     previousGlyph = glyph;
     previousXAdvance = glyphObject.xAdvance;
     previousExitAnchors = collectAnchors(
-      index,
+      glyphIndex,
       glyphObject.propagatedAnchors,
       rightPrefix
     );
@@ -620,7 +620,7 @@ function _applyMarkPositioning(
 
   const ordered = rightToLeft ? reversed : (v) => v;
 
-  for (const [index, glyph] of enumerate(ordered(glyphs))) {
+  for (const [glyphIndex, glyph] of enumerate(ordered(glyphs))) {
     const glyphObject = glyphObjects[glyph.glyphname];
     if (!glyphObject) {
       baseAnchors = [{}];
@@ -648,7 +648,7 @@ function _applyMarkPositioning(
           baseAnchors = splitLigatureAnchors(
             numLigatureComponents,
             collectAnchors(
-              index,
+              glyphIndex,
               glyphObject.propagatedAnchors,
               "",
               "",
@@ -660,7 +660,7 @@ function _applyMarkPositioning(
           baseLigatureId = 0;
 
           const newBaseAnchors = collectAnchors(
-            index,
+            glyphIndex,
             glyphObject.propagatedAnchors,
             "",
             "",
@@ -680,7 +680,7 @@ function _applyMarkPositioning(
     } else {
       // NOTE: for marks, we *don't* use glyphObject.propagedAnchors, but
       // only the anchors defined in the glyph proper.
-      const markAnchors = collectAnchors(index, glyphObject.anchors, "_");
+      const markAnchors = collectAnchors(glyphIndex, glyphObject.anchors, "_");
 
       // If a mark has the same ligature id as the ligature, it attaches to it
       // and it will have a (1-based) ligature component indicating which component
@@ -698,14 +698,14 @@ function _applyMarkPositioning(
           const markAnchor = markAnchors[anchorName];
           messageFunc?.(
             glyphs,
-            `attaching mark glyph at ${index} to glyph at ${baseAnchor.index}`
+            `attaching mark glyph at ${glyphIndex} to glyph at ${baseAnchor.glyphIndex}`
           );
           glyph.x_offset = Math.round(baseAnchor.x - markAnchor.x - previousXAdvance);
           glyph.y_offset = Math.round(baseAnchor.y - markAnchor.y);
           didModify = true;
           messageFunc?.(
             glyphs,
-            `attached mark glyph at ${index} to glyph at ${baseAnchor.index}`
+            `attached mark glyph at ${glyphIndex} to glyph at ${baseAnchor.glyphIndex}`
           );
           break;
         }
@@ -713,13 +713,18 @@ function _applyMarkPositioning(
 
       if (markToMark) {
         // We don't use glyphObject.propagedAnchors for marks
-        const markBaseAnchors = collectAnchors(index, glyphObject.anchors, "", "_");
+        const markBaseAnchors = collectAnchors(
+          glyphIndex,
+          glyphObject.anchors,
+          "",
+          "_"
+        );
         for (const [anchorName, markAnchor] of Object.entries(markBaseAnchors)) {
           baseAnchors[componentIndex][anchorName] = {
             name: anchorName,
             x: markAnchor.x + glyph.x_offset + previousXAdvance,
             y: markAnchor.y + glyph.y_offset,
-            index,
+            glyphIndex,
           };
         }
       }
@@ -738,7 +743,14 @@ function _applyMarkPositioning(
   return didModify;
 }
 
-function collectAnchors(index, anchors, prefix = "", skipPrefix = "", dx = 0, dy = 0) {
+function collectAnchors(
+  glyphIndex,
+  anchors,
+  prefix = "",
+  skipPrefix = "",
+  dx = 0,
+  dy = 0
+) {
   const lenPrefix = prefix.length;
   const anchorsBySuffix = {};
 
@@ -746,7 +758,7 @@ function collectAnchors(index, anchors, prefix = "", skipPrefix = "", dx = 0, dy
     if (name.startsWith(prefix) && (!skipPrefix || !name.startsWith(skipPrefix))) {
       const suffix = name.slice(lenPrefix);
       if (!(suffix in anchorsBySuffix)) {
-        anchorsBySuffix[suffix] = { name, x: x + dx, y: y + dy, index };
+        anchorsBySuffix[suffix] = { name, x: x + dx, y: y + dy, glyphIndex };
       }
     }
   }
