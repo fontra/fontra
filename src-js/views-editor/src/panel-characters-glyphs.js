@@ -345,7 +345,13 @@ export default class CharactersGlyphsPanel extends Panel {
       let selectedGlyph;
       const m = selectedMessage.match(/at (\d+(,\d+)*)/);
       if (m) {
-        const indices = m[1].split(",").map((v) => Number(v));
+        const { glyphs, direction } =
+          this.sceneSettings.positionedLines[
+            this.sceneSettings.glyphRenderInfoLineIndex
+          ];
+        const adjustForDirection =
+          direction == "rtl" ? (i) => glyphs.length - 1 - i : (i) => i;
+        const indices = m[1].split(",").map((v) => adjustForDirection(Number(v)));
         selectedGlyph = {
           lineIndex: this.sceneSettings.glyphRenderInfoLineIndex,
           glyphIndex: indices[0],
