@@ -264,7 +264,7 @@ class HBShaper extends ShaperBase {
         let didModify = false;
         const beforeLookupId = parseInt(match[1]);
 
-        for (const { tag, lookupId } of this.insertMarkers) {
+        for (const { tag, lookupId } of this.insertMarkers ?? []) {
           if (!skipFeatures.has(tag) && beforeLookupId >= lookupId) {
             if (glyphs == undefined) {
               glyphs = this.getGlyphInfoFromBuffer(buffer);
