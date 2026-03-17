@@ -533,6 +533,7 @@ export function applyCursiveAttachments(
   let didModify = false;
 
   const [leftPrefix, rightPrefix] = rightToLeft ? ["exit", "entry"] : ["entry", "exit"];
+  const adjustForDirection = rightToLeft ? (i) => glyphs.length - 1 - i : (i) => i;
 
   let previousGlyph;
   let previousXAdvance = 0;
@@ -564,7 +565,9 @@ export function applyCursiveAttachments(
 
         messageFunc?.(
           glyphs,
-          `cursive attaching glyph at ${glyphIndex} to glyph at ${exitAnchor.glyphIndex}`
+          `cursive attaching glyph at ${adjustForDirection(
+            glyphIndex
+          )} to glyph at ${adjustForDirection(exitAnchor.glyphIndex)}`
         );
 
         // Horizontal adjustment
@@ -584,7 +587,9 @@ export function applyCursiveAttachments(
 
         messageFunc?.(
           glyphs,
-          `cursive attached glyph at ${glyphIndex} to glyph at ${exitAnchor.glyphIndex}`
+          `cursive attached glyph at ${adjustForDirection(
+            glyphIndex
+          )} to glyph at ${adjustForDirection(exitAnchor.glyphIndex)}`
         );
 
         break;
