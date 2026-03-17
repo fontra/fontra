@@ -1,6 +1,6 @@
 # Changelog for Fontra
 
-## 2026-03-?? [version 2026.3.4]
+## 2026-03-17 [version 2026.3.4]
 
 ### Fixes
 
