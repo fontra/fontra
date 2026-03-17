@@ -184,10 +184,18 @@ class HBShaper extends ShaperBase {
       emulatedFeaturesMessageFunc
     );
 
+    let requiredGlyphs = glyphs.map((g) => g.glyphname);
+    if (this._glyphsAtBreakIndex) {
+      requiredGlyphs = Array.from(
+        new Set(requiredGlyphs.concat(this._glyphsAtBreakIndex.map((g) => g.glyphname)))
+      );
+    }
+
     return {
       glyphs: this._glyphsAtBreakIndex ?? glyphs,
       shaperMessages: this._messages,
       direction,
+      requiredGlyphs,
     };
   }
 

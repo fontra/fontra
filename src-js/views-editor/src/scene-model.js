@@ -1292,16 +1292,13 @@ class LineSetter {
       glyphs: shapedGlyphs,
       shaperMessages,
       direction,
+      requiredGlyphs,
     } = this.shaper.shape(codePoints, this.glyphInstances, shaperOptions);
+
     let needsReshape = false;
-    for (const glyphInfo of shapedGlyphs) {
-      if (
-        !(glyphInfo.glyphname in this.glyphInstances) &&
-        glyphInfo.glyphname in fontController.glyphMap
-      ) {
-        this.glyphInstances[glyphInfo.glyphname] = await this.getGlyphInstanceFunc(
-          glyphInfo.glyphname
-        );
+    for (const glyphName of requiredGlyphs) {
+      if (!(glyphName in this.glyphInstances) && glyphName in fontController.glyphMap) {
+        this.glyphInstances[glyphName] = await this.getGlyphInstanceFunc(glyphName);
         needsReshape = true;
       }
     }
