@@ -181,6 +181,10 @@ export class GlyphSetsController {
       }
       this.updateLoadedGlyphSets(event.oldValue, event.newValue);
 
+      if (event.senderInfo?.sentFromInitializer) {
+        return;
+      }
+
       const changes = await this.fontController.performEdit(
         "edit glyph sets",
         "customData",
