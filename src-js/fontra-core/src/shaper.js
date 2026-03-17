@@ -535,6 +535,8 @@ export function applyCursiveAttachments(
   let previousXAdvance = 0;
   let previousExitAnchors = {};
 
+  messageFunc?.(glyphs, "start emulated feature 'curs'");
+
   for (const [glyphIndex, glyph] of enumerate(glyphs)) {
     if (glyph.mark) {
       continue;
@@ -557,6 +559,11 @@ export function applyCursiveAttachments(
       if (exitAnchor) {
         const entryAnchor = entryAnchors[suffix];
 
+        messageFunc?.(
+          glyphs,
+          `cursive attaching glyph at ${glyphIndex} to glyph at ${exitAnchor.glyphIndex}`
+        );
+
         // Horizontal adjustment
         previousGlyph.x_advance = Math.max(
           0,
@@ -571,6 +578,12 @@ export function applyCursiveAttachments(
         );
 
         didModify = true;
+
+        messageFunc?.(
+          glyphs,
+          `cursive attached glyph at ${glyphIndex} to glyph at ${exitAnchor.glyphIndex}`
+        );
+
         break;
       }
     }
@@ -583,6 +596,12 @@ export function applyCursiveAttachments(
       rightPrefix
     );
   }
+
+  if (!didModify) {
+    messageFunc?.(glyphs, "skipped emulated feature 'curs' because no glyph matches");
+  }
+
+  messageFunc?.(glyphs, "end emulated feature 'curs'");
 
   return didModify;
 }
@@ -704,17 +723,21 @@ function _applyMarkPositioning(
         const baseAnchor = baseAnchors[componentIndex][anchorName];
         if (baseAnchor) {
           const markAnchor = markAnchors[anchorName];
+
           messageFunc?.(
             glyphs,
             `attaching mark glyph at ${glyphIndex} to glyph at ${baseAnchor.glyphIndex}`
           );
+
           glyph.x_offset = Math.round(baseAnchor.x - markAnchor.x - previousXAdvance);
           glyph.y_offset = Math.round(baseAnchor.y - markAnchor.y);
           didModify = true;
+
           messageFunc?.(
             glyphs,
             `attached mark glyph at ${glyphIndex} to glyph at ${baseAnchor.glyphIndex}`
           );
+
           break;
         }
       }
