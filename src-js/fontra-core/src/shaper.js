@@ -92,7 +92,7 @@ class ShaperBase {
     }
 
     if (kerningPairFunc && !skipFeatures?.has("kern")) {
-      applyKerning(glyphs, kerningPairFunc, messageFunc);
+      applyKerning(glyphs, kerningPairFunc, isRTL, messageFunc);
     }
 
     if (!skipFeatures?.has("mark")) {
@@ -317,6 +317,7 @@ class HBShaper extends ShaperBase {
                 applyDidModify = applyKerning(
                   glyphs,
                   kerningPairFunc,
+                  isRTL,
                   emulatedFeaturesMessageFunc
                 );
                 break;
@@ -490,9 +491,16 @@ class DumbShaper extends ShaperBase {
   }
 }
 
-export function applyKerning(glyphs, pairFunc, messageFunc = null) {
+export function applyKerning(
+  glyphs,
+  pairFunc,
+  rightToLeft = false,
+  messageFunc = null
+) {
   let didModify = false;
   let previousGlyph;
+
+  const adjustForDirection = rightToLeft ? (i) => glyphs.length - i + 1 : (i) => i;
 
   messageFunc?.(glyphs, "start emulated feature 'kern'");
 
@@ -502,15 +510,24 @@ export function applyKerning(glyphs, pairFunc, messageFunc = null) {
     }
     const glyphName = glyph.glyphname;
     if (previousGlyph != undefined) {
-      messageFunc?.(glyphs, `try kerning glyphs at ${index - 1},${index}`);
+      const displayIndex =
+        messageFunc && rightToLeft ? adjustForDirection(index) : index;
+
+      messageFunc?.(
+        glyphs,
+        `try kerning glyphs at ${displayIndex - 1},${displayIndex}`
+      );
       const previousGlyphName = previousGlyph.glyphname;
       const kernValue = pairFunc(previousGlyphName, glyphName);
       if (kernValue) {
         previousGlyph.x_advance += Math.round(kernValue);
-        messageFunc?.(glyphs, `kerned glyphs at ${index - 1},${index}`);
+        messageFunc?.(glyphs, `kerned glyphs at ${displayIndex - 1},${displayIndex}`);
         didModify = true;
       }
-      messageFunc?.(glyphs, `tried kerning glyphs at ${index - 1},${index}`);
+      messageFunc?.(
+        glyphs,
+        `tried kerning glyphs at ${displayIndex - 1},${displayIndex}`
+      );
     }
     previousGlyph = glyph;
   });
