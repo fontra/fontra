@@ -117,7 +117,11 @@ export class SceneController {
     this.sceneSettings.myGlyphSets = getMyGlyphSets();
 
     this.fontController.ensureInitialized.then(() => {
-      this.sceneSettings.projectGlyphSets = readProjectGlyphSets(this.fontController);
+      this.sceneSettingsController.setItem(
+        "projectGlyphSets",
+        readProjectGlyphSets(this.fontController),
+        { sentFromInitializer: true }
+      );
       this.updateShaperInfo();
     });
 
