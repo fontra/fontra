@@ -27,6 +27,7 @@ import {
   consolidateCalls,
   enumerate,
   mapObjectKeys,
+  objectsEqual,
   parseSelection,
   range,
   reversed,
@@ -398,8 +399,12 @@ export class SceneModel {
     this.usedGlyphNames = usedGlyphNames;
     this.cachedGlyphNames = cachedGlyphNames;
 
-    if (result.shaperMessages) {
+    if (
+      result.shaperMessages &&
+      !objectsEqual(result.shaperMessages, this.sceneSettings.shapingDebuggerMessages)
+    ) {
       this.sceneSettings.shapingDebuggerMessages = result.shaperMessages;
+      this.sceneSettings.shapingDebuggerBreakIndex = null;
     }
   }
 

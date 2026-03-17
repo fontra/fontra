@@ -41,9 +41,12 @@ export default class CharactersGlyphsPanel extends Panel {
       true // immediate, avoids mismatch with characterLines
     );
 
-    this.sceneSettingsController.addKeyListener("shapingDebuggerMessages", (event) => {
-      this.updateShapingDebuggerMessages(event.newValue);
-    });
+    this.sceneSettingsController.addKeyListener("shapingDebuggerMessages", (event) =>
+      this.updateShapingDebuggerMessages(event.newValue)
+    );
+    this.sceneSettingsController.addKeyListener("shapingDebuggerBreakIndex", (event) =>
+      this.updateShapingDebuggerBreakIndex(event.newValue)
+    );
   }
 
   getContentElement() {
@@ -366,23 +369,12 @@ export default class CharactersGlyphsPanel extends Panel {
   }
 
   updateShapingDebuggerMessages(shaperMessages) {
-    const breakIndex = this.sceneSettings.shapingDebuggerBreakIndex;
     shaperMessages = shaperMessages.concat(["the end"]);
+    this.shapingDebuggerList.setItems(shaperMessages);
+  }
 
-    if (!objectsEqual(shaperMessages, this.shapingDebuggerList.items)) {
-      this.shapingDebuggerList.setItems(shaperMessages);
-      if (
-        breakIndex != null &&
-        objectsEqual(
-          shaperMessages.slice(0, breakIndex + 1),
-          this.shapingDebuggerList.items.slice(0, breakIndex + 1)
-        )
-      ) {
-        this.shapingDebuggerList.setSelectedItemIndex(breakIndex, false);
-      } else {
-        this.shapingDebuggerList.setSelectedItemIndex(undefined, false);
-      }
-    }
+  updateShapingDebuggerBreakIndex(breakIndex) {
+    this.shapingDebuggerList.setSelectedItemIndex(breakIndex ?? undefined, false);
   }
 
   async toggle(on, focus) {
