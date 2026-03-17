@@ -260,6 +260,9 @@ class HBShaper extends ShaperBase {
         if (reorderingPhase && message.startsWith("start table GSUB")) {
           reorderingPhase = false;
         }
+        if (message.startsWith("start postprocess-glyphs")) {
+          glyphsFollowWritingDirection = false;
+        }
 
         if (options.traceBreakIndex == messages.length) {
           if (reorderingPhase) {
