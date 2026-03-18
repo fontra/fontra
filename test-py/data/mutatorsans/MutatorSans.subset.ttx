@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ttFont sfntVersion="\x00\x01\x00\x00" ttLibVersion="4.61">
+<ttFont sfntVersion="\x00\x01\x00\x00" ttLibVersion="4.62">
 
   <GlyphOrder>
     <!-- The 'id' attribute is only for humans; it is ignored when parsed. -->
@@ -14,7 +14,7 @@
     <!-- Most of this table will be recalculated by the compiler -->
     <tableVersion value="1.0"/>
     <fontRevision value="1.002"/>
-    <checkSumAdjustment value="0x1509f6bd"/>
+    <checkSumAdjustment value="0x146e02c5"/>
     <magicNumber value="0x5f0f3cf5"/>
     <flags value="00000000 00000011"/>
     <unitsPerEm value="1000"/>
@@ -321,7 +321,7 @@
   </name>
 
   <post>
-    <formatType value="3.0"/>
+    <formatType value="2.0"/>
     <italicAngle value="0.0"/>
     <underlinePosition value="-75"/>
     <underlineThickness value="50"/>
@@ -330,6 +330,18 @@
     <maxMemType42 value="0"/>
     <minMemType1 value="0"/>
     <maxMemType1 value="0"/>
+    <psNames>
+      <!-- This file uses unique glyph names based on the information
+           found in the 'post' table. Since these names might not be unique,
+           we have to invent artificial names in case of clashes. In order to
+           be able to retain the original information, we need a name to
+           ps name mapping for those cases where they differ. That's what
+           you see below.
+            -->
+    </psNames>
+    <extraNames>
+      <!-- following are the name that are not taken from the standard Mac glyph order -->
+    </extraNames>
   </post>
 
   <GDEF>
