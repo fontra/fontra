@@ -38,7 +38,17 @@ from .base import ReadableBaseBackend
 from .filewatcher import Change
 from .watchable import WatchableBackend
 
-shaperFontTables = {"fvar", "head", "name", "GDEF", "GSUB", "GPOS", "BASE", "post"}
+shaperFontTables = {
+    "fvar",
+    "head",
+    "maxp",
+    "name",
+    "GDEF",
+    "GSUB",
+    "GPOS",
+    "BASE",
+    "post",
+}
 
 
 class OTFBackend(WatchableBackend, ReadableBaseBackend):
