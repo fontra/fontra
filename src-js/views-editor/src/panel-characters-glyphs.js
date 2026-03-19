@@ -346,7 +346,7 @@ export default class CharactersGlyphsPanel extends Panel {
     }
   }
 
-  shapingDebuggerListClickHandler(event) {
+  async shapingDebuggerListClickHandler(event) {
     const breakIndex = this.shapingDebuggerList.getSelectedItem()?.index;
 
     if (breakIndex == this.sceneSettings.shapingDebuggerBreakIndex) {
@@ -358,6 +358,10 @@ export default class CharactersGlyphsPanel extends Panel {
     if (breakIndex == null) {
       return;
     }
+
+    // We need to wait for positionedLines to get updated so we can flip the
+    // glyph index when doing RTL
+    await this.sceneSettingsController.waitForKeyChange("positionedLines");
 
     const selectedMessage = this.sceneSettings.shapingDebuggerMessages[breakIndex];
     if (selectedMessage) {
