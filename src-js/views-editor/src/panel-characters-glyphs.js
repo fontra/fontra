@@ -203,6 +203,7 @@ export default class CharactersGlyphsPanel extends Panel {
 
     this.shapingDebuggerList = new UIList();
     this.shapingDebuggerList.minHeight = "5em";
+    this.shapingDebuggerList.settingsStorageKey = "chars-glyphs-shaping-debugger-list";
     this.shapingDebuggerList.addEventListener("listSelectionChanged", (event) =>
       this.shapingDebuggerListClickHandler(event)
     );
@@ -380,7 +381,7 @@ export default class CharactersGlyphsPanel extends Panel {
   }
 
   updateShapingDebuggerMessages(shaperMessages) {
-    shaperMessages = shaperMessages.concat(["the end"]);
+    shaperMessages = shaperMessages.concat([{ message: "the end" }]);
 
     const items = shaperMessages.map(({ message, changed }, index) => ({
       message,
