@@ -155,6 +155,7 @@ class HBShaper extends ShaperBase {
 
     this._messages = options.trace ? [] : null;
     this._glyphsAtBreakIndex = null;
+    this._previousGlyphsSerialized = null;
     const emulatedFeaturesMessageFunc = options.trace
       ? (glyphs, message) =>
           this._emulatedFeaturesMessageFunc(glyphs, message, options.traceBreakIndex)
@@ -174,8 +175,6 @@ class HBShaper extends ShaperBase {
 
     hb.shape(this.font, buffer, features);
 
-    delete this._glyphObjects;
-
     const glyphs = this.getGlyphInfoFromBuffer(buffer);
     buffer.destroy();
 
@@ -189,6 +188,8 @@ class HBShaper extends ShaperBase {
     );
 
     emulatedFeaturesMessageFunc?.(glyphs, "end processing");
+
+    delete this._glyphObjects;
 
     let requiredGlyphs = glyphs.map((g) => g.glyphname);
     if (this._glyphsAtBreakIndex) {
@@ -207,34 +208,33 @@ class HBShaper extends ShaperBase {
 
   getGlyphInfoFromBuffer(buffer) {
     const glyphs = buffer.getGlyphInfosAndPositions();
-    if (buffer.getContentType() == "GLYPHS") {
+
+    if (buffer.getContentType() != "GLYPHS") {
+      // Convert Unicode code points to glyph IDs
       glyphs.forEach((glyph) => {
-        glyph.glyphname = this.glyphOrder[glyph.codepoint];
-        glyph.mark = this.face.getGlyphClass(glyph.codepoint) == "MARK";
-        if (glyph.x_advance == undefined) {
-          // During the GSUB phase, positioning is stil undefined, but we need
-          // it for tracing
-          glyph.x_advance = this._glyphObjects[glyph.glyphname]?.xAdvance ?? 500;
-          glyph.y_advance = 0; // TODO
-          glyph.x_offset = 0;
-          glyph.y_offset = 0;
-        }
-        if (glyph.mark) {
-          glyph.x_advance = 0; // Force marks to be zero-width
-        }
+        const glyphName = this.nominalGlyph(glyph.codepoint);
+        glyph.codepoint = glyphName ? this.glyphNameToID[glyphName] ?? 0 : 0;
       });
-    } else {
-      glyphs.forEach((glyph) => {
-        glyph.glyphname = this.nominalGlyph(glyph.codepoint);
-        glyph.codepoint = glyph.glyphname
-          ? this.glyphNameToID[glyph.glyphname] ?? 0
-          : 0;
-        glyph.x_advance = this._glyphObjects[glyph.glyphname]?.xAdvance ?? 500;
+    }
+
+    glyphs.forEach((glyph) => {
+      const glyphName = this.glyphOrder[glyph.codepoint];
+      if (!glyph.x_advance) {
+        // During the GSUB phase, positioning is stil undefined, but we need
+        // it for tracing
+        glyph.x_advance = this._glyphObjects[glyphName]?.xAdvance ?? 500;
         glyph.y_advance = 0; // TODO
         glyph.x_offset = 0;
         glyph.y_offset = 0;
-      });
-    }
+      }
+
+      glyph.glyphname = glyphName;
+      glyph.mark = this.face.getGlyphClass(glyph.codepoint) == "MARK";
+
+      if (glyph.mark) {
+        glyph.x_advance = 0; // Force marks to be zero-width
+      }
+    });
 
     return glyphs;
   }
@@ -310,14 +310,25 @@ class HBShaper extends ShaperBase {
           glyphsFollowWritingDirection = false;
         }
 
-        if (options.traceBreakIndex == messages.length) {
-          this._glyphsAtBreakIndex = this.getGlyphInfoFromBuffer(buffer);
-
-          if (glyphsFollowWritingDirection && isRTL) {
-            this._glyphsAtBreakIndex.reverse();
-          }
+        const glyphs = this.getGlyphInfoFromBuffer(buffer);
+        if (glyphsFollowWritingDirection && isRTL) {
+          glyphs.reverse();
         }
-        messages.push({ message, changed: false });
+
+        if (options.traceBreakIndex == messages.length) {
+          this._glyphsAtBreakIndex = glyphs;
+        }
+
+        const glyphsSerialized = JSON.stringify(glyphs);
+
+        messages.push({
+          message,
+          changed:
+            this._previousGlyphsSerialized &&
+            glyphsSerialized != this._previousGlyphsSerialized,
+        });
+
+        this._previousGlyphsSerialized = glyphsSerialized;
 
         if (message.startsWith("end table GPOS")) {
           glyphsFollowWritingDirection = false;
