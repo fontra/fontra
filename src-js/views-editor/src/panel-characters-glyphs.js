@@ -5,7 +5,6 @@ import { isDisjoint, updateSet } from "@fontra/core/set-ops.js";
 import { characterGlyphMapping } from "@fontra/core/shaper.js";
 import {
   makeUPlusStringFromCodePoint,
-  objectsEqual,
   round,
   throttleCalls,
 } from "@fontra/core/utils.js";
