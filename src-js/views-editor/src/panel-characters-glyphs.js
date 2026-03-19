@@ -357,7 +357,7 @@ export default class CharactersGlyphsPanel extends Panel {
     const selectedMessage = this.sceneSettings.shapingDebuggerMessages[breakIndex];
     if (selectedMessage) {
       let selectedGlyph;
-      const m = selectedMessage.match(/at (\d+(,\d+)*)/);
+      const m = selectedMessage.message.match(/at (\d+(,\d+)*)/);
       if (m) {
         const { glyphs, direction } =
           this.sceneSettings.positionedLines[
