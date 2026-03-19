@@ -284,48 +284,47 @@ class HBShaper extends ShaperBase {
 
       if (gposPhase) {
         const match = message.match(/^start lookup (\d+)/);
-        if (!match) {
-          return true;
-        }
+        if (match) {
+          let glyphs;
+          const glyphObjects = this._glyphObjects;
+          let didModify = false;
+          const beforeLookupId = parseInt(match[1]);
 
-        let glyphs;
-        const glyphObjects = this._glyphObjects;
-        let didModify = false;
-        const beforeLookupId = parseInt(match[1]);
-
-        for (const { tag, lookupId } of this.insertMarkers ?? []) {
-          if (!skipFeatures.has(tag) && beforeLookupId >= lookupId) {
-            if (glyphs == undefined) {
-              glyphs = this.getGlyphInfoFromBuffer(buffer);
-              if (isRTL) {
-                glyphs.reverse();
+          for (const { tag, lookupId } of this.insertMarkers ?? []) {
+            if (!skipFeatures.has(tag) && beforeLookupId >= lookupId) {
+              if (glyphs == undefined) {
+                glyphs = this.getGlyphInfoFromBuffer(buffer);
+                if (isRTL) {
+                  glyphs.reverse();
+                }
               }
+
+              const applyDidModify = applyEmulatedPositioningForTag(
+                tag,
+                glyphs,
+                glyphObjects,
+                kerningPairFunc,
+                isRTL,
+                emulatedFeaturesMessageFunc
+              );
+
+              didModify ||= applyDidModify;
+
+              skipFeatures.add(tag);
             }
-
-            const applyDidModify = applyEmulatedPositioningForTag(
-              tag,
-              glyphs,
-              glyphObjects,
-              kerningPairFunc,
-              isRTL,
-              emulatedFeaturesMessageFunc
-            );
-
-            didModify ||= applyDidModify;
-
-            skipFeatures.add(tag);
           }
-        }
 
-        if (didModify) {
-          if (isRTL) {
-            glyphs.reverse();
+          if (didModify) {
+            if (isRTL) {
+              glyphs.reverse();
+            }
+            buffer.updateGlyphPositions(glyphs);
           }
-          buffer.updateGlyphPositions(glyphs);
         }
       } else if (message.startsWith("start table GPOS")) {
         gposPhase = true;
       }
+
       return true;
     });
 
