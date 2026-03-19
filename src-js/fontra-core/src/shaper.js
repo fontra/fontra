@@ -170,7 +170,7 @@ class HBShaper extends ShaperBase {
 
     if (messageFunc) {
       buffer.setMessageFunc(messageFunc);
-      messageFunc(buffer, this.font, "begin processing");
+      messageFunc(buffer, this.font, "start processing");
     }
 
     hb.shape(this.font, buffer, features);
