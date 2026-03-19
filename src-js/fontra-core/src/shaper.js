@@ -256,32 +256,6 @@ class HBShaper extends ShaperBase {
     let glyphsFollowWritingDirection = true;
 
     buffer.setMessageFunc((buffer, font, message) => {
-      if (messages) {
-        if (reorderingPhase && message.startsWith("start table GSUB")) {
-          reorderingPhase = false;
-        }
-        if (message.startsWith("start postprocess-glyphs")) {
-          glyphsFollowWritingDirection = false;
-        }
-
-        if (options.traceBreakIndex == messages.length) {
-          if (reorderingPhase) {
-            this._glyphsAtBreakIndex =
-              this.getGlyphInfoFromBufferReorderingPhase(buffer);
-          } else {
-            this._glyphsAtBreakIndex = this.getGlyphInfoFromBuffer(buffer);
-          }
-          if (glyphsFollowWritingDirection && isRTL) {
-            this._glyphsAtBreakIndex.reverse();
-          }
-        }
-        messages.push(message);
-
-        if (message.startsWith("end table GPOS")) {
-          glyphsFollowWritingDirection = false;
-        }
-      }
-
       if (gposPhase) {
         const match = message.match(/^start lookup (\d+)/);
         if (match) {
@@ -323,6 +297,32 @@ class HBShaper extends ShaperBase {
         }
       } else if (message.startsWith("start table GPOS")) {
         gposPhase = true;
+      }
+
+      if (messages) {
+        if (reorderingPhase && message.startsWith("start table GSUB")) {
+          reorderingPhase = false;
+        }
+        if (message.startsWith("start postprocess-glyphs")) {
+          glyphsFollowWritingDirection = false;
+        }
+
+        if (options.traceBreakIndex == messages.length) {
+          if (reorderingPhase) {
+            this._glyphsAtBreakIndex =
+              this.getGlyphInfoFromBufferReorderingPhase(buffer);
+          } else {
+            this._glyphsAtBreakIndex = this.getGlyphInfoFromBuffer(buffer);
+          }
+          if (glyphsFollowWritingDirection && isRTL) {
+            this._glyphsAtBreakIndex.reverse();
+          }
+        }
+        messages.push(message);
+
+        if (message.startsWith("end table GPOS")) {
+          glyphsFollowWritingDirection = false;
+        }
       }
 
       return true;
