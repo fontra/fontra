@@ -302,7 +302,8 @@ class HBShaper extends ShaperBase {
               }
             }
 
-            const applyDidModify = applyEmulatedPositioning(
+            const applyDidModify = applyEmulatedPositioningForTag(
+              tag,
               glyphs,
               glyphObjects,
               kerningPairFunc,
@@ -411,7 +412,8 @@ class HBShaper extends ShaperBase {
   }
 }
 
-function applyEmulatedPositioning(
+function applyEmulatedPositioningForTag(
+  tag,
   glyphs,
   glyphObjects,
   kerningPairFunc,
@@ -493,7 +495,9 @@ class DumbShaper extends ShaperBase {
       options.direction
     );
 
-    return { glyphs };
+    const requiredGlyphs = glyphs.map((g) => g.glyphname);
+
+    return { glyphs, requiredGlyphs };
   }
 
   getFeatureInfo(otTableTag) {
