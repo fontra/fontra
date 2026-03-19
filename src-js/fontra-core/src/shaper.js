@@ -160,13 +160,17 @@ class HBShaper extends ShaperBase {
           this._emulatedFeaturesMessageFunc(glyphs, message, options.traceBreakIndex)
       : null;
 
-    const skipFeatures = this.setupInsertFeatures(
-      buffer,
+    const { skipFeatures, messageFunc } = this.setupInsertFeatures(
       options,
       emulatedFeaturesMessageFunc
     );
 
     this._glyphObjects = glyphObjects;
+
+    if (messageFunc) {
+      buffer.setMessageFunc(messageFunc);
+      messageFunc(buffer, this.font, "begin processing");
+    }
 
     hb.shape(this.font, buffer, features);
 
@@ -183,6 +187,8 @@ class HBShaper extends ShaperBase {
       options.direction,
       emulatedFeaturesMessageFunc
     );
+
+    emulatedFeaturesMessageFunc?.(glyphs, "end processing");
 
     let requiredGlyphs = glyphs.map((g) => g.glyphname);
     if (this._glyphsAtBreakIndex) {
@@ -232,7 +238,7 @@ class HBShaper extends ShaperBase {
     return glyphs;
   }
 
-  setupInsertFeatures(buffer, options, emulatedFeaturesMessageFunc) {
+  setupInsertFeatures(options, emulatedFeaturesMessageFunc) {
     const { emulatedFeatures, kerningPairFunc, direction } = options;
 
     const messages = this._messages;
@@ -246,7 +252,7 @@ class HBShaper extends ShaperBase {
       // An "undefined" lookupId means "do the emulation after HB is done"
       // So if all lookupIds are undefined, we don't need to use the insertion
       // mechanism at all.
-      return skipFeatures;
+      return { skipFeatures, messageFunc: null };
     }
 
     const isRTL = direction == "rtl";
@@ -255,7 +261,7 @@ class HBShaper extends ShaperBase {
     let gposPhase = false;
     let glyphsFollowWritingDirection = true;
 
-    buffer.setMessageFunc((buffer, font, message) => {
+    const messageFunc = (buffer, font, message) => {
       if (gposPhase) {
         const match = message.match(/^start lookup (\d+)/);
         if (match) {
@@ -326,9 +332,9 @@ class HBShaper extends ShaperBase {
       }
 
       return true;
-    });
+    };
 
-    return skipFeatures;
+    return { skipFeatures, messageFunc };
   }
 
   _emulatedFeaturesMessageFunc(glyphs, message, traceBreakIndex) {
