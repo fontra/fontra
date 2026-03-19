@@ -345,7 +345,15 @@ class HBShaper extends ShaperBase {
     if (traceBreakIndex == this._messages.length) {
       this._glyphsAtBreakIndex = copyGlyphInfos(glyphs);
     }
-    this._messages.push({ message, changed: false });
+
+    const glyphsSerialized = JSON.stringify(glyphs);
+
+    this._messages.push({
+      message,
+      changed: glyphsSerialized != this._previousGlyphsSerialized,
+    });
+
+    this._previousGlyphsSerialized = glyphsSerialized;
   }
 
   _getNominalGlyph(font, codePoint) {
