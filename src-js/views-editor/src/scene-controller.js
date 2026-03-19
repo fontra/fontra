@@ -475,11 +475,18 @@ export class SceneController {
   }
 
   async updateShaper() {
+    const applyTextShaping = this.sceneSettings.applyTextShaping;
+
     const { shaper } = await (this.sceneSettings.applyTextShaping
       ? this.sceneSettings.shaperInfo
       : this.sceneSettings.dumbShaperInfo);
 
-    this.sceneSettings.shaper = shaper;
+    if (applyTextShaping == this.sceneSettings.applyTextShaping) {
+      // If the setting was changed since we were called we should *not*
+      // set the shaper. This method can get galled again before an
+      // earlier call completes. The later call should "win".
+      this.sceneSettings.shaper = shaper;
+    }
   }
 
   async setLocationFromSourceIndex(sourceIndex) {
