@@ -7,6 +7,7 @@ import {
   assert,
   enumerate,
   isObjectEmpty,
+  objectsEqualSerialized,
   range,
   reversed,
 } from "./utils.js";
@@ -722,7 +723,7 @@ export class VarPackedPath {
   isCompatible(other) {
     return (
       other instanceof VarPackedPath &&
-      arrayEquals(this.contourInfo, other.contourInfo) &&
+      objectsEqualSerialized(this.contourInfo, other.contourInfo) &&
       pointTypesEquals(this.pointTypes, other.pointTypes)
     );
   }
@@ -1094,11 +1095,6 @@ const decomposeSegmentFuncs = {
     });
   },
 };
-
-function arrayEquals(a, b) {
-  // Oh well
-  return JSON.stringify(a) === JSON.stringify(b);
-}
 
 function pointTypesEquals(a, b) {
   if (a.length !== b.length) {
