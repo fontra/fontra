@@ -27,7 +27,7 @@ import {
   consolidateCalls,
   enumerate,
   mapObjectKeys,
-  objectsEqual,
+  objectsEqualSerialized,
   parseSelection,
   range,
   reversed,
@@ -401,7 +401,10 @@ export class SceneModel {
 
     if (
       result.shaperMessages &&
-      !objectsEqual(result.shaperMessages, this.sceneSettings.shapingDebuggerMessages)
+      !objectsEqualSerialized(
+        result.shaperMessages,
+        this.sceneSettings.shapingDebuggerMessages
+      )
     ) {
       this.sceneSettings.shapingDebuggerMessages = result.shaperMessages;
       this.sceneSettings.shapingDebuggerBreakIndex = null;
