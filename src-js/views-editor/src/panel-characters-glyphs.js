@@ -40,8 +40,12 @@ export default class CharactersGlyphsPanel extends Panel {
       true // immediate, avoids mismatch with characterLines
     );
 
-    this.sceneSettingsController.addKeyListener("shapingDebuggerMessages", (event) =>
-      this.updateShapingDebuggerMessages(event.newValue)
+    this.sceneSettingsController.addKeyListener(
+      ["applyTextShaping", "shapingDebuggerMessages"],
+      (event) =>
+        this.updateShapingDebuggerMessages(
+          this.sceneSettings.shapingDebuggerMessages ?? []
+        )
     );
     this.sceneSettingsController.addKeyListener("shapingDebuggerBreakIndex", (event) =>
       this.updateShapingDebuggerBreakIndex(event.newValue)
@@ -381,13 +385,15 @@ export default class CharactersGlyphsPanel extends Panel {
   }
 
   updateShapingDebuggerMessages(shaperMessages) {
-    shaperMessages = shaperMessages.concat([{ message: "the end" }]);
-
+    if (!this.sceneSettings.applyTextShaping) {
+      shaperMessages = [];
+    }
     const items = shaperMessages.map(({ message, changed }, index) => ({
       message,
       changed,
       index,
     }));
+
     this.shapingDebuggerList.setItems(items);
   }
 
