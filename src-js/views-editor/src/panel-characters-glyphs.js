@@ -209,6 +209,12 @@ export default class CharactersGlyphsPanel extends Panel {
     );
     this.shapingDebuggerList.columnDescriptions = [
       {
+        key: "changed",
+        title: "",
+        width: "1.5em",
+        get: (item) => (item.changed ? "🟢" : ""),
+      },
+      {
         key: "message",
         title: "Message",
       },
@@ -377,7 +383,11 @@ export default class CharactersGlyphsPanel extends Panel {
   updateShapingDebuggerMessages(shaperMessages) {
     shaperMessages = shaperMessages.concat(["the end"]);
 
-    const items = shaperMessages.map((message, index) => ({ message, index }));
+    const items = shaperMessages.map(({ message, changed }, index) => ({
+      message,
+      changed,
+      index,
+    }));
     this.shapingDebuggerList.setItems(items);
   }
 

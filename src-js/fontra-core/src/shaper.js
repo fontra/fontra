@@ -318,7 +318,7 @@ class HBShaper extends ShaperBase {
             this._glyphsAtBreakIndex.reverse();
           }
         }
-        messages.push(message);
+        messages.push({ message, changed: false });
 
         if (message.startsWith("end table GPOS")) {
           glyphsFollowWritingDirection = false;
@@ -335,7 +335,7 @@ class HBShaper extends ShaperBase {
     if (traceBreakIndex == this._messages.length) {
       this._glyphsAtBreakIndex = copyGlyphInfos(glyphs);
     }
-    this._messages.push(message);
+    this._messages.push({ message, changed: false });
   }
 
   _getNominalGlyph(font, codePoint) {
