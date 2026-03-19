@@ -302,42 +302,13 @@ class HBShaper extends ShaperBase {
               }
             }
 
-            let applyDidModify = false;
-
-            switch (tag) {
-              case "curs":
-                applyDidModify = applyCursiveAttachments(
-                  glyphs,
-                  glyphObjects,
-                  isRTL,
-                  emulatedFeaturesMessageFunc
-                );
-                break;
-              case "kern":
-                applyDidModify = applyKerning(
-                  glyphs,
-                  kerningPairFunc,
-                  isRTL,
-                  emulatedFeaturesMessageFunc
-                );
-                break;
-              case "mark":
-                applyDidModify = applyMarkToBasePositioning(
-                  glyphs,
-                  glyphObjects,
-                  isRTL,
-                  emulatedFeaturesMessageFunc
-                );
-                break;
-              case "mkmk":
-                applyDidModify = applyMarkToMarkPositioning(
-                  glyphs,
-                  glyphObjects,
-                  isRTL,
-                  emulatedFeaturesMessageFunc
-                );
-                break;
-            }
+            const applyDidModify = applyEmulatedPositioning(
+              glyphs,
+              glyphObjects,
+              kerningPairFunc,
+              isRTL,
+              emulatedFeaturesMessageFunc
+            );
 
             didModify ||= applyDidModify;
 
@@ -438,6 +409,53 @@ class HBShaper extends ShaperBase {
     this.face.destroy();
     this.blob.destroy();
   }
+}
+
+function applyEmulatedPositioning(
+  glyphs,
+  glyphObjects,
+  kerningPairFunc,
+  isRTL,
+  emulatedFeaturesMessageFunc
+) {
+  let applyDidModify = false;
+
+  switch (tag) {
+    case "curs":
+      applyDidModify = applyCursiveAttachments(
+        glyphs,
+        glyphObjects,
+        isRTL,
+        emulatedFeaturesMessageFunc
+      );
+      break;
+    case "kern":
+      applyDidModify = applyKerning(
+        glyphs,
+        kerningPairFunc,
+        isRTL,
+        emulatedFeaturesMessageFunc
+      );
+      break;
+    case "mark":
+      applyDidModify = applyMarkToBasePositioning(
+        glyphs,
+        glyphObjects,
+        isRTL,
+        emulatedFeaturesMessageFunc
+      );
+      break;
+    case "mkmk":
+      applyDidModify = applyMarkToMarkPositioning(
+        glyphs,
+        glyphObjects,
+        isRTL,
+        emulatedFeaturesMessageFunc
+      );
+      break;
+  }
+
+  return applyDidModify;
 }
 
 class DumbShaper extends ShaperBase {
