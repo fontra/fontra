@@ -205,36 +205,37 @@ class HBShaper extends ShaperBase {
     };
   }
 
-  getGlyphInfoFromBufferReorderingPhase(buffer) {
-    const glyphs = buffer.getGlyphInfosAndPositions();
-    glyphs.forEach((glyph) => {
-      glyph.glyphname = this.nominalGlyph(glyph.codepoint);
-      glyph.codepoint = glyph.glyphname ? this.glyphNameToID[glyph.glyphname] ?? 0 : 0;
-      glyph.x_advance = this._glyphObjects[glyph.glyphname]?.xAdvance ?? 500;
-      glyph.y_advance = 0; // TODO
-      glyph.x_offset = 0;
-      glyph.y_offset = 0;
-    });
-    return glyphs;
-  }
-
   getGlyphInfoFromBuffer(buffer) {
     const glyphs = buffer.getGlyphInfosAndPositions();
-    glyphs.forEach((glyph) => {
-      glyph.glyphname = this.glyphOrder[glyph.codepoint];
-      glyph.mark = this.face.getGlyphClass(glyph.codepoint) == "MARK";
-      if (glyph.x_advance == undefined) {
-        // During the GSUB phase, positioning is stil undefined, but we need
-        // it for tracing
+    if (buffer.getContentType() == "GLYPHS") {
+      glyphs.forEach((glyph) => {
+        glyph.glyphname = this.glyphOrder[glyph.codepoint];
+        glyph.mark = this.face.getGlyphClass(glyph.codepoint) == "MARK";
+        if (glyph.x_advance == undefined) {
+          // During the GSUB phase, positioning is stil undefined, but we need
+          // it for tracing
+          glyph.x_advance = this._glyphObjects[glyph.glyphname]?.xAdvance ?? 500;
+          glyph.y_advance = 0; // TODO
+          glyph.x_offset = 0;
+          glyph.y_offset = 0;
+        }
+        if (glyph.mark) {
+          glyph.x_advance = 0; // Force marks to be zero-width
+        }
+      });
+    } else {
+      glyphs.forEach((glyph) => {
+        glyph.glyphname = this.nominalGlyph(glyph.codepoint);
+        glyph.codepoint = glyph.glyphname
+          ? this.glyphNameToID[glyph.glyphname] ?? 0
+          : 0;
         glyph.x_advance = this._glyphObjects[glyph.glyphname]?.xAdvance ?? 500;
         glyph.y_advance = 0; // TODO
         glyph.x_offset = 0;
         glyph.y_offset = 0;
-      }
-      if (glyph.mark) {
-        glyph.x_advance = 0; // Force marks to be zero-width
-      }
-    });
+      });
+    }
+
     return glyphs;
   }
 
@@ -257,7 +258,6 @@ class HBShaper extends ShaperBase {
 
     const isRTL = direction == "rtl";
 
-    let reorderingPhase = true;
     let gposPhase = false;
     let glyphsFollowWritingDirection = true;
 
@@ -306,20 +306,13 @@ class HBShaper extends ShaperBase {
       }
 
       if (messages) {
-        if (reorderingPhase && message.startsWith("start table GSUB")) {
-          reorderingPhase = false;
-        }
         if (message.startsWith("start postprocess-glyphs")) {
           glyphsFollowWritingDirection = false;
         }
 
         if (options.traceBreakIndex == messages.length) {
-          if (reorderingPhase) {
-            this._glyphsAtBreakIndex =
-              this.getGlyphInfoFromBufferReorderingPhase(buffer);
-          } else {
-            this._glyphsAtBreakIndex = this.getGlyphInfoFromBuffer(buffer);
-          }
+          this._glyphsAtBreakIndex = this.getGlyphInfoFromBuffer(buffer);
+
           if (glyphsFollowWritingDirection && isRTL) {
             this._glyphsAtBreakIndex.reverse();
           }
