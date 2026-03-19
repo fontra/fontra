@@ -2,7 +2,7 @@
 
 ## 2026-03-?? [version 2026.3.5]
 
-- [fontra-pak] Make .fontra the default format when creating a new font. [fontra-pak PR 231](https://github.com/fontra/fontra-pak/pull/231)
+- [fontra-pak] Make .fontra the default format when creating a new font, and remove the .rcjk legacy format from the new font format options. [fontra-pak PR 231](https://github.com/fontra/fontra-pak/pull/231)
 - [fontra-glyphs] Fixed support for smart components that don't respond to font axes, yet use master layers that do. Reported and mostly fixed by Zachary Quinn Scheuren. [fontra-glyphs PR 133](https://github.com/fontra/fontra-glyphs/pull/133) and [fontra-glyphs PR 134](https://github.com/fontra/fontra-glyphs/pull/134)
 
 ## 2026-03-17 [version 2026.3.4]
