@@ -1352,7 +1352,8 @@ class LineSetter {
       }
 
       const kernValue =
-        shaperOptions.traceBreakIndex == undefined &&
+        (shaperOptions.traceBreakIndex == undefined ||
+          shaperMessages?.length == shaperOptions.traceBreakIndex + 1) &&
         shaperOptions.kerningPairFunc &&
         glyphIndex > 0
           ? shaperOptions.kerningPairFunc(
