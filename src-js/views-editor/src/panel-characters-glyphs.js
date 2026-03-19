@@ -215,7 +215,7 @@ export default class CharactersGlyphsPanel extends Panel {
       {
         key: "changed",
         title: "",
-        width: "1.5em",
+        width: "1em",
         get: (item) => (item.changed ? "➔" : ""),
       },
       {
