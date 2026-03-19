@@ -207,6 +207,12 @@ export default class CharactersGlyphsPanel extends Panel {
     this.shapingDebuggerList.addEventListener("listSelectionChanged", (event) =>
       this.shapingDebuggerListClickHandler(event)
     );
+    this.shapingDebuggerList.columnDescriptions = [
+      {
+        key: "message",
+        title: "Message",
+      },
+    ];
 
     this.accordion = new Accordion();
     this.accordion.appendStyle(`
@@ -331,7 +337,7 @@ export default class CharactersGlyphsPanel extends Panel {
   }
 
   shapingDebuggerListClickHandler(event) {
-    const breakIndex = this.shapingDebuggerList.getSelectedItemIndex();
+    const breakIndex = this.shapingDebuggerList.getSelectedItem()?.index;
 
     if (breakIndex == this.sceneSettings.shapingDebuggerBreakIndex) {
       return;
@@ -370,11 +376,20 @@ export default class CharactersGlyphsPanel extends Panel {
 
   updateShapingDebuggerMessages(shaperMessages) {
     shaperMessages = shaperMessages.concat(["the end"]);
-    this.shapingDebuggerList.setItems(shaperMessages);
+
+    const items = shaperMessages.map((message, index) => ({ message, index }));
+    this.shapingDebuggerList.setItems(items);
   }
 
   updateShapingDebuggerBreakIndex(breakIndex) {
-    this.shapingDebuggerList.setSelectedItemIndex(breakIndex ?? undefined, false);
+    const itemIndex = this.shapingDebuggerList.items.findIndex(
+      (item) => item.index == breakIndex && item.index != undefined
+    );
+
+    this.shapingDebuggerList.setSelectedItemIndex(
+      itemIndex != -1 ? itemIndex : undefined,
+      false
+    );
   }
 
   async toggle(on, focus) {
