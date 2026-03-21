@@ -14,6 +14,7 @@ export const languages = [
     langLang: "繁體中文",
     status: "beta",
   },
+  { code: "tl", langEn: "Filipino", langLang: "Tagalog", status: "beta" },
 ];
 
 const debugTranslation = false;

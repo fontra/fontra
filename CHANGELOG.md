@@ -1,12 +1,21 @@
 # Changelog for Fontra
 
-## 2026-03-?? [version 2026.3.4]
+## 2026-03-?? [version 2026.3.5]
+
+- [translations] Added Tagalog (Filipino) translations, contributed by FlaviusChromacitrin. [Issue 2503](https://github.com/fontra/fontra/issues/2503), [PR 2506](https://github.com/fontra/fontra/pull/2506)
+- [designspace/ufo] Don't unnecessarily modify UFO's metainfo.plist file when reading. This happened when the metainfo.plist file was formatted differently from how fontTools.ufoLib would do it. [Issue 2504](https://github.com/fontra/fontra/issues/2504), [PR 2505](https://github.com/fontra/fontra/pull/2505)
+- [fontra-pak] Make .fontra the default format when creating a new font, and remove the .rcjk legacy format from the new font format options. [fontra-pak PR 231](https://github.com/fontra/fontra-pak/pull/231)
+- [fontra-glyphs] Fixed support for smart components that don't respond to font axes, yet use master layers that do. Reported and mostly fixed by Zachary Quinn Scheuren. [fontra-glyphs PR 133](https://github.com/fontra/fontra-glyphs/pull/133) and [fontra-glyphs PR 134](https://github.com/fontra/fontra-glyphs/pull/134)
+- [ttx] Fixed .ttx support for fonts that contain a format 2 `post` table. [PR 2501](https://github.com/fontra/fontra/pull/2501)
+
+## 2026-03-17 [version 2026.3.4]
 
 ### Fixes
 
 - [shaping] A GDEF table in the feature code must override our own glyph-is-mark logic. [Issue 2495](https://github.com/fontra/fontra/issues/2495), [PR 2496](https://github.com/fontra/fontra/pull/2496)
 - [cross-axis mapping/avar-2] Fix edge case where we specify an output axis value at the default, while the corresponding input value is _not_ at the default. [PR 2492](https://github.com/fontra/fontra/pull/2492)
 - Prevent unnecessary .designspace lib pollution by not writing the "project glyph sets" list if it is empty. [PR 2491](https://github.com/fontra/fontra/pull/2491)
+- Fixed write-on-initial-read bug that was especially harmful for .designspace: Fontra should never write files when it is only reading. [PR 2499](https://github.com/fontra/fontra/pull/2499)
 
 ## 2026-03-12 [version 2026.3.3]
 
