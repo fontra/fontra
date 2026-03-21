@@ -272,6 +272,14 @@ class UFOGlyphSetWriter(UFOGlyphSetReader, Protocol):
         pass
 
 
+class DummyUFOGlyphSetReader:
+    def __init__(self):
+        self.contents = {}
+
+    def __contains__(self, glyphName: str) -> bool:
+        return False
+
+
 class DesignspaceBackend(WatchableBackend, WritableBaseBackend):
     @classmethod
     def fromPath(cls, path: PathLike) -> WritableFontBackend:
@@ -1085,7 +1093,7 @@ class DesignspaceBackend(WatchableBackend, WritableBaseBackend):
                 ufoLayerName = f"{suggestedLayerName}#{count}"
             # This creates the layer
             self.ufoManager.getGlyphSetWriter(ufoPath, ufoLayerName)
-        else:
+        elif glyphName is not None:
             # getGlyphSetWriter() will create the layer if it doesn't already exist
             while glyphName in self.ufoManager.getGlyphSetWriter(ufoPath, ufoLayerName):
                 # TODO: THIS IS NOT COVERED BY TESTS
@@ -1968,22 +1976,26 @@ class UFOManager:
             self._glyphSets[path] = {}  # forget any "reader" glyph sets for this path
         return writer
 
-    def getGlyphSetReader(self, path: str, layerName: str) -> GlyphSet:
-        glyphSet = self._glyphSets[path].get(layerName)
+    def getGlyphSetReader(self, path: str, layerName: str) -> UFOGlyphSetReader:
+        glyphSet: UFOGlyphSetReader = self._glyphSets[path].get(layerName)
         if glyphSet is None:
             reader = self.getReader(path)
             if isinstance(reader, UFOWriter):
                 glyphSet = reader.getGlyphSet(layerName, defaultLayer=False)
             else:
-                glyphSet = reader.getGlyphSet(layerName)
+                try:
+                    glyphSet = reader.getGlyphSet(layerName)
+                except UFOLibError:
+                    glyphSet = DummyUFOGlyphSetReader()
             self._glyphSets[path][layerName] = glyphSet
         return glyphSet
 
-    def getGlyphSetWriter(self, path: str, layerName: str) -> GlyphSet:
+    def getGlyphSetWriter(self, path: str, layerName: str) -> UFOGlyphSetWriter:
         glyphSet = self._glyphSets[path].get(layerName)
         if glyphSet is None:
             glyphSet = self.getWriter(path).getGlyphSet(layerName, defaultLayer=False)
             self._glyphSets[path][layerName] = glyphSet
+        assert glyphSet is not None
         return glyphSet
 
 
