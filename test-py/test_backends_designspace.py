@@ -15,6 +15,7 @@ from fontra.backends.designspace import (
     DesignspaceBackend,
     UFOBackend,
     UFOFontInfo,
+    UFOLayer,
     convertImageData,
 )
 from fontra.backends.null import NullBackend
@@ -97,8 +98,8 @@ def writableTestFontSingleUFO(tmpdir):
     return UFOBackend.fromPath(destPath)
 
 
-def readGLIFData(glyphName, ufoLayers):
-    glyphSets = {layer.fontraLayerName: layer.glyphSet for layer in ufoLayers}
+def readGLIFData(glyphName, ufoLayers: list[UFOLayer]) -> dict[str, str]:
+    glyphSets = {layer.fontraLayerName: layer.glyphSetForReading for layer in ufoLayers}
     return {
         layerName: glyphSet.getGLIF(glyphName).decode("utf-8").replace("\r\n", "\n")
         for layerName, glyphSet in glyphSets.items()
@@ -786,16 +787,22 @@ async def test_writeCorrectLayers(tmpdir, testFont):
     ] == fileNamesFromDir(tmpdir / "Test_LightCondensed.ufo")
 
 
-async def test_deleteGlyph(writableTestFont):
+async def test_deleteGlyph(writableTestFont: DesignspaceBackend) -> None:
     glyphName = "A"
-    assert any(glyphName in layer.glyphSet for layer in writableTestFont.ufoLayers)
     assert any(
-        glyphName in layer.glyphSet.contents for layer in writableTestFont.ufoLayers
+        glyphName in layer.glyphSetForReading for layer in writableTestFont.ufoLayers
+    )
+    assert any(
+        glyphName in layer.glyphSetForReading.contents
+        for layer in writableTestFont.ufoLayers
     )
     await writableTestFont.deleteGlyph(glyphName)
-    assert not any(glyphName in layer.glyphSet for layer in writableTestFont.ufoLayers)
     assert not any(
-        glyphName in layer.glyphSet.contents for layer in writableTestFont.ufoLayers
+        glyphName in layer.glyphSetForReading for layer in writableTestFont.ufoLayers
+    )
+    assert not any(
+        glyphName in layer.glyphSetForReading.contents
+        for layer in writableTestFont.ufoLayers
     )
     assert await writableTestFont.getGlyph(glyphName) is None
 
