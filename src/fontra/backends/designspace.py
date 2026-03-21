@@ -37,7 +37,6 @@ from fontTools.ufoLib import (
     UFOReader,
     UFOWriter,
 )
-from fontTools.ufoLib.glifLib import GlyphSet
 
 from ..core import kernutils
 from ..core.async_property import async_property
@@ -244,6 +243,15 @@ class UFOGlyphSetReader(Protocol):
     contents: dict
 
     def __contains__(self, glyphName: str) -> bool:
+        pass
+
+    def readGlyph(
+        self,
+        glyphName: str,
+        glyphObject: Any | None = None,
+        pointPen=None,
+        validate=None,
+    ) -> None:
         pass
 
     def getGLIF(self, glyphName: str) -> bytes:
@@ -1104,9 +1112,9 @@ class DesignspaceBackend(WatchableBackend, WritableBaseBackend):
                 ufoLayerName = f"{suggestedLayerName}#{count}"
 
         if ufoLayerName not in existingLayerNames:
-            writer.writeLayerContents()
             glyphSet = self.ufoManager.getGlyphSetWriter(ufoPath, ufoLayerName)
             glyphSet.writeContents()
+            writer.writeLayerContents()
 
         assert ufoLayerName, repr(ufoLayerName)
 
@@ -1970,7 +1978,7 @@ class UFOManager:
 
     def getWriter(self, path: str) -> UFOWriter:
         writer = self._readerWriters.get(path)
-        if writer is None or isinstance(writer, UFOReader):
+        if writer is None or not isinstance(writer, UFOWriter):
             writer = UFOWriter(path)
             self._readerWriters[path] = writer
             self._glyphSets[path] = {}  # forget any "reader" glyph sets for this path
@@ -2346,12 +2354,12 @@ def packGuidelines(guidelines, lib):
 
 
 def readGlyphOrCreate(
-    glyphSet: GlyphSet,
+    glyphSet: UFOGlyphSetReader | None,
     glyphName: str,
     codePoints: list[int],
 ) -> UFOGlyph:
     layerGlyph = UFOGlyph()
-    if glyphName in glyphSet:
+    if glyphSet is not None and glyphName in glyphSet:
         # We read the existing glyph so we don't lose any data that
         # Fontra doesn't understand
         glyphSet.readGlyph(glyphName, layerGlyph, validate=False)
