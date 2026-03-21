@@ -14,7 +14,7 @@ from datetime import datetime
 from functools import cached_property, singledispatch
 from os import PathLike
 from types import SimpleNamespace
-from typing import Any, Callable, TypeVar
+from typing import Any, Callable, Protocol, TypeVar
 
 from fontTools.designspaceLib import (
     AxisDescriptor,
@@ -238,6 +238,38 @@ featuresWarning = """\
 #
 
 """
+
+
+class UFOGlyphSetReader(Protocol):
+    contents: dict
+
+    def __contains__(self, glyphName: str) -> bool:
+        pass
+
+    def getGLIF(self, glyphName: str) -> bytes:
+        pass
+
+    def getGLIFModificationTime(self, glyphName: str) -> float | None:
+        pass
+
+
+class UFOGlyphSetWriter(UFOGlyphSetReader, Protocol):
+
+    def writeGlyph(
+        self,
+        glyphName: str,
+        glyphObject: Any | None = None,
+        drawPointsFunc=None,
+        formatVersion=None,
+        validate=None,
+    ) -> None:
+        pass
+
+    def deleteGlyph(self, glyphName: str) -> None:
+        pass
+
+    def writeContents(self) -> None:
+        pass
 
 
 class DesignspaceBackend(WatchableBackend, WritableBaseBackend):
@@ -495,7 +527,7 @@ class DesignspaceBackend(WatchableBackend, WritableBaseBackend):
                 glifFileNames[fileName] = glyphName
         self.glifFileNames = glifFileNames
 
-    def updateGlyphSetContents(self, glyphSet):
+    def updateGlyphSetContents(self, glyphSet: UFOGlyphSetWriter):
         glyphSet.writeContents()
         glifFileNames = self.glifFileNames
         for glyphName, fileName in glyphSet.contents.items():
@@ -1054,7 +1086,7 @@ class DesignspaceBackend(WatchableBackend, WritableBaseBackend):
             # This creates the layer
             self.ufoManager.getGlyphSetWriter(ufoPath, ufoLayerName)
         else:
-            # getGlyphSet() will create the layer if it doesn't already exist
+            # getGlyphSetWriter() will create the layer if it doesn't already exist
             while glyphName in self.ufoManager.getGlyphSetWriter(ufoPath, ufoLayerName):
                 # TODO: THIS IS NOT COVERED BY TESTS
                 # The glyph already exists in the layer, which means there is
@@ -2074,11 +2106,11 @@ class UFOLayer:
         return self.manager.getWriter(self.path)
 
     @property
-    def glyphSetReader(self) -> GlyphSet:
+    def glyphSetReader(self) -> UFOGlyphSetReader:
         return self.manager.getGlyphSetReader(self.path, self.name)
 
     @property
-    def glyphSetWriter(self) -> GlyphSet:
+    def glyphSetWriter(self) -> UFOGlyphSetWriter:
         return self.manager.getGlyphSetWriter(self.path, self.name)
 
     @cached_property
