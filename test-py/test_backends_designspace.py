@@ -99,7 +99,7 @@ def writableTestFontSingleUFO(tmpdir):
 
 
 def readGLIFData(glyphName, ufoLayers: list[UFOLayer]) -> dict[str, str]:
-    glyphSets = {layer.fontraLayerName: layer.glyphSetForReading for layer in ufoLayers}
+    glyphSets = {layer.fontraLayerName: layer.glyphSetReader for layer in ufoLayers}
     return {
         layerName: glyphSet.getGLIF(glyphName).decode("utf-8").replace("\r\n", "\n")
         for layerName, glyphSet in glyphSets.items()
@@ -790,18 +790,18 @@ async def test_writeCorrectLayers(tmpdir, testFont):
 async def test_deleteGlyph(writableTestFont: DesignspaceBackend) -> None:
     glyphName = "A"
     assert any(
-        glyphName in layer.glyphSetForReading for layer in writableTestFont.ufoLayers
+        glyphName in layer.glyphSetReader for layer in writableTestFont.ufoLayers
     )
     assert any(
-        glyphName in layer.glyphSetForReading.contents
+        glyphName in layer.glyphSetReader.contents
         for layer in writableTestFont.ufoLayers
     )
     await writableTestFont.deleteGlyph(glyphName)
     assert not any(
-        glyphName in layer.glyphSetForReading for layer in writableTestFont.ufoLayers
+        glyphName in layer.glyphSetReader for layer in writableTestFont.ufoLayers
     )
     assert not any(
-        glyphName in layer.glyphSetForReading.contents
+        glyphName in layer.glyphSetReader.contents
         for layer in writableTestFont.ufoLayers
     )
     assert await writableTestFont.getGlyph(glyphName) is None
