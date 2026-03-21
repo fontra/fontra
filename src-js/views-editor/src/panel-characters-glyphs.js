@@ -12,6 +12,7 @@ import { showMenu } from "@fontra/web-components/menu-panel.js";
 import { Accordion } from "@fontra/web-components/ui-accordion.js";
 import { UIList } from "@fontra/web-components/ui-list.js";
 import Panel from "./panel.js";
+import { equalGlyphSelection } from "./scene-controller.js";
 
 export default class CharactersGlyphsPanel extends Panel {
   identifier = "characters-glyphs";
@@ -39,12 +40,16 @@ export default class CharactersGlyphsPanel extends Panel {
       true // immediate, avoids mismatch with characterLines
     );
 
-    // this.sceneSettingsController.addKeyListener(
-    //   ["selectedGlyph"],
-    //   (event) => console.log("sel changed")
-    // );
-
-    this.selectedLineIndex = 0;
+    this.sceneSettingsController.addKeyListener(
+      ["applyTextShaping", "shapingDebuggerMessages"],
+      (event) =>
+        this.updateShapingDebuggerMessages(
+          this.sceneSettings.shapingDebuggerMessages ?? []
+        )
+    );
+    this.sceneSettingsController.addKeyListener("shapingDebuggerBreakIndex", (event) =>
+      this.updateShapingDebuggerBreakIndex(event.newValue)
+    );
   }
 
   getContentElement() {
@@ -96,7 +101,7 @@ export default class CharactersGlyphsPanel extends Panel {
       const characterIndex = this.characterList.getSelectedItemIndex();
       const glyphIndices = this.characterGlyphMapping.charToGlyphs[characterIndex];
       this.sceneSettings.selectedGlyph = {
-        lineIndex: this.selectedLineIndex,
+        lineIndex: this.sceneSettings.glyphRenderInfoLineIndex,
         glyphIndex: glyphIndices[0],
       };
       this.glyphList.setSelectedItemIndices(glyphIndices, false, true);
@@ -192,13 +197,32 @@ export default class CharactersGlyphsPanel extends Panel {
     this.glyphList.addEventListener("listSelectionChanged", (event) => {
       const glyphIndex = this.glyphList.getSelectedItemIndex();
       this.sceneSettings.selectedGlyph = {
-        lineIndex: this.selectedLineIndex,
+        lineIndex: this.sceneSettings.glyphRenderInfoLineIndex,
         glyphIndex,
       };
     });
     this.glyphList.addEventListener("rowDoubleClicked", (event) =>
       this.glyphDoubleClickHandler(event)
     );
+
+    this.shapingDebuggerList = new UIList();
+    this.shapingDebuggerList.minHeight = "5em";
+    this.shapingDebuggerList.settingsStorageKey = "chars-glyphs-shaping-debugger-list";
+    this.shapingDebuggerList.addEventListener("listSelectionChanged", (event) =>
+      this.shapingDebuggerListClickHandler(event)
+    );
+    this.shapingDebuggerList.columnDescriptions = [
+      {
+        key: "changed",
+        title: "",
+        width: "1em",
+        get: (item) => (item.changed ? "➔" : ""),
+      },
+      {
+        key: "message",
+        title: "Message",
+      },
+    ];
 
     this.accordion = new Accordion();
     this.accordion.appendStyle(`
@@ -220,34 +244,49 @@ export default class CharactersGlyphsPanel extends Panel {
         open: true,
         content: this.glyphList,
       },
+      {
+        label: translate("sidebar.characters-glyphs.shaping-debugger"),
+        open: false,
+        content: this.shapingDebuggerList,
+        id: "shaper-debugger",
+      },
     ];
+
+    this.accordion.onItemOpenClose = (item, open) =>
+      this._accordionItemOpenClose(item, open);
 
     return html.div({ class: "panel" }, [
       html.div({ class: "main-section" }, [this.accordion]),
     ]);
   }
 
+  _accordionItemOpenClose(item, open) {
+    if (item.id == "shaper-debugger") {
+      this.sceneSettings.shapingDebuggerEnabled = open;
+    }
+  }
+
   async update() {
     const selectedGlyph = this.sceneSettings.selectedGlyph;
 
-    this.selectedLineIndex = selectedGlyph?.lineIndex ?? this.selectedLineIndex;
     const glyphIndex = selectedGlyph?.glyphIndex;
+    const lineIndex = this.sceneSettings.glyphRenderInfoLineIndex;
 
     const charLines = this.sceneSettings.characterLines;
     const positionedLines = this.sceneSettings.positionedLines;
 
     if (
-      !this.selectedLineIndex === undefined ||
-      !charLines[this.selectedLineIndex] ||
-      !positionedLines[this.selectedLineIndex]
+      !lineIndex === undefined ||
+      !charLines[lineIndex] ||
+      !positionedLines[lineIndex]
     ) {
       this.characterList.setItems([]);
       this.glyphList.setItems([]);
       return;
     }
 
-    const charLine = charLines[this.selectedLineIndex];
-    const positionedLine = positionedLines[this.selectedLineIndex];
+    const charLine = charLines[lineIndex];
+    const positionedLine = positionedLines[lineIndex];
 
     const charItems = charLine.map(({ character, glyphName }, index) => ({
       character,
@@ -305,6 +344,72 @@ export default class CharactersGlyphsPanel extends Panel {
       this.characterList.setSelectedItemIndex(undefined);
       this.glyphList.setSelectedItemIndex(undefined);
     }
+  }
+
+  async shapingDebuggerListClickHandler(event) {
+    const breakIndex = this.shapingDebuggerList.getSelectedItem()?.index;
+
+    if (breakIndex == this.sceneSettings.shapingDebuggerBreakIndex) {
+      return;
+    }
+
+    this.sceneSettings.shapingDebuggerBreakIndex = breakIndex ?? null;
+
+    if (breakIndex == null) {
+      return;
+    }
+
+    // We need to wait for positionedLines to get updated so we can flip the
+    // glyph index when doing RTL
+    await this.sceneSettingsController.waitForKeyChange("positionedLines");
+
+    const selectedMessage = this.sceneSettings.shapingDebuggerMessages[breakIndex];
+    if (selectedMessage) {
+      let selectedGlyph;
+      const m = selectedMessage.message.match(/at (\d+(,\d+)*)/);
+      if (m) {
+        const { glyphs, direction } =
+          this.sceneSettings.positionedLines[
+            this.sceneSettings.glyphRenderInfoLineIndex
+          ];
+        const adjustForDirection =
+          direction == "rtl" ? (i) => glyphs.length - 1 - i : (i) => i;
+        const indices = m[1].split(",").map((v) => adjustForDirection(Number(v)));
+        selectedGlyph = {
+          lineIndex: this.sceneSettings.glyphRenderInfoLineIndex,
+          glyphIndex: indices[0],
+        };
+      } else {
+        selectedGlyph = null;
+      }
+      if (!equalGlyphSelection(this.sceneSettings.selectedGlyph, selectedGlyph)) {
+        this.sceneSettings.selectedGlyph = selectedGlyph;
+      }
+    }
+  }
+
+  updateShapingDebuggerMessages(shaperMessages) {
+    if (!this.sceneSettings.applyTextShaping) {
+      shaperMessages = [];
+    }
+    const items = shaperMessages.map(({ message, changed }, index) => ({
+      message,
+      changed,
+      index,
+    }));
+
+    this.shapingDebuggerList.setItems(items);
+  }
+
+  updateShapingDebuggerBreakIndex(breakIndex) {
+    const itemIndex = this.shapingDebuggerList.items.findIndex(
+      (item) => item.index == breakIndex && item.index != undefined
+    );
+
+    this.shapingDebuggerList.setSelectedItemIndex(
+      itemIndex != -1 ? itemIndex : undefined,
+      false
+    );
   }
 
   async toggle(on, focus) {

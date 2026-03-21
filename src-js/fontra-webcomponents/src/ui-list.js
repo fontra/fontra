@@ -328,6 +328,7 @@ export class UIList extends UnlitElement {
     this.rowsElement.innerHTML = "";
     this.items = items;
     this._itemsBackLog = Array.from(items);
+    // TODO: the following is wrong if the list contains duplicate items
     this.setSelectedItem(selectedItem, shouldDispatchEvent);
     this._addMoreItemsIfNeeded();
     if (keepScrollPosition) {
@@ -590,7 +591,16 @@ export class UIList extends UnlitElement {
   _clickHandler(event) {
     const rowIndex = this._getRowIndexFromTarget(event.target);
     if (rowIndex !== undefined) {
-      this.setSelectedItemIndex(rowIndex, true);
+      if (
+        rowIndex == this.getSelectedItemIndex() &&
+        this.allowEmptySelection &&
+        event.shiftKey
+      ) {
+        // Deselect
+        this.setSelectedItemIndex(undefined, true);
+      } else {
+        this.setSelectedItemIndex(rowIndex, true);
+      }
     }
   }
 
@@ -629,7 +639,8 @@ export class UIList extends UnlitElement {
     while (node && node.parentNode !== this.rowsElement) {
       node = node.parentNode;
     }
-    return node?.dataset.rowIndex;
+    const rowIndex = node?.dataset.rowIndex;
+    return rowIndex ? Number(rowIndex) : undefined;
   }
 
   setSelectedItemIndex(
@@ -691,7 +702,6 @@ export class UIList extends UnlitElement {
   }
 
   getSelectedItemIndex() {
-    const indices = [...this.selectedItemIndices];
     return firstItemOfSet(this.selectedItemIndices);
   }
 
