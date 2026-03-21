@@ -7,13 +7,14 @@ import pathlib
 import shutil
 import uuid
 from collections import defaultdict
+from collections.abc import Iterable, Iterator
 from copy import deepcopy
 from dataclasses import asdict, dataclass, field, replace
 from datetime import datetime
-from functools import cache, cached_property, singledispatch
+from functools import cached_property, singledispatch
 from os import PathLike
 from types import SimpleNamespace
-from typing import Any, Callable
+from typing import Any, Callable, Protocol, TypeVar
 
 from fontTools.designspaceLib import (
     AxisDescriptor,
@@ -34,9 +35,8 @@ from fontTools.ufoLib import (
     LIB_FILENAME,
     UFOLibError,
     UFOReader,
-    UFOReaderWriter,
+    UFOWriter,
 )
-from fontTools.ufoLib.glifLib import GlyphSet
 
 from ..core import kernutils
 from ..core.async_property import async_property
@@ -239,6 +239,70 @@ featuresWarning = """\
 """
 
 
+class UFOGlyphSetReader(Protocol):
+    contents: dict
+
+    def __contains__(self, glyphName: str) -> bool:
+        pass
+
+    def readGlyph(
+        self,
+        glyphName: str,
+        glyphObject: Any | None = None,
+        pointPen=None,
+        validate=None,
+    ) -> None:
+        pass
+
+    def getGLIF(self, glyphName: str) -> bytes:
+        pass
+
+    def getGLIFModificationTime(self, glyphName: str) -> float | None:
+        pass
+
+
+class UFOGlyphSetWriter(UFOGlyphSetReader, Protocol):
+
+    def writeGlyph(
+        self,
+        glyphName: str,
+        glyphObject: Any | None = None,
+        drawPointsFunc=None,
+        formatVersion=None,
+        validate=None,
+    ) -> None:
+        pass
+
+    def deleteGlyph(self, glyphName: str) -> None:
+        pass
+
+    def writeContents(self) -> None:
+        pass
+
+
+class DummyUFOGlyphSetReader:
+    def __init__(self):
+        self.contents = {}
+
+    def __contains__(self, glyphName: str) -> bool:
+        return False
+
+    def readGlyph(
+        self,
+        glyphName: str,
+        glyphObject: Any | None = None,
+        pointPen=None,
+        validate=None,
+    ) -> None:
+        raise NotImplementedError()
+
+    def getGLIF(self, glyphName: str) -> bytes:
+        raise NotImplementedError()
+
+    def getGLIFModificationTime(self, glyphName: str) -> float | None:
+        raise NotImplementedError()
+
+
 class DesignspaceBackend(WatchableBackend, WritableBaseBackend):
     @classmethod
     def fromPath(cls, path: PathLike) -> WritableFontBackend:
@@ -278,7 +342,7 @@ class DesignspaceBackend(WatchableBackend, WritableBaseBackend):
         self.glyphMap = (
             {}
             if self.defaultDSSource is None
-            else getGlyphMapFromGlyphSet(self.defaultDSSource.layer.glyphSet)
+            else getGlyphMapFromGlyphSet(self.defaultDSSource.layer.glyphSetReader)
         )
         self.savedGlyphModificationTimes: dict[str, set] = {}
         self.zombieDSSources: dict[str, DSSource] = {}
@@ -360,17 +424,21 @@ class DesignspaceBackend(WatchableBackend, WritableBaseBackend):
             self._backgroundTasksTask.cancel()
 
     @property
-    def defaultDSSource(self):
+    def defaultDSSource(self) -> DSSource | None:
         return self.dsSources.findItem(isDefault=True)
 
     @property
-    def defaultUFOLayer(self):
+    def defaultUFOLayer(self) -> UFOLayer:
         assert self.defaultDSSource is not None
         return self.defaultDSSource.layer
 
     @property
-    def defaultReader(self):
+    def defaultReader(self) -> UFOReader:
         return self.defaultUFOLayer.reader
+
+    @property
+    def defaultWriter(self) -> UFOWriter:
+        return self.defaultUFOLayer.writer
 
     @property
     def ufoDir(self) -> pathlib.Path:
@@ -409,15 +477,15 @@ class DesignspaceBackend(WatchableBackend, WritableBaseBackend):
 
     def loadUFOLayers(self) -> None:
         manager = self.ufoManager
-        self.dsSources = ItemList()
-        self.ufoLayers = ItemList()
+        self.dsSources: ItemList[DSSource] = ItemList()
+        self.ufoLayers: ItemList[UFOLayer] = ItemList()
 
         makeUniqueSourceName = uniqueNameMaker()
         for source in self.dsDoc.sources:
             if self._familyName is None and source.familyName:
                 self._familyName = source.familyName
             ufoPath = os.path.normpath(source.path)
-            reader = manager.getReader(ufoPath, createIfNeeded=False)
+            reader = manager.getReader(ufoPath)
             defaultLayerName = reader.getDefaultLayerName()
             ufoLayerName = source.layerName or defaultLayerName
 
@@ -457,7 +525,7 @@ class DesignspaceBackend(WatchableBackend, WritableBaseBackend):
         manager = self.ufoManager
         for source in self.dsDoc.sources:
             ufoPath = os.path.normpath(source.path)
-            reader = manager.getReader(ufoPath, createIfNeeded=False)
+            reader = manager.getReader(ufoPath)
             for ufoLayerName in reader.getLayerNames():
                 layer = self.ufoLayers.findItem(path=ufoPath, name=ufoLayerName)
                 if layer is None:
@@ -485,33 +553,33 @@ class DesignspaceBackend(WatchableBackend, WritableBaseBackend):
 
     def buildGlyphFileNameMapping(self):
         glifFileNames = {}
-        for glyphSet in self.ufoLayers.iterAttrs("glyphSet"):
+        for glyphSet in self.ufoLayers.iterAttrs("glyphSetReader"):
             for glyphName, fileName in glyphSet.contents.items():
                 glifFileNames[fileName] = glyphName
         self.glifFileNames = glifFileNames
 
-    def updateGlyphSetContents(self, glyphSet):
+    def updateGlyphSetContents(self, glyphSet: UFOGlyphSetWriter):
         glyphSet.writeContents()
         glifFileNames = self.glifFileNames
         for glyphName, fileName in glyphSet.contents.items():
             glifFileNames[fileName] = glyphName
 
     def ensureGlyphInGlyphOrder(self, layer, glyphName):
-        reader = layer.reader
+        writer = layer.writer
         originalGlyphOrderMapping = layer.originalGlyphOrderMapping
-        lib = reader.readLib()
+        lib = writer.readLib()
         glyphOrder = lib.get("public.glyphOrder")
         if glyphOrder is not None and glyphName not in glyphOrder:
             glyphOrder.append(glyphName)
             glyphOrder.sort(
                 key=lambda gn: originalGlyphOrderMapping.get(gn, 0xFFFFFFFF)
             )
-            reader.writeLib(lib)
+            writer.writeLib(lib)
             self.fileWatcherIgnoreNextChange(os.path.join(layer.path, LIB_FILENAME))
 
-    def ensureGlyphNotInGlyphOrder(self, layer, glyphName):
-        reader = layer.reader
-        lib = reader.readLib()
+    def ensureGlyphNotInGlyphOrder(self, layer: UFOLayer, glyphName: str) -> None:
+        writer = layer.writer
+        lib = writer.readLib()
         glyphOrder = lib.get("public.glyphOrder")
         if not layer.originalGlyphOrderMapping and glyphOrder is not None:
             layer.originalGlyphOrderMapping.update(
@@ -520,7 +588,7 @@ class DesignspaceBackend(WatchableBackend, WritableBaseBackend):
 
         if glyphOrder is not None and glyphName in glyphOrder:
             glyphOrder.remove(glyphName)
-            reader.writeLib(lib)
+            writer.writeLib(lib)
             self.fileWatcherIgnoreNextChange(os.path.join(layer.path, LIB_FILENAME))
 
     async def getGlyphMap(self) -> dict[str, list[int]]:
@@ -539,7 +607,7 @@ class DesignspaceBackend(WatchableBackend, WritableBaseBackend):
         layers = {}
 
         defaultStaticGlyph, defaultUFOGlyph = ufoLayerToStaticGlyph(
-            self.defaultUFOLayer.glyphSet, glyphName
+            self.defaultUFOLayer.glyphSetReader, glyphName
         )
 
         localDS = defaultUFOGlyph.lib.get(GLYPH_DESIGNSPACE_LIB_KEY)
@@ -560,13 +628,13 @@ class DesignspaceBackend(WatchableBackend, WritableBaseBackend):
         sourcesCustomData = {}
 
         for ufoLayer in self.ufoLayers:
-            if glyphName not in ufoLayer.glyphSet:
+            if glyphName not in ufoLayer.glyphSetReader:
                 continue
 
             staticGlyph, ufoGlyph = (
                 (defaultStaticGlyph, defaultUFOGlyph)
                 if ufoLayer == self.defaultUFOLayer
-                else ufoLayerToStaticGlyph(ufoLayer.glyphSet, glyphName)
+                else ufoLayerToStaticGlyph(ufoLayer.glyphSetReader, glyphName)
             )
 
             layerName = layerNameMapping.get(
@@ -594,7 +662,7 @@ class DesignspaceBackend(WatchableBackend, WritableBaseBackend):
         }
 
         for dsSource in self.dsSources:
-            glyphSet = dsSource.layer.glyphSet
+            glyphSet = dsSource.layer.glyphSetReader
             if glyphName not in glyphSet:
                 continue
             sources.append(dsSource.asFontraGlyphSource(localDefaultOverride))
@@ -690,7 +758,7 @@ class DesignspaceBackend(WatchableBackend, WritableBaseBackend):
             self._createDefaultSourceAndUFO(sourceName)
 
         defaultLayerGlyph = readGlyphOrCreate(
-            self.defaultUFOLayer.glyphSet, glyphName, codePoints
+            self.defaultUFOLayer.glyphSetWriter, glyphName, codePoints
         )
         revLayerNameMapping = reverseSparseDict(
             defaultLayerGlyph.lib.get(LAYER_NAME_MAPPING_LIB_KEY, {})
@@ -731,7 +799,7 @@ class DesignspaceBackend(WatchableBackend, WritableBaseBackend):
 
         # Gather all UFO layers
         usedLayers = set()
-        layers = []
+        layers: list[tuple[Layer, UFOLayer]] = []
         for layerName, layer in glyph.layers.items():
             layerName = revLayerNameMapping.get(layerName, layerName)
             ufoLayer = self.ufoLayers.findItem(fontraLayerName=layerName)
@@ -760,10 +828,10 @@ class DesignspaceBackend(WatchableBackend, WritableBaseBackend):
         hasVariableComponents = glyphHasVariableComponents(glyph)
         modTimes = set()
         for layer, ufoLayer in layers:
-            glyphSet = ufoLayer.glyphSet
+            glyphSet = ufoLayer.glyphSetWriter
             writeGlyphSetContents = glyphName not in glyphSet
 
-            if glyphSet == self.defaultUFOLayer.glyphSet:
+            if glyphSet == self.defaultUFOLayer.glyphSetWriter:
                 layerGlyph = defaultLayerGlyph
                 storeInLib(layerGlyph, GLYPH_DESIGNSPACE_LIB_KEY, localDS)
                 storeInLib(layerGlyph, SOURCE_NAME_MAPPING_LIB_KEY, sourceNameMapping)
@@ -815,14 +883,15 @@ class DesignspaceBackend(WatchableBackend, WritableBaseBackend):
         relevantLayerNames = set(
             layer.fontraLayerName
             for layer in self.ufoLayers
-            if glyphName in layer.glyphSet
+            if glyphName in layer.glyphSetReader
         )
 
         layersToDelete = relevantLayerNames - usedLayers
 
         for layerName in sorted(layersToDelete):
             ufoLayer = self.ufoLayers.findItem(fontraLayerName=layerName)
-            glyphSet = ufoLayer.glyphSet
+            assert ufoLayer is not None
+            glyphSet = ufoLayer.glyphSetWriter
             glyphSet.deleteGlyph(glyphName)
             # FIXME: this is inefficient if we write many glyphs
             self.updateGlyphSetContents(glyphSet)
@@ -1005,17 +1074,17 @@ class DesignspaceBackend(WatchableBackend, WritableBaseBackend):
 
         ufoPath = os.fspath(makeUniqueUFOPath(self.ufoDir, suggestedUFOFileName))
 
-        reader = self.ufoManager.getReader(ufoPath)  # this creates the UFO
+        writer = self.ufoManager.getWriter(ufoPath)  # this creates the UFO
         info = UFOFontInfo()
         for infoAttr in ufoFontInfoAttributes:
             value = getattr(self.defaultFontInfo, infoAttr, None)
             if value is not None:
                 setattr(info, infoAttr, value)
-        reader.writeInfo(info)
-        glyphSet = reader.getGlyphSet()  # this creates the default layer
+        writer.writeInfo(info)
+        glyphSet = writer.getGlyphSet()  # this creates the default layer
         glyphSet.writeContents()
-        reader.writeLayerContents()
-        ufoLayerName = reader.getDefaultLayerName()
+        writer.writeLayerContents()
+        ufoLayerName = writer.getDefaultLayerName()
         assert os.path.isdir(ufoPath)
 
         ufoLayer = UFOLayer(
@@ -1036,8 +1105,8 @@ class DesignspaceBackend(WatchableBackend, WritableBaseBackend):
         fontraLayerName: str,
         mustCreateNewLayer: bool = False,
     ) -> UFOLayer:
-        reader = self.ufoManager.getReader(ufoPath)
-        existingLayerNames = set(reader.getLayerNames())
+        writer = self.ufoManager.getWriter(ufoPath)
+        existingLayerNames = set(writer.getLayerNames())
         ufoLayerName = suggestedLayerName
         count = 0
 
@@ -1046,10 +1115,10 @@ class DesignspaceBackend(WatchableBackend, WritableBaseBackend):
                 count += 1
                 ufoLayerName = f"{suggestedLayerName}#{count}"
             # This creates the layer
-            self.ufoManager.getGlyphSet(ufoPath, ufoLayerName)
-        else:
-            # getGlyphSet() will create the layer if it doesn't already exist
-            while glyphName in self.ufoManager.getGlyphSet(ufoPath, ufoLayerName):
+            self.ufoManager.getGlyphSetWriter(ufoPath, ufoLayerName)
+        elif glyphName is not None:
+            # getGlyphSetWriter() will create the layer if it doesn't already exist
+            while glyphName in self.ufoManager.getGlyphSetWriter(ufoPath, ufoLayerName):
                 # TODO: THIS IS NOT COVERED BY TESTS
                 # The glyph already exists in the layer, which means there is
                 # a conflict. Let's make up a layer name in which the glyph
@@ -1058,9 +1127,9 @@ class DesignspaceBackend(WatchableBackend, WritableBaseBackend):
                 ufoLayerName = f"{suggestedLayerName}#{count}"
 
         if ufoLayerName not in existingLayerNames:
-            reader.writeLayerContents()
-            glyphSet = self.ufoManager.getGlyphSet(ufoPath, ufoLayerName)
+            glyphSet = self.ufoManager.getGlyphSetWriter(ufoPath, ufoLayerName)
             glyphSet.writeContents()
+            writer.writeLayerContents()
 
         assert ufoLayerName, repr(ufoLayerName)
 
@@ -1083,13 +1152,13 @@ class DesignspaceBackend(WatchableBackend, WritableBaseBackend):
         }
         return {**self.defaultLocation, **globalLocation}
 
-    async def deleteGlyph(self, glyphName):
+    async def deleteGlyph(self, glyphName: str) -> None:
         if glyphName not in self.glyphMap:
             logger.debug(f"Can't delete unknown glyph '{glyphName}'")
             return
 
         for ufoLayer in self.ufoLayers:
-            glyphSet = ufoLayer.glyphSet
+            glyphSet = ufoLayer.glyphSetWriter
             if glyphName in glyphSet:
                 glyphSet.deleteGlyph(glyphName)
                 # FIXME: this is inefficient if we write many glyphs
@@ -1181,7 +1250,7 @@ class DesignspaceBackend(WatchableBackend, WritableBaseBackend):
         }
 
     async def putSources(self, sources: dict[str, FontSource]) -> None:
-        newDSSources = ItemList()
+        newDSSources: ItemList[DSSource] = ItemList()
         for sourceIdentifier, fontSource in sorted(
             sources.items(), key=lambda item: item[1].isSparse
         ):
@@ -1237,7 +1306,7 @@ class DesignspaceBackend(WatchableBackend, WritableBaseBackend):
                 )
 
             if not dsSource.isSparse:
-                updateFontInfoFromFontSource(dsSource.layer.reader, fontSource)
+                updateFontInfoFromFontSource(dsSource.layer.writer, fontSource)
                 self.fileWatcherIgnoreNextChange(
                     os.path.join(dsSource.layer.path, FONTINFO_FILENAME)
                 )
@@ -1259,7 +1328,7 @@ class DesignspaceBackend(WatchableBackend, WritableBaseBackend):
         self.dsSources = newDSSources
 
         # Prune layers
-        newLayers = ItemList()
+        newLayers: ItemList[UFOLayer] = ItemList()
         for dsSource in newDSSources:
             newLayers.append(dsSource.layer)
         self.ufoLayers = newLayers
@@ -1288,11 +1357,11 @@ class DesignspaceBackend(WatchableBackend, WritableBaseBackend):
         _updateFontInfoFromDict(self.defaultFontInfo, infoDict)
         ufoPaths = sorted(set(self.ufoLayers.iterAttrs("path")))
         for ufoPath in ufoPaths:
-            reader = self.ufoManager.getReader(ufoPath)
+            writer = self.ufoManager.getWriter(ufoPath)
             info = UFOFontInfo()
-            reader.readInfo(info)
+            writer.readInfo(info)
             _updateFontInfoFromDict(info, infoDict)
-            reader.writeInfo(info)
+            writer.writeInfo(info)
             self.fileWatcherIgnoreNextChange(os.path.join(ufoPath, FONTINFO_FILENAME))
 
     async def getKerning(self) -> dict[str, Kerning]:
@@ -1339,7 +1408,7 @@ class DesignspaceBackend(WatchableBackend, WritableBaseBackend):
             sourceIdentifiers = kerningTable.sourceIdentifiers
 
             dsSources = [
-                self.dsSources.findItem(identifier=sourceIdentifier)
+                self.dsSources.findRequiredItem(identifier=sourceIdentifier)
                 for sourceIdentifier in sourceIdentifiers
             ]
 
@@ -1381,9 +1450,9 @@ class DesignspaceBackend(WatchableBackend, WritableBaseBackend):
                     groups = prefixGroups(
                         kerningTable.groupsSide1, "public.kern1."
                     ) | prefixGroups(kerningTable.groupsSide2, "public.kern2.")
-                    dsSource.layer.reader.writeGroups(groups)
+                    dsSource.layer.writer.writeGroups(groups)
                     ufoKerning = kerningPerSource.get(dsSource.identifier, {})
-                    dsSource.layer.reader.writeKerning(ufoKerning)
+                    dsSource.layer.writer.writeKerning(ufoKerning)
                     self.fileWatcherIgnoreNextChange(
                         os.path.join(dsSource.layer.path, GROUPS_FILENAME)
                     )
@@ -1437,7 +1506,7 @@ class DesignspaceBackend(WatchableBackend, WritableBaseBackend):
         paths = sorted(set(self.ufoLayers.iterAttrs("path")))
         defaultPath = self.defaultUFOLayer.path if paths else None
         for path in paths:
-            writer = self.ufoManager.getReader(path)
+            writer = self.ufoManager.getWriter(path)
             featureText = features.text if path == defaultPath else ""
             writer.writeFeatures(featureText)
             self.fileWatcherIgnoreNextChange(os.path.join(path, FEATURES_FILENAME))
@@ -1450,10 +1519,10 @@ class DesignspaceBackend(WatchableBackend, WritableBaseBackend):
             return None
 
         ufoPath, imageFileName = imageInfo
-        reader = self.ufoManager.getReader(ufoPath)
+        writer = self.ufoManager.getWriter(ufoPath)
 
         try:
-            data = reader.readImage(imageFileName, validate=True)
+            data = writer.readImage(imageFileName, validate=True)
         except UFOLibError as e:
             logger.warning(str(e))
             return None
@@ -1493,7 +1562,7 @@ class DesignspaceBackend(WatchableBackend, WritableBaseBackend):
     async def getCustomData(self) -> dict[str, Any]:
         return deepcopy(self.dsDoc.lib)
 
-    async def putCustomData(self, lib):
+    async def putCustomData(self, lib) -> None:
         self.dsDoc.lib = deepcopy(lib)
         self._writeDesignSpaceDocument()
 
@@ -1534,7 +1603,7 @@ class DesignspaceBackend(WatchableBackend, WritableBaseBackend):
 
         paths = sorted(set(self.ufoLayers.iterAttrs("path")))
         for path in paths:
-            writer = self.ufoManager.getReader(path)
+            writer = self.ufoManager.getWriter(path)
             lib = writer.readLib()
 
             storeInDict(lib, GLYPH_INFOS_LIB_KEY, newGlyphInfos)
@@ -1571,8 +1640,9 @@ class DesignspaceBackend(WatchableBackend, WritableBaseBackend):
         # TODO: update glyphMap for changed non-new glyphs
 
         for glyphName in changedItems.newGlyphs | changedItems.changedGlyphs:
+            assert self.defaultDSSource is not None
             try:
-                glifData = self.defaultDSSource.layer.glyphSet.getGLIF(glyphName)
+                glifData = self.defaultDSSource.layer.glyphSetReader.getGLIF(glyphName)
             except KeyError:
                 logger.info(f"new glyph '{glyphName}' not found in default source")
                 continue
@@ -1648,7 +1718,7 @@ class DesignspaceBackend(WatchableBackend, WritableBaseBackend):
             # TODO: come up with a better solution.
             #
             await asyncio.sleep(0.15)
-            for glyphSet in self.ufoLayers.iterAttrs("glyphSet"):
+            for glyphSet in self.ufoLayers.iterAttrs("glyphSetReader"):
                 glyphSet.rebuildContents()
 
         return changedItems
@@ -1839,8 +1909,8 @@ class UFOBackend(DesignspaceBackend):
     async def getCustomData(self) -> dict[str, Any]:
         return self.defaultReader.readLib()
 
-    async def putCustomData(self, lib):
-        self.defaultReader.writeLib(lib)
+    async def putCustomData(self, lib) -> None:
+        self.defaultWriter.writeLib(lib)
         self.fileWatcherIgnoreNextChange(
             os.path.join(self.defaultUFOLayer.path, LIB_FILENAME)
         )
@@ -1862,7 +1932,7 @@ class UFOBackend(DesignspaceBackend):
 def createDSDocFromUFOPath(ufoPath, styleName):
     ufoPath = os.fspath(ufoPath)
     assert not os.path.exists(ufoPath)
-    writer = UFOReaderWriter(ufoPath)  # this creates the UFO
+    writer = UFOWriter(ufoPath)  # this creates the UFO
     info = UFOFontInfo()
     _updateFontInfoFromDict(info, defaultUFOInfoAttrs)
     writer.writeInfo(info)
@@ -1903,18 +1973,64 @@ class UFOGlyph:
 class UFOFontInfo:
     unitsPerEm = 1000
     guidelines: list = []
+    styleName: str
+    italicAngle: float
 
 
 class UFOManager:
-    @cache
-    def getReader(self, path: str, createIfNeeded: bool = True) -> UFOReaderWriter:
-        if not createIfNeeded and not os.path.exists(path):
-            raise FileNotFoundError(path)
-        return UFOReaderWriter(path)
+    def __init__(self) -> None:
+        self._readerWriters: dict[str, UFOReader | UFOWriter] = {}
+        self._glyphSetReaders: dict[str, dict[str, UFOGlyphSetReader]] = defaultdict(
+            dict
+        )
+        self._glyphSetWriters: dict[str, dict[str, UFOGlyphSetWriter]] = defaultdict(
+            dict
+        )
 
-    @cache
-    def getGlyphSet(self, path: str, layerName: str) -> GlyphSet:
-        return self.getReader(path).getGlyphSet(layerName, defaultLayer=False)
+    def getReader(self, path: str) -> UFOReader:
+        reader = self._readerWriters.get(path)
+        if reader is None:
+            if not os.path.exists(path):
+                raise FileNotFoundError(path)
+            reader = UFOReader(path)
+            self._readerWriters[path] = reader
+        return reader
+
+    def getWriter(self, path: str) -> UFOWriter:
+        writer = self._readerWriters.get(path)
+        if writer is None or not isinstance(writer, UFOWriter):
+            writer = UFOWriter(path)
+            self._readerWriters[path] = writer
+        return writer
+
+    def getGlyphSetReader(self, path: str, layerName: str) -> UFOGlyphSetReader:
+        glyphSet: UFOGlyphSetReader | None = self._glyphSetReaders[path].get(layerName)
+
+        if glyphSet is None:
+            reader = self.getReader(path)
+            if isinstance(reader, UFOWriter):
+                glyphSet = reader.getGlyphSet(layerName, defaultLayer=False)
+            else:
+                try:
+                    glyphSet = reader.getGlyphSet(layerName)
+                except UFOLibError:
+                    # The layer doesn't exist, return an empty dummy glyph set
+                    glyphSet = DummyUFOGlyphSetReader()
+            self._glyphSetReaders[path][layerName] = glyphSet
+
+        return glyphSet
+
+    def getGlyphSetWriter(self, path: str, layerName: str) -> UFOGlyphSetWriter:
+        glyphSet = self._glyphSetWriters[path].get(layerName)
+
+        if glyphSet is None:
+            glyphSet = self.getWriter(path).getGlyphSet(layerName, defaultLayer=False)
+            self._glyphSetWriters[path][layerName] = glyphSet
+            # Also set the glyph set reader, the actual glyph set can both read
+            # and write, and we must have exactly one for this path/layerName
+            self._glyphSetReaders[path][layerName] = glyphSet
+
+        return glyphSet
 
 
 @dataclass(kw_only=True, frozen=True)
@@ -2027,25 +2143,36 @@ class UFOLayer:
     def fileName(self) -> str:
         return os.path.splitext(os.path.basename(self.path))[0]
 
-    @cached_property
-    def reader(self) -> UFOReaderWriter:
+    @property
+    def reader(self) -> UFOReader:
         return self.manager.getReader(self.path)
 
-    @cached_property
-    def glyphSet(self) -> GlyphSet:
-        return self.manager.getGlyphSet(self.path, self.name)
+    @property
+    def writer(self) -> UFOWriter:
+        return self.manager.getWriter(self.path)
+
+    @property
+    def glyphSetReader(self) -> UFOGlyphSetReader:
+        return self.manager.getGlyphSetReader(self.path, self.name)
+
+    @property
+    def glyphSetWriter(self) -> UFOGlyphSetWriter:
+        return self.manager.getGlyphSetWriter(self.path, self.name)
 
     @cached_property
     def isDefaultLayer(self) -> bool:
         return self.name == self.reader.getDefaultLayerName()
 
 
-class ItemList:
+T = TypeVar("T")
+
+
+class ItemList(Iterable[T]):
     def __init__(self):
         self.items = []
         self.invalidateCache()
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[T]:
         return iter(self.items)
 
     def __len__(self):
@@ -2058,11 +2185,17 @@ class ItemList:
     def invalidateCache(self):
         self._mappings = {}
 
-    def findItem(self, **kwargs):
+    def findItem(self, **kwargs) -> T | None:
         items = self.findItems(**kwargs)
         return items[0] if items else None
 
-    def findItems(self, **kwargs):
+    def findRequiredItem(self, **kwargs) -> T:
+        items = self.findItems(**kwargs)
+        if not items:
+            raise KeyError(kwargs)
+        return items[0]
+
+    def findItems(self, **kwargs) -> list[T]:
         attrTuple = tuple(kwargs.keys())
         valueTuple = tuple(kwargs.values())
         keyMapping = self._mappings.get(attrTuple)
@@ -2247,12 +2380,12 @@ def packGuidelines(guidelines, lib):
 
 
 def readGlyphOrCreate(
-    glyphSet: GlyphSet,
+    glyphSet: UFOGlyphSetReader | None,
     glyphName: str,
     codePoints: list[int],
 ) -> UFOGlyph:
     layerGlyph = UFOGlyph()
-    if glyphName in glyphSet:
+    if glyphSet is not None and glyphName in glyphSet:
         # We read the existing glyph so we don't lose any data that
         # Fontra doesn't understand
         glyphSet.readGlyph(glyphName, layerGlyph, validate=False)
@@ -2516,9 +2649,9 @@ def getDefaultSourceName(
     return sourceName
 
 
-def updateFontInfoFromFontSource(reader, fontSource):
+def updateFontInfoFromFontSource(writer: UFOWriter, fontSource) -> None:
     fontInfo = UFOFontInfo()
-    reader.readInfo(fontInfo)
+    writer.readInfo(fontInfo)
 
     fontInfo.styleName = fontSource.name
 
@@ -2540,7 +2673,7 @@ def updateFontInfoFromFontSource(reader, fontSource):
 
     fontInfo.italicAngle = fontSource.italicAngle
 
-    lib = reader.readLib()
+    lib = writer.readLib()
 
     fontInfo.guidelines = packGuidelines(fontSource.guidelines, lib)
 
@@ -2554,13 +2687,13 @@ def updateFontInfoFromFontSource(reader, fontSource):
             if hasattr(fontInfo, infoAttr):
                 delattr(fontInfo, infoAttr)
 
-    reader.writeInfo(fontInfo)
+    writer.writeInfo(fontInfo)
 
     if zones:
         lib[LINE_METRICS_HOR_ZONES_KEY] = zones
     else:
         lib.pop(LINE_METRICS_HOR_ZONES_KEY, None)
-    reader.writeLib(lib)
+    writer.writeLib(lib)
 
 
 def sortedSourceDescriptors(newSourceDescriptors, oldSourceDescriptors, axisOrder):
