@@ -276,6 +276,7 @@ export const strings = {
   "sidebar.characters-glyphs": "Input characters and output glyphs",
   "sidebar.characters-glyphs.input-characters": "Input characters",
   "sidebar.characters-glyphs.output-glyphs": "Output glyphs",
+  "sidebar.characters-glyphs.shaping-debugger": "Shaping debugger",
   "sidebar.designspace-navigation": "Designspace navigatie",
   "sidebar.designspace-navigation.dialog.add-source.label.layer": "Layer:",
   "sidebar.designspace-navigation.dialog.add-source.label.source-name": "Source name:",
