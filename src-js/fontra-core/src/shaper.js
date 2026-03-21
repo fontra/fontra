@@ -167,11 +167,14 @@ class HBShaper extends ShaperBase {
     );
 
     this._glyphObjects = glyphObjects;
+    this._processingHasStarted = false;
 
     if (messageFunc) {
       buffer.setMessageFunc(messageFunc);
       messageFunc(buffer, this.font, "start processing");
     }
+
+    this._processingHasStarted = true;
 
     hb.shape(this.font, buffer, features);
 
@@ -219,9 +222,12 @@ class HBShaper extends ShaperBase {
 
     glyphs.forEach((glyph) => {
       const glyphName = this.glyphOrder[glyph.codepoint];
-      if (glyph.x_advance == undefined) {
-        // During the GSUB phase, positioning is stil undefined, but we need
-        // it for tracing
+      if (glyph.x_advance == undefined || !this._processingHasStarted) {
+        // 1. During the GSUB phase, the positioning fields are undefined, so
+        //    we fill them in so we can render something.
+        // 2. When the buffer has been populated with code points, but actual
+        //    processing hasn't yet begun (before hb.shape() gets called), the
+        //    positioning fields are still zero, which doesn't render nice.
         glyph.x_advance = this._glyphObjects[glyphName]?.xAdvance ?? 500;
         glyph.y_advance = 0; // TODO
         glyph.x_offset = 0;
