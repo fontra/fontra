@@ -7,6 +7,7 @@ from dataclasses import asdict, replace
 
 import pytest
 from fontTools.designspaceLib import DesignSpaceDocument
+from fontTools.misc import plistlib
 from fontTools.ufoLib import UFOReaderWriter
 
 from fontra.backends import getFileSystemBackend, newFileSystemBackend
@@ -1708,6 +1709,42 @@ async def test_putGlyphInfos(writableTestFont):
     reopenedFont = getFileSystemBackend(writableTestFont.path)
     glyphInfos = await reopenedFont.getGlyphInfos()
     assert glyphInfos == newGlyphsInfos
+
+
+async def test_noWriteOnRead(writableTestFont):
+    # Test that we don't write metainfo.plist when simply opening a font
+
+    varPath = writableTestFont.path
+    singlePath = writableTestFont.dsDoc.sources[0].path
+    await writableTestFont.aclose()
+
+    for fontPath in [varPath, singlePath]:
+        font = getFileSystemBackend(fontPath)
+        ufoPath = font.dsDoc.sources[0].path
+        await font.aclose()
+
+        metaInfoPath = pathlib.Path(ufoPath) / "metainfo.plist"
+        metaInfo = plistlib.loads(metaInfoPath.read_bytes())
+
+        # Serialize with non-standard formatting
+        metaInfoPath.write_bytes(plistlib.dumps(metaInfo, pretty_print=False))
+
+        metaInfoTextBefore = metaInfoPath.read_text()
+
+        # Open/read, metainfo.plist should not have changed
+        font = getFileSystemBackend(fontPath)
+        glyph = await font.getGlyph("A")
+        assert glyph is not None
+
+        metaInfoTextAfter = metaInfoPath.read_text()
+        assert metaInfoTextBefore == metaInfoTextAfter
+
+        # Write/close, *now* we expect a changed metainfo.plist
+        await font.putGlyph("A", glyph, [ord("A")])
+        await font.aclose()
+
+        metaInfoTextAfter = metaInfoPath.read_text()
+        assert metaInfoTextBefore != metaInfoTextAfter
 
 
 def fileNamesFromDir(path):
