@@ -2,6 +2,7 @@
 
 ## 2026-03-?? [version 2026.3.5]
 
+- [translations] Added Tagalog (Filipino) translations, contributed by FlaviusChromacitrin. [Issue 2503](https://github.com/fontra/fontra/issues/2503), [PR 2506](https://github.com/fontra/fontra/pull/2506)
 - [designspace/ufo] Don't unnecessarily modify UFO's metainfo.plist file when reading. This happened when the metainfo.plist file was formatted differently from how fontTools.ufoLib would do it. [Issue 2504](https://github.com/fontra/fontra/issues/2504), [PR 2505](https://github.com/fontra/fontra/pull/2505)
 - [fontra-pak] Make .fontra the default format when creating a new font, and remove the .rcjk legacy format from the new font format options. [fontra-pak PR 231](https://github.com/fontra/fontra-pak/pull/231)
 - [fontra-glyphs] Fixed support for smart components that don't respond to font axes, yet use master layers that do. Reported and mostly fixed by Zachary Quinn Scheuren. [fontra-glyphs PR 133](https://github.com/fontra/fontra-glyphs/pull/133) and [fontra-glyphs PR 134](https://github.com/fontra/fontra-glyphs/pull/134)
