@@ -287,6 +287,21 @@ class DummyUFOGlyphSetReader:
     def __contains__(self, glyphName: str) -> bool:
         return False
 
+    def readGlyph(
+        self,
+        glyphName: str,
+        glyphObject: Any | None = None,
+        pointPen=None,
+        validate=None,
+    ) -> None:
+        raise NotImplementedError()
+
+    def getGLIF(self, glyphName: str) -> bytes:
+        raise NotImplementedError()
+
+    def getGLIFModificationTime(self, glyphName: str) -> float | None:
+        raise NotImplementedError()
+
 
 class DesignspaceBackend(WatchableBackend, WritableBaseBackend):
     @classmethod
@@ -1963,9 +1978,14 @@ class UFOFontInfo:
 
 
 class UFOManager:
-    def __init__(self):
-        self._readerWriters = {}
-        self._glyphSets = defaultdict(dict)
+    def __init__(self) -> None:
+        self._readerWriters: dict[str, UFOReader | UFOWriter] = {}
+        self._glyphSetReaders: dict[str, dict[str, UFOGlyphSetReader]] = defaultdict(
+            dict
+        )
+        self._glyphSetWriters: dict[str, dict[str, UFOGlyphSetWriter]] = defaultdict(
+            dict
+        )
 
     def getReader(self, path: str) -> UFOReader:
         reader = self._readerWriters.get(path)
@@ -1981,11 +2001,11 @@ class UFOManager:
         if writer is None or not isinstance(writer, UFOWriter):
             writer = UFOWriter(path)
             self._readerWriters[path] = writer
-            self._glyphSets[path] = {}  # forget any "reader" glyph sets for this path
         return writer
 
     def getGlyphSetReader(self, path: str, layerName: str) -> UFOGlyphSetReader:
-        glyphSet: UFOGlyphSetReader = self._glyphSets[path].get(layerName)
+        glyphSet: UFOGlyphSetReader | None = self._glyphSetReaders[path].get(layerName)
+
         if glyphSet is None:
             reader = self.getReader(path)
             if isinstance(reader, UFOWriter):
@@ -1994,16 +2014,22 @@ class UFOManager:
                 try:
                     glyphSet = reader.getGlyphSet(layerName)
                 except UFOLibError:
+                    # The layer doesn't exist, return an empty dummy glyph set
                     glyphSet = DummyUFOGlyphSetReader()
-            self._glyphSets[path][layerName] = glyphSet
+            self._glyphSetReaders[path][layerName] = glyphSet
+
         return glyphSet
 
     def getGlyphSetWriter(self, path: str, layerName: str) -> UFOGlyphSetWriter:
-        glyphSet = self._glyphSets[path].get(layerName)
+        glyphSet = self._glyphSetWriters[path].get(layerName)
+
         if glyphSet is None:
             glyphSet = self.getWriter(path).getGlyphSet(layerName, defaultLayer=False)
-            self._glyphSets[path][layerName] = glyphSet
-        assert glyphSet is not None
+            self._glyphSetWriters[path][layerName] = glyphSet
+            # Also set the glyph set reader, the actual glyph set can both read
+            # and write, and we must have exactly one for this path/layerName
+            self._glyphSetReaders[path][layerName] = glyphSet
+
         return glyphSet
 
 
