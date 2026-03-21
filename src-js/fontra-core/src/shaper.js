@@ -219,7 +219,7 @@ class HBShaper extends ShaperBase {
 
     glyphs.forEach((glyph) => {
       const glyphName = this.glyphOrder[glyph.codepoint];
-      if (!glyph.x_advance) {
+      if (glyph.x_advance == undefined) {
         // During the GSUB phase, positioning is stil undefined, but we need
         // it for tracing
         glyph.x_advance = this._glyphObjects[glyphName]?.xAdvance ?? 500;
