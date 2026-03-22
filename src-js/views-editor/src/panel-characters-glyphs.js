@@ -416,10 +416,12 @@ export default class CharactersGlyphsPanel extends Panel {
 
   updateShapingDebuggerMessages(shaperMessages) {
     if (!this.sceneSettings.applyTextShaping) {
-      shaperMessages = [];
+      this.shapingDebuggerList.setItems([]);
+      return;
     }
 
     let level = 0;
+
     shaperMessages = shaperMessages.map((message) => {
       let endMessage = false;
       if (message.message.match(/^end (?!processing)/)) {
@@ -449,6 +451,7 @@ export default class CharactersGlyphsPanel extends Panel {
         endMessage,
       }))
       .filter(({ endMessage }) => !endMessage);
+
     this.shapingDebuggerList.setItems(items);
   }
 
