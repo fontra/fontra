@@ -248,7 +248,10 @@ export default class CharactersGlyphsPanel extends Panel {
       .changed-icon {
         transform: scale(110%) translate(0, 15%);
         margin-right: 0.25em;
-        color: #999;
+      }
+
+      .changed-icon.nested {
+        color: #9999;
       }
 
       .folding-icon {
@@ -478,16 +481,13 @@ export default class CharactersGlyphsPanel extends Panel {
     messageItems.forEach((messageItem) => {
       const { message, changed, level, children } = messageItem;
 
-      const childChanged = changed || anyChildChanged(messageItem);
-      const iconPath = changed
-        ? "/tabler-icons/arrow-big-right.svg"
-        : "/tabler-icons/arrow-right.svg";
+      const childChanged = anyChildChanged(messageItem);
 
       const changedElement =
         changed || childChanged
           ? html.createDomElement("inline-svg", {
-              class: "indent-block changed-icon",
-              src: iconPath,
+              class: `indent-block changed-icon ${childChanged ? "nested" : ""}`,
+              src: "/tabler-icons/arrow-big-right.svg",
               onclick: (event) => foldingChevron.classList.toggle("closed"),
             })
           : html.span({ class: "indent-block changed-icon" });
