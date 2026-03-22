@@ -106,6 +106,10 @@ export class UIList extends UnlitElement {
       user-select: none;
     }
 
+    .row.hidden {
+      display: none;
+    }
+
     .contents > .selected,
     .selected > input {
       background-color: var(--row-selected-background-color);
@@ -718,6 +722,10 @@ export class UIList extends UnlitElement {
     }
   }
 
+  getRowElement(index) {
+    return this.rowsElement.children[index];
+  }
+
   editCell(rowIndex, columnKey) {
     this.setSelectedItemIndex(rowIndex, true);
     const row = this.rowsElement.children[rowIndex];
@@ -773,8 +781,13 @@ export class UIList extends UnlitElement {
     if (rowIndex === undefined) {
       rowIndex = 0;
     } else {
-      rowIndex = event.key === "ArrowUp" ? rowIndex - 1 : rowIndex + 1;
-      rowIndex = Math.min(Math.max(rowIndex, 0), this.items.length - 1);
+      const rowDelta = event.key === "ArrowUp" ? -1 : 1;
+      do {
+        rowIndex += rowDelta;
+        if (rowIndex < 0 || rowIndex >= this.items.length) {
+          return;
+        }
+      } while (this.rowsElement.children[rowIndex]?.classList.contains("hidden"));
     }
     this._isKeyRepeating = event.repeat;
     this.setSelectedItemIndex(rowIndex, true, true);
