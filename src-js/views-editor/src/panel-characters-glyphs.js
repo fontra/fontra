@@ -4,6 +4,7 @@ import { translate } from "@fontra/core/localization.js";
 import { isDisjoint, updateSet } from "@fontra/core/set-ops.js";
 import { characterGlyphMapping } from "@fontra/core/shaper.js";
 import {
+  assert,
   makeUPlusStringFromCodePoint,
   range,
   round,
@@ -248,6 +249,18 @@ export default class CharactersGlyphsPanel extends Panel {
         width: 1em;
         height: 1em;
       }
+
+      .row-icon {
+        transform: scale(120%) translate(0, 15%) rotate(180deg);
+        margin-right: 0.25em;
+        transition: 120ms;
+      }
+
+      .row-icon.closed {
+        transform: scale(120%) translate(0, 15%) rotate(90deg);
+        margin-right: 0.25em;
+      }
+
     `);
 
     this.accordion = new Accordion();
@@ -420,39 +433,68 @@ export default class CharactersGlyphsPanel extends Panel {
       return;
     }
 
-    let level = 0;
-
-    shaperMessages = shaperMessages.map((message) => {
-      let endMessage = false;
-      if (message.message.match(/^end (?!processing)/)) {
-        level--;
-        endMessage = true;
-      }
-      message = { ...message, level, endMessage };
-      if (message.message.match(/^start (?!processing)/)) {
-        level++;
-        message.message = message.message.slice(6); // strip "start "
-      }
-      return message;
-    });
-
-    if (level) {
-      console.error(`shaping debugger nesting mismatch, final level: ${level}`);
-    }
-
-    const items = shaperMessages
-      .map(({ message, changed, level, endMessage }, breakIndex) => ({
-        message: html.span({}, [
-          ...repeat(level, () => html.span({ class: "indent-block" }, [])),
-          ...formatShaperMessage(message),
-        ]),
-        changed,
-        breakIndex,
-        endMessage,
-      }))
-      .filter(({ endMessage }) => !endMessage);
+    const items = this._structureShaperMessages(shaperMessages);
 
     this.shapingDebuggerList.setItems(items);
+  }
+
+  _structureShaperMessages(shaperMessages) {
+    const rootMessage = { children: [] };
+    const stack = [rootMessage];
+
+    const messageItems = shaperMessages
+      .map((message, breakIndex) => {
+        if (message.message.match(/^end (?!processing)/)) {
+          const { startToken } = stack.pop();
+          const endToken = message.message.slice(4);
+          assert(
+            startToken.startsWith(endToken),
+            `message stack mismatch: expected ${startToken}, found ${endToken}`
+          );
+          return null;
+        }
+
+        const messageItem = { ...message, breakIndex, level: stack.length - 1 };
+
+        stack.at(-1).children.push(messageItem);
+
+        if (message.message.match(/^start (?!processing)/)) {
+          const strippedMessage = message.message.slice(6); // strip "start "
+          messageItem.children = [];
+          messageItem.message = strippedMessage;
+          stack.push({
+            startToken: strippedMessage,
+            children: messageItem.children,
+          });
+        }
+
+        return messageItem;
+      })
+      .filter((messageItem) => messageItem != null);
+
+    assert(stack.length == 1, `shaping debugger start/end mismatch, stack: ${stack}`);
+
+    // Add indentation, add folding control, format message
+    messageItems.forEach((messageItem) => {
+      const { message, level, children } = messageItem;
+
+      const foldingChevron =
+        children != undefined
+          ? html.createDomElement("inline-svg", {
+              class: "indent-block row-icon",
+              src: "/tabler-icons/chevron-up.svg",
+              // onclick: (event) => foldingChevron.classList.toggle("closed"),
+            })
+          : html.span({ class: "indent-block row-icon" });
+
+      messageItem.message = html.span({}, [
+        ...repeat(level, () => html.span({ class: "indent-block" }, [])),
+        foldingChevron,
+        ...formatShaperMessage(message),
+      ]);
+    });
+
+    return messageItems;
   }
 
   updateShapingDebuggerBreakIndex(breakIndex) {
