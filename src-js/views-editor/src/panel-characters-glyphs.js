@@ -215,7 +215,7 @@ export default class CharactersGlyphsPanel extends Panel {
     );
     this.shapingDebuggerList.columnDescriptions = [
       {
-        key: "formatterMessage",
+        key: "formattedMessage",
         title: "Message",
       },
     ];
@@ -488,7 +488,6 @@ export default class CharactersGlyphsPanel extends Panel {
           ? html.createDomElement("inline-svg", {
               class: `indent-block changed-icon ${childChanged ? "nested" : ""}`,
               src: "/tabler-icons/arrow-big-right.svg",
-              onclick: (event) => foldingChevron.classList.toggle("closed"),
             })
           : html.span({ class: "indent-block changed-icon" });
 
@@ -496,11 +495,11 @@ export default class CharactersGlyphsPanel extends Panel {
         ? html.createDomElement("inline-svg", {
             class: "indent-block folding-icon",
             src: "/tabler-icons/chevron-up.svg",
-            onclick: (event) => foldingChevron.classList.toggle("closed"),
+            // onclick: (event) => foldingChevron.classList.toggle("closed"),
           })
         : html.span({ class: "indent-block folding-icon" });
 
-      messageItem.formatterMessage = html.span({}, [
+      messageItem.formattedMessage = html.span({}, [
         changedElement,
         ...repeat(level, () => html.span({ class: "indent-block" })),
         foldingChevron,
