@@ -242,11 +242,13 @@ export default class CharactersGlyphsPanel extends Panel {
         display: inline-block;
         width: 1em;
         height: 1em;
+        margin-right: 1em;
       }
 
       .changed-icon {
         transform: scale(110%) translate(0, 15%);
         margin-right: 0.25em;
+        color: #999;
       }
 
       .folding-icon {
@@ -488,7 +490,7 @@ export default class CharactersGlyphsPanel extends Panel {
               src: iconPath,
               onclick: (event) => foldingChevron.classList.toggle("closed"),
             })
-          : html.span({ class: "indent-block folding-icon" });
+          : html.span({ class: "indent-block changed-icon" });
 
       const foldingChevron = children?.length
         ? html.createDomElement("inline-svg", {
@@ -500,7 +502,7 @@ export default class CharactersGlyphsPanel extends Panel {
 
       messageItem.formatterMessage = html.span({}, [
         changedElement,
-        ...repeat(level, () => html.span({ class: "indent-block" }, [])),
+        ...repeat(level, () => html.span({ class: "indent-block" })),
         foldingChevron,
         ...formatShaperMessage(message),
       ]);
