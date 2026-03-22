@@ -215,13 +215,7 @@ export default class CharactersGlyphsPanel extends Panel {
     );
     this.shapingDebuggerList.columnDescriptions = [
       {
-        key: "changed",
-        title: "",
-        width: "1em",
-        get: (item) => (item.changed ? "➔" : ""),
-      },
-      {
-        key: "message",
+        key: "formatterMessage",
         title: "Message",
       },
     ];
@@ -250,13 +244,18 @@ export default class CharactersGlyphsPanel extends Panel {
         height: 1em;
       }
 
-      .row-icon {
+      .changed-icon {
+        transform: scale(110%) translate(0, 15%);
+        margin-right: 0.25em;
+      }
+
+      .folding-icon {
         transform: scale(120%) translate(0, 15%) rotate(180deg);
         margin-right: 0.25em;
         transition: 120ms;
       }
 
-      .row-icon.closed {
+      .folding-icon.closed {
         transform: scale(120%) translate(0, 15%) rotate(90deg);
         margin-right: 0.25em;
       }
@@ -476,18 +475,33 @@ export default class CharactersGlyphsPanel extends Panel {
 
     // Add indentation, add folding control, format message
     messageItems.forEach((messageItem) => {
-      const { message, level, children } = messageItem;
+      const { message, changed, level, children } = messageItem;
+
+      const childChanged = changed || anyChildChanged(messageItem);
+      const iconPath = changed
+        ? "/tabler-icons/arrow-big-right.svg"
+        : "/tabler-icons/arrow-right.svg";
+
+      const changedElement =
+        changed || childChanged
+          ? html.createDomElement("inline-svg", {
+              class: "indent-block changed-icon",
+              src: iconPath,
+              onclick: (event) => foldingChevron.classList.toggle("closed"),
+            })
+          : html.span({ class: "indent-block folding-icon" });
 
       const foldingChevron =
         children != undefined
           ? html.createDomElement("inline-svg", {
-              class: "indent-block row-icon",
+              class: "indent-block folding-icon",
               src: "/tabler-icons/chevron-up.svg",
               // onclick: (event) => foldingChevron.classList.toggle("closed"),
             })
-          : html.span({ class: "indent-block row-icon" });
+          : html.span({ class: "indent-block folding-icon" });
 
-      messageItem.message = html.span({}, [
+      messageItem.formatterMessage = html.span({}, [
+        changedElement,
         ...repeat(level, () => html.span({ class: "indent-block" }, [])),
         foldingChevron,
         ...formatShaperMessage(message),
@@ -613,6 +627,13 @@ function* repeat(n, f) {
   for (const i of range(n)) {
     yield f(i);
   }
+}
+
+function anyChildChanged(messageItem) {
+  if (!messageItem.children?.length) {
+    return false;
+  }
+  return messageItem.children.some((child) => child.changed || anyChildChanged(child));
 }
 
 customElements.define("panel-characters-glyphs", CharactersGlyphsPanel);
