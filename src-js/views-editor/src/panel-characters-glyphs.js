@@ -223,6 +223,25 @@ export default class CharactersGlyphsPanel extends Panel {
         title: "Message",
       },
     ];
+    this.shapingDebuggerList.appendStyle(`
+      .ot-tag {
+        padding: 0em 0.2em 0em 0.2em;
+        border-radius: 0.25em;
+        font-family: monospace;
+      }
+
+      .table-tag {
+        background-color: #8CF5;
+      }
+
+      .script-tag {
+        background-color: #8CF5;
+      }
+
+      .feature-tag {
+        background-color: #C8F5;
+      }
+    `);
 
     this.accordion = new Accordion();
     this.accordion.appendStyle(`
@@ -393,7 +412,7 @@ export default class CharactersGlyphsPanel extends Panel {
       shaperMessages = [];
     }
     const items = shaperMessages.map(({ message, changed }, index) => ({
-      message,
+      message: formatShaperMessage(message),
       changed,
       index,
     }));
@@ -490,6 +509,27 @@ function sameGlyphNames(items1, items2) {
   const key1 = items1.map((item) => item.glyphName).join("|");
   const key2 = items2.map((item) => item.glyphName).join("|");
   return key1 == key2;
+}
+
+function formatShaperMessage(message) {
+  const parts = [message];
+
+  for (const [cls, regex] of [
+    ["ot-tag table-tag", /(?<=table )(GSUB|GPOS)/],
+    ["ot-tag script-tag", /(?<=script tag )'(.+?)'/],
+    ["ot-tag feature-tag", /(?<=feature )'(.+?)'/],
+  ]) {
+    const part = parts.at(-1);
+    const m = part.match(regex);
+    if (m) {
+      const [match, repl] = m;
+      parts.splice(-1, 1, part.slice(0, m.index));
+      parts.push(html.span({ class: cls }, [repl]));
+      parts.push(part.slice(m.index + match.length));
+    }
+  }
+
+  return parts.length == 1 ? parts[0] : html.span({}, parts);
 }
 
 customElements.define("panel-characters-glyphs", CharactersGlyphsPanel);
