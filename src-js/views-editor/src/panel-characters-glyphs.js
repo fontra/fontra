@@ -255,13 +255,13 @@ export default class CharactersGlyphsPanel extends Panel {
       }
 
       .folding-icon {
-        transform: scale(120%) translate(0, 15%) rotate(180deg);
+        transform: scale(125%) translate(0, 0%) rotate(180deg);
         margin-right: 0.25em;
         transition: 120ms;
       }
 
       .folding-icon.closed {
-        transform: scale(120%) translate(0, 15%) rotate(90deg);
+        transform: scale(125%) translate(0, 5%) rotate(90deg);
         margin-right: 0.25em;
       }
 
