@@ -240,9 +240,9 @@ export default class CharactersGlyphsPanel extends Panel {
 
       .indent-block {
         display: inline-block;
-        width: 1em;
+        width: 1em; // don't change: it'll change the icon size
         height: 1em;
-        margin-right: 1em;
+        margin-right: 0.2em; // change this to tune the indent level
       }
 
       .changed-icon {
