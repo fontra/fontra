@@ -219,6 +219,7 @@ export class UIList extends UnlitElement {
     );
     this.selectedItemIndices = new Set();
     this.allowEmptySelection = true;
+    this.hiddenRowProperty = "hidden";
     this._settingsStorageKey = null;
 
     this.columnWidths = {};
@@ -392,6 +393,9 @@ export class UIList extends UnlitElement {
     let rowIndex = this.rowsElement.childElementCount;
     for (const item of items) {
       const row = html.div({ class: "row" });
+      if (item[this.hiddenRowProperty]) {
+        row.classList.add("hidden");
+      }
       row.dataset.rowIndex = rowIndex;
       if (this.selectedItemIndices.has(rowIndex)) {
         row.classList.add("selected");
