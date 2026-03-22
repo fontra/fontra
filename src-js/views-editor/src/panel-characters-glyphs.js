@@ -478,7 +478,8 @@ export default class CharactersGlyphsPanel extends Panel {
     assert(stack.length == 1, `shaping debugger start/end mismatch, stack: ${stack}`);
 
     // Add indentation, add folding control, format message
-    messageItems.forEach((messageItem) => {
+    messageItems.forEach((messageItem, rowIndex) => {
+      messageItem.rowIndex = rowIndex;
       const { message, changed, level, children } = messageItem;
 
       const childChanged = anyChildChanged(messageItem);
@@ -495,7 +496,20 @@ export default class CharactersGlyphsPanel extends Panel {
         ? html.createDomElement("inline-svg", {
             class: "indent-block folding-icon",
             src: "/tabler-icons/chevron-up.svg",
-            // onclick: (event) => foldingChevron.classList.toggle("closed"),
+            onclick: (event) => {
+              const doClose = !foldingChevron.classList.contains("closed");
+              foldingChevron.classList.toggle("closed", doClose);
+              const childrenToToggle = [...children];
+              for (const child of childrenToToggle) {
+                if (child.children) {
+                  childrenToToggle.push(...child.children);
+                }
+                const rowElement = this.shapingDebuggerList.getRowElement(
+                  child.rowIndex
+                );
+                rowElement?.classList.toggle("hidden", doClose);
+              }
+            },
           })
         : html.span({ class: "indent-block folding-icon" });
 
