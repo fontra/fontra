@@ -438,8 +438,7 @@ export default class CharactersGlyphsPanel extends Panel {
   }
 
   _structureShaperMessages(shaperMessages) {
-    const rootMessage = { children: [] };
-    const stack = [rootMessage];
+    const stack = [{ children: [] }];
 
     const messageItems = shaperMessages
       .map((message, breakIndex) => {
@@ -491,14 +490,13 @@ export default class CharactersGlyphsPanel extends Panel {
             })
           : html.span({ class: "indent-block folding-icon" });
 
-      const foldingChevron =
-        children != undefined
-          ? html.createDomElement("inline-svg", {
-              class: "indent-block folding-icon",
-              src: "/tabler-icons/chevron-up.svg",
-              // onclick: (event) => foldingChevron.classList.toggle("closed"),
-            })
-          : html.span({ class: "indent-block folding-icon" });
+      const foldingChevron = children?.length
+        ? html.createDomElement("inline-svg", {
+            class: "indent-block folding-icon",
+            src: "/tabler-icons/chevron-up.svg",
+            onclick: (event) => foldingChevron.classList.toggle("closed"),
+          })
+        : html.span({ class: "indent-block folding-icon" });
 
       messageItem.formatterMessage = html.span({}, [
         changedElement,
