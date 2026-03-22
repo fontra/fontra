@@ -5,6 +5,7 @@ import { isDisjoint, updateSet } from "@fontra/core/set-ops.js";
 import { characterGlyphMapping } from "@fontra/core/shaper.js";
 import {
   makeUPlusStringFromCodePoint,
+  range,
   round,
   throttleCalls,
 } from "@fontra/core/utils.js";
@@ -241,6 +242,12 @@ export default class CharactersGlyphsPanel extends Panel {
       .feature-tag {
         background-color: #C8F5;
       }
+
+      .indent-block {
+        display: inline-block;
+        width: 1em;
+        height: 1em;
+      }
     `);
 
     this.accordion = new Accordion();
@@ -366,7 +373,7 @@ export default class CharactersGlyphsPanel extends Panel {
   }
 
   async shapingDebuggerListClickHandler(event) {
-    const breakIndex = this.shapingDebuggerList.getSelectedItem()?.index;
+    const breakIndex = this.shapingDebuggerList.getSelectedItem()?.breakIndex;
 
     if (breakIndex == this.sceneSettings.shapingDebuggerBreakIndex) {
       return;
@@ -411,10 +418,30 @@ export default class CharactersGlyphsPanel extends Panel {
     if (!this.sceneSettings.applyTextShaping) {
       shaperMessages = [];
     }
-    const items = shaperMessages.map(({ message, changed }, index) => ({
-      message: formatShaperMessage(message),
+
+    let level = 0;
+    shaperMessages = shaperMessages.map((message) => {
+      if (message.message.match(/^end (?!processing)/)) {
+        level--;
+      }
+      message = { ...message, level };
+      if (message.message.match(/^start (?!processing)/)) {
+        level++;
+      }
+      return message;
+    });
+
+    if (level) {
+      console.error(`shaping debugger nesting mismatch, final level: ${level}`);
+    }
+
+    const items = shaperMessages.map(({ message, changed, level }, breakIndex) => ({
+      message: html.span({}, [
+        ...repeat(level, () => html.span({ class: "indent-block" }, [])),
+        ...formatShaperMessage(message),
+      ]),
       changed,
-      index,
+      breakIndex,
     }));
 
     this.shapingDebuggerList.setItems(items);
@@ -422,7 +449,7 @@ export default class CharactersGlyphsPanel extends Panel {
 
   updateShapingDebuggerBreakIndex(breakIndex) {
     const itemIndex = this.shapingDebuggerList.items.findIndex(
-      (item) => item.index == breakIndex && item.index != undefined
+      (item) => item.breakIndex == breakIndex && item.breakIndex != undefined
     );
 
     this.shapingDebuggerList.setSelectedItemIndex(
@@ -529,7 +556,13 @@ function formatShaperMessage(message) {
     }
   }
 
-  return parts.length == 1 ? parts[0] : html.span({}, parts);
+  return parts;
+}
+
+function* repeat(n, f) {
+  for (const i of range(n)) {
+    yield f(i);
+  }
 }
 
 customElements.define("panel-characters-glyphs", CharactersGlyphsPanel);
