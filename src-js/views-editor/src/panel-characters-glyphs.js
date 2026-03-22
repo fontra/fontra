@@ -421,12 +421,15 @@ export default class CharactersGlyphsPanel extends Panel {
 
     let level = 0;
     shaperMessages = shaperMessages.map((message) => {
+      let endMessage = false;
       if (message.message.match(/^end (?!processing)/)) {
         level--;
+        endMessage = true;
       }
-      message = { ...message, level };
+      message = { ...message, level, endMessage };
       if (message.message.match(/^start (?!processing)/)) {
         level++;
+        message.message = message.message.slice(6); // strip "start "
       }
       return message;
     });
@@ -435,15 +438,17 @@ export default class CharactersGlyphsPanel extends Panel {
       console.error(`shaping debugger nesting mismatch, final level: ${level}`);
     }
 
-    const items = shaperMessages.map(({ message, changed, level }, breakIndex) => ({
-      message: html.span({}, [
-        ...repeat(level, () => html.span({ class: "indent-block" }, [])),
-        ...formatShaperMessage(message),
-      ]),
-      changed,
-      breakIndex,
-    }));
-
+    const items = shaperMessages
+      .map(({ message, changed, level, endMessage }, breakIndex) => ({
+        message: html.span({}, [
+          ...repeat(level, () => html.span({ class: "indent-block" }, [])),
+          ...formatShaperMessage(message),
+        ]),
+        changed,
+        breakIndex,
+        endMessage,
+      }))
+      .filter(({ endMessage }) => !endMessage);
     this.shapingDebuggerList.setItems(items);
   }
 
