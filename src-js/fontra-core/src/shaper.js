@@ -285,7 +285,7 @@ class HBShaper extends ShaperBase {
                 }
               }
 
-              const applyDidModify = applyEmulatedPositioningForTag(
+              const applyDidModify = applyEmulatedPositioningForFeature(
                 tag,
                 glyphs,
                 glyphObjects,
@@ -435,7 +435,7 @@ class HBShaper extends ShaperBase {
   }
 }
 
-function applyEmulatedPositioningForTag(
+function applyEmulatedPositioningForFeature(
   tag,
   glyphs,
   glyphObjects,
