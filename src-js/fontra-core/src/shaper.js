@@ -280,7 +280,11 @@ class HBShaper extends ShaperBase {
           const beforeLookupId = match ? parseInt(match[1]) : Infinity;
 
           for (const { tag, lookupId } of this.insertMarkers ?? []) {
-            if (!skipFeatures.has(tag) && beforeLookupId >= lookupId) {
+            if (
+              !skipFeatures.has(tag) &&
+              (beforeLookupId >= lookupId ||
+                (beforeLookupId == Infinity && lookupId == undefined))
+            ) {
               if (glyphs == undefined) {
                 glyphs = this.getGlyphInfoFromBuffer(buffer);
                 if (isRTL) {
