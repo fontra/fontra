@@ -63,3 +63,58 @@ async def test_filewatcher_basic(tmpdir):
             ("folder_to_watch_2/testing2.txt", Change.added),
         ]
     ) == sorted(collectedChanges)
+
+
+async def test_filewatcher_ignoreNextChange(tmpdir):
+    testDir = pathlib.Path(tmpdir) / "folder_to_watch"
+    testDir.mkdir()
+
+    testPath = testDir / "testing.txt"
+    testPath.write_text("testing")
+
+    collectedChanges = []
+
+    async def callback(changes):
+        for changeType, path in changes:
+            path = pathlib.Path(path)
+            name = "/".join(path.parts[-2:])
+            collectedChanges.append((name, changeType, path.read_text()))
+
+    await asyncio.sleep(0.1)
+
+    watcher = FileWatcher(callback)
+
+    delay = 0.15
+
+    async with aclosing(watcher):
+        watcher.setPaths([testDir])
+        await asyncio.sleep(delay)
+
+        # we expect a change
+        testPath.write_text("hello")
+        await asyncio.sleep(delay)
+
+        testPath.write_text("hello2")
+        # this should cause the next event (caused byt the *previous* write)
+        # to be ignored
+        watcher.ignoreNextChange(testPath)
+        await asyncio.sleep(delay)
+
+        # We also want subsequent writes that don't change the contents to
+        # be ignored
+        watcher.ignoreNextChange(testPath)
+        testPath.write_text("hello2")  # same contents
+        await asyncio.sleep(delay)
+
+        # But if a subsequent write writes *different* content, we do want
+        # to receive an event
+        watcher.ignoreNextChange(testPath)
+        testPath.write_text("hello3")
+        await asyncio.sleep(delay)
+
+    assert (
+        [
+            ("folder_to_watch/testing.txt", Change.added, "hello"),
+            ("folder_to_watch/testing.txt", Change.added, "hello3"),
+        ]
+    ) == collectedChanges
