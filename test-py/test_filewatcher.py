@@ -7,7 +7,7 @@ from watchfiles import Change
 from fontra.backends.filewatcher import FileWatcher
 
 
-async def test_filewatcher(tmpdir):
+async def test_filewatcher_basic(tmpdir):
     testDir_1 = pathlib.Path(tmpdir) / "folder_to_watch_1"
     testDir_1.mkdir()
 
