@@ -181,6 +181,9 @@ class HBShaper extends ShaperBase {
     const glyphs = this.getGlyphInfoFromBuffer(buffer);
     buffer.destroy();
 
+    // If we are *not* using the message API (we're not tracing, and *all* insertMarkers
+    // indicate that emulation should be done "at the end"), then we still have some
+    // emulation to do.
     this.applyEmulatedPositioning(
       glyphs,
       glyphObjects,
