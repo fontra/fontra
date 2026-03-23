@@ -270,11 +270,11 @@ class HBShaper extends ShaperBase {
     const messageFunc = (buffer, font, message) => {
       if (gposPhase) {
         const match = message.match(/^start lookup (\d+)/);
-        if (match) {
+        if (match || message.startsWith("end table GPOS")) {
           let glyphs;
           const glyphObjects = this._glyphObjects;
           let didModify = false;
-          const beforeLookupId = parseInt(match[1]);
+          const beforeLookupId = match ? parseInt(match[1]) : Infinity;
 
           for (const { tag, lookupId } of this.insertMarkers ?? []) {
             if (!skipFeatures.has(tag) && beforeLookupId >= lookupId) {
