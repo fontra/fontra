@@ -457,17 +457,24 @@ export default class CharactersGlyphsPanel extends Panel {
           return null;
         }
 
-        const messageItem = { ...message, breakIndex, level: stack.length - 1 };
+        const messageItem = {
+          ...message,
+          breakIndex,
+          level: stack.length - 1,
+          hidden: stack.at(-1).hideChildren,
+        };
 
         stack.at(-1).children.push(messageItem);
 
         if (message.message.match(/^start (?!processing)/)) {
           const strippedMessage = message.message.slice(6); // strip "start "
           messageItem.children = [];
+          messageItem.open = stack.length < 2;
           messageItem.message = strippedMessage;
           stack.push({
             startToken: strippedMessage,
             children: messageItem.children,
+            hideChildren: !messageItem.open,
           });
         }
 
@@ -494,22 +501,10 @@ export default class CharactersGlyphsPanel extends Panel {
 
       const foldingChevron = children?.length
         ? html.createDomElement("inline-svg", {
-            class: "indent-block folding-icon",
+            class: `indent-block folding-icon ${messageItem.open ? "" : "closed"}`,
             src: "/tabler-icons/chevron-up.svg",
-            onclick: (event) => {
-              const doClose = !foldingChevron.classList.contains("closed");
-              foldingChevron.classList.toggle("closed", doClose);
-              const childrenToToggle = [...children];
-              for (const child of childrenToToggle) {
-                if (child.children) {
-                  childrenToToggle.push(...child.children);
-                }
-                const rowElement = this.shapingDebuggerList.getRowElement(
-                  child.rowIndex
-                );
-                rowElement?.classList.toggle("hidden", doClose);
-              }
-            },
+            onclick: (event) =>
+              this._toggleShaperMessageItem(messageItem, event.altKey),
           })
         : html.span({ class: "indent-block folding-icon" });
 
@@ -522,6 +517,26 @@ export default class CharactersGlyphsPanel extends Panel {
     });
 
     return messageItems;
+  }
+
+  _toggleShaperMessageItem(messageItem, toggleChildren = false, force = undefined) {
+    messageItem.open = force ?? !messageItem.open;
+
+    const foldingChevron = messageItem.formattedMessage.querySelector(".folding-icon");
+    foldingChevron.classList.toggle("closed", !messageItem.open);
+
+    const childrenToToggle = [...messageItem.children];
+    for (const child of childrenToToggle) {
+      if (child.children) {
+        if (toggleChildren) {
+          this._toggleShaperMessageItem(child, true, messageItem.open);
+        } else if (!messageItem.open || child.open) {
+          childrenToToggle.push(...child.children);
+        }
+      }
+      const rowElement = this.shapingDebuggerList.getRowElement(child.rowIndex);
+      rowElement?.classList.toggle("hidden", !messageItem.open);
+    }
   }
 
   updateShapingDebuggerBreakIndex(breakIndex) {
