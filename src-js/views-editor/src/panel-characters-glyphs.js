@@ -465,9 +465,13 @@ export default class CharactersGlyphsPanel extends Panel {
 
     const messageItems = shaperMessages
       .map((message, breakIndex) => {
-        if (message.message.match(/^end (?!processing)/)) {
+        if (message.message.match(/^end (?!processing)|recursed /)) {
           const { startToken } = stack.pop();
-          const endToken = message.message.slice(4);
+
+          const endToken = message.message.startsWith("end ")
+            ? message.message.slice(4) // strip "end "
+            : message.message.slice(9); // strip "recursed "
+
           assert(
             startToken.startsWith(endToken),
             `message stack mismatch: expected ${startToken}, found ${endToken}`
@@ -484,13 +488,19 @@ export default class CharactersGlyphsPanel extends Panel {
 
         stack.at(-1).children.push(messageItem);
 
-        if (message.message.match(/^start (?!processing)/)) {
-          const strippedMessage = message.message.slice(6); // strip "start "
+        if (message.message.match(/^start (?!processing)|recursing /)) {
+          const strippedMessage = message.message.startsWith("start ")
+            ? message.message.slice(6) // strip "start "
+            : message.message;
+          const startToken = message.message.startsWith("start ")
+            ? strippedMessage
+            : message.message.slice(10); // strip "recursing "
+
           messageItem.children = [];
           messageItem.open = stack.length < 2;
           messageItem.message = strippedMessage;
           stack.push({
-            startToken: strippedMessage,
+            startToken,
             children: messageItem.children,
             hideChildren: !messageItem.open,
           });
