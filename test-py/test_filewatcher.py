@@ -112,9 +112,7 @@ async def test_filewatcher_ignoreNextChange(tmpdir):
         testPath.write_text("hello3")
         await asyncio.sleep(delay)
 
-    assert (
-        [
-            ("folder_to_watch/testing.txt", "hello"),
-            ("folder_to_watch/testing.txt", "hello3"),
-        ]
-    ) == collectedChanges
+    assert [
+        ("folder_to_watch/testing.txt", "hello"),
+        ("folder_to_watch/testing.txt", "hello3"),
+    ] == collectedChanges
