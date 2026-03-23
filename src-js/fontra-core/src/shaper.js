@@ -844,7 +844,7 @@ function _applyMarkPositioning(
   if (!didModify) {
     messageFunc?.(
       glyphs,
-      `skipped emulated feature feature '${featureTag}' because no glyph matches`
+      `skipped emulated feature '${featureTag}' because no glyph matches`
     );
   }
 
