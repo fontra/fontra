@@ -121,4 +121,4 @@ def fileContentHash(path: str) -> bytes | None:
         return None
 
     with open(path, "rb") as f:
-        return hashlib.file_digest(f, "sha256").digest()
+        return hashlib.sha256(f.read()).digest()
