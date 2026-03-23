@@ -1,4 +1,5 @@
 import asyncio
+import hashlib
 import logging
 import os
 from collections import defaultdict
@@ -19,6 +20,7 @@ class FileWatcher:
     _ignorePaths: dict[str, set[float | None]] = field(
         init=False, default_factory=lambda: defaultdict(set)
     )
+    _ignorePathHashes: dict[str, bytes | None] = field(init=False, default_factory=dict)
 
     async def aclose(self) -> None:
         if self._task is None:
@@ -43,8 +45,10 @@ class FileWatcher:
 
     def ignoreNextChange(self, path: os.PathLike | str):
         path = os.fspath(path)
+        print("XXXX", path)
         mtime = os.stat(path).st_mtime if os.path.exists(path) else None
         self._ignorePaths[path].add(mtime)
+        self._ignorePathHashes[path] = fileContentHash(path)
 
     def _startWatching(self) -> None:
         # Stop the current loop after a delay, so that it can process pending changes.
@@ -69,6 +73,7 @@ class FileWatcher:
         filteredChanges = set()
 
         for change, path in changes:
+            # Can we ignore this changes based on a recorded modification time?
             mtimes = self._ignorePaths.get(path)
             if mtimes is not None:
                 mtime = os.stat(path).st_mtime if os.path.exists(path) else None
@@ -77,6 +82,11 @@ class FileWatcher:
                     if not mtimes:
                         del self._ignorePaths[path]
                     continue
+
+            # We still want to ignore the change if the contents didn't really change.
+            contentHash = self._ignorePathHashes.pop(path, None)
+            if contentHash is not None and contentHash == fileContentHash(path):
+                continue
 
             filteredChanges.add((change, path))
 
@@ -105,3 +115,11 @@ def cleanupWatchFilesChanges(
 async def setEventAfterDelay(event, delay=0.1) -> None:
     await asyncio.sleep(delay)
     event.set()
+
+
+def fileContentHash(path: str) -> bytes | None:
+    if not os.path.isfile(path):
+        return None
+
+    with open(path, "rb") as f:
+        return hashlib.sha256(f.read()).digest()
