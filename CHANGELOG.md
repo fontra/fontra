@@ -2,6 +2,7 @@
 
 ## 2026-03-?? [version 2026.3.5]
 
+- [shaping] Make explicit non-mark glyph category take precedence over ad-hoc mark detection. [Issue 2507](https://github.com/fontra/fontra/issues/2507), [PR 2508](https://github.com/fontra/fontra/pull/2508)
 - [translations] Added Tagalog (Filipino) translations, contributed by FlaviusChromacitrin. [Issue 2503](https://github.com/fontra/fontra/issues/2503), [PR 2506](https://github.com/fontra/fontra/pull/2506)
 - [designspace/ufo] Don't unnecessarily modify UFO's metainfo.plist file when reading. This happened when the metainfo.plist file was formatted differently from how fontTools.ufoLib would do it. [Issue 2504](https://github.com/fontra/fontra/issues/2504), [PR 2505](https://github.com/fontra/fontra/pull/2505)
 - [fontra-pak] Make .fontra the default format when creating a new font, and remove the .rcjk legacy format from the new font format options. [fontra-pak PR 231](https://github.com/fontra/fontra-pak/pull/231)
