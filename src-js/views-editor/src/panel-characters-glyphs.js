@@ -503,8 +503,11 @@ export default class CharactersGlyphsPanel extends Panel {
         ? html.createDomElement("inline-svg", {
             class: `indent-block folding-icon ${messageItem.open ? "" : "closed"}`,
             src: "/tabler-icons/chevron-up.svg",
-            onclick: (event) =>
-              this._toggleShaperMessageItem(messageItem, event.altKey),
+            onclick: (event) => {
+              event.preventDefault();
+              event.stopImmediatePropagation();
+              this._toggleShaperMessageItem(messageItem, event.altKey);
+            },
           })
         : html.span({ class: "indent-block folding-icon" });
 
