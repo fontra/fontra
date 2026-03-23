@@ -277,13 +277,12 @@ class HBShaper extends ShaperBase {
           let glyphs;
           const glyphObjects = this._glyphObjects;
           let didModify = false;
-          const beforeLookupId = match ? parseInt(match[1]) : Infinity;
+          const beforeLookupId = match ? parseInt(match[1]) : undefined;
 
           for (const { tag, lookupId } of this.insertMarkers ?? []) {
             if (
               !skipFeatures.has(tag) &&
-              (beforeLookupId >= lookupId ||
-                (beforeLookupId == Infinity && lookupId == undefined))
+              (beforeLookupId >= lookupId || beforeLookupId == undefined)
             ) {
               if (glyphs == undefined) {
                 glyphs = this.getGlyphInfoFromBuffer(buffer);
