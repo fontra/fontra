@@ -213,6 +213,9 @@ export default class CharactersGlyphsPanel extends Panel {
     this.shapingDebuggerList.addEventListener("listSelectionChanged", (event) =>
       this.shapingDebuggerListClickHandler(event)
     );
+    this.shapingDebuggerList.rowsElement.addEventListener("keydown", (event) =>
+      this._shapingDebuggerHandleArrowLeftRight(event)
+    );
     this.shapingDebuggerList.columnDescriptions = [
       {
         key: "formattedMessage",
@@ -431,6 +434,21 @@ export default class CharactersGlyphsPanel extends Panel {
     }
   }
 
+  _shapingDebuggerHandleArrowLeftRight(event) {
+    if (event.key != "ArrowLeft" && event.key != "ArrowRight") {
+      return;
+    }
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    const messageItem = this.shapingDebuggerList.getSelectedItem();
+    if (messageItem) {
+      this._toggleShaperMessageItem(
+        messageItem,
+        event.altKey,
+        event.key == "ArrowRight"
+      );
+    }
+  }
   updateShapingDebuggerMessages(shaperMessages) {
     if (!this.sceneSettings.applyTextShaping) {
       this.shapingDebuggerList.setItems([]);
@@ -523,6 +541,10 @@ export default class CharactersGlyphsPanel extends Panel {
   }
 
   _toggleShaperMessageItem(messageItem, toggleChildren = false, force = undefined) {
+    if (!messageItem.children) {
+      return;
+    }
+
     messageItem.open = force ?? !messageItem.open;
 
     const foldingChevron = messageItem.formattedMessage.querySelector(".folding-icon");
