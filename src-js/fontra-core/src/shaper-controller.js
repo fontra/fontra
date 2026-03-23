@@ -251,13 +251,12 @@ export class ShaperController {
         };
 
     const isMark = (glyphName) => {
-      if (isAdHocMark(glyphName)) {
-        return true;
-      }
-
       const customInfo = glyphInfos[glyphName];
       if (customInfo?.category === "Mark" && customInfo?.subcategory === "Nonspacing") {
         return true;
+      } else if (customInfo?.category) {
+        // There is an explicit category, but it's not Mark/Nonspacing so this is not a mark
+        return false;
       }
 
       let info = getGlyphInfoFromGlyphName(glyphName);
@@ -273,7 +272,18 @@ export class ShaperController {
           }
         }
       }
-      return info?.category === "Mark" && info?.subCategory === "Nonspacing";
+
+      // Note "subcategory" (lowercase, Fontra glyph infos API) and "subCategory" (camelCase),
+      // as inherited from the Glyph Data database.
+      if (info?.category === "Mark" && info?.subCategory === "Nonspacing") {
+        return true;
+      } else if (info?.category) {
+        // There is an explicit category, but it's not Mark/Nonspacing so this is not a mark
+        return false;
+      }
+
+      // As a last resort, use the ad-hoc mark heuristic
+      return isAdHocMark(glyphName);
     };
 
     const glyphClasses = {
