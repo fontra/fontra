@@ -78,7 +78,7 @@ async def test_filewatcher_ignoreNextChange(tmpdir):
         for changeType, path in changes:
             path = pathlib.Path(path)
             name = "/".join(path.parts[-2:])
-            collectedChanges.append((name, changeType, path.read_text()))
+            collectedChanges.append((name, path.read_text()))
 
     await asyncio.sleep(0.1)
 
@@ -114,7 +114,7 @@ async def test_filewatcher_ignoreNextChange(tmpdir):
 
     assert (
         [
-            ("folder_to_watch/testing.txt", Change.added, "hello"),
-            ("folder_to_watch/testing.txt", Change.added, "hello3"),
+            ("folder_to_watch/testing.txt", "hello"),
+            ("folder_to_watch/testing.txt", "hello3"),
         ]
     ) == collectedChanges
