@@ -2,13 +2,16 @@
 
 ## 2026-03-24 [version 2026.3.5]
 
+### New features
+
+- [fontra-pak] Make .fontra the default format when creating a new font, and remove the .rcjk legacy format from the new font format options. [fontra-pak PR 231](https://github.com/fontra/fontra-pak/pull/231)
+- [translations] Added Tagalog (Filipino) translations, contributed by FlaviusChromacitrin. [Issue 2503](https://github.com/fontra/fontra/issues/2503), [PR 2506](https://github.com/fontra/fontra/pull/2506)
+
 ### Fixes
 
 - [Windows + OneDrive] Work around erroneous reloads that disrupt editing, caused by OneDrive on Windows: if files are stored in a OneDrive folder, each file write by Fontra causes OneDrive to change the modification time again a bit later, causing Fontra to receive a "file changed" event, even though the file didn't really change. We work around this by also comparing the contents of the file, and ignore the event if it's still the same. [PR 2511](https://github.com/fontra/fontra/pull/2511)
 - [shaping] Make explicit non-mark glyph category take precedence over ad-hoc mark detection. [Issue 2507](https://github.com/fontra/fontra/issues/2507), [PR 2508](https://github.com/fontra/fontra/pull/2508)
-- [translations] Added Tagalog (Filipino) translations, contributed by FlaviusChromacitrin. [Issue 2503](https://github.com/fontra/fontra/issues/2503), [PR 2506](https://github.com/fontra/fontra/pull/2506)
 - [designspace/ufo] Don't unnecessarily modify UFO's metainfo.plist file when reading. This happened when the metainfo.plist file was formatted differently from how fontTools.ufoLib would do it. [Issue 2504](https://github.com/fontra/fontra/issues/2504), [PR 2505](https://github.com/fontra/fontra/pull/2505)
-- [fontra-pak] Make .fontra the default format when creating a new font, and remove the .rcjk legacy format from the new font format options. [fontra-pak PR 231](https://github.com/fontra/fontra-pak/pull/231)
 - [fontra-glyphs] Fixed support for smart components that don't respond to font axes, yet use master layers that do. Reported and mostly fixed by Zachary Quinn Scheuren. [fontra-glyphs PR 133](https://github.com/fontra/fontra-glyphs/pull/133) and [fontra-glyphs PR 134](https://github.com/fontra/fontra-glyphs/pull/134)
 - [ttx] Fixed .ttx support for fonts that contain a format 2 `post` table. [PR 2501](https://github.com/fontra/fontra/pull/2501)
 
