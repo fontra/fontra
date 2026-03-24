@@ -14,7 +14,7 @@ import {
   updateObject,
 } from "@fontra/core/utils.js";
 import { MenuItemDivider } from "@fontra/web-components/menu-panel.js";
-import { dialog } from "@fontra/web-components/modal-dialog.js";
+import { dialog, message } from "@fontra/web-components/modal-dialog.js";
 import { BaseTool, shouldInitiateDrag } from "./edit-tools-base.js";
 import { equalGlyphSelection } from "./scene-controller.js";
 import {
@@ -511,6 +511,11 @@ class SidebearingTool extends MetricsBaseTool {
   }
 
   async handleDrag(eventStream, initialEvent) {
+    if (this.fontController.readOnly) {
+      messageCantEditMetricsFontReadOnly();
+      return;
+    }
+
     this.canvasController.canvas.focus();
 
     const selector = await this._prepareDrag(eventStream, initialEvent);
@@ -587,11 +592,16 @@ class SidebearingTool extends MetricsBaseTool {
     const sidebearingSelectors = [];
     const notAtSourceGlyphs = new Set();
 
+    let lockedGlyphNames = [];
+
     for (const glyphName of allGlyphNames) {
       const varGlyph = await this.fontController.getGlyph(glyphName);
-      if (!varGlyph) {
+
+      if (!varGlyph || !!varGlyph?.glyph.customData["fontra.glyph.locked"]) {
+        lockedGlyphNames.push(glyphName);
         continue;
       }
+
       const sourceIndex = varGlyph.getSourceIndex(
         this.sceneModel.getLocationForGlyph(glyphName)
       );
@@ -609,6 +619,11 @@ class SidebearingTool extends MetricsBaseTool {
         sidebearing,
         layerName,
       });
+    }
+
+    if (lockedGlyphNames.length) {
+      messageCantEditMetricsSomeGlyphsAreLocked(lockedGlyphNames);
+      return;
     }
 
     if (notAtSourceGlyphs.size) {
@@ -1058,6 +1073,11 @@ class KerningTool extends MetricsBaseTool {
   }
 
   async handleDrag(eventStream, initialEvent) {
+    if (this.fontController.readOnly) {
+      messageCantEditKerningFontReadOnly();
+      return;
+    }
+
     this.canvasController.canvas.focus();
 
     const selector = await this._prepareDrag(eventStream, initialEvent);
@@ -1534,4 +1554,25 @@ function getDeleteKerningPairLabel(numPairs, forThisSource) {
   const suffix = forThisSource ? "for this source" : "for all sources";
   const plural_s = numPairs > 1 ? "s" : "";
   return `delete kerning pair${plural_s} ${suffix}`;
+}
+
+function messageCantEditMetricsFontReadOnly() {
+  message("Can't edit metrics", translate("dialog.cant-edit-glyph.content"));
+}
+
+function messageCantEditKerningFontReadOnly() {
+  message("Can't edit kerning", translate("dialog.cant-edit-glyph.content"));
+}
+
+function messageCantEditMetricsSomeGlyphsAreLocked(lockedGlyphNames) {
+  const formattedGlyphNames = lockedGlyphNames
+    .map((glyphName) => `${glyphName}`)
+    .join(", ");
+
+  message(
+    "Can't edit metrics",
+    lockedGlyphNames.length == 1
+      ? `Glyph '${lockedGlyphNames[0]}' is locked.`
+      : `Some glyphs are locked: ${formattedGlyphNames}`
+  );
 }
