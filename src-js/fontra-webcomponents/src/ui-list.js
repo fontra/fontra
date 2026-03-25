@@ -697,7 +697,16 @@ export class UIList extends UnlitElement {
     if (shouldScrollInfoView && rowIndices.size) {
       const rowIndex = firstItemOfSet(rowIndices);
       const row = this.rowsElement.children[rowIndex];
-      row?.scrollIntoView({ behavior: "auto", block: "nearest", inline: "nearest" });
+      // Delay slightly: this avoids glitches in some cases
+      setTimeout(
+        () =>
+          row?.scrollIntoView({
+            behavior: "auto",
+            block: "nearest",
+            inline: "nearest",
+          }),
+        10
+      );
     }
   }
 
