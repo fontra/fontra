@@ -465,12 +465,15 @@ export default class CharactersGlyphsPanel extends Panel {
 
     const messageItems = shaperMessages
       .map((message, breakIndex) => {
-        if (message.message.match(/^end (?!processing)|recursed /)) {
+        // For now we can't use "recurse/recursed" because these messages aren't
+        // guaranteed to be balanced.
+        // if (message.message.match(/^end (?!processing)|recursed /)) {
+        if (message.message.match(/^end (?!processing)/)) {
           const { startToken } = stack.pop();
 
           const endToken = message.message.startsWith("end ")
             ? message.message.slice(4) // strip "end "
-            : message.message.slice(9); // strip "recursed "
+            : message.message.slice(9); // strip "recursed " // See comment above
 
           assert(
             startToken.startsWith(endToken),
@@ -488,13 +491,16 @@ export default class CharactersGlyphsPanel extends Panel {
 
         stack.at(-1).children.push(messageItem);
 
-        if (message.message.match(/^start (?!processing)|recursing /)) {
+        // For now we can't use "recurse/recursed" because these messages aren't
+        // guaranteed to be balanced.
+        // if (message.message.match(/^start (?!processing)|recursing /)) {
+        if (message.message.match(/^start (?!processing)/)) {
           const strippedMessage = message.message.startsWith("start ")
             ? message.message.slice(6) // strip "start "
             : message.message;
           const startToken = message.message.startsWith("start ")
             ? strippedMessage
-            : message.message.slice(10); // strip "recursing "
+            : message.message.slice(10); // strip "recursing " // See comment above
 
           messageItem.children = [];
           messageItem.open = stack.length < 2;
