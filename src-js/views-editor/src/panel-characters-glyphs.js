@@ -461,74 +461,74 @@ export default class CharactersGlyphsPanel extends Panel {
   }
 
   _structureShaperMessages(shaperMessages) {
-    const stack = [{ children: [] }];
+    const stack = [{ open: true, children: [] }];
 
-    const messageItems = shaperMessages
-      .map((message, breakIndex) => {
-        // For now we can't use "recurse/recursed" because these messages aren't
-        // guaranteed to be balanced.
-        // if (message.message.match(/^end (?!processing)|recursed /)) {
-        if (message.message.match(/^end (?!processing)/)) {
-          const { startToken } = stack.pop();
+    shaperMessages.forEach((message, breakIndex) => {
+      // For now we can't use "recurse/recursed" because these messages aren't
+      // guaranteed to be balanced.
+      // if (message.message.match(/^end (?!processing)|recursed /)) {
+      if (message.message.match(/^end (?!processing)/)) {
+        const { startToken } = stack.pop();
 
-          const endToken = message.message.startsWith("end ")
-            ? message.message.slice(4) // strip "end "
-            : message.message.slice(9); // strip "recursed " // See comment above
+        const endToken = message.message.startsWith("end ")
+          ? message.message.slice(4) // strip "end "
+          : message.message.slice(9); // strip "recursed " // See comment above
 
-          assert(
-            startToken.startsWith(endToken),
-            `message stack mismatch: expected ${startToken}, found ${endToken}`
-          );
-          return null;
-        }
+        assert(
+          startToken.startsWith(endToken),
+          `message stack mismatch: expected ${startToken}, found ${endToken}`
+        );
+        return;
+      }
 
-        const messageItem = {
-          ...message,
-          breakIndex,
-          level: stack.length - 1,
-          hidden: stack.at(-1).hideChildren,
-        };
+      const messageItem = {
+        ...message,
+        breakIndex,
+        level: stack.length - 1,
+        hidden: stack.at(-1).hideChildren,
+      };
 
-        stack.at(-1).children.push(messageItem);
+      stack.at(-1).children.push(messageItem);
 
-        // For now we can't use "recurse/recursed" because these messages aren't
-        // guaranteed to be balanced.
-        // if (message.message.match(/^start (?!processing)|recursing /)) {
-        if (message.message.match(/^start (?!processing)/)) {
-          const strippedMessage = message.message.startsWith("start ")
-            ? message.message.slice(6) // strip "start "
-            : message.message;
-          const startToken = message.message.startsWith("start ")
-            ? strippedMessage
-            : message.message.slice(10); // strip "recursing " // See comment above
+      // For now we can't use "recurse/recursed" because these messages aren't
+      // guaranteed to be balanced.
+      // if (message.message.match(/^start (?!processing)|recursing /)) {
+      if (message.message.match(/^start (?!processing)/)) {
+        const strippedMessage = message.message.startsWith("start ")
+          ? message.message.slice(6) // strip "start "
+          : message.message;
+        const startToken = message.message.startsWith("start ")
+          ? strippedMessage
+          : message.message.slice(10); // strip "recursing " // See comment above
 
-          messageItem.children = [];
-          messageItem.open = stack.length < 2;
-          messageItem.message = strippedMessage;
-          stack.push({
-            startToken,
-            children: messageItem.children,
-            hideChildren: !messageItem.open,
-          });
-        }
-
-        return messageItem;
-      })
-      .filter((messageItem) => messageItem != null);
+        messageItem.children = [];
+        messageItem.open = stack.length < 2;
+        messageItem.message = strippedMessage;
+        stack.push({
+          startToken,
+          children: messageItem.children,
+          hideChildren: !messageItem.open,
+        });
+      }
+    });
 
     assert(stack.length == 1, `shaping debugger start/end mismatch, stack: ${stack}`);
+
+    const messageItems = flattenMessageItemChildren(stack[0]).slice(1);
 
     // Add indentation, add folding control, format message
     messageItems.forEach((messageItem, rowIndex) => {
       messageItem.rowIndex = rowIndex;
       const { message, changed, level, children } = messageItem;
 
-      const childChanged = anyChildChanged(messageItem);
+      messageItem.childChanged = anyChildChanged(messageItem);
 
       const changedElement =
-        changed || childChanged
+        changed || messageItem.childChanged
           ? html.createDomElement("inline-svg", {
-              class: `indent-block changed-icon ${childChanged ? "nested" : ""}`,
+              class: `indent-block changed-icon ${
+                messageItem.childChanged ? "nested" : ""
+              }`,
               src: "/tabler-icons/arrow-big-right.svg",
             })
           : html.span({ class: "indent-block changed-icon" });
@@ -703,6 +703,17 @@ function anyChildChanged(messageItem) {
     return false;
   }
   return messageItem.children.some((child) => child.changed || anyChildChanged(child));
+}
+
+function flattenMessageItemChildren(messageItem) {
+  return [
+    messageItem,
+    ...(messageItem.children?.length
+      ? messageItem.children.flatMap((childItem) =>
+          flattenMessageItemChildren(childItem)
+        )
+      : []),
+  ];
 }
 
 customElements.define("panel-characters-glyphs", CharactersGlyphsPanel);
