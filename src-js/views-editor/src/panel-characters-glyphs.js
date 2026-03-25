@@ -305,7 +305,9 @@ export default class CharactersGlyphsPanel extends Panel {
         auxiliaryHeaderElement: makeAccordionHeaderButton({
           icon: "menu-2",
           id: "shaping-debugger-options-button",
-          tooltip: "Debugger options", // TODO: translate
+          tooltip: translate(
+            "sidebar.characters-glyphs.shaping-debugger.options-menu-tooltip"
+          ),
           tooltipposition: "left",
           onclick: (event) => this.showShapingDebuggerOptionsMenu(event),
         }),
@@ -334,7 +336,9 @@ export default class CharactersGlyphsPanel extends Panel {
   showShapingDebuggerOptionsMenu() {
     const menuItems = [
       {
-        title: "Show ineffective items",
+        title: translate(
+          "sidebar.characters-glyphs.shaping-debugger.show-ineffective-items"
+        ),
         callback: () => {
           applicationSettingsController.model.shapingDebuggerShowIneffectiveItems =
             !applicationSettingsController.model.shapingDebuggerShowIneffectiveItems;

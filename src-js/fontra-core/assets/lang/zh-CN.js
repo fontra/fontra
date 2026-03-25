@@ -263,6 +263,9 @@ export const strings = {
   "sidebar.characters-glyphs.input-characters": "输入字符",
   "sidebar.characters-glyphs.output-glyphs": "输出字形",
   "sidebar.characters-glyphs.shaping-debugger": "Shaping debugger",
+  "sidebar.characters-glyphs.shaping-debugger.options-menu-tooltip": " ",
+  "sidebar.characters-glyphs.shaping-debugger.show-ineffective-items":
+    "Show ineffective items",
   "sidebar.designspace-navigation": "Designspace 导航",
   "sidebar.designspace-navigation.dialog.add-source.label.layer": "图层：",
   "sidebar.designspace-navigation.dialog.add-source.label.source-name": "源名称：",
