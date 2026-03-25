@@ -754,22 +754,28 @@ function anyChildChanged(messageItem) {
 }
 
 function flattenMessageItemChildren(messageItem, filterIneffective = false) {
-  if (
-    filterIneffective &&
-    !messageItem.changed &&
-    !messageItem.childChanged &&
-    !messageItem.message.match(/recursing|start processing|end processing/)
-  ) {
+  if (filterIneffective && !isMessageItemEffective(messageItem)) {
     return [];
   }
+
+  messageItem.children = filterIneffective
+    ? messageItem.children?.filter(isMessageItemEffective)
+    : messageItem.children;
+
   return [
     messageItem,
-    ...(messageItem.children?.length
-      ? messageItem.children.flatMap((childItem) =>
-          flattenMessageItemChildren(childItem, filterIneffective)
-        )
-      : []),
+    ...(messageItem.children?.flatMap((childItem) =>
+      flattenMessageItemChildren(childItem, filterIneffective)
+    ) ?? []),
   ];
+}
+
+function isMessageItemEffective(messageItem) {
+  return (
+    messageItem.changed ||
+    messageItem.childChanged ||
+    messageItem.message.match(/recursing|start processing|end processing/)
+  );
 }
 
 customElements.define("panel-characters-glyphs", CharactersGlyphsPanel);
