@@ -626,15 +626,17 @@ export default class CharactersGlyphsPanel extends Panel {
   }
 
   updateShapingDebuggerBreakIndex(breakIndex) {
-    const itemIndex = this.shapingDebuggerList.items.findIndex(
+    let itemIndex = this.shapingDebuggerList.items.findIndex(
       (item) => item.breakIndex == breakIndex && item.breakIndex != undefined
     );
 
-    this.shapingDebuggerList.setSelectedItemIndex(
-      itemIndex != -1 ? itemIndex : undefined,
-      false,
-      true
-    );
+    if (itemIndex == -1) {
+      itemIndex = undefined;
+    }
+
+    if (this.shapingDebuggerList.getSelectedItemIndex() != itemIndex) {
+      this.shapingDebuggerList.setSelectedItemIndex(itemIndex, false, true);
+    }
   }
 
   async toggle(on, focus) {
