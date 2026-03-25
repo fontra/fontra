@@ -1,3 +1,4 @@
+import { applicationSettingsController } from "@fontra/core/application-settings.js";
 import { getGlyphInfoFromCodePoint } from "@fontra/core/glyph-data.js";
 import * as html from "@fontra/core/html-utils.js";
 import { translate } from "@fontra/core/localization.js";
@@ -11,7 +12,10 @@ import {
   throttleCalls,
 } from "@fontra/core/utils.js";
 import { showMenu } from "@fontra/web-components/menu-panel.js";
-import { Accordion } from "@fontra/web-components/ui-accordion.js";
+import {
+  Accordion,
+  makeAccordionHeaderButton,
+} from "@fontra/web-components/ui-accordion.js";
 import { UIList } from "@fontra/web-components/ui-list.js";
 import Panel from "./panel.js";
 import { equalGlyphSelection } from "./scene-controller.js";
@@ -49,6 +53,14 @@ export default class CharactersGlyphsPanel extends Panel {
           this.sceneSettings.shapingDebuggerMessages ?? []
         )
     );
+    applicationSettingsController.addKeyListener(
+      "shapingDebuggerShowIneffectiveItems",
+      (event) =>
+        this.updateShapingDebuggerMessages(
+          this.sceneSettings.shapingDebuggerMessages ?? []
+        )
+    );
+
     this.sceneSettingsController.addKeyListener("shapingDebuggerBreakIndex", (event) =>
       this.updateShapingDebuggerBreakIndex(event.newValue)
     );
@@ -290,6 +302,13 @@ export default class CharactersGlyphsPanel extends Panel {
         open: false,
         content: this.shapingDebuggerList,
         id: "shaper-debugger",
+        auxiliaryHeaderElement: makeAccordionHeaderButton({
+          icon: "menu-2",
+          id: "shaping-debugger-options-button",
+          tooltip: "Debugger options", // TODO: translate
+          tooltipposition: "left",
+          onclick: (event) => this.showShapingDebuggerOptionsMenu(event),
+        }),
       },
       {
         label: translate("sidebar.characters-glyphs.output-glyphs"),
@@ -310,6 +329,24 @@ export default class CharactersGlyphsPanel extends Panel {
     if (item.id == "shaper-debugger") {
       this.sceneSettings.shapingDebuggerEnabled = open;
     }
+  }
+
+  showShapingDebuggerOptionsMenu() {
+    const menuItems = [
+      {
+        title: "Show ineffective items",
+        callback: () => {
+          applicationSettingsController.model.shapingDebuggerShowIneffectiveItems =
+            !applicationSettingsController.model.shapingDebuggerShowIneffectiveItems;
+        },
+        checked:
+          applicationSettingsController.model.shapingDebuggerShowIneffectiveItems,
+      },
+    ];
+
+    const button = this.accordion.querySelector("#shaping-debugger-options-button");
+    const buttonRect = button.getBoundingClientRect();
+    showMenu(menuItems, { x: buttonRect.left, y: buttonRect.bottom });
   }
 
   async update() {
@@ -449,6 +486,7 @@ export default class CharactersGlyphsPanel extends Panel {
       );
     }
   }
+
   updateShapingDebuggerMessages(shaperMessages) {
     if (!this.sceneSettings.applyTextShaping) {
       this.shapingDebuggerList.setItems([]);
@@ -516,7 +554,10 @@ export default class CharactersGlyphsPanel extends Panel {
 
     assert(stack.length == 1, `shaping debugger start/end mismatch, stack: ${stack}`);
 
-    const messageItems = flattenMessageItemChildren(rootMessageItem).slice(1); // drop the rootMessageItem
+    const messageItems = flattenMessageItemChildren(
+      rootMessageItem,
+      !applicationSettingsController.model.shapingDebuggerShowIneffectiveItems
+    ).slice(1); // drop the rootMessageItem
 
     // Add indentation, add folding control, format message
     messageItems.forEach((messageItem, rowIndex) => {
