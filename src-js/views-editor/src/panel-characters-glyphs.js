@@ -461,7 +461,8 @@ export default class CharactersGlyphsPanel extends Panel {
   }
 
   _structureShaperMessages(shaperMessages) {
-    const stack = [{ open: true, children: [] }];
+    const rootNode = { children: [] };
+    const stack = [rootNode];
 
     shaperMessages.forEach((message, breakIndex) => {
       // For now we can't use "recurse/recursed" because these messages aren't
@@ -514,7 +515,7 @@ export default class CharactersGlyphsPanel extends Panel {
 
     assert(stack.length == 1, `shaping debugger start/end mismatch, stack: ${stack}`);
 
-    const messageItems = flattenMessageItemChildren(stack[0]).slice(1);
+    const messageItems = flattenMessageItemChildren(rootNode).slice(1); // drop the rootNode
 
     // Add indentation, add folding control, format message
     messageItems.forEach((messageItem, rowIndex) => {
