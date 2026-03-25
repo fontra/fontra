@@ -461,15 +461,18 @@ export default class CharactersGlyphsPanel extends Panel {
   }
 
   _structureShaperMessages(shaperMessages) {
-    const rootNode = { children: [] };
-    const stack = [rootNode];
+    const rootMessageItem = { children: [], childChanged: true };
+    const stack = [rootMessageItem];
 
     shaperMessages.forEach((message, breakIndex) => {
       // For now we can't use "recurse/recursed" because these messages aren't
       // guaranteed to be balanced.
       // if (message.message.match(/^end (?!processing)|recursed /)) {
       if (message.message.match(/^end (?!processing)/)) {
-        const { startToken } = stack.pop();
+        const topMessageItem = stack.pop();
+        topMessageItem.childChanged = anyChildChanged(topMessageItem);
+
+        const { startToken } = topMessageItem;
 
         const endToken = message.message.startsWith("end ")
           ? message.message.slice(4) // strip "end "
@@ -505,24 +508,20 @@ export default class CharactersGlyphsPanel extends Panel {
         messageItem.children = [];
         messageItem.open = stack.length < 2;
         messageItem.message = strippedMessage;
-        stack.push({
-          startToken,
-          children: messageItem.children,
-          hideChildren: !messageItem.open,
-        });
+        messageItem.startToken = startToken;
+        messageItem.hideChildren = !messageItem.open;
+        stack.push(messageItem);
       }
     });
 
     assert(stack.length == 1, `shaping debugger start/end mismatch, stack: ${stack}`);
 
-    const messageItems = flattenMessageItemChildren(rootNode).slice(1); // drop the rootNode
+    const messageItems = flattenMessageItemChildren(rootMessageItem).slice(1); // drop the rootMessageItem
 
     // Add indentation, add folding control, format message
     messageItems.forEach((messageItem, rowIndex) => {
       messageItem.rowIndex = rowIndex;
       const { message, changed, level, children } = messageItem;
-
-      messageItem.childChanged = anyChildChanged(messageItem);
 
       const changedElement =
         changed || messageItem.childChanged
@@ -588,7 +587,8 @@ export default class CharactersGlyphsPanel extends Panel {
 
     this.shapingDebuggerList.setSelectedItemIndex(
       itemIndex != -1 ? itemIndex : undefined,
-      false
+      false,
+      true
     );
   }
 
@@ -706,12 +706,20 @@ function anyChildChanged(messageItem) {
   return messageItem.children.some((child) => child.changed || anyChildChanged(child));
 }
 
-function flattenMessageItemChildren(messageItem) {
+function flattenMessageItemChildren(messageItem, filterIneffective = false) {
+  if (
+    filterIneffective &&
+    !messageItem.changed &&
+    !messageItem.childChanged &&
+    !messageItem.message.match(/recursing|start processing|end processing/)
+  ) {
+    return [];
+  }
   return [
     messageItem,
     ...(messageItem.children?.length
       ? messageItem.children.flatMap((childItem) =>
-          flattenMessageItemChildren(childItem)
+          flattenMessageItemChildren(childItem, filterIneffective)
         )
       : []),
   ];
