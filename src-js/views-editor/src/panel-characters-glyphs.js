@@ -436,7 +436,7 @@ export default class CharactersGlyphsPanel extends Panel {
   async shapingDebuggerListClickHandler(event) {
     const selectedMessage = this.shapingDebuggerList.getSelectedItem();
 
-    const breakIndex = getBreakIndexFromMessageItem(selectedMessage);
+    const breakIndex = messageItemGetBreakIndex(selectedMessage);
 
     if (breakIndex == this.sceneSettings.shapingDebuggerBreakIndex) {
       return;
@@ -511,7 +511,7 @@ export default class CharactersGlyphsPanel extends Panel {
       // if (message.message.match(/^end (?!processing)|recursed /)) {
       if (message.message.match(/^end (?!processing)/)) {
         const topMessageItem = stack.pop();
-        topMessageItem.childChanged = anyChildChanged(topMessageItem);
+        topMessageItem.childChanged = messageItemAnyChildChanged(topMessageItem);
         // Store the breakIndex for the end of the block, which we'll use
         // when the item is closed
         topMessageItem.endBreakIndex = breakIndex;
@@ -560,7 +560,7 @@ export default class CharactersGlyphsPanel extends Panel {
 
     assert(stack.length == 1, `shaping debugger start/end mismatch, stack: ${stack}`);
 
-    const messageItems = flattenMessageItemChildren(
+    const messageItems = messageItemFlatten(
       rootMessageItem,
       !applicationSettingsController.model.shapingDebuggerShowIneffectiveItems
     ).slice(1); // drop the rootMessageItem
@@ -642,7 +642,7 @@ export default class CharactersGlyphsPanel extends Panel {
 
   updateShapingDebuggerBreakIndex(breakIndex) {
     let itemIndex = this.shapingDebuggerList.items.findIndex((item) => {
-      const itemBreakIndex = getBreakIndexFromMessageItem(item);
+      const itemBreakIndex = messageItemGetBreakIndex(item);
       return itemBreakIndex == breakIndex && itemBreakIndex != undefined;
     });
 
@@ -762,31 +762,33 @@ function* repeat(n, f) {
   }
 }
 
-function anyChildChanged(messageItem) {
+function messageItemAnyChildChanged(messageItem) {
   if (!messageItem.children?.length) {
     return false;
   }
-  return messageItem.children.some((child) => child.changed || anyChildChanged(child));
+  return messageItem.children.some(
+    (child) => child.changed || messageItemAnyChildChanged(child)
+  );
 }
 
-function flattenMessageItemChildren(messageItem, filterIneffective = false) {
-  if (filterIneffective && !isMessageItemEffective(messageItem)) {
+function messageItemFlatten(messageItem, filterIneffective = false) {
+  if (filterIneffective && !messageItemIsEffective(messageItem)) {
     return [];
   }
 
   messageItem.children = filterIneffective
-    ? messageItem.children?.filter(isMessageItemEffective)
+    ? messageItem.children?.filter(messageItemIsEffective)
     : messageItem.children;
 
   return [
     messageItem,
     ...(messageItem.children?.flatMap((childItem) =>
-      flattenMessageItemChildren(childItem, filterIneffective)
+      messageItemFlatten(childItem, filterIneffective)
     ) ?? []),
   ];
 }
 
-function isMessageItemEffective(messageItem) {
+function messageItemIsEffective(messageItem) {
   return (
     messageItem.changed ||
     messageItem.childChanged ||
@@ -794,7 +796,7 @@ function isMessageItemEffective(messageItem) {
   );
 }
 
-function getBreakIndexFromMessageItem(messageItem) {
+function messageItemGetBreakIndex(messageItem) {
   return messageItem?.open == false // .open can also be undefined
     ? messageItem.endBreakIndex
     : messageItem.breakIndex;
