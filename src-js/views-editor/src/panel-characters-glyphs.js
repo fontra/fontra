@@ -625,6 +625,19 @@ export default class CharactersGlyphsPanel extends Panel {
       const rowElement = this.shapingDebuggerList.getRowElement(child.rowIndex);
       rowElement?.classList.toggle("hidden", !messageItem.open);
     }
+
+    if (messageItem.open) {
+      this.sceneSettings.shapingDebuggerBreakIndex = messageItem.breakIndex;
+    } else {
+      if (
+        messageItemContainsBreakIndex(
+          messageItem,
+          this.sceneSettings.shapingDebuggerBreakIndex
+        )
+      ) {
+        this.sceneSettings.shapingDebuggerBreakIndex = messageItem.endBreakIndex;
+      }
+    }
   }
 
   updateShapingDebuggerBreakIndex(breakIndex) {
@@ -785,6 +798,18 @@ function getBreakIndexFromMessageItem(messageItem) {
   return messageItem?.open == false // .open can also be undefined
     ? messageItem.endBreakIndex
     : messageItem.breakIndex;
+}
+
+function messageItemContainsBreakIndex(messageItem, breakIndex) {
+  if (messageItem.breakIndex == breakIndex) {
+    return true;
+  }
+
+  return (
+    messageItem.children?.some((childItem) =>
+      messageItemContainsBreakIndex(childItem, breakIndex)
+    ) ?? false
+  );
 }
 
 customElements.define("panel-characters-glyphs", CharactersGlyphsPanel);
