@@ -434,7 +434,9 @@ export default class CharactersGlyphsPanel extends Panel {
   }
 
   async shapingDebuggerListClickHandler(event) {
-    const breakIndex = this.shapingDebuggerList.getSelectedItem()?.breakIndex;
+    const selectedMessage = this.shapingDebuggerList.getSelectedItem();
+
+    const breakIndex = getBreakIndexFromMessageItem(selectedMessage);
 
     if (breakIndex == this.sceneSettings.shapingDebuggerBreakIndex) {
       return;
@@ -442,7 +444,7 @@ export default class CharactersGlyphsPanel extends Panel {
 
     this.sceneSettings.shapingDebuggerBreakIndex = breakIndex ?? null;
 
-    if (breakIndex == null) {
+    if (breakIndex == null || !selectedMessage) {
       return;
     }
 
@@ -450,28 +452,25 @@ export default class CharactersGlyphsPanel extends Panel {
     // glyph index when doing RTL
     await this.sceneSettingsController.waitForKeyChange("positionedLines");
 
-    const selectedMessage = this.sceneSettings.shapingDebuggerMessages[breakIndex];
-    if (selectedMessage) {
-      let selectedGlyph;
-      const m = selectedMessage.message.match(/at (\d+(,\d+)*)/);
-      if (m) {
-        const { glyphs, direction } =
-          this.sceneSettings.positionedLines[
-            this.sceneSettings.glyphRenderInfoLineIndex
-          ];
-        const adjustForDirection =
-          direction == "rtl" ? (i) => glyphs.length - 1 - i : (i) => i;
-        const indices = m[1].split(",").map((v) => adjustForDirection(Number(v)));
-        selectedGlyph = {
-          lineIndex: this.sceneSettings.glyphRenderInfoLineIndex,
-          glyphIndex: indices[0],
-        };
-      } else {
-        selectedGlyph = null;
-      }
-      if (!equalGlyphSelection(this.sceneSettings.selectedGlyph, selectedGlyph)) {
-        this.sceneSettings.selectedGlyph = selectedGlyph;
-      }
+    // const selectedMessage = this.sceneSettings.shapingDebuggerMessages[breakIndex];
+    // if (selectedMessage) {
+    let selectedGlyph;
+    const m = selectedMessage.message.match(/at (\d+(,\d+)*)/);
+    if (m) {
+      const { glyphs, direction } =
+        this.sceneSettings.positionedLines[this.sceneSettings.glyphRenderInfoLineIndex];
+      const adjustForDirection =
+        direction == "rtl" ? (i) => glyphs.length - 1 - i : (i) => i;
+      const indices = m[1].split(",").map((v) => adjustForDirection(Number(v)));
+      selectedGlyph = {
+        lineIndex: this.sceneSettings.glyphRenderInfoLineIndex,
+        glyphIndex: indices[0],
+      };
+    } else {
+      selectedGlyph = null;
+    }
+    if (!equalGlyphSelection(this.sceneSettings.selectedGlyph, selectedGlyph)) {
+      this.sceneSettings.selectedGlyph = selectedGlyph;
     }
   }
 
@@ -513,6 +512,9 @@ export default class CharactersGlyphsPanel extends Panel {
       if (message.message.match(/^end (?!processing)/)) {
         const topMessageItem = stack.pop();
         topMessageItem.childChanged = anyChildChanged(topMessageItem);
+        // Store the breakIndex for the end of the block, which we'll use
+        // when the item is closed
+        topMessageItem.endBreakIndex = breakIndex;
 
         const { startToken } = topMessageItem;
 
@@ -626,9 +628,10 @@ export default class CharactersGlyphsPanel extends Panel {
   }
 
   updateShapingDebuggerBreakIndex(breakIndex) {
-    let itemIndex = this.shapingDebuggerList.items.findIndex(
-      (item) => item.breakIndex == breakIndex && item.breakIndex != undefined
-    );
+    let itemIndex = this.shapingDebuggerList.items.findIndex((item) => {
+      const itemBreakIndex = getBreakIndexFromMessageItem(item);
+      return itemBreakIndex == breakIndex && itemBreakIndex != undefined;
+    });
 
     if (itemIndex == -1) {
       itemIndex = undefined;
@@ -776,6 +779,12 @@ function isMessageItemEffective(messageItem) {
     messageItem.childChanged ||
     messageItem.message.match(/recursing|start processing|end processing/)
   );
+}
+
+function getBreakIndexFromMessageItem(messageItem) {
+  return messageItem?.open == false // .open can also be undefined
+    ? messageItem.endBreakIndex
+    : messageItem.breakIndex;
 }
 
 customElements.define("panel-characters-glyphs", CharactersGlyphsPanel);
