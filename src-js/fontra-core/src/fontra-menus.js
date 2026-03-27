@@ -58,7 +58,6 @@ function getFontraMenu() {
         enabled: () => true,
         callback: () => {
           const url = new URL(window.location);
-          console.log(url.pathname);
           const target = "/applicationsettings.html";
           window.open(
             `${target}#${panelID}-panel`,
@@ -100,7 +99,7 @@ function getHelpMenu() {
           title: "GitHub",
           enabled: () => true,
           callback: () => {
-            window.open("https://github.com/fontra/fontra");
+            window.open("https://github.com/fontra");
           },
         },
       ];
