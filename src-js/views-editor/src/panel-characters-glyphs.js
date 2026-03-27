@@ -507,9 +507,6 @@ export default class CharactersGlyphsPanel extends Panel {
     const stack = [rootMessageItem];
 
     shaperMessages.forEach((message, breakIndex) => {
-      // For now we can't use "recurse/recursed" because these messages aren't
-      // guaranteed to be balanced.
-      // if (message.message.match(/^end (?!processing)|recursed /)) {
       if (message.message.match(/^end (?!processing)/)) {
         const topMessageItem = stack.pop();
         topMessageItem.childChanged = messageItemAnyChildChanged(topMessageItem);
@@ -518,10 +515,7 @@ export default class CharactersGlyphsPanel extends Panel {
         topMessageItem.endBreakIndex = breakIndex;
 
         const { startToken } = topMessageItem;
-
-        const endToken = message.message.startsWith("end ")
-          ? message.message.slice(4) // strip "end "
-          : message.message.slice(9); // strip "recursed " // See comment above
+        const endToken = message.message.slice(4); // strip "end "
 
         assert(
           startToken.startsWith(endToken),
@@ -539,21 +533,13 @@ export default class CharactersGlyphsPanel extends Panel {
 
       stack.at(-1).children.push(messageItem);
 
-      // For now we can't use "recurse/recursed" because these messages aren't
-      // guaranteed to be balanced.
-      // if (message.message.match(/^start (?!processing)|recursing /)) {
       if (message.message.match(/^start (?!processing)/)) {
-        const strippedMessage = message.message.startsWith("start ")
-          ? message.message.slice(6) // strip "start "
-          : message.message;
-        const startToken = message.message.startsWith("start ")
-          ? strippedMessage
-          : message.message.slice(10); // strip "recursing " // See comment above
+        const strippedMessage = message.message.slice(6); // strip "start "
 
         messageItem.children = [];
         messageItem.open = stack.length < 2;
         messageItem.message = strippedMessage;
-        messageItem.startToken = startToken;
+        messageItem.startToken = strippedMessage;
         messageItem.hideChildren = !messageItem.open;
         stack.push(messageItem);
       }
@@ -793,7 +779,7 @@ function messageItemIsEffective(messageItem) {
   return (
     messageItem.changed ||
     messageItem.childChanged ||
-    messageItem.message.match(/recursing|start processing|end processing/)
+    messageItem.message.match(/^recursing|^start processing|^end processing/)
   );
 }
 
