@@ -499,6 +499,7 @@ export default class TextEntryPanel extends Panel {
     const opentypeFeaturesURL = new URL(window.location);
     opentypeFeaturesURL.pathname = "fontinfo.html";
     opentypeFeaturesURL.hash = "#opentype-feature-code-panel";
+    const opentypeFeaturesURLTarget = `fontra.fontinfo.${this.editorController.projectIdentifier}`;
 
     this.accordion.items = [
       {
@@ -547,7 +548,7 @@ export default class TextEntryPanel extends Panel {
               id: "features-errors",
               class: "hidden",
               href: opentypeFeaturesURL,
-              target: "_blank",
+              target: opentypeFeaturesURLTarget,
             },
             [
               html.createDomElement("inline-svg", {
