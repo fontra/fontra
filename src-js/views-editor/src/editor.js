@@ -105,8 +105,8 @@ const PASTE_BEHAVIOR_REPLACE = "replace";
 const PASTE_BEHAVIOR_ADD = "add";
 
 export class EditorController extends ViewController {
-  constructor(font) {
-    super(font);
+  constructor(font, projectIdentifier) {
+    super(font, projectIdentifier);
     const canvas = document.querySelector("#edit-canvas");
     canvas.focus();
     // This relates to getActionIdentifierFromKeyEvent which contains logic that

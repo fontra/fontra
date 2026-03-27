@@ -90,8 +90,8 @@ export class FontOverviewController extends ViewController {
     return `Fontra Font Overview — ${displayName}`;
   }
 
-  constructor(font) {
-    super(font);
+  constructor(font, projectIdentifier) {
+    super(font, projectIdentifier);
 
     this.undoStack = new UndoStack();
 
