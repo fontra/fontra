@@ -61,7 +61,7 @@ function getFontraMenu() {
           const target = "/applicationsettings.html";
           window.open(
             `${target}#${panelID}-panel`,
-            url.pathname.includes(target) ? "_self" : undefined
+            url.pathname.includes(target) ? "_self" : "fontra.applicationsettings"
           );
         },
       }));
