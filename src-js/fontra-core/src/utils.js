@@ -892,3 +892,7 @@ export function parseDataURL(dataURL) {
   }
   return { type, data };
 }
+
+export function objectsEqualSerialized(a, b) {
+  return JSON.stringify(a) === JSON.stringify(b);
+}

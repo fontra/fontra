@@ -284,6 +284,10 @@ export const strings = {
   "sidebar.characters-glyphs.input-characters": "Mga karakter sa pag-input",
   "sidebar.characters-glyphs.output-glyphs": "Mga output glyph",
   "sidebar.characters-glyphs.shaping-debugger": "Shaping debugger",
+  "sidebar.characters-glyphs.shaping-debugger.options-menu-tooltip":
+    "Shaping debugger options",
+  "sidebar.characters-glyphs.shaping-debugger.show-ineffective-items":
+    "Show ineffective items",
   "sidebar.designspace-navigation": "Nabigasyon sa Designspace",
   "sidebar.designspace-navigation.dialog.add-source.label.layer": "Patong:",
   "sidebar.designspace-navigation.dialog.add-source.label.source-name":

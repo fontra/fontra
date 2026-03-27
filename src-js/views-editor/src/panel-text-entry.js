@@ -227,7 +227,9 @@ export default class TextEntryPanel extends Panel {
   }
 
   async getShaper() {
-    const shaperInfoPromise = this.textSettings.applyTextShaping
+    const applyTextShaping = this.textSettings.applyTextShaping;
+
+    const shaperInfoPromise = applyTextShaping
       ? this.textSettings.shaperInfo
       : this.textSettings.dumbShaperInfo;
 
@@ -236,6 +238,12 @@ export default class TextEntryPanel extends Panel {
     }
 
     const { shaper, messages, canEmulateSomeGPOS } = await shaperInfoPromise;
+
+    if (applyTextShaping != this.textSettings.applyTextShaping) {
+      // The setting was changed since we were called: ignore, or else we may
+      // override the correct things that may have been set up before us.
+      return;
+    }
 
     const errorMessages = messages.filter((message) => message.level != "warning");
     const numberOfErrorsMessage = errorMessages.length == 1 ? "an error" : "errors";
@@ -363,7 +371,9 @@ export default class TextEntryPanel extends Panel {
   setupAccordionElement() {
     this.textSettingsController.addKeyListener("textScript", async (event) => {
       const shaper = await this.getShaper();
-      this.updateLanguages(shaper?.getScriptAndLanguageInfo() ?? {});
+      if (shaper) {
+        this.updateLanguages(shaper.getScriptAndLanguageInfo());
+      }
     });
 
     this.accordion = new Accordion();

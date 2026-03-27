@@ -186,7 +186,7 @@ export function groupAccordionHeaderButtons(buttons) {
 }
 
 export function makeAccordionHeaderButton(button) {
-  const options = {
+  let options = {
     style: "width: 1.4em; height: 1.4em;",
     src: `/tabler-icons/${button.icon}.svg`,
     onclick: button.onclick,
@@ -198,7 +198,7 @@ export function makeAccordionHeaderButton(button) {
 
   if (button.tooltip) {
     options["data-tooltip"] = button.tooltip;
-    options["data-tooltipposition"] = "bottom";
+    options["data-tooltipposition"] = button.tooltipposition ?? "bottom";
   }
 
   return html.createDomElement("icon-button", options);

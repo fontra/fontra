@@ -1,17 +1,24 @@
+import { applicationSettingsController } from "@fontra/core/application-settings.js";
 import { getGlyphInfoFromCodePoint } from "@fontra/core/glyph-data.js";
 import * as html from "@fontra/core/html-utils.js";
 import { translate } from "@fontra/core/localization.js";
 import { isDisjoint, updateSet } from "@fontra/core/set-ops.js";
 import { characterGlyphMapping } from "@fontra/core/shaper.js";
 import {
+  assert,
   makeUPlusStringFromCodePoint,
+  range,
   round,
   throttleCalls,
 } from "@fontra/core/utils.js";
 import { showMenu } from "@fontra/web-components/menu-panel.js";
-import { Accordion } from "@fontra/web-components/ui-accordion.js";
+import {
+  Accordion,
+  makeAccordionHeaderButton,
+} from "@fontra/web-components/ui-accordion.js";
 import { UIList } from "@fontra/web-components/ui-list.js";
 import Panel from "./panel.js";
+import { equalGlyphSelection } from "./scene-controller.js";
 
 export default class CharactersGlyphsPanel extends Panel {
   identifier = "characters-glyphs";
@@ -39,12 +46,24 @@ export default class CharactersGlyphsPanel extends Panel {
       true // immediate, avoids mismatch with characterLines
     );
 
-    // this.sceneSettingsController.addKeyListener(
-    //   ["selectedGlyph"],
-    //   (event) => console.log("sel changed")
-    // );
+    this.sceneSettingsController.addKeyListener(
+      ["applyTextShaping", "shapingDebuggerMessages"],
+      (event) =>
+        this.updateShapingDebuggerMessages(
+          this.sceneSettings.shapingDebuggerMessages ?? []
+        )
+    );
+    applicationSettingsController.addKeyListener(
+      "shapingDebuggerShowIneffectiveItems",
+      (event) =>
+        this.updateShapingDebuggerMessages(
+          this.sceneSettings.shapingDebuggerMessages ?? []
+        )
+    );
 
-    this.selectedLineIndex = 0;
+    this.sceneSettingsController.addKeyListener("shapingDebuggerBreakIndex", (event) =>
+      this.updateShapingDebuggerBreakIndex(event.newValue)
+    );
   }
 
   getContentElement() {
@@ -96,7 +115,7 @@ export default class CharactersGlyphsPanel extends Panel {
       const characterIndex = this.characterList.getSelectedItemIndex();
       const glyphIndices = this.characterGlyphMapping.charToGlyphs[characterIndex];
       this.sceneSettings.selectedGlyph = {
-        lineIndex: this.selectedLineIndex,
+        lineIndex: this.sceneSettings.glyphRenderInfoLineIndex,
         glyphIndex: glyphIndices[0],
       };
       this.glyphList.setSelectedItemIndices(glyphIndices, false, true);
@@ -192,13 +211,76 @@ export default class CharactersGlyphsPanel extends Panel {
     this.glyphList.addEventListener("listSelectionChanged", (event) => {
       const glyphIndex = this.glyphList.getSelectedItemIndex();
       this.sceneSettings.selectedGlyph = {
-        lineIndex: this.selectedLineIndex,
+        lineIndex: this.sceneSettings.glyphRenderInfoLineIndex,
         glyphIndex,
       };
     });
     this.glyphList.addEventListener("rowDoubleClicked", (event) =>
       this.glyphDoubleClickHandler(event)
     );
+
+    this.shapingDebuggerList = new UIList();
+    this.shapingDebuggerList.minHeight = "5em";
+    this.shapingDebuggerList.settingsStorageKey = "chars-glyphs-shaping-debugger-list";
+    this.shapingDebuggerList.addEventListener("listSelectionChanged", (event) =>
+      this.shapingDebuggerListClickHandler(event)
+    );
+    this.shapingDebuggerList.rowsElement.addEventListener("keydown", (event) =>
+      this._shapingDebuggerHandleArrowLeftRight(event)
+    );
+    this.shapingDebuggerList.columnDescriptions = [
+      {
+        key: "formattedMessage",
+        title: "Message",
+      },
+    ];
+    this.shapingDebuggerList.appendStyle(`
+      .ot-tag {
+        padding: 0em 0.2em 0em 0.2em;
+        border-radius: 0.25em;
+        font-family: monospace;
+      }
+
+      .table-tag {
+        background-color: #8CF5;
+      }
+
+      .script-tag {
+        background-color: #8CF5;
+      }
+
+      .feature-tag {
+        background-color: #C8F5;
+      }
+
+      .indent-block {
+        display: inline-block;
+        width: 1em; // don't change: it'll change the icon size
+        height: 1em;
+        margin-right: 0.2em; // change this to tune the indent level
+      }
+
+      .changed-icon {
+        transform: scale(110%) translate(0, 15%);
+        margin-right: 0.25em;
+      }
+
+      .changed-icon.nested {
+        color: #9999;
+      }
+
+      .folding-icon {
+        transform: scale(125%) translate(0, 0%) rotate(180deg);
+        margin-right: 0.25em;
+        transition: 120ms;
+      }
+
+      .folding-icon.closed {
+        transform: scale(125%) translate(0, 5%) rotate(90deg);
+        margin-right: 0.25em;
+      }
+
+    `);
 
     this.accordion = new Accordion();
     this.accordion.appendStyle(`
@@ -216,38 +298,82 @@ export default class CharactersGlyphsPanel extends Panel {
         content: this.characterList,
       },
       {
+        label: translate("sidebar.characters-glyphs.shaping-debugger"),
+        open: false,
+        content: this.shapingDebuggerList,
+        id: "shaper-debugger",
+        auxiliaryHeaderElement: makeAccordionHeaderButton({
+          icon: "menu-2",
+          id: "shaping-debugger-options-button",
+          tooltip: translate(
+            "sidebar.characters-glyphs.shaping-debugger.options-menu-tooltip"
+          ),
+          tooltipposition: "left",
+          onclick: (event) => this.showShapingDebuggerOptionsMenu(event),
+        }),
+      },
+      {
         label: translate("sidebar.characters-glyphs.output-glyphs"),
         open: true,
         content: this.glyphList,
       },
     ];
 
+    this.accordion.onItemOpenClose = (item, open) =>
+      this._accordionItemOpenClose(item, open);
+
     return html.div({ class: "panel" }, [
       html.div({ class: "main-section" }, [this.accordion]),
     ]);
   }
 
+  _accordionItemOpenClose(item, open) {
+    if (item.id == "shaper-debugger") {
+      this.sceneSettings.shapingDebuggerEnabled = open;
+    }
+  }
+
+  showShapingDebuggerOptionsMenu() {
+    const menuItems = [
+      {
+        title: translate(
+          "sidebar.characters-glyphs.shaping-debugger.show-ineffective-items"
+        ),
+        callback: () => {
+          applicationSettingsController.model.shapingDebuggerShowIneffectiveItems =
+            !applicationSettingsController.model.shapingDebuggerShowIneffectiveItems;
+        },
+        checked:
+          applicationSettingsController.model.shapingDebuggerShowIneffectiveItems,
+      },
+    ];
+
+    const button = this.accordion.querySelector("#shaping-debugger-options-button");
+    const buttonRect = button.getBoundingClientRect();
+    showMenu(menuItems, { x: buttonRect.left, y: buttonRect.bottom });
+  }
+
   async update() {
     const selectedGlyph = this.sceneSettings.selectedGlyph;
 
-    this.selectedLineIndex = selectedGlyph?.lineIndex ?? this.selectedLineIndex;
     const glyphIndex = selectedGlyph?.glyphIndex;
+    const lineIndex = this.sceneSettings.glyphRenderInfoLineIndex;
 
     const charLines = this.sceneSettings.characterLines;
     const positionedLines = this.sceneSettings.positionedLines;
 
     if (
-      !this.selectedLineIndex === undefined ||
-      !charLines[this.selectedLineIndex] ||
-      !positionedLines[this.selectedLineIndex]
+      !lineIndex === undefined ||
+      !charLines[lineIndex] ||
+      !positionedLines[lineIndex]
     ) {
       this.characterList.setItems([]);
       this.glyphList.setItems([]);
       return;
     }
 
-    const charLine = charLines[this.selectedLineIndex];
-    const positionedLine = positionedLines[this.selectedLineIndex];
+    const charLine = charLines[lineIndex];
+    const positionedLine = positionedLines[lineIndex];
 
     const charItems = charLine.map(({ character, glyphName }, index) => ({
       character,
@@ -304,6 +430,225 @@ export default class CharactersGlyphsPanel extends Panel {
     } else {
       this.characterList.setSelectedItemIndex(undefined);
       this.glyphList.setSelectedItemIndex(undefined);
+    }
+  }
+
+  async shapingDebuggerListClickHandler(event) {
+    const selectedMessage = this.shapingDebuggerList.getSelectedItem();
+
+    const breakIndex = messageItemGetBreakIndex(selectedMessage);
+
+    if (breakIndex == this.sceneSettings.shapingDebuggerBreakIndex) {
+      return;
+    }
+
+    this.sceneSettings.shapingDebuggerBreakIndex = breakIndex ?? null;
+
+    if (breakIndex == null || !selectedMessage) {
+      return;
+    }
+
+    // We need to wait for positionedLines to get updated so we can flip the
+    // glyph index when doing RTL
+    await this.sceneSettingsController.waitForKeyChange("positionedLines");
+
+    // const selectedMessage = this.sceneSettings.shapingDebuggerMessages[breakIndex];
+    // if (selectedMessage) {
+    let selectedGlyph;
+    const m = selectedMessage.message.match(/at (\d+(,\d+)*)/);
+    if (m) {
+      const { glyphs, direction } =
+        this.sceneSettings.positionedLines[this.sceneSettings.glyphRenderInfoLineIndex];
+      const adjustForDirection =
+        direction == "rtl" ? (i) => glyphs.length - 1 - i : (i) => i;
+      const indices = m[1].split(",").map((v) => adjustForDirection(Number(v)));
+      selectedGlyph = {
+        lineIndex: this.sceneSettings.glyphRenderInfoLineIndex,
+        glyphIndex: indices[0],
+      };
+    } else {
+      selectedGlyph = null;
+    }
+    if (!equalGlyphSelection(this.sceneSettings.selectedGlyph, selectedGlyph)) {
+      this.sceneSettings.selectedGlyph = selectedGlyph;
+    }
+  }
+
+  _shapingDebuggerHandleArrowLeftRight(event) {
+    if (event.key != "ArrowLeft" && event.key != "ArrowRight") {
+      return;
+    }
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    const messageItem = this.shapingDebuggerList.getSelectedItem();
+    if (messageItem) {
+      this._toggleShaperMessageItem(
+        messageItem,
+        event.altKey,
+        event.key == "ArrowRight"
+      );
+    }
+  }
+
+  updateShapingDebuggerMessages(shaperMessages) {
+    if (!this.sceneSettings.applyTextShaping) {
+      this.shapingDebuggerList.setItems([]);
+      return;
+    }
+
+    const items = this._structureShaperMessages(shaperMessages);
+
+    this.shapingDebuggerList.setItems(items);
+    this.updateShapingDebuggerBreakIndex(this.sceneSettings.shapingDebuggerBreakIndex);
+  }
+
+  _structureShaperMessages(shaperMessages) {
+    const rootMessageItem = { children: [], childChanged: true };
+    const stack = [rootMessageItem];
+
+    shaperMessages.forEach((message, breakIndex) => {
+      if (message.message.match(/^end (?!processing)/)) {
+        const topMessageItem = stack.pop();
+        topMessageItem.childChanged = messageItemAnyChildChanged(topMessageItem);
+        // Store the breakIndex for the end of the block, which we'll use
+        // when the item is closed
+        topMessageItem.endBreakIndex = breakIndex;
+
+        const { startToken } = topMessageItem;
+        const endToken = message.message.slice(4); // strip "end "
+
+        assert(
+          startToken.startsWith(endToken),
+          `message stack mismatch: expected ${startToken}, found ${endToken}`
+        );
+        return;
+      }
+
+      const messageItem = {
+        ...message,
+        breakIndex,
+        level: stack.length - 1,
+        hidden: stack.at(-1).hideChildren,
+      };
+
+      stack.at(-1).children.push(messageItem);
+
+      if (message.message.match(/^start (?!processing)/)) {
+        const strippedMessage = message.message.slice(6); // strip "start "
+
+        messageItem.children = [];
+        messageItem.open = stack.length < 2;
+        messageItem.message = strippedMessage;
+        messageItem.startToken = strippedMessage;
+        messageItem.hideChildren = !messageItem.open;
+        stack.push(messageItem);
+      }
+    });
+
+    assert(stack.length == 1, `shaping debugger start/end mismatch, stack: ${stack}`);
+
+    const messageItems = messageItemFlatten(
+      rootMessageItem,
+      !applicationSettingsController.model.shapingDebuggerShowIneffectiveItems
+    ).slice(1); // drop the rootMessageItem
+
+    // Add indentation, add folding control, format message
+    messageItems.forEach((messageItem, rowIndex) => {
+      messageItem.rowIndex = rowIndex;
+      const { message, changed, level, children } = messageItem;
+
+      const changedElement =
+        changed || messageItem.childChanged
+          ? html.createDomElement("inline-svg", {
+              class: `indent-block changed-icon ${
+                messageItem.childChanged ? "nested" : ""
+              }`,
+              src: "/tabler-icons/arrow-big-right.svg",
+            })
+          : html.span({ class: "indent-block changed-icon" });
+
+      const foldingChevron = children?.length
+        ? html.createDomElement("inline-svg", {
+            class: `indent-block folding-icon ${messageItem.open ? "" : "closed"}`,
+            src: "/tabler-icons/chevron-up.svg",
+            onclick: (event) => {
+              event.preventDefault();
+              event.stopImmediatePropagation();
+              this._toggleShaperMessageItem(messageItem, event.altKey);
+            },
+          })
+        : html.span({ class: "indent-block folding-icon" });
+
+      messageItem.formattedMessage = html.span({}, [
+        changedElement,
+        ...repeat(level, () => html.span({ class: "indent-block" })),
+        foldingChevron,
+        ...formatShaperMessage(message),
+      ]);
+    });
+
+    return messageItems;
+  }
+
+  _toggleShaperMessageItem(messageItem, toggleChildren = false, force = undefined) {
+    if (!messageItem.children) {
+      return;
+    }
+
+    messageItem.open = force ?? !messageItem.open;
+
+    const foldingChevron = messageItem.formattedMessage.querySelector(".folding-icon");
+    foldingChevron.classList.toggle("closed", !messageItem.open);
+
+    const childrenToToggle = [...messageItem.children];
+    for (const child of childrenToToggle) {
+      if (child.children) {
+        if (toggleChildren) {
+          this._toggleShaperMessageItem(child, true, messageItem.open);
+        } else if (!messageItem.open || child.open) {
+          childrenToToggle.push(...child.children);
+        }
+      }
+      const rowElement = this.shapingDebuggerList.getRowElement(child.rowIndex);
+      rowElement?.classList.toggle("hidden", !messageItem.open);
+      child.hidden = !messageItem.open;
+    }
+
+    if (messageItem.open) {
+      this.sceneSettings.shapingDebuggerBreakIndex = messageItem.breakIndex;
+    } else {
+      if (
+        messageItemContainsBreakIndex(
+          messageItem,
+          this.sceneSettings.shapingDebuggerBreakIndex
+        )
+      ) {
+        this.sceneSettings.shapingDebuggerBreakIndex = messageItem.endBreakIndex;
+      }
+    }
+  }
+
+  updateShapingDebuggerBreakIndex(breakIndex) {
+    let itemIndex = this.shapingDebuggerList.items.findIndex((item) => {
+      const itemBreakIndex = messageItemGetBreakIndex(item);
+      return (
+        itemBreakIndex == breakIndex && itemBreakIndex != undefined && !item.hidden
+      );
+    });
+
+    if (itemIndex == -1) {
+      itemIndex = undefined;
+    }
+
+    if (this.shapingDebuggerList.getSelectedItemIndex() != itemIndex) {
+      this.shapingDebuggerList.setSelectedItemIndex(itemIndex, false, true);
+    }
+
+    if (
+      itemIndex == undefined &&
+      this.sceneSettings.shapingDebuggerBreakIndex != null
+    ) {
+      this.sceneSettings.shapingDebuggerBreakIndex = null;
     }
   }
 
@@ -385,6 +730,85 @@ function sameGlyphNames(items1, items2) {
   const key1 = items1.map((item) => item.glyphName).join("|");
   const key2 = items2.map((item) => item.glyphName).join("|");
   return key1 == key2;
+}
+
+function formatShaperMessage(message) {
+  const parts = [message];
+
+  for (const [cls, regex] of [
+    ["ot-tag table-tag", /(?<=table )(GSUB|GPOS)/],
+    ["ot-tag script-tag", /(?<=script tag )'(.+?)'/],
+    ["ot-tag feature-tag", /(?<=feature )'(.+?)'/],
+  ]) {
+    const part = parts.at(-1);
+    const m = part.match(regex);
+    if (m) {
+      const [match, repl] = m;
+      parts.splice(-1, 1, part.slice(0, m.index));
+      parts.push(html.span({ class: cls }, [repl]));
+      parts.push(part.slice(m.index + match.length));
+    }
+  }
+
+  return parts;
+}
+
+function* repeat(n, f) {
+  for (const i of range(n)) {
+    yield f(i);
+  }
+}
+
+function messageItemAnyChildChanged(messageItem) {
+  if (!messageItem.children?.length) {
+    return false;
+  }
+  return messageItem.children.some(
+    (child) => child.changed || messageItemAnyChildChanged(child)
+  );
+}
+
+function messageItemFlatten(messageItem, filterIneffective = false) {
+  if (filterIneffective && !messageItemIsEffective(messageItem)) {
+    return [];
+  }
+
+  messageItem.children = filterIneffective
+    ? messageItem.children?.filter(messageItemIsEffective)
+    : messageItem.children;
+
+  return [
+    messageItem,
+    ...(messageItem.children?.flatMap((childItem) =>
+      messageItemFlatten(childItem, filterIneffective)
+    ) ?? []),
+  ];
+}
+
+function messageItemIsEffective(messageItem) {
+  return (
+    messageItem.changed ||
+    messageItem.childChanged ||
+    messageItem.message.match(/^recursing|^start processing|^end processing/)
+  );
+}
+
+function messageItemGetBreakIndex(messageItem) {
+  return messageItem?.open == false // .open can also be undefined
+    ? messageItem.endBreakIndex
+    : messageItem.breakIndex;
+}
+
+function messageItemContainsBreakIndex(messageItem, breakIndex) {
+  if (messageItem.breakIndex == breakIndex) {
+    return true;
+  }
+
+  return (
+    messageItem.children?.some((childItem) =>
+      messageItemContainsBreakIndex(childItem, breakIndex)
+    ) ?? false
+  );
 }
 
 customElements.define("panel-characters-glyphs", CharactersGlyphsPanel);
