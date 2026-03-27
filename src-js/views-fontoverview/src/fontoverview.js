@@ -141,6 +141,10 @@ export class FontOverviewController extends ViewController {
 
     this.fontSources = await this.fontController.getSources();
 
+    // Set window.name so that others can navigate back to us, using the
+    // same string as a target
+    window.name = `fontra.fontoverview.${this.projectIdentifier}`;
+
     window.addEventListener("popstate", (event) => {
       this._updateFromWindowLocation();
     });
