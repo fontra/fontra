@@ -611,6 +611,7 @@ export default class CharactersGlyphsPanel extends Panel {
       }
       const rowElement = this.shapingDebuggerList.getRowElement(child.rowIndex);
       rowElement?.classList.toggle("hidden", !messageItem.open);
+      child.hidden = !messageItem.open;
     }
 
     if (messageItem.open) {
@@ -630,7 +631,9 @@ export default class CharactersGlyphsPanel extends Panel {
   updateShapingDebuggerBreakIndex(breakIndex) {
     let itemIndex = this.shapingDebuggerList.items.findIndex((item) => {
       const itemBreakIndex = messageItemGetBreakIndex(item);
-      return itemBreakIndex == breakIndex && itemBreakIndex != undefined;
+      return (
+        itemBreakIndex == breakIndex && itemBreakIndex != undefined && !item.hidden
+      );
     });
 
     if (itemIndex == -1) {
