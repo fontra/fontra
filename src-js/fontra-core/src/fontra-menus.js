@@ -78,28 +78,28 @@ function getHelpMenu() {
           title: translate("menubar.help.homepage"),
           enabled: () => true,
           callback: () => {
-            window.open("https://fontra.xyz/");
+            window.open("https://fontra.xyz/", "fontra.website");
           },
         },
         {
           title: translate("menubar.help.documentation"),
           enabled: () => true,
           callback: () => {
-            window.open("https://docs.fontra.xyz");
+            window.open("https://docs.fontra.xyz", "fontra.documentation");
           },
         },
         {
           title: translate("menubar.help.changelog"),
           enabled: () => true,
           callback: () => {
-            window.open("https://fontra.xyz/changelog.html");
+            window.open("https://fontra.xyz/changelog.html", "fontra.changelog");
           },
         },
         {
           title: "GitHub",
           enabled: () => true,
           callback: () => {
-            window.open("https://github.com/fontra");
+            window.open("https://github.com/fontra", "fontra.github");
           },
         },
       ];
