@@ -640,6 +640,13 @@ export default class CharactersGlyphsPanel extends Panel {
     if (this.shapingDebuggerList.getSelectedItemIndex() != itemIndex) {
       this.shapingDebuggerList.setSelectedItemIndex(itemIndex, false, true);
     }
+
+    if (
+      itemIndex == undefined &&
+      this.sceneSettings.shapingDebuggerBreakIndex != null
+    ) {
+      this.sceneSettings.shapingDebuggerBreakIndex = null;
+    }
   }
 
   async toggle(on, focus) {
