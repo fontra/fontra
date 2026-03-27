@@ -499,6 +499,7 @@ export default class CharactersGlyphsPanel extends Panel {
     const items = this._structureShaperMessages(shaperMessages);
 
     this.shapingDebuggerList.setItems(items);
+    this.updateShapingDebuggerBreakIndex(this.sceneSettings.shapingDebuggerBreakIndex);
   }
 
   _structureShaperMessages(shaperMessages) {
