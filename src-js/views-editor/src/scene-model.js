@@ -406,8 +406,17 @@ export class SceneModel {
         this.sceneSettings.shapingDebuggerMessages
       )
     ) {
+      const breakIndex = this.sceneSettings.shapingDebuggerBreakIndex;
+      if (
+        breakIndex != null &&
+        !objectsEqualSerialized(
+          result.shaperMessages.slice(0, breakIndex + 1),
+          this.sceneSettings.shapingDebuggerMessages?.slice(0, breakIndex + 1)
+        )
+      ) {
+        this.sceneSettings.shapingDebuggerBreakIndex = null;
+      }
       this.sceneSettings.shapingDebuggerMessages = result.shaperMessages;
-      this.sceneSettings.shapingDebuggerBreakIndex = null;
     }
   }
 
