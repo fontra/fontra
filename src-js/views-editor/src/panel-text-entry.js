@@ -251,7 +251,8 @@ export default class TextEntryPanel extends Panel {
     this.updateShaperError(
       errorMessages.length
         ? `The OpenType feature code contains ${numberOfErrorsMessage}`
-        : null
+        : null,
+      errorMessages[0]
     );
 
     return shaper;
@@ -496,11 +497,6 @@ export default class TextEntryPanel extends Panel {
     this.textScriptOptions = [{ label: "Automatic", value: null }];
     this.textLanguageOptions = [{ label: "Default (dflt)", value: null }];
 
-    const opentypeFeaturesURL = new URL(window.location);
-    opentypeFeaturesURL.pathname = "fontinfo.html";
-    opentypeFeaturesURL.hash = "#opentype-feature-code-panel";
-    const opentypeFeaturesURLTarget = `fontra.fontinfo.${this.editorController.projectIdentifier}`;
-
     this.accordion.items = [
       {
         id: "shaping-options-accordion-item",
@@ -547,8 +543,8 @@ export default class TextEntryPanel extends Panel {
             {
               id: "features-errors",
               class: "hidden",
-              href: opentypeFeaturesURL,
-              target: opentypeFeaturesURLTarget,
+              href: "", // will get filled in later
+              target: `fontra.fontinfo.${this.editorController.projectIdentifier}`,
             },
             [
               html.createDomElement("inline-svg", {
@@ -615,11 +611,18 @@ export default class TextEntryPanel extends Panel {
     showMenu(menuItems, { x: buttonRect.left, y: buttonRect.bottom });
   }
 
-  updateShaperError(error) {
+  updateShaperError(error, errorMessage) {
     const errorElement = this.accordion.querySelector("#features-errors");
     const messageElement = this.accordion.querySelector("#features-errors-message");
     errorElement.classList.toggle("hidden", !error);
     messageElement.innerText = error ?? "";
+
+    if (errorMessage) {
+      const opentypeFeaturesURL = new URL(window.location);
+      opentypeFeaturesURL.pathname = "fontinfo.html";
+      opentypeFeaturesURL.hash = `#opentype-feature-code-panel#C${errorMessage.span[0]}-${errorMessage.span[1]}`;
+      errorElement.href = opentypeFeaturesURL;
+    }
   }
 
   updateFeatures(shaper) {
