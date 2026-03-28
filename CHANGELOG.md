@@ -6,6 +6,10 @@
 
 - Added a "Shaping debugger", as part of the "Input characters and output glyphs" panel. It sits in a new closed-by-default accordion item between "Input characters" and "Output glyphs" and allows the user to step through all the processing steps involved with text shaping and OpenType feature application, such as character reordering, glyph substition and glyph positioning. The user can see what effect each step has on the rendered string, both visually in the canvas and textually/numerically in the output glyphs list. This builds on the HarfBuzz "message API", and offers similar functionality to the [Crowbar](https://github.com/simoncozens/crowbar) tool. [PR 2500](https://github.com/fontra/fontra/pull/2500)
 
+### Improvements
+
+- Improved browser tab management significantly: when navigating to the font info view or to the font overview, activate an existing tab for that view. This avoids opening redundant new tabs, and allows the user to switch tabs with the "Font" menu. [PR 2520](https://github.com/fontra/fontra/pull/2520)
+
 ### Fixes
 
 - Prevent editing of metrics and kerning when the font is read-only, and prevent editing metrics when glyphs are locked. [Issue 2407](https://github.com/fontra/fontra/issues/2407), [PR 2513](https://github.com/fontra/fontra/pull/2513)
