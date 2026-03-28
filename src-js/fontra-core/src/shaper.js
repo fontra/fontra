@@ -1,5 +1,5 @@
 import hbPromise from "harfbuzzjs";
-import { assert, enumerate, range, reversed } from "./utils.js";
+import { assert, enumerate, mapObjectValues, range, reversed } from "./utils.js";
 
 const hb = await hbPromise;
 
@@ -570,9 +570,14 @@ export function applyKerning(
         `try kerning glyphs at ${displayIndex - 1},${displayIndex}`
       );
       const previousGlyphName = previousGlyph.glyphname;
-      const kernValue = pairFunc(previousGlyphName, glyphName);
+      const kernValue = Math.round(pairFunc(previousGlyphName, glyphName) ?? 0);
       if (kernValue) {
-        previousGlyph.x_advance += Math.round(kernValue);
+        if (rightToLeft) {
+          glyph.x_advance += kernValue;
+          glyph.x_offset += kernValue;
+        } else {
+          previousGlyph.x_advance += kernValue;
+        }
         messageFunc?.(glyphs, `kerned glyphs at ${displayIndex - 1},${displayIndex}`);
         didModify = true;
       }
@@ -712,7 +717,6 @@ function _applyMarkPositioning(
   messageFunc
 ) {
   // For simplicity, we treat non-ligatures as ligatures with a single component
-  let previousXAdvance = 0;
   let baseAnchors = [{}];
   let didModify = false;
   let baseLigatureId = 0;
@@ -747,40 +751,37 @@ function _applyMarkPositioning(
         // marks, for mark-to-mark positioning
         baseAnchors = splitLigatureAnchors(numLigatureComponents, {});
       } else {
+        const glyphAnchors = collectAnchors(
+          glyphIndex,
+          glyphObject.propagatedAnchors,
+          "",
+          "",
+          glyph.x_offset - (rightToLeft ? 0 : glyph.x_advance),
+          glyph.y_offset
+        );
+
         if (ligatureProps & IS_LIG_BASE) {
           // This glyph is a ligature
-          baseAnchors = splitLigatureAnchors(
-            numLigatureComponents,
-            collectAnchors(
-              glyphIndex,
-              glyphObject.propagatedAnchors,
-              "",
-              "",
-              glyph.x_offset,
-              glyph.y_offset
-            )
-          );
+          baseAnchors = splitLigatureAnchors(numLigatureComponents, glyphAnchors);
         } else {
           baseLigatureId = 0;
 
-          const newBaseAnchors = collectAnchors(
-            glyphIndex,
-            glyphObject.propagatedAnchors,
-            "",
-            "",
-            glyph.x_offset,
-            glyph.y_offset
-          );
+          const newBaseAnchors = glyphAnchors;
 
           if (glyph.cluster != previousCluster) {
             baseAnchors = [newBaseAnchors];
           } else {
             // We're still in the same cluster, don't throw away the previous base anchors
-            baseAnchors.splice(-1, 1, { ...baseAnchors.at(-1), ...newBaseAnchors });
+            baseAnchors.splice(-1, 1, {
+              ...moveAnchors(
+                baseAnchors.at(-1),
+                rightToLeft ? glyph.x_advance : -glyph.x_advance
+              ),
+              ...newBaseAnchors,
+            });
           }
         }
       }
-      previousXAdvance = rightToLeft ? 0 : glyphObject.xAdvance;
     } else {
       // NOTE: for marks, we *don't* use glyphObject.propagedAnchors, but
       // only the anchors defined in the glyph proper.
@@ -806,7 +807,7 @@ function _applyMarkPositioning(
             `attaching mark glyph at ${glyphIndex} to glyph at ${baseAnchor.glyphIndex}`
           );
 
-          glyph.x_offset = Math.round(baseAnchor.x - markAnchor.x - previousXAdvance);
+          glyph.x_offset = Math.round(baseAnchor.x - markAnchor.x);
           glyph.y_offset = Math.round(baseAnchor.y - markAnchor.y);
           didModify = true;
 
@@ -830,7 +831,7 @@ function _applyMarkPositioning(
         for (const [anchorName, markAnchor] of Object.entries(markBaseAnchors)) {
           baseAnchors[componentIndex][anchorName] = {
             name: anchorName,
-            x: markAnchor.x + glyph.x_offset + previousXAdvance,
+            x: markAnchor.x + glyph.x_offset,
             y: markAnchor.y + glyph.y_offset,
             glyphIndex,
           };
@@ -939,4 +940,12 @@ export function characterGlyphMapping(clusters, numChars) {
 
 function copyGlyphInfos(glyphs) {
   return glyphs.map((glyph) => ({ ...glyph }));
+}
+
+function moveAnchors(anchors, dx = 0, dy = 0) {
+  return mapObjectValues(anchors, (anchor) => ({
+    ...anchor,
+    x: anchor.x + dx,
+    y: anchor.y + dy,
+  }));
 }
