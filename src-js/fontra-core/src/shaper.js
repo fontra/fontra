@@ -1,5 +1,5 @@
 import hbPromise from "harfbuzzjs";
-import { assert, enumerate, range, reversed } from "./utils.js";
+import { assert, enumerate, mapObjectValues, range, reversed } from "./utils.js";
 
 const hb = await hbPromise;
 
@@ -943,10 +943,9 @@ function copyGlyphInfos(glyphs) {
 }
 
 function moveAnchors(anchors, dx = 0, dy = 0) {
-  return Object.fromEntries(
-    Object.entries(anchors).map(([name, anchor]) => [
-      name,
-      { ...anchor, x: anchor.x + dx, y: anchor.y + dy },
-    ])
-  );
+  return mapObjectValues(anchors, (anchor) => ({
+    ...anchor,
+    x: anchor.x + dx,
+    y: anchor.y + dy,
+  }));
 }
