@@ -131,10 +131,11 @@ class HBShaper extends ShaperBase {
   }
 
   shape(codePoints, glyphObjects, options) {
-    if (!codePoints.length) {
-      return { glyphs: [] };
-    }
     const { variations, features, direction, script, language } = options;
+
+    if (!codePoints.length) {
+      return { glyphs: [], requiredGlyphs: [], direction };
+    }
 
     const buffer = hb.createBuffer();
     buffer.addCodePoints(codePoints);
