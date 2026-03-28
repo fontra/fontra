@@ -12,6 +12,7 @@
 
 ### Fixes
 
+- [shaping] Fixed emulated mark positioning around "multiplied" glyph. [Issue 2521](https://github.com/fontra/fontra/issues/2521), [PR 2523](https://github.com/fontra/fontra/pull/2523)
 - Prevent editing of metrics and kerning when the font is read-only, and prevent editing metrics when glyphs are locked. [Issue 2407](https://github.com/fontra/fontra/issues/2407), [PR 2513](https://github.com/fontra/fontra/pull/2513)
 
 ## 2026-03-24 [version 2026.3.5]
