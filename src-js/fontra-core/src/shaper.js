@@ -570,9 +570,14 @@ export function applyKerning(
         `try kerning glyphs at ${displayIndex - 1},${displayIndex}`
       );
       const previousGlyphName = previousGlyph.glyphname;
-      const kernValue = pairFunc(previousGlyphName, glyphName);
+      const kernValue = Math.round(pairFunc(previousGlyphName, glyphName) ?? 0);
       if (kernValue) {
-        previousGlyph.x_advance += Math.round(kernValue);
+        if (rightToLeft) {
+          glyph.x_advance += kernValue;
+          glyph.x_offset += kernValue;
+        } else {
+          previousGlyph.x_advance += kernValue;
+        }
         messageFunc?.(glyphs, `kerned glyphs at ${displayIndex - 1},${displayIndex}`);
         didModify = true;
       }
