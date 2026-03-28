@@ -167,7 +167,10 @@ export default class DesignspaceNavigationPanel extends Panel {
               const url = new URL(window.location);
               url.pathname = url.pathname.replace("/editor.html", "/fontinfo.html");
               url.hash = "#axes-panel";
-              window.open(url.toString());
+              window.open(
+                url.toString(),
+                `fontra.fontinfo.${this.editorController.projectIdentifier}`
+              );
             },
           }),
           makeAccordionHeaderButton({

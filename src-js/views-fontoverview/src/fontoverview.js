@@ -90,8 +90,8 @@ export class FontOverviewController extends ViewController {
     return `Fontra Font Overview — ${displayName}`;
   }
 
-  constructor(font) {
-    super(font);
+  constructor(font, projectIdentifier) {
+    super(font, projectIdentifier);
 
     this.undoStack = new UndoStack();
 
@@ -140,6 +140,10 @@ export class FontOverviewController extends ViewController {
     await super.start();
 
     this.fontSources = await this.fontController.getSources();
+
+    // Set window.name so that others can navigate back to us, using the
+    // same string as a target
+    window.name = `fontra.fontoverview.${this.projectIdentifier}`;
 
     window.addEventListener("popstate", (event) => {
       this._updateFromWindowLocation();

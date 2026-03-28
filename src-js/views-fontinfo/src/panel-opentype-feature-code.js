@@ -362,6 +362,16 @@ export class OpenTypeFeatureCodePanel extends BaseInfoPanel {
 
     this.showAllErrors = false;
     await this.checkCompileErrors();
+
+    this.navigateToURLData(this._initialURLData);
+  }
+
+  setURLData(urlData) {
+    if (!this.editorView) {
+      this._initialURLData = urlData;
+    } else {
+      this.navigateToURLData(urlData);
+    }
   }
 
   async _updateFeatureCode(update) {
@@ -450,9 +460,46 @@ export class OpenTypeFeatureCodePanel extends BaseInfoPanel {
     errorElement.classList.toggle("hidden", !messages.length);
   }
 
+  navigateToURLData(urlData) {
+    if (!urlData) {
+      return;
+    }
+
+    const match = urlData.match(/^(?<type>L|C)(?<N>\d+)(-(?<M>\d+))?$/);
+    if (!match) {
+      return;
+    }
+
+    const lineNumbers = match.groups.type == "L";
+    let N = parseInt(match.groups.N);
+    let M = match.groups.M ? parseInt(match.groups.M) : undefined;
+
+    if (lineNumbers) {
+      const doc = this.editorView.state.doc;
+      if (N <= doc.lines) {
+        const lineN = doc.line(N);
+        const lineM = M >= N ? doc.line(Math.min(M, doc.lines)) : undefined;
+        N = lineN.from;
+        M = Math.min((lineM ? lineM.to : lineN.to) + 1, doc.length);
+      } else {
+        N = doc.length;
+        M = undefined;
+      }
+    }
+
+    this.goToSpan(N, M);
+  }
+
   goToSpan(spanFrom, spanTo) {
     this.editorView.dispatch({
-      selection: EditorSelection.create([EditorSelection.range(spanTo, spanFrom)], 0),
+      selection: EditorSelection.create(
+        [
+          spanTo != undefined
+            ? EditorSelection.range(spanTo, spanFrom)
+            : EditorSelection.cursor(spanFrom),
+        ],
+        0
+      ),
       scrollIntoView: true,
     });
 

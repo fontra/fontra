@@ -10,8 +10,10 @@ export class MultiPanelController {
     this.foldingStateLocalStorageKey = `multi-panel-${panelIdentifier}-folded`;
     this.panels = {};
 
-    this.selectedPanelIdentifier =
+    const { selectedPanelIdentifier, panelURLData } =
       getSelectedPanelIdentifierFromWindowLocation(panelClasses);
+
+    this.selectedPanelIdentifier = selectedPanelIdentifier;
 
     const panelContainer = document.querySelector("#multi-panel-panel-container");
     const headerContainer = document.querySelector("#multi-panel-header-container");
@@ -81,15 +83,19 @@ export class MultiPanelController {
       panelContainer.appendChild(panelElement);
 
       this.panels[panelClass.id] = new panelClass(viewController, panelElement);
+      this.panels[panelClass.id].setURLData(panelURLData);
       observer.observe(panelElement);
     }
 
     window.addEventListener("popstate", (event) => {
-      this.selectPanel(getSelectedPanelIdentifierFromWindowLocation(panelClasses));
+      const { selectedPanelIdentifier, panelURLData } =
+        getSelectedPanelIdentifierFromWindowLocation(panelClasses);
+
+      this.selectPanel(selectedPanelIdentifier, panelURLData);
     });
   }
 
-  selectPanel(panelIdentifier) {
+  selectPanel(panelIdentifier, panelURLData) {
     this.headerAccordion
       .querySelector(".multi-panel-header.selected")
       ?.classList.remove("selected");
@@ -99,17 +105,24 @@ export class MultiPanelController {
     );
     selectedHeader?.classList.add("selected");
 
-    this.selectedPanelIdentifier = panelIdentifier;
-    for (const el of document.querySelectorAll(".multi-panel-panel")) {
-      el.hidden = el.id != this.selectedPanelIdentifier;
-      if (el.id == this.selectedPanelIdentifier) {
-        el.focus(); // So it can receive key events
+    if (this.selectedPanelIdentifier != panelIdentifier) {
+      this.selectedPanelIdentifier = panelIdentifier;
+
+      for (const el of document.querySelectorAll(".multi-panel-panel")) {
+        el.hidden = el.id != this.selectedPanelIdentifier;
+        if (el.id == this.selectedPanelIdentifier) {
+          el.focus(); // So it can receive key events
+        }
       }
+
+      const url = new URL(window.location);
+      url.hash = `#${this.selectedPanelIdentifier}`;
+      window.history.replaceState({}, "", url);
     }
 
-    const url = new URL(window.location);
-    url.hash = `#${this.selectedPanelIdentifier}`;
-    window.history.replaceState({}, "", url);
+    if (panelURLData) {
+      this.panels[this.selectedPanelIdentifier].setURLData(panelURLData);
+    }
   }
 
   get selectedPanel() {
@@ -153,13 +166,20 @@ export class MultiPanelBasePanel {
   initializePanel() {
     this.setupUI();
   }
+
+  setURLData(urlData) {
+    // optional override
+  }
 }
 
 function getSelectedPanelIdentifierFromWindowLocation(panelClasses) {
   const panelIdentifiers = panelClasses.map((p) => p.id);
   const url = new URL(window.location);
-  const selectedPanelIdentifier = url.hash?.slice(1);
-  return panelIdentifiers.includes(selectedPanelIdentifier)
+  let [selectedPanelIdentifier, panelURLData] = url.hash?.slice(1).split("#", 2);
+
+  selectedPanelIdentifier = panelIdentifiers.includes(selectedPanelIdentifier)
     ? selectedPanelIdentifier
     : panelIdentifiers[0];
+
+  return { selectedPanelIdentifier, panelURLData };
 }

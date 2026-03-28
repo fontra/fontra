@@ -18,7 +18,7 @@ export class ViewController {
     await ensureLanguageHasLoaded;
 
     const remoteFontEngine = await Backend.remoteFont(projectIdentifier);
-    const controller = new this(remoteFontEngine);
+    const controller = new this(remoteFontEngine, projectIdentifier);
     remoteFontEngine.on("close", (event) => controller.handleRemoteClose(event));
     remoteFontEngine.on("error", (event) => controller.handleRemoteError(event));
     remoteFontEngine.on("initializationError", (error) =>
@@ -44,8 +44,9 @@ export class ViewController {
     return controller;
   }
 
-  constructor(font) {
+  constructor(font, projectIdentifier) {
     this.fontController = new FontController(font);
+    this.projectIdentifier = projectIdentifier;
 
     document.addEventListener("visibilitychange", (event) => {
       if (this._reconnectDialog) {
