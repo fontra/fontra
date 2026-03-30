@@ -27,78 +27,80 @@ describe("shaper tests", () => {
 
   const testInputCodePoints = [..."😻VABCÄS"].map((c) => ord(c));
 
-  const expectedGlyphs = [
-    {
-      codepoint: 0,
-      cluster: 0,
-      x_advance: 500,
-      y_advance: 0,
-      x_offset: 0,
-      y_offset: 0,
-      glyphname: ".notdef",
-      mark: false,
-    },
-    {
-      codepoint: 24,
-      cluster: 1,
-      x_advance: 301,
-      y_advance: 0,
-      x_offset: 0,
-      y_offset: 0,
-      glyphname: "V",
-      mark: false,
-    },
-    {
-      codepoint: 1,
-      cluster: 2,
-      x_advance: 396,
-      y_advance: 0,
-      x_offset: 0,
-      y_offset: 0,
-      glyphname: "A",
-      mark: false,
-    },
-    {
-      codepoint: 4,
-      cluster: 3,
-      x_advance: 443,
-      y_advance: 0,
-      x_offset: 0,
-      y_offset: 0,
-      glyphname: "B",
-      mark: false,
-    },
-    {
-      codepoint: 5,
-      cluster: 4,
-      x_advance: 499,
-      y_advance: 0,
-      x_offset: 0,
-      y_offset: 0,
-      glyphname: "C",
-      mark: false,
-    },
-    {
-      codepoint: 3,
-      cluster: 5,
-      x_advance: 396,
-      y_advance: 0,
-      x_offset: 0,
-      y_offset: 0,
-      glyphname: "Adieresis",
-      mark: false,
-    },
-    {
-      codepoint: 21,
-      cluster: 6,
-      x_advance: 393,
-      y_advance: 0,
-      x_offset: 0,
-      y_offset: 0,
-      glyphname: "S",
-      mark: false,
-    },
-  ];
+  function getExpectedGlyphs(useGlyphObjects) {
+    return [
+      {
+        codepoint: 0,
+        cluster: 0,
+        x_advance: 500,
+        y_advance: 0,
+        x_offset: 0,
+        y_offset: 0,
+        glyphname: ".notdef",
+        mark: false,
+      },
+      {
+        codepoint: 24,
+        cluster: 1,
+        x_advance: useGlyphObjects ? 301 : 300,
+        y_advance: 0,
+        x_offset: 0,
+        y_offset: 0,
+        glyphname: "V",
+        mark: false,
+      },
+      {
+        codepoint: 1,
+        cluster: 2,
+        x_advance: 396,
+        y_advance: 0,
+        x_offset: 0,
+        y_offset: 0,
+        glyphname: "A",
+        mark: false,
+      },
+      {
+        codepoint: 4,
+        cluster: 3,
+        x_advance: 443,
+        y_advance: 0,
+        x_offset: 0,
+        y_offset: 0,
+        glyphname: "B",
+        mark: false,
+      },
+      {
+        codepoint: 5,
+        cluster: 4,
+        x_advance: 499,
+        y_advance: 0,
+        x_offset: 0,
+        y_offset: 0,
+        glyphname: "C",
+        mark: false,
+      },
+      {
+        codepoint: 3,
+        cluster: 5,
+        x_advance: 396,
+        y_advance: 0,
+        x_offset: 0,
+        y_offset: 0,
+        glyphname: "Adieresis",
+        mark: false,
+      },
+      {
+        codepoint: 21,
+        cluster: 6,
+        x_advance: 393,
+        y_advance: 0,
+        x_offset: 0,
+        y_offset: 0,
+        glyphname: "S",
+        mark: false,
+      },
+    ];
+  }
 
   const glyphOrder = [
     ".notdef",
@@ -184,7 +186,7 @@ describe("shaper tests", () => {
   const kerningData = { V: { A: -100 } };
   const kerning = { getGlyphPairValue: (g1, g2) => kerningData[g1]?.[g2] ?? 0 };
 
-  it("test HBShaper basic tests", () => {
+  it("test HBShaper basic tests with funcs", () => {
     const fontData = new Uint8Array(fs.readFileSync(mutatorSansPath));
     const shaper = getShaper({
       fontData,
@@ -194,11 +196,21 @@ describe("shaper tests", () => {
     });
     const { glyphs } = shaper.shape(testInputCodePoints, glyphObjects, {
       variations: { wght: 0, wdth: 0 },
-      features: "-kern,-rvrn",
+      features: "kern,-rvrn",
     });
-    applyKerning(glyphs, (g1, g2) => kerning.getGlyphPairValue(g1, g2));
 
-    expect(glyphs).to.deep.equal(expectedGlyphs);
+    expect(glyphs).to.deep.equal(getExpectedGlyphs(true));
+  });
+
+  it("test HBShaper basic tests without funcs", () => {
+    const fontData = new Uint8Array(fs.readFileSync(mutatorSansPath));
+    const shaper = getShaper({ fontData });
+    const { glyphs } = shaper.shape(testInputCodePoints, null, {
+      variations: { wght: 0, wdth: 0 },
+      features: "kern,-rvrn",
+    });
+
+    expect(glyphs).to.deep.equal(getExpectedGlyphs(false));
   });
 
   it("test HBShaper RTL", () => {
@@ -296,10 +308,10 @@ describe("shaper tests", () => {
     const { glyphs } = shaper.shape(testInputCodePoints, glyphObjects, {
       variations: { wght: 0, wdth: 0 },
       features: "kern",
+      kerningPairFunc: (g1, g2) => kerning.getGlyphPairValue(g1, g2),
     });
-    applyKerning(glyphs, (g1, g2) => kerning.getGlyphPairValue(g1, g2));
 
-    expect(glyphs).to.deep.equal(expectedGlyphs);
+    expect(glyphs).to.deep.equal(getExpectedGlyphs(true));
   });
 
   it("test DumbShaper RTL", () => {
