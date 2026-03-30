@@ -39,6 +39,10 @@ export class LocalFontEngine {
     return await this.backend.getCustomData();
   }
 
+  async getShaperFontData() {
+    return null;
+  }
+
   async isReadOnly() {
     return true;
   }

@@ -61,6 +61,7 @@ describe("FontController tests", async () => {
     });
     expect((await fontController.getFeatures()).text).to.equal("");
     expect(await fontController.getGlyphInfos()).to.deep.equal({});
+    expect(await fontController.getShaperFontData()).to.equal(null);
 
     const kerning = await fontController.getKerning();
     expect(kerning["kern"].sourceIdentifiers).to.deep.equal([
