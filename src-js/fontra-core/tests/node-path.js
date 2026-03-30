@@ -2,6 +2,9 @@ import fs from "fs";
 import { glob, readFile } from "fs/promises";
 import { basename, dirname, extname, join } from "path";
 
+// This class aims to implement a small subset of Python's pathlib.Path object,
+// to conveniently access the filesystem from code running in NodeJS.
+
 export class NodePath {
   constructor(path) {
     this._path = path;
