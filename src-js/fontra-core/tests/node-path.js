@@ -40,4 +40,8 @@ export class NodePath {
       yield this.joinpath(name);
     }
   }
+
+  exists() {
+    return fs.existsSync(this._path);
+  }
 }
