@@ -49,8 +49,10 @@ export class StaticGlyph {
     glyph.xAdvance = obj.xAdvance;
     glyph.yAdvance = obj.yAdvance;
     glyph.verticalOrigin = obj.verticalOrigin;
-    if (obj.path) {
+    if (obj.path?.coordinates) {
       glyph.path = noCopy ? obj.path : VarPackedPath.fromObject(obj.path);
+    } else if (obj.path?.contours) {
+      glyph.path = VarPackedPath.fromUnpackedContours(obj.path.contours);
     } else {
       glyph.path = new VarPackedPath();
     }
