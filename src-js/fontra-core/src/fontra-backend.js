@@ -1,5 +1,7 @@
 import { assert, enumerate } from "./utils.js";
 
+const fontDefaults = { unitsPerEm: 1000 };
+
 export class FontraBackend {
   static glyphInfoFileName = "glyph-info.csv";
   static fontDataFileName = "font-data.json";
@@ -57,7 +59,7 @@ export class FontraBackend {
 
   async _readFontData() {
     const fontDataPath = this.path.joinpath(FontraBackend.fontDataFileName);
-    this.fontData = JSON.parse(await fontDataPath.readText());
+    this.fontData = { ...fontDefaults, ...JSON.parse(await fontDataPath.readText()) };
   }
 
   _getGlyphFilePath(self, glyphName) {

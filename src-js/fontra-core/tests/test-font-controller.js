@@ -40,6 +40,7 @@ describe("FontController tests", async () => {
     };
 
     const fontController = await getFontController(mutatorSansPath);
+    expect(fontController.unitsPerEm).to.equal(1000);
     expect(Object.keys(fontController.glyphMap).length).to.equal(55);
     expect(Object.keys(fontController.characterMap).length).to.equal(74);
     expect(fontController.glyphMap["A"]).to.deep.equal([65, 97]);
