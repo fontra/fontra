@@ -36,6 +36,7 @@ export const strings = {
   "action.export-as.rcjk": "RCJK (*.rcjk)",
   "action.export-as.ttf": "TrueType (*.ttf)",
   "action.export-as.ufo": "UFO (*.ufo)",
+  "action.export-as.woff2": "Webfont (*.woff2)",
   "action.glyph.add-background-image": "Magdagdag ng larawan sa background...",
   "action.glyph.add-source": "Magdagdag ng pinagmulan...",
   "action.glyph.delete-source": "Burahin ang pinagmulan...",
