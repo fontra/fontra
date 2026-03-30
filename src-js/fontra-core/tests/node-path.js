@@ -7,7 +7,7 @@ export class NodePath {
     this._path = path;
   }
 
-  joinpath(...pathsegments) {
+  joinPath(...pathsegments) {
     return new NodePath(join(this._path, ...pathsegments));
   }
 
@@ -37,7 +37,7 @@ export class NodePath {
 
   async *glob(pattern) {
     for await (const name of glob(pattern, { cwd: this._path })) {
-      yield this.joinpath(name);
+      yield this.joinPath(name);
     }
   }
 

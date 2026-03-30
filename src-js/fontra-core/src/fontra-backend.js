@@ -23,7 +23,7 @@ export class FontraBackend {
   async _readGlyphFileNames() {
     this._glyphPaths = {};
     for await (const glyphPath of this.path
-      .joinpath(FontraBackend.glyphsDirName)
+      .joinPath(FontraBackend.glyphsDirName)
       .glob("*.json")) {
       this._glyphPaths[fileNameToString(glyphPath.stem)] = glyphPath;
     }
@@ -33,7 +33,7 @@ export class FontraBackend {
     this.glyphMap = {};
     this.glyphInfos = {};
 
-    const glyphInfoPath = this.path.joinpath(FontraBackend.glyphInfoFileName);
+    const glyphInfoPath = this.path.joinPath(FontraBackend.glyphInfoFileName);
     const rows = parseCSVData(await glyphInfoPath.readText());
 
     const header = rows.shift();
@@ -58,12 +58,12 @@ export class FontraBackend {
   }
 
   async _readFontData() {
-    const fontDataPath = this.path.joinpath(FontraBackend.fontDataFileName);
+    const fontDataPath = this.path.joinPath(FontraBackend.fontDataFileName);
     this.fontData = { ...fontDefaults, ...JSON.parse(await fontDataPath.readText()) };
   }
 
   _getGlyphFilePath(self, glyphName) {
-    return this.path.joinpath(
+    return this.path.joinPath(
       FontraBackend.glyphsDirName,
       stringToFileName(glyphName) + ".json"
     );
@@ -98,7 +98,7 @@ export class FontraBackend {
   }
 
   async getKerning() {
-    const kerningPath = this.path.joinpath(FontraBackend.kerningFileName);
+    const kerningPath = this.path.joinPath(FontraBackend.kerningFileName);
     if (kerningPath.exists()) {
       return parseKerningData(await kerningPath.readText());
     } else {
@@ -107,7 +107,7 @@ export class FontraBackend {
   }
 
   async getFeatures() {
-    const featuresPath = this.path.joinpath(FontraBackend.featureTextFileName);
+    const featuresPath = this.path.joinPath(FontraBackend.featureTextFileName);
     if (featuresPath.exists()) {
       return { language: "fea", text: await featuresPath.readText() };
     } else {
