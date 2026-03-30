@@ -19,6 +19,14 @@ export class LocalFontEngine {
     return await this.backend.getUnitsPerEm();
   }
 
+  async getKerning() {
+    return await this.backend.getKerning();
+  }
+
+  async getFeatures() {
+    return await this.backend.getFeatures();
+  }
+
   async getCustomData() {
     return await this.backend.getCustomData();
   }
