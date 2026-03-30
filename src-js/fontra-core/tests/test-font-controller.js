@@ -84,6 +84,14 @@ describe("FontController tests", async () => {
       null,
       null,
     ]);
+
+    const kerningInstance = (
+      await fontController.getKerningController("kern")
+    ).instantiate({ weight: 400 });
+    expect(kerningInstance.getGlyphPairValue("A", "V")).to.equal(-27.5);
+
+    const source = fontController.fontSourcesInstancer.instantiate({ weight: 850 });
+    expect(source.name).to.equal("BoldCondensed");
   });
 
   it("getGlyphInstance neutral", async () => {
