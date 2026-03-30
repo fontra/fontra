@@ -16,8 +16,6 @@ export class FontraBackend {
     await this._readGlyphFileNames();
     await this._readGlyphInfo();
     await this._readFontData();
-    await this._readKerning();
-    await this._readFeatures();
   }
 
   async _readGlyphFileNames() {
@@ -62,14 +60,6 @@ export class FontraBackend {
     this.fontData = JSON.parse(await fontDataPath.readText());
   }
 
-  async _readKerning() {
-    //
-  }
-
-  async _readFeatures() {
-    //
-  }
-
   _getGlyphFilePath(self, glyphName) {
     return this.path.joinpath(
       FontraBackend.glyphsDirName,
@@ -95,6 +85,19 @@ export class FontraBackend {
 
   async getUnitsPerEm() {
     return this.fontData.unitsPerEm;
+  }
+
+  async getKerning() {
+    return {};
+  }
+
+  async getFeatures() {
+    const featuresPath = this.path.joinpath(FontraBackend.featureTextFileName);
+    if (featuresPath.exists()) {
+      return { language: "fea", text: await featuresPath.readText() };
+    } else {
+      return {};
+    }
   }
 
   async getGlyph(glyphName) {
