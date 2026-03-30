@@ -88,7 +88,12 @@ export class FontraBackend {
   }
 
   async getKerning() {
-    return {};
+    const kerningPath = this.path.joinpath(FontraBackend.kerningFileName);
+    if (kerningPath.exists()) {
+      return parseKerningData(await kerningPath.readText());
+    } else {
+      return {};
+    }
   }
 
   async getFeatures() {
@@ -151,4 +156,150 @@ const separatorChar = "^";
 
 function fileNameToString(fileName) {
   return decodeURIComponent(fileName.split(separatorChar, 1)[0]);
+}
+
+function parseKerningData(kerningData) {
+  const rows = parseCSVData(kerningData);
+
+  const kerning = {};
+
+  const rowIter = enumerate(rows, 1);
+
+  while (true) {
+    const kernType = kerningReadType(rowIter);
+    if (!kernType) {
+      break;
+    }
+
+    const groupsSide1 = kerningReadGroups(rowIter, "GROUPS1");
+    const groupsSide2 = kerningReadGroups(rowIter, "GROUPS2");
+
+    const [sourceIdentifiers, values] = kerningReadValues(rowIter);
+
+    kerning[kernType] = {
+      groupsSide1: groupsSide1,
+      groupsSide2: groupsSide2,
+      sourceIdentifiers: sourceIdentifiers,
+      values: values,
+    };
+  }
+
+  return kerning;
+}
+
+class KerningParseError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = this.constructor.name;
+  }
+}
+
+function kerningReadType(rowIter) {
+  let [lineNumber, row] = nextNonBlankRow(rowIter);
+  if (lineNumber == undefined) {
+    return null;
+  }
+
+  if (!row || row[0] != "TYPE") {
+    throw new KerningParseError(`expected TYPE keyword (line ${lineNumber})`);
+  }
+
+  [lineNumber, row] = next(rowIter);
+
+  if (!row || !row[0]) {
+    throw new KerningParseError(`expected TYPE value string (line ${lineNumber})`);
+  }
+
+  return row[0];
+}
+
+function kerningReadGroups(rowIter, keyword) {
+  let [lineNumber, row] = nextNonBlankRow(rowIter);
+  if (!row || row[0] != keyword) {
+    throw new KerningParseError(`expected {keyword} keyword (line ${lineNumber})`);
+  }
+
+  const groups = {};
+
+  for ([lineNumber, row] of iterNoClose(rowIter)) {
+    if (!row || !row[0]) {
+      break;
+    }
+    groups[row[0]] = row.slice(1);
+  }
+
+  return groups;
+}
+
+function kerningReadValues(rowIter) {
+  let [lineNumber, row] = nextNonBlankRow(rowIter);
+  if (!row || row[0] != "VALUES") {
+    throw new KerningParseError(`expected VALUES keyword (line ${lineNumber})`);
+  }
+
+  [lineNumber, row] = next(rowIter);
+  if (!row || row.length < 3 || row[0] != "side1" || row[1] != "side2") {
+    throw new KerningParseError(`"expected source identifier row (line ${lineNumber})`);
+  }
+
+  const sourceIdentifiers = row.slice(2);
+
+  const values = {};
+
+  for (const [lineNumber, row] of iterNoClose(rowIter)) {
+    if (!row || !row[0]) {
+      break;
+    }
+    if (row.length < 2) {
+      throw new KerningParseError(`expected kern values (line ${lineNumber})`);
+    }
+
+    const left = row[0];
+    const right = row[1];
+    let rowValues;
+
+    try {
+      rowValues = row.slice(2).map((v) => (v ? parseFloat(v) : null));
+    } catch (e) {
+      throw new KerningParseError(`parse error: ${e} (line ${lineNumber})`);
+    }
+
+    if (!values[left]) {
+      values[left] = {};
+    }
+
+    values[left][right] = rowValues;
+  }
+
+  return [sourceIdentifiers, values];
+}
+
+function nextNonBlankRow(rowIter) {
+  for (const [lineNumber, row] of iterNoClose(rowIter)) {
+    if (row && row[0]) {
+      return [lineNumber, row];
+    }
+  }
+  return [null, null];
+}
+
+class StopIterationError extends Error {}
+
+function next(iterator) {
+  const result = iterator.next();
+  if (result.done) {
+    throw new StopIterationError();
+  }
+  return result.value;
+}
+
+function* iterNoClose(iterator) {
+  while (true) {
+    const result = iterator.next();
+    if (result.done) {
+      break;
+    }
+
+    yield result.value;
+  }
 }
