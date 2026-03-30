@@ -51,6 +51,14 @@ describe("FontController tests", async () => {
     expect(fontController.axes.axes[0]).to.deep.equal(expectedWeightAxis);
     expect(Object.keys(fontController.sources).length).to.equal(8);
     expect(fontController.sources["light-condensed"].name).to.equal("LightCondensed");
+    expect(await fontController.getFontInfo()).to.deep.equal({
+      copyright: "License same as MutatorMath. BSD 3-clause. [test-token: C]",
+      familyName: "MutatorMathTest",
+      licenseDescription: "License same as MutatorMath. BSD 3-clause. [test-token: C]",
+      vendorID: "LTTR",
+      versionMajor: 1,
+      versionMinor: 2,
+    });
     expect((await fontController.getFeatures()).text).to.equal("");
 
     const kerning = await fontController.getKerning();

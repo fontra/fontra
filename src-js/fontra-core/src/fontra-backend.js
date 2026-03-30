@@ -73,6 +73,10 @@ export class FontraBackend {
     return this.glyphMap;
   }
 
+  async getFontInfo() {
+    return this.fontData.fontInfo;
+  }
+
   async getAxes() {
     return this.fontData.axes;
   }

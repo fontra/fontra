@@ -7,6 +7,10 @@ export class LocalFontEngine {
     return await this.backend.getGlyphMap();
   }
 
+  async getFontInfo() {
+    return await this.backend.getFontInfo();
+  }
+
   async getAxes() {
     return await this.backend.getAxes();
   }
