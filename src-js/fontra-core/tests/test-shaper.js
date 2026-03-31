@@ -1581,6 +1581,7 @@ describe("shaper tests compare emulation with native", () => {
         ],
       },
       {
+        // https://github.com/fontra/fontra/issues/2507
         input: "ن",
         expectedGlyphs: [
           {
@@ -1604,6 +1605,7 @@ describe("shaper tests compare emulation with native", () => {
         ],
       },
       {
+        // https://github.com/fontra/fontra/issues/2437
         input: "فَأنتَ",
         expectedGlyphs: [
           {
@@ -1699,6 +1701,7 @@ describe("shaper tests compare emulation with native", () => {
         ],
       },
       {
+        // https://github.com/fontra/fontra/issues/2521
         input: "قل",
         expectedGlyphs: [
           {
