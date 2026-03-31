@@ -188,7 +188,7 @@ describe("shaper tests", () => {
   const kerning = { getGlyphPairValue: (g1, g2) => kerningData[g1]?.[g2] ?? 0 };
 
   it("test HBShaper basic tests with funcs", () => {
-    const fontData = new Uint8Array(mutatorSansPath.readBytesSync());
+    const fontData = mutatorSansPath.readBytesSync();
     const shaper = getShaper({
       fontData,
       nominalGlyphFunc,
@@ -204,7 +204,7 @@ describe("shaper tests", () => {
   });
 
   it("test HBShaper basic tests without funcs", () => {
-    const fontData = new Uint8Array(mutatorSansPath.readBytesSync());
+    const fontData = mutatorSansPath.readBytesSync();
     const shaper = getShaper({ fontData });
     const { glyphs } = shaper.shape(testInputCodePoints, null, {
       variations: { wght: 0, wdth: 0 },
@@ -215,7 +215,7 @@ describe("shaper tests", () => {
   });
 
   it("test HBShaper RTL", () => {
-    const fontData = new Uint8Array(mutatorSansPath.readBytesSync());
+    const fontData = mutatorSansPath.readBytesSync();
     const shaper = getShaper({
       fontData,
       nominalGlyphFunc,
@@ -270,7 +270,7 @@ describe("shaper tests", () => {
 
     const expectedGPOSInfo = { kern: {}, mark: {}, mkmk: {} };
 
-    const fontData = new Uint8Array(notoSansPath.readBytesSync());
+    const fontData = notoSansPath.readBytesSync();
     const shaper = getShaper({
       fontData,
       nominalGlyphFunc,
@@ -283,7 +283,7 @@ describe("shaper tests", () => {
   });
 
   it("test HBShaper getScriptAndLanguageInfo", () => {
-    const fontData = new Uint8Array(notoSansPath.readBytesSync());
+    const fontData = notoSansPath.readBytesSync();
     const shaper = getShaper({
       fontData,
       nominalGlyphFunc,
@@ -1846,7 +1846,7 @@ function setupShapersFactory(path) {
       assert(ttfPath);
       assert(fontraPath);
 
-      const fontData = new Uint8Array(ttfPath.readBytesSync());
+      const fontData = ttfPath.readBytesSync();
       const nativeShaper = getShaper({ fontData });
       const nativeShapeFunc = (codePoints, options) =>
         nativeShaper.shape(codePoints, null, options);
