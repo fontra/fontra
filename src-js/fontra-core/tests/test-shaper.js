@@ -1,15 +1,13 @@
-import { expect } from "chai";
-
 import { deepCopyObject } from "@fontra/core/utils.js";
-import fs from "fs";
-import { dirname, join } from "path";
+import { expect } from "chai";
 import { fileURLToPath } from "url";
+import { NodePath } from "./node-path.js";
 import { getFontController } from "./test-font-controller.js";
 import { parametrize } from "./test-support.js";
 
 import { buildShaperFont } from "build-shaper-font";
 
-const moduleDirName = dirname(fileURLToPath(import.meta.url));
+const moduleDirName = new NodePath(fileURLToPath(import.meta.url)).parent;
 
 import { ObservableController } from "@fontra/core/observable-object.js";
 import { ShaperController } from "@fontra/core/shaper-controller.js";
@@ -23,9 +21,9 @@ import {
 } from "@fontra/core/shaper.js";
 
 describe("shaper tests", () => {
-  const testDataDir = join(dirname(dirname(dirname(moduleDirName))), "test-py", "data");
-  const mutatorSansPath = join(testDataDir, "mutatorsans", "MutatorSans.ttf");
-  const notoSansPath = join(testDataDir, "noto", "NotoSans-Regular.otf");
+  const testDataDir = moduleDirName.parent.parent.parent.joinPath("test-py", "data");
+  const mutatorSansPath = testDataDir.joinPath("mutatorsans", "MutatorSans.ttf");
+  const notoSansPath = testDataDir.joinPath("noto", "NotoSans-Regular.otf");
 
   const testInputCodePoints = [..."😻VABCÄS"].map((c) => ord(c));
 
@@ -189,7 +187,7 @@ describe("shaper tests", () => {
   const kerning = { getGlyphPairValue: (g1, g2) => kerningData[g1]?.[g2] ?? 0 };
 
   it("test HBShaper basic tests with funcs", () => {
-    const fontData = new Uint8Array(fs.readFileSync(mutatorSansPath));
+    const fontData = new Uint8Array(mutatorSansPath.readBytesSync());
     const shaper = getShaper({
       fontData,
       nominalGlyphFunc,
@@ -205,7 +203,7 @@ describe("shaper tests", () => {
   });
 
   it("test HBShaper basic tests without funcs", () => {
-    const fontData = new Uint8Array(fs.readFileSync(mutatorSansPath));
+    const fontData = new Uint8Array(mutatorSansPath.readBytesSync());
     const shaper = getShaper({ fontData });
     const { glyphs } = shaper.shape(testInputCodePoints, null, {
       variations: { wght: 0, wdth: 0 },
@@ -216,7 +214,7 @@ describe("shaper tests", () => {
   });
 
   it("test HBShaper RTL", () => {
-    const fontData = new Uint8Array(fs.readFileSync(mutatorSansPath));
+    const fontData = new Uint8Array(mutatorSansPath.readBytesSync());
     const shaper = getShaper({
       fontData,
       nominalGlyphFunc,
@@ -271,7 +269,7 @@ describe("shaper tests", () => {
 
     const expectedGPOSInfo = { kern: {}, mark: {}, mkmk: {} };
 
-    const fontData = new Uint8Array(fs.readFileSync(notoSansPath));
+    const fontData = new Uint8Array(notoSansPath.readBytesSync());
     const shaper = getShaper({
       fontData,
       nominalGlyphFunc,
@@ -284,7 +282,7 @@ describe("shaper tests", () => {
   });
 
   it("test HBShaper getScriptAndLanguageInfo", () => {
-    const fontData = new Uint8Array(fs.readFileSync(notoSansPath));
+    const fontData = new Uint8Array(notoSansPath.readBytesSync());
     const shaper = getShaper({
       fontData,
       nominalGlyphFunc,
@@ -1384,11 +1382,11 @@ table GDEF {
 });
 
 describe("shaper tests compare emulation with native", () => {
-  const dataDir = join(moduleDirName, "data", "positioning-emulation");
-  const nativeTestFontPath = join(dataDir, "positioning-emulation.ttf");
-  const emulatingTestFontPath = join(dataDir, "positioning-emulation.fontra");
+  const dataDir = moduleDirName.joinPath("data", "positioning-emulation");
+  const nativeTestFontPath = dataDir.joinPath("positioning-emulation.ttf");
+  const emulatingTestFontPath = dataDir.joinPath("positioning-emulation.fontra");
 
-  const fontData = new Uint8Array(fs.readFileSync(nativeTestFontPath));
+  const fontData = new Uint8Array(nativeTestFontPath.readBytesSync());
   const nativeShaper = getShaper({ fontData });
 
   let _emulatedShapeFunc;
