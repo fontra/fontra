@@ -1,4 +1,4 @@
-import { deepCopyObject } from "@fontra/core/utils.js";
+import { assert, deepCopyObject } from "@fontra/core/utils.js";
 import { expect } from "chai";
 import { fileURLToPath } from "url";
 import { NodePath } from "./node-path.js";
@@ -1382,21 +1382,9 @@ table GDEF {
 });
 
 describe("shaper tests compare emulation with native", () => {
-  const dataDir = moduleDirName.joinPath("data", "positioning-emulation");
-  const nativeTestFontPath = dataDir.joinPath("positioning-emulation.ttf");
-  const emulatingTestFontPath = dataDir.joinPath("positioning-emulation.fontra");
-
-  const fontData = new Uint8Array(nativeTestFontPath.readBytesSync());
-  const nativeShaper = getShaper({ fontData });
-
-  let _emulatedShapeFunc;
-
-  async function getEmulatedShapeFunc() {
-    if (!_emulatedShapeFunc) {
-      _emulatedShapeFunc = await getEmulatedShapeFuncForPath(emulatingTestFontPath);
-    }
-    return _emulatedShapeFunc;
-  }
+  const setupShapers = setupShapersFactory(
+    moduleDirName.joinPath("data", "positioning-emulation")
+  );
 
   const emulationTestData = [
     {
@@ -1572,15 +1560,16 @@ describe("shaper tests compare emulation with native", () => {
   ];
 
   parametrize("basic emulation tests", emulationTestData, async (testCase) => {
+    const { nativeShapeFunc, emulatedShapeFunc } = await setupShapers();
+
     const testInputCodePoints = [...testCase.input].map((c) => ord(c));
-    const { glyphs: nativeGlyphs } = nativeShaper.shape(testInputCodePoints, null, {
+
+    const { glyphs: nativeGlyphs } = nativeShapeFunc(testInputCodePoints, {
       variations: testCase.variations,
       features: testCase.features,
     });
 
     expect(stripGlyphIDs(nativeGlyphs)).to.deep.equal(testCase.expectedGlyphs);
-
-    const emulatedShapeFunc = await getEmulatedShapeFunc();
 
     const { glyphs: emulatedGlyphs } = await emulatedShapeFunc(testInputCodePoints, {
       variations: testCase.variations,
@@ -1643,4 +1632,36 @@ async function getEmulatedShapeFuncForPath(path) {
   }
 
   return emulatedShapeFunc;
+}
+
+function setupShapersFactory(path) {
+  let testCase;
+
+  async function setupFunc() {
+    if (!testCase) {
+      const ttfPath = await iterFirst(await path.glob("*.ttf"));
+      const fontraPath = await iterFirst(await path.glob("*.fontra"));
+      assert(ttfPath);
+      assert(fontraPath);
+
+      const fontData = new Uint8Array(ttfPath.readBytesSync());
+      const nativeShaper = getShaper({ fontData });
+      const nativeShapeFunc = (codePoints, options) =>
+        nativeShaper.shape(codePoints, null, options);
+
+      const emulatedShapeFunc = await getEmulatedShapeFuncForPath(fontraPath);
+
+      testCase = { nativeShapeFunc, emulatedShapeFunc };
+    }
+    return testCase;
+  }
+
+  return setupFunc;
+}
+
+async function iterFirst(iterator) {
+  for await (const item of iterator) {
+    return item;
+  }
+  return undefined;
 }
