@@ -1837,10 +1837,10 @@ async function getEmulatedShapeFuncForPath(path) {
 }
 
 function setupShapersFactory(path) {
-  let testCase;
+  let shapers;
 
   async function setupFunc() {
-    if (!testCase) {
+    if (!shapers) {
       const ttfPath = await iterFirst(await path.glob("*.ttf"));
       const fontraPath = await iterFirst(await path.glob("*.fontra"));
       assert(ttfPath);
@@ -1853,9 +1853,9 @@ function setupShapersFactory(path) {
 
       const emulatedShapeFunc = await getEmulatedShapeFuncForPath(fontraPath);
 
-      testCase = { nativeShapeFunc, emulatedShapeFunc };
+      shapers = { nativeShapeFunc, emulatedShapeFunc };
     }
-    return testCase;
+    return shapers;
   }
 
   return setupFunc;
