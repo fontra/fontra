@@ -1,4 +1,4 @@
-import fs from "fs";
+import { existsSync, readFileSync } from "fs";
 import { glob, readFile } from "fs/promises";
 import { basename, dirname, extname, join } from "path";
 
@@ -34,8 +34,16 @@ export class NodePath {
     return await readFile(this._path, { encoding: "utf-8" });
   }
 
+  readTextSync() {
+    return readFileSync(this._path, { encoding: "utf-8" });
+  }
+
   async readBytes() {
     return await readFile(this._path);
+  }
+
+  readBytesSync() {
+    return readFileSync(this._path);
   }
 
   async *glob(pattern) {
@@ -45,6 +53,10 @@ export class NodePath {
   }
 
   exists() {
-    return fs.existsSync(this._path);
+    return existsSync(this._path);
+  }
+
+  toString() {
+    return this._path;
   }
 }
