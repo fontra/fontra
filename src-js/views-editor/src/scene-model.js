@@ -3,8 +3,8 @@ import {
   rectIntersectsPolygon,
 } from "@fontra/core/convex-hull.js";
 import {
-  getGlyphInfoFromCodePoint,
   getSuggestedGlyphName,
+  guessDirectionFromCodePoints,
 } from "@fontra/core/glyph-data.js";
 import { loaderSpinner } from "@fontra/core/loader-spinner.js";
 import {
@@ -1458,14 +1458,4 @@ function addBoundingBoxes(glyphs, descender, ascender) {
     item.bounds = offsetRect(bounds, item.x, item.y);
     item.unpositionedBounds = bounds;
   });
-}
-
-function guessDirectionFromCodePoints(codePoints) {
-  for (const codePoint of codePoints) {
-    const info = getGlyphInfoFromCodePoint(codePoint);
-    if (info?.category === "Letter") {
-      return info.direction === "RTL" ? "rtl" : "ltr";
-    }
-  }
-  return undefined;
 }
