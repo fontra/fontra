@@ -7,8 +7,6 @@ import { parametrize } from "./test-support.js";
 
 import { buildShaperFont } from "build-shaper-font";
 
-const moduleDirName = new NodePath(fileURLToPath(import.meta.url)).parent;
-
 import { guessDirectionFromCodePoints } from "@fontra/core/glyph-data.js";
 import { ObservableController } from "@fontra/core/observable-object.js";
 import { ShaperController } from "@fontra/core/shaper-controller.js";
@@ -20,6 +18,8 @@ import {
   characterGlyphMapping,
   getShaper,
 } from "@fontra/core/shaper.js";
+
+const moduleDirName = new NodePath(fileURLToPath(import.meta.url)).parent;
 
 describe("shaper tests", () => {
   const testDataDir = moduleDirName.parent.parent.parent.joinPath("test-py", "data");
