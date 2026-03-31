@@ -9,6 +9,7 @@ import { buildShaperFont } from "build-shaper-font";
 
 const moduleDirName = new NodePath(fileURLToPath(import.meta.url)).parent;
 
+import { guessDirectionFromCodePoints } from "@fontra/core/glyph-data.js";
 import { ObservableController } from "@fontra/core/observable-object.js";
 import { ShaperController } from "@fontra/core/shaper-controller.js";
 import {
@@ -1561,22 +1562,74 @@ describe("shaper tests compare emulation with native", () => {
     ],
   };
 
-  for (const { name, setupShapers, testData } of [basicComparisonTests]) {
+  const raqqComparisonTests = {
+    name: "raqq",
+    setupShapers: setupShapersFactory(moduleDirName.joinPath("data", "raqq")),
+    testData: [
+      {
+        input: "ا",
+        expectedGlyphs: [
+          {
+            cluster: 0,
+            x_advance: 658,
+            y_advance: 0,
+            x_offset: 0,
+            y_offset: 0,
+            glyphname: "alef-ar",
+            mark: false,
+          },
+        ],
+      },
+      {
+        input: "ن",
+        expectedGlyphs: [
+          {
+            cluster: 0,
+            x_advance: 0,
+            y_advance: 0,
+            x_offset: 5,
+            y_offset: 191,
+            glyphname: "dotabove-ar",
+            mark: true,
+          },
+          {
+            cluster: 0,
+            x_advance: 295,
+            y_advance: 0,
+            x_offset: 0,
+            y_offset: 0,
+            glyphname: "noonghunna-ar",
+            mark: false,
+          },
+        ],
+      },
+    ],
+  };
+
+  for (const { name, setupShapers, testData } of [
+    basicComparisonTests,
+    raqqComparisonTests,
+  ]) {
     parametrize(`${name} emulation tests`, testData, async (testCase) => {
       const { nativeShapeFunc, emulatedShapeFunc } = await setupShapers();
 
       const testInputCodePoints = [...testCase.input].map((c) => ord(c));
+      const direction = guessDirectionFromCodePoints(testInputCodePoints);
 
       const { glyphs: nativeGlyphs } = nativeShapeFunc(testInputCodePoints, {
         variations: testCase.variations,
         features: testCase.features,
+        direction,
       });
+
+      // console.log(JSON.stringify(stripGlyphIDs(nativeGlyphs)));
 
       expect(stripGlyphIDs(nativeGlyphs)).to.deep.equal(testCase.expectedGlyphs);
 
       const { glyphs: emulatedGlyphs } = await emulatedShapeFunc(testInputCodePoints, {
         variations: testCase.variations,
         features: testCase.features,
+        direction,
       });
 
       expect(stripGlyphIDs(emulatedGlyphs)).to.deep.equal(testCase.expectedGlyphs);
