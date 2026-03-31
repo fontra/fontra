@@ -1,0 +1,63 @@
+{
+"name": ".notdef",
+"sources": [
+{
+"name": "",
+"layerName": "default",
+"locationBase": "default"
+}
+],
+"layers": {
+"default": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": 45,
+"y": 710
+},
+{
+"x": 45,
+"y": -210
+},
+{
+"x": 455,
+"y": -210
+},
+{
+"x": 455,
+"y": 710
+}
+],
+"isClosed": true
+},
+{
+"points": [
+{
+"x": 115,
+"y": 640
+},
+{
+"x": 385,
+"y": 640
+},
+{
+"x": 385,
+"y": -140
+},
+{
+"x": 115,
+"y": -140
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 500
+}
+}
+}
+}
