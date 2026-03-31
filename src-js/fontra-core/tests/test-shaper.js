@@ -1382,202 +1382,206 @@ table GDEF {
 });
 
 describe("shaper tests compare emulation with native", () => {
-  const setupShapers = setupShapersFactory(
-    moduleDirName.joinPath("data", "positioning-emulation")
-  );
+  const basicComparisonTests = {
+    name: "basic",
+    setupShapers: setupShapersFactory(
+      moduleDirName.joinPath("data", "positioning-emulation")
+    ),
+    testData: [
+      {
+        input: "HH",
+        expectedGlyphs: [
+          {
+            cluster: 0,
+            x_advance: 800,
+            y_advance: 0,
+            x_offset: 0,
+            y_offset: 0,
+            glyphname: "H_H",
+            mark: false,
+          },
+        ],
+      },
+      {
+        input: "ABC",
+        expectedGlyphs: [
+          {
+            cluster: 0,
+            x_advance: 450,
+            y_advance: 0,
+            x_offset: 0,
+            y_offset: 0,
+            glyphname: "A",
+            mark: false,
+          },
+          {
+            cluster: 1,
+            x_advance: 425,
+            y_advance: 0,
+            x_offset: -25,
+            y_offset: 150,
+            glyphname: "B",
+            mark: false,
+          },
+          {
+            cluster: 2,
+            x_advance: 475,
+            y_advance: 0,
+            x_offset: -25,
+            y_offset: 300,
+            glyphname: "C",
+            mark: false,
+          },
+        ],
+      },
+      {
+        input: "Ḥ̄̇Ḥ̇̄",
+        expectedGlyphs: [
+          {
+            cluster: 0,
+            x_advance: 800,
+            y_advance: 0,
+            x_offset: 0,
+            y_offset: 0,
+            glyphname: "H_H",
+            mark: false,
+          },
+          {
+            cluster: 0,
+            x_advance: 0,
+            y_advance: 0,
+            x_offset: -650,
+            y_offset: 0,
+            glyphname: "dotbelowcomb",
+            mark: true,
+          },
+          {
+            cluster: 0,
+            x_advance: 0,
+            y_advance: 0,
+            x_offset: -720,
+            y_offset: -14,
+            glyphname: "macroncomb",
+            mark: true,
+          },
+          {
+            cluster: 0,
+            x_advance: 0,
+            y_advance: 0,
+            x_offset: -650,
+            y_offset: 140,
+            glyphname: "dotaccentcomb",
+            mark: true,
+          },
+          {
+            cluster: 5,
+            x_advance: 0,
+            y_advance: 0,
+            x_offset: -350,
+            y_offset: 0,
+            glyphname: "dotbelowcomb",
+            mark: true,
+          },
+          {
+            cluster: 5,
+            x_advance: 0,
+            y_advance: 0,
+            x_offset: -350,
+            y_offset: -10,
+            glyphname: "dotaccentcomb",
+            mark: true,
+          },
+          {
+            cluster: 7,
+            x_advance: 0,
+            y_advance: 0,
+            x_offset: -420,
+            y_offset: 156,
+            glyphname: "macroncomb",
+            mark: true,
+          },
+        ],
+      },
+      {
+        input: "H̄",
+        expectedGlyphs: [
+          {
+            cluster: 0,
+            x_advance: 500,
+            y_advance: 0,
+            x_offset: 0,
+            y_offset: 0,
+            glyphname: "H",
+            mark: false,
+          },
+          {
+            cluster: 1,
+            x_advance: 0,
+            y_advance: 0,
+            x_offset: -420,
+            y_offset: -14,
+            glyphname: "macroncomb",
+            mark: true,
+          },
+        ],
+      },
+      {
+        input: "H̄",
+        features: "ss03",
+        expectedGlyphs: [
+          {
+            cluster: 0,
+            x_advance: 500,
+            y_advance: 0,
+            x_offset: 0,
+            y_offset: 0,
+            glyphname: "H",
+            mark: false,
+          },
+          {
+            cluster: 0,
+            x_advance: 500,
+            y_advance: 0,
+            x_offset: 0,
+            y_offset: 0,
+            glyphname: "A",
+            mark: false,
+          },
+          {
+            cluster: 1,
+            x_advance: 0,
+            y_advance: 0,
+            x_offset: -920,
+            y_offset: -14,
+            glyphname: "macroncomb",
+            mark: true,
+          },
+        ],
+      },
+    ],
+  };
 
-  const emulationTestData = [
-    {
-      input: "HH",
-      expectedGlyphs: [
-        {
-          cluster: 0,
-          x_advance: 800,
-          y_advance: 0,
-          x_offset: 0,
-          y_offset: 0,
-          glyphname: "H_H",
-          mark: false,
-        },
-      ],
-    },
-    {
-      input: "ABC",
-      expectedGlyphs: [
-        {
-          cluster: 0,
-          x_advance: 450,
-          y_advance: 0,
-          x_offset: 0,
-          y_offset: 0,
-          glyphname: "A",
-          mark: false,
-        },
-        {
-          cluster: 1,
-          x_advance: 425,
-          y_advance: 0,
-          x_offset: -25,
-          y_offset: 150,
-          glyphname: "B",
-          mark: false,
-        },
-        {
-          cluster: 2,
-          x_advance: 475,
-          y_advance: 0,
-          x_offset: -25,
-          y_offset: 300,
-          glyphname: "C",
-          mark: false,
-        },
-      ],
-    },
-    {
-      input: "Ḥ̄̇Ḥ̇̄",
-      expectedGlyphs: [
-        {
-          cluster: 0,
-          x_advance: 800,
-          y_advance: 0,
-          x_offset: 0,
-          y_offset: 0,
-          glyphname: "H_H",
-          mark: false,
-        },
-        {
-          cluster: 0,
-          x_advance: 0,
-          y_advance: 0,
-          x_offset: -650,
-          y_offset: 0,
-          glyphname: "dotbelowcomb",
-          mark: true,
-        },
-        {
-          cluster: 0,
-          x_advance: 0,
-          y_advance: 0,
-          x_offset: -720,
-          y_offset: -14,
-          glyphname: "macroncomb",
-          mark: true,
-        },
-        {
-          cluster: 0,
-          x_advance: 0,
-          y_advance: 0,
-          x_offset: -650,
-          y_offset: 140,
-          glyphname: "dotaccentcomb",
-          mark: true,
-        },
-        {
-          cluster: 5,
-          x_advance: 0,
-          y_advance: 0,
-          x_offset: -350,
-          y_offset: 0,
-          glyphname: "dotbelowcomb",
-          mark: true,
-        },
-        {
-          cluster: 5,
-          x_advance: 0,
-          y_advance: 0,
-          x_offset: -350,
-          y_offset: -10,
-          glyphname: "dotaccentcomb",
-          mark: true,
-        },
-        {
-          cluster: 7,
-          x_advance: 0,
-          y_advance: 0,
-          x_offset: -420,
-          y_offset: 156,
-          glyphname: "macroncomb",
-          mark: true,
-        },
-      ],
-    },
-    {
-      input: "H̄",
-      expectedGlyphs: [
-        {
-          cluster: 0,
-          x_advance: 500,
-          y_advance: 0,
-          x_offset: 0,
-          y_offset: 0,
-          glyphname: "H",
-          mark: false,
-        },
-        {
-          cluster: 1,
-          x_advance: 0,
-          y_advance: 0,
-          x_offset: -420,
-          y_offset: -14,
-          glyphname: "macroncomb",
-          mark: true,
-        },
-      ],
-    },
-    {
-      input: "H̄",
-      features: "ss03",
-      expectedGlyphs: [
-        {
-          cluster: 0,
-          x_advance: 500,
-          y_advance: 0,
-          x_offset: 0,
-          y_offset: 0,
-          glyphname: "H",
-          mark: false,
-        },
-        {
-          cluster: 0,
-          x_advance: 500,
-          y_advance: 0,
-          x_offset: 0,
-          y_offset: 0,
-          glyphname: "A",
-          mark: false,
-        },
-        {
-          cluster: 1,
-          x_advance: 0,
-          y_advance: 0,
-          x_offset: -920,
-          y_offset: -14,
-          glyphname: "macroncomb",
-          mark: true,
-        },
-      ],
-    },
-  ];
+  for (const { name, setupShapers, testData } of [basicComparisonTests]) {
+    parametrize(`${name} emulation tests`, testData, async (testCase) => {
+      const { nativeShapeFunc, emulatedShapeFunc } = await setupShapers();
 
-  parametrize("basic emulation tests", emulationTestData, async (testCase) => {
-    const { nativeShapeFunc, emulatedShapeFunc } = await setupShapers();
+      const testInputCodePoints = [...testCase.input].map((c) => ord(c));
 
-    const testInputCodePoints = [...testCase.input].map((c) => ord(c));
+      const { glyphs: nativeGlyphs } = nativeShapeFunc(testInputCodePoints, {
+        variations: testCase.variations,
+        features: testCase.features,
+      });
 
-    const { glyphs: nativeGlyphs } = nativeShapeFunc(testInputCodePoints, {
-      variations: testCase.variations,
-      features: testCase.features,
+      expect(stripGlyphIDs(nativeGlyphs)).to.deep.equal(testCase.expectedGlyphs);
+
+      const { glyphs: emulatedGlyphs } = await emulatedShapeFunc(testInputCodePoints, {
+        variations: testCase.variations,
+        features: testCase.features,
+      });
+
+      expect(stripGlyphIDs(emulatedGlyphs)).to.deep.equal(testCase.expectedGlyphs);
     });
-
-    expect(stripGlyphIDs(nativeGlyphs)).to.deep.equal(testCase.expectedGlyphs);
-
-    const { glyphs: emulatedGlyphs } = await emulatedShapeFunc(testInputCodePoints, {
-      variations: testCase.variations,
-      features: testCase.features,
-    });
-
-    expect(stripGlyphIDs(emulatedGlyphs)).to.deep.equal(testCase.expectedGlyphs);
-  });
+  }
 });
 
 function stripGlyphIDs(glyphs) {
