@@ -7,7 +7,7 @@ import { basename, dirname, extname, join } from "path";
 
 export class NodePath {
   constructor(path) {
-    this._path = path;
+    this._path = typeof path == "string" ? path : path.toString();
   }
 
   joinPath(...pathsegments) {
