@@ -4,12 +4,15 @@ import { deepCopyObject } from "@fontra/core/utils.js";
 import fs from "fs";
 import { dirname, join } from "path";
 import { fileURLToPath } from "url";
+import { getFontController } from "./test-font-controller.js";
 import { parametrize } from "./test-support.js";
 
 import { buildShaperFont } from "build-shaper-font";
 
 const moduleDirName = dirname(fileURLToPath(import.meta.url));
 
+import { ObservableController } from "@fontra/core/observable-object.js";
+import { ShaperController } from "@fontra/core/shaper-controller.js";
 import {
   applyCursiveAttachments,
   applyKerning,
@@ -1381,21 +1384,27 @@ table GDEF {
 });
 
 describe("shaper tests compare emulation with native", () => {
-  const positionEmulationTestFontPath = join(
-    moduleDirName,
-    "data",
-    "positioning-emulation",
-    "positioning-emulation.ttf"
-  );
-  const fontData = new Uint8Array(fs.readFileSync(positionEmulationTestFontPath));
+  const dataDir = join(moduleDirName, "data", "positioning-emulation");
+  const nativeTestFontPath = join(dataDir, "positioning-emulation.ttf");
+  const emulatingTestFontPath = join(dataDir, "positioning-emulation.fontra");
+
+  const fontData = new Uint8Array(fs.readFileSync(nativeTestFontPath));
   const nativeShaper = getShaper({ fontData });
+
+  let _emulatedShapeFunc;
+
+  async function getEmulatedShapeFunc() {
+    if (!_emulatedShapeFunc) {
+      _emulatedShapeFunc = await getEmulatedShapeFuncForPath(emulatingTestFontPath);
+    }
+    return _emulatedShapeFunc;
+  }
 
   const emulationTestData = [
     {
       input: "HH",
       expectedGlyphs: [
         {
-          codepoint: 15,
           cluster: 0,
           x_advance: 800,
           y_advance: 0,
@@ -1410,7 +1419,6 @@ describe("shaper tests compare emulation with native", () => {
       input: "ABC",
       expectedGlyphs: [
         {
-          codepoint: 1,
           cluster: 0,
           x_advance: 450,
           y_advance: 0,
@@ -1420,7 +1428,6 @@ describe("shaper tests compare emulation with native", () => {
           mark: false,
         },
         {
-          codepoint: 2,
           cluster: 1,
           x_advance: 425,
           y_advance: 0,
@@ -1430,7 +1437,6 @@ describe("shaper tests compare emulation with native", () => {
           mark: false,
         },
         {
-          codepoint: 3,
           cluster: 2,
           x_advance: 475,
           y_advance: 0,
@@ -1445,7 +1451,6 @@ describe("shaper tests compare emulation with native", () => {
       input: "Ḥ̄̇Ḥ̇̄",
       expectedGlyphs: [
         {
-          codepoint: 15,
           cluster: 0,
           x_advance: 800,
           y_advance: 0,
@@ -1455,7 +1460,6 @@ describe("shaper tests compare emulation with native", () => {
           mark: false,
         },
         {
-          codepoint: 12,
           cluster: 0,
           x_advance: 0,
           y_advance: 0,
@@ -1465,7 +1469,6 @@ describe("shaper tests compare emulation with native", () => {
           mark: true,
         },
         {
-          codepoint: 14,
           cluster: 0,
           x_advance: 0,
           y_advance: 0,
@@ -1475,7 +1478,6 @@ describe("shaper tests compare emulation with native", () => {
           mark: true,
         },
         {
-          codepoint: 13,
           cluster: 0,
           x_advance: 0,
           y_advance: 0,
@@ -1485,7 +1487,6 @@ describe("shaper tests compare emulation with native", () => {
           mark: true,
         },
         {
-          codepoint: 12,
           cluster: 5,
           x_advance: 0,
           y_advance: 0,
@@ -1495,7 +1496,6 @@ describe("shaper tests compare emulation with native", () => {
           mark: true,
         },
         {
-          codepoint: 13,
           cluster: 5,
           x_advance: 0,
           y_advance: 0,
@@ -1505,7 +1505,6 @@ describe("shaper tests compare emulation with native", () => {
           mark: true,
         },
         {
-          codepoint: 14,
           cluster: 7,
           x_advance: 0,
           y_advance: 0,
@@ -1520,7 +1519,6 @@ describe("shaper tests compare emulation with native", () => {
       input: "H̄",
       expectedGlyphs: [
         {
-          codepoint: 11,
           cluster: 0,
           x_advance: 500,
           y_advance: 0,
@@ -1530,7 +1528,6 @@ describe("shaper tests compare emulation with native", () => {
           mark: false,
         },
         {
-          codepoint: 14,
           cluster: 1,
           x_advance: 0,
           y_advance: 0,
@@ -1546,7 +1543,6 @@ describe("shaper tests compare emulation with native", () => {
       features: "ss03",
       expectedGlyphs: [
         {
-          codepoint: 11,
           cluster: 0,
           x_advance: 500,
           y_advance: 0,
@@ -1556,7 +1552,6 @@ describe("shaper tests compare emulation with native", () => {
           mark: false,
         },
         {
-          codepoint: 1,
           cluster: 0,
           x_advance: 500,
           y_advance: 0,
@@ -1566,7 +1561,6 @@ describe("shaper tests compare emulation with native", () => {
           mark: false,
         },
         {
-          codepoint: 14,
           cluster: 1,
           x_advance: 0,
           y_advance: 0,
@@ -1579,17 +1573,33 @@ describe("shaper tests compare emulation with native", () => {
     },
   ];
 
-  parametrize("basic emulation tests", emulationTestData, (testCase) => {
+  parametrize("basic emulation tests", emulationTestData, async (testCase) => {
     const testInputCodePoints = [...testCase.input].map((c) => ord(c));
-    const { glyphs } = nativeShaper.shape(testInputCodePoints, null, {
+    const { glyphs: nativeGlyphs } = nativeShaper.shape(testInputCodePoints, null, {
       variations: testCase.variations,
       features: testCase.features,
     });
 
-    // console.log(JSON.stringify(glyphs));
-    expect(glyphs).to.deep.equal(testCase.expectedGlyphs);
+    expect(stripGlyphIDs(nativeGlyphs)).to.deep.equal(testCase.expectedGlyphs);
+
+    const emulatedShapeFunc = await getEmulatedShapeFunc();
+
+    const { glyphs: emulatedGlyphs } = await emulatedShapeFunc(testInputCodePoints, {
+      variations: testCase.variations,
+      features: testCase.features,
+    });
+
+    expect(stripGlyphIDs(emulatedGlyphs)).to.deep.equal(testCase.expectedGlyphs);
   });
 });
+
+function stripGlyphIDs(glyphs) {
+  return glyphs.map((glyph) => {
+    glyph = { ...glyph };
+    delete glyph.codepoint;
+    return glyph;
+  });
+}
 
 function ord(s) {
   return s.codePointAt(0);
@@ -1599,4 +1609,40 @@ function propagateAnchors(glyphs) {
   for (const glyph of Object.values(glyphs)) {
     glyph.propagatedAnchors = glyph.anchors;
   }
+}
+
+async function getEmulatedShapeFuncForPath(path) {
+  const fontController = await getFontController(path);
+  const mockAppSettingsController = new ObservableController({});
+  const shaperController = new ShaperController(
+    fontController,
+    mockAppSettingsController
+  );
+
+  const { shaper } = await shaperController.getShaper(true);
+
+  async function emulatedShapeFunc(codePoints, shaperOptions) {
+    const glyphInstances = {};
+
+    let { glyphs, requiredGlyphs } = shaper.shape(
+      codePoints,
+      glyphInstances,
+      shaperOptions
+    );
+
+    for (const glyphName of requiredGlyphs) {
+      if (!(glyphName in glyphInstances) && glyphName in fontController.glyphMap) {
+        glyphInstances[glyphName] = await fontController.getGlyphInstance(
+          glyphName,
+          {}
+        );
+      }
+    }
+
+    ({ glyphs } = shaper.shape(codePoints, glyphInstances, shaperOptions));
+
+    return { glyphs };
+  }
+
+  return emulatedShapeFunc;
 }
