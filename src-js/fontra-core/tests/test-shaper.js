@@ -1603,6 +1603,101 @@ describe("shaper tests compare emulation with native", () => {
           },
         ],
       },
+      {
+        input: "فَأنتَ",
+        expectedGlyphs: [
+          {
+            cluster: 5,
+            x_advance: 0,
+            y_advance: 0,
+            x_offset: 593,
+            y_offset: 93,
+            glyphname: "fatha-ar",
+            mark: true,
+          },
+          {
+            cluster: 4,
+            x_advance: 0,
+            y_advance: 0,
+            x_offset: 803,
+            y_offset: 264,
+            glyphname: "twodotsverticalabove-ar",
+            mark: true,
+          },
+          {
+            cluster: 4,
+            x_advance: 984,
+            y_advance: 0,
+            x_offset: 0,
+            y_offset: 0,
+            glyphname: "behDotless-ar.fina",
+            mark: false,
+          },
+          {
+            cluster: 3,
+            x_advance: 0,
+            y_advance: 0,
+            x_offset: -9,
+            y_offset: 392,
+            glyphname: "dotabove-ar.beh",
+            mark: true,
+          },
+          {
+            cluster: 3,
+            x_advance: 0,
+            y_advance: 0,
+            x_offset: 0,
+            y_offset: 0,
+            glyphname: "_c.seen.beh",
+            mark: false,
+          },
+          {
+            cluster: 3,
+            x_advance: 130,
+            y_advance: 0,
+            x_offset: 0,
+            y_offset: 0,
+            glyphname: "behDotless-ar.init.high",
+            mark: false,
+          },
+          {
+            cluster: 0,
+            x_advance: 0,
+            y_advance: 0,
+            x_offset: 491,
+            y_offset: 594,
+            glyphname: "fatha-ar",
+            mark: true,
+          },
+          {
+            cluster: 0,
+            x_advance: 0,
+            y_advance: 0,
+            x_offset: 673,
+            y_offset: 432,
+            glyphname: "fatha-ar",
+            mark: true,
+          },
+          {
+            cluster: 0,
+            x_advance: 0,
+            y_advance: 0,
+            x_offset: 553,
+            y_offset: 394,
+            glyphname: "dotabove-ar",
+            mark: true,
+          },
+          {
+            cluster: 0,
+            x_advance: 960,
+            y_advance: 0,
+            x_offset: 400,
+            y_offset: 0,
+            glyphname: "fehDotless_alef-ar",
+            mark: false,
+          },
+        ],
+      },
     ],
   };
 
@@ -1663,9 +1758,15 @@ async function getEmulatedShapeFuncForPath(path) {
     mockAppSettingsController
   );
 
+  const kerningController = await fontController.getKerningController("kern");
+  const kerningInstance = kerningController.instantiate({});
+  const kerningPairFunc = (leftGlyph, rightGlyph) =>
+    kerningInstance.getGlyphPairValue(leftGlyph, rightGlyph);
+
   const { shaper } = await shaperController.getShaper(true);
 
   async function emulatedShapeFunc(codePoints, shaperOptions) {
+    shaperOptions = { ...shaperOptions, kerningPairFunc };
     const glyphInstances = {};
 
     let { glyphs, requiredGlyphs } = shaper.shape(
