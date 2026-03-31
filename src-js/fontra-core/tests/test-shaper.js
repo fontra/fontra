@@ -1698,6 +1698,47 @@ describe("shaper tests compare emulation with native", () => {
           },
         ],
       },
+      {
+        input: "قل",
+        expectedGlyphs: [
+          {
+            cluster: 1,
+            x_advance: 177,
+            y_advance: 0,
+            x_offset: 0,
+            y_offset: 0,
+            glyphname: "lam-ar.fina",
+            mark: false,
+          },
+          {
+            cluster: 0,
+            x_advance: 0,
+            y_advance: 0,
+            x_offset: -31,
+            y_offset: 381,
+            glyphname: "twodotsverticalabove-ar",
+            mark: true,
+          },
+          {
+            cluster: 0,
+            x_advance: 174,
+            y_advance: 0,
+            x_offset: 0,
+            y_offset: 0,
+            glyphname: "_c.feh.init.beh",
+            mark: false,
+          },
+          {
+            cluster: 0,
+            x_advance: 220,
+            y_advance: 0,
+            x_offset: -114,
+            y_offset: 0,
+            glyphname: "fehDotless-ar.init",
+            mark: false,
+          },
+        ],
+      },
     ],
   };
 
