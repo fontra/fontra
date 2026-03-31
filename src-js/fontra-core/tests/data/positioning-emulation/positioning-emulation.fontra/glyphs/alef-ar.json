@@ -1,0 +1,70 @@
+{
+"name": "alef-ar",
+"sources": [
+{
+"name": "",
+"layerName": "default",
+"locationBase": "default"
+}
+],
+"layers": {
+"default": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": 475,
+"y": 250
+},
+{
+"x": 475,
+"y": 200
+},
+{
+"x": 50,
+"y": 200
+},
+{
+"x": 50,
+"y": 250
+}
+],
+"isClosed": true
+},
+{
+"points": [
+{
+"x": 52,
+"y": 290
+},
+{
+"x": 48,
+"y": 290
+},
+{
+"x": 48,
+"y": 310
+},
+{
+"x": 52,
+"y": 310
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 500,
+"anchors": [
+{
+"name": "exit",
+"x": 50,
+"y": 300
+}
+]
+}
+}
+}
+}

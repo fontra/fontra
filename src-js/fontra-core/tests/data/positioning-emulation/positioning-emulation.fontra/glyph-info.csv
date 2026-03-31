@@ -1,0 +1,17 @@
+glyph name;code points
+.notdef;
+A;U+0041
+A.alt;
+B;U+0042
+B.alt;
+C;U+0043
+C.alt;
+H;U+0048
+H_H;
+alef-ar;U+0627
+beh-ar;U+0628
+dotaccentcomb;U+0307
+dotbelowcomb;U+0323
+macroncomb;U+0304
+space;U+0020
+teh-ar;U+062A

@@ -18,7 +18,6 @@ class ShaperBase {
     const { nominalGlyphFunc, glyphOrder, isGlyphMarkFunc, insertMarkers } =
       shaperSupport;
 
-    this._baseNominalGlyphFunc = nominalGlyphFunc;
     this.glyphOrder = glyphOrder;
     this.isGlyphMarkFunc = isGlyphMarkFunc;
     this.insertMarkers = insertMarkers?.filter((marker) =>
@@ -27,18 +26,23 @@ class ShaperBase {
     this.emulatedDefaultValues = Object.fromEntries(
       EMULATED_FEATURE_TAGS.map((emulatedTag) => [
         emulatedTag,
-        !!this.insertMarkers?.find(({ tag }) => tag === emulatedTag),
+        !this.insertMarkers ||
+          !!this.insertMarkers.find(({ tag }) => tag === emulatedTag),
       ])
     );
 
-    this.glyphNameToID = {};
-    for (const [i, glyphName] of enumerate(glyphOrder)) {
-      this.glyphNameToID[glyphName] = i;
+    if (glyphOrder) {
+      this.glyphNameToID = {};
+      for (const [i, glyphName] of enumerate(glyphOrder)) {
+        this.glyphNameToID[glyphName] = i;
+      }
     }
-    this.nominalGlyph = (codePoint) =>
-      codePoint >= MAX_UNICODE
-        ? this.glyphOrder[codePoint - MAX_UNICODE]
-        : this._baseNominalGlyphFunc(codePoint);
+    this.nominalGlyph = nominalGlyphFunc
+      ? (codePoint) =>
+          codePoint >= MAX_UNICODE
+            ? this.glyphOrder[codePoint - MAX_UNICODE]
+            : nominalGlyphFunc(codePoint)
+      : null;
   }
 
   _getInitialSkipEmulatedFeatures(emulatedFeatures) {
@@ -116,13 +120,17 @@ class HBShaper extends ShaperBase {
 
     this.fontFuncs = hb.createFontFuncs();
 
-    this.fontFuncs.setNominalGlyphFunc((font, codePoint) =>
-      this._getNominalGlyph(font, codePoint)
-    );
+    if (this.nominalGlyph) {
+      this.fontFuncs.setNominalGlyphFunc((font, codePoint) =>
+        this._getNominalGlyph(font, codePoint)
+      );
+    }
 
-    this.fontFuncs.setGlyphHAdvanceFunc((font, glyphID) =>
-      this._getHAdvanceFunc(font, glyphID)
-    );
+    if (this.glyphOrder) {
+      this.fontFuncs.setGlyphHAdvanceFunc((font, glyphID) =>
+        this._getHAdvanceFunc(font, glyphID)
+      );
+    }
 
     const subFont = this.font.subFont();
     subFont.setFuncs(this.fontFuncs);
@@ -183,16 +191,18 @@ class HBShaper extends ShaperBase {
     buffer.destroy();
 
     // If we are *not* using the message API (we're not tracing, and *all* insertMarkers
-    // indicate that emulation should be done "at the end"), then we still have some
+    // indicate that emulation should be done "at the end"), then we may still have some
     // emulation to do.
-    this.applyEmulatedPositioning(
-      glyphs,
-      glyphObjects,
-      skipFeatures,
-      options.kerningPairFunc,
-      options.direction,
-      emulatedFeaturesMessageFunc
-    );
+    if (glyphObjects) {
+      this.applyEmulatedPositioning(
+        glyphs,
+        glyphObjects,
+        skipFeatures,
+        options.kerningPairFunc,
+        options.direction,
+        emulatedFeaturesMessageFunc
+      );
+    }
 
     emulatedFeaturesMessageFunc?.(glyphs, "end processing");
 
@@ -225,7 +235,9 @@ class HBShaper extends ShaperBase {
     }
 
     glyphs.forEach((glyph) => {
-      const glyphName = this.glyphOrder[glyph.codepoint];
+      const glyphName = this.glyphOrder
+        ? this.glyphOrder[glyph.codepoint]
+        : this.font.glyphName(glyph.codepoint);
       if (glyph.x_advance == undefined || !this._processingHasStarted) {
         // 1. During the GSUB phase, the positioning fields are undefined, so
         //    we fill them in so we can render something.

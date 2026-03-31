@@ -1,0 +1,54 @@
+{
+"name": "macroncomb",
+"sources": [
+{
+"name": "",
+"layerName": "default",
+"locationBase": "default"
+}
+],
+"layers": {
+"default": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": 20,
+"y": 850
+},
+{
+"x": 20,
+"y": 770
+},
+{
+"x": 320,
+"y": 770
+},
+{
+"x": 320,
+"y": 850
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 340,
+"anchors": [
+{
+"name": "_top",
+"x": 170,
+"y": 734
+},
+{
+"name": "top",
+"x": 170,
+"y": 884
+}
+]
+}
+}
+}
+}

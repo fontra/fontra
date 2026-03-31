@@ -1,0 +1,70 @@
+{
+"name": "teh-ar",
+"sources": [
+{
+"name": "",
+"layerName": "default",
+"locationBase": "default"
+}
+],
+"layers": {
+"default": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": 475,
+"y": 250
+},
+{
+"x": 475,
+"y": 200
+},
+{
+"x": 50,
+"y": 200
+},
+{
+"x": 50,
+"y": 250
+}
+],
+"isClosed": true
+},
+{
+"points": [
+{
+"x": 485,
+"y": 152
+},
+{
+"x": 485,
+"y": 148
+},
+{
+"x": 465,
+"y": 148
+},
+{
+"x": 465,
+"y": 152
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 500,
+"anchors": [
+{
+"name": "entry",
+"x": 475,
+"y": 150
+}
+]
+}
+}
+}
+}

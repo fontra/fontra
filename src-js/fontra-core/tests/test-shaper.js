@@ -4,13 +4,15 @@ import { deepCopyObject } from "@fontra/core/utils.js";
 import fs from "fs";
 import { dirname, join } from "path";
 import { fileURLToPath } from "url";
+import { getFontController } from "./test-font-controller.js";
 import { parametrize } from "./test-support.js";
 
 import { buildShaperFont } from "build-shaper-font";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+const moduleDirName = dirname(fileURLToPath(import.meta.url));
 
+import { ObservableController } from "@fontra/core/observable-object.js";
+import { ShaperController } from "@fontra/core/shaper-controller.js";
 import {
   applyCursiveAttachments,
   applyKerning,
@@ -21,84 +23,86 @@ import {
 } from "@fontra/core/shaper.js";
 
 describe("shaper tests", () => {
-  const testDataDir = join(dirname(__dirname), "..", "..", "test-py", "data");
+  const testDataDir = join(dirname(dirname(dirname(moduleDirName))), "test-py", "data");
   const mutatorSansPath = join(testDataDir, "mutatorsans", "MutatorSans.ttf");
   const notoSansPath = join(testDataDir, "noto", "NotoSans-Regular.otf");
 
   const testInputCodePoints = [..."😻VABCÄS"].map((c) => ord(c));
 
-  const expectedGlyphs = [
-    {
-      codepoint: 0,
-      cluster: 0,
-      x_advance: 500,
-      y_advance: 0,
-      x_offset: 0,
-      y_offset: 0,
-      glyphname: ".notdef",
-      mark: false,
-    },
-    {
-      codepoint: 24,
-      cluster: 1,
-      x_advance: 301,
-      y_advance: 0,
-      x_offset: 0,
-      y_offset: 0,
-      glyphname: "V",
-      mark: false,
-    },
-    {
-      codepoint: 1,
-      cluster: 2,
-      x_advance: 396,
-      y_advance: 0,
-      x_offset: 0,
-      y_offset: 0,
-      glyphname: "A",
-      mark: false,
-    },
-    {
-      codepoint: 4,
-      cluster: 3,
-      x_advance: 443,
-      y_advance: 0,
-      x_offset: 0,
-      y_offset: 0,
-      glyphname: "B",
-      mark: false,
-    },
-    {
-      codepoint: 5,
-      cluster: 4,
-      x_advance: 499,
-      y_advance: 0,
-      x_offset: 0,
-      y_offset: 0,
-      glyphname: "C",
-      mark: false,
-    },
-    {
-      codepoint: 3,
-      cluster: 5,
-      x_advance: 396,
-      y_advance: 0,
-      x_offset: 0,
-      y_offset: 0,
-      glyphname: "Adieresis",
-      mark: false,
-    },
-    {
-      codepoint: 21,
-      cluster: 6,
-      x_advance: 393,
-      y_advance: 0,
-      x_offset: 0,
-      y_offset: 0,
-      glyphname: "S",
-      mark: false,
-    },
-  ];
+  function getExpectedGlyphs(useGlyphObjects) {
+    return [
+      {
+        codepoint: 0,
+        cluster: 0,
+        x_advance: 500,
+        y_advance: 0,
+        x_offset: 0,
+        y_offset: 0,
+        glyphname: ".notdef",
+        mark: false,
+      },
+      {
+        codepoint: 24,
+        cluster: 1,
+        x_advance: useGlyphObjects ? 301 : 300,
+        y_advance: 0,
+        x_offset: 0,
+        y_offset: 0,
+        glyphname: "V",
+        mark: false,
+      },
+      {
+        codepoint: 1,
+        cluster: 2,
+        x_advance: 396,
+        y_advance: 0,
+        x_offset: 0,
+        y_offset: 0,
+        glyphname: "A",
+        mark: false,
+      },
+      {
+        codepoint: 4,
+        cluster: 3,
+        x_advance: 443,
+        y_advance: 0,
+        x_offset: 0,
+        y_offset: 0,
+        glyphname: "B",
+        mark: false,
+      },
+      {
+        codepoint: 5,
+        cluster: 4,
+        x_advance: 499,
+        y_advance: 0,
+        x_offset: 0,
+        y_offset: 0,
+        glyphname: "C",
+        mark: false,
+      },
+      {
+        codepoint: 3,
+        cluster: 5,
+        x_advance: 396,
+        y_advance: 0,
+        x_offset: 0,
+        y_offset: 0,
+        glyphname: "Adieresis",
+        mark: false,
+      },
+      {
+        codepoint: 21,
+        cluster: 6,
+        x_advance: 393,
+        y_advance: 0,
+        x_offset: 0,
+        y_offset: 0,
+        glyphname: "S",
+        mark: false,
+      },
+    ];
+  }
 
   const glyphOrder = [
     ".notdef",
@@ -184,7 +188,7 @@ describe("shaper tests", () => {
   const kerningData = { V: { A: -100 } };
   const kerning = { getGlyphPairValue: (g1, g2) => kerningData[g1]?.[g2] ?? 0 };
 
-  it("test HBShaper basic tests", () => {
+  it("test HBShaper basic tests with funcs", () => {
     const fontData = new Uint8Array(fs.readFileSync(mutatorSansPath));
     const shaper = getShaper({
       fontData,
@@ -194,11 +198,21 @@ describe("shaper tests", () => {
     });
     const { glyphs } = shaper.shape(testInputCodePoints, glyphObjects, {
       variations: { wght: 0, wdth: 0 },
-      features: "-kern,-rvrn",
+      features: "kern,-rvrn",
     });
-    applyKerning(glyphs, (g1, g2) => kerning.getGlyphPairValue(g1, g2));
 
-    expect(glyphs).to.deep.equal(expectedGlyphs);
+    expect(glyphs).to.deep.equal(getExpectedGlyphs(true));
+  });
+
+  it("test HBShaper basic tests without funcs", () => {
+    const fontData = new Uint8Array(fs.readFileSync(mutatorSansPath));
+    const shaper = getShaper({ fontData });
+    const { glyphs } = shaper.shape(testInputCodePoints, null, {
+      variations: { wght: 0, wdth: 0 },
+      features: "kern,-rvrn",
+    });
+
+    expect(glyphs).to.deep.equal(getExpectedGlyphs(false));
   });
 
   it("test HBShaper RTL", () => {
@@ -296,10 +310,10 @@ describe("shaper tests", () => {
     const { glyphs } = shaper.shape(testInputCodePoints, glyphObjects, {
       variations: { wght: 0, wdth: 0 },
       features: "kern",
+      kerningPairFunc: (g1, g2) => kerning.getGlyphPairValue(g1, g2),
     });
-    applyKerning(glyphs, (g1, g2) => kerning.getGlyphPairValue(g1, g2));
 
-    expect(glyphs).to.deep.equal(expectedGlyphs);
+    expect(glyphs).to.deep.equal(getExpectedGlyphs(true));
   });
 
   it("test DumbShaper RTL", () => {
@@ -1369,6 +1383,224 @@ table GDEF {
   );
 });
 
+describe("shaper tests compare emulation with native", () => {
+  const dataDir = join(moduleDirName, "data", "positioning-emulation");
+  const nativeTestFontPath = join(dataDir, "positioning-emulation.ttf");
+  const emulatingTestFontPath = join(dataDir, "positioning-emulation.fontra");
+
+  const fontData = new Uint8Array(fs.readFileSync(nativeTestFontPath));
+  const nativeShaper = getShaper({ fontData });
+
+  let _emulatedShapeFunc;
+
+  async function getEmulatedShapeFunc() {
+    if (!_emulatedShapeFunc) {
+      _emulatedShapeFunc = await getEmulatedShapeFuncForPath(emulatingTestFontPath);
+    }
+    return _emulatedShapeFunc;
+  }
+
+  const emulationTestData = [
+    {
+      input: "HH",
+      expectedGlyphs: [
+        {
+          cluster: 0,
+          x_advance: 800,
+          y_advance: 0,
+          x_offset: 0,
+          y_offset: 0,
+          glyphname: "H_H",
+          mark: false,
+        },
+      ],
+    },
+    {
+      input: "ABC",
+      expectedGlyphs: [
+        {
+          cluster: 0,
+          x_advance: 450,
+          y_advance: 0,
+          x_offset: 0,
+          y_offset: 0,
+          glyphname: "A",
+          mark: false,
+        },
+        {
+          cluster: 1,
+          x_advance: 425,
+          y_advance: 0,
+          x_offset: -25,
+          y_offset: 150,
+          glyphname: "B",
+          mark: false,
+        },
+        {
+          cluster: 2,
+          x_advance: 475,
+          y_advance: 0,
+          x_offset: -25,
+          y_offset: 300,
+          glyphname: "C",
+          mark: false,
+        },
+      ],
+    },
+    {
+      input: "Ḥ̄̇Ḥ̇̄",
+      expectedGlyphs: [
+        {
+          cluster: 0,
+          x_advance: 800,
+          y_advance: 0,
+          x_offset: 0,
+          y_offset: 0,
+          glyphname: "H_H",
+          mark: false,
+        },
+        {
+          cluster: 0,
+          x_advance: 0,
+          y_advance: 0,
+          x_offset: -650,
+          y_offset: 0,
+          glyphname: "dotbelowcomb",
+          mark: true,
+        },
+        {
+          cluster: 0,
+          x_advance: 0,
+          y_advance: 0,
+          x_offset: -720,
+          y_offset: -14,
+          glyphname: "macroncomb",
+          mark: true,
+        },
+        {
+          cluster: 0,
+          x_advance: 0,
+          y_advance: 0,
+          x_offset: -650,
+          y_offset: 140,
+          glyphname: "dotaccentcomb",
+          mark: true,
+        },
+        {
+          cluster: 5,
+          x_advance: 0,
+          y_advance: 0,
+          x_offset: -350,
+          y_offset: 0,
+          glyphname: "dotbelowcomb",
+          mark: true,
+        },
+        {
+          cluster: 5,
+          x_advance: 0,
+          y_advance: 0,
+          x_offset: -350,
+          y_offset: -10,
+          glyphname: "dotaccentcomb",
+          mark: true,
+        },
+        {
+          cluster: 7,
+          x_advance: 0,
+          y_advance: 0,
+          x_offset: -420,
+          y_offset: 156,
+          glyphname: "macroncomb",
+          mark: true,
+        },
+      ],
+    },
+    {
+      input: "H̄",
+      expectedGlyphs: [
+        {
+          cluster: 0,
+          x_advance: 500,
+          y_advance: 0,
+          x_offset: 0,
+          y_offset: 0,
+          glyphname: "H",
+          mark: false,
+        },
+        {
+          cluster: 1,
+          x_advance: 0,
+          y_advance: 0,
+          x_offset: -420,
+          y_offset: -14,
+          glyphname: "macroncomb",
+          mark: true,
+        },
+      ],
+    },
+    {
+      input: "H̄",
+      features: "ss03",
+      expectedGlyphs: [
+        {
+          cluster: 0,
+          x_advance: 500,
+          y_advance: 0,
+          x_offset: 0,
+          y_offset: 0,
+          glyphname: "H",
+          mark: false,
+        },
+        {
+          cluster: 0,
+          x_advance: 500,
+          y_advance: 0,
+          x_offset: 0,
+          y_offset: 0,
+          glyphname: "A",
+          mark: false,
+        },
+        {
+          cluster: 1,
+          x_advance: 0,
+          y_advance: 0,
+          x_offset: -920,
+          y_offset: -14,
+          glyphname: "macroncomb",
+          mark: true,
+        },
+      ],
+    },
+  ];
+
+  parametrize("basic emulation tests", emulationTestData, async (testCase) => {
+    const testInputCodePoints = [...testCase.input].map((c) => ord(c));
+    const { glyphs: nativeGlyphs } = nativeShaper.shape(testInputCodePoints, null, {
+      variations: testCase.variations,
+      features: testCase.features,
+    });
+
+    expect(stripGlyphIDs(nativeGlyphs)).to.deep.equal(testCase.expectedGlyphs);
+
+    const emulatedShapeFunc = await getEmulatedShapeFunc();
+
+    const { glyphs: emulatedGlyphs } = await emulatedShapeFunc(testInputCodePoints, {
+      variations: testCase.variations,
+      features: testCase.features,
+    });
+
+    expect(stripGlyphIDs(emulatedGlyphs)).to.deep.equal(testCase.expectedGlyphs);
+  });
+});
+
+function stripGlyphIDs(glyphs) {
+  return glyphs.map((glyph) => {
+    glyph = { ...glyph };
+    delete glyph.codepoint;
+    return glyph;
+  });
+}
+
 function ord(s) {
   return s.codePointAt(0);
 }
@@ -1377,4 +1609,40 @@ function propagateAnchors(glyphs) {
   for (const glyph of Object.values(glyphs)) {
     glyph.propagatedAnchors = glyph.anchors;
   }
+}
+
+async function getEmulatedShapeFuncForPath(path) {
+  const fontController = await getFontController(path);
+  const mockAppSettingsController = new ObservableController({});
+  const shaperController = new ShaperController(
+    fontController,
+    mockAppSettingsController
+  );
+
+  const { shaper } = await shaperController.getShaper(true);
+
+  async function emulatedShapeFunc(codePoints, shaperOptions) {
+    const glyphInstances = {};
+
+    let { glyphs, requiredGlyphs } = shaper.shape(
+      codePoints,
+      glyphInstances,
+      shaperOptions
+    );
+
+    for (const glyphName of requiredGlyphs) {
+      if (!(glyphName in glyphInstances) && glyphName in fontController.glyphMap) {
+        glyphInstances[glyphName] = await fontController.getGlyphInstance(
+          glyphName,
+          {}
+        );
+      }
+    }
+
+    ({ glyphs } = shaper.shape(codePoints, glyphInstances, shaperOptions));
+
+    return { glyphs };
+  }
+
+  return emulatedShapeFunc;
 }

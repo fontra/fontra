@@ -1,0 +1,54 @@
+{
+"name": "dotaccentcomb",
+"sources": [
+{
+"name": "",
+"layerName": "default",
+"locationBase": "default"
+}
+],
+"layers": {
+"default": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": 50,
+"y": 860
+},
+{
+"x": 50,
+"y": 760
+},
+{
+"x": 150,
+"y": 760
+},
+{
+"x": 150,
+"y": 860
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 200,
+"anchors": [
+{
+"name": "_top",
+"x": 100,
+"y": 730
+},
+{
+"name": "top",
+"x": 100,
+"y": 900
+}
+]
+}
+}
+}
+}

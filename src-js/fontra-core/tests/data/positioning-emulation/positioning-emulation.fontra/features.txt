@@ -1,0 +1,33 @@
+languagesystem DFLT dflt;
+languagesystem latn dflt;
+
+
+@ABC = [A B C];
+
+feature ss01 {
+  sub @ABC by [A.alt B.alt C.alt];
+} ss01;
+
+feature ss02 {
+  sub A by A.alt;
+} ss02;
+
+feature ss03 {
+  sub H' macroncomb by H A;
+} ss03;
+
+# Some comments
+
+feature ss04 {
+  sub A by C.alt;
+} ss04;
+
+feature dist {
+  pos H H 77;
+} dist;
+
+feature liga {
+  lookupflag IgnoreMarks;
+
+  sub H H by H_H;
+} liga;
