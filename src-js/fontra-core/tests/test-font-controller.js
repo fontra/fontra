@@ -15,7 +15,7 @@ const mutatorSansPath = join(
   "MutatorSans.fontra"
 );
 
-async function getFontController(path) {
+export async function getFontController(path) {
   const backend = new FontraBackend(new NodePath(path));
   await backend.initialize();
   const engine = new LocalFontEngine(backend);
