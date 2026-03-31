@@ -8,8 +8,7 @@ import { parametrize } from "./test-support.js";
 
 import { buildShaperFont } from "build-shaper-font";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+const moduleDirName = dirname(fileURLToPath(import.meta.url));
 
 import {
   applyCursiveAttachments,
@@ -21,7 +20,7 @@ import {
 } from "@fontra/core/shaper.js";
 
 describe("shaper tests", () => {
-  const testDataDir = join(dirname(dirname(dirname(__dirname))), "test-py", "data");
+  const testDataDir = join(dirname(dirname(dirname(moduleDirName))), "test-py", "data");
   const mutatorSansPath = join(testDataDir, "mutatorsans", "MutatorSans.ttf");
   const notoSansPath = join(testDataDir, "noto", "NotoSans-Regular.otf");
 
