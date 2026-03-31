@@ -21,7 +21,7 @@ import {
 } from "@fontra/core/shaper.js";
 
 describe("shaper tests", () => {
-  const testDataDir = join(dirname(__dirname), "..", "..", "test-py", "data");
+  const testDataDir = join(dirname(dirname(dirname(__dirname))), "test-py", "data");
   const mutatorSansPath = join(testDataDir, "mutatorsans", "MutatorSans.ttf");
   const notoSansPath = join(testDataDir, "noto", "NotoSans-Regular.otf");
 
