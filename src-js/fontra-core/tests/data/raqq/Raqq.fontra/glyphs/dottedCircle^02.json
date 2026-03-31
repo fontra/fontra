@@ -1,0 +1,291 @@
+{
+"name": "dottedCircle",
+"sources": [
+{
+"name": "",
+"layerName": "m01",
+"locationBase": "m01"
+}
+],
+"layers": {
+"m01": {
+"glyph": {
+"components": [
+{
+"name": "_dot",
+"transformation": {
+"translateX": 252,
+"translateY": -7,
+"scaleX": 0.5,
+"scaleY": 0.5
+},
+"customData": {
+"com.glyphsapp.component.alignment": -1
+}
+},
+{
+"name": "_dot",
+"transformation": {
+"translateX": 252,
+"translateY": 510,
+"scaleX": 0.5,
+"scaleY": 0.5
+},
+"customData": {
+"com.glyphsapp.component.alignment": -1
+}
+},
+{
+"name": "_dot",
+"transformation": {
+"translateX": -7,
+"translateY": 252,
+"scaleX": 0.5,
+"scaleY": 0.5
+},
+"customData": {
+"com.glyphsapp.component.alignment": -1
+}
+},
+{
+"name": "_dot",
+"transformation": {
+"translateX": 510,
+"translateY": 252,
+"scaleX": 0.5,
+"scaleY": 0.5
+},
+"customData": {
+"com.glyphsapp.component.alignment": -1
+}
+},
+{
+"name": "_dot",
+"transformation": {
+"translateX": 332,
+"translateY": 6,
+"scaleX": 0.5,
+"scaleY": 0.5
+},
+"customData": {
+"com.glyphsapp.component.alignment": -1
+}
+},
+{
+"name": "_dot",
+"transformation": {
+"translateX": 173,
+"translateY": 497,
+"scaleX": 0.5,
+"scaleY": 0.5
+},
+"customData": {
+"com.glyphsapp.component.alignment": -1
+}
+},
+{
+"name": "_dot",
+"transformation": {
+"translateX": 6,
+"translateY": 173,
+"scaleX": 0.5,
+"scaleY": 0.5
+},
+"customData": {
+"com.glyphsapp.component.alignment": -1
+}
+},
+{
+"name": "_dot",
+"transformation": {
+"translateX": 497,
+"translateY": 332,
+"scaleX": 0.5,
+"scaleY": 0.5
+},
+"customData": {
+"com.glyphsapp.component.alignment": -1
+}
+},
+{
+"name": "_dot",
+"transformation": {
+"translateX": 173,
+"translateY": 6,
+"scaleX": 0.5,
+"scaleY": 0.5
+},
+"customData": {
+"com.glyphsapp.component.alignment": -1
+}
+},
+{
+"name": "_dot",
+"transformation": {
+"translateX": 332,
+"translateY": 497,
+"scaleX": 0.5,
+"scaleY": 0.5
+},
+"customData": {
+"com.glyphsapp.component.alignment": -1
+}
+},
+{
+"name": "_dot",
+"transformation": {
+"translateX": 6,
+"translateY": 332,
+"scaleX": 0.5,
+"scaleY": 0.5
+},
+"customData": {
+"com.glyphsapp.component.alignment": -1
+}
+},
+{
+"name": "_dot",
+"transformation": {
+"translateX": 497,
+"translateY": 173,
+"scaleX": 0.5,
+"scaleY": 0.5
+},
+"customData": {
+"com.glyphsapp.component.alignment": -1
+}
+},
+{
+"name": "_dot",
+"transformation": {
+"translateX": 404,
+"translateY": 42,
+"scaleX": 0.5,
+"scaleY": 0.5
+},
+"customData": {
+"com.glyphsapp.component.alignment": -1
+}
+},
+{
+"name": "_dot",
+"transformation": {
+"translateX": 101,
+"translateY": 460,
+"scaleX": 0.5,
+"scaleY": 0.5
+},
+"customData": {
+"com.glyphsapp.component.alignment": -1
+}
+},
+{
+"name": "_dot",
+"transformation": {
+"translateX": 42,
+"translateY": 101,
+"scaleX": 0.5,
+"scaleY": 0.5
+},
+"customData": {
+"com.glyphsapp.component.alignment": -1
+}
+},
+{
+"name": "_dot",
+"transformation": {
+"translateX": 460,
+"translateY": 404,
+"scaleX": 0.5,
+"scaleY": 0.5
+},
+"customData": {
+"com.glyphsapp.component.alignment": -1
+}
+},
+{
+"name": "_dot",
+"transformation": {
+"translateX": 101,
+"translateY": 42,
+"scaleX": 0.5,
+"scaleY": 0.5
+},
+"customData": {
+"com.glyphsapp.component.alignment": -1
+}
+},
+{
+"name": "_dot",
+"transformation": {
+"translateX": 404,
+"translateY": 460,
+"scaleX": 0.5,
+"scaleY": 0.5
+},
+"customData": {
+"com.glyphsapp.component.alignment": -1
+}
+},
+{
+"name": "_dot",
+"transformation": {
+"translateX": 42,
+"translateY": 404,
+"scaleX": 0.5,
+"scaleY": 0.5
+},
+"customData": {
+"com.glyphsapp.component.alignment": -1
+}
+},
+{
+"name": "_dot",
+"transformation": {
+"translateX": 460,
+"translateY": 101,
+"scaleX": 0.5,
+"scaleY": 0.5
+},
+"customData": {
+"com.glyphsapp.component.alignment": -1
+}
+}
+],
+"xAdvance": 578,
+"anchors": [
+{
+"name": "alefabove",
+"x": 0,
+"y": 0
+},
+{
+"name": "damma",
+"x": -100,
+"y": 290
+},
+{
+"name": "fatha",
+"x": 290,
+"y": 690
+},
+{
+"name": "hamzaabove",
+"x": 608,
+"y": 504
+},
+{
+"name": "kasra",
+"x": 290,
+"y": -115
+},
+{
+"name": "madda",
+"x": -30,
+"y": 504
+}
+]
+}
+}
+}
+}

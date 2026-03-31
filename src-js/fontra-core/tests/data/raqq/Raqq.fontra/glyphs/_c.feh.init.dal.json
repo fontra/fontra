@@ -1,0 +1,68 @@
+{
+"name": "_c.feh.init.dal",
+"sources": [
+{
+"name": "",
+"layerName": "m01",
+"locationBase": "m01"
+}
+],
+"layers": {
+"m01": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": -60,
+"y": 0
+},
+{
+"x": 10,
+"y": 0
+},
+{
+"x": 137,
+"y": 110
+},
+{
+"x": 51,
+"y": 109,
+"type": "cubic"
+},
+{
+"x": -7,
+"y": 140,
+"type": "cubic"
+},
+{
+"x": -31,
+"y": 199
+},
+{
+"x": -60,
+"y": 199
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 137,
+"anchors": [
+{
+"name": "entry",
+"x": 137,
+"y": 0
+},
+{
+"name": "exit",
+"x": 0,
+"y": 0
+}
+]
+}
+}
+}
+}

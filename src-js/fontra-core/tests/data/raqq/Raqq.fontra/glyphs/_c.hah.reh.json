@@ -1,0 +1,68 @@
+{
+"name": "_c.hah.reh",
+"sources": [
+{
+"name": "",
+"layerName": "m01",
+"locationBase": "m01"
+}
+],
+"layers": {
+"m01": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": -32,
+"y": 0
+},
+{
+"x": 111,
+"y": 59
+},
+{
+"x": 111,
+"y": 104
+},
+{
+"x": 42,
+"y": 110,
+"type": "cubic"
+},
+{
+"x": 20,
+"y": 128,
+"type": "cubic"
+},
+{
+"x": -21,
+"y": 171
+},
+{
+"x": -32,
+"y": 171
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 111,
+"anchors": [
+{
+"name": "entry",
+"x": 111,
+"y": 0
+},
+{
+"name": "exit",
+"x": 0,
+"y": 0
+}
+]
+}
+}
+}
+}

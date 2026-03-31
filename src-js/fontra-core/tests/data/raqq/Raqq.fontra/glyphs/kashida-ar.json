@@ -1,0 +1,161 @@
+{
+"name": "kashida-ar",
+"sources": [
+{
+"name": "",
+"layerName": "m01",
+"locationBase": "m01"
+},
+{
+"name": "Regular / 17 May 23 at 02:27",
+"layerName": "200AAD3F-109F-4B5F-B6CA-7BA661F2BEFA"
+}
+],
+"layers": {
+"200AAD3F-109F-4B5F-B6CA-7BA661F2BEFA": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": -20,
+"y": 0
+},
+{
+"x": 1987,
+"y": -13,
+"type": "cubic"
+},
+{
+"x": 3993,
+"y": -13,
+"type": "cubic"
+},
+{
+"x": 6000,
+"y": 0
+},
+{
+"x": 6000,
+"y": 110
+},
+{
+"x": 4000,
+"y": 94,
+"type": "cubic"
+},
+{
+"x": 2000,
+"y": 94,
+"type": "cubic"
+},
+{
+"x": 0,
+"y": 110
+},
+{
+"x": -20,
+"y": 110
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 6000,
+"anchors": [
+{
+"name": "entry",
+"x": 6000,
+"y": 0
+},
+{
+"name": "exit",
+"x": 0,
+"y": 0
+},
+{
+"name": "kasra",
+"x": 3000,
+"y": -54
+}
+]
+}
+},
+"m01": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": -20,
+"y": 0
+},
+{
+"x": 20,
+"y": 0,
+"type": "cubic"
+},
+{
+"x": 60,
+"y": 0,
+"type": "cubic"
+},
+{
+"x": 100,
+"y": 0
+},
+{
+"x": 100,
+"y": 110
+},
+{
+"x": 67,
+"y": 110,
+"type": "cubic"
+},
+{
+"x": 33,
+"y": 110,
+"type": "cubic"
+},
+{
+"x": 0,
+"y": 110
+},
+{
+"x": -20,
+"y": 110
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 100,
+"anchors": [
+{
+"name": "entry",
+"x": 100,
+"y": 0
+},
+{
+"name": "exit",
+"x": 0,
+"y": 0
+},
+{
+"name": "kasra",
+"x": 50,
+"y": -54
+}
+]
+}
+}
+},
+"customData": {
+"com.glyphsapp.glyph-color": 9
+}
+}

@@ -1,0 +1,132 @@
+{
+"name": "ayah.200",
+"sources": [
+{
+"name": "",
+"layerName": "m01",
+"locationBase": "m01"
+}
+],
+"layers": {
+"m01": {
+"glyph": {
+"components": [
+{
+"name": "_ayah.200",
+"transformation": {
+"translateX": 455,
+"translateY": 165,
+"scaleX": 0.8,
+"scaleY": 0.7500000000000001
+},
+"customData": {
+"com.glyphsapp.component.alignment": -1
+}
+},
+{
+"name": "_ayah.noon",
+"transformation": {
+"translateX": 504,
+"translateY": 24,
+"scaleX": 0.8,
+"scaleY": 0.85
+},
+"customData": {
+"com.glyphsapp.component.alignment": -1
+}
+}
+],
+"xAdvance": 1117,
+"anchors": [
+{
+"name": "*origin",
+"x": 1117,
+"y": 0
+}
+]
+}
+},
+"m01^17 Apr 23 at 00:00": {
+"glyph": {
+"components": [
+{
+"name": "_ayah.200.1",
+"transformation": {
+"translateX": 455,
+"translateY": 165,
+"scaleX": 0.8,
+"scaleY": 0.7500000000000001
+},
+"customData": {
+"com.glyphsapp.component.alignment": -1
+}
+},
+{
+"name": "_ayah.noon.1",
+"transformation": {
+"translateX": 504,
+"translateY": 24,
+"scaleX": 0.8,
+"scaleY": 0.85
+},
+"customData": {
+"com.glyphsapp.component.alignment": -1
+}
+}
+],
+"xAdvance": 1117,
+"anchors": [
+{
+"name": "*origin",
+"x": 1117,
+"y": 0
+}
+]
+},
+"customData": {
+"com.glyphsapp.layer.layerId": "D542F106-890E-45CF-A3C8-AEA4B940F3D6"
+}
+},
+"m01^Color 1 17 Apr 23 at 00:03": {
+"glyph": {
+"components": [
+{
+"name": "_ayah.200",
+"transformation": {
+"translateX": 455,
+"translateY": 165,
+"scaleX": 0.8,
+"scaleY": 0.7500000000000001
+},
+"customData": {
+"com.glyphsapp.component.alignment": -1
+}
+},
+{
+"name": "_ayah.noon",
+"transformation": {
+"translateX": 504,
+"translateY": 24,
+"scaleX": 0.8,
+"scaleY": 0.85
+},
+"customData": {
+"com.glyphsapp.component.alignment": -1
+}
+}
+],
+"xAdvance": 1117,
+"anchors": [
+{
+"name": "*origin",
+"x": 1117,
+"y": 0
+}
+]
+},
+"customData": {
+"com.glyphsapp.layer.layerId": "A4C02AA6-6022-44EC-AFA7-E0EFF98AA081"
+}
+}
+}
+}

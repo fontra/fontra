@@ -1,0 +1,150 @@
+{
+"name": "ayah.020",
+"sources": [
+{
+"name": "",
+"layerName": "m01",
+"locationBase": "m01"
+}
+],
+"layers": {
+"m01": {
+"glyph": {
+"components": [
+{
+"name": "_ayah.010",
+"transformation": {
+"translateX": 288,
+"translateY": 190
+},
+"customData": {
+"com.glyphsapp.component.alignment": -1
+}
+},
+{
+"name": "_ayah.waw",
+"transformation": {
+"translateX": 538,
+"translateY": 52
+},
+"customData": {
+"com.glyphsapp.component.alignment": -1
+}
+},
+{
+"name": "_ayah.noon",
+"transformation": {
+"translateX": 409,
+"translateY": 23
+},
+"customData": {
+"com.glyphsapp.component.alignment": -1
+}
+}
+],
+"xAdvance": 1117,
+"anchors": [
+{
+"name": "*origin",
+"x": 1117,
+"y": 0
+}
+]
+}
+},
+"m01^17 Apr 23 at 00:00": {
+"glyph": {
+"components": [
+{
+"name": "_ayah.010.1",
+"transformation": {
+"translateX": 288,
+"translateY": 190
+},
+"customData": {
+"com.glyphsapp.component.alignment": -1
+}
+},
+{
+"name": "_ayah.waw.1",
+"transformation": {
+"translateX": 538,
+"translateY": 52
+},
+"customData": {
+"com.glyphsapp.component.alignment": -1
+}
+},
+{
+"name": "_ayah.noon.1",
+"transformation": {
+"translateX": 409,
+"translateY": 23
+},
+"customData": {
+"com.glyphsapp.component.alignment": -1
+}
+}
+],
+"xAdvance": 1117,
+"anchors": [
+{
+"name": "*origin",
+"x": 1117,
+"y": 0
+}
+]
+},
+"customData": {
+"com.glyphsapp.layer.layerId": "D542F106-890E-45CF-A3C8-AEA4B940F3D6"
+}
+},
+"m01^Color 1 17 Apr 23 at 00:03": {
+"glyph": {
+"components": [
+{
+"name": "_ayah.010",
+"transformation": {
+"translateX": 288,
+"translateY": 190
+},
+"customData": {
+"com.glyphsapp.component.alignment": -1
+}
+},
+{
+"name": "_ayah.waw",
+"transformation": {
+"translateX": 538,
+"translateY": 52
+},
+"customData": {
+"com.glyphsapp.component.alignment": -1
+}
+},
+{
+"name": "_ayah.noon",
+"transformation": {
+"translateX": 409,
+"translateY": 23
+},
+"customData": {
+"com.glyphsapp.component.alignment": -1
+}
+}
+],
+"xAdvance": 1117,
+"anchors": [
+{
+"name": "*origin",
+"x": 1117,
+"y": 0
+}
+]
+},
+"customData": {
+"com.glyphsapp.layer.layerId": "A4C02AA6-6022-44EC-AFA7-E0EFF98AA081"
+}
+}
+}
+}

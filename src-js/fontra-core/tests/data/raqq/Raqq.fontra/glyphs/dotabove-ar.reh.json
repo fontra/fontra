@@ -1,0 +1,153 @@
+{
+"name": "dotabove-ar.reh",
+"sources": [
+{
+"name": "",
+"layerName": "m01",
+"locationBase": "m01"
+}
+],
+"layers": {
+"m01": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": 10,
+"y": 24,
+"smooth": true
+},
+{
+"x": 13,
+"y": 24,
+"type": "cubic"
+},
+{
+"x": 15,
+"y": 25,
+"type": "cubic"
+},
+{
+"x": 17,
+"y": 27,
+"smooth": true
+},
+{
+"x": 43,
+"y": 54,
+"type": "cubic"
+},
+{
+"x": 69,
+"y": 83,
+"type": "cubic"
+},
+{
+"x": 92,
+"y": 112,
+"smooth": true
+},
+{
+"x": 93,
+"y": 113,
+"type": "cubic"
+},
+{
+"x": 94,
+"y": 116,
+"type": "cubic"
+},
+{
+"x": 94,
+"y": 118,
+"smooth": true
+},
+{
+"x": 94,
+"y": 124,
+"type": "cubic"
+},
+{
+"x": 90,
+"y": 128,
+"type": "cubic"
+},
+{
+"x": 84,
+"y": 128,
+"smooth": true
+},
+{
+"x": 81,
+"y": 128,
+"type": "cubic"
+},
+{
+"x": 78,
+"y": 127,
+"type": "cubic"
+},
+{
+"x": 76,
+"y": 124,
+"smooth": true
+},
+{
+"x": 53,
+"y": 95,
+"type": "cubic"
+},
+{
+"x": 29,
+"y": 68,
+"type": "cubic"
+},
+{
+"x": 3,
+"y": 41,
+"smooth": true
+},
+{
+"x": 1,
+"y": 39,
+"type": "cubic"
+},
+{
+"x": 0,
+"y": 37,
+"type": "cubic"
+},
+{
+"x": 0,
+"y": 34,
+"smooth": true
+},
+{
+"x": 0,
+"y": 28,
+"type": "cubic"
+},
+{
+"x": 4,
+"y": 24,
+"type": "cubic"
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 94,
+"anchors": [
+{
+"name": "_top",
+"x": 63,
+"y": 50
+}
+]
+}
+}
+}
+}

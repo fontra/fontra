@@ -1,0 +1,34 @@
+{
+"name": "meem-ar.medi.round",
+"sources": [
+{
+"name": "",
+"layerName": "m01",
+"locationBase": "m01"
+}
+],
+"layers": {
+"m01": {
+"glyph": {
+"components": [
+{
+"name": "meem-ar.init"
+}
+],
+"xAdvance": 425,
+"anchors": [
+{
+"name": "entry",
+"x": 425,
+"y": 0
+},
+{
+"name": "exit",
+"x": 0,
+"y": 0
+}
+]
+}
+}
+}
+}

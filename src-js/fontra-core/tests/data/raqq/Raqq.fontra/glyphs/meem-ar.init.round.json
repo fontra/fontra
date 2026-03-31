@@ -1,0 +1,173 @@
+{
+"name": "meem-ar.init.round",
+"sources": [
+{
+"name": "",
+"layerName": "m01",
+"locationBase": "m01"
+}
+],
+"layers": {
+"m01": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": 230,
+"y": -34,
+"smooth": true
+},
+{
+"x": 352,
+"y": -33,
+"type": "cubic"
+},
+{
+"x": 398,
+"y": -7,
+"type": "cubic"
+},
+{
+"x": 398,
+"y": 94,
+"smooth": true
+},
+{
+"x": 398,
+"y": 194,
+"type": "cubic"
+},
+{
+"x": 330,
+"y": 361,
+"type": "cubic"
+},
+{
+"x": 205,
+"y": 361,
+"smooth": true
+},
+{
+"x": 60,
+"y": 361,
+"type": "cubic"
+},
+{
+"x": -26,
+"y": 223,
+"type": "cubic"
+},
+{
+"x": -7,
+"y": 104,
+"smooth": true
+},
+{
+"x": 7,
+"y": 26,
+"type": "cubic"
+},
+{
+"x": 76,
+"y": -35,
+"type": "cubic"
+}
+],
+"isClosed": true
+},
+{
+"points": [
+{
+"x": 204,
+"y": 148,
+"smooth": true
+},
+{
+"x": 197,
+"y": 148,
+"type": "cubic"
+},
+{
+"x": 191,
+"y": 154,
+"type": "cubic"
+},
+{
+"x": 191,
+"y": 161,
+"smooth": true
+},
+{
+"x": 191,
+"y": 167,
+"type": "cubic"
+},
+{
+"x": 197,
+"y": 173,
+"type": "cubic"
+},
+{
+"x": 204,
+"y": 173,
+"smooth": true
+},
+{
+"x": 210,
+"y": 173,
+"type": "cubic"
+},
+{
+"x": 216,
+"y": 167,
+"type": "cubic"
+},
+{
+"x": 216,
+"y": 161,
+"smooth": true
+},
+{
+"x": 216,
+"y": 154,
+"type": "cubic"
+},
+{
+"x": 210,
+"y": 148,
+"type": "cubic"
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 398,
+"anchors": [
+{
+"name": "damma",
+"x": -21,
+"y": 181
+},
+{
+"name": "exit",
+"x": 0,
+"y": 0
+},
+{
+"name": "fatha",
+"x": 200,
+"y": 411
+},
+{
+"name": "kasra",
+"x": 308,
+"y": -78
+}
+]
+}
+}
+}
+}

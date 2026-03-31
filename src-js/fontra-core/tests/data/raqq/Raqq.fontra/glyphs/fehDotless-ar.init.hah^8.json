@@ -1,0 +1,246 @@
+{
+"name": "fehDotless-ar.init.hah",
+"sources": [
+{
+"name": "",
+"layerName": "m01",
+"locationBase": "m01"
+}
+],
+"layers": {
+"m01": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": -40,
+"y": -4
+},
+{
+"x": 82,
+"y": -14,
+"type": "cubic"
+},
+{
+"x": 328,
+"y": 9,
+"type": "cubic"
+},
+{
+"x": 328,
+"y": 115,
+"smooth": true
+},
+{
+"x": 328,
+"y": 287,
+"type": "cubic"
+},
+{
+"x": 245,
+"y": 462,
+"type": "cubic"
+},
+{
+"x": 130,
+"y": 462,
+"smooth": true
+},
+{
+"x": 23,
+"y": 462,
+"type": "cubic"
+},
+{
+"x": -53,
+"y": 351,
+"type": "cubic"
+},
+{
+"x": -53,
+"y": 260,
+"smooth": true
+},
+{
+"x": -53,
+"y": 216,
+"type": "cubic"
+},
+{
+"x": -30,
+"y": 178,
+"type": "cubic"
+},
+{
+"x": 4,
+"y": 155,
+"smooth": true
+},
+{
+"x": 60,
+"y": 117,
+"type": "cubic"
+},
+{
+"x": 159,
+"y": 128,
+"type": "cubic"
+},
+{
+"x": 207,
+"y": 137,
+"smooth": true
+},
+{
+"x": 218,
+"y": 139,
+"type": "cubic"
+},
+{
+"x": 219,
+"y": 128,
+"type": "cubic"
+},
+{
+"x": 208,
+"y": 121,
+"smooth": true
+},
+{
+"x": 198,
+"y": 114,
+"type": "cubic"
+},
+{
+"x": 157,
+"y": 111,
+"type": "cubic"
+},
+{
+"x": 107,
+"y": 110,
+"smooth": true
+},
+{
+"x": 28,
+"y": 108,
+"type": "cubic"
+},
+{
+"x": -12,
+"y": 138,
+"type": "cubic"
+},
+{
+"x": -40,
+"y": 170
+}
+],
+"isClosed": true
+},
+{
+"points": [
+{
+"x": 127,
+"y": 287,
+"smooth": true
+},
+{
+"x": 120,
+"y": 287,
+"type": "cubic"
+},
+{
+"x": 114,
+"y": 293,
+"type": "cubic"
+},
+{
+"x": 114,
+"y": 300,
+"smooth": true
+},
+{
+"x": 114,
+"y": 306,
+"type": "cubic"
+},
+{
+"x": 120,
+"y": 312,
+"type": "cubic"
+},
+{
+"x": 127,
+"y": 312,
+"smooth": true
+},
+{
+"x": 133,
+"y": 312,
+"type": "cubic"
+},
+{
+"x": 139,
+"y": 306,
+"type": "cubic"
+},
+{
+"x": 139,
+"y": 300,
+"smooth": true
+},
+{
+"x": 139,
+"y": 293,
+"type": "cubic"
+},
+{
+"x": 133,
+"y": 287,
+"type": "cubic"
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 328,
+"anchors": [
+{
+"name": "bottom",
+"x": 284,
+"y": 50
+},
+{
+"name": "damma",
+"x": -43,
+"y": 172
+},
+{
+"name": "exit",
+"x": 0,
+"y": 0
+},
+{
+"name": "fatha",
+"x": 127,
+"y": 513
+},
+{
+"name": "kasra",
+"x": 206,
+"y": -44
+},
+{
+"name": "top",
+"x": 12,
+"y": 411
+}
+]
+}
+}
+}
+}

@@ -1,0 +1,51 @@
+{
+"name": "threedotshorizontalabove-ar.3",
+"sources": [
+{
+"name": "",
+"layerName": "m01",
+"locationBase": "m01"
+}
+],
+"layers": {
+"m01": {
+"glyph": {
+"components": [
+{
+"name": "dotabove-ar",
+"transformation": {
+"translateX": 255,
+"translateY": 73,
+"rotation": 9.399999999999979,
+"scaleX": 0.9999999999999999
+}
+},
+{
+"name": "dotabove-ar",
+"transformation": {
+"translateX": 4,
+"translateY": 7,
+"rotation": 8.999999999999984
+}
+},
+{
+"name": "dotabove-ar",
+"transformation": {
+"translateX": 128,
+"translateY": 36,
+"rotation": 8.999999999999984
+}
+}
+],
+"xAdvance": 347,
+"anchors": [
+{
+"name": "_top",
+"x": 194,
+"y": 77
+}
+]
+}
+}
+}
+}

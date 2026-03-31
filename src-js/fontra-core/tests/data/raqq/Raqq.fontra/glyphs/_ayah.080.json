@@ -1,0 +1,926 @@
+{
+"name": "_ayah.080",
+"sources": [
+{
+"name": "",
+"layerName": "m01",
+"locationBase": "m01"
+}
+],
+"layers": {
+"m01": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": 143,
+"y": -48,
+"smooth": true
+},
+{
+"x": 165,
+"y": -43,
+"type": "cubic"
+},
+{
+"x": 176,
+"y": -29,
+"type": "cubic"
+},
+{
+"x": 176,
+"y": 0
+},
+{
+"x": 376,
+"y": 0,
+"smooth": true
+},
+{
+"x": 392,
+"y": 0,
+"type": "cubic"
+},
+{
+"x": 406,
+"y": 15,
+"type": "cubic"
+},
+{
+"x": 406,
+"y": 29,
+"smooth": true
+},
+{
+"x": 405,
+"y": 69,
+"type": "cubic"
+},
+{
+"x": 403,
+"y": 108,
+"type": "cubic"
+},
+{
+"x": 400,
+"y": 153
+},
+{
+"x": 392,
+"y": 141,
+"type": "cubic"
+},
+{
+"x": 369,
+"y": 119,
+"type": "cubic"
+},
+{
+"x": 358,
+"y": 111
+},
+{
+"x": 359,
+"y": 104,
+"type": "cubic"
+},
+{
+"x": 362,
+"y": 63,
+"type": "cubic"
+},
+{
+"x": 362,
+"y": 43
+},
+{
+"x": 357,
+"y": 43
+},
+{
+"x": 357,
+"y": 100,
+"type": "cubic"
+},
+{
+"x": 324,
+"y": 140,
+"type": "cubic"
+},
+{
+"x": 288,
+"y": 140,
+"smooth": true
+},
+{
+"x": 252,
+"y": 140,
+"type": "cubic"
+},
+{
+"x": 212,
+"y": 106,
+"type": "cubic"
+},
+{
+"x": 212,
+"y": 43
+},
+{
+"x": 208,
+"y": 43
+},
+{
+"x": 203,
+"y": 141
+},
+{
+"x": 191,
+"y": 129,
+"type": "cubic"
+},
+{
+"x": 178,
+"y": 116,
+"type": "cubic"
+},
+{
+"x": 167,
+"y": 106
+},
+{
+"x": 168,
+"y": 94,
+"type": "cubic"
+},
+{
+"x": 170,
+"y": 63,
+"type": "cubic"
+},
+{
+"x": 170,
+"y": 43
+},
+{
+"x": 166,
+"y": 43
+},
+{
+"x": 157,
+"y": 88,
+"type": "cubic"
+},
+{
+"x": 140,
+"y": 109,
+"type": "cubic"
+},
+{
+"x": 99,
+"y": 109,
+"smooth": true
+},
+{
+"x": 63,
+"y": 109,
+"type": "cubic"
+},
+{
+"x": 40,
+"y": 77,
+"type": "cubic"
+},
+{
+"x": 40,
+"y": 53,
+"smooth": true
+},
+{
+"x": 40,
+"y": 1,
+"type": "cubic"
+},
+{
+"x": 82,
+"y": -5,
+"type": "cubic"
+},
+{
+"x": 137,
+"y": 0
+},
+{
+"x": 139,
+"y": -5
+},
+{
+"x": 92,
+"y": -11,
+"type": "cubic"
+},
+{
+"x": 59,
+"y": -5,
+"type": "cubic"
+},
+{
+"x": 42,
+"y": 14
+},
+{
+"x": 37,
+"y": 5,
+"type": "cubic"
+},
+{
+"x": 16,
+"y": -8,
+"type": "cubic"
+},
+{
+"x": 0,
+"y": -14
+},
+{
+"x": 22,
+"y": -63,
+"type": "cubic"
+},
+{
+"x": 122,
+"y": -54,
+"type": "cubic"
+}
+],
+"isClosed": true
+},
+{
+"points": [
+{
+"x": 107,
+"y": 42,
+"smooth": true
+},
+{
+"x": 103,
+"y": 42,
+"type": "cubic"
+},
+{
+"x": 101,
+"y": 44,
+"type": "cubic"
+},
+{
+"x": 101,
+"y": 48,
+"smooth": true
+},
+{
+"x": 101,
+"y": 50,
+"type": "cubic"
+},
+{
+"x": 103,
+"y": 54,
+"type": "cubic"
+},
+{
+"x": 107,
+"y": 54,
+"smooth": true
+},
+{
+"x": 109,
+"y": 54,
+"type": "cubic"
+},
+{
+"x": 113,
+"y": 50,
+"type": "cubic"
+},
+{
+"x": 113,
+"y": 48,
+"smooth": true
+},
+{
+"x": 113,
+"y": 44,
+"type": "cubic"
+},
+{
+"x": 109,
+"y": 42,
+"type": "cubic"
+}
+],
+"isClosed": true
+},
+{
+"points": [
+{
+"x": 290,
+"y": 67,
+"smooth": true
+},
+{
+"x": 287,
+"y": 67,
+"type": "cubic"
+},
+{
+"x": 285,
+"y": 69,
+"type": "cubic"
+},
+{
+"x": 285,
+"y": 72,
+"smooth": true
+},
+{
+"x": 285,
+"y": 74,
+"type": "cubic"
+},
+{
+"x": 287,
+"y": 77,
+"type": "cubic"
+},
+{
+"x": 290,
+"y": 77,
+"smooth": true
+},
+{
+"x": 292,
+"y": 77,
+"type": "cubic"
+},
+{
+"x": 295,
+"y": 74,
+"type": "cubic"
+},
+{
+"x": 295,
+"y": 72,
+"smooth": true
+},
+{
+"x": 295,
+"y": 69,
+"type": "cubic"
+},
+{
+"x": 292,
+"y": 67,
+"type": "cubic"
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 406
+}
+},
+"m01^24 Jun 23 at 22:18": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": 105,
+"y": 42,
+"smooth": true
+},
+{
+"x": 101,
+"y": 42,
+"type": "cubic"
+},
+{
+"x": 99,
+"y": 44,
+"type": "cubic"
+},
+{
+"x": 99,
+"y": 48,
+"smooth": true
+},
+{
+"x": 99,
+"y": 50,
+"type": "cubic"
+},
+{
+"x": 101,
+"y": 54,
+"type": "cubic"
+},
+{
+"x": 105,
+"y": 54,
+"smooth": true
+},
+{
+"x": 107,
+"y": 54,
+"type": "cubic"
+},
+{
+"x": 111,
+"y": 50,
+"type": "cubic"
+},
+{
+"x": 111,
+"y": 48,
+"smooth": true
+},
+{
+"x": 111,
+"y": 44,
+"type": "cubic"
+},
+{
+"x": 107,
+"y": 42,
+"type": "cubic"
+}
+],
+"isClosed": true
+},
+{
+"points": [
+{
+"x": 206,
+"y": 45,
+"smooth": true
+},
+{
+"x": 202,
+"y": 132,
+"smooth": true
+},
+{
+"x": 202,
+"y": 139,
+"type": "cubic"
+},
+{
+"x": 196,
+"y": 139,
+"type": "cubic"
+},
+{
+"x": 193,
+"y": 136,
+"smooth": true
+},
+{
+"x": 180,
+"y": 119,
+"type": "cubic"
+},
+{
+"x": 180,
+"y": 120,
+"type": "cubic"
+},
+{
+"x": 171,
+"y": 111,
+"smooth": true
+},
+{
+"x": 167,
+"y": 107,
+"type": "cubic"
+},
+{
+"x": 165,
+"y": 106,
+"type": "cubic"
+},
+{
+"x": 165,
+"y": 102,
+"smooth": true
+},
+{
+"x": 166,
+"y": 90,
+"type": "cubic"
+},
+{
+"x": 168,
+"y": 66,
+"type": "cubic"
+},
+{
+"x": 168,
+"y": 47,
+"smooth": true
+},
+{
+"x": 168,
+"y": 44,
+"type": "cubic"
+},
+{
+"x": 165,
+"y": 43,
+"type": "cubic"
+},
+{
+"x": 164,
+"y": 47,
+"smooth": true
+},
+{
+"x": 154,
+"y": 88,
+"type": "cubic"
+},
+{
+"x": 138,
+"y": 109,
+"type": "cubic"
+},
+{
+"x": 97,
+"y": 109,
+"smooth": true
+},
+{
+"x": 61,
+"y": 109,
+"type": "cubic"
+},
+{
+"x": 38,
+"y": 77,
+"type": "cubic"
+},
+{
+"x": 38,
+"y": 53,
+"smooth": true
+},
+{
+"x": 38,
+"y": 1,
+"type": "cubic"
+},
+{
+"x": 77,
+"y": -5,
+"type": "cubic"
+},
+{
+"x": 132,
+"y": 0,
+"smooth": true
+},
+{
+"x": 137,
+"y": 0,
+"type": "cubic"
+},
+{
+"x": 138,
+"y": -5,
+"type": "cubic"
+},
+{
+"x": 132,
+"y": -5,
+"smooth": true
+},
+{
+"x": 121,
+"y": -5,
+"type": "cubic"
+},
+{
+"x": 77,
+"y": -13,
+"type": "cubic"
+},
+{
+"x": 49,
+"y": 8,
+"smooth": true
+},
+{
+"x": 45,
+"y": 11,
+"type": "cubic"
+},
+{
+"x": 41,
+"y": 16,
+"type": "cubic"
+},
+{
+"x": 38,
+"y": 12,
+"smooth": true
+},
+{
+"x": 33,
+"y": 3,
+"type": "cubic"
+},
+{
+"x": 14,
+"y": -13,
+"type": "cubic"
+},
+{
+"x": 6,
+"y": -13,
+"smooth": true
+},
+{
+"x": 2,
+"y": -13,
+"type": "cubic"
+},
+{
+"x": -3,
+"y": -16,
+"type": "cubic"
+},
+{
+"x": 2,
+"y": -22,
+"smooth": true
+},
+{
+"x": 17,
+"y": -43,
+"type": "cubic"
+},
+{
+"x": 31,
+"y": -53,
+"type": "cubic"
+},
+{
+"x": 87,
+"y": -53,
+"smooth": true
+},
+{
+"x": 144,
+"y": -53,
+"type": "cubic"
+},
+{
+"x": 174,
+"y": -48,
+"type": "cubic"
+},
+{
+"x": 174,
+"y": 0
+},
+{
+"x": 374,
+"y": 0,
+"smooth": true
+},
+{
+"x": 390,
+"y": 0,
+"type": "cubic"
+},
+{
+"x": 404,
+"y": 15,
+"type": "cubic"
+},
+{
+"x": 404,
+"y": 29,
+"smooth": true
+},
+{
+"x": 403,
+"y": 69,
+"type": "cubic"
+},
+{
+"x": 398,
+"y": 105,
+"type": "cubic"
+},
+{
+"x": 398,
+"y": 145,
+"smooth": true
+},
+{
+"x": 398,
+"y": 149,
+"type": "cubic"
+},
+{
+"x": 395,
+"y": 150,
+"type": "cubic"
+},
+{
+"x": 392,
+"y": 146,
+"smooth": true
+},
+{
+"x": 384,
+"y": 134,
+"type": "cubic"
+},
+{
+"x": 373,
+"y": 122,
+"type": "cubic"
+},
+{
+"x": 362,
+"y": 114
+},
+{
+"x": 356,
+"y": 111,
+"type": "cubic"
+},
+{
+"x": 357,
+"y": 104,
+"type": "cubic"
+},
+{
+"x": 358,
+"y": 92,
+"smooth": true
+},
+{
+"x": 359,
+"y": 78,
+"type": "cubic"
+},
+{
+"x": 360,
+"y": 66,
+"type": "cubic"
+},
+{
+"x": 360,
+"y": 44,
+"smooth": true
+},
+{
+"x": 360,
+"y": 40,
+"type": "cubic"
+},
+{
+"x": 356,
+"y": 40,
+"type": "cubic"
+},
+{
+"x": 356,
+"y": 44,
+"smooth": true
+},
+{
+"x": 356,
+"y": 103,
+"type": "cubic"
+},
+{
+"x": 322,
+"y": 140,
+"type": "cubic"
+},
+{
+"x": 286,
+"y": 140,
+"smooth": true
+},
+{
+"x": 250,
+"y": 140,
+"type": "cubic"
+},
+{
+"x": 210,
+"y": 109,
+"type": "cubic"
+},
+{
+"x": 210,
+"y": 45,
+"smooth": true
+},
+{
+"x": 210,
+"y": 41,
+"type": "cubic"
+},
+{
+"x": 206,
+"y": 41,
+"type": "cubic"
+}
+],
+"isClosed": true
+},
+{
+"points": [
+{
+"x": 288,
+"y": 67,
+"smooth": true
+},
+{
+"x": 285,
+"y": 67,
+"type": "cubic"
+},
+{
+"x": 283,
+"y": 69,
+"type": "cubic"
+},
+{
+"x": 283,
+"y": 72,
+"smooth": true
+},
+{
+"x": 283,
+"y": 74,
+"type": "cubic"
+},
+{
+"x": 285,
+"y": 77,
+"type": "cubic"
+},
+{
+"x": 288,
+"y": 77,
+"smooth": true
+},
+{
+"x": 290,
+"y": 77,
+"type": "cubic"
+},
+{
+"x": 293,
+"y": 74,
+"type": "cubic"
+},
+{
+"x": 293,
+"y": 72,
+"smooth": true
+},
+{
+"x": 293,
+"y": 69,
+"type": "cubic"
+},
+{
+"x": 290,
+"y": 67,
+"type": "cubic"
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 404
+},
+"customData": {
+"com.glyphsapp.layer.layerId": "A750BCAD-CD3D-46E8-900D-BCA88ECFE444"
+}
+}
+}
+}

@@ -1,0 +1,68 @@
+{
+"name": "_c.hah.beh",
+"sources": [
+{
+"name": "",
+"layerName": "m01",
+"locationBase": "m01"
+}
+],
+"layers": {
+"m01": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": -23,
+"y": 0
+},
+{
+"x": 130,
+"y": 59
+},
+{
+"x": 130,
+"y": 104
+},
+{
+"x": 50,
+"y": 111,
+"type": "cubic"
+},
+{
+"x": -5,
+"y": 142,
+"type": "cubic"
+},
+{
+"x": -4,
+"y": 192
+},
+{
+"x": -23,
+"y": 192
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 7,
+"anchors": [
+{
+"name": "entry",
+"x": 7,
+"y": 0
+},
+{
+"name": "exit",
+"x": 0,
+"y": 0
+}
+]
+}
+}
+}
+}

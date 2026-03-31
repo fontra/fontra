@@ -1,0 +1,17 @@
+{
+"name": "zero",
+"sources": [
+{
+"name": "",
+"layerName": "m01",
+"locationBase": "m01"
+}
+],
+"layers": {
+"m01": {
+"glyph": {
+"xAdvance": 0
+}
+}
+}
+}

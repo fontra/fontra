@@ -1,0 +1,25 @@
+{
+"name": "sad-ar.medi.l2",
+"sources": [
+{
+"name": "",
+"layerName": "m01",
+"locationBase": "m01"
+}
+],
+"layers": {
+"m01": {
+"glyph": {
+"components": [
+{
+"name": "sad-ar.medi"
+}
+],
+"xAdvance": 758
+}
+}
+},
+"customData": {
+"com.glyphsapp.glyph-color": 0
+}
+}

@@ -1,0 +1,68 @@
+{
+"name": "_c.ain.meem",
+"sources": [
+{
+"name": "",
+"layerName": "m01",
+"locationBase": "m01"
+}
+],
+"layers": {
+"m01": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": -38,
+"y": 0
+},
+{
+"x": 87,
+"y": 0
+},
+{
+"x": 87,
+"y": 110
+},
+{
+"x": 53,
+"y": 110,
+"type": "cubic"
+},
+{
+"x": -5,
+"y": 141,
+"type": "cubic"
+},
+{
+"x": -28,
+"y": 192
+},
+{
+"x": -38,
+"y": 192
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 35,
+"anchors": [
+{
+"name": "entry",
+"x": 35,
+"y": 0
+},
+{
+"name": "exit",
+"x": 0,
+"y": 0
+}
+]
+}
+}
+}
+}

@@ -1,0 +1,24 @@
+{
+"name": "space.mark",
+"sources": [
+{
+"name": "",
+"layerName": "m01",
+"locationBase": "m01"
+}
+],
+"layers": {
+"m01": {
+"glyph": {
+"xAdvance": 400,
+"anchors": [
+{
+"name": "alefabove",
+"x": 0,
+"y": 0
+}
+]
+}
+}
+}
+}

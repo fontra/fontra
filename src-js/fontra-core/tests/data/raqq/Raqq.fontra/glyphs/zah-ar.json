@@ -1,0 +1,32 @@
+{
+"name": "zah-ar",
+"sources": [
+{
+"name": "",
+"layerName": "m01",
+"locationBase": "m01"
+}
+],
+"layers": {
+"m01": {
+"glyph": {
+"components": [
+{
+"name": "tah-ar"
+},
+{
+"name": "dotabove-ar",
+"transformation": {
+"translateX": 350,
+"translateY": 237
+}
+}
+],
+"xAdvance": 805
+}
+}
+},
+"customData": {
+"com.glyphsapp.glyph-color": 0
+}
+}

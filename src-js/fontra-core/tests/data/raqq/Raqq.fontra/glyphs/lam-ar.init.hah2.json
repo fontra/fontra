@@ -1,0 +1,267 @@
+{
+"name": "lam-ar.init.hah2",
+"sources": [
+{
+"name": "",
+"layerName": "m01",
+"locationBase": "m01"
+}
+],
+"layers": {
+"m01": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": -20,
+"y": 230
+},
+{
+"x": 18,
+"y": 230
+},
+{
+"x": 92,
+"y": 232,
+"type": "cubic"
+},
+{
+"x": 127,
+"y": 238,
+"type": "cubic"
+},
+{
+"x": 123,
+"y": 346,
+"smooth": true
+},
+{
+"x": 118,
+"y": 493,
+"type": "cubic"
+},
+{
+"x": 110,
+"y": 645,
+"type": "cubic"
+},
+{
+"x": 104,
+"y": 787,
+"smooth": true
+},
+{
+"x": 103,
+"y": 810,
+"type": "cubic"
+},
+{
+"x": 89,
+"y": 816,
+"type": "cubic"
+},
+{
+"x": 79,
+"y": 797,
+"smooth": true
+},
+{
+"x": 67,
+"y": 774,
+"type": "cubic"
+},
+{
+"x": 28,
+"y": 740,
+"type": "cubic"
+},
+{
+"x": 10,
+"y": 726,
+"smooth": true
+},
+{
+"x": -5,
+"y": 713,
+"type": "cubic"
+},
+{
+"x": 1,
+"y": 700,
+"type": "cubic"
+},
+{
+"x": 2,
+"y": 690,
+"smooth": true
+},
+{
+"x": 9,
+"y": 580,
+"type": "cubic"
+},
+{
+"x": 16,
+"y": 444,
+"type": "cubic"
+},
+{
+"x": 20,
+"y": 340
+},
+{
+"x": -20,
+"y": 340
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 123,
+"anchors": [
+{
+"name": "damma",
+"x": 5,
+"y": 403
+},
+{
+"name": "exit",
+"x": 0,
+"y": 230
+},
+{
+"name": "fatha",
+"x": -48,
+"y": 620
+},
+{
+"name": "kasra",
+"x": 123,
+"y": 194
+}
+]
+}
+},
+"m01^1 May 23 at 01:53": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": -20,
+"y": 0
+},
+{
+"x": 18,
+"y": 0
+},
+{
+"x": 92,
+"y": 2,
+"type": "cubic"
+},
+{
+"x": 127,
+"y": 8,
+"type": "cubic"
+},
+{
+"x": 123,
+"y": 116,
+"smooth": true
+},
+{
+"x": 118,
+"y": 263,
+"type": "cubic"
+},
+{
+"x": 107,
+"y": 475,
+"type": "cubic"
+},
+{
+"x": 98,
+"y": 671,
+"smooth": true
+},
+{
+"x": 97,
+"y": 694,
+"type": "cubic"
+},
+{
+"x": 83,
+"y": 700,
+"type": "cubic"
+},
+{
+"x": 73,
+"y": 681,
+"smooth": true
+},
+{
+"x": 61,
+"y": 658,
+"type": "cubic"
+},
+{
+"x": 22,
+"y": 624,
+"type": "cubic"
+},
+{
+"x": 4,
+"y": 610,
+"smooth": true
+},
+{
+"x": -11,
+"y": 597,
+"type": "cubic"
+},
+{
+"x": -5,
+"y": 584,
+"type": "cubic"
+},
+{
+"x": -4,
+"y": 574,
+"smooth": true
+},
+{
+"x": 6,
+"y": 413,
+"type": "cubic"
+},
+{
+"x": 16,
+"y": 239,
+"type": "cubic"
+},
+{
+"x": 18,
+"y": 110
+},
+{
+"x": -20,
+"y": 110
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 123
+},
+"customData": {
+"com.glyphsapp.layer.layerId": "57202DD3-E382-4D04-9977-46B2FD35FB4D"
+}
+}
+}
+}

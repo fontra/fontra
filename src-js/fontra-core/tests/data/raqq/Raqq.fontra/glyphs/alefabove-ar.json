@@ -1,0 +1,123 @@
+{
+"name": "alefabove-ar",
+"sources": [
+{
+"name": "",
+"layerName": "m01",
+"locationBase": "m01"
+}
+],
+"layers": {
+"m01": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": -1,
+"y": 357,
+"smooth": true
+},
+{
+"x": 0,
+"y": 333,
+"type": "cubic"
+},
+{
+"x": 19,
+"y": 333,
+"type": "cubic"
+},
+{
+"x": 19,
+"y": 358,
+"smooth": true
+},
+{
+"x": 19,
+"y": 516,
+"type": "cubic"
+},
+{
+"x": 18,
+"y": 650,
+"type": "cubic"
+},
+{
+"x": 29,
+"y": 781,
+"smooth": true
+},
+{
+"x": 31,
+"y": 808,
+"type": "cubic"
+},
+{
+"x": 18,
+"y": 800,
+"type": "cubic"
+},
+{
+"x": 15,
+"y": 786,
+"smooth": true
+},
+{
+"x": 10,
+"y": 761,
+"type": "cubic"
+},
+{
+"x": -6,
+"y": 737,
+"type": "cubic"
+},
+{
+"x": -21,
+"y": 714,
+"smooth": true
+},
+{
+"x": -26,
+"y": 707,
+"type": "cubic"
+},
+{
+"x": -31,
+"y": 708,
+"type": "cubic"
+},
+{
+"x": -27,
+"y": 690,
+"smooth": true
+},
+{
+"x": -11,
+"y": 610,
+"type": "cubic"
+},
+{
+"x": -5,
+"y": 478,
+"type": "cubic"
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 0,
+"anchors": [
+{
+"name": "_alefabove",
+"x": 0,
+"y": 0
+}
+]
+}
+}
+}
+}

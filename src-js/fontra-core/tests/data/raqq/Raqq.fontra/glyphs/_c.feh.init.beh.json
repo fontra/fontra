@@ -1,0 +1,68 @@
+{
+"name": "_c.feh.init.beh",
+"sources": [
+{
+"name": "",
+"layerName": "m01",
+"locationBase": "m01"
+}
+],
+"layers": {
+"m01": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": -23,
+"y": 0
+},
+{
+"x": 47,
+"y": 0
+},
+{
+"x": 174,
+"y": 110
+},
+{
+"x": 60,
+"y": 108,
+"type": "cubic"
+},
+{
+"x": -4,
+"y": 164,
+"type": "cubic"
+},
+{
+"x": -7,
+"y": 264
+},
+{
+"x": -23,
+"y": 264
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 174,
+"anchors": [
+{
+"name": "entry",
+"x": 174,
+"y": 0
+},
+{
+"name": "exit",
+"x": 0,
+"y": 0
+}
+]
+}
+}
+}
+}

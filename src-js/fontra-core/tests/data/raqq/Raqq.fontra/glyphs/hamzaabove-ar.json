@@ -1,0 +1,42 @@
+{
+"name": "hamzaabove-ar",
+"sources": [
+{
+"name": "",
+"layerName": "m01",
+"locationBase": "m01"
+}
+],
+"layers": {
+"m01": {
+"glyph": {
+"components": [
+{
+"name": "fatha-ar"
+}
+],
+"xAdvance": 150,
+"anchors": [
+{
+"name": "_hamzaabove",
+"x": 75,
+"y": 75
+}
+]
+}
+},
+"m01^Regular 25 Jun 22, 20:50": {
+"glyph": {
+"components": [
+{
+"name": "_dot"
+}
+],
+"xAdvance": 150
+},
+"customData": {
+"com.glyphsapp.layer.layerId": "057221C3-A498-4D61-8B14-F8267A46D106"
+}
+}
+}
+}

@@ -1,0 +1,45 @@
+{
+"name": "fathatan-ar",
+"sources": [
+{
+"name": "",
+"layerName": "m01",
+"locationBase": "m01"
+}
+],
+"layers": {
+"m01": {
+"glyph": {
+"components": [
+{
+"name": "kasratan-ar"
+}
+],
+"xAdvance": 284,
+"anchors": [
+{
+"name": "_fatha",
+"x": 142,
+"y": 75
+}
+]
+}
+},
+"m01^Regular 25 Jun 22, 20:50": {
+"glyph": {
+"components": [
+{
+"name": "kasratan-ar",
+"customData": {
+"com.glyphsapp.component.alignment": 1
+}
+}
+],
+"xAdvance": 284
+},
+"customData": {
+"com.glyphsapp.layer.layerId": "B1CF235A-D426-403E-AC5F-FAE0BFC820A1"
+}
+}
+}
+}

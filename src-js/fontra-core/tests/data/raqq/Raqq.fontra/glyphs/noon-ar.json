@@ -1,0 +1,32 @@
+{
+"name": "noon-ar",
+"sources": [
+{
+"name": "",
+"layerName": "m01",
+"locationBase": "m01"
+}
+],
+"layers": {
+"m01": {
+"glyph": {
+"components": [
+{
+"name": "noonghunna-ar"
+},
+{
+"name": "dotabove-ar",
+"transformation": {
+"translateX": 5,
+"translateY": 191
+}
+}
+],
+"xAdvance": 295
+}
+}
+},
+"customData": {
+"com.glyphsapp.glyph-color": 0
+}
+}

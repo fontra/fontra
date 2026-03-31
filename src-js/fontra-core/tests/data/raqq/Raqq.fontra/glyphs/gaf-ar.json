@@ -1,0 +1,32 @@
+{
+"name": "gaf-ar",
+"sources": [
+{
+"name": "",
+"layerName": "m01",
+"locationBase": "m01"
+}
+],
+"layers": {
+"m01": {
+"glyph": {
+"components": [
+{
+"name": "kaf-ar"
+},
+{
+"name": "gafsarkashabove-ar",
+"transformation": {
+"translateX": 112,
+"translateY": 682
+}
+}
+],
+"xAdvance": 896
+}
+}
+},
+"customData": {
+"com.glyphsapp.glyph-color": 0
+}
+}

@@ -1,0 +1,97 @@
+{
+"name": "hah-ar.fina.alt",
+"sources": [
+{
+"name": "",
+"layerName": "m01",
+"locationBase": "m01"
+},
+{
+"name": "Regular / 17 May 23 at 17:56",
+"layerName": "94172F02-4388-4672-8AFE-BEC85DEDFE74",
+"location": {
+"Mashq": 20,
+"Spacing": 0
+}
+},
+{
+"name": "Regular / 17 May 23 at 17:56",
+"layerName": "5CEC36C1-5F28-4DF0-934C-02B5E49A159A",
+"location": {
+"Mashq": 100,
+"Spacing": 0
+}
+}
+],
+"layers": {
+"5CEC36C1-5F28-4DF0-934C-02B5E49A159A": {
+"glyph": {
+"components": [
+{
+"name": "hah-ar"
+}
+],
+"xAdvance": 1083,
+"anchors": [
+{
+"name": "entry",
+"x": 507,
+"y": 130
+},
+{
+"name": "fatha",
+"x": 459,
+"y": 328
+}
+]
+}
+},
+"94172F02-4388-4672-8AFE-BEC85DEDFE74": {
+"glyph": {
+"components": [
+{
+"name": "hah-ar"
+}
+],
+"xAdvance": 1083,
+"anchors": [
+{
+"name": "entry",
+"x": 507,
+"y": 130
+},
+{
+"name": "fatha",
+"x": 459,
+"y": 328
+}
+]
+}
+},
+"m01": {
+"glyph": {
+"components": [
+{
+"name": "hah-ar"
+}
+],
+"xAdvance": 983,
+"anchors": [
+{
+"name": "entry",
+"x": 407,
+"y": 130
+},
+{
+"name": "fatha",
+"x": 359,
+"y": 328
+}
+]
+}
+}
+},
+"customData": {
+"com.glyphsapp.glyph-color": 9
+}
+}

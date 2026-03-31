@@ -1,0 +1,68 @@
+{
+"name": "_c.feh.medi.meem",
+"sources": [
+{
+"name": "",
+"layerName": "m01",
+"locationBase": "m01"
+}
+],
+"layers": {
+"m01": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": -46,
+"y": 0
+},
+{
+"x": 47,
+"y": 0
+},
+{
+"x": 47,
+"y": 110
+},
+{
+"x": 18,
+"y": 109,
+"type": "cubic"
+},
+{
+"x": -9,
+"y": 138,
+"type": "cubic"
+},
+{
+"x": -21,
+"y": 174
+},
+{
+"x": -46,
+"y": 174
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 47,
+"anchors": [
+{
+"name": "entry",
+"x": 47,
+"y": 0
+},
+{
+"name": "exit",
+"x": 0,
+"y": 0
+}
+]
+}
+}
+}
+}

@@ -1,0 +1,778 @@
+@isol = [alef-ar behDotless-ar hah-ar dal-ar reh-ar seen-ar sad-ar tah-ar ain-ar fehDotless-ar qafDotless-ar kaf-ar lam-ar meem-ar noonghunna-ar heh-ar waw-ar alefMaksura-ar yehbarree-ar lam_lam_heh-ar lam_alef-ar fehDotless_alef-ar seen_alefMaksura-ar lam-ar.short period threedots-ar zerowidthspace endofayah-ar dottedCircle];
+@init = [behDotless-ar.init behDotless-ar.init.hah behDotless-ar.init.med behDotless-ar.init.high hah-ar.init hah-ar.init.hah seen-ar.init sad-ar.init tah-ar.init tah-ar.init.hah1 tah-ar.init.hah2 ain-ar.init ain-ar.init.hah fehDotless-ar.init fehDotless-ar.init.hah fehDotless-ar.init.yeh kaf-ar.init kaf-ar.init.alt lam-ar.init lam-ar.init.hah1 lam-ar.init.hah1.alt lam-ar.init.hah2 lam-ar.init.hah2.alt lam-ar.init.short meem-ar.init meem-ar.init.round heh-ar.init heh-ar.init.round];
+@fina = [alef-ar.fina alef-ar.fina.kashida alef-ar.fina.short behDotless-ar.fina hah-ar.fina hah-ar.fina.alt dal-ar.fina reh-ar.fina seen-ar.fina seen-ar.fina.low sad-ar.fina tah-ar.fina ain-ar.fina fehDotless-ar.fina qafDotless-ar.fina kaf-ar.fina lam-ar.fina lam-ar.fina.short meem-ar.fina meem-ar.fina.round noonghunna-ar.fina heh-ar.fina waw-ar.fina waw-ar.fina.round alefMaksura-ar.fina alefMaksura-ar.fina.salt alefMaksura-ar.fina.wide alefMaksura-ar.fina.wide.salt alefMaksura-ar.fina.tooth yehbarree-ar.fina yehbarree-ar.fina.baseline lam_alef-ar.fina seen_alefMaksura-ar.fina];
+@dotsbelow = [dotbelow-ar twodotsverticalbelow-ar threedotsdownbelow-ar];
+# Prefix: Languagesystems
+languagesystem DFLT dflt;
+languagesystem arab dflt;
+# Prefix: ccmp
+lookup ccmp_1 {
+    sub alefHamzaabove-ar by alef-ar hamzaabove-ar;
+    sub alefHamzabelow-ar by alef-ar hamzabelow-ar;
+    sub alefMadda-ar by alef-ar madda-ar;
+    sub alefWasla-ar by alef-ar;
+    # wasla-ar
+    sub beh-ar by behDotless-ar dotbelow-ar;
+    sub teh-ar by behDotless-ar twodotsverticalabove-ar;
+    sub theh-ar by behDotless-ar threedotsupabove-ar;
+    sub peh-ar by behDotless-ar threedotsdownbelow-ar;
+    sub jeem-ar by hah-ar dotbelow-ar;
+    sub tcheh-ar by hah-ar threedotsdownbelow-ar;
+    sub khah-ar by hah-ar dotabove-ar;
+    sub thal-ar by dal-ar dotabove-ar;
+    sub zain-ar by reh-ar dotabove-ar.reh;
+    sub jeh-ar by reh-ar threedotsupabove-ar;
+    sub sheen-ar by seen-ar threedotshorizontalabove-ar;
+    sub dad-ar by sad-ar dotabove-ar;
+    sub zah-ar by tah-ar dotabove-ar;
+    sub ghain-ar by ain-ar dotabove-ar;
+    sub feh-ar by fehDotless-ar dotabove-ar;
+    sub veh-ar by fehDotless-ar threedotsupabove-ar;
+    sub keheh-ar by kaf-ar;
+    sub gaf-ar by kaf-ar gafsarkashabove-ar;
+    sub qaf-ar by qafDotless-ar twodotsverticalabove-ar;
+    sub noon-ar by noonghunna-ar dotabove-ar;
+    sub tehMarbuta-ar by heh-ar twodotsverticalabove-ar;
+    sub wawHamzaabove-ar by waw-ar hamzaabove-ar;
+    sub yeh-ar by alefMaksura-ar twodotsverticalbelow-ar;
+    sub yehHamzaabove-ar by alefMaksura-ar hamzaabove-ar;
+} ccmp_1;
+
+lookup ccmp_hamza_1 {
+    sub kashida-ar hamzaabove-ar fathatan-ar by hamza_fathatan-ar;
+    sub hamzaabove-ar fatha-ar by fatha-ar;
+    sub hamzaabove-ar damma-ar by damma-ar;
+    sub kashida-ar hamzaabove-ar damma-ar by damma-ar;
+    sub hamzabelow-ar kasra-ar by kasra-ar;
+    sub hamzaabove-ar kasra-ar by kasra-ar;
+    sub hamzabelow-ar kasratan-ar by kasratan-ar;
+    sub hamza-ar fatha-ar by hamza_fatha-ar;
+    sub hamza-ar damma-ar by hamza_damma-ar;
+    sub hamza-ar kasra-ar by hamza_kasra-ar;
+} ccmp_hamza_1;
+
+lookup ccmp_hamza_2 {
+    ignore sub waw-ar hamzaabove-ar';
+    sub hamzaabove-ar' by fatha-ar;
+    sub hamzabelow-ar' by kasra-ar;
+} ccmp_hamza_2;
+
+lookup ccmp_hamza_3 {
+    sub hamza_fathatan-ar alef-ar' by alef-ar fathatan-ar;
+    sub [hamza-ar hamza_fatha-ar] alef-ar' by alef-ar madda-ar;
+    sub alef-ar [hamza-ar hamza_fatha-ar]' by madda-ar;
+    sub [hamza-ar hamza_damma-ar]' waw-ar by hamza-ar.alt;
+    sub waw-ar hamza_kasra-ar' by kasra-ar;
+} ccmp_hamza_3;
+
+lookup vertical_vowels {
+    sub fathatan-ar by fathatan-ar.alt;
+    sub kasratan-ar by kasratan-ar.alt;
+} vertical_vowels;
+
+lookup ccmp_vertical_vowels {
+    sub [alef-ar lam-ar tah-ar] fathatan-ar' lookup vertical_vowels;
+} ccmp_vertical_vowels;
+
+@numbers = [zero one two three four five six seven eight nine zero-ar one-ar two-ar three-ar four-ar five-ar six-ar seven-ar eight-ar nine-ar];
+@one = [one one-ar];
+@two = [two two-ar];
+@three = [three three-ar];
+@four = [four four-ar];
+@five = [five five-ar];
+@six = [six six-ar];
+@seven = [seven seven-ar];
+@eight = [eight eight-ar];
+@nine = [nine nine-ar];
+@zero = [zero zero-ar];
+lookup ayah_05 {
+    sub endofayah-ar by endofayah-ar.05;
+} ayah_05;
+
+lookup ayah_10 {
+    sub endofayah-ar by endofayah-ar.10;
+} ayah_10;
+
+lookup ayah_numbers_10s {
+    sub @one @zero by ayah.010;
+    sub @two @zero by ayah.020;
+    sub @three @zero by ayah.030;
+    sub @four @zero by ayah.040;
+    sub @five @zero by ayah.050;
+    sub @six @zero by ayah.060;
+    sub @seven @zero by ayah.070;
+    sub @eight @zero by ayah.080;
+    sub @nine @zero by ayah.090;
+} ayah_numbers_10s;
+
+lookup ayah_numbers_100s {
+    sub @one @zero @zero by ayah.100;
+    sub @one @one @zero by ayah.110;
+    sub @one @two @zero by ayah.120;
+    sub @one @three @zero by ayah.130;
+    sub @one @four @zero by ayah.140;
+    sub @one @five @zero by ayah.150;
+    sub @one @six @zero by ayah.160;
+    sub @one @seven @zero by ayah.170;
+    sub @one @eight @zero by ayah.180;
+    sub @one @nine @zero by ayah.190;
+    sub @two @zero @zero by ayah.200;
+    sub @two @one @zero by ayah.210;
+    sub @two @two @zero by ayah.220;
+    sub @two @three @zero by ayah.230;
+    sub @two @four @zero by ayah.240;
+    sub @two @five @zero by ayah.250;
+    sub @two @six @zero by ayah.260;
+    sub @two @seven @zero by ayah.270;
+    sub @two @eight @zero by ayah.280;
+} ayah_numbers_100s;
+
+lookup ccmp_ayah_numbers {
+    sub endofayah-ar' lookup ayah_05 @numbers @numbers @five;
+    ignore sub endofayah-ar' @numbers @five @numbers;
+    sub endofayah-ar' lookup ayah_05 @numbers @five;
+    ignore sub endofayah-ar' @five @numbers;
+    sub endofayah-ar' lookup ayah_05 @five;
+    sub endofayah-ar @numbers' lookup ayah_numbers_100s @numbers' @numbers';
+    sub endofayah-ar @numbers' lookup ayah_numbers_10s @numbers';
+} ccmp_ayah_numbers;
+
+lookup ccmp_ayah_10 {
+    sub endofayah-ar' lookup ayah_10 [ayah.005 ayah.010 ayah.020 ayah.030 ayah.040 ayah.050 ayah.060 ayah.070 ayah.080 ayah.090 ayah.100 ayah.110 ayah.120 ayah.130 ayah.140 ayah.150 ayah.160 ayah.170 ayah.180 ayah.190 ayah.200 ayah.210 ayah.220 ayah.230 ayah.240 ayah.250 ayah.260 ayah.270 ayah.280];
+} ccmp_ayah_10;
+
+lookup ayah_numbers_delete {
+    sub @numbers by dummy.mark;
+} ayah_numbers_delete;
+
+lookup ccmp_ayah_cleanup_1 {
+    lookupflag IgnoreMarks;
+    sub [endofayah-ar endofayah-ar.05 endofayah-ar.10] @numbers' lookup ayah_numbers_delete;
+} ccmp_ayah_cleanup_1;
+
+lookup ccmp_ayah_cleanup_2 {
+    sub dummy.mark by NULL;
+} ccmp_ayah_cleanup_2;
+
+lookup ccmp_kashida {
+    sub kashida-ar alefabove-ar by alefabove-ar;
+} ccmp_kashida;
+
+lookup ccmp_space {
+    lookupflag 0;
+    sub space by space.mark;
+} ccmp_space;
+
+# Prefix: basic
+lookup isol {
+    sub fehAfrican-ar by fehDotless-ar;
+    sub qafAfrican-ar by qafDotless-ar;
+    sub noonAfrican-ar by noonghunna-ar;
+    sub yehFarsi-ar by alefMaksura-ar;
+} isol;
+
+lookup init {
+    sub behDotless-ar by behDotless-ar.init;
+    sub hah-ar by hah-ar.init;
+    sub seen-ar by seen-ar.init;
+    sub sad-ar by sad-ar.init;
+    sub tah-ar by tah-ar.init;
+    sub ain-ar by ain-ar.init;
+    sub fehDotless-ar by fehDotless-ar.init;
+    sub fehAfrican-ar by fehDotless-ar.init dotbelow-ar;
+    sub qafDotless-ar by fehDotless-ar.init;
+    sub qafAfrican-ar by fehDotless-ar.init dotabove-ar;
+    sub kaf-ar by kaf-ar.init;
+    sub lam-ar by lam-ar.init;
+    sub meem-ar by meem-ar.init;
+    sub noonghunna-ar by behDotless-ar.init;
+    sub noonAfrican-ar by behDotless-ar.init dotabove-ar;
+    sub heh-ar by heh-ar.init;
+    sub alefMaksura-ar by behDotless-ar.init;
+    sub yehFarsi-ar by behDotless-ar.init twodotsverticalbelow-ar;
+} init;
+
+lookup medi {
+    sub behDotless-ar by behDotless-ar.medi;
+    sub hah-ar by hah-ar.medi;
+    sub seen-ar by seen-ar.medi;
+    sub sad-ar by sad-ar.medi;
+    sub tah-ar by tah-ar.medi;
+    sub ain-ar by ain-ar.medi;
+    sub fehDotless-ar by fehDotless-ar.medi;
+    sub fehAfrican-ar by fehDotless-ar.medi dotbelow-ar;
+    sub qafDotless-ar by fehDotless-ar.medi;
+    sub qafAfrican-ar by fehDotless-ar.medi dotabove-ar;
+    sub kaf-ar by kaf-ar.medi;
+    sub lam-ar by lam-ar.medi;
+    sub meem-ar by meem-ar.medi;
+    sub noonghunna-ar by behDotless-ar.medi;
+    sub noonAfrican-ar by behDotless-ar.medi dotabove-ar;
+    sub heh-ar by heh-ar.medi;
+    sub alefMaksura-ar by behDotless-ar.medi;
+    sub yehFarsi-ar by behDotless-ar.medi twodotsverticalbelow-ar;
+} medi;
+
+lookup fina {
+    sub alef-ar by alef-ar.fina;
+    sub behDotless-ar by behDotless-ar.fina;
+    sub hah-ar by hah-ar.fina;
+    sub dal-ar by dal-ar.fina;
+    sub reh-ar by reh-ar.fina;
+    sub seen-ar by seen-ar.fina;
+    sub sad-ar by sad-ar.fina;
+    sub tah-ar by tah-ar.fina;
+    sub ain-ar by ain-ar.fina;
+    sub fehDotless-ar by fehDotless-ar.fina;
+    sub fehAfrican-ar by fehDotless-ar.fina;
+    sub qafDotless-ar by qafDotless-ar.fina;
+    sub qafAfrican-ar by qafDotless-ar.fina;
+    sub kaf-ar by kaf-ar.fina;
+    sub lam-ar by lam-ar.fina;
+    sub meem-ar by meem-ar.fina;
+    sub noonghunna-ar by noonghunna-ar.fina;
+    sub noonAfrican-ar by noonghunna-ar.fina;
+    sub heh-ar by heh-ar.fina;
+    sub waw-ar by waw-ar.fina;
+    sub alefMaksura-ar by alefMaksura-ar.fina;
+    sub yehFarsi-ar by alefMaksura-ar.fina;
+    sub yehbarree-ar by yehbarree-ar.fina;
+} fina;
+
+# Prefix: marks
+lookup rlig_vertical_dots {
+    lookupflag UseMarkFilteringSet [twodotsverticalabove-ar threedotsupabove-ar];
+    sub [behDotless-ar.init behDotless-ar.medi] [twodotsverticalabove-ar threedotsupabove-ar]' [alef-ar.fina lam-ar.medi lam-ar.fina heh-ar.fina heh-ar.medi heh-ar.medi.round] by [twodotsverticalabove-ar.vert threedotsupabove-ar.vert];
+} rlig_vertical_dots;
+
+# Prefix: hah
+@medi.l0 = [behDotless-ar.medi hah-ar.medi seen-ar.medi sad-ar.medi ain-ar.medi fehDotless-ar.medi kaf-ar.medi meem-ar.medi heh-ar.medi kashida-ar];
+@medi.l1 = [behDotless-ar.medi.l1 hah-ar.medi.l1 seen-ar.medi.l1 sad-ar.medi.l1 ain-ar.medi.l1 fehDotless-ar.medi.l1 kaf-ar.medi.l1 meem-ar.medi.l1 heh-ar.medi.l1 kashida-ar.l1];
+@medi.l2 = [behDotless-ar.medi.l2 hah-ar.medi.l2 seen-ar.medi.l2 sad-ar.medi.l2 ain-ar.medi.l2 fehDotless-ar.medi.l2 kaf-ar.medi.l2 meem-ar.medi.l2 heh-ar.medi.l2 kashida-ar.l2];
+@medi.l0.full = [@medi.l0 lam-ar.medi tah-ar.medi];
+@medi.l1.full = [@medi.l1 lam-ar.medi.hah1 tah-ar.medi.hah1];
+@medi.l2.full = [@medi.l2 lam-ar.medi.hah2 tah-ar.medi.hah2];
+# First substitute all glyphs before hah with an alternate ones
+lookup rlig_hah_medi_l1 {
+    lookupflag IgnoreMarks;
+    rsub [@medi.l0.full lam-ar.init tah-ar.init]' [hah-ar.medi hah-ar.fina @medi.l1.full] by [@medi.l1.full lam-ar.init.hah1 tah-ar.init.hah1];
+} rlig_hah_medi_l1;
+
+# Then substitute all glyphs before another hah with an alternate ones
+lookup rlig_hah_medi_l2 {
+    lookupflag IgnoreMarks;
+    rsub [@medi.l1.full lam-ar.init.hah1 tah-ar.init.hah1]' [hah-ar.medi.l1 @medi.l2.full] by [@medi.l2.full lam-ar.init.hah2 tah-ar.init.hah2];
+} rlig_hah_medi_l2;
+
+# Substitute signle initial glyphs before hah with alternate ones
+lookup above_hah {
+    sub lam-ar.init.hah1 by lam-ar.init.hah1.alt;
+    sub behDotless-ar.init by behDotless-ar.init.hah;
+    sub hah-ar.medi by hah-ar.medi.alt;
+    sub hah-ar.medi.l1 by hah-ar.medi.hah.alt;
+    sub hah-ar.medi.l2 by hah-ar.medi.hah.alt;
+    sub hah-ar.fina by hah-ar.fina.alt;
+} above_hah;
+
+lookup above_hah1 {
+    sub lam-ar.init.hah2 by lam-ar.init.hah2.alt;
+    sub behDotless-ar.init by behDotless-ar.init.hah;
+} above_hah1;
+
+lookup rlig_hah_init {
+    lookupflag IgnoreMarks;
+    sub [fehDotless-ar.init ain-ar.init hah-ar.init hah-ar.medi.l1 hah-ar.medi.l2]' [hah-ar.medi hah-ar.medi.l1 hah-ar.medi.l2 hah-ar.fina] by [fehDotless-ar.init.hah ain-ar.init.hah hah-ar.init.hah hah-ar.medi.hah hah-ar.medi.hah];
+    sub [behDotless-ar.init lam-ar.init.hah1]' lookup above_hah [hah-ar.medi hah-ar.medi.l1 hah-ar.medi.l2 hah-ar.fina]' lookup above_hah;
+    sub [behDotless-ar.init lam-ar.init.hah2]' lookup above_hah1 [hah-ar.medi.l1 hah-ar.medi.l2]' lookup above_hah;
+} rlig_hah_init;
+
+# Some of the alternates are superflous but we needed them as context, not any more.
+# Replace them back with the original glyphs.
+lookup rlig_hah_cleanup {
+    sub @medi.l1 by @medi.l0;
+    sub @medi.l2 by @medi.l0;
+} rlig_hah_cleanup;
+
+# Prefix: ligatures
+lookup rlig_ligatures_1 {
+    lookupflag IgnoreMarks;
+    sub lam-ar.init alef-ar.fina by lam_alef-ar;
+    sub lam-ar.medi alef-ar.fina by lam_alef-ar.fina;
+    sub fehDotless-ar.init alef-ar.fina by fehDotless_alef-ar;
+    sub lam-ar.init lam-ar.medi heh-ar.fina by lam_lam_heh-ar;
+} rlig_ligatures_1;
+
+lookup rlig_ligatures_2 {
+    lookupflag UseMarkFilteringSet [@dotsbelow kasra-ar kasratan-ar];
+    sub seen-ar.init alefMaksura-ar.fina by seen_alefMaksura-ar;
+    sub seen-ar.medi alefMaksura-ar.fina by seen_alefMaksura-ar.fina;
+} rlig_ligatures_2;
+
+# Prefix: teeth
+lookup high_beh {
+    sub behDotless-ar.init by behDotless-ar.init.high;
+    sub behDotless-ar.medi by behDotless-ar.medi.high;
+} high_beh;
+
+lookup med_beh {
+    sub behDotless-ar.init by behDotless-ar.init.med;
+    sub behDotless-ar.medi by behDotless-ar.medi.med;
+} med_beh;
+
+lookup low_seen {
+    sub seen-ar.medi by seen-ar.medi.low;
+    sub seen-ar.fina by seen-ar.fina.low;
+} low_seen;
+
+lookup rlig_teeth_1 {
+    lookupflag IgnoreMarks;
+    sub [behDotless-ar.init behDotless-ar.medi]' [behDotless-ar.medi]' lookup high_beh [seen_alefMaksura-ar.fina];
+    sub [behDotless-ar.init behDotless-ar.medi]' lookup high_beh [seen_alefMaksura-ar.fina];
+} rlig_teeth_1;
+
+lookup rlig_teeth_2 {
+    lookupflag IgnoreMarks;
+    rsub [behDotless-ar.init behDotless-ar.medi]' [behDotless-ar.medi behDotless-ar.fina] by [behDotless-ar.init.high behDotless-ar.medi.high];
+} rlig_teeth_2;
+
+lookup rlig_teeth_3 {
+    lookupflag IgnoreMarks;
+    ignore sub [behDotless-ar.init.high behDotless-ar.medi.high] [behDotless-ar.init behDotless-ar.medi]' [ain-ar.medi ain-ar.fina heh-ar.fina heh-ar.medi];
+    sub [behDotless-ar.init behDotless-ar.medi]' lookup high_beh [ain-ar.medi ain-ar.fina];
+    sub behDotless-ar.init' lookup high_beh heh-ar.fina;
+    sub [behDotless-ar.init behDotless-ar.medi]' lookup med_beh [heh-ar.medi heh-ar.fina];
+    sub [behDotless-ar.init behDotless-ar.medi]' lookup med_beh [seen-ar.medi seen-ar.fina]' lookup low_seen;
+    sub [fehDotless-ar.medi meem-ar.init meem-ar.medi hah-ar.init hah-ar.medi] [seen-ar.medi seen-ar.fina]' lookup low_seen;
+} rlig_teeth_3;
+
+# Prefix: misc
+lookup tooth_rounded {
+    sub behDotless-ar.medi by behDotless-ar.medi.round;
+    sub lam-ar.medi by lam-ar.medi.round;
+    sub lam-ar.medi.short by lam-ar.medi.round.short;
+    sub lam-ar.medi.hah1 by lam-ar.medi.hah1.round;
+    sub lam-ar.medi.hah2 by lam-ar.medi.hah2.round;
+} tooth_rounded;
+
+lookup tooth_yeh {
+    sub [alefMaksura-ar.fina alefMaksura-ar.fina.salt] by alefMaksura-ar.fina.tooth;
+} tooth_yeh;
+
+lookup wide_yeh {
+    sub alefMaksura-ar.fina by alefMaksura-ar.fina.wide;
+    sub fehDotless-ar.init by fehDotless-ar.init.yeh;
+} wide_yeh;
+
+lookup rlig_wide_yeh {
+    lookupflag IgnoreMarks;
+    sub [behDotless-ar.init lam-ar.init fehDotless-ar.init]' lookup wide_yeh [alefMaksura-ar.fina yehbarree-ar.fina]' lookup wide_yeh;
+} rlig_wide_yeh;
+
+@dots = [dotabove-ar dotabove-ar.beh dotabove-ar.reh dotbelow-ar twodotsverticalabove-ar twodotsverticalabove-ar.beh twodotsverticalabove-ar.vert twodotsverticalabove-ar.vert.beh twodotsverticalbelow-ar threedotsupabove-ar threedotsupabove-ar.beh threedotsupabove-ar.vert threedotsupabove-ar.vert.beh threedotsdownbelow-ar threedotshorizontalabove-ar threedotshorizontalabove-ar.1 threedotshorizontalabove-ar.2 threedotshorizontalabove-ar.3 threedotshorizontalabove-ar.4 threedotshorizontalabove-ar.5];
+lookup ss01_dots {
+    sub @dots by dummy.mark;
+} ss01_dots;
+
+lookup ss01_cleanup {
+    sub dummy.mark by NULL;
+} ss01_cleanup;
+
+lookup salt_1 {
+    sub alefMaksura-ar from [alefMaksura-ar.salt yehbarree-ar];
+    sub alefMaksura-ar.fina from [alefMaksura-ar.fina.salt yehbarree-ar.fina];
+    sub alefMaksura-ar.fina.wide from [alefMaksura-ar.fina.wide.salt yehbarree-ar.fina];
+} salt_1;
+
+@beforeyehtooth = [behDotless-ar.medi lam-ar.medi lam-ar.medi.short];
+lookup rclt_tooth_yeh {
+    lookupflag UseMarkFilteringSet [@dotsbelow kasra-ar kasratan-ar];
+    ignore sub [behDotless-ar.init.high behDotless-ar.medi.high]' @dotsbelow' @beforeyehtooth';
+    sub @beforeyehtooth' lookup tooth_rounded [alefMaksura-ar.fina alefMaksura-ar.fina.salt]' lookup tooth_yeh;
+} rclt_tooth_yeh;
+
+lookup rounded {
+    sub meem-ar.init by meem-ar.init.round;
+    sub meem-ar.medi by meem-ar.medi.round;
+    sub meem-ar.fina by meem-ar.fina.round;
+    sub waw-ar.fina by waw-ar.fina.round;
+    sub heh-ar.init by heh-ar.init.round;
+} rounded;
+
+lookup rounded2 {
+    sub meem-ar.medi by meem-ar.medi.round2;
+    sub meem-ar.medi.round by meem-ar.medi.round3;
+    sub heh-ar.medi by heh-ar.medi.round;
+} rounded2;
+
+lookup short_lam {
+    sub lam-ar.fina by lam-ar.fina.short;
+    sub lam-ar.medi by lam-ar.medi.short;
+    sub lam-ar.medi.round by lam-ar.medi.round.short;
+    sub alef-ar.fina by alef-ar.fina.short;
+    sub lam-ar by lam-ar.short;
+    sub lam-ar.init by lam-ar.init.short;
+} short_lam;
+
+lookup yehbarree_baseline {
+    sub yehbarree-ar.fina by yehbarree-ar.fina.baseline;
+    sub lam-ar.init by lam-ar.init.hah1;
+    sub tah-ar.init by tah-ar.init.hah1;
+} yehbarree_baseline;
+
+lookup rclt_yehbarree_baseline {
+    lookupflag IgnoreMarks;
+    sub @init' lookup yehbarree_baseline yehbarree-ar.fina' lookup yehbarree_baseline;
+} rclt_yehbarree_baseline;
+
+@aftermeem = [meem-ar.medi meem-ar.fina waw-ar.fina reh-ar.fina noonghunna-ar.fina];
+lookup rlig_3 {
+    lookupflag IgnoreMarks;
+    sub [behDotless-ar.medi lam-ar.medi lam-ar.medi.hah1 lam-ar.medi.hah2]' lookup tooth_rounded [meem-ar.medi meem-ar.fina noonghunna-ar.fina]' lookup rounded;
+    sub [meem-ar.init heh-ar.init]' lookup rounded @aftermeem' lookup rounded;
+    sub [meem-ar.medi heh-ar.medi]' lookup rounded2 @aftermeem' lookup rounded;
+} rlig_3;
+
+lookup rlig_4 {
+    lookupflag IgnoreMarks;
+    sub [lam-ar.init lam-ar.medi tah-ar.init tah-ar.medi] [lam-ar.medi lam-ar.medi.round lam-ar.fina alef-ar.fina]' lookup short_lam;
+    sub [meem-ar.medi.round]' lookup rounded2 @aftermeem' lookup rounded;
+} rlig_4;
+
+lookup rlig_short_lam_2 {
+    lookupflag IgnoreMarks;
+    ignore sub [alef-ar alef-ar.fina fehDotless_alef-ar] [lam-ar lam-ar.init]' [lam-ar.medi.short lam-ar.medi.round.short lam-ar.fina.short];
+    sub [alef-ar alef-ar.fina fehDotless_alef-ar] [lam-ar lam-ar.init]' lookup short_lam;
+} rlig_short_lam_2;
+
+# Prefix: dots
+lookup rclt_fathatan {
+    lookupflag UseMarkFilteringSet [fathatan-ar];
+    sub [kaf-ar kaf-ar.fina] fathatan-ar' lookup vertical_vowels;
+} rclt_fathatan;
+
+lookup rclt_kasratan {
+    lookupflag UseMarkFilteringSet [kasratan-ar];
+    sub [seen-ar seen-ar.fina seen-ar.fina.low noonghunna-ar noonghunna-ar.fina lam-ar lam-ar.fina lam-ar.fina.short alefMaksura-ar.salt alefMaksura-ar.fina.salt alefMaksura-ar.fina.wide.salt] kasratan-ar' lookup vertical_vowels;
+} rclt_kasratan;
+
+lookup rlig_sheen_dots {
+    lookupflag UseMarkFilteringSet [threedotshorizontalabove-ar];
+    sub [seen-ar.medi] [threedotshorizontalabove-ar]' by [threedotshorizontalabove-ar.1];
+    sub [seen-ar.medi.low] [threedotshorizontalabove-ar]' by [threedotshorizontalabove-ar.2];
+    sub [seen_alefMaksura-ar seen_alefMaksura-ar.fina] [threedotshorizontalabove-ar]' by [threedotshorizontalabove-ar.3];
+    sub [seen-ar seen-ar.fina] [threedotshorizontalabove-ar]' by [threedotshorizontalabove-ar.4];
+    sub [seen-ar.fina.low] [threedotshorizontalabove-ar]' by [threedotshorizontalabove-ar.5];
+} rlig_sheen_dots;
+
+@beh1_dots = [dotabove-ar twodotsverticalabove-ar threedotsupabove-ar twodotsverticalabove-ar.vert threedotsupabove-ar.vert];
+lookup rlig_beh_dots {
+    lookupflag UseMarkFilteringSet @beh1_dots;
+    sub [behDotless-ar.medi behDotless-ar.medi.med behDotless-ar.medi.high behDotless-ar.medi.round behDotless-ar.init.high behDotless-ar.init.hah] @beh1_dots' by [dotabove-ar.beh twodotsverticalabove-ar.beh threedotsupabove-ar.beh twodotsverticalabove-ar.vert.beh threedotsupabove-ar.vert.beh];
+} rlig_beh_dots;
+
+# Prefix: connections
+@beh = [behDotless-ar.medi behDotless-ar.medi.med behDotless-ar.medi.high behDotless-ar.init behDotless-ar.init.med behDotless-ar.init.high];
+@hah = [hah-ar.init hah-ar.medi hah-ar.medi.alt];
+@seen = [seen-ar.init seen-ar.medi seen-ar.medi.low];
+@sad = [sad-ar.init sad-ar.medi tah-ar.medi tah-ar.medi.hah1 tah-ar.medi.hah2 tah-ar.init tah-ar.init.hah1 tah-ar.init.hah2];
+@ain = [ain-ar.init ain-ar.medi];
+@feh = [fehDotless-ar.init fehDotless-ar.medi];
+@lam = [lam-ar.medi lam-ar.medi.hah1 lam-ar.medi.hah2 lam-ar.medi.short lam-ar.init lam-ar.init.hah1 lam-ar.init.hah2 lam-ar.init.short];
+@meem = [meem-ar.init meem-ar.medi meem-ar.medi.round];
+@heh = [heh-ar.init heh-ar.medi];
+@before_beh1 = [@beh @seen @sad @lam @meem];
+@before_beh = [@before_beh1 @hah @ain @feh @heh kashida-ar];
+lookup before_beh {
+    sub @before_beh1 by @before_beh1 _c.seen.beh;
+    sub @heh by @heh _c.feh.medi.beh;
+    sub @hah by @hah _c.hah.beh;
+    sub @ain by @ain [_c.ain.init.beh _c.ain.medi.beh];
+    sub @feh by @feh [_c.feh.init.beh _c.feh.medi.beh];
+    sub kashida-ar by kashida-ar _c.ain.init.beh;
+    sub alef-ar.fina by alef-ar.fina.kashida;
+    sub lam-ar.medi.round by lam-ar.medi.round.kashida;
+    sub behDotless-ar.medi.round by behDotless-ar.medi.round.kashida;
+} before_beh;
+
+lookup before_dal {
+    sub @feh by @feh [_c.feh.init.dal _c.feh.medi.dal];
+    sub @hah by @hah _c.hah.dal;
+    sub @ain by @ain _c.ain.dal;
+} before_dal;
+
+@before_reh = [@hah @ain fehDotless-ar.medi kashida-ar];
+lookup before_reh {
+    sub @hah by @hah _c.hah.reh;
+    sub @ain by @ain [_c.hah.reh _c.ain.medi.reh];
+    sub fehDotless-ar.medi by fehDotless-ar.medi _c.feh.medi.reh;
+    sub kashida-ar by kashida-ar _c.hah.reh;
+} before_reh;
+
+lookup before_meem {
+    sub fehDotless-ar.medi by fehDotless-ar.medi _c.feh.medi.meem;
+    sub @seen by @seen _c.seen.meem;
+    sub [@hah @ain] by [@hah @ain] _c.ain.meem;
+    sub kashida-ar by kashida-ar _c.ain.meem;
+} before_meem;
+
+@before_noon = [@hah @seen @ain fehDotless-ar.init fehDotless-ar.medi kashida-ar];
+lookup before_noon {
+    sub @before_noon by @before_noon _c.hah.noon;
+} before_noon;
+
+lookup before_waw {
+    sub fehDotless-ar.medi by fehDotless-ar.medi _c.feh.medi.waw;
+} before_waw;
+
+@before_yeh = [@hah @ain kashida-ar];
+lookup before_yeh {
+    sub @before_yeh by @before_yeh _c.ain.yeh;
+} before_yeh;
+
+lookup rclt_connection {
+    lookupflag IgnoreMarks;
+    ignore sub [kaf-ar.init kaf-ar.medi]' kashida-ar;
+    sub [kaf-ar.init kaf-ar.medi]' by [kaf-ar.init.alt kaf-ar.medi.alt];
+    sub [kashida-ar]' [alef-ar.fina behDotless-ar.medi.round lam-ar.medi.round]' lookup before_beh;
+    sub @before_beh' lookup before_beh [alef-ar.fina alef-ar.fina.short behDotless-ar.fina behDotless-ar.medi behDotless-ar.medi.med behDotless-ar.medi.high behDotless-ar.medi.round seen-ar.fina seen-ar.fina.low seen-ar.medi seen-ar.medi.low ain-ar.fina ain-ar.medi lam-ar.fina lam-ar.fina.short lam-ar.medi lam-ar.medi.hah1 lam-ar.medi.hah1.round lam-ar.medi.hah2 lam-ar.medi.hah2.round lam-ar.medi.round lam-ar.medi.round.short lam-ar.medi.short heh-ar.fina heh-ar.medi heh-ar.medi.round seen_alefMaksura-ar.fina fehDotless-ar.medi fehDotless-ar.fina];
+    sub [@hah @ain fehDotless-ar.medi]' lookup before_dal [dal-ar.fina sad-ar.medi sad-ar.fina tah-ar.medi tah-ar.medi.hah1 tah-ar.medi.hah2 tah-ar.fina kaf-ar.medi kaf-ar.fina];
+    sub fehDotless-ar.init' lookup before_dal [dal-ar.fina sad-ar.medi sad-ar.fina tah-ar.medi tah-ar.medi.hah1 tah-ar.medi.hah2 tah-ar.fina kaf-ar.medi kaf-ar.fina qafDotless-ar.fina waw-ar.fina meem-ar.medi meem-ar.medi.round2 meem-ar.fina];
+    sub fehDotless-ar.medi' lookup before_reh yehbarree-ar.fina;
+    sub @before_reh' lookup before_reh reh-ar.fina;
+    sub [@seen @hah @ain fehDotless-ar.medi kashida-ar]' lookup before_meem [qafDotless-ar.fina meem-ar.medi meem-ar.medi.round2 meem-ar.fina];
+    sub @before_reh' lookup before_meem waw-ar.fina;
+    sub fehDotless-ar.medi' lookup before_meem [alefMaksura-ar.fina alefMaksura-ar.fina.salt];
+    sub @before_noon' lookup before_noon noonghunna-ar.fina;
+    sub fehDotless-ar.medi' lookup before_waw waw-ar.fina;
+    sub fehDotless-ar.init' lookup wide_yeh reh-ar.fina;
+    sub @before_yeh' lookup before_yeh [alefMaksura-ar.fina alefMaksura-ar.fina.salt yehbarree-ar.fina yehbarree-ar.fina.baseline];
+    sub [_c.feh.medi.waw _c.ain.meem] waw-ar.fina' lookup rounded;
+} rclt_connection;
+
+# Prefix: variations
+conditionset compact {
+    SPAC -100 -95;
+} compact;
+
+variation ccmp compact {
+    lookup ccmp_space;
+} ccmp;
+
+variation rlig compact {
+    lookup rlig_short_lam_2;
+} rlig;
+
+feature ccmp {
+    lookup ccmp_1;
+    lookup ccmp_hamza_1;
+    lookup ccmp_hamza_2;
+    lookup ccmp_hamza_3;
+    lookup ccmp_vertical_vowels;
+    lookup ccmp_kashida;
+    lookup ccmp_ayah_numbers;
+    lookup ccmp_ayah_10;
+    lookup ccmp_ayah_cleanup_1;
+    lookup ccmp_ayah_cleanup_2;
+} ccmp;
+
+feature isol {
+    lookup isol;
+} isol;
+
+feature init {
+    lookup init;
+} init;
+
+feature medi {
+    lookup medi;
+} medi;
+
+feature fina {
+    lookup fina;
+} fina;
+
+feature rlig {
+    lookup rlig_hah_medi_l1;
+    lookup rlig_hah_medi_l2;
+    lookup rlig_hah_init;
+    lookup rlig_hah_cleanup;
+    lookup rlig_vertical_dots;
+    lookup rlig_teeth_1;
+    lookup rlig_teeth_2;
+    lookup rlig_teeth_3;
+    lookup rlig_wide_yeh;
+    lookup rlig_ligatures_1;
+    lookup rlig_ligatures_2;
+    lookup rlig_3;
+    lookup rlig_4;
+    lookup rlig_sheen_dots;
+    lookup rlig_beh_dots;
+} rlig;
+
+feature rclt {
+    lookup rclt_tooth_yeh;
+    lookup rclt_yehbarree_baseline;
+    lookup rclt_connection;
+    lookup rclt_fathatan;
+    lookup rclt_kasratan;
+} rclt;
+
+feature ss01 {
+        featureNames {
+        name "Dot-less Letter Forms";
+        name 3 1 3073 "حروف مهملة (بلا نقاط)";
+    };
+
+    lookup ss01_dots;
+    lookup ss01_cleanup;
+} ss01;
+
+feature curs {
+    # Automatic Code
+} curs;
+
+feature kern {
+    lookup spacing {
+        lookupflag IgnoreMarks;
+        pos [@isol @fina] [@init @isol] <(SPAC=0:400 SPAC=-100:20 SPAC=125:500) 0 (SPAC=0:400 SPAC=-100:20 SPAC=125:500) 0>;
+    } spacing;
+
+    # Automatic Code
+    @beh.init = [behDotless-ar.init behDotless-ar.init.hah behDotless-ar.init.med behDotless-ar.init.high lam-ar.init lam-ar.init.hah1 lam-ar.init.hah1.alt lam-ar.init.hah2 lam-ar.init.hah2.alt lam-ar.init.short];
+    @beh.medi = [behDotless-ar.medi behDotless-ar.medi.med behDotless-ar.medi.high behDotless-ar.medi.round behDotless-ar.medi.round.kashida lam-ar.medi lam-ar.medi.hah1 lam-ar.medi.hah1.round lam-ar.medi.hah2 lam-ar.medi.hah2.round lam-ar.medi.round lam-ar.medi.round.kashida lam-ar.medi.round.short lam-ar.medi.short behDotless-ar.medi.l1 behDotless-ar.medi.l2];
+    @sad.init = [sad-ar.init tah-ar.init tah-ar.init.hah1 tah-ar.init.hah2 kaf-ar.init kaf-ar.init.alt];
+    @sad.medi = [sad-ar.medi tah-ar.medi tah-ar.medi.hah1 tah-ar.medi.hah2 kaf-ar.medi kaf-ar.medi.alt sad-ar.medi.l1 kaf-ar.medi.l1 sad-ar.medi.l2 kaf-ar.medi.l2];
+    @hah.init = [hah-ar.init hah-ar.init.hah];
+    @hah.medi = [hah-ar.medi hah-ar.medi.alt hah-ar.medi.hah hah-ar.medi.hah.alt hah-ar.medi.l1 hah-ar.medi.l2];
+    @seen.medi = [seen-ar.medi seen-ar.medi.low seen-ar.medi.l1 seen-ar.medi.l2];
+    @yeh.fina = [alefMaksura-ar.fina alefMaksura-ar.fina.salt];
+    @hah.fina = [hah-ar.fina];
+    # THIS FILE IS AUTO GENERATED, DO NOT EDIT
+    lookup overhang {
+        lookupflag IgnoreMarks;
+        pos @beh.init' 410 hah-ar.fina.alt';
+        pos seen-ar.init' 90 @hah.fina';
+        pos fehDotless-ar.init.hah' 140 @hah.fina';
+        pos heh-ar.init' 100 @hah.fina';
+        pos @beh.init' 210 _c.seen.beh' @beh.medi' @hah.fina';
+        pos @beh.init' 110 _c.seen.beh' ain-ar.medi' @hah.fina';
+        pos @beh.init' 80 _c.seen.beh' @beh.medi' _c.seen.beh' @beh.medi' @hah.fina';
+        pos @beh.init' 410 @hah.medi';
+        pos seen-ar.init' 90 @hah.medi';
+        pos fehDotless-ar.init.hah' 140 @hah.medi';
+        pos heh-ar.init' 100 @hah.medi';
+        pos @beh.init' 210 _c.seen.beh' @beh.medi' @hah.medi';
+        pos @beh.init' 110 _c.seen.beh' ain-ar.medi' @hah.medi';
+        pos @beh.init' 80 _c.seen.beh' @beh.medi' _c.seen.beh' @beh.medi' @hah.medi';
+        pos @beh.init' (MSHQ=10:640 MSHQ=100:5571) yehbarree-ar.fina.baseline';
+        pos @hah.init' (MSHQ=10:50 MSHQ=100:4981) _c.ain.yeh' yehbarree-ar.fina.baseline';
+        pos seen-ar.init' (MSHQ=10:390 MSHQ=100:5321) yehbarree-ar.fina.baseline';
+        pos ain-ar.init' (MSHQ=10:70 MSHQ=100:5001) _c.ain.yeh' yehbarree-ar.fina.baseline';
+        pos fehDotless-ar.init.yeh' (MSHQ=10:440 MSHQ=100:5371) yehbarree-ar.fina.baseline';
+        pos meem-ar.init' (MSHQ=10:350 MSHQ=100:5281) yehbarree-ar.fina.baseline';
+        pos heh-ar.init' (MSHQ=10:410 MSHQ=100:5341) yehbarree-ar.fina.baseline';
+        pos @beh.init' (MSHQ=10:510 MSHQ=100:5441) _c.seen.beh' @beh.medi' yehbarree-ar.fina';
+        pos @beh.init' (MSHQ=10:460 MSHQ=100:5391) @hah.medi' _c.ain.yeh' yehbarree-ar.fina';
+        pos @beh.init' (MSHQ=10:230 MSHQ=100:5161) _c.seen.beh' @seen.medi' yehbarree-ar.fina';
+        pos @beh.init' (MSHQ=10:410 MSHQ=100:5341) _c.seen.beh' ain-ar.medi' _c.ain.yeh' yehbarree-ar.fina';
+        pos @beh.init' (MSHQ=10:220 MSHQ=100:5151) _c.seen.beh' fehDotless-ar.medi' _c.feh.medi.reh' yehbarree-ar.fina';
+        pos @beh.init' (MSHQ=10:260 MSHQ=100:5191) meem-ar.medi' yehbarree-ar.fina';
+        pos @beh.init' (MSHQ=10:280 MSHQ=100:5211) _c.seen.beh' heh-ar.medi' yehbarree-ar.fina';
+        pos seen-ar.init' (MSHQ=10:270 MSHQ=100:5201) _c.seen.beh' @beh.medi' yehbarree-ar.fina';
+        pos seen-ar.init' (MSHQ=10:250 MSHQ=100:5181) @hah.medi' _c.ain.yeh' yehbarree-ar.fina';
+        pos seen-ar.init' (MSHQ=10:160 MSHQ=100:5091) _c.seen.beh' ain-ar.medi' _c.ain.yeh' yehbarree-ar.fina';
+        pos fehDotless-ar.init' (MSHQ=10:140 MSHQ=100:5071) _c.feh.init.beh' @beh.medi' yehbarree-ar.fina';
+        pos fehDotless-ar.init.hah' (MSHQ=10:300 MSHQ=100:5231) @hah.medi' _c.ain.yeh' yehbarree-ar.fina';
+        pos meem-ar.init' (MSHQ=10:220 MSHQ=100:5151) _c.seen.beh' @beh.medi' yehbarree-ar.fina';
+        pos meem-ar.init' (MSHQ=10:200 MSHQ=100:5131) @hah.medi' _c.ain.yeh' yehbarree-ar.fina';
+        pos meem-ar.init' (MSHQ=10:110 MSHQ=100:5041) _c.seen.beh' ain-ar.medi' _c.ain.yeh' yehbarree-ar.fina';
+        pos heh-ar.init' (MSHQ=10:280 MSHQ=100:5211) _c.feh.medi.beh' @beh.medi' yehbarree-ar.fina';
+        pos heh-ar.init' (MSHQ=10:260 MSHQ=100:5191) @hah.medi' _c.ain.yeh' yehbarree-ar.fina';
+        pos heh-ar.init' (MSHQ=10:180 MSHQ=100:5111) _c.feh.medi.beh' ain-ar.medi' _c.ain.yeh' yehbarree-ar.fina';
+        pos heh-ar.init' (MSHQ=10:50 MSHQ=100:4981) _c.feh.medi.beh' heh-ar.medi' yehbarree-ar.fina';
+        pos @beh.init' (MSHQ=10:390 MSHQ=100:5321) _c.seen.beh' @beh.medi' _c.seen.beh' @beh.medi' yehbarree-ar.fina';
+        pos @beh.init' (MSHQ=10:370 MSHQ=100:5301) _c.seen.beh' @beh.medi' @hah.medi' _c.ain.yeh' yehbarree-ar.fina';
+        pos @beh.init' (MSHQ=10:100 MSHQ=100:5031) _c.seen.beh' @beh.medi' _c.seen.beh' @seen.medi' yehbarree-ar.fina';
+        pos @beh.init' (MSHQ=10:280 MSHQ=100:5211) _c.seen.beh' @beh.medi' _c.seen.beh' ain-ar.medi' _c.ain.yeh' yehbarree-ar.fina';
+        pos @beh.init' (MSHQ=10:90 MSHQ=100:5021) _c.seen.beh' @beh.medi' _c.seen.beh' fehDotless-ar.medi' _c.feh.medi.reh' yehbarree-ar.fina';
+        pos @beh.init' (MSHQ=10:110 MSHQ=100:5041) _c.seen.beh' @beh.medi' meem-ar.medi.round' yehbarree-ar.fina';
+        pos @beh.init' (MSHQ=10:160 MSHQ=100:5091) _c.seen.beh' @beh.medi' _c.seen.beh' heh-ar.medi' yehbarree-ar.fina';
+        pos @beh.init' (MSHQ=10:100 MSHQ=100:5031) _c.seen.beh' @seen.medi' _c.seen.beh' @beh.medi' yehbarree-ar.fina';
+        pos @beh.init' (MSHQ=10:80 MSHQ=100:5011) _c.seen.beh' @seen.medi' @hah.medi' _c.ain.yeh' yehbarree-ar.fina';
+        pos @beh.init' (MSHQ=10:230 MSHQ=100:5161) _c.seen.beh' ain-ar.medi' _c.ain.medi.beh' @beh.medi' yehbarree-ar.fina';
+        pos @beh.init' (MSHQ=10:270 MSHQ=100:5201) _c.seen.beh' ain-ar.medi' @hah.medi' _c.ain.yeh' yehbarree-ar.fina';
+        pos @beh.init' (MSHQ=10:120 MSHQ=100:5051) _c.seen.beh' ain-ar.medi' _c.ain.medi.beh' ain-ar.medi' _c.ain.yeh' yehbarree-ar.fina';
+        pos @beh.init' (MSHQ=10:140 MSHQ=100:5071) _c.seen.beh' fehDotless-ar.medi' _c.feh.medi.beh' @beh.medi' yehbarree-ar.fina';
+        pos @beh.init' (MSHQ=10:120 MSHQ=100:5051) _c.seen.beh' fehDotless-ar.medi' @hah.medi' _c.ain.yeh' yehbarree-ar.fina';
+        pos @beh.init' (MSHQ=10:130 MSHQ=100:5061) meem-ar.medi' _c.seen.beh' @beh.medi' yehbarree-ar.fina';
+        pos @beh.init' (MSHQ=10:110 MSHQ=100:5041) meem-ar.medi' @hah.medi' _c.ain.yeh' yehbarree-ar.fina';
+        pos @beh.init' (MSHQ=10:160 MSHQ=100:5091) _c.seen.beh' heh-ar.medi' _c.feh.medi.beh' @beh.medi' yehbarree-ar.fina';
+        pos @beh.init' (MSHQ=10:140 MSHQ=100:5071) _c.seen.beh' heh-ar.medi' @hah.medi' _c.ain.yeh' yehbarree-ar.fina';
+        pos @beh.init' (MSHQ=10:50 MSHQ=100:4981) _c.seen.beh' heh-ar.medi' _c.feh.medi.beh' ain-ar.medi' _c.ain.yeh' yehbarree-ar.fina';
+        pos seen-ar.init' (MSHQ=10:140 MSHQ=100:5071) _c.seen.beh' @beh.medi' _c.seen.beh' @beh.medi' yehbarree-ar.fina';
+        pos seen-ar.init' (MSHQ=10:120 MSHQ=100:5051) _c.seen.beh' @beh.medi' @hah.medi' _c.ain.yeh' yehbarree-ar.fina';
+        pos meem-ar.init' (MSHQ=10:90 MSHQ=100:5021) _c.seen.beh' @beh.medi' _c.seen.beh' @beh.medi' yehbarree-ar.fina';
+        pos meem-ar.init' (MSHQ=10:70 MSHQ=100:5001) _c.seen.beh' @beh.medi' @hah.medi' _c.ain.yeh' yehbarree-ar.fina';
+        pos heh-ar.init' (MSHQ=10:160 MSHQ=100:5091) _c.feh.medi.beh' @beh.medi' _c.seen.beh' @beh.medi' yehbarree-ar.fina';
+        pos heh-ar.init' (MSHQ=10:140 MSHQ=100:5071) _c.feh.medi.beh' @beh.medi' @hah.medi' _c.ain.yeh' yehbarree-ar.fina';
+        pos heh-ar.init' (MSHQ=10:50 MSHQ=100:4981) _c.feh.medi.beh' @beh.medi' _c.seen.beh' ain-ar.medi' _c.ain.yeh' yehbarree-ar.fina';
+        pos @beh.init' (MSHQ=10:260 MSHQ=100:5191) _c.seen.beh' @beh.medi' _c.seen.beh' @beh.medi' _c.seen.beh' @beh.medi' yehbarree-ar.fina';
+        pos @beh.init' (MSHQ=10:240 MSHQ=100:5171) _c.seen.beh' @beh.medi' _c.seen.beh' @beh.medi' @hah.medi' _c.ain.yeh' yehbarree-ar.fina';
+        pos @beh.init' (MSHQ=10:150 MSHQ=100:5081) _c.seen.beh' @beh.medi' _c.seen.beh' @beh.medi' _c.seen.beh' ain-ar.medi' _c.ain.yeh' yehbarree-ar.fina';
+        pos @beh.init' (MSHQ=10:100 MSHQ=100:5031) _c.seen.beh' @beh.medi' _c.seen.beh' ain-ar.medi' _c.ain.medi.beh' @beh.medi' yehbarree-ar.fina';
+        pos @beh.init' (MSHQ=10:150 MSHQ=100:5081) _c.seen.beh' @beh.medi' _c.seen.beh' ain-ar.medi' @hah.medi' _c.ain.yeh' yehbarree-ar.fina';
+        pos @beh.init' (MSHQ=10:100 MSHQ=100:5031) _c.seen.beh' ain-ar.medi' _c.ain.medi.beh' @beh.medi' _c.seen.beh' @beh.medi' yehbarree-ar.fina';
+        pos @beh.init' (MSHQ=10:80 MSHQ=100:5011) _c.seen.beh' ain-ar.medi' _c.ain.medi.beh' @beh.medi' @hah.medi' _c.ain.yeh' yehbarree-ar.fina';
+        pos @beh.init' (MSHQ=10:130 MSHQ=100:5061) _c.seen.beh' @beh.medi' _c.seen.beh' @beh.medi' _c.seen.beh' @beh.medi' _c.seen.beh' @beh.medi' yehbarree-ar.fina';
+        pos @beh.init' (MSHQ=10:110 MSHQ=100:5041) _c.seen.beh' @beh.medi' _c.seen.beh' @beh.medi' _c.seen.beh' @beh.medi' @hah.medi' _c.ain.yeh' yehbarree-ar.fina';
+    } overhang;
+
+} kern;
+
+feature mark {
+    # Automatic Code
+    @behmedi = [behDotless-ar.medi behDotless-ar.medi.med behDotless-ar.medi.high behDotless-ar.medi.round behDotless-ar.medi.round.kashida behDotless-ar.medi.l1 behDotless-ar.medi.l2];
+    @behinit = [behDotless-ar.init behDotless-ar.init.hah behDotless-ar.init.med behDotless-ar.init.high];
+    lookup dots_below {
+        lookupflag UseMarkFilteringSet @dotsbelow;
+        ignore pos behDotless-ar.medi.high _c.seen.beh @dotsbelow [behDotless-ar.medi behDotless-ar.medi.round] @dotsbelow' [noonghunna-ar.fina alefMaksura-ar.fina];
+        pos [behDotless-ar.medi behDotless-ar.medi.round] @dotsbelow' <70 0 0 0> [noonghunna-ar.fina alefMaksura-ar.fina];
+        pos [hah-ar.init hah-ar.medi] _c.hah.beh @dotsbelow' <50 -20 0 0> [lam-ar.medi.hah1 lam-ar.medi.hah2 behDotless-ar.medi] [hah-ar.medi hah-ar.medi.hah hah-ar.fina];
+        pos [hah-ar.init hah-ar.medi] _c.hah.beh @dotsbelow' <150 -20 0 0> [behDotless-ar.medi] @dotsbelow [hah-ar.medi hah-ar.medi.hah hah-ar.fina];
+        pos @behmedi @dotsbelow' <395 -20 0 0> [hah-ar.medi hah-ar.medi.hah hah-ar.fina];
+        pos @behmedi _c.seen.beh @dotsbelow' <265 -20 0 0> @beh.medi [hah-ar.medi hah-ar.medi.hah hah-ar.fina];
+        pos @behmedi _c.seen.beh @dotsbelow' <15 -20 0 0> fehDotless-ar.medi [hah-ar.medi hah-ar.medi.hah hah-ar.fina];
+        pos @behmedi @dotsbelow' <0 -30 0 0> [waw-ar.fina reh-ar.fina];
+        pos @behinit [_c.seen.beh] @dotsbelow' <50 50 0 0> [behDotless-ar.medi ain-ar.medi heh-ar.medi lam-ar.medi.hah1 lam-ar.medi.hah2] [hah-ar.medi hah-ar.fina];
+        pos @behinit [_c.seen.beh] @dotsbelow' <50 50 0 0> [behDotless-ar.medi] @dotsbelow [hah-ar.medi hah-ar.fina];
+        pos @behinit [_c.seen.beh] @dotsbelow' <0 -40 0 0> [fehDotless-ar.medi] [hah-ar.medi hah-ar.fina];
+        pos behDotless-ar.init @dotsbelow' <0 -40 0 0> [meem-ar.medi] [hah-ar.medi hah-ar.fina];
+        ignore pos [behDotless-ar.init.high behDotless-ar.medi.high] _c.seen.beh behDotless-ar.medi @dotsbelow' qafDotless-ar.fina;
+        ignore pos [behDotless-ar.init.high behDotless-ar.medi.high] _c.seen.beh @dotsbelow behDotless-ar.medi @dotsbelow' qafDotless-ar.fina;
+        pos behDotless-ar.medi @dotsbelow' <150 0 0 0> qafDotless-ar.fina;
+    } dots_below;
+
+    lookup heh_dots {
+        lookupflag UseMarkFilteringSet [kasratan-ar];
+        pos heh-ar.fina kasratan-ar' <-67 0 0 0>;
+    } heh_dots;
+
+} mark;
+
+feature salt {
+    lookup salt_1;
+    sub endofayah-ar.05 by endofayah-ar.10 ayah.005;
+} salt;
+
+feature lfbd {
+    lookup optical_bounds {
+        pos endofayah-ar <-400 0 -400 0>;
+        pos endofayah-ar.05 <-400 0 -400 0>;
+        pos endofayah-ar.10 <-1117 0 -1117 0>;
+    } optical_bounds;
+
+} lfbd;
+
+feature rtbd {
+    lookup optical_bounds;
+} rtbd;

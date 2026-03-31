@@ -1,0 +1,243 @@
+{
+"name": "reh-ar",
+"sources": [
+{
+"name": "",
+"layerName": "m01",
+"locationBase": "m01"
+}
+],
+"layers": {
+"m01": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": 228,
+"y": -54,
+"smooth": true
+},
+{
+"x": 290,
+"y": -56,
+"type": "cubic"
+},
+{
+"x": 351,
+"y": -52,
+"type": "cubic"
+},
+{
+"x": 395,
+"y": -39,
+"smooth": true
+},
+{
+"x": 447,
+"y": -25,
+"type": "cubic"
+},
+{
+"x": 451,
+"y": 10,
+"type": "cubic"
+},
+{
+"x": 450,
+"y": 46,
+"smooth": true
+},
+{
+"x": 447,
+"y": 146,
+"type": "cubic"
+},
+{
+"x": 368,
+"y": 249,
+"type": "cubic"
+},
+{
+"x": 303,
+"y": 293,
+"smooth": true
+},
+{
+"x": 286,
+"y": 305,
+"type": "cubic"
+},
+{
+"x": 283,
+"y": 297,
+"type": "cubic"
+},
+{
+"x": 275,
+"y": 289,
+"smooth": true
+},
+{
+"x": 248,
+"y": 262,
+"type": "cubic"
+},
+{
+"x": 171,
+"y": 166,
+"type": "cubic"
+},
+{
+"x": 133,
+"y": 129,
+"smooth": true
+},
+{
+"x": 125,
+"y": 122,
+"type": "cubic"
+},
+{
+"x": 122,
+"y": 109,
+"type": "cubic"
+},
+{
+"x": 137,
+"y": 101,
+"smooth": true
+},
+{
+"x": 182,
+"y": 77,
+"type": "cubic"
+},
+{
+"x": 270,
+"y": 72,
+"type": "cubic"
+},
+{
+"x": 319,
+"y": 74,
+"smooth": true
+},
+{
+"x": 327,
+"y": 74,
+"type": "cubic"
+},
+{
+"x": 330,
+"y": 61,
+"type": "cubic"
+},
+{
+"x": 320,
+"y": 60,
+"smooth": true
+},
+{
+"x": 274,
+"y": 54,
+"type": "cubic"
+},
+{
+"x": 171,
+"y": 61,
+"type": "cubic"
+},
+{
+"x": 107,
+"y": 89,
+"smooth": true
+},
+{
+"x": 97,
+"y": 93,
+"type": "cubic"
+},
+{
+"x": 94,
+"y": 94,
+"type": "cubic"
+},
+{
+"x": 89,
+"y": 88,
+"smooth": true
+},
+{
+"x": 69,
+"y": 63,
+"type": "cubic"
+},
+{
+"x": 43,
+"y": 19,
+"type": "cubic"
+},
+{
+"x": 12,
+"y": 8,
+"smooth": true
+},
+{
+"x": -2,
+"y": 3,
+"type": "cubic"
+},
+{
+"x": -6,
+"y": -10,
+"type": "cubic"
+},
+{
+"x": 11,
+"y": -18,
+"smooth": true
+},
+{
+"x": 53,
+"y": -37,
+"type": "cubic"
+},
+{
+"x": 143,
+"y": -51,
+"type": "cubic"
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 450,
+"anchors": [
+{
+"name": "damma",
+"x": -29,
+"y": 40
+},
+{
+"name": "fatha",
+"x": 294,
+"y": 347
+},
+{
+"name": "kasra",
+"x": 333,
+"y": -95
+},
+{
+"name": "top",
+"x": 206,
+"y": 211
+}
+]
+}
+}
+}
+}

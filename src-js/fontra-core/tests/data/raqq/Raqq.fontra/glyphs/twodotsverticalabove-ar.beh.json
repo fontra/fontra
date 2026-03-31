@@ -1,0 +1,39 @@
+{
+"name": "twodotsverticalabove-ar.beh",
+"sources": [
+{
+"name": "",
+"layerName": "m01",
+"locationBase": "m01"
+}
+],
+"layers": {
+"m01": {
+"glyph": {
+"components": [
+{
+"name": "dotabove-ar.beh",
+"transformation": {
+"translateY": 19
+}
+},
+{
+"name": "dotabove-ar.beh",
+"transformation": {
+"translateX": 30,
+"translateY": -8
+}
+}
+],
+"xAdvance": 126,
+"anchors": [
+{
+"name": "_top",
+"x": 104,
+"y": 30
+}
+]
+}
+}
+}
+}
