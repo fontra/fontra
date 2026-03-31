@@ -1380,6 +1380,217 @@ table GDEF {
   );
 });
 
+describe("shaper tests compare emulation with native", () => {
+  const positionEmulationTestFontPath = join(
+    moduleDirName,
+    "data",
+    "positioning-emulation",
+    "positioning-emulation.ttf"
+  );
+  const fontData = new Uint8Array(fs.readFileSync(positionEmulationTestFontPath));
+  const nativeShaper = getShaper({ fontData });
+
+  const emulationTestData = [
+    {
+      input: "HH",
+      expectedGlyphs: [
+        {
+          codepoint: 15,
+          cluster: 0,
+          x_advance: 800,
+          y_advance: 0,
+          x_offset: 0,
+          y_offset: 0,
+          glyphname: "H_H",
+          mark: false,
+        },
+      ],
+    },
+    {
+      input: "ABC",
+      expectedGlyphs: [
+        {
+          codepoint: 1,
+          cluster: 0,
+          x_advance: 450,
+          y_advance: 0,
+          x_offset: 0,
+          y_offset: 0,
+          glyphname: "A",
+          mark: false,
+        },
+        {
+          codepoint: 2,
+          cluster: 1,
+          x_advance: 425,
+          y_advance: 0,
+          x_offset: -25,
+          y_offset: 150,
+          glyphname: "B",
+          mark: false,
+        },
+        {
+          codepoint: 3,
+          cluster: 2,
+          x_advance: 475,
+          y_advance: 0,
+          x_offset: -25,
+          y_offset: 300,
+          glyphname: "C",
+          mark: false,
+        },
+      ],
+    },
+    {
+      input: "Ḥ̄̇Ḥ̇̄",
+      expectedGlyphs: [
+        {
+          codepoint: 15,
+          cluster: 0,
+          x_advance: 800,
+          y_advance: 0,
+          x_offset: 0,
+          y_offset: 0,
+          glyphname: "H_H",
+          mark: false,
+        },
+        {
+          codepoint: 12,
+          cluster: 0,
+          x_advance: 0,
+          y_advance: 0,
+          x_offset: -650,
+          y_offset: 0,
+          glyphname: "dotbelowcomb",
+          mark: true,
+        },
+        {
+          codepoint: 14,
+          cluster: 0,
+          x_advance: 0,
+          y_advance: 0,
+          x_offset: -720,
+          y_offset: -14,
+          glyphname: "macroncomb",
+          mark: true,
+        },
+        {
+          codepoint: 13,
+          cluster: 0,
+          x_advance: 0,
+          y_advance: 0,
+          x_offset: -650,
+          y_offset: 140,
+          glyphname: "dotaccentcomb",
+          mark: true,
+        },
+        {
+          codepoint: 12,
+          cluster: 5,
+          x_advance: 0,
+          y_advance: 0,
+          x_offset: -350,
+          y_offset: 0,
+          glyphname: "dotbelowcomb",
+          mark: true,
+        },
+        {
+          codepoint: 13,
+          cluster: 5,
+          x_advance: 0,
+          y_advance: 0,
+          x_offset: -350,
+          y_offset: -10,
+          glyphname: "dotaccentcomb",
+          mark: true,
+        },
+        {
+          codepoint: 14,
+          cluster: 7,
+          x_advance: 0,
+          y_advance: 0,
+          x_offset: -420,
+          y_offset: 156,
+          glyphname: "macroncomb",
+          mark: true,
+        },
+      ],
+    },
+    {
+      input: "H̄",
+      expectedGlyphs: [
+        {
+          codepoint: 11,
+          cluster: 0,
+          x_advance: 500,
+          y_advance: 0,
+          x_offset: 0,
+          y_offset: 0,
+          glyphname: "H",
+          mark: false,
+        },
+        {
+          codepoint: 14,
+          cluster: 1,
+          x_advance: 0,
+          y_advance: 0,
+          x_offset: -420,
+          y_offset: -14,
+          glyphname: "macroncomb",
+          mark: true,
+        },
+      ],
+    },
+    {
+      input: "H̄",
+      features: "ss03",
+      expectedGlyphs: [
+        {
+          codepoint: 11,
+          cluster: 0,
+          x_advance: 500,
+          y_advance: 0,
+          x_offset: 0,
+          y_offset: 0,
+          glyphname: "H",
+          mark: false,
+        },
+        {
+          codepoint: 1,
+          cluster: 0,
+          x_advance: 500,
+          y_advance: 0,
+          x_offset: 0,
+          y_offset: 0,
+          glyphname: "A",
+          mark: false,
+        },
+        {
+          codepoint: 14,
+          cluster: 1,
+          x_advance: 0,
+          y_advance: 0,
+          x_offset: -920,
+          y_offset: -14,
+          glyphname: "macroncomb",
+          mark: true,
+        },
+      ],
+    },
+  ];
+
+  parametrize("basic emulation tests", emulationTestData, (testCase) => {
+    const testInputCodePoints = [...testCase.input].map((c) => ord(c));
+    const { glyphs } = nativeShaper.shape(testInputCodePoints, null, {
+      variations: testCase.variations,
+      features: testCase.features,
+    });
+
+    // console.log(JSON.stringify(glyphs));
+    expect(glyphs).to.deep.equal(testCase.expectedGlyphs);
+  });
+});
+
 function ord(s) {
   return s.codePointAt(0);
 }
