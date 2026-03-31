@@ -149,7 +149,7 @@ function parseCodePoints(cell) {
 }
 
 function readGlyphInfo(infoKeys, cells) {
-  info = {};
+  const info = {};
 
   for (const [i, key] of enumerate(infoKeys)) {
     const cellValue = cells[i];
