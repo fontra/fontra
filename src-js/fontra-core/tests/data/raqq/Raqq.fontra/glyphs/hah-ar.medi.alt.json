@@ -1,0 +1,39 @@
+{
+"name": "hah-ar.medi.alt",
+"sources": [
+{
+"name": "",
+"layerName": "m01",
+"locationBase": "m01"
+}
+],
+"layers": {
+"m01": {
+"glyph": {
+"components": [
+{
+"name": "hah-ar.init"
+}
+],
+"xAdvance": 703,
+"anchors": [
+{
+"name": "entry",
+"x": 135,
+"y": 135
+},
+{
+"name": "exit",
+"x": 0,
+"y": 0
+},
+{
+"name": "fatha",
+"x": 81,
+"y": 337
+}
+]
+}
+}
+}
+}

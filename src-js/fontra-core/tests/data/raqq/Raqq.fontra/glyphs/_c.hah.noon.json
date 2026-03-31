@@ -1,0 +1,64 @@
+{
+"name": "_c.hah.noon",
+"sources": [
+{
+"name": "",
+"layerName": "m01",
+"locationBase": "m01"
+}
+],
+"layers": {
+"m01": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": -42,
+"y": 26
+},
+{
+"x": 70,
+"y": 26
+},
+{
+"x": 70,
+"y": 110
+},
+{
+"x": 1,
+"y": 116,
+"type": "cubic"
+},
+{
+"x": -23,
+"y": 141,
+"type": "cubic"
+},
+{
+"x": -70,
+"y": 174
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 0,
+"anchors": [
+{
+"name": "entry",
+"x": -20,
+"y": 0
+},
+{
+"name": "exit",
+"x": 0,
+"y": 0
+}
+]
+}
+}
+}
+}

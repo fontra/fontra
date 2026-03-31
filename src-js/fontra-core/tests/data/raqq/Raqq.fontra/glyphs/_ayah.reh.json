@@ -1,0 +1,130 @@
+{
+"name": "_ayah.reh",
+"sources": [
+{
+"name": "",
+"layerName": "m01",
+"locationBase": "m01"
+}
+],
+"layers": {
+"m01": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": 162,
+"y": -16,
+"smooth": true
+},
+{
+"x": 183,
+"y": -10,
+"type": "cubic"
+},
+{
+"x": 184,
+"y": 4,
+"type": "cubic"
+},
+{
+"x": 184,
+"y": 18,
+"smooth": true
+},
+{
+"x": 183,
+"y": 58,
+"type": "cubic"
+},
+{
+"x": 152,
+"y": 100,
+"type": "cubic"
+},
+{
+"x": 119,
+"y": 121
+},
+{
+"x": 108,
+"y": 107,
+"type": "cubic"
+},
+{
+"x": 66,
+"y": 57,
+"type": "cubic"
+},
+{
+"x": 49,
+"y": 43
+},
+{
+"x": 79,
+"y": 30,
+"type": "cubic"
+},
+{
+"x": 116,
+"y": 28,
+"type": "cubic"
+},
+{
+"x": 132,
+"y": 30
+},
+{
+"x": 134,
+"y": 24
+},
+{
+"x": 107,
+"y": 21,
+"type": "cubic"
+},
+{
+"x": 67,
+"y": 26,
+"type": "cubic"
+},
+{
+"x": 42,
+"y": 38
+},
+{
+"x": 26,
+"y": 13,
+"type": "cubic"
+},
+{
+"x": 11,
+"y": 4,
+"type": "cubic"
+},
+{
+"x": 0,
+"y": -1
+},
+{
+"x": 43,
+"y": -27,
+"type": "cubic"
+},
+{
+"x": 129,
+"y": -25,
+"type": "cubic"
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 184
+}
+}
+}
+}

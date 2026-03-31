@@ -1,0 +1,121 @@
+{
+"name": "_p.sad",
+"sources": [
+{
+"name": "",
+"layerName": "m01",
+"locationBase": "m01"
+},
+{
+"name": "Regular / 16 May 23 at 18:18",
+"layerName": "F6FEBD79-76E2-4209-8DE8-5053BC3B12D2",
+"location": {
+"Mashq": 100,
+"Spacing": 0
+}
+},
+{
+"name": "Regular / 17 May 23 at 13:08",
+"layerName": "1D62A9B9-6FF3-4CAE-AEBB-D710A7B21B07",
+"location": {
+"Mashq": 0,
+"Spacing": 0
+}
+}
+],
+"layers": {
+"1D62A9B9-6FF3-4CAE-AEBB-D710A7B21B07": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": 200,
+"y": 0
+},
+{
+"x": 401,
+"y": 0
+},
+{
+"x": 401,
+"y": 110
+},
+{
+"x": 343,
+"y": 110
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 401
+}
+},
+"F6FEBD79-76E2-4209-8DE8-5053BC3B12D2": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": 0,
+"y": 0
+},
+{
+"x": 401,
+"y": 0
+},
+{
+"x": 401,
+"y": 110
+},
+{
+"x": 343,
+"y": 110
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 401
+}
+},
+"m01": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": 0,
+"y": 0
+},
+{
+"x": 401,
+"y": 0
+},
+{
+"x": 401,
+"y": 110
+},
+{
+"x": 343,
+"y": 110
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 401
+}
+}
+},
+"customData": {
+"com.glyphsapp.glyph-color": 9
+}
+}

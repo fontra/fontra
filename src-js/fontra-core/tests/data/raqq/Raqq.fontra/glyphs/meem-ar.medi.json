@@ -1,0 +1,209 @@
+{
+"name": "meem-ar.medi",
+"sources": [
+{
+"name": "",
+"layerName": "m01",
+"locationBase": "m01"
+}
+],
+"layers": {
+"m01": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": 200,
+"y": -8,
+"smooth": true
+},
+{
+"x": 266,
+"y": -9,
+"type": "cubic"
+},
+{
+"x": 380,
+"y": -9,
+"type": "cubic"
+},
+{
+"x": 380,
+"y": 74,
+"smooth": true
+},
+{
+"x": 380,
+"y": 243,
+"type": "cubic"
+},
+{
+"x": 302,
+"y": 351,
+"type": "cubic"
+},
+{
+"x": 205,
+"y": 351,
+"smooth": true
+},
+{
+"x": 107,
+"y": 351,
+"type": "cubic"
+},
+{
+"x": -3,
+"y": 257,
+"type": "cubic"
+},
+{
+"x": 18,
+"y": 69,
+"smooth": true
+},
+{
+"x": 25,
+"y": 6,
+"type": "cubic"
+},
+{
+"x": 125,
+"y": -7,
+"type": "cubic"
+}
+],
+"isClosed": true
+},
+{
+"points": [
+{
+"x": -20,
+"y": 0
+},
+{
+"x": 380,
+"y": 0
+},
+{
+"x": 380,
+"y": 110
+},
+{
+"x": -20,
+"y": 110
+},
+{
+"x": -20,
+"y": 115,
+"type": "cubic"
+},
+{
+"x": -20,
+"y": 8,
+"type": "cubic"
+}
+],
+"isClosed": true
+},
+{
+"points": [
+{
+"x": 210,
+"y": 167,
+"smooth": true
+},
+{
+"x": 203,
+"y": 167,
+"type": "cubic"
+},
+{
+"x": 197,
+"y": 173,
+"type": "cubic"
+},
+{
+"x": 197,
+"y": 180,
+"smooth": true
+},
+{
+"x": 197,
+"y": 186,
+"type": "cubic"
+},
+{
+"x": 203,
+"y": 192,
+"type": "cubic"
+},
+{
+"x": 210,
+"y": 192,
+"smooth": true
+},
+{
+"x": 216,
+"y": 192,
+"type": "cubic"
+},
+{
+"x": 222,
+"y": 186,
+"type": "cubic"
+},
+{
+"x": 222,
+"y": 180,
+"smooth": true
+},
+{
+"x": 222,
+"y": 173,
+"type": "cubic"
+},
+{
+"x": 216,
+"y": 167,
+"type": "cubic"
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 380,
+"anchors": [
+{
+"name": "damma",
+"x": 7,
+"y": 171
+},
+{
+"name": "entry",
+"x": 380,
+"y": 0
+},
+{
+"name": "exit",
+"x": 0,
+"y": 0
+},
+{
+"name": "fatha",
+"x": 190,
+"y": 402
+},
+{
+"name": "kasra",
+"x": 276,
+"y": -56
+}
+]
+}
+}
+}
+}

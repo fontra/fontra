@@ -1,0 +1,60 @@
+{
+"name": "kasratan-ar",
+"sources": [
+{
+"name": "",
+"layerName": "m01",
+"locationBase": "m01"
+}
+],
+"layers": {
+"m01": {
+"glyph": {
+"components": [
+{
+"name": "fatha-ar",
+"customData": {
+"com.glyphsapp.component.alignment": -1
+}
+},
+{
+"name": "fatha-ar",
+"transformation": {
+"translateX": 134
+}
+}
+],
+"xAdvance": 284,
+"anchors": [
+{
+"name": "_kasra",
+"x": 142,
+"y": 75
+}
+]
+}
+},
+"m01^Regular 25 Jun 22, 20:51": {
+"glyph": {
+"components": [
+{
+"name": "_dot",
+"customData": {
+"com.glyphsapp.component.alignment": -1
+}
+},
+{
+"name": "_dot",
+"transformation": {
+"translateX": 134
+}
+}
+],
+"xAdvance": 284
+},
+"customData": {
+"com.glyphsapp.layer.layerId": "93F08398-69CF-41D4-8750-0A9275A491D4"
+}
+}
+}
+}

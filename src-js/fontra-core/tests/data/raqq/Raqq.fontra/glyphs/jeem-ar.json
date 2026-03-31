@@ -1,0 +1,32 @@
+{
+"name": "jeem-ar",
+"sources": [
+{
+"name": "",
+"layerName": "m01",
+"locationBase": "m01"
+}
+],
+"layers": {
+"m01": {
+"glyph": {
+"components": [
+{
+"name": "hah-ar"
+},
+{
+"name": "dotbelow-ar",
+"transformation": {
+"translateX": 611,
+"translateY": -122
+}
+}
+],
+"xAdvance": 983
+}
+}
+},
+"customData": {
+"com.glyphsapp.glyph-color": 0
+}
+}

@@ -1,0 +1,42 @@
+{
+"name": "fatha-ar",
+"sources": [
+{
+"name": "",
+"layerName": "m01",
+"locationBase": "m01"
+}
+],
+"layers": {
+"m01": {
+"glyph": {
+"components": [
+{
+"name": "_dot.circle"
+}
+],
+"xAdvance": 150,
+"anchors": [
+{
+"name": "_fatha",
+"x": 75,
+"y": 75
+}
+]
+}
+},
+"m01^Regular 25 Jun 22, 20:51": {
+"glyph": {
+"components": [
+{
+"name": "_dot"
+}
+],
+"xAdvance": 150
+},
+"customData": {
+"com.glyphsapp.layer.layerId": "7AFB0887-D8D9-481C-81E1-5E6720F61C9F"
+}
+}
+}
+}

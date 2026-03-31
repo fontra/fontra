@@ -1,0 +1,158 @@
+{
+"name": "dotabove-ar.beh",
+"sources": [
+{
+"name": "",
+"layerName": "m01",
+"locationBase": "m01"
+}
+],
+"layers": {
+"m01": {
+"glyph": {
+"components": [
+{
+"name": "dotabove-ar",
+"transformation": {
+"translateX": 4,
+"translateY": -9,
+"rotation": 8.999999999999984
+}
+}
+],
+"xAdvance": 96,
+"anchors": [
+{
+"name": "_top",
+"x": 74,
+"y": 38
+}
+]
+}
+},
+"m01^1 May 21, 00:30": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": 16,
+"y": 0
+},
+{
+"x": 128,
+"y": 152
+},
+{
+"x": 112,
+"y": 164
+},
+{
+"x": 0,
+"y": 12
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 128,
+"anchors": [
+{
+"name": "_top",
+"x": 90,
+"y": 50
+}
+]
+},
+"customData": {
+"com.glyphsapp.layer.layerId": "1951D83C-027C-46A2-BBE7-A485E6845D98"
+}
+},
+"m01^25 Feb 23 at 15:48": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": 19,
+"y": 13,
+"smooth": true
+},
+{
+"x": 52,
+"y": 38,
+"type": "cubic"
+},
+{
+"x": 81,
+"y": 71,
+"type": "cubic"
+},
+{
+"x": 106,
+"y": 100,
+"smooth": true
+},
+{
+"x": 117,
+"y": 113,
+"type": "cubic"
+},
+{
+"x": 101,
+"y": 126,
+"type": "cubic"
+},
+{
+"x": 91,
+"y": 113,
+"smooth": true
+},
+{
+"x": 67,
+"y": 84,
+"type": "cubic"
+},
+{
+"x": 36,
+"y": 52,
+"type": "cubic"
+},
+{
+"x": 6,
+"y": 27,
+"smooth": true
+},
+{
+"x": -8,
+"y": 14,
+"type": "cubic"
+},
+{
+"x": 4,
+"y": 1,
+"type": "cubic"
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 110,
+"anchors": [
+{
+"name": "_top",
+"x": 79,
+"y": 38
+}
+]
+},
+"customData": {
+"com.glyphsapp.layer.layerId": "35FFA398-3489-4430-A27C-01EFA9C459D5"
+}
+}
+}
+}

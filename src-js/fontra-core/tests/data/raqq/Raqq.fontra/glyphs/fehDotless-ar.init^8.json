@@ -1,0 +1,231 @@
+{
+"name": "fehDotless-ar.init",
+"sources": [
+{
+"name": "",
+"layerName": "m01",
+"locationBase": "m01"
+}
+],
+"layers": {
+"m01": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": -20,
+"y": 0
+},
+{
+"x": 130,
+"y": -2,
+"type": "cubic"
+},
+{
+"x": 334,
+"y": -3,
+"type": "cubic"
+},
+{
+"x": 334,
+"y": 115,
+"smooth": true
+},
+{
+"x": 334,
+"y": 287,
+"type": "cubic"
+},
+{
+"x": 251,
+"y": 462,
+"type": "cubic"
+},
+{
+"x": 136,
+"y": 462,
+"smooth": true
+},
+{
+"x": 29,
+"y": 462,
+"type": "cubic"
+},
+{
+"x": -47,
+"y": 351,
+"type": "cubic"
+},
+{
+"x": -47,
+"y": 260,
+"smooth": true
+},
+{
+"x": -47,
+"y": 216,
+"type": "cubic"
+},
+{
+"x": -24,
+"y": 178,
+"type": "cubic"
+},
+{
+"x": 10,
+"y": 155,
+"smooth": true
+},
+{
+"x": 66,
+"y": 117,
+"type": "cubic"
+},
+{
+"x": 165,
+"y": 128,
+"type": "cubic"
+},
+{
+"x": 213,
+"y": 137,
+"smooth": true
+},
+{
+"x": 224,
+"y": 139,
+"type": "cubic"
+},
+{
+"x": 225,
+"y": 128,
+"type": "cubic"
+},
+{
+"x": 214,
+"y": 121,
+"smooth": true
+},
+{
+"x": 195,
+"y": 109,
+"type": "cubic"
+},
+{
+"x": 69,
+"y": 109,
+"type": "cubic"
+},
+{
+"x": -20,
+"y": 110
+}
+],
+"isClosed": true
+},
+{
+"points": [
+{
+"x": 133,
+"y": 287,
+"smooth": true
+},
+{
+"x": 126,
+"y": 287,
+"type": "cubic"
+},
+{
+"x": 120,
+"y": 293,
+"type": "cubic"
+},
+{
+"x": 120,
+"y": 300,
+"smooth": true
+},
+{
+"x": 120,
+"y": 306,
+"type": "cubic"
+},
+{
+"x": 126,
+"y": 312,
+"type": "cubic"
+},
+{
+"x": 133,
+"y": 312,
+"smooth": true
+},
+{
+"x": 139,
+"y": 312,
+"type": "cubic"
+},
+{
+"x": 145,
+"y": 306,
+"type": "cubic"
+},
+{
+"x": 145,
+"y": 300,
+"smooth": true
+},
+{
+"x": 145,
+"y": 293,
+"type": "cubic"
+},
+{
+"x": 139,
+"y": 287,
+"type": "cubic"
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 334,
+"anchors": [
+{
+"name": "bottom",
+"x": 295,
+"y": 43
+},
+{
+"name": "damma",
+"x": -37,
+"y": 172
+},
+{
+"name": "exit",
+"x": 0,
+"y": 0
+},
+{
+"name": "fatha",
+"x": 133,
+"y": 513
+},
+{
+"name": "kasra",
+"x": 212,
+"y": -44
+},
+{
+"name": "top",
+"x": 18,
+"y": 411
+}
+]
+}
+}
+}
+}

@@ -1,0 +1,32 @@
+{
+"name": "jeh-ar",
+"sources": [
+{
+"name": "",
+"layerName": "m01",
+"locationBase": "m01"
+}
+],
+"layers": {
+"m01": {
+"glyph": {
+"components": [
+{
+"name": "reh-ar"
+},
+{
+"name": "threedotsupabove-ar",
+"transformation": {
+"translateX": 63,
+"translateY": 181
+}
+}
+],
+"xAdvance": 450
+}
+}
+},
+"customData": {
+"com.glyphsapp.glyph-color": 0
+}
+}

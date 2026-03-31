@@ -1,0 +1,54 @@
+{
+"name": "lam-ar.medi.short",
+"sources": [
+{
+"name": "",
+"layerName": "m01",
+"locationBase": "m01"
+}
+],
+"layers": {
+"m01": {
+"glyph": {
+"components": [
+{
+"name": "lam-ar.init.hah1",
+"transformation": {
+"translateY": -115
+},
+"customData": {
+"com.glyphsapp.component.alignment": -1
+}
+},
+{
+"name": "_p.lam",
+"transformation": {
+"translateX": 23
+},
+"customData": {
+"com.glyphsapp.component.alignment": -1
+}
+}
+],
+"xAdvance": 123,
+"anchors": [
+{
+"name": "entry",
+"x": 123,
+"y": 0
+},
+{
+"name": "exit",
+"x": 0,
+"y": 0
+},
+{
+"name": "kasra",
+"x": 80,
+"y": -49
+}
+]
+}
+}
+}
+}

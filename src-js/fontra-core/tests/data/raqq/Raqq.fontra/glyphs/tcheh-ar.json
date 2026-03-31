@@ -1,0 +1,32 @@
+{
+"name": "tcheh-ar",
+"sources": [
+{
+"name": "",
+"layerName": "m01",
+"locationBase": "m01"
+}
+],
+"layers": {
+"m01": {
+"glyph": {
+"components": [
+{
+"name": "hah-ar"
+},
+{
+"name": "threedotsdownbelow-ar",
+"transformation": {
+"translateX": 611,
+"translateY": -174
+}
+}
+],
+"xAdvance": 983
+}
+}
+},
+"customData": {
+"com.glyphsapp.glyph-color": 0
+}
+}

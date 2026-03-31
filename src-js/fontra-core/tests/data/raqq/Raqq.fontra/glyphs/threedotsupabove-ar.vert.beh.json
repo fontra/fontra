@@ -1,0 +1,38 @@
+{
+"name": "threedotsupabove-ar.vert.beh",
+"sources": [
+{
+"name": "",
+"layerName": "m01",
+"locationBase": "m01"
+}
+],
+"layers": {
+"m01": {
+"glyph": {
+"components": [
+{
+"name": "dotabove-ar.beh",
+"transformation": {
+"translateX": 3,
+"translateY": 109,
+"rotation": 7.999999999999981,
+"scaleY": 1.0000000000000002
+}
+},
+{
+"name": "twodotsverticalabove-ar.vert.beh"
+}
+],
+"xAdvance": 96,
+"anchors": [
+{
+"name": "_top",
+"x": 77,
+"y": 34
+}
+]
+}
+}
+}
+}

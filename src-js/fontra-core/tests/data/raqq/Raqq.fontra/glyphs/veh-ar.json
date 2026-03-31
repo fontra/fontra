@@ -1,0 +1,32 @@
+{
+"name": "veh-ar",
+"sources": [
+{
+"name": "",
+"layerName": "m01",
+"locationBase": "m01"
+}
+],
+"layers": {
+"m01": {
+"glyph": {
+"components": [
+{
+"name": "fehDotless-ar"
+},
+{
+"name": "threedotsupabove-ar",
+"transformation": {
+"translateX": 543,
+"translateY": 363
+}
+}
+],
+"xAdvance": 1020
+}
+}
+},
+"customData": {
+"com.glyphsapp.glyph-color": 0
+}
+}

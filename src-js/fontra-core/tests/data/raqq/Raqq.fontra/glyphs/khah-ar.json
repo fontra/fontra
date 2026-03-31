@@ -1,0 +1,32 @@
+{
+"name": "khah-ar",
+"sources": [
+{
+"name": "",
+"layerName": "m01",
+"locationBase": "m01"
+}
+],
+"layers": {
+"m01": {
+"glyph": {
+"components": [
+{
+"name": "hah-ar"
+},
+{
+"name": "dotabove-ar",
+"transformation": {
+"translateX": 256,
+"translateY": 188
+}
+}
+],
+"xAdvance": 983
+}
+}
+},
+"customData": {
+"com.glyphsapp.glyph-color": 0
+}
+}

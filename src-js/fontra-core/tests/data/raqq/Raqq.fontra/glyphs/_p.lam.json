@@ -1,0 +1,42 @@
+{
+"name": "_p.lam",
+"sources": [
+{
+"name": "",
+"layerName": "m01",
+"locationBase": "m01"
+}
+],
+"layers": {
+"m01": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": -20,
+"y": 0
+},
+{
+"x": 100,
+"y": 0
+},
+{
+"x": 100,
+"y": 110
+},
+{
+"x": -20,
+"y": 110
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 100
+}
+}
+}
+}

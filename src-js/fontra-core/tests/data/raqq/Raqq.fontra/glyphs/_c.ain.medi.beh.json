@@ -1,0 +1,68 @@
+{
+"name": "_c.ain.medi.beh",
+"sources": [
+{
+"name": "",
+"layerName": "m01",
+"locationBase": "m01"
+}
+],
+"layers": {
+"m01": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": -24,
+"y": 0
+},
+{
+"x": 118,
+"y": 0
+},
+{
+"x": 118,
+"y": 123
+},
+{
+"x": 76,
+"y": 123,
+"type": "cubic"
+},
+{
+"x": -5,
+"y": 151,
+"type": "cubic"
+},
+{
+"x": -6,
+"y": 237
+},
+{
+"x": -24,
+"y": 237
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 66,
+"anchors": [
+{
+"name": "entry",
+"x": 66,
+"y": 0
+},
+{
+"name": "exit",
+"x": 0,
+"y": 0
+}
+]
+}
+}
+}
+}

@@ -1,0 +1,149 @@
+{
+"name": "lam-ar.init",
+"sources": [
+{
+"name": "",
+"layerName": "m01",
+"locationBase": "m01"
+}
+],
+"layers": {
+"m01": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": -20,
+"y": 0
+},
+{
+"x": 18,
+"y": 0
+},
+{
+"x": 92,
+"y": 2,
+"type": "cubic"
+},
+{
+"x": 127,
+"y": 8,
+"type": "cubic"
+},
+{
+"x": 123,
+"y": 116,
+"smooth": true
+},
+{
+"x": 118,
+"y": 263,
+"type": "cubic"
+},
+{
+"x": 103,
+"y": 575,
+"type": "cubic"
+},
+{
+"x": 94,
+"y": 771,
+"smooth": true
+},
+{
+"x": 93,
+"y": 794,
+"type": "cubic"
+},
+{
+"x": 79,
+"y": 800,
+"type": "cubic"
+},
+{
+"x": 69,
+"y": 781,
+"smooth": true
+},
+{
+"x": 57,
+"y": 758,
+"type": "cubic"
+},
+{
+"x": 18,
+"y": 724,
+"type": "cubic"
+},
+{
+"x": 0,
+"y": 710,
+"smooth": true
+},
+{
+"x": -15,
+"y": 697,
+"type": "cubic"
+},
+{
+"x": -9,
+"y": 684,
+"type": "cubic"
+},
+{
+"x": -8,
+"y": 674,
+"smooth": true
+},
+{
+"x": 2,
+"y": 513,
+"type": "cubic"
+},
+{
+"x": 16,
+"y": 239,
+"type": "cubic"
+},
+{
+"x": 18,
+"y": 110
+},
+{
+"x": -20,
+"y": 110
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 123,
+"anchors": [
+{
+"name": "damma",
+"x": 5,
+"y": 173
+},
+{
+"name": "exit",
+"x": 0,
+"y": 0
+},
+{
+"name": "fatha",
+"x": -58,
+"y": 625
+},
+{
+"name": "kasra",
+"x": 123,
+"y": -36
+}
+]
+}
+}
+}
+}

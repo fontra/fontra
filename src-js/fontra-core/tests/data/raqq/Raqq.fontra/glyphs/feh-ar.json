@@ -1,0 +1,32 @@
+{
+"name": "feh-ar",
+"sources": [
+{
+"name": "",
+"layerName": "m01",
+"locationBase": "m01"
+}
+],
+"layers": {
+"m01": {
+"glyph": {
+"components": [
+{
+"name": "fehDotless-ar"
+},
+{
+"name": "dotabove-ar",
+"transformation": {
+"translateX": 607,
+"translateY": 355
+}
+}
+],
+"xAdvance": 1020
+}
+}
+},
+"customData": {
+"com.glyphsapp.glyph-color": 0
+}
+}

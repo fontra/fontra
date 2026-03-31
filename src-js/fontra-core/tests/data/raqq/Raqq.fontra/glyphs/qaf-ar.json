@@ -1,0 +1,32 @@
+{
+"name": "qaf-ar",
+"sources": [
+{
+"name": "",
+"layerName": "m01",
+"locationBase": "m01"
+}
+],
+"layers": {
+"m01": {
+"glyph": {
+"components": [
+{
+"name": "qafDotless-ar"
+},
+{
+"name": "twodotsverticalabove-ar",
+"transformation": {
+"translateX": -70,
+"translateY": 279
+}
+}
+],
+"xAdvance": 469
+}
+}
+},
+"customData": {
+"com.glyphsapp.glyph-color": 0
+}
+}

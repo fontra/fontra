@@ -1,0 +1,68 @@
+{
+"name": "_c.seen.meem",
+"sources": [
+{
+"name": "",
+"layerName": "m01",
+"locationBase": "m01"
+}
+],
+"layers": {
+"m01": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": -40,
+"y": 45
+},
+{
+"x": 16,
+"y": 45
+},
+{
+"x": 16,
+"y": 132
+},
+{
+"x": 6,
+"y": 136,
+"type": "cubic"
+},
+{
+"x": -14,
+"y": 152,
+"type": "cubic"
+},
+{
+"x": -22,
+"y": 177
+},
+{
+"x": -40,
+"y": 177
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 16,
+"anchors": [
+{
+"name": "entry",
+"x": 16,
+"y": 0
+},
+{
+"name": "exit",
+"x": 0,
+"y": 0
+}
+]
+}
+}
+}
+}

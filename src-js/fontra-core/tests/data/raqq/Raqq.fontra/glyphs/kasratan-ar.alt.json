@@ -1,0 +1,42 @@
+{
+"name": "kasratan-ar.alt",
+"sources": [
+{
+"name": "",
+"layerName": "m01",
+"locationBase": "m01"
+}
+],
+"layers": {
+"m01": {
+"glyph": {
+"components": [
+{
+"name": "dammatan-ar"
+}
+],
+"xAdvance": 150,
+"anchors": [
+{
+"name": "_kasra",
+"x": 75,
+"y": 142
+}
+]
+}
+},
+"m01^Regular 25 Jun 22, 20:51": {
+"glyph": {
+"components": [
+{
+"name": "dammatan-ar"
+}
+],
+"xAdvance": 150
+},
+"customData": {
+"com.glyphsapp.layer.layerId": "95BC5585-F924-4AAC-B205-D7D219410245"
+}
+}
+}
+}

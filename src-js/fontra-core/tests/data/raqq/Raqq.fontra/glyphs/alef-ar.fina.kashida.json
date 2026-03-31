@@ -1,0 +1,166 @@
+{
+"name": "alef-ar.fina.kashida",
+"sources": [
+{
+"name": "",
+"layerName": "m01",
+"locationBase": "m01"
+}
+],
+"layers": {
+"m01": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": 199,
+"y": 0,
+"smooth": true
+},
+{
+"x": 219,
+"y": 0
+},
+{
+"x": 219,
+"y": 110
+},
+{
+"x": 194,
+"y": 110,
+"type": "cubic"
+},
+{
+"x": 104,
+"y": 126,
+"type": "cubic"
+},
+{
+"x": 98,
+"y": 228,
+"smooth": true
+},
+{
+"x": 93,
+"y": 317,
+"type": "cubic"
+},
+{
+"x": 83,
+"y": 608,
+"type": "cubic"
+},
+{
+"x": 71,
+"y": 769,
+"smooth": true
+},
+{
+"x": 70,
+"y": 789,
+"type": "cubic"
+},
+{
+"x": 57,
+"y": 789,
+"type": "cubic"
+},
+{
+"x": 50,
+"y": 778,
+"smooth": true
+},
+{
+"x": 28,
+"y": 742,
+"type": "cubic"
+},
+{
+"x": 9,
+"y": 714,
+"type": "cubic"
+},
+{
+"x": -18,
+"y": 697,
+"smooth": true
+},
+{
+"x": -42,
+"y": 682,
+"type": "cubic"
+},
+{
+"x": -21,
+"y": 643,
+"type": "cubic"
+},
+{
+"x": -14,
+"y": 570,
+"smooth": true
+},
+{
+"x": -4,
+"y": 456,
+"type": "cubic"
+},
+{
+"x": 4,
+"y": 298,
+"type": "cubic"
+},
+{
+"x": 12,
+"y": 149,
+"smooth": true
+},
+{
+"x": 16,
+"y": 76,
+"type": "cubic"
+},
+{
+"x": 12,
+"y": 0,
+"type": "cubic"
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 219,
+"anchors": [
+{
+"name": "damma",
+"x": -26,
+"y": 61
+},
+{
+"name": "entry",
+"x": 219,
+"y": 0
+},
+{
+"name": "fatha",
+"x": 135,
+"y": 650
+},
+{
+"name": "kasra",
+"x": 87,
+"y": -56
+},
+{
+"name": "madda",
+"x": -76,
+"y": 635
+}
+]
+}
+}
+}
+}

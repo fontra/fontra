@@ -1,0 +1,277 @@
+{
+"name": "dotabove-ar",
+"sources": [
+{
+"name": "",
+"layerName": "m01",
+"locationBase": "m01"
+}
+],
+"layers": {
+"m01": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": 16,
+"y": 13,
+"smooth": true
+},
+{
+"x": 18,
+"y": 13,
+"type": "cubic"
+},
+{
+"x": 21,
+"y": 14,
+"type": "cubic"
+},
+{
+"x": 22,
+"y": 15,
+"smooth": true
+},
+{
+"x": 53,
+"y": 40,
+"type": "cubic"
+},
+{
+"x": 80,
+"y": 68,
+"type": "cubic"
+},
+{
+"x": 104,
+"y": 99,
+"smooth": true
+},
+{
+"x": 105,
+"y": 100,
+"type": "cubic"
+},
+{
+"x": 106,
+"y": 103,
+"type": "cubic"
+},
+{
+"x": 106,
+"y": 105,
+"smooth": true
+},
+{
+"x": 106,
+"y": 111,
+"type": "cubic"
+},
+{
+"x": 102,
+"y": 115,
+"type": "cubic"
+},
+{
+"x": 96,
+"y": 115,
+"smooth": true
+},
+{
+"x": 93,
+"y": 115,
+"type": "cubic"
+},
+{
+"x": 90,
+"y": 114,
+"type": "cubic"
+},
+{
+"x": 88,
+"y": 111,
+"smooth": true
+},
+{
+"x": 64,
+"y": 82,
+"type": "cubic"
+},
+{
+"x": 39,
+"y": 54,
+"type": "cubic"
+},
+{
+"x": 10,
+"y": 31,
+"smooth": true
+},
+{
+"x": 7,
+"y": 29,
+"type": "cubic"
+},
+{
+"x": 6,
+"y": 26,
+"type": "cubic"
+},
+{
+"x": 6,
+"y": 23,
+"smooth": true
+},
+{
+"x": 6,
+"y": 17,
+"type": "cubic"
+},
+{
+"x": 10,
+"y": 13,
+"type": "cubic"
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 110,
+"anchors": [
+{
+"name": "_top",
+"x": 79,
+"y": 38
+}
+]
+}
+},
+"m01^1 May 21, 00:30": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": 16,
+"y": 0
+},
+{
+"x": 128,
+"y": 152
+},
+{
+"x": 112,
+"y": 164
+},
+{
+"x": 0,
+"y": 12
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 128,
+"anchors": [
+{
+"name": "_top",
+"x": 90,
+"y": 50
+}
+]
+},
+"customData": {
+"com.glyphsapp.layer.layerId": "1951D83C-027C-46A2-BBE7-A485E6845D98"
+}
+},
+"m01^25 Feb 23 at 15:48": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": 19,
+"y": 13,
+"smooth": true
+},
+{
+"x": 52,
+"y": 38,
+"type": "cubic"
+},
+{
+"x": 81,
+"y": 71,
+"type": "cubic"
+},
+{
+"x": 106,
+"y": 100,
+"smooth": true
+},
+{
+"x": 117,
+"y": 113,
+"type": "cubic"
+},
+{
+"x": 101,
+"y": 126,
+"type": "cubic"
+},
+{
+"x": 91,
+"y": 113,
+"smooth": true
+},
+{
+"x": 67,
+"y": 84,
+"type": "cubic"
+},
+{
+"x": 36,
+"y": 52,
+"type": "cubic"
+},
+{
+"x": 6,
+"y": 27,
+"smooth": true
+},
+{
+"x": -8,
+"y": 14,
+"type": "cubic"
+},
+{
+"x": 4,
+"y": 1,
+"type": "cubic"
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 110,
+"anchors": [
+{
+"name": "_top",
+"x": 79,
+"y": 38
+}
+]
+},
+"customData": {
+"com.glyphsapp.layer.layerId": "35FFA398-3489-4430-A27C-01EFA9C459D5"
+}
+}
+}
+}

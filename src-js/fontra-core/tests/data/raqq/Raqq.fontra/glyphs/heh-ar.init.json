@@ -1,0 +1,50 @@
+{
+"name": "heh-ar.init",
+"sources": [
+{
+"name": "",
+"layerName": "m01",
+"locationBase": "m01"
+}
+],
+"layers": {
+"m01": {
+"glyph": {
+"components": [
+{
+"name": "heh-ar.init.round",
+"transformation": {
+"translateX": 34
+},
+"customData": {
+"com.glyphsapp.component.alignment": -1
+}
+},
+{
+"name": "_p.lam",
+"transformation": {
+"translateX": 20,
+"scaleX": 2
+},
+"customData": {
+"com.glyphsapp.component.alignment": -1
+}
+}
+],
+"xAdvance": 361,
+"anchors": [
+{
+"name": "damma",
+"x": 8,
+"y": 169
+},
+{
+"name": "exit",
+"x": 0,
+"y": 0
+}
+]
+}
+}
+}
+}

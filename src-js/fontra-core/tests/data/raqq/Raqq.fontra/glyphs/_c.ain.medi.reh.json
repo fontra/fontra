@@ -1,0 +1,68 @@
+{
+"name": "_c.ain.medi.reh",
+"sources": [
+{
+"name": "",
+"layerName": "m01",
+"locationBase": "m01"
+}
+],
+"layers": {
+"m01": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": -10,
+"y": 0
+},
+{
+"x": 34,
+"y": 0
+},
+{
+"x": 34,
+"y": 109
+},
+{
+"x": 4,
+"y": 138,
+"type": "cubic"
+},
+{
+"x": -21,
+"y": 163,
+"type": "cubic"
+},
+{
+"x": -50,
+"y": 191
+},
+{
+"x": -60,
+"y": 191
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 7,
+"anchors": [
+{
+"name": "entry",
+"x": 7,
+"y": 0
+},
+{
+"name": "exit",
+"x": 0,
+"y": 0
+}
+]
+}
+}
+}
+}

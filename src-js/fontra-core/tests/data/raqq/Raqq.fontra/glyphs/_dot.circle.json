@@ -1,0 +1,151 @@
+{
+"name": "_dot.circle",
+"sources": [
+{
+"name": "",
+"layerName": "m01",
+"locationBase": "m01"
+}
+],
+"layers": {
+"m01": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": 75,
+"y": 14,
+"smooth": true
+},
+{
+"x": 108,
+"y": 14,
+"type": "cubic"
+},
+{
+"x": 136,
+"y": 43,
+"type": "cubic"
+},
+{
+"x": 136,
+"y": 75,
+"smooth": true
+},
+{
+"x": 136,
+"y": 108,
+"type": "cubic"
+},
+{
+"x": 108,
+"y": 136,
+"type": "cubic"
+},
+{
+"x": 75,
+"y": 136,
+"smooth": true
+},
+{
+"x": 43,
+"y": 136,
+"type": "cubic"
+},
+{
+"x": 14,
+"y": 108,
+"type": "cubic"
+},
+{
+"x": 14,
+"y": 75,
+"smooth": true
+},
+{
+"x": 14,
+"y": 43,
+"type": "cubic"
+},
+{
+"x": 43,
+"y": 14,
+"type": "cubic"
+}
+],
+"isClosed": true
+},
+{
+"points": [
+{
+"x": 75,
+"y": 24,
+"smooth": true
+},
+{
+"x": 47,
+"y": 24,
+"type": "cubic"
+},
+{
+"x": 24,
+"y": 47,
+"type": "cubic"
+},
+{
+"x": 24,
+"y": 75,
+"smooth": true
+},
+{
+"x": 24,
+"y": 104,
+"type": "cubic"
+},
+{
+"x": 47,
+"y": 126,
+"type": "cubic"
+},
+{
+"x": 75,
+"y": 126,
+"smooth": true
+},
+{
+"x": 104,
+"y": 126,
+"type": "cubic"
+},
+{
+"x": 126,
+"y": 104,
+"type": "cubic"
+},
+{
+"x": 126,
+"y": 75,
+"smooth": true
+},
+{
+"x": 126,
+"y": 47,
+"type": "cubic"
+},
+{
+"x": 104,
+"y": 24,
+"type": "cubic"
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 150
+}
+}
+}
+}
