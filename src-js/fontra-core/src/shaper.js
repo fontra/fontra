@@ -176,14 +176,11 @@ class HBShaper extends ShaperBase {
     );
 
     this._glyphObjects = glyphObjects;
-    this._processingHasStarted = false;
 
     if (messageFunc) {
       buffer.setMessageFunc(messageFunc);
       messageFunc(buffer, this.font, "start processing");
     }
-
-    this._processingHasStarted = true;
 
     hb.shape(this.font, buffer, features);
 
@@ -226,7 +223,9 @@ class HBShaper extends ShaperBase {
   getGlyphInfoFromBuffer(buffer) {
     const glyphs = buffer.getGlyphInfosAndPositions();
 
-    if (buffer.getContentType() != "GLYPHS") {
+    const bufferContainsUnicode = buffer.getContentType() != "GLYPHS";
+
+    if (bufferContainsUnicode) {
       // Convert Unicode code points to glyph IDs
       glyphs.forEach((glyph) => {
         const glyphName = this.nominalGlyph(glyph.codepoint);
@@ -238,11 +237,10 @@ class HBShaper extends ShaperBase {
       const glyphName = this.glyphOrder
         ? this.glyphOrder[glyph.codepoint]
         : this.font.glyphName(glyph.codepoint);
-      if (glyph.x_advance == undefined || !this._processingHasStarted) {
+      if (glyph.x_advance == undefined || bufferContainsUnicode) {
         // 1. During the GSUB phase, the positioning fields are undefined, so
         //    we fill them in so we can render something.
-        // 2. When the buffer has been populated with code points, but actual
-        //    processing hasn't yet begun (before hb.shape() gets called), the
+        // 2. When the buffer has been populated with code points, the
         //    positioning fields are still zero, which doesn't render nice.
         glyph.x_advance = this._glyphObjects[glyphName]?.xAdvance ?? 500;
         glyph.y_advance = 0; // TODO
