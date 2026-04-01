@@ -603,9 +603,9 @@ def fixSpuriousCubicOffCurvePoints(points, pointTypes, pointAttributes, isClosed
     startPoint = points[0]
 
     if isClosed and firstOnCurvePointIndex:
-        points = shift(points, -firstOnCurvePointIndex)
-        pointTypes = shift(pointTypes, -firstOnCurvePointIndex)
-        pointAttributes = shift(pointAttributes, -firstOnCurvePointIndex)
+        points = shiftLeft(points, firstOnCurvePointIndex)
+        pointTypes = shiftLeft(pointTypes, firstOnCurvePointIndex)
+        pointAttributes = shiftLeft(pointAttributes, firstOnCurvePointIndex)
 
     assert pointTypes[0] not in {PointType.OFF_CURVE_CUBIC, PointType.OFF_CURVE_QUAD}, (
         firstOnCurvePointIndex,
@@ -628,17 +628,17 @@ def fixSpuriousCubicOffCurvePoints(points, pointTypes, pointAttributes, isClosed
 
     if isClosed and firstOnCurvePointIndex and startPoint in points:
         shiftBy = points.index(startPoint)
-        points = shift(points, -shiftBy)
-        pointTypes = shift(pointTypes, -shiftBy)
-        pointAttributes = shift(pointAttributes, -shiftBy)
+        points = shiftLeft(points, shiftBy)
+        pointTypes = shiftLeft(pointTypes, shiftBy)
+        pointAttributes = shiftLeft(pointAttributes, shiftBy)
 
     return points, pointTypes, pointAttributes
 
 
-def shift(lst, N):
+def shiftLeft(lst, N):
     if N == 0:
         return lst
-    N = -N % len(lst)
+    N = N % len(lst)
     return lst[N:] + lst[:N]
 
 
