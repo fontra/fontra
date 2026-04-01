@@ -1,10 +1,10 @@
-aiohttp==3.13.3
+aiohttp==3.13.5
 aiosignal==1.4.0
 cattrs==26.1.0
-fonttools[ufo,unicode]==4.62.0
-pillow==12.1.1
+fonttools[ufo,unicode]==4.62.1
+pillow==12.2.0
 pyyaml==6.0.3
-ufo2ft==3.7.0
+ufo2ft==3.7.1
 ufoLib2==0.18.1
 ufomerge==1.9.6
 watchfiles==1.1.1
