@@ -1,0 +1,114 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<glyph name="A" format="2">
+  <advance width="500"/>
+  <unicode hex="0041"/>
+  <outline>
+    <contour>
+      <point x="39" y="613" type="move"/>
+      <point x="124" y="686"/>
+      <point x="341" y="709"/>
+      <point x="404" y="610" type="curve" smooth="yes"/>
+    </contour>
+    <contour>
+      <point x="39" y="513" type="move"/>
+      <point x="124" y="586"/>
+      <point x="341" y="609"/>
+      <point x="404" y="510" type="curve" smooth="yes"/>
+    </contour>
+    <contour>
+      <point x="39" y="413" type="move"/>
+      <point x="124" y="486"/>
+      <point x="341" y="509"/>
+      <point x="404" y="410" type="curve" smooth="yes"/>
+    </contour>
+    <contour>
+      <point x="50" y="300" type="curve" smooth="yes"/>
+      <point x="50" y="350"/>
+      <point x="120" y="350"/>
+      <point x="120" y="300" type="curve" smooth="yes"/>
+      <point x="120" y="250"/>
+      <point x="50" y="250"/>
+    </contour>
+    <contour>
+      <point x="150" y="350"/>
+      <point x="220" y="350"/>
+      <point x="220" y="300" type="curve" smooth="yes"/>
+      <point x="220" y="250"/>
+      <point x="150" y="250"/>
+      <point x="150" y="300" type="curve" smooth="yes"/>
+    </contour>
+    <contour>
+      <point x="320" y="300" type="curve" smooth="yes"/>
+      <point x="320" y="250"/>
+      <point x="250" y="250"/>
+      <point x="250" y="300" type="curve" smooth="yes"/>
+      <point x="250" y="350"/>
+      <point x="320" y="350"/>
+    </contour>
+    <contour>
+      <point x="420" y="350"/>
+      <point x="420" y="300" type="curve" smooth="yes"/>
+      <point x="420" y="250"/>
+      <point x="350" y="250"/>
+      <point x="350" y="300" type="curve" smooth="yes"/>
+      <point x="350" y="350"/>
+    </contour>
+    <contour>
+      <point x="120" y="180" type="curve" smooth="yes"/>
+      <point x="120" y="130"/>
+      <point x="50" y="130"/>
+      <point x="50" y="180" type="curve" smooth="yes"/>
+      <point x="50" y="230"/>
+      <point x="120" y="230"/>
+    </contour>
+    <contour>
+      <point x="220" y="130"/>
+      <point x="150" y="130"/>
+      <point x="150" y="180" type="curve" smooth="yes"/>
+      <point x="150" y="230"/>
+      <point x="220" y="230"/>
+      <point x="220" y="180" type="curve" smooth="yes"/>
+    </contour>
+    <contour>
+      <point x="250" y="180" type="curve" smooth="yes"/>
+      <point x="250" y="230"/>
+      <point x="320" y="230"/>
+      <point x="320" y="180" type="curve" smooth="yes"/>
+      <point x="320" y="130"/>
+      <point x="250" y="130"/>
+    </contour>
+    <contour>
+      <point x="350" y="180" type="curve" smooth="yes"/>
+      <point x="350" y="230"/>
+      <point x="420" y="230"/>
+      <point x="420" y="180" type="curve" smooth="yes"/>
+      <point x="420" y="130"/>
+      <point x="350" y="130"/>
+    </contour>
+    <contour>
+      <point x="50" y="60" type="curve" smooth="yes"/>
+      <point x="50" y="110"/>
+      <point x="120" y="110"/>
+      <point x="120" y="60" type="curve" smooth="yes"/>
+      <point x="120" y="10"/>
+      <point x="50" y="10"/>
+    </contour>
+    <contour>
+      <point x="150" y="10"/>
+      <point x="150" y="60" type="curve" smooth="yes"/>
+      <point x="150" y="110"/>
+      <point x="220" y="110"/>
+      <point x="220" y="60" type="curve" smooth="yes"/>
+      <point x="220" y="10"/>
+    </contour>
+  </outline>
+  <lib>
+    <dict>
+      <key>xyz.fontra.layer-names</key>
+      <dict>
+        <key>default</key>
+        <string>0d2e6ea6</string>
+      </dict>
+    </dict>
+  </lib>
+</glyph>
