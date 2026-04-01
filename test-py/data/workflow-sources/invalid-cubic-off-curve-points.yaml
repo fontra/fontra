@@ -1,3 +1,4 @@
+# https://github.com/fontra/fontra/issues/2527
 steps:
   - input: fontra-read
     source: test-py/data/workflow/input-invalid-cubic-off-curve-points.fontra
