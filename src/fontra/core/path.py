@@ -194,6 +194,11 @@ class PackedPath:
                 if self.pointAttributes
                 else [None] * len(pointTypes)
             )
+
+            points, pointTypes, pointAttributes = fixSpuriousCubicOffCurvePoints(
+                points, pointTypes, pointAttributes, contourInfo.isClosed
+            )
+
             if not contourInfo.isClosed:
                 # strip leading and trailing off-curve points, they cause
                 # validation problems
@@ -585,6 +590,63 @@ def packPointType(type, smooth):
     else:
         pointType = PointType.ON_CURVE
     return pointType
+
+
+def fixSpuriousCubicOffCurvePoints(points, pointTypes, pointAttributes, isClosed):
+    if not any(pointType == PointType.OFF_CURVE_CUBIC for pointType in pointTypes):
+        return points, pointTypes, pointAttributes
+
+    firstOnCurvePointIndex = findFirstOnCurvePointIndex(pointTypes)
+    if firstOnCurvePointIndex is None:
+        return points, pointTypes, pointAttributes
+
+    startPoint = points[0]
+
+    if isClosed and firstOnCurvePointIndex:
+        points = shiftLeft(points, firstOnCurvePointIndex)
+        pointTypes = shiftLeft(pointTypes, firstOnCurvePointIndex)
+        pointAttributes = shiftLeft(pointAttributes, firstOnCurvePointIndex)
+
+    assert pointTypes[0] not in {PointType.OFF_CURVE_CUBIC, PointType.OFF_CURVE_QUAD}, (
+        firstOnCurvePointIndex,
+    )
+
+    indicesToDelete = set()
+    for i in range(1, len(pointTypes) - 1):
+        if (
+            pointTypes[i - 1] == PointType.OFF_CURVE_CUBIC
+            and pointTypes[i] == PointType.OFF_CURVE_CUBIC
+            and pointTypes[i + 1] == PointType.OFF_CURVE_CUBIC
+        ):
+            indicesToDelete.add(i)
+
+    if indicesToDelete:
+        for i in reversed(sorted(indicesToDelete)):
+            del points[i]
+            del pointTypes[i]
+            del pointAttributes[i]
+
+    if isClosed and firstOnCurvePointIndex and startPoint in points:
+        shiftBy = points.index(startPoint)
+        points = shiftLeft(points, shiftBy)
+        pointTypes = shiftLeft(pointTypes, shiftBy)
+        pointAttributes = shiftLeft(pointAttributes, shiftBy)
+
+    return points, pointTypes, pointAttributes
+
+
+def shiftLeft(lst, N):
+    if N == 0:
+        return lst
+    N = N % len(lst)
+    return lst[N:] + lst[:N]
+
+
+def findFirstOnCurvePointIndex(pointTypes):
+    for i, pointType in enumerate(pointTypes):
+        if pointType not in {PointType.OFF_CURVE_CUBIC, PointType.OFF_CURVE_QUAD}:
+            return i
+    return None
 
 
 #
