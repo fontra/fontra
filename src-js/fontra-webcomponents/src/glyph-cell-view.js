@@ -392,7 +392,7 @@ export class GlyphCellView extends HTMLElement {
     const glyphName = glyphCell.glyphName;
 
     if (this.glyphSelection.has(glyphName)) {
-      if (event.metaKey) {
+      if (event.metaKey || event.altKey) {
         this._resetSelectionHelpers();
         this.glyphSelection = difference(this.glyphSelection, [glyphName]);
       } else if (resetGlyphSelection && this.glyphSelection.size > 1) {
@@ -408,7 +408,7 @@ export class GlyphCellView extends HTMLElement {
         }, 500);
       }
     } else {
-      if (event.metaKey) {
+      if (event.metaKey || event.altKey) {
         this.glyphSelection = union(this.glyphSelection, [glyphName]);
       } else {
         this.glyphSelection = new Set([glyphName]);
@@ -477,7 +477,7 @@ export class GlyphCellView extends HTMLElement {
     }
 
     this._clickedCell = glyphCell;
-    this._dragErase = event.metaKey ? glyphCell.selected : false;
+    this._dragErase = event.metaKey || event.altKey ? glyphCell.selected : false;
     this._mouseInCell = true;
     this._mouseDownSelection = this.glyphSelection;
   }
@@ -593,7 +593,7 @@ export class GlyphCellView extends HTMLElement {
       this.extendSelection(glyphCell);
     } else {
       let selection = this.getGlyphNamesForRange(this._firstClickedCell, glyphCell);
-      if (this._mouseDownEvent.metaKey) {
+      if (this._mouseDownEvent.metaKey || this._mouseDownEvent.altKey) {
         selection = this._dragErase
           ? difference(this.glyphSelection, selection)
           : union(this._mouseDownSelection, selection);
