@@ -32,6 +32,9 @@
     "features": {
       "type": "OpenTypeFeatures"
     },
+    "conditionalSubstitutions": {
+      "type": "ConditionalSubstitutions"
+    },
     "customData": {
       "type": "dict",
       "subtype": "Any"
@@ -546,6 +549,39 @@
     "customData": {
       "type": "dict",
       "subtype": "Any"
+    }
+  },
+  "ConditionalSubstitutions": {
+    "featureTags": {
+      "type": "list",
+      "subtype": "str"
+    },
+    "rules": {
+      "type": "list",
+      "subtype": "SubstitionRule"
+    }
+  },
+  "SubstitionRule": {
+    "conditions": {
+      "type": "list",
+      "subtype": "SubstitionCondition"
+    },
+    "substitutions": {
+      "type": "dict",
+      "subtype": "str"
+    }
+  },
+  "SubstitionCondition": {
+    "name": {
+      "type": "str"
+    },
+    "minValue": {
+      "type": "float",
+      "optional": true
+    },
+    "maxValue": {
+      "type": "float",
+      "optional": true
     }
   }
 }

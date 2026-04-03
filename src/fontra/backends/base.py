@@ -2,6 +2,7 @@ from typing import Any
 
 from ..core.classes import (
     Axes,
+    ConditionalSubstitutions,
     FontInfo,
     FontSource,
     Kerning,
@@ -49,6 +50,9 @@ class ReadableBaseBackend:
     async def getGlyphInfos(self) -> dict[str, Any]:
         return {}
 
+    async def getConditionalSubstitutions(self) -> ConditionalSubstitutions:
+        return ConditionalSubstitutions()
+
 
 class WritableBaseBackend(ReadableBaseBackend):
     async def putGlyph(
@@ -85,3 +89,8 @@ class WritableBaseBackend(ReadableBaseBackend):
 
     async def putGlyphInfos(self, glyphInfos: dict[str, Any]) -> None:
         pass  # Better drop the glyph infos than to crash
+
+    async def putConditionalSubstitutions(
+        self, substitutions: ConditionalSubstitutions
+    ) -> None:
+        raise NotImplementedError()

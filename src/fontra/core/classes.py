@@ -62,6 +62,27 @@ class OpenTypeFeatures:
 
 
 @dataclass(kw_only=True)
+class SubstitionCondition:
+    name: str
+    minValue: Optional[float] = None
+    maxValue: Optional[float] = None
+
+
+@dataclass(kw_only=True)
+class SubstitionRule:
+    conditions: list[SubstitionCondition]
+    substitutions: dict[str, str]
+
+
+@dataclass(kw_only=True)
+class ConditionalSubstitutions:
+    # processing="first": ["rvrn"]
+    # processing="last": ["rclt"]
+    featureTags: list[str] = field(default_factory=lambda: ["rclt"])
+    rules: list[SubstitionRule] = field(default_factory=list)
+
+
+@dataclass(kw_only=True)
 class Kerning:
     groupsSide1: dict[str, list[str]]
     groupsSide2: dict[str, list[str]]
@@ -81,6 +102,9 @@ class Font:
     sources: dict[str, FontSource] = field(default_factory=dict)
     kerning: dict[str, Kerning] = field(default_factory=dict)
     features: OpenTypeFeatures = field(default_factory=OpenTypeFeatures)
+    conditionalSubstitutions: ConditionalSubstitutions = field(
+        default_factory=ConditionalSubstitutions
+    )
     customData: CustomData = field(default_factory=dict)
 
     def _trackAssignedAttributeNames(self):
