@@ -4,7 +4,7 @@
 
 ### New features
 
-- [pointer tool] Convert a line to a curve with alt-click (avoiding the need to switch to the pen tool for this) [PR 2538](https://github.com/fontra/fontra/pull/2538)
+- [pointer tool] Convert a line to a curve with alt-click (eliminating the need to switch to the pen tool for this) [PR 2538](https://github.com/fontra/fontra/pull/2538)
 
 ### Fixes
 
