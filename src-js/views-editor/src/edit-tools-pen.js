@@ -100,11 +100,7 @@ export class PenToolCubic extends BaseTool {
       const size = Math.max(1, this.sceneController.mouseClickMargin);
       const hit = this.sceneModel.pathHitAtPoint(point, size);
       if (event.altKey && hit.segment?.points?.length === 2) {
-        const pt1 = hit.segment.points[0];
-        const pt2 = hit.segment.points[1];
-        const handle1 = vector.roundVector(vector.interpolateVectors(pt1, pt2, 1 / 3));
-        const handle2 = vector.roundVector(vector.interpolateVectors(pt1, pt2, 2 / 3));
-        return { insertHandles: { points: [handle1, handle2], hit: hit } };
+        return this.getInsertHandlesFromPathHit(hit);
       } else {
         const targetPoint = { ...hit };
         if ("x" in targetPoint) {
@@ -147,6 +143,14 @@ export class PenToolCubic extends BaseTool {
     return { targetPoint: path.getPoint(hoveredPointIndex) };
   }
 
+  getInsertHandlesFromPathHit(hit) {
+    const pt1 = hit.segment.points[0];
+    const pt2 = hit.segment.points[1];
+    const handle1 = vector.roundVector(vector.interpolateVectors(pt1, pt2, 1 / 3));
+    const handle2 = vector.roundVector(vector.interpolateVectors(pt1, pt2, 2 / 3));
+    return { insertHandles: { points: [handle1, handle2], hit: hit } };
+  }
+
   async handleDrag(eventStream, initialEvent) {
     if (!this.sceneModel.selectedGlyph?.isEditing) {
       await this.editor.tools["pointer-tool"].handleDrag(eventStream, initialEvent);
@@ -156,7 +160,7 @@ export class PenToolCubic extends BaseTool {
     if (this.sceneModel.pathConnectTargetPoint?.segment) {
       await this._handleInsertPoint();
     } else if (this.sceneModel.pathInsertHandles) {
-      await this._handleInsertHandles();
+      await this.handleInsertHandles();
     } else {
       this._resetHover();
       await this._handleAddPoints(eventStream, initialEvent);
@@ -179,7 +183,7 @@ export class PenToolCubic extends BaseTool {
     });
   }
 
-  async _handleInsertHandles() {
+  async handleInsertHandles() {
     const segmentPointIndices =
       this.sceneModel.pathInsertHandles.hit.segment.pointIndices;
     await this.sceneController.editLayersAndRecordChanges((layerGlyphs) => {
@@ -714,7 +718,7 @@ function getHoveredPointIndex(sceneController, event) {
   return pointSelection[0];
 }
 
-function handlesEqual(handles1, handles2) {
+export function handlesEqual(handles1, handles2) {
   const points1 = handles1?.points;
   const points2 = handles2?.points;
   return (

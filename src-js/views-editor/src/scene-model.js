@@ -590,6 +590,11 @@ export class SceneModel {
     return mapObjectKeys(shaperLocation, (key) => nameToTagMapping[key]);
   }
 
+  get canEdit() {
+    const glyphController = this.getSelectedPositionedGlyph()?.glyph;
+    return !!glyphController?.canEdit;
+  }
+
   getLocationForGlyph(glyphName) {
     return {
       ...this.sceneSettings.fontLocationSourceMapped,
