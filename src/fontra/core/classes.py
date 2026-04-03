@@ -70,6 +70,7 @@ class SubstitionCondition:
 
 @dataclass(kw_only=True)
 class SubstitionRule:
+    name: Optional[str] = None
     conditions: list[SubstitionCondition]
     substitutions: dict[str, str]
 

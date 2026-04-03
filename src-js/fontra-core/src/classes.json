@@ -562,6 +562,10 @@
     }
   },
   "SubstitionRule": {
+    "name": {
+      "type": "str",
+      "optional": true
+    },
     "conditions": {
       "type": "list",
       "subtype": "SubstitionCondition"
