@@ -2,6 +2,10 @@
 
 ## 2026-04-?? [version 2026.4.1]
 
+### New features
+
+- [pointer tool] Convert a line to a curve with alt-click (avoiding the need to switch to the pen tool for this) [PR 2538](https://github.com/fontra/fontra/pull/2538)
+
 ### Fixes
 
 - [font overview] Accept the alt/option key as a modifier to toggle the glyph selection (when clicking or dragging). This can already be done with the command/Windows/meta key, but that has an annoying side effect on Windows. [Issue 2536](https://github.com/fontra/fontra/issues/2536), [PR 2537](https://github.com/fontra/fontra/pull/2537)
