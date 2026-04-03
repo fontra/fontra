@@ -1207,6 +1207,10 @@ export class EditorController extends ViewController {
     this.selectedToolIdentifier = selectedToolIdentifier;
   }
 
+  getPenTool() {
+    return this.tools[this.getToolIdentifierFromMultiTool("pen-tool")];
+  }
+
   getToolIdentifierFromMultiTool(toolIdentifier) {
     for (const editToolItem of document.querySelectorAll(
       "#edit-tools > .tool-button"
