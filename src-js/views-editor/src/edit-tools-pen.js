@@ -156,7 +156,7 @@ export class PenToolCubic extends BaseTool {
     if (this.sceneModel.pathConnectTargetPoint?.segment) {
       await this._handleInsertPoint();
     } else if (this.sceneModel.pathInsertHandles) {
-      await this._handleInsertHandles();
+      await this.handleInsertHandles();
     } else {
       this._resetHover();
       await this._handleAddPoints(eventStream, initialEvent);
@@ -179,7 +179,7 @@ export class PenToolCubic extends BaseTool {
     });
   }
 
-  async _handleInsertHandles() {
+  async handleInsertHandles() {
     const segmentPointIndices =
       this.sceneModel.pathInsertHandles.hit.segment.pointIndices;
     await this.sceneController.editLayersAndRecordChanges((layerGlyphs) => {
