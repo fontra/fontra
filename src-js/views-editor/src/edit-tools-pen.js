@@ -718,7 +718,7 @@ function getHoveredPointIndex(sceneController, event) {
   return pointSelection[0];
 }
 
-function handlesEqual(handles1, handles2) {
+export function handlesEqual(handles1, handles2) {
   const points1 = handles1?.points;
   const points2 = handles2?.points;
   return (
