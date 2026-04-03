@@ -1207,6 +1207,21 @@ export class EditorController extends ViewController {
     this.selectedToolIdentifier = selectedToolIdentifier;
   }
 
+  getToolIdentifierFromMultiTool(toolIdentifier) {
+    for (const editToolItem of document.querySelectorAll(
+      "#edit-tools > .tool-button"
+    )) {
+      if (
+        editToolItem.classList.contains("multi-tool") &&
+        editToolItem.dataset.tool === toolIdentifier
+      ) {
+        return editToolItem.children[0].dataset.tool;
+      }
+    }
+
+    return toolIdentifier;
+  }
+
   themeChanged() {
     this.visualizationLayers.darkTheme = this.isThemeDark;
     this.cleanGlyphsLayers.darkTheme = this.isThemeDark;
