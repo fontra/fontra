@@ -21,6 +21,7 @@ from fontTools.designspaceLib import (
     AxisLabelDescriptor,
     DesignSpaceDocument,
     DiscreteAxisDescriptor,
+    RuleDescriptor,
     SourceDescriptor,
 )
 from fontTools.feaLib.error import FeatureLibError
@@ -46,6 +47,7 @@ from ..core.classes import (
     AxisValueLabel,
     BackgroundImage,
     Component,
+    ConditionalSubstitutions,
     CrossAxisMapping,
     DiscreteFontAxis,
     FontAxis,
@@ -62,6 +64,9 @@ from ..core.classes import (
     OpenTypeFeatures,
     RGBAColor,
     StaticGlyph,
+    SubstitionRule,
+    SubstitutionCondition,
+    SubstitutionConditionSet,
     VariableGlyph,
 )
 from ..core.glyphdependencies import GlyphDependencies
@@ -1513,6 +1518,35 @@ class DesignspaceBackend(WatchableBackend, WritableBaseBackend):
 
         self.resetGlyphDirections()
 
+    async def getConditionalSubstitutions(self) -> ConditionalSubstitutions:
+        return ConditionalSubstitutions(
+            featureTags=self.dsDoc.lib.get(
+                "com.github.fonttools.varLib.featureVarsFeatureTag",
+                ["rclt"] if self.dsDoc.rulesProcessingLast else ["rvrn"],
+            ),
+            rules=unpackRules(self.dsDoc.rules),
+        )
+
+    async def putConditionalSubstitutions(
+        self, substitutions: ConditionalSubstitutions
+    ) -> None:
+        self.dsDoc.rulesProcessingLast = substitutions.featureTags != ["rvrn"]
+        featureTags = (
+            None
+            if substitutions.featureTags == ["rvrn"]
+            or substitutions.featureTags == ["rclt"]
+            else substitutions.featureTags
+        )
+        storeInDict(
+            self.dsDoc.lib,
+            "com.github.fonttools.varLib.featureVarsFeatureTag",
+            featureTags,
+        )
+
+        self.dsDoc.rules = packRules(substitutions.rules)
+
+        self._writeDesignSpaceDocument()
+
     async def getBackgroundImage(self, imageIdentifier: str) -> ImageData | None:
         imageInfo = self._imageMapping.reverse.get(imageIdentifier)
         if imageInfo is None:
@@ -1850,6 +1884,54 @@ def packAxisLabels(valueLabels):
         )
         for label in valueLabels
     ]
+
+
+def unpackRules(dsRules: list[RuleDescriptor]) -> list[SubstitionRule]:
+    return [unpackRule(dsRule) for dsRule in dsRules]
+
+
+def unpackRule(dsRule: RuleDescriptor) -> SubstitionRule:
+    return SubstitionRule(
+        name=dsRule.name,
+        conditionSets=[
+            SubstitutionConditionSet(
+                conditions=[
+                    unpackCondition(dsCondition) for dsCondition in dsConditionSet
+                ]
+            )
+            for dsConditionSet in dsRule.conditionSets
+        ],
+        substitutions=dict(dsRule.subs),
+    )
+
+
+def unpackCondition(dsCondition: dict) -> SubstitutionCondition:
+    return SubstitutionCondition(
+        name=dsCondition["name"],
+        minValue=dsCondition["minimum"],
+        maxValue=dsCondition["maximum"],
+    )
+
+
+def packRules(rules: list[SubstitionRule]) -> list[RuleDescriptor]:
+    return [packRule(rule) for rule in rules]
+
+
+def packRule(rule: SubstitionRule) -> RuleDescriptor:
+    return RuleDescriptor(
+        name=rule.name,
+        conditionSets=[
+            [packCondition(condition) for condition in conditionSet.conditions]
+            for conditionSet in rule.conditionSets
+        ],
+        subs=rule.substitutions.items(),
+    )
+
+
+def packCondition(condition: SubstitutionCondition) -> dict:
+    return dict(
+        name=condition.name, minimum=condition.minValue, maximum=condition.maxValue
+    )
 
 
 # def getPostscriptBlueValues(fontInfo):
