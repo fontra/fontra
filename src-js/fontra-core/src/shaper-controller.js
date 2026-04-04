@@ -166,6 +166,10 @@ export class ShaperController {
 
   async buildShaperFont(glyphOrder) {
     const features = await this.fontController.getFeatures();
+    const conditionalSubstitutions = prepareConditionalSubstitutions(
+      await this.fontController.getConditionalSubstitutions(),
+      this.fontController.fontAxes
+    );
 
     const glyphClasses = await this.getGlyphClasses();
 
@@ -182,7 +186,8 @@ export class ShaperController {
             defaultValue: axis.defaultValue,
             maxValue: axis.maxValue,
           })),
-        glyphClasses
+        glyphClasses,
+        [conditionalSubstitutions]
       );
     } catch (e) {
       console.error(e);
@@ -311,4 +316,26 @@ function ensureNotdef(glyphOrder) {
     glyphOrder.splice(index, 1);
   }
   glyphOrder.unshift(".notdef");
+}
+
+function prepareConditionalSubstitutions(substitutions, fontAxes) {
+  const axesByName = Object.fromEntries(fontAxes.map((axis) => [axis.name, axis]));
+
+  return {
+    featureTags: substitutions.featureTags,
+    rules: substitutions.rules.map(({ conditionSets, substitutions }) => [
+      conditionSets.map(({ conditions }) =>
+        Object.fromEntries(
+          conditions.map(({ name, minValue, maxValue }) => [
+            axesByName[name].tag,
+            [
+              minValue ?? axesByName[name].minValue,
+              maxValue ?? axesByName[name].maxValue,
+            ],
+          ])
+        )
+      ),
+      substitutions,
+    ]),
+  };
 }
