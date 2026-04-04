@@ -39,6 +39,10 @@ export class LocalFontEngine {
     return await this.backend.getCustomData();
   }
 
+  async getConditionalSubstitutions() {
+    return await this.backend.getConditionalSubstitutions();
+  }
+
   async getShaperFontData() {
     return null;
   }
