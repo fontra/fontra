@@ -103,7 +103,9 @@ export class FontraBackend {
   }
 
   async getConditionalSubstitutions() {
-    return this.fontData.conditionalSubstitutions;
+    return (
+      this.fontData.conditionalSubstitutions ?? { featureTags: ["rclt"], rules: [] }
+    );
   }
 
   async getKerning() {
