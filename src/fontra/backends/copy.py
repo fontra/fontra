@@ -57,6 +57,9 @@ async def _copyFont(
     await destBackend.putSources(await sourceBackend.getSources())
     await destBackend.putCustomData(await sourceBackend.getCustomData())
     await destBackend.putGlyphInfos(await sourceBackend.getGlyphInfos())
+    await destBackend.putConditionalSubstitutions(
+        await sourceBackend.getConditionalSubstitutions()
+    )
     glyphMap = await sourceBackend.getGlyphMap()
     glyphNamesToCopy = sorted(glyphMap)
     glyphNamesCopied: set[str] = set()
