@@ -27,6 +27,11 @@ export class ShaperController {
     this.fontController.addChangeListener(
       { glyphs: null },
       consolidateCalls((change, isExternalChange) => {
+        if (!change) {
+          // reload everything
+          this.purgeGlyphClassesCache();
+          return;
+        }
         const glyphNames = collectGlyphNames(change);
         const extendedGlyphNames = new Set(glyphNames);
 
