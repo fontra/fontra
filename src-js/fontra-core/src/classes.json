@@ -566,16 +566,22 @@
       "type": "str",
       "optional": true
     },
-    "conditions": {
+    "conditionSets": {
       "type": "list",
-      "subtype": "SubstitionCondition"
+      "subtype": "SubstitutionConditionSet"
     },
     "substitutions": {
       "type": "dict",
       "subtype": "str"
     }
   },
-  "SubstitionCondition": {
+  "SubstitutionConditionSet": {
+    "conditions": {
+      "type": "list",
+      "subtype": "SubstitutionCondition"
+    }
+  },
+  "SubstitutionCondition": {
     "name": {
       "type": "str"
     },

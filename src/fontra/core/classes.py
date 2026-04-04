@@ -62,16 +62,21 @@ class OpenTypeFeatures:
 
 
 @dataclass(kw_only=True)
-class SubstitionCondition:
+class SubstitutionCondition:
     name: str
     minValue: Optional[float] = None
     maxValue: Optional[float] = None
 
 
 @dataclass(kw_only=True)
+class SubstitutionConditionSet:
+    conditions: list[SubstitutionCondition] = field(default_factory=list)
+
+
+@dataclass(kw_only=True)
 class SubstitionRule:
     name: Optional[str] = None
-    conditions: list[SubstitionCondition]
+    conditionSets: list[SubstitutionConditionSet]
     substitutions: dict[str, str]
 
 
