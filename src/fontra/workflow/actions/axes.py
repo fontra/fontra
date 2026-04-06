@@ -304,9 +304,9 @@ class SubsetAxes(BaseFilter):
         if not substitutions.rules:
             return substitutions
 
-        axes = await self.inputAxes
-        keepAxisNames = self.getAxisNamesToKeep(axes.axes)
-        axesByName = {axis.name: axis for axis in axes.axes}
+        axes = (await self.fontInstancer.fontSourcesInstancer).fontAxesSourceSpace
+        keepAxisNames = self.getAxisNamesToKeep(axes)
+        axesByName = {axis.name: axis for axis in axes}
 
         newRules = [
             replace(
