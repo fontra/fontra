@@ -6,7 +6,12 @@ from dataclasses import dataclass, field, replace
 from typing import Any
 
 from ...core.async_property import async_cached_property
-from ...core.classes import Kerning, OpenTypeFeatures, VariableGlyph
+from ...core.classes import (
+    ConditionalSubstitutions,
+    Kerning,
+    OpenTypeFeatures,
+    VariableGlyph,
+)
 from ..features import LayoutHandling, subsetFeatures
 from . import ActionError
 from .base import BaseFilter, getActiveSources, registerFilterAction
@@ -27,6 +32,12 @@ class BaseGlyphSubsetter(BaseFilter):
     async def processKerning(self, kerning: dict[str, Kerning]) -> dict[str, Kerning]:
         glyphMap, _ = await self._subsettedGlyphMapAndFeatures
         return subsetKerning(kerning, glyphMap)
+
+    async def processConditionalSubstitutions(
+        self, substitutions: ConditionalSubstitutions
+    ) -> ConditionalSubstitutions:
+        glyphMap, _ = await self._subsettedGlyphMapAndFeatures
+        return subsetConditionalSubstitutions(substitutions, glyphMap)
 
     async def getFeatures(self) -> OpenTypeFeatures:
         _, features = await self._subsettedGlyphMapAndFeatures
@@ -149,6 +160,30 @@ def subsetGroups(groups, glyphNames):
         if group:
             newGroups[groupName] = group
     return newGroups
+
+
+def subsetConditionalSubstitutions(
+    substitutions: ConditionalSubstitutions, glyphNames: set[str]
+) -> ConditionalSubstitutions:
+    subsettedRules = [
+        subsetSubstitutionRule(rule, glyphNames) for rule in substitutions.rules
+    ]
+    subsettedRules = [rule for rule in subsettedRules if rule.substitutions]
+
+    return ConditionalSubstitutions(
+        featureTags=list(substitutions.featureTags), rules=subsettedRules
+    )
+
+
+def subsetSubstitutionRule(rule, glyphNames):
+    return replace(
+        rule,
+        substitutions={
+            g1: g2
+            for g1, g2 in rule.substitutions.items()
+            if g1 in glyphNames and g2 in glyphNames
+        },
+    )
 
 
 def getComponentNames(glyph):

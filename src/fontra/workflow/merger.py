@@ -11,6 +11,7 @@ from ..backends.null import NullBackend
 from ..core.async_property import async_cached_property
 from ..core.classes import (
     Axes,
+    ConditionalSubstitutions,
     FontInfo,
     FontSource,
     ImageData,
@@ -22,8 +23,9 @@ from ..core.classes import (
 from ..core.kernutils import disambiguateKerningGroupNames
 from ..core.protocols import ReadableFontBackend, ReadBackgroundImage
 from ..core.varutils import locationToTuple
+from .actions import ActionError
 from .actions.axes import mapFontSourceLocationsAndFilter
-from .actions.subset import subsetKerning
+from .actions.subset import subsetConditionalSubstitutions, subsetKerning
 from .features import mergeFeatures
 
 logger = logging.getLogger(__name__)
@@ -231,6 +233,42 @@ class FontBackendMerger(ReadableBaseBackend):
         customDataA = await self.inputA.getCustomData()
         customDataB = await self.inputB.getCustomData()
         return customDataA | customDataB
+
+    async def getConditionalSubstitutions(self) -> ConditionalSubstitutions:
+        await self._prepareGlyphMap()
+        assert self._glyphNamesA is not None
+        assert self._glyphNamesB is not None
+
+        substitutionsA = subsetConditionalSubstitutions(
+            await self.inputA.getConditionalSubstitutions(),
+            self._glyphNamesA - self._glyphNamesB,
+        )
+        substitutionsB = subsetConditionalSubstitutions(
+            await self.inputB.getConditionalSubstitutions(), self._glyphNamesB
+        )
+
+        if not substitutionsB.rules:
+            return substitutionsA
+        elif not substitutionsA.rules:
+            return substitutionsB
+
+        if "rvrn" in (
+            set(substitutionsA.featureTags) ^ set(substitutionsB.featureTags)
+        ):
+            raise ActionError(
+                f"Merger: conditional substitution feature tags are not compatible: "
+                f"A: {substitutionsA.featureTags}, B: {substitutionsB.featureTags}"
+            )
+
+        mergedFeatureTags = list(substitutionsA.featureTags)
+        for tag in substitutionsB.featureTags:
+            if tag not in mergedFeatureTags:
+                mergedFeatureTags.append(tag)
+
+        return ConditionalSubstitutions(
+            featureTags=mergedFeatureTags,
+            rules=substitutionsA.rules + substitutionsB.rules,
+        )
 
     async def getUnitsPerEm(self) -> int:
         unitsPerEmA = await self.inputA.getUnitsPerEm()
