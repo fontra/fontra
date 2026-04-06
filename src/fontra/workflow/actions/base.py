@@ -18,6 +18,7 @@ from ...backends.null import NullBackend
 from ...core.async_property import async_cached_property
 from ...core.classes import (
     Axes,
+    ConditionalSubstitutions,
     FontInfo,
     FontSource,
     ImageData,
@@ -170,6 +171,12 @@ class BaseFilter(ReadableBaseBackend):
         customData = await self.validatedInput.getCustomData()
         return await self.processCustomData(customData)
 
+    async def getConditionalSubstitutions(self) -> ConditionalSubstitutions:
+        conditionalSubstitutions = (
+            await self.validatedInput.getConditionalSubstitutions()
+        )
+        return await self.processConditionalSubstitutions(conditionalSubstitutions)
+
     async def getUnitsPerEm(self) -> int:
         unitsPerEm = await self.validatedInput.getUnitsPerEm()
         return await self.processUnitsPerEm(unitsPerEm)
@@ -214,6 +221,12 @@ class BaseFilter(ReadableBaseBackend):
 
     async def processCustomData(self, customData):
         return customData
+
+    async def processConditionalSubstitutions(
+        self,
+        conditionalSubstitutions: ConditionalSubstitutions,
+    ) -> ConditionalSubstitutions:
+        return conditionalSubstitutions
 
     async def processUnitsPerEm(self, unitsPerEm: int) -> int:
         return unitsPerEm
