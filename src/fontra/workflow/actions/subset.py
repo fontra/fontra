@@ -58,6 +58,9 @@ class BaseGlyphSubsetter(BaseFilter):
         inputGlyphMap = await self.inputGlyphMap
         selectedGlyphs = await self._buildSubsettedGlyphSet(inputGlyphMap)
 
+        if LayoutHandling(self.layoutHandling) == LayoutHandling.CLOSURE:
+            selectedGlyphs = await self._conditionalSubstitutionsClosure(selectedGlyphs)
+
         selectedGlyphs, features = await self._featuresClosure(selectedGlyphs)
         selectedGlyphs = await self._componentsClosure(selectedGlyphs)
         glyphMap = filterGlyphDict(inputGlyphMap, selectedGlyphs)
@@ -68,6 +71,19 @@ class BaseGlyphSubsetter(BaseFilter):
     ) -> set[str]:
         # Override
         raise NotImplementedError
+
+    async def _conditionalSubstitutionsClosure(
+        self, selectedGlyphs: set[str]
+    ) -> set[str]:
+        substitutions = await self.validatedInput.getConditionalSubstitutions()
+        additionalGlyphs = set()
+
+        for rule in substitutions.rules:
+            inputGlyphNames = selectedGlyphs & set(rule.substitutions)
+            for glyphName in sorted(inputGlyphNames):
+                additionalGlyphs.add(rule.substitutions[glyphName])
+
+        return selectedGlyphs | additionalGlyphs
 
     async def _featuresClosure(
         self, selectedGlyphs
