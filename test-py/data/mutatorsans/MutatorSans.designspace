@@ -13,7 +13,7 @@
       </labels>
     </axis>
   </axes>
-  <rules>
+  <rules processing="last">
     <rule name="fold_I_serifs">
       <conditionset>
         <condition name="width" minimum="0" maximum="328"/>
