@@ -16,11 +16,12 @@
 }
 },
 {
-"name": "support.crossbar",
-"layerName": "MutatorSansLightCondensed/support.crossbar",
+"name": "",
+"layerName": "support.crossbar",
 "location": {
 "weight": 595
-}
+},
+"locationBase": "support.crossbar"
 },
 {
 "name": "weight=704.75",
@@ -31,7 +32,7 @@
 }
 ],
 "layers": {
-"MutatorSansLightCondensed/support.crossbar": {
+"support.crossbar": {
 "glyph": {
 "path": {
 "contours": [
