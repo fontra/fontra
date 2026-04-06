@@ -2,53 +2,33 @@
 "name": "period",
 "sources": [
 {
-"name": "LightCondensed",
-"layerName": "MutatorSansLightCondensed/foreground",
-"location": {
-"italic": 0,
-"weight": 150,
-"width": 0
-}
+"name": "",
+"layerName": "light-condensed",
+"locationBase": "light-condensed"
 },
 {
-"name": "BoldCondensed",
-"layerName": "MutatorSansBoldCondensed/foreground",
-"location": {
-"italic": 0,
-"weight": 850,
-"width": 0
-}
+"name": "",
+"layerName": "bold-condensed",
+"locationBase": "bold-condensed"
 },
 {
-"name": "LightWide",
-"layerName": "MutatorSansLightWide/foreground",
-"location": {
-"italic": 0,
-"weight": 150,
-"width": 1000
-}
+"name": "",
+"layerName": "light-wide",
+"locationBase": "light-wide"
 },
 {
-"name": "BoldWide",
-"layerName": "MutatorSansBoldWide/foreground",
-"location": {
-"italic": 0,
-"weight": 850,
-"width": 1000
-}
+"name": "",
+"layerName": "bold-wide",
+"locationBase": "bold-wide"
 },
 {
-"name": "LightCondensedItalic",
-"layerName": "MutatorSansLightCondensedItalic/public.default",
-"location": {
-"italic": 1,
-"weight": 150,
-"width": 0
-}
+"name": "",
+"layerName": "light-condensed-italic",
+"locationBase": "light-condensed-italic"
 }
 ],
 "layers": {
-"MutatorSansBoldCondensed/foreground": {
+"bold-condensed": {
 "glyph": {
 "path": {
 "contours": [
@@ -78,7 +58,7 @@
 "xAdvance": 250
 }
 },
-"MutatorSansBoldWide/foreground": {
+"bold-wide": {
 "glyph": {
 "path": {
 "contours": [
@@ -108,37 +88,7 @@
 "xAdvance": 310
 }
 },
-"MutatorSansLightCondensed/background": {
-"glyph": {
-"path": {
-"contours": [
-{
-"points": [
-{
-"x": 62,
-"y": 0
-},
-{
-"x": 112,
-"y": 0
-},
-{
-"x": 112,
-"y": 120
-},
-{
-"x": 62,
-"y": 120
-}
-],
-"isClosed": true
-}
-]
-},
-"xAdvance": 170
-}
-},
-"MutatorSansLightCondensed/foreground": {
+"light-condensed": {
 "glyph": {
 "path": {
 "contours": [
@@ -168,7 +118,7 @@
 "xAdvance": 170
 }
 },
-"MutatorSansLightCondensedItalic/public.default": {
+"light-condensed-italic": {
 "glyph": {
 "path": {
 "contours": [
@@ -202,7 +152,37 @@
 "xAdvance": 170
 }
 },
-"MutatorSansLightWide/foreground": {
+"light-condensed^background": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": 62,
+"y": 0
+},
+{
+"x": 112,
+"y": 0
+},
+{
+"x": 112,
+"y": 120
+},
+{
+"x": 62,
+"y": 120
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 170
+}
+},
+"light-wide": {
 "glyph": {
 "path": {
 "contours": [

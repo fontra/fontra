@@ -16,39 +16,37 @@
 ],
 "sources": [
 {
-"name": "LightCondensed",
-"layerName": "MutatorSansLightCondensed/foreground",
-"location": {
-"italic": 0,
-"weight": 150,
-"width": 0
-}
+"name": "",
+"layerName": "light-condensed",
+"locationBase": "light-condensed"
 },
 {
 "name": "varco_flip",
-"layerName": "MutatorSansLightCondensed/varco_flip",
+"layerName": "varco_flip",
 "location": {
 "flip": 100
-}
+},
+"locationBase": "light-condensed"
 },
 {
 "name": "varco_flop",
-"layerName": "MutatorSansLightCondensed/varco_flop",
+"layerName": "varco_flop",
 "location": {
 "flop": 100
-}
+},
+"locationBase": "light-condensed"
 },
 {
 "name": "weight=850,flip=100",
 "layerName": "weight=850,flip=100",
 "location": {
-"flip": 100,
-"weight": 850
-}
+"flip": 100
+},
+"locationBase": "bold-condensed"
 }
 ],
 "layers": {
-"MutatorSansLightCondensed/foreground": {
+"light-condensed": {
 "glyph": {
 "path": {
 "contours": [
@@ -94,7 +92,7 @@
 "xAdvance": 500
 }
 },
-"MutatorSansLightCondensed/varco_flip": {
+"varco_flip": {
 "glyph": {
 "path": {
 "contours": [
@@ -140,7 +138,7 @@
 "xAdvance": 500
 }
 },
-"MutatorSansLightCondensed/varco_flop": {
+"varco_flop": {
 "glyph": {
 "path": {
 "contours": [

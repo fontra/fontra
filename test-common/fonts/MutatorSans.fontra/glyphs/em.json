@@ -2,31 +2,23 @@
 "name": "em",
 "sources": [
 {
-"name": "LightCondensed",
-"layerName": "MutatorSansLightCondensed/foreground",
-"location": {
-"italic": 0,
-"weight": 150,
-"width": 0
-}
+"name": "",
+"layerName": "light-condensed",
+"locationBase": "light-condensed"
 },
 {
-"name": "BoldWide",
-"layerName": "MutatorSansBoldWide/foreground",
-"location": {
-"italic": 0,
-"weight": 850,
-"width": 1000
-}
+"name": "",
+"layerName": "bold-wide",
+"locationBase": "bold-wide"
 }
 ],
 "layers": {
-"MutatorSansBoldWide/foreground": {
+"bold-wide": {
 "glyph": {
 "xAdvance": 0
 }
 },
-"MutatorSansLightCondensed/foreground": {
+"light-condensed": {
 "glyph": {
 "xAdvance": 500
 }

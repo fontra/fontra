@@ -17,38 +17,41 @@
 "sources": [
 {
 "name": "<default>",
-"layerName": "<default>",
+"layerName": "light-condensed",
 "location": {
-"italic": 0,
 "weight": 0,
 "width": 0
-}
+},
+"locationBase": "light-condensed"
 },
 {
 "name": "weight=1",
-"layerName": "weight=1",
+"layerName": "light-condensed^weight=1",
 "location": {
 "weight": 1
-}
+},
+"locationBase": "light-condensed"
 },
 {
 "name": "width=1",
-"layerName": "width=1",
+"layerName": "light-condensed^width=1",
 "location": {
 "width": 1
-}
+},
+"locationBase": "light-condensed"
 },
 {
 "name": "width=1,weight=1",
-"layerName": "width=1,weight=1",
+"layerName": "light-condensed^width=1,weight=1",
 "location": {
 "weight": 1,
 "width": 1
-}
+},
+"locationBase": "light-condensed"
 }
 ],
 "layers": {
-"<default>": {
+"light-condensed": {
 "glyph": {
 "path": {
 "contours": [
@@ -205,7 +208,7 @@
 "xAdvance": 454
 }
 },
-"weight=1": {
+"light-condensed^weight=1": {
 "glyph": {
 "path": {
 "contours": [
@@ -362,7 +365,7 @@
 "xAdvance": 720
 }
 },
-"width=1": {
+"light-condensed^width=1": {
 "glyph": {
 "path": {
 "contours": [
@@ -519,7 +522,7 @@
 "xAdvance": 1171
 }
 },
-"width=1,weight=1": {
+"light-condensed^width=1,weight=1": {
 "glyph": {
 "path": {
 "contours": [

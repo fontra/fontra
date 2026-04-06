@@ -2,17 +2,13 @@
 "name": "nestedcomponents",
 "sources": [
 {
-"name": "<default>",
-"layerName": "<default>",
-"location": {
-"italic": 0,
-"weight": 150,
-"width": 0
-}
+"name": "",
+"layerName": "light-condensed",
+"locationBase": "light-condensed"
 }
 ],
 "layers": {
-"<default>": {
+"light-condensed": {
 "glyph": {
 "components": [
 {
