@@ -12,12 +12,14 @@ from fontTools.varLib.models import piecewiseLinearMap
 from ...core.async_property import async_cached_property
 from ...core.classes import (
     Axes,
+    ConditionalSubstitutions,
     DiscreteFontAxis,
     FontAxis,
     FontSource,
     GlyphSource,
     Kerning,
     Layer,
+    SubstitutionConditionSet,
     VariableGlyph,
     structure,
     unstructure,
@@ -296,6 +298,78 @@ class SubsetAxes(BaseFilter):
         mapping = {sourceIdentifier: sourceIdentifier for sourceIdentifier in sources}
         return mapKerningSourcesAndFilter(kerning, mapping)
 
+    async def processConditionalSubstitutions(
+        self, substitutions: ConditionalSubstitutions
+    ) -> ConditionalSubstitutions:
+        if not substitutions.rules:
+            return substitutions
+
+        axes = await self.inputAxes
+        keepAxisNames = self.getAxisNamesToKeep(axes.axes)
+        axesByName = {axis.name: axis for axis in axes.axes}
+
+        newRules = [
+            replace(
+                rule,
+                conditionSets=filterConditionSets(
+                    rule.conditionSets, axesByName, keepAxisNames
+                ),
+            )
+            for rule in substitutions.rules
+        ]
+
+        newRules = [rule for rule in newRules if rule.conditionSets]
+
+        return replace(substitutions, rules=newRules)
+
+
+def filterConditionSets(
+    conditionSets: list[SubstitutionConditionSet],
+    axesByName: dict[str, FontAxis],
+    keepAxisNames: set,
+) -> list[SubstitutionConditionSet]:
+    newConditionSets = []
+
+    conditionSet: SubstitutionConditionSet | None
+
+    for conditionSet in conditionSets:
+        conditionSet = filterConditionSet(conditionSet, axesByName, keepAxisNames)
+        if conditionSet is not None:
+            newConditionSets.append(conditionSet)
+
+    return newConditionSets
+
+
+def filterConditionSet(
+    conditionSet: SubstitutionConditionSet,
+    axesByName: dict[str, FontAxis],
+    keepAxisNames: set,
+) -> SubstitutionConditionSet | None:
+    newConditions = []
+
+    for condition in conditionSet.conditions:
+        if condition.name not in axesByName:
+            continue
+
+        if condition.name not in keepAxisNames:
+            # This axis is being dropped. If the axis default value is *not*
+            # within the condition range, the condition is False and we return
+            # None. If it is, then it depends on the other conditions in the set.
+            # Note: An empty conditionSet is considered True.
+            axis = axesByName[condition.name]
+            if (
+                condition.minValue is not None
+                and condition.minValue > axis.defaultValue
+            ) or (
+                condition.maxValue is not None
+                and axis.defaultValue > condition.maxValue
+            ):
+                return None
+        else:
+            newConditions.append(condition)
+
+    return replace(conditionSet, conditions=newConditions)
+
 
 def getDefaultSourceLocation(axes):
     return {
@@ -427,6 +501,16 @@ class BaseMoveDefaultLocation(BaseFilter):
 
     async def processKerning(self, kerning: dict[str, Kerning]) -> dict[str, Kerning]:
         return await processKerningHelper(self, kerning)
+
+    async def processConditionalSubstitutions(
+        self, substitutions: ConditionalSubstitutions
+    ) -> ConditionalSubstitutions:
+        if not substitutions.rules:
+            return substitutions
+
+        raise NotImplementedError("BaseMoveDefaultLocation")
+
+        return substitutions
 
     def _filterAxisList(self, axes):
         raise NotImplementedError()
@@ -646,6 +730,16 @@ class TrimAxes(BaseFilter):
 
     async def processKerning(self, kerning: dict[str, Kerning]) -> dict[str, Kerning]:
         return await processKerningHelper(self, kerning)
+
+    async def processConditionalSubstitutions(
+        self, substitutions: ConditionalSubstitutions
+    ) -> ConditionalSubstitutions:
+        if not substitutions.rules:
+            return substitutions
+
+        raise NotImplementedError("TrimAxes")
+
+        return substitutions
 
     async def getGlyph(self, glyphName: str) -> VariableGlyph:
         instancer = await self.fontInstancer.getGlyphInstancer(glyphName)
