@@ -256,5 +256,51 @@
 "width": 0
 }
 }
+},
+"conditionalSubstitutions": {
+"featureTags": [
+"rvrn"
+],
+"rules": [
+{
+"name": "fold_I_serifs",
+"conditionSets": [
+{
+"conditions": [
+{
+"name": "width",
+"minValue": 0,
+"maxValue": 328
+}
+]
+}
+],
+"substitutions": {
+"I": "I.narrow"
+}
+},
+{
+"name": "fold_S_terminals",
+"conditionSets": [
+{
+"conditions": [
+{
+"name": "width",
+"minValue": 0,
+"maxValue": 1000
+},
+{
+"name": "weight",
+"minValue": 0,
+"maxValue": 500
+}
+]
+}
+],
+"substitutions": {
+"S": "S.closed"
+}
+}
+]
 }
 }
