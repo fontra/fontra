@@ -1,0 +1,81 @@
+{
+"name": "I.narrow",
+"sources": [
+{
+"name": "weight=150",
+"layerName": "weight=150",
+"location": {
+"weight": 150
+}
+},
+{
+"name": "weight=850",
+"layerName": "weight=850",
+"location": {
+"weight": 850
+}
+}
+],
+"layers": {
+"weight=150": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": 72,
+"y": 0
+},
+{
+"x": 112,
+"y": 0
+},
+{
+"x": 112,
+"y": 700
+},
+{
+"x": 72,
+"y": 700
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 184
+}
+},
+"weight=850": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": 36,
+"y": 0
+},
+{
+"x": 376,
+"y": 0
+},
+{
+"x": 376,
+"y": 800
+},
+{
+"x": 36,
+"y": 800
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 412
+}
+}
+}
+}
