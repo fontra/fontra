@@ -313,14 +313,32 @@ class SubsetAxes(BaseFilter):
             if name not in keepAxisNames
         }
 
-        return filterConditionalSubstitutions(substitutions, locationToDrop)
+        filterFunc = partial(filterSubstitutionCondition, locationToDrop)
+        return filterConditionalSubstitutions(substitutions, filterFunc)
 
 
-def filterConditionalSubstitutions(substitutions, locationToDrop):
+def filterSubstitutionCondition(locationToDrop, condition):
+    value = locationToDrop.get(condition.name)
+    if value is not None:
+        # This axis is being dropped. If the axis default value is *not*
+        # within the condition range, the condition is False and we return
+        # None. If it is, then it depends on the other conditions in the set.
+        # Note: An empty conditionSet is considered True.
+        if (condition.minValue is not None and value < condition.minValue) or (
+            condition.maxValue is not None and value > condition.maxValue
+        ):
+            return None, True
+        else:
+            return None, False
+
+    return condition, None
+
+
+def filterConditionalSubstitutions(substitutions, filterFunc):
     newRules = [
         replace(
             rule,
-            conditionSets=filterConditionSets(rule.conditionSets, locationToDrop),
+            conditionSets=filterConditionSets(rule.conditionSets, filterFunc),
         )
         for rule in substitutions.rules
     ]
@@ -331,14 +349,14 @@ def filterConditionalSubstitutions(substitutions, locationToDrop):
 
 
 def filterConditionSets(
-    conditionSets: list[SubstitutionConditionSet], locationToDrop: dict[str, float]
+    conditionSets: list[SubstitutionConditionSet], filterFunc
 ) -> list[SubstitutionConditionSet]:
     newConditionSets = []
 
     conditionSet: SubstitutionConditionSet | None
 
     for conditionSet in conditionSets:
-        conditionSet = filterConditionSet(conditionSet, locationToDrop)
+        conditionSet = filterConditionSet(conditionSet, filterFunc)
         if conditionSet is not None:
             newConditionSets.append(conditionSet)
 
@@ -346,23 +364,19 @@ def filterConditionSets(
 
 
 def filterConditionSet(
-    conditionSet: SubstitutionConditionSet, locationToDrop: dict[str, float]
+    conditionSet: SubstitutionConditionSet, filterFunc
 ) -> SubstitutionConditionSet | None:
     newConditions = []
 
     for condition in conditionSet.conditions:
-        value = locationToDrop.get(condition.name)
-        if value is not None:
-            # This axis is being dropped. If the axis default value is *not*
-            # within the condition range, the condition is False and we return
-            # None. If it is, then it depends on the other conditions in the set.
-            # Note: An empty conditionSet is considered True.
-            if (condition.minValue is not None and value < condition.minValue) or (
-                condition.maxValue is not None and value > condition.maxValue
-            ):
-                return None
-        else:
+        condition, isFalse = filterFunc(condition)
+        if condition is not None:
             newConditions.append(condition)
+        elif isFalse:
+            # The condition is always false, tell our caller
+            return None
+        # else:
+        #   The condition is always true, keep going
 
     return replace(conditionSet, conditions=newConditions)
 
@@ -508,7 +522,8 @@ class BaseMoveDefaultLocation(BaseFilter):
             name: value for name, value in (await self.newDefaultSourceLocation).items()
         }
 
-        return filterConditionalSubstitutions(substitutions, locationToDrop)
+        filterFunc = partial(filterSubstitutionCondition, locationToDrop)
+        return filterConditionalSubstitutions(substitutions, filterFunc)
 
     def _filterAxisList(self, axes):
         raise NotImplementedError()
