@@ -750,9 +750,30 @@ class TrimAxes(BaseFilter):
         if not substitutions.rules:
             return substitutions
 
-        raise NotImplementedError("TrimAxes")
+        _, trimmedRanges = await self._trimmedAxesAndSourceRanges
 
-        return substitutions
+        def filterFunc(condition):
+            rng = trimmedRanges.get(condition.name)
+            if rng is None:
+                return None, False  # ignore this condition
+
+            minValue = (
+                max(condition.minValue, rng.minValue)
+                if condition.minValue is not None
+                else None
+            )
+            maxValue = (
+                min(condition.maxValue, rng.maxValue)
+                if condition.maxValue is not None
+                else None
+            )
+            if minValue == maxValue:
+                # Range is empty now, this makes the entire condition set false
+                return None, True
+
+            return replace(condition, minValue=minValue, maxValue=maxValue), None
+
+        return filterConditionalSubstitutions(substitutions, filterFunc)
 
     async def getGlyph(self, glyphName: str) -> VariableGlyph:
         instancer = await self.fontInstancer.getGlyphInstancer(glyphName)
