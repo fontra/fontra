@@ -505,7 +505,7 @@ class BaseMoveDefaultLocation(BaseFilter):
             return substitutions
 
         locationToDrop = {
-            name: value for name, value in self.newDefaultSourceLocation.items()
+            name: value for name, value in (await self.newDefaultSourceLocation).items()
         }
 
         return filterConditionalSubstitutions(substitutions, locationToDrop)
