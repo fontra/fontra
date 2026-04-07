@@ -291,5 +291,51 @@
 }
 }
 }
+},
+"conditionalSubstitutions": {
+"featureTags": [
+"rclt"
+],
+"rules": [
+{
+"name": "rule_A_B",
+"conditionSets": [
+{
+"conditions": [
+{
+"name": "weight",
+"minValue": 750,
+"maxValue": 762.5
+}
+]
+}
+],
+"substitutions": {
+"A": "B"
+}
+},
+{
+"name": "rule_B_A",
+"conditionSets": [
+{
+"conditions": [
+{
+"name": "width",
+"minValue": 100,
+"maxValue": 110
+},
+{
+"name": "weight",
+"minValue": 237.5,
+"maxValue": 300
+}
+]
+}
+],
+"substitutions": {
+"B": "A"
+}
+}
+]
 }
 }
