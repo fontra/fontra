@@ -313,17 +313,21 @@ class SubsetAxes(BaseFilter):
             if name not in keepAxisNames
         }
 
-        newRules = [
-            replace(
-                rule,
-                conditionSets=filterConditionSets(rule.conditionSets, locationToDrop),
-            )
-            for rule in substitutions.rules
-        ]
+        return filterConditionalSubstitutions(substitutions, locationToDrop)
 
-        newRules = [rule for rule in newRules if rule.conditionSets]
 
-        return replace(substitutions, rules=newRules)
+def filterConditionalSubstitutions(substitutions, locationToDrop):
+    newRules = [
+        replace(
+            rule,
+            conditionSets=filterConditionSets(rule.conditionSets, locationToDrop),
+        )
+        for rule in substitutions.rules
+    ]
+
+    newRules = [rule for rule in newRules if rule.conditionSets]
+
+    return replace(substitutions, rules=newRules)
 
 
 def filterConditionSets(
@@ -500,9 +504,11 @@ class BaseMoveDefaultLocation(BaseFilter):
         if not substitutions.rules:
             return substitutions
 
-        raise NotImplementedError("BaseMoveDefaultLocation")
+        locationToDrop = {
+            name: value for name, value in self.newDefaultSourceLocation.items()
+        }
 
-        return substitutions
+        return filterConditionalSubstitutions(substitutions, locationToDrop)
 
     def _filterAxisList(self, axes):
         raise NotImplementedError()
