@@ -1,7 +1,8 @@
+import { Backend } from "./backend-api.js";
 import { recordChanges } from "./change-recorder.js";
 import {
   applyChange,
-  collectChangePaths,
+  collectGlyphNames,
   consolidateChanges,
   filterChangePattern,
   matchChangePattern,
@@ -13,6 +14,7 @@ import { FontSourcesInstancer } from "./font-sources-instancer.js";
 import { StaticGlyphController, VariableGlyphController } from "./glyph-controller.js";
 import { KerningController } from "./kerning-controller.js";
 import { LRUCache } from "./lru-cache.js";
+import { ObservableController } from "./observable-object.js";
 import { setPopFirst } from "./set-ops.js";
 import { TaskPool } from "./task-pool.js";
 import {
@@ -20,15 +22,20 @@ import {
   chain,
   colorizeImage,
   getCharFromCodePoint,
+  mapObject,
+  mapObjectKeys,
   mapObjectValues,
   normalizeGuidelines,
+  parseDataURL,
   sleepAsync,
   throttleCalls,
   uniqueID,
 } from "./utils.js";
 import { StaticGlyph, VariableGlyph } from "./var-glyph.js";
 import {
+  locationToName,
   locationToString,
+  makeSparseLocation,
   mapAxesFromUserSpaceToSourceSpace,
   mapBackward,
   mapForward,
@@ -61,11 +68,12 @@ export class FontController {
     });
     this.undoStacks = {}; // glyph name -> undo stack
     this.readOnly = true;
-    this._instanceRequestQueue = new InstanceRequestQueue(this);
-    this._backgroundImageCache = new LRUCache(BACKGROUND_IMAGE_CACHE_SIZE);
+    this._glyphsPromiseCacheChanged = new ObservableController({ counter: 0 });
   }
 
   async initialize(initListener = true) {
+    this._instanceRequestQueue = new InstanceRequestQueue(this);
+    this._backgroundImageCache = new LRUCache(BACKGROUND_IMAGE_CACHE_SIZE);
     const glyphMap = await this.font.getGlyphMap();
     this.characterMap = makeCharacterMapFromGlyphMap(glyphMap, false);
     this._rootObject = {};
@@ -82,7 +90,11 @@ export class FontController {
     if (initListener) {
       this.addChangeListener(
         { axes: null, sources: null },
-        (change, isExternalChange) => this._purgeCachesRelatedToAxesAndSourcesChanges()
+        (change, isExternalChange) => {
+          this._purgeCachesRelatedToAxesAndSourcesChanges();
+        },
+        false,
+        true // immediate
       );
     }
 
@@ -95,6 +107,10 @@ export class FontController {
 
   unsubscribeChanges(pathOrPattern, wantLiveChanges) {
     this.font.unsubscribeChanges(pathOrPattern, wantLiveChanges);
+  }
+
+  addGlyphCacheListener(listener, immediate = false) {
+    this._glyphsPromiseCacheChanged.addListener(listener, immediate);
   }
 
   getRootKeys() {
@@ -144,6 +160,7 @@ export class FontController {
     if (!this._rootObject[key]) {
       const methods = {
         fontInfo: "getFontInfo",
+        glyphInfos: "getGlyphInfos",
         features: "getFeatures",
         kerning: "getKerning",
       };
@@ -156,12 +173,16 @@ export class FontController {
     return this._rootObject[key];
   }
 
+  async getGlyphInfos() {
+    return await this.getData("glyphInfos");
+  }
+
   async getFontInfo() {
     return await this.getData("fontInfo");
   }
 
   async getFeatures() {
-    return await this.getData("features");
+    return { language: "fea", text: "", ...(await this.getData("features")) };
   }
 
   async getKerning() {
@@ -173,7 +194,7 @@ export class FontController {
     return this._rootObject.sources;
   }
 
-  getSortedSourceIdentifiers() {
+  getSortedSourceIdentifiers(skipSparseSources = false) {
     const defaultSourceLocation = this.fontSourcesInstancer.defaultSourceLocation;
 
     const sortFunc = (identifierA, identifierB) => {
@@ -195,7 +216,16 @@ export class FontController {
       return 0;
     };
 
-    return Object.keys(this.sources).sort(sortFunc);
+    return Object.keys(this.sources)
+      .filter(
+        (sourceIdentifier) =>
+          !(skipSparseSources && this.sources[sourceIdentifier].isSparse)
+      )
+      .sort(sortFunc);
+  }
+
+  async getShaperFontData() {
+    return await this.font.getShaperFontData();
   }
 
   getBackgroundImage(imageIdentifier) {
@@ -313,11 +343,9 @@ export class FontController {
   }
 
   async putBackgroundImageData(imageIdentifier, imageDataURL) {
-    const [header, imageData] = imageDataURL.split(",");
-    const imageTypeRegex = /data:image\/(.+?);/g;
-    const match = imageTypeRegex.exec(header);
-    const imageType = match[1];
-    assert(imageType === "png" || imageType === "jpeg");
+    const { type, data } = parseDataURL(imageDataURL);
+    assert(type === "image/png" || type === "image/jpeg");
+    const imageType = type.split("/")[1];
 
     this._cacheBackgroundImageFromDataURLPromise(
       imageIdentifier,
@@ -326,7 +354,7 @@ export class FontController {
 
     await this.font.putBackgroundImage(imageIdentifier, {
       type: imageType,
-      data: imageData,
+      data,
     });
   }
 
@@ -417,6 +445,7 @@ export class FontController {
     if (glyphPromise === undefined) {
       glyphPromise = this._getGlyph(glyphName);
       const purgedGlyphName = this._glyphsPromiseCache.put(glyphName, glyphPromise);
+      this._glyphsPromiseCacheChanged.model.counter++;
       // if (purgedGlyphName) {
       //   console.log("purging", purgedGlyphName);
       //   this.font.unloadGlyph(purgedGlyphName);
@@ -480,34 +509,22 @@ export class FontController {
       );
     }
 
-    if (!varGlyph) {
-      const sourceIdentifier = this.defaultSourceIdentifier;
-      const layerName = sourceIdentifier || "default";
-      const sourceName = this.sources[sourceIdentifier] ? "" : layerName;
-      varGlyph = {
-        name: glyphName,
-        sources: [
-          {
-            name: sourceName,
-            location: {},
-            layerName: layerName,
-            locationBase: sourceIdentifier,
-          },
-        ],
-        layers: {
-          [layerName]: {
-            glyph: defaultLayerGlyph || StaticGlyph.fromObject({ xAdvance: 500 }),
-          },
-        },
-      };
-    } else {
+    let glyph;
+
+    if (varGlyph) {
+      glyph = VariableGlyph.fromObject(varGlyph);
+      glyph.name = glyphName;
       assert(!defaultLayerGlyph, "can't pass defaultLayerGlyph when passing varGlyph");
+    } else {
+      glyph = this.makeVariableGlyphFromSingleStaticGlyph(
+        glyphName,
+        defaultLayerGlyph || StaticGlyph.fromObject({ xAdvance: 500 })
+      );
     }
 
-    const glyph = VariableGlyph.fromObject(varGlyph);
-    glyph.name = glyphName;
     const glyphController = this.makeVariableGlyphController(glyph);
     this._glyphsPromiseCache.put(glyphName, Promise.resolve(glyphController));
+    this._glyphsPromiseCacheChanged.model.counter++;
 
     const codePoints = typeof codePoint == "number" ? [codePoint] : [];
     this.glyphMap[glyphName] = codePoints;
@@ -777,47 +794,31 @@ export class FontController {
       console.log("can't edit font in read-only mode");
       return;
     }
-    const cachedPattern = this.getCachedDataPattern();
 
-    const unmatched = filterChangePattern(change, cachedPattern, true);
-    const glyphSetChange = unmatched
-      ? filterChangePattern(unmatched, { glyphs: null })
-      : null;
+    const cachedPattern = this.getCachedDataPattern();
     change = filterChangePattern(change, cachedPattern);
     if (!change) {
       return;
     }
 
     const glyphNames = collectGlyphNames(change);
-    const glyphSet = {};
-    for (const glyphName of glyphNames) {
-      glyphSet[glyphName] = (await this.getGlyph(glyphName)).glyph;
-    }
+    const glyphSet = await this.getMultipleGlyphs(glyphNames);
+    const glyphSetTracker = objectPropertyTracker(glyphSet);
 
-    this._rootObject["glyphs"] = glyphSet;
+    this._rootObject["glyphs"] = glyphSetTracker.proxy;
     applyChange(this._rootObject, change, this._rootClassDef);
     delete this._rootObject["glyphs"];
 
-    if (glyphSetChange) {
-      // Some glyphs got added and/or some glyphs got deleted, let's find out which.
-      const glyphSet = {};
-      const glyphSetTracker = objectPropertyTracker(glyphSet);
-      applyChange(
-        { glyphs: glyphSetTracker.proxy },
-        glyphSetChange,
-        this._rootClassDef
+    for (const glyphName of glyphSetTracker.addedProperties) {
+      this._glyphsPromiseCache.put(
+        glyphName,
+        Promise.resolve(this.makeVariableGlyphController(glyphSet[glyphName]))
       );
-      for (const glyphName of glyphSetTracker.addedProperties) {
-        this._glyphsPromiseCache.put(
-          glyphName,
-          Promise.resolve(this.makeVariableGlyphController(glyphSet[glyphName]))
-        );
-        glyphNames.push(glyphName);
-      }
-      for (const glyphName of glyphSetTracker.deletedProperties) {
-        this._glyphsPromiseCache.delete(glyphName);
-        glyphNames.push(glyphName);
-      }
+      this._glyphsPromiseCacheChanged.model.counter++;
+    }
+
+    for (const glyphName of glyphSetTracker.deletedProperties) {
+      this._glyphsPromiseCache.delete(glyphName);
     }
 
     for (const glyphName of glyphNames) {
@@ -922,6 +923,7 @@ export class FontController {
     this._glyphsPromiseCache.clear();
     this._glyphInstancePromiseCache.clear();
     this._glyphInstancePromiseCacheKeys = {};
+
     await this.initialize(false);
     this.notifyChangeListeners(null, false, true);
   }
@@ -990,15 +992,6 @@ export class FontController {
     return undoRecord["info"];
   }
 
-  glyphInfoFromGlyphName(glyphName) {
-    const glyphInfo = { glyphName: glyphName };
-    const codePoint = this.codePointForGlyph(glyphName);
-    if (codePoint !== undefined) {
-      glyphInfo["character"] = getCharFromCodePoint(codePoint);
-    }
-    return glyphInfo;
-  }
-
   mapUserLocationToSourceLocation(userLocation) {
     return mapForward(userLocation, this.fontAxes);
   }
@@ -1062,6 +1055,175 @@ export class FontController {
 
   async exportAs(options) {
     return await this.font.exportAs(options);
+  }
+
+  async getMultipleGlyphs(glyphNames) {
+    const glyphs = {};
+    for (const glyphName of glyphNames) {
+      const glyph = await this.getGlyph(glyphName);
+      if (glyph) {
+        glyphs[glyphName] = glyph.glyph;
+      }
+    }
+    return glyphs;
+  }
+
+  getSourceLocations() {
+    return Object.fromEntries(
+      Object.entries(this.sources).map(([sourceIdentifier, source]) => [
+        sourceIdentifier,
+        source.location,
+      ])
+    );
+  }
+
+  async collectBackgroundImageData(...glyphs) {
+    const backgroundImageData = {};
+
+    for (const glyph of glyphs) {
+      for (const layer of Object.values(glyph.layers)) {
+        if (layer.glyph.backgroundImage) {
+          const backgroundImage = await this.getBackgroundImage(
+            layer.glyph.backgroundImage.identifier
+          );
+          backgroundImageData[layer.glyph.backgroundImage.identifier] =
+            backgroundImage.src;
+        }
+      }
+    }
+
+    return backgroundImageData;
+  }
+
+  async writeBackgroundImages(backgroundImageData) {
+    if (!backgroundImageData || !this.backendInfo.features["background-image"]) {
+      return;
+    }
+
+    for (const [identifier, data] of Object.entries(backgroundImageData)) {
+      await this.putBackgroundImageData(identifier, data);
+    }
+  }
+
+  makeVariableGlyphFromSingleStaticGlyph(glyphName, glyph) {
+    const sourceIdentifier = this.defaultSourceIdentifier;
+    const layerName = sourceIdentifier || "default";
+    const sourceName = this.sources[sourceIdentifier] ? "" : layerName;
+    return VariableGlyph.fromObject({
+      name: glyphName,
+      sources: [
+        {
+          name: sourceName,
+          location: {},
+          layerName: layerName,
+          locationBase: sourceIdentifier,
+        },
+      ],
+      layers: {
+        [layerName]: { glyph },
+      },
+    });
+  }
+
+  adjustVariableGlyphsFromClipboard(glyphs, sourceLocations, backgroundImageData) {
+    // 1. Try to map original locationBase to ours, or fall back to concrete location
+    // 2. Create new unique identifiers for background images
+
+    const locationBaseMapping = mapObject(
+      sourceLocations,
+      ([oldIdentifier, location]) => [
+        oldIdentifier,
+        this.fontSourcesInstancer.getSourceIdentifierForLocation(location),
+      ]
+    );
+
+    const backgroundImageMapping =
+      makeBackgroundImageIdentifierMapping(backgroundImageData);
+
+    glyphs = glyphs.map((glyph) =>
+      this._adjustVariableGlyphFromClipboard(
+        glyph,
+        sourceLocations,
+        locationBaseMapping,
+        backgroundImageMapping
+      )
+    );
+
+    backgroundImageData = remapBackgroundImageData(
+      backgroundImageData,
+      backgroundImageMapping
+    );
+
+    return { glyphs, backgroundImageData };
+  }
+
+  _adjustVariableGlyphFromClipboard(
+    glyph,
+    sourceLocations,
+    locationBaseMapping,
+    backgroundImageMapping
+  ) {
+    const layerNameMapping = {};
+
+    const defaultSourceName = this.defaultSourceIdentifier
+      ? this.sources[this.defaultSourceIdentifier].name
+      : "default";
+
+    const newSources = glyph.sources.map((source) => {
+      if (source.locationBase) {
+        const locationBase = locationBaseMapping[source.locationBase];
+
+        const location = locationBase
+          ? source.location
+          : { ...sourceLocations[source.locationBase], ...source.location };
+
+        const name = locationBase
+          ? source.name
+          : source.name ||
+            locationToName(
+              makeSparseLocation(location, this.fontAxesSourceSpace),
+              defaultSourceName
+            );
+
+        const layerName =
+          source.layerName == source.locationBase && locationBase
+            ? locationBase
+            : source.layerName;
+
+        layerNameMapping[source.layerName] = layerName;
+
+        source = { ...source, locationBase, location, name, layerName };
+      }
+      return source;
+    });
+
+    return VariableGlyph.fromObject({
+      ...glyph,
+      sources: newSources,
+      layers: mapObject(glyph.layers, ([layerName, layer]) => [
+        layerNameMapping[layerName] || layerName,
+        {
+          ...layer,
+          glyph: adjustStaticGlyphFromClipboard(layer.glyph, backgroundImageMapping),
+        },
+      ]),
+    });
+  }
+
+  adjustStaticGlyphsFromClipboard(glyphs, backgroundImageData) {
+    const backgroundImageMapping =
+      makeBackgroundImageIdentifierMapping(backgroundImageData);
+
+    glyphs = glyphs.map((glyph) =>
+      adjustStaticGlyphFromClipboard(glyph, backgroundImageMapping)
+    );
+
+    backgroundImageData = remapBackgroundImageData(
+      backgroundImageData,
+      backgroundImageMapping
+    );
+
+    return { glyphs, backgroundImageData };
   }
 }
 
@@ -1181,12 +1343,6 @@ function _popUndoRedoRecord(popStack, pushStack) {
   return undoRecord;
 }
 
-function collectGlyphNames(change) {
-  return collectChangePaths(change, 2)
-    .filter((item) => item[0] === "glyphs" && item[1] !== undefined)
-    .map((item) => item[1]);
-}
-
 function objectPropertyTracker(obj) {
   const addedProperties = new Set();
   const deletedProperties = new Set();
@@ -1240,6 +1396,7 @@ export function ensureDenseSource(source) {
     ),
     guidelines: normalizeGuidelines(source.guidelines || []),
     customData: source.customData || {},
+    italicAngle: source.italicAngle ?? 0,
   };
 }
 
@@ -1287,4 +1444,39 @@ class InstanceRequestQueue {
       this.requests.delete(requestID);
     }
   }
+}
+
+function makeBackgroundImageIdentifierMapping(backgroundImageData) {
+  return mapObject(backgroundImageData || {}, ([identifier, data]) => [
+    identifier,
+    crypto.randomUUID(),
+  ]);
+}
+
+function adjustStaticGlyphFromClipboard(glyph, backgroundImageMapping) {
+  if (!glyph.backgroundImage) {
+    return glyph;
+  }
+
+  const backgroundImage = glyph.backgroundImage;
+  const identifier = backgroundImage?.identifier;
+
+  return StaticGlyph.fromObject({
+    ...glyph,
+    backgroundImage: backgroundImage
+      ? {
+          ...backgroundImage,
+          identifier: backgroundImageMapping[identifier] || identifier,
+        }
+      : undefined,
+  });
+}
+
+function remapBackgroundImageData(backgroundImageData, backgroundImageMapping) {
+  return backgroundImageData
+    ? mapObjectKeys(
+        backgroundImageData,
+        (identifier) => backgroundImageMapping[identifier] || identifier
+      )
+    : undefined;
 }

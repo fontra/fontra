@@ -1,0 +1,16 @@
+steps:
+  - input: fontra-read
+    source: test-common/fonts/MutatorSans.fontra
+    steps:
+      - filter: scale
+        scaleFactor: 0.75
+        scaleFontMetrics: false
+      - filter: drop-shapes
+      - filter: subset-glyphs
+        glyphNames:
+          - A
+          - T
+          - V
+      - filter: round-coordinates
+  - destination: output-subset-scale-kerning.fontra
+    output: fontra-write

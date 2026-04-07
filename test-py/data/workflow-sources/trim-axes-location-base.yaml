@@ -1,0 +1,17 @@
+steps:
+  - input: fontra-read
+    source: test-py/data/mutatorsans/MutatorSansLocationBase.fontra
+  - filter: subset-glyphs
+    glyphNames:
+      - A
+      - B
+  - axes:
+      weight:
+        maxValue: 300
+        minValue: 100
+      width:
+        maxValue: 400
+        minValue: 0
+    filter: trim-axes
+  - destination: output-trim-axes-location-base.fontra
+    output: fontra-write

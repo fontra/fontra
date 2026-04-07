@@ -1,0 +1,11 @@
+steps:
+  - input: fontra-read
+    source: test-py/data/workflow/input2-A.fontra
+  - input: fontra-read
+    source: test-py/data/workflow/input2-B.fontra
+  - destination: output-merge-axes.fontra
+    output: fontra-write
+test-info:
+  expected-log:
+    - level: 40
+      message: "Merger: Axis default values should be the same; weight, A: 400, B: 100"

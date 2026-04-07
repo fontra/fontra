@@ -1,0 +1,13 @@
+steps:
+  - input: fontra-read
+    source: test-py/data/workflow/input-interpolation-fail.fontra
+  - axes:
+      weight:
+        maxValue: 600
+    filter: trim-axes
+  - destination: output-interpolation-fail.fontra
+    output: fontra-write
+test-info:
+  expected-log:
+    - level: 40
+      message: "glyph A caused an error: InterpolationError('paths are not compatible')"

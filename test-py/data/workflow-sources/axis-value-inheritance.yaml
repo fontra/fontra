@@ -1,0 +1,6 @@
+steps:
+  - input: fontra-read
+    source: test-py/data/workflow/input-axis-value-inheritance.fontra
+  - filter: decompose-composites
+  - destination: output-axis-value-inheritance.fontra
+    output: fontra-write

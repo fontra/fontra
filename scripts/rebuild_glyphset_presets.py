@@ -57,47 +57,6 @@ def getGoogleFontsGlyphSets():
     }
 
 
-def getBlackFoundryGlyphSets():
-    sourceURL = "https://github.com/BlackFoundryCom/BF_font_standard"
-
-    glyphSets = []
-
-    for topInfo in getGitHubDirectoryInfo("BlackFoundryCom", "BF_font_standard", ""):
-        if topInfo["type"] != "dir":
-            continue
-
-        for dirInfo in getGitHubDirectoryInfo(
-            "BlackFoundryCom", "BF_font_standard", topInfo["name"]
-        ):
-            name = dirInfo["name"]
-            if not name.endswith(".csv"):
-                continue
-
-            name = " ".join(name[:-4].split("_"))
-            name = name.capitalize()
-            name = "BF " + name
-            glyphSets.append(
-                {
-                    "name": name,
-                    "url": jsDelivrURL(
-                        "BlackFoundryCom", "BF_font_standard", dirInfo["path"]
-                    ),
-                }
-            )
-
-    return {
-        "name": "Black Foundry",
-        "sourceURL": sourceURL,
-        "dataOptions": {
-            "dataFormat": "tsv/csv",
-            "hasHeader": True,
-            "codePointColumn": "unicode hex",
-            "glyphNameColumn": "name",
-        },
-        "glyphSets": glyphSets,
-    }
-
-
 def getAdobeLatinCyrGreekGlyphSets():
     sourceURL = "https://github.com/orgs/adobe-type-tools/repositories?q=charsets"
 
@@ -232,14 +191,53 @@ def getBengaliGlyphSets():
     }
 
 
+def getJustFontGlyphSets():
+    sourceURL = "https://github.com/justfont/jf7000"
+
+    dirContents = getGitHubDirectoryInfo("justfont", "jf7000", "charset/0.9")
+
+    nameMapping = {
+        "list_base.txt": "JF Core Set",
+        "list_ext_cantonese.txt": "JF Hong Kong and Macao Common Pack",
+        "list_ext_japan.txt": "JF Japanese Common Pack",
+        "list_ext_naming.txt": "JF Taiwan Naming Pack",
+        "list_ext_symbols.txt": "JF Symbol Pack",
+        "list_ext_taiwan.txt": "JF Formosan Languages Pack",
+    }
+
+    glyphSets = []
+
+    for dirInfo in dirContents:
+        name = dirInfo["name"]
+        if not name.endswith(".txt"):
+            continue
+
+        name = nameMapping.get(name, name)
+        glyphSets.append(
+            {
+                "name": name,
+                "url": jsDelivrURL("justfont", "jf7000", dirInfo["path"]),
+            }
+        )
+
+    glyphSets.sort(key=lambda glyphSet: glyphSet["name"])
+
+    return {
+        "name": "JustFont jf 7000 Character Set",
+        "sourceURL": sourceURL,
+        "dataOptions": {"dataFormat": "glyph-names"},
+        "glyphSets": glyphSets,
+    }
+
+
 def collectCollections():
     collections = []
     collections.append(getGoogleFontsGlyphSets())
-    collections.append(getBlackFoundryGlyphSets())
     collections.append(getAdobeLatinCyrGreekGlyphSets())
     collections.append(getKoeberlinLatinGlyphSets())
     collections.append(getWickedLettersGeorgianGlyphSets())
     collections.append(getBengaliGlyphSets())
+    collections.append(getJustFontGlyphSets())
     return collections
 
 

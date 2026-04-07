@@ -1,0 +1,8 @@
+steps:
+  - input: fontra-read
+    source: test-py/data/workflow/input1-A.fontra
+  - filter: convert-to-quadratics
+    maximumError: 1
+    reverseDirection: false
+  - destination: output-convert-to-quadratics.fontra
+    output: fontra-write

@@ -1,0 +1,127 @@
+{
+"unitsPerEm": 800,
+"fontInfo": {
+"familyName": "Raqq",
+"versionMajor": 0,
+"versionMinor": 0,
+"copyright": "Copyright 2021–2024 The Raqq Project Authors (github.com/aliftype/raqq)",
+"designer": "Khaled Hosny",
+"designerURL": "https://khaledhosny.com",
+"manufacturer": "Alif Type",
+"manufacturerURL": "https://aliftype.com",
+"licenseDescription": "This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.\n\nThis program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details.\n\nYou should have received a copy of the GNU Affero General Public License along with this program.  If not, see <https://www.gnu.org/licenses/>",
+"vendorID": "ALIF"
+},
+"axes": {
+"axes": [
+{
+"name": "Spacing",
+"label": "Spacing",
+"tag": "SPAC",
+"minValue": -100,
+"defaultValue": 0,
+"maxValue": 125
+},
+{
+"name": "Mashq",
+"label": "Mashq",
+"tag": "MSHQ",
+"minValue": 7,
+"defaultValue": 10,
+"maxValue": 100
+}
+]
+},
+"sources": {
+"m01": {
+"name": "Regular",
+"location": {
+"Mashq": 10,
+"Spacing": 0
+},
+"lineMetricsHorizontalLayout": {
+"ascender": {
+"value": 805,
+"zone": -10
+},
+"capHeight": {
+"value": 690,
+"zone": -10
+},
+"xHeight": {
+"value": 345,
+"zone": -10
+},
+"baseline": {
+"value": 0,
+"zone": -10
+},
+"descender": {
+"value": -500,
+"zone": -10
+}
+},
+"guidelines": [
+{
+"name": "tail, eye, noon.fina",
+"y": 115,
+"locked": 1
+},
+{
+"name": "8",
+"y": 920,
+"locked": 1
+},
+{
+"name": "7",
+"y": 805,
+"locked": 1
+},
+{
+"name": "alef, lam,",
+"y": 690,
+"locked": 1
+},
+{
+"name": "",
+"y": 575,
+"locked": 1
+},
+{
+"name": "tooth high",
+"y": 460,
+"locked": 1
+},
+{
+"name": "tooth",
+"y": 345,
+"locked": 1
+},
+{
+"name": "sad, dal, kaf",
+"y": 230,
+"locked": 1
+},
+{
+"name": "-1",
+"y": -115,
+"locked": 1
+},
+{
+"name": "-2",
+"y": -230,
+"locked": 1
+},
+{
+"name": "",
+"locked": 1
+},
+{
+"name": "-3",
+"y": -345,
+"locked": 1
+}
+]
+}
+}
+}

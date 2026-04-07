@@ -1,0 +1,8 @@
+steps:
+  - input: fontra-read
+    source: test-py/data/workflow/input-variable-composites.fontra
+  - filter: shallow-decompose-composites
+    glyphNames:
+      - uni4FFC
+  - destination: output-shallow-decompose-composites-single-glyph.fontra
+    output: fontra-write

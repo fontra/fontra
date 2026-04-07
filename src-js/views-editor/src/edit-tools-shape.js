@@ -229,8 +229,8 @@ registerVisualizationLayerDefinition({
   selectionFunc: glyphSelector("editing"),
   zIndex: 500,
   screenParameters: { strokeWidth: 1 },
-  colors: { boxColor: "#FFFB", color: "#000" },
-  colorsDarkMode: { boxColor: "#1118", color: "#FFF" },
+  colors: { boxColor: "#FFFB", strokeColor: "#000" },
+  colorsDarkMode: { boxColor: "#1118", strokeColor: "#FFF" },
   draw: (context, positionedGlyph, parameters, model, controller) => {
     const shape = model.shapeToolShapePath;
     if (!shape) {

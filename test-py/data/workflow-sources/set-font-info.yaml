@@ -1,0 +1,14 @@
+steps:
+  - input: fontra-read
+    source: test-py/data/workflow/input-set-font-info.fontra
+  - filter: set-font-info
+    fontInfo:
+      designer: Joe Font Designer
+      familyName: A Brand New Font
+      unknownName: Unknown, will be warned about
+  - destination: output-set-font-info.fontra
+    output: fontra-write
+test-info:
+  expected-log:
+    - level: 40
+      message: "set-font-info: unknown name(s): 'unknownName'"

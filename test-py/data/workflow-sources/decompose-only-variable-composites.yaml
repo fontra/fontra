@@ -1,0 +1,7 @@
+steps:
+  - input: fontra-read
+    source: test-py/data/workflow/input-composites.fontra
+  - filter: decompose-composites
+    onlyVariableComposites: true
+  - destination: output-decompose-only-variable-composites.fontra
+    output: fontra-write

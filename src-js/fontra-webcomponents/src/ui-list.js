@@ -1,6 +1,7 @@
 import { DefaultFormatter } from "@fontra/core/formatters.js";
 import * as html from "@fontra/core/html-utils.js";
 import { UnlitElement } from "@fontra/core/html-utils.js";
+import { firstItemOfSet, isEqualSet } from "@fontra/core/set-ops.js";
 import { message } from "@fontra/web-components/modal-dialog.js";
 import { themeColorCSS } from "./theme-support.js";
 
@@ -19,6 +20,8 @@ export class UIList extends UnlitElement {
     ${themeColorCSS(colors)}
 
     :host {
+      --column-header-divider-thickness: 1px;
+      --column-header-divider-right-margin: 2px;
       display: grid;
       grid-template-rows: auto 1fr;
       gap: 0.2em;
@@ -26,7 +29,7 @@ export class UIList extends UnlitElement {
       min-width: 0;
     }
 
-    .container {
+    .rows-container {
       overflow: auto;
       height: 100%;
       width: 100%;
@@ -34,7 +37,7 @@ export class UIList extends UnlitElement {
       background-color: var(--row-background-color);
     }
 
-    .container.drop-target {
+    .rows-container.drop-target {
       border-radius: 0.1px;
       outline: 6px solid #BBB8;
     }
@@ -66,6 +69,29 @@ export class UIList extends UnlitElement {
       user-select: none;
     }
 
+    .header-cell.resizable {
+      border-right: var(--column-header-divider-thickness) solid #8888;
+      margin-right: var(--column-header-divider-right-margin);
+    }
+
+    .header-cell-container {
+      position: relative;
+    }
+
+    .header-resize-handle {
+      // background-color: red;
+      display: block;
+      position: absolute;
+      opacity: 40%;
+      top: 0;
+      right: 0;
+      transform: translate(50%, 0);
+      width: 0.5em;
+      height: 100%;
+      cursor: col-resize;
+      z-index: 10;
+    }
+
     .row {
       display: flex;
       width: min-content;
@@ -78,6 +104,10 @@ export class UIList extends UnlitElement {
       padding-right: 0.5em;
       cursor: pointer;
       user-select: none;
+    }
+
+    .row.hidden {
+      display: none;
     }
 
     .contents > .selected,
@@ -155,51 +185,59 @@ export class UIList extends UnlitElement {
     this.items = [];
     this.itemEqualFunc = null;
 
-    this.contents = html.div({
+    this.rowsElement = html.div({
       class: "contents",
       onclick: (event) => this._clickHandler(event),
       ondblclick: (event) => this._dblClickHandler(event),
       tabIndex: 1,
     });
 
-    this.container = html.div(
+    this.rowsContainer = html.div(
       {
-        class: "container",
+        class: "rows-container",
         ondrop: (event) => this._dropHandler(event),
         ondragover: (event) => this._dragOverHandler(event),
         ondragleave: (event) => this._dragLeaveHandler(event),
       },
-      [this.contents]
+      [this.rowsElement]
     );
 
-    this.container.addEventListener(
+    this.rowsContainer.addEventListener(
       "scroll",
       (event) => this._scrollHandler(event),
       false
     );
-    this.contents.addEventListener(
+    this.rowsElement.addEventListener(
       "keydown",
       (event) => this._keyDownHandler(event),
       false
     );
-    this.contents.addEventListener(
+    this.rowsElement.addEventListener(
       "keyup",
       (event) => this._keyUpHandler(event),
       false
     );
-    this.selectedItemIndex = undefined;
+    this.selectedItemIndices = new Set();
     this.allowEmptySelection = true;
+    this.hiddenRowProperty = "hidden";
+    this._settingsStorageKey = null;
+
+    this.columnWidths = {};
   }
 
   render() {
     if (this.minHeight) {
-      this.container.style.minHeight = this.minHeight;
+      this.rowsContainer.style.minHeight = this.minHeight;
     }
+
     const contents = [];
+
     if (this.showHeader) {
       contents.push(this._makeHeader());
     }
-    contents.push(this.container);
+
+    contents.push(this.rowsContainer);
+
     return contents;
   }
 
@@ -219,22 +257,88 @@ export class UIList extends UnlitElement {
       (desc) => desc.get || ((item) => item[desc.key])
     );
     this.itemEqualFunc = (a, b) => getters.every((getter) => getter(a) === getter(b));
+
+    for (const colDesc of columnDescriptions) {
+      if (colDesc.width) {
+        this.setColumnWidth(colDesc.key, colDesc.width);
+      }
+    }
+
     this.setItems(this.items);
     this.requestUpdate();
   }
 
+  setColumnWidth(key, width, store = false) {
+    this.style.setProperty(
+      columnWidthProperty(key),
+      typeof width == "number" ? `${width}px` : width
+    );
+    this.columnWidths[key] = width;
+    if (store) {
+      this.storeSettings();
+    }
+  }
+
+  get settingsStorageKey() {
+    return this._settingsStorageKey;
+  }
+
+  set settingsStorageKey(key) {
+    this._settingsStorageKey = key;
+    this.restoreSettings();
+  }
+
+  storeSettings() {
+    if (!this.settingsStorageKey) {
+      return;
+    }
+
+    const columnWidths = {};
+    for (const colDesc of this.columnDescriptions) {
+      const columnWidth = this.columnWidths[colDesc.key];
+      if (colDesc.minWidth != undefined && columnWidth != undefined) {
+        columnWidths[colDesc.key] = columnWidth;
+      }
+    }
+    const settings = { columnWidths };
+    localStorage.setItem(
+      `fontra.list.${this.settingsStorageKey}`,
+      JSON.stringify(settings)
+    );
+  }
+
+  restoreSettings() {
+    if (!this.settingsStorageKey) {
+      return;
+    }
+    const settingsString = localStorage.getItem(
+      `fontra.list.${this.settingsStorageKey}`
+    );
+    const settings = settingsString ? JSON.parse(settingsString) : {};
+
+    for (const colDesc of this.columnDescriptions) {
+      if (
+        colDesc.minWidth != undefined &&
+        settings.columnWidths?.[colDesc.key] != undefined
+      ) {
+        this.setColumnWidth(colDesc.key, settings.columnWidths?.[colDesc.key]);
+      }
+    }
+  }
+
   setItems(items, shouldDispatchEvent = false, keepScrollPosition = false) {
-    const scrollLeft = this.container.scrollLeft;
-    const scrollTop = this.container.scrollTop;
+    const scrollLeft = this.rowsContainer.scrollLeft;
+    const scrollTop = this.rowsContainer.scrollTop;
     const selectedItem = this.getSelectedItem();
-    this.contents.innerHTML = "";
+    this.rowsElement.innerHTML = "";
     this.items = items;
     this._itemsBackLog = Array.from(items);
+    // TODO: the following is wrong if the list contains duplicate items
     this.setSelectedItem(selectedItem, shouldDispatchEvent);
     this._addMoreItemsIfNeeded();
     if (keepScrollPosition) {
-      this.container.scrollLeft = scrollLeft;
-      this.container.scrollTop = scrollTop;
+      this.rowsContainer.scrollLeft = scrollLeft;
+      this.rowsContainer.scrollTop = scrollTop;
     }
     this._dispatchEvent("itemsSet");
   }
@@ -246,7 +350,7 @@ export class UIList extends UnlitElement {
     return this.items[this.selectedItemIndex];
   }
 
-  setSelectedItem(item, shouldDispatchEvent = false) {
+  setSelectedItem(item, shouldDispatchEvent = false, shouldScrollInfoView = false) {
     if (!item) {
       this.setSelectedItemIndex(undefined, shouldDispatchEvent);
       return;
@@ -265,7 +369,7 @@ export class UIList extends UnlitElement {
       index = this.items.indexOf(item);
     }
     if (index >= 0) {
-      this.setSelectedItemIndex(index, shouldDispatchEvent);
+      this.setSelectedItemIndex(index, shouldDispatchEvent, shouldScrollInfoView);
     } else {
       this.setSelectedItemIndex(undefined, shouldDispatchEvent);
     }
@@ -274,7 +378,8 @@ export class UIList extends UnlitElement {
   _addMoreItemsIfNeeded() {
     while (
       this._itemsBackLog.length > 0 &&
-      this.container.scrollTop + this.offsetHeight + 200 > this.contents.offsetHeight
+      this.rowsContainer.scrollTop + this.offsetHeight + 200 >
+        this.rowsElement.offsetHeight
     ) {
       this._addMoreItems();
       if (this.offsetHeight === 0) {
@@ -285,12 +390,14 @@ export class UIList extends UnlitElement {
 
   _addMoreItems() {
     const items = this._itemsBackLog.splice(0, LIST_CHUNK_SIZE);
-    let rowIndex = this.contents.childElementCount;
+    let rowIndex = this.rowsElement.childElementCount;
     for (const item of items) {
-      const row = document.createElement("div");
-      row.className = "row";
+      const row = html.div({ class: "row" });
+      if (item[this.hiddenRowProperty]) {
+        row.classList.add("hidden");
+      }
       row.dataset.rowIndex = rowIndex;
-      if (rowIndex === this.selectedItemIndex) {
+      if (this.selectedItemIndices.has(rowIndex)) {
         row.classList.add("selected");
       }
 
@@ -325,13 +432,13 @@ export class UIList extends UnlitElement {
             cell = html.div({ class: classString }, [formattedValue]);
           }
           if (colDesc.width) {
-            cell.style.width = colDesc.width;
+            cell.style.width = `var(${columnWidthProperty(colDesc.key)})`;
           }
         }
         row.appendChild(cell);
       }
 
-      this.contents.appendChild(row);
+      this.rowsElement.appendChild(row);
       rowIndex++;
     }
   }
@@ -340,17 +447,32 @@ export class UIList extends UnlitElement {
     const header = html.div({ class: "header" });
 
     for (const colDesc of this.columnDescriptions) {
-      const cell = document.createElement("div");
-      cell.className = "text-cell-header " + colDesc.key;
+      const cell = html.div({ class: "text-cell-header header-cell " + colDesc.key });
       if (colDesc.align) {
         cell.classList.add(colDesc.align);
       }
       if (colDesc.width) {
-        cell.style.width = colDesc.width;
+        cell.style.width = colDesc.minWidth
+          ? `calc(var(${columnWidthProperty(
+              colDesc.key
+            )}) - var(--column-header-divider-thickness)
+                - var(--column-header-divider-right-margin))`
+          : `var(${columnWidthProperty(colDesc.key)}`;
       }
       const value = colDesc.title || colDesc.key;
       cell.append(value);
-      header.appendChild(cell);
+
+      const cellContainer = html.div({ class: "header-cell-container" });
+
+      cellContainer.appendChild(cell);
+
+      if (colDesc.minWidth) {
+        cell.classList.add("resizable");
+        const resizeHandle = this._setupResizeHandle(colDesc);
+        cellContainer.appendChild(resizeHandle);
+      }
+
+      header.appendChild(cellContainer);
     }
     this.headerContainer = html.div({ class: "header-container" }, [header]);
     this.headerContainer.addEventListener(
@@ -359,6 +481,42 @@ export class UIList extends UnlitElement {
       false
     );
     return this.headerContainer;
+  }
+
+  _setupResizeHandle(colDesc) {
+    const resizeHandle = html.div({ class: "header-resize-handle" });
+
+    let initialEvent;
+    let initialWidth;
+
+    resizeHandle.addEventListener("mousedown", (event) => {
+      initialEvent = event;
+      initialWidth = this.columnWidths[colDesc.key] ?? colDesc.width;
+      document.addEventListener("mousemove", mouseMoveHandler);
+      document.addEventListener("mouseup", mouseUpHandler);
+      document.body.style.cursor = "col-resize";
+    });
+
+    const setColumnWidthFromEvent = (event, store = false) => {
+      const newWidth = Math.max(
+        colDesc.minWidth,
+        initialWidth + event.x - initialEvent.x
+      );
+      this.setColumnWidth(colDesc.key, newWidth, store);
+    };
+
+    const mouseMoveHandler = (event) => {
+      setColumnWidthFromEvent(event, false);
+    };
+
+    const mouseUpHandler = (event) => {
+      document.body.style.cursor = null;
+      document.removeEventListener("mousemove", mouseMoveHandler);
+      document.removeEventListener("mouseup", mouseUpHandler);
+      setColumnWidthFromEvent(event, true);
+    };
+
+    return resizeHandle;
   }
 
   _makeCellEditor(cell, colDesc, item) {
@@ -386,7 +544,7 @@ export class UIList extends UnlitElement {
       cell.classList.remove("editing");
       cell.scrollTop = 0;
       cell.scrollLeft = 0;
-      this.contents.focus();
+      this.rowsElement.focus();
       handleChange(event, false);
       if (formattingError) {
         const formatter =
@@ -441,7 +599,16 @@ export class UIList extends UnlitElement {
   _clickHandler(event) {
     const rowIndex = this._getRowIndexFromTarget(event.target);
     if (rowIndex !== undefined) {
-      this.setSelectedItemIndex(rowIndex, true);
+      if (
+        rowIndex == this.getSelectedItemIndex() &&
+        this.allowEmptySelection &&
+        event.shiftKey
+      ) {
+        // Deselect
+        this.setSelectedItemIndex(undefined, true);
+      } else {
+        this.setSelectedItemIndex(rowIndex, true);
+      }
     }
   }
 
@@ -453,10 +620,10 @@ export class UIList extends UnlitElement {
   _dropHandler(event) {
     event.preventDefault();
     if (this.onFilesDrop) {
-      this.container.classList.remove("drop-target");
+      this.rowsContainer.classList.remove("drop-target");
       if (event.dataTransfer?.files?.length) {
         this.onFilesDrop(event.dataTransfer.files);
-        this.contents.focus();
+        this.rowsElement.focus();
       }
     }
   }
@@ -464,57 +631,117 @@ export class UIList extends UnlitElement {
   _dragOverHandler(event) {
     event.preventDefault();
     if (this.onFilesDrop) {
-      this.container.classList.add("drop-target");
+      this.rowsContainer.classList.add("drop-target");
     }
   }
 
   _dragLeaveHandler(event) {
     event.preventDefault();
     if (this.onFilesDrop) {
-      this.container.classList.remove("drop-target");
+      this.rowsContainer.classList.remove("drop-target");
     }
   }
 
   _getRowIndexFromTarget(target) {
     let node = target;
-    while (node && node.parentNode !== this.contents) {
+    while (node && node.parentNode !== this.rowsElement) {
       node = node.parentNode;
     }
-    return node?.dataset.rowIndex;
+    const rowIndex = node?.dataset.rowIndex;
+    return rowIndex ? Number(rowIndex) : undefined;
   }
 
-  setSelectedItemIndex(rowIndex, shouldDispatchEvent = false) {
-    if (rowIndex == undefined && !this.allowEmptySelection) {
-      return;
-    }
+  setSelectedItemIndex(
+    rowIndex,
+    shouldDispatchEvent = false,
+    shouldScrollInfoView = false
+  ) {
     if (!isNaN(rowIndex)) {
       rowIndex = Number(rowIndex);
     }
-    if (rowIndex === this.selectedItemIndex) {
+
+    this.setSelectedItemIndices(
+      new Set(rowIndex == undefined ? undefined : [rowIndex]),
+      shouldDispatchEvent,
+      shouldScrollInfoView
+    );
+  }
+
+  setSelectedItemIndices(
+    rowIndices,
+    shouldDispatchEvent = false,
+    shouldScrollInfoView = false
+  ) {
+    rowIndices = new Set(rowIndices);
+
+    if (!rowIndices.size && !this.allowEmptySelection) {
+      return;
+    }
+    if (isEqualSet(rowIndices, this.selectedItemIndices)) {
       // nothing to do
       return;
     }
-    if (this.selectedItemIndex !== undefined) {
-      const row = this.contents.children[this.selectedItemIndex];
+    for (const rowIndex of this.selectedItemIndices) {
+      const row = this.rowsElement.children[rowIndex];
       row?.classList.remove("selected");
     }
-    if (rowIndex !== undefined) {
-      const row = this.contents.children[rowIndex];
+    for (const rowIndex of rowIndices) {
+      const row = this.rowsElement.children[rowIndex];
       row?.classList.add("selected");
     }
-    this.selectedItemIndex = rowIndex;
+    this.selectedItemIndices = rowIndices;
     if (!this._isKeyRepeating && shouldDispatchEvent) {
       this._dispatchEvent("listSelectionChanged");
     }
+
+    if (shouldScrollInfoView && rowIndices.size) {
+      const rowIndex = firstItemOfSet(rowIndices);
+      const row = this.rowsElement.children[rowIndex];
+      // Delay slightly: this avoids glitches in some cases
+      setTimeout(
+        () =>
+          row?.scrollIntoView({
+            behavior: "auto",
+            block: "nearest",
+            inline: "nearest",
+          }),
+        10
+      );
+    }
+  }
+
+  get selectedItemIndex() {
+    return this.getSelectedItemIndex();
+  }
+
+  getSelectedItemIndices() {
+    return this.selectedItemIndices;
   }
 
   getSelectedItemIndex() {
-    return this.selectedItemIndex;
+    return firstItemOfSet(this.selectedItemIndices);
+  }
+
+  getItemIndexAtPoint(x, y) {
+    let element = this.shadowRoot.elementFromPoint(x, y);
+    while (element && !element.classList.contains("row")) {
+      element = element.parentElement;
+    }
+    if (!element) {
+      return;
+    }
+    if (element.dataset.rowIndex) {
+      return Number(element.dataset.rowIndex);
+    }
+  }
+
+  getRowElement(index) {
+    return this.rowsElement.children[index];
   }
 
   editCell(rowIndex, columnKey) {
     this.setSelectedItemIndex(rowIndex, true);
-    const row = this.contents.children[rowIndex];
+    const row = this.rowsElement.children[rowIndex];
     if (!row) {
       return;
     }
@@ -539,7 +766,7 @@ export class UIList extends UnlitElement {
     if (
       (event.key === "Delete" || event.key === "Backspace") &&
       (this.selectedItemIndex !== undefined || event.altKey) &&
-      !this.container.querySelector(".editing")
+      !this.rowsContainer.querySelector(".editing")
     ) {
       event.stopImmediatePropagation();
       if (event.altKey) {
@@ -567,13 +794,16 @@ export class UIList extends UnlitElement {
     if (rowIndex === undefined) {
       rowIndex = 0;
     } else {
-      rowIndex = event.key === "ArrowUp" ? rowIndex - 1 : rowIndex + 1;
-      rowIndex = Math.min(Math.max(rowIndex, 0), this.items.length - 1);
+      const rowDelta = event.key === "ArrowUp" ? -1 : 1;
+      do {
+        rowIndex += rowDelta;
+        if (rowIndex < 0 || rowIndex >= this.items.length) {
+          return;
+        }
+      } while (this.rowsElement.children[rowIndex]?.classList.contains("hidden"));
     }
     this._isKeyRepeating = event.repeat;
-    this.setSelectedItemIndex(rowIndex, true);
-    const newRow = this.contents.children[rowIndex];
-    newRow?.scrollIntoView({ behavior: "auto", block: "nearest", inline: "nearest" });
+    this.setSelectedItemIndex(rowIndex, true, true);
   }
 
   _keyUpHandler(event) {
@@ -586,20 +816,24 @@ export class UIList extends UnlitElement {
   }
 
   _headerScrollHandler(event) {
-    if (this.container.scrollLeft != this.headerContainer.scrollLeft) {
-      this.container.scrollLeft = this.headerContainer.scrollLeft;
+    if (this.rowsContainer.scrollLeft != this.headerContainer.scrollLeft) {
+      this.rowsContainer.scrollLeft = this.headerContainer.scrollLeft;
     }
   }
 
   _scrollHandler(event) {
     if (
       this.headerContainer &&
-      this.headerContainer.scrollLeft != this.container.scrollLeft
+      this.headerContainer.scrollLeft != this.rowsContainer.scrollLeft
     ) {
-      this.headerContainer.scrollLeft = this.container.scrollLeft;
+      this.headerContainer.scrollLeft = this.rowsContainer.scrollLeft;
     }
     this._addMoreItemsIfNeeded();
   }
+}
+
+function columnWidthProperty(key) {
+  return `--column-${key}-width`;
 }
 
 customElements.define("ui-list", UIList);

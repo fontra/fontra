@@ -167,3 +167,13 @@ export function guessGlyphPlaceholderString(codePoints, glyphName) {
 
   return { glyphString, direction };
 }
+
+export function guessDirectionFromCodePoints(codePoints) {
+  for (const codePoint of codePoints) {
+    const info = getGlyphInfoFromCodePoint(codePoint);
+    if (info?.category === "Letter") {
+      return info.direction === "RTL" ? "rtl" : "ltr";
+    }
+  }
+  return undefined;
+}

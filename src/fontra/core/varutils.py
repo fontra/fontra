@@ -62,6 +62,37 @@ def subsetLocationDrop(location, axisNames):
     return {n: v for n, v in location.items() if n not in axisNames}
 
 
+def clamp(number, minimum, maximum):
+    return max(min(number, maximum), minimum)
+
+
+def unnormalizeValue(v, lower, dflt, upper):
+    # The opposite of normalizeValue
+    if v < 0:
+        v = dflt + v * (dflt - lower)
+    else:
+        v = dflt + v * (upper - dflt)
+
+    return clamp(v, lower, upper)
+
+
+def unnormalizeLocation(location, axisList):
+    # The opposite of normalizeLocation.
+    # Does *not* take axis.mapping into account.
+    out = {}
+    for axis in axisList:
+        v = location.get(axis.name)
+        if v is not None:
+            out[axis.name] = unnormalizeValue(
+                v,
+                axis.minValue,
+                clamp(axis.defaultValue, axis.minValue, axis.maxValue),
+                clamp(axis.maxValue, axis.minValue, axis.maxValue),
+            )
+
+    return out
+
+
 @dataclass
 class AxisRange:
     minValue: float | None = None

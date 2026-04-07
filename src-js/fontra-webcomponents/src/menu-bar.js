@@ -80,6 +80,7 @@ export class MenuBar extends SimpleElement {
   onMouseDown({ target }) {
     if (isMenuItem(target)) {
       if (!this.menuPanel) {
+        MenuPanel.closeMenuPanels({});
         this.openMenu(target);
       } else {
         this.closeMenu();

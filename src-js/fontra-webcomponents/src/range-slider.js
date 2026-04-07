@@ -358,6 +358,7 @@ export class RangeSlider extends html.UnlitElement {
     }
 
     event.preventDefault();
+    event.stopImmediatePropagation();
 
     value = clamp(value, this.minValue, this.maxValue);
 
@@ -446,7 +447,7 @@ export class RangeSlider extends html.UnlitElement {
               tabindex: "-1",
               onkeydown: (event) => this.onKeyDown(event),
               onmouseup: (event) => {
-                this._savedCanvasElement?.focus();
+                this._savedActiveElement?.focus();
                 this.sawMouseDown = false;
                 this.sawMouseUp = true;
                 if (!this.sawChangeEvent) {
@@ -462,8 +463,11 @@ export class RangeSlider extends html.UnlitElement {
                 this.sawMouseDown = true;
                 this.sawMouseUp = false;
                 const activeElement = document.activeElement;
-                this._savedCanvasElement =
-                  activeElement?.id === "edit-canvas" ? activeElement : undefined;
+                this._savedActiveElement = activeElement?.classList.contains(
+                  "focus-preferred"
+                )
+                  ? activeElement
+                  : undefined;
                 if (event.altKey) {
                   event.preventDefault();
                   this.reset();

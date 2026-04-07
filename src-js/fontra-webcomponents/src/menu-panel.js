@@ -19,6 +19,7 @@ import { themeColorCSS } from "./theme-support.js";
 export const MenuItemDivider = { title: "-" };
 
 export function showMenu(menuItems, position, options) {
+  MenuPanel.closeMenuPanels({});
   const container = getMenuContainer();
   const { left, top } = container.getBoundingClientRect();
   position = { x: position.x - left, y: position.y - top };

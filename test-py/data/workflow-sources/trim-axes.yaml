@@ -1,0 +1,13 @@
+steps:
+  - input: fontra-read
+    source: test-py/data/workflow/input-trim-axes.fontra
+  - axes:
+      weight:
+        maxValue: 800
+        minValue: 200
+      width:
+        maxValue: 700
+        minValue: 100
+    filter: trim-axes
+  - destination: output-trim-axes.fontra
+    output: fontra-write

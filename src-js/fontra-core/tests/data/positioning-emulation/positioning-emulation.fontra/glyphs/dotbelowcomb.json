@@ -1,0 +1,54 @@
+{
+"name": "dotbelowcomb",
+"sources": [
+{
+"name": "",
+"layerName": "default",
+"locationBase": "default"
+}
+],
+"layers": {
+"default": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": 50,
+"y": -60
+},
+{
+"x": 50,
+"y": -160
+},
+{
+"x": 150,
+"y": -160
+},
+{
+"x": 150,
+"y": -60
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 200,
+"anchors": [
+{
+"name": "_bottom",
+"x": 100,
+"y": -20
+},
+{
+"name": "bottom",
+"x": 100,
+"y": -190
+}
+]
+}
+}
+}
+}

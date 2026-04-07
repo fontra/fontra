@@ -1,0 +1,28 @@
+{
+"name": "kashida-ar.l2",
+"sources": [
+{
+"name": "",
+"layerName": "m01",
+"locationBase": "m01"
+}
+],
+"layers": {
+"m01": {
+"glyph": {
+"components": [
+{
+"name": "kashida-ar",
+"transformation": {
+"translateX": -20
+}
+}
+],
+"xAdvance": 80
+}
+}
+},
+"customData": {
+"com.glyphsapp.glyph-color": 0
+}
+}

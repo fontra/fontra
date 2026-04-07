@@ -30,12 +30,14 @@ import {
 import {
   areGuidelinesCompatible,
   assert,
+  compare,
   enumerate,
   filterObject,
   mapObjectValues,
   normalizeGuidelines,
   parseSelection,
   range,
+  reversed,
   zip,
 } from "./utils.js";
 import { addItemwise } from "./var-funcs.js";
@@ -126,7 +128,7 @@ export class VariableGlyphController {
   }
 
   getSourceLocation(source) {
-    return { ...this.fontSources[source.locationBase]?.location, ...source.location };
+    return { ...this.fontSources?.[source.locationBase]?.location, ...source.location };
   }
 
   _setupAxisMapping() {
@@ -318,7 +320,7 @@ export class VariableGlyphController {
       if (source.layerName in layerGlyphs) {
         continue;
       }
-      layerGlyphs[source.layerName] = stripNonInterpolatables(
+      layerGlyphs[source.layerName] = stripNonInterpolatablesAndSortAnchors(
         this.layers[source.layerName].glyph
       );
     }
@@ -745,6 +747,10 @@ export class StaticGlyphController {
     return getRepresentation(this, "flattenedPathHitTester");
   }
 
+  get propagatedAnchors() {
+    return getRepresentation(this, "propagatedAnchors");
+  }
+
   getSelectionBounds(selection, getBackgroundImageBoundsFunc = undefined) {
     if (!selection.size) {
       return undefined;
@@ -889,6 +895,53 @@ registerRepresentationFactory(
   }
 );
 
+registerRepresentationFactory(StaticGlyphController, "propagatedAnchors", (glyph) => {
+  // TODO: analyze the component traversal strategy and see what we really need.
+
+  // Try to behave similar to glyphsLib, and only let "receiving anchors" through
+  // for the component that is closest to the origin. We should only do that if
+  // we are a mark ligature glyph, but we can't know that here for sure. Still,
+  // the presence of a receiving mark in the "closest" component could be a clue.
+
+  const hasReceivingAnchors = glyph.components.some((compo) =>
+    compo.anchors.some((anchor) => anchor.name?.startsWith("_"))
+  );
+
+  const closestToOrigin = hasReceivingAnchors
+    ? findClosestToOrigin(glyph.components)
+    : null;
+
+  const componentAnchors = glyph.components.map((compo) =>
+    !hasReceivingAnchors || compo === closestToOrigin
+      ? compo.anchors
+      : compo.anchors.filter((anchor) => anchor.name && !anchor.name.startsWith("_"))
+  );
+  componentAnchors.reverse();
+
+  return glyph.anchors.concat(componentAnchors.flat());
+});
+
+function findClosestToOrigin(components) {
+  // Weird heuristic, but matches glyphsLib
+  if (!components.length) {
+    return null;
+  }
+
+  const withDistance = components.map((compo) => ({
+    compo,
+    distance: Math.hypot(...boundsOrigin(compo)),
+  }));
+
+  withDistance.sort((a, b) => a.distance - b.distance);
+
+  return withDistance[0].compo;
+}
+
+function boundsOrigin(compo) {
+  const bounds = compo.controlBounds;
+  return bounds ? [bounds.xMin, bounds.yMin] : [0, 0];
+}
+
 class ComponentController {
   constructor(
     compo,
@@ -898,15 +951,23 @@ class ComponentController {
     parentGlyphNames
   ) {
     this.compo = compo;
-    const { path, errors } = flattenComponent(
+    const { path, anchors, errors } = flattenComponent(
       compo,
       glyphDependencies,
       parentLocation,
       parentGlyphNames,
       fontAxisNames
     );
+
     this.path = path;
     this.errors = errors;
+
+    const componentAnchor =
+      compo.customData?.["com.glyphsapp.component.anchor"] || undefined;
+
+    this.anchors = componentAnchor?.includes("_")
+      ? upgradeLigatureAnchors(componentAnchor, anchors)
+      : anchors;
   }
 
   get path2d() {
@@ -976,7 +1037,8 @@ function flattenComponent(
 ) {
   let componentErrors = [];
   const paths = [];
-  for (const { path, errors } of iterFlattenedComponentPaths(
+  const allAnchors = [];
+  for (const { path, anchors, errors } of iterFlattenedComponentPaths(
     compo,
     glyphDependencies,
     parentLocation,
@@ -984,6 +1046,7 @@ function flattenComponent(
     fontAxisNames
   )) {
     paths.push(path);
+    allAnchors.push(...anchors);
     if (errors) {
       componentErrors.push(...errors);
     }
@@ -991,7 +1054,7 @@ function flattenComponent(
   if (!componentErrors.length) {
     componentErrors = undefined;
   }
-  return { path: joinPaths(paths), errors: componentErrors };
+  return { path: joinPaths(paths), anchors: allAnchors, errors: componentErrors };
 }
 
 function* iterFlattenedComponentPaths(
@@ -1035,10 +1098,18 @@ function* iterFlattenedComponentPaths(
   if (transformation) {
     t = transformation.transform(t);
   }
-  const componentPaths = {};
+
   if (inst.path.numPoints) {
-    yield { path: inst.path.transformed(t), errors: instErrors };
+    yield {
+      path: inst.path.transformed(t),
+      anchors: inst.anchors.map((anchor) => ({
+        name: anchor.name,
+        ...t.transformPointObject(anchor),
+      })),
+      errors: instErrors,
+    };
   }
+
   for (const subCompo of inst.components) {
     yield* iterFlattenedComponentPaths(
       subCompo,
@@ -1103,6 +1174,28 @@ export async function decomposeComponents(
   }
   const newPath = joinPaths(newPaths);
   return { path: newPath, components: newComponents, anchors: newAnchors };
+}
+
+function upgradeLigatureAnchors(componentAnchor, anchors) {
+  // If the component was placed as a ligature mark, upgrade *its* anchors to
+  // become ligature anchors, so subsequent marks can be attached correctly.
+  // To achieve this, change any anchor's name to that of `componentAnchor`
+  // - if the anchor is a base anchor (does not start with "_")
+  // - and if `componentAnchor` starts with the anchor's name + "_"
+  // - and if there exists a matching mark anchor: "_" + the anchor's name
+  //
+  // Example: if `componentAnchor` is "top_1", and our component has anchors
+  // named "top" and "_top", then rename the "top" anchor to "top_1".
+
+  anchors = anchors.map((anchor) =>
+    anchor.name &&
+    !anchor.name.startsWith("_") &&
+    componentAnchor.startsWith(anchor.name + "_") &&
+    anchors.find((otherAnchor) => otherAnchor.name == "_" + anchor.name)
+      ? { ...anchor, name: componentAnchor }
+      : anchor
+  );
+  return anchors;
 }
 
 export function getAxisBaseName(axisName) {
@@ -1212,9 +1305,13 @@ function ensureGlyphCompatibility(layers, glyphDependencies) {
   const layerGlyphs = layers.map(({ glyph }) => glyph);
 
   const componentsAreCompatible = areComponentsCompatible(layerGlyphs);
+  let componentCustomDatasAreCompatible = false;
 
   if (componentsAreCompatible) {
-    setupComponentLocationFallbackValues(layers, glyphDependencies);
+    componentCustomDatasAreCompatible = setupComponentLocationFallbackValues(
+      layers,
+      glyphDependencies
+    );
   }
 
   const guidelinesAreCompatible = areGuidelinesCompatible(layerGlyphs);
@@ -1224,8 +1321,14 @@ function ensureGlyphCompatibility(layers, glyphDependencies) {
       {
         ...glyph,
         components: componentsAreCompatible
-          ? normalizeComponents(glyph, sourceLocation, componentLocationFallbackValues)
-          : glyph.components,
+          ? normalizeComponents(
+              glyph,
+              sourceLocation,
+              componentLocationFallbackValues,
+              componentCustomDatasAreCompatible
+            )
+          : stripComponentCustomData(glyph.components),
+        anchors: glyph.anchors.slice().sort((a, b) => compare(a.name, b.name)),
         guidelines: guidelinesAreCompatible
           ? normalizeGuidelines(glyph.guidelines, true)
           : [],
@@ -1258,14 +1361,19 @@ function setupComponentLocationFallbackValues(layers, glyphDependencies) {
   const componentInfo = layers[0].glyph.components.map((compo) => ({
     name: compo.name,
     usedAxisNames: new Set(),
+    customData: compo.customData,
   }));
+
+  let customDatasCompatible = true;
 
   const baseGlyphAxesByName = Object.fromEntries(
     componentInfo.map(({ name }) => [
       name,
-      Object.fromEntries(
-        glyphDependencies[name].combinedAxes.map((axis) => [axis.name, axis])
-      ),
+      glyphDependencies[name]
+        ? Object.fromEntries(
+            glyphDependencies[name].combinedAxes.map((axis) => [axis.name, axis])
+          )
+        : {},
     ])
   );
 
@@ -1276,14 +1384,21 @@ function setupComponentLocationFallbackValues(layers, glyphDependencies) {
 
   const numComponents = layers[0].glyph.components.length;
 
-  // populate usedAxisNames
+  // populate usedAxisNames, check customData
   for (const componentIndex of range(numComponents)) {
     for (const { sourceLocation, glyph } of layers) {
       const compo = glyph.components[componentIndex];
+      const info = componentInfo[componentIndex];
       for (const axisName of Object.keys(compo.location)) {
         if (baseGlyphAxisNames[compo.name]?.has(axisName)) {
-          componentInfo[componentIndex].usedAxisNames.add(axisName);
+          info.usedAxisNames.add(axisName);
         }
+      }
+
+      try {
+        const _ = addItemwise(info.customData, compo.customData);
+      } catch (error) {
+        customDatasCompatible = false;
       }
     }
   }
@@ -1303,9 +1418,16 @@ function setupComponentLocationFallbackValues(layers, glyphDependencies) {
       }
     );
   }
+
+  return customDatasCompatible;
 }
 
-function normalizeComponents(glyph, sourceLocation, componentLocationFallbackValues) {
+function normalizeComponents(
+  glyph,
+  sourceLocation,
+  componentLocationFallbackValues,
+  customDatasCompatible = true
+) {
   const normalizedComponents = [];
 
   for (const [compo, fallbackValues] of zip(
@@ -1318,28 +1440,58 @@ function normalizeComponents(glyph, sourceLocation, componentLocationFallbackVal
         fallbackValues.hasOwnProperty(axisName)
       ),
     };
-    normalizedComponents.push({ ...compo, location });
+    normalizedComponents.push({
+      name: compo.name,
+      transformation: compo.transformation,
+      location,
+      customData: customDatasCompatible ? compo.customData : {},
+    });
   }
 
   return normalizedComponents;
 }
 
-function stripNonInterpolatables(glyph) {
-  // Hm, the following optimization oddly causes a false positive when undoing a bg img
-  // placement. TODO: figure out what's going on.
-  // if (!glyph.components.length && !glyph.guidelines.length && !glyph.backgroundImage) {
-  //   console.log("have bg img?", !!glyph.backgroundImage);
-  //   return glyph;
-  // }
+function stripComponentCustomData(components) {
+  return components.map((component) => ({
+    name: component.name,
+    transformation: component.transformation,
+    location: component.location,
+  }));
+}
+
+function areCustomDatasCompatible(customDatas) {
+  if (customDatas.length <= 1) {
+    return true;
+  }
+
+  console.log(customDatas);
+
+  const firstCustomData = customDatas[0];
+
+  for (const customData of customDatas.slice(1)) {
+    try {
+      addItemwise(firstCustomData, customData);
+    } catch (error) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+function stripNonInterpolatablesAndSortAnchors(glyph) {
   return StaticGlyph.fromObject(
     {
       ...glyph,
       components: glyph.components.map((component) => {
         return {
-          ...component,
+          name: component.name,
+          transformation: component.transformation,
           location: {},
+          customData: {},
         };
       }),
+      anchors: glyph.anchors.slice().sort((a, b) => compare(a.name, b.name)),
       guidelines: [],
       backgroundImage: undefined,
     },

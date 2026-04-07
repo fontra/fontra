@@ -1,0 +1,151 @@
+{
+"name": "_p.dal",
+"sources": [
+{
+"name": "",
+"layerName": "m01",
+"locationBase": "m01"
+},
+{
+"name": "Regular / 16 May 23 at 17:24",
+"layerName": "B7198512-ACC9-4997-BBCE-B89F3F46B128",
+"location": {
+"Mashq": 100,
+"Spacing": 0
+}
+},
+{
+"name": "Regular / 17 May 23 at 04:01",
+"layerName": "F26A4821-776C-44AF-815D-A9B817B98379",
+"location": {
+"Mashq": 0,
+"Spacing": 0
+}
+}
+],
+"layers": {
+"B7198512-ACC9-4997-BBCE-B89F3F46B128": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": 0,
+"y": 1
+},
+{
+"x": 137,
+"y": 1,
+"type": "cubic"
+},
+{
+"x": 274,
+"y": -1,
+"type": "cubic"
+},
+{
+"x": 393,
+"y": 0
+},
+{
+"x": 393,
+"y": 110
+},
+{
+"x": 340,
+"y": 110
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 393
+}
+},
+"F26A4821-776C-44AF-815D-A9B817B98379": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": 200,
+"y": -2
+},
+{
+"x": 264,
+"y": -1,
+"type": "cubic"
+},
+{
+"x": 329,
+"y": -1,
+"type": "cubic"
+},
+{
+"x": 393,
+"y": 0
+},
+{
+"x": 393,
+"y": 110
+},
+{
+"x": 340,
+"y": 110
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 393
+}
+},
+"m01": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": 0,
+"y": -7
+},
+{
+"x": 137,
+"y": -7,
+"type": "cubic"
+},
+{
+"x": 274,
+"y": -4,
+"type": "cubic"
+},
+{
+"x": 393,
+"y": 0
+},
+{
+"x": 393,
+"y": 110
+},
+{
+"x": 340,
+"y": 110
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 393
+}
+}
+},
+"customData": {
+"com.glyphsapp.glyph-color": 9
+}
+}

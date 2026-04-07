@@ -1,0 +1,11 @@
+steps:
+  - input: fontra-read
+    source: test-py/data/workflow/input-variable-composites.fontra
+  - filter: drop-shapes
+  - filter: subset-by-development-status
+    sourceSelectBehavior: all
+    statuses:
+      - 4
+  - filter: drop-unreachable-glyphs
+  - destination: output-subset-by-development-status-no.fontra
+    output: fontra-write

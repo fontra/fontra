@@ -1,0 +1,19 @@
+steps:
+  - input: fontra-read
+    source: test-py/data/workflow/input1-A.fontra
+  - filter: subset-glyphs
+    glyphNames:
+      - A
+  - filter: subset-glyphs
+    glyphNames:
+      - A
+  - filter: drop-axis-mappings
+  - axes:
+      weight:
+        defaultValue: 400
+        maxValue: 800
+        minValue: 200
+    filter: adjust-axes
+    remapSources: false
+  - destination: output-adjust-axes-no-mapping-no-source-remap.fontra
+    output: fontra-write

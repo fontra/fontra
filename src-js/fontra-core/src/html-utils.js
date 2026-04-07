@@ -181,4 +181,5 @@ export const details = createDomElement.bind(null, "details");
 export const summary = createDomElement.bind(null, "summary");
 export const b = createDomElement.bind(null, "b");
 export const i = createDomElement.bind(null, "i");
+export const pre = createDomElement.bind(null, "pre");
 // Let's add more once needed

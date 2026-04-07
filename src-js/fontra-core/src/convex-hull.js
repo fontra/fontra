@@ -1,5 +1,5 @@
 import { equalRect, normalizeRect, sectRect } from "./rectangle.js";
-import { reversed } from "./utils.js";
+import { compare, reversed } from "./utils.js";
 
 export function pointInConvexPolygon(x, y, polygon) {
   // Adapted from a comment on
@@ -111,11 +111,6 @@ function clipT(a, b, minimum, maximum) {
     t[1] = 1;
   }
   return t[0] <= t[1] ? t : undefined;
-}
-
-function compare(a, b) {
-  // Return -1 when a < b, 1 when a > b, and 0 when a == b
-  return (a > b) - (a < b);
 }
 
 export function convexHull(points) {

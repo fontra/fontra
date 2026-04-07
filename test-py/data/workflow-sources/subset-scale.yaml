@@ -1,0 +1,22 @@
+steps:
+  - input: fontra-read
+    source: test-common/fonts/MutatorSans.fontra
+    steps:
+      - filter: scale
+        scaleFactor: 0.75
+        scaleFontMetrics: false
+      - filter: subset-glyphs
+        glyphNames:
+          - B
+          - Adieresis
+        glyphNamesFile: test-py/data/workflow/subset-keep-glyph-names.txt
+  - input: fontra-read
+    source: test-common/fonts/MutatorSans.fontra
+    steps:
+      - filter: subset-glyphs
+        glyphNames:
+          - C
+          - D
+      - filter: drop-background-images
+  - destination: output-subset-scale.fontra
+    output: fontra-write

@@ -1,0 +1,7 @@
+steps:
+  - input: fontra-read
+    source: test-py/data/workflow/input-merge-kerning-A.fontra
+  - input: fontra-read
+    source: test-py/data/workflow/input-merge-kerning-B.fontra
+  - destination: output-merge-kerning.fontra
+    output: fontra-write

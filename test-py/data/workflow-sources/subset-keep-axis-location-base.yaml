@@ -1,0 +1,13 @@
+steps:
+  - input: fontra-read
+    source: test-py/data/mutatorsans/MutatorSans.designspace
+  - filter: drop-features
+  - filter: subset-glyphs
+    glyphNames:
+      - B
+  - filter: drop-shapes
+  - axisNames:
+      - weight
+    filter: subset-axes
+  - destination: output-subset-axes-location-base.fontra
+    output: fontra-write

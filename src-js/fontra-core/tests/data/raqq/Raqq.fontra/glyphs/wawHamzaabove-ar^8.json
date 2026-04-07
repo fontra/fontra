@@ -1,0 +1,32 @@
+{
+"name": "wawHamzaabove-ar",
+"sources": [
+{
+"name": "",
+"layerName": "m01",
+"locationBase": "m01"
+}
+],
+"layers": {
+"m01": {
+"glyph": {
+"components": [
+{
+"name": "waw-ar"
+},
+{
+"name": "hamzaabove-ar",
+"transformation": {
+"translateX": -12,
+"translateY": 209
+}
+}
+],
+"xAdvance": 509
+}
+}
+},
+"customData": {
+"com.glyphsapp.glyph-color": 0
+}
+}

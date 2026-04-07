@@ -1,0 +1,35 @@
+{
+"name": "waw-ar.fina.round",
+"sources": [
+{
+"name": "",
+"layerName": "m01",
+"locationBase": "m01"
+}
+],
+"layers": {
+"m01": {
+"glyph": {
+"components": [
+{
+"name": "waw-ar",
+"transformation": {
+"translateY": -83
+},
+"customData": {
+"com.glyphsapp.component.alignment": -1
+}
+}
+],
+"xAdvance": 492,
+"anchors": [
+{
+"name": "entry",
+"x": 492,
+"y": 0
+}
+]
+}
+}
+}
+}

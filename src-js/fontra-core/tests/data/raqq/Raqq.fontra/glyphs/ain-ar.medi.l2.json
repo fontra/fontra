@@ -1,0 +1,25 @@
+{
+"name": "ain-ar.medi.l2",
+"sources": [
+{
+"name": "",
+"layerName": "m01",
+"locationBase": "m01"
+}
+],
+"layers": {
+"m01": {
+"glyph": {
+"components": [
+{
+"name": "ain-ar.medi"
+}
+],
+"xAdvance": 220
+}
+}
+},
+"customData": {
+"com.glyphsapp.glyph-color": 0
+}
+}

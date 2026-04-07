@@ -1,0 +1,96 @@
+{
+"name": "H",
+"sources": [
+{
+"name": "",
+"layerName": "default",
+"locationBase": "default"
+}
+],
+"layers": {
+"default": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": 50,
+"y": 701
+},
+{
+"x": 50,
+"y": 0
+},
+{
+"x": 150,
+"y": 0
+},
+{
+"x": 150,
+"y": 701
+}
+],
+"isClosed": true
+},
+{
+"points": [
+{
+"x": 350,
+"y": 701
+},
+{
+"x": 350,
+"y": 0
+},
+{
+"x": 450,
+"y": 0
+},
+{
+"x": 450,
+"y": 701
+}
+],
+"isClosed": true
+},
+{
+"points": [
+{
+"x": 100,
+"y": 405
+},
+{
+"x": 100,
+"y": 320
+},
+{
+"x": 400,
+"y": 320
+},
+{
+"x": 400,
+"y": 405
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 500,
+"anchors": [
+{
+"name": "top",
+"x": 250,
+"y": 720
+},
+{
+"name": "bottom",
+"x": 250,
+"y": -20
+}
+]
+}
+}
+}
+}

@@ -1,0 +1,29 @@
+{
+"name": "threedotsdownbelow-ar",
+"sources": [
+{
+"name": "",
+"layerName": "m01",
+"locationBase": "m01"
+}
+],
+"layers": {
+"m01": {
+"glyph": {
+"components": [
+{
+"name": "threedotsupabove-ar"
+}
+],
+"xAdvance": 174,
+"anchors": [
+{
+"name": "_bottom",
+"x": 37,
+"y": 124
+}
+]
+}
+}
+}
+}

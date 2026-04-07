@@ -1,0 +1,13 @@
+steps:
+  - input: fontra-read
+    source: test-py/data/workflow/output-merge-features.fontra
+  - filter: subset-glyphs
+    glyphNames:
+      - A
+    layoutHandling: closure
+  - destination: output-subset-features.fontra
+    output: fontra-write
+test-info:
+  expected-log:
+    - level: 30
+      message: Removing ineffective feature calt

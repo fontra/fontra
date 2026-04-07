@@ -1,0 +1,19 @@
+steps:
+  - input: fontra-read
+    source: test-py/data/workflow/input1-A.fontra
+  - axisNames: []
+    filter: subset-axes
+  - fork: null
+    steps:
+      - filter: subset-glyphs
+        glyphNames:
+          - A
+      - destination: output-fork-A.fontra
+        output: fontra-write
+  - fork: null
+    steps:
+      - filter: subset-glyphs
+        glyphNames:
+          - B
+      - destination: output-fork-B.fontra
+        output: fontra-write

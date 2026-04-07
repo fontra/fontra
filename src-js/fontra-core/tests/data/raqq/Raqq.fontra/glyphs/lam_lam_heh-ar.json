@@ -1,0 +1,455 @@
+{
+"name": "lam_lam_heh-ar",
+"sources": [
+{
+"name": "",
+"layerName": "m01",
+"locationBase": "m01"
+}
+],
+"layers": {
+"m01": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": 217,
+"y": -6,
+"smooth": true
+},
+{
+"x": 312,
+"y": -6,
+"type": "cubic"
+},
+{
+"x": 359,
+"y": -7,
+"type": "cubic"
+},
+{
+"x": 452,
+"y": -6,
+"smooth": true
+},
+{
+"x": 558,
+"y": -5,
+"type": "cubic"
+},
+{
+"x": 577,
+"y": 9,
+"type": "cubic"
+},
+{
+"x": 572,
+"y": 116,
+"smooth": true
+},
+{
+"x": 565,
+"y": 263,
+"type": "cubic"
+},
+{
+"x": 551,
+"y": 587,
+"type": "cubic"
+},
+{
+"x": 540,
+"y": 783,
+"smooth": true
+},
+{
+"x": 539,
+"y": 806,
+"type": "cubic"
+},
+{
+"x": 522,
+"y": 812,
+"type": "cubic"
+},
+{
+"x": 512,
+"y": 793,
+"smooth": true
+},
+{
+"x": 500,
+"y": 770,
+"type": "cubic"
+},
+{
+"x": 463,
+"y": 734,
+"type": "cubic"
+},
+{
+"x": 438,
+"y": 715,
+"smooth": true
+},
+{
+"x": 429,
+"y": 708,
+"type": "cubic"
+},
+{
+"x": 437,
+"y": 692,
+"type": "cubic"
+},
+{
+"x": 442,
+"y": 632,
+"smooth": true
+},
+{
+"x": 450,
+"y": 521,
+"type": "cubic"
+},
+{
+"x": 461,
+"y": 255,
+"type": "cubic"
+},
+{
+"x": 475,
+"y": 121
+},
+{
+"x": 470,
+"y": 119,
+"type": "cubic"
+},
+{
+"x": 461,
+"y": 119,
+"type": "cubic"
+},
+{
+"x": 459,
+"y": 133,
+"smooth": true
+},
+{
+"x": 439,
+"y": 286,
+"type": "cubic"
+},
+{
+"x": 436,
+"y": 595,
+"type": "cubic"
+},
+{
+"x": 407,
+"y": 703,
+"smooth": true
+},
+{
+"x": 398,
+"y": 735,
+"type": "cubic"
+},
+{
+"x": 376,
+"y": 719,
+"type": "cubic"
+},
+{
+"x": 373,
+"y": 707,
+"smooth": true
+},
+{
+"x": 366,
+"y": 678,
+"type": "cubic"
+},
+{
+"x": 348,
+"y": 649,
+"type": "cubic"
+},
+{
+"x": 322,
+"y": 637,
+"smooth": true
+},
+{
+"x": 309,
+"y": 631,
+"type": "cubic"
+},
+{
+"x": 293,
+"y": 629,
+"type": "cubic"
+},
+{
+"x": 300,
+"y": 609,
+"smooth": true
+},
+{
+"x": 304,
+"y": 596,
+"type": "cubic"
+},
+{
+"x": 313,
+"y": 571,
+"type": "cubic"
+},
+{
+"x": 318,
+"y": 541,
+"smooth": true
+},
+{
+"x": 327,
+"y": 491,
+"type": "cubic"
+},
+{
+"x": 350,
+"y": 252,
+"type": "cubic"
+},
+{
+"x": 353,
+"y": 119
+},
+{
+"x": 348,
+"y": 116,
+"type": "cubic"
+},
+{
+"x": 336,
+"y": 121,
+"type": "cubic"
+},
+{
+"x": 335,
+"y": 135,
+"smooth": true
+},
+{
+"x": 329,
+"y": 217,
+"type": "cubic"
+},
+{
+"x": 326,
+"y": 302,
+"type": "cubic"
+},
+{
+"x": 312,
+"y": 375,
+"smooth": true
+},
+{
+"x": 305,
+"y": 409,
+"type": "cubic"
+},
+{
+"x": 283,
+"y": 435,
+"type": "cubic"
+},
+{
+"x": 269,
+"y": 400,
+"smooth": true
+},
+{
+"x": 261,
+"y": 381,
+"type": "cubic"
+},
+{
+"x": 253,
+"y": 370,
+"type": "cubic"
+},
+{
+"x": 233,
+"y": 345,
+"smooth": true
+},
+{
+"x": 222,
+"y": 332,
+"type": "cubic"
+},
+{
+"x": 208,
+"y": 327,
+"type": "cubic"
+},
+{
+"x": 209,
+"y": 318,
+"smooth": true
+},
+{
+"x": 210,
+"y": 311
+},
+{
+"x": 93,
+"y": 308,
+"type": "cubic"
+},
+{
+"x": 2,
+"y": 231,
+"type": "cubic"
+},
+{
+"x": 0,
+"y": 140,
+"smooth": true
+},
+{
+"x": -2,
+"y": 57,
+"type": "cubic"
+},
+{
+"x": 64,
+"y": -6,
+"type": "cubic"
+}
+],
+"isClosed": true
+},
+{
+"points": [
+{
+"x": 216,
+"y": 135,
+"smooth": true
+},
+{
+"x": 209,
+"y": 135,
+"type": "cubic"
+},
+{
+"x": 203,
+"y": 141,
+"type": "cubic"
+},
+{
+"x": 203,
+"y": 148,
+"smooth": true
+},
+{
+"x": 203,
+"y": 154,
+"type": "cubic"
+},
+{
+"x": 209,
+"y": 160,
+"type": "cubic"
+},
+{
+"x": 216,
+"y": 160,
+"smooth": true
+},
+{
+"x": 222,
+"y": 160,
+"type": "cubic"
+},
+{
+"x": 228,
+"y": 154,
+"type": "cubic"
+},
+{
+"x": 228,
+"y": 148,
+"smooth": true
+},
+{
+"x": 228,
+"y": 141,
+"type": "cubic"
+},
+{
+"x": 222,
+"y": 135,
+"type": "cubic"
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 573,
+"anchors": [
+{
+"name": "caret_1",
+"x": 345,
+"y": 0
+},
+{
+"name": "caret_2",
+"x": 467,
+"y": 0
+},
+{
+"name": "damma_3",
+"x": -78,
+"y": 131
+},
+{
+"name": "fatha_1",
+"x": 498,
+"y": 809
+},
+{
+"name": "fatha_2",
+"x": 339,
+"y": 698
+},
+{
+"name": "fatha_3",
+"x": 261,
+"y": 452
+},
+{
+"name": "kasra_1",
+"x": 547,
+"y": -67
+},
+{
+"name": "kasra_2",
+"x": 414,
+"y": -66
+},
+{
+"name": "kasra_3",
+"x": 243,
+"y": -66
+}
+]
+}
+}
+}
+}

@@ -5,6 +5,7 @@ export const strings = {
   "action-topics.export-as": "Exporter sous",
   "action-topics.glyph-editor-appearance": "Glyphe édition apparence",
   "action-topics.menu.edit": "Édition",
+  "action-topics.menu.file": "Fichier",
   "action-topics.menu.glyph": "Glyphe",
   "action-topics.menu.view": "Affichage",
   "action-topics.reference-font": "Fonte de référence",
@@ -35,6 +36,7 @@ export const strings = {
   "action.export-as.rcjk": "RCJK (*.rcjk)",
   "action.export-as.ttf": "TrueType (*.ttf)",
   "action.export-as.ufo": "UFO (*.ufo)",
+  "action.export-as.woff2": "Webfont (*.woff2)",
   "action.glyph.add-background-image": "Ajouter une image d'arrière plan",
   "action.glyph.add-source": "Ajouter une source…",
   "action.glyph.delete-source": "Supprimer la source…",
@@ -237,9 +239,9 @@ export const strings = {
     "Ajouter un glyphe avant le glyphe sélectionné",
   "menubar.view.find-glyphs-that-use": "Trouver les glyphes qui utilisent «%0»",
   "menubar.view.remove-selected-glyph-from-canvas":
-    "Retirer le glyphe sélectionné du canvas",
+    "Retirer le glyphe sélectionné du canvas...",
   "menubar.view.replace-selected-glyph-on-canvas":
-    "Remplacer le glyphe sélectionné du canvas",
+    "Remplacer le glyphe sélectionné du canvas...",
   "menubar.view.select-glyph-source-layer": "Select glyph/source/layer",
   "menubar.view.select-next-glyph": "Sélectionner le prochain glyphe",
   "menubar.view.select-next-source": "Sélectionner la source suivante ",
@@ -276,6 +278,14 @@ export const strings = {
   "shortcuts.tooltip.click-and-record": "Click and record a shortcut",
   "shortcuts.tooltip.reset-to-default": "Reset to default",
   "shortcuts.warning.exists": "Le raccourci clavier existe pour %0",
+  "sidebar.characters-glyphs": "Input characters and output glyphs",
+  "sidebar.characters-glyphs.input-characters": "Input characters",
+  "sidebar.characters-glyphs.output-glyphs": "Output glyphs",
+  "sidebar.characters-glyphs.shaping-debugger": "Shaping debugger",
+  "sidebar.characters-glyphs.shaping-debugger.options-menu-tooltip":
+    "Shaping debugger options",
+  "sidebar.characters-glyphs.shaping-debugger.show-ineffective-items":
+    "Show ineffective items",
   "sidebar.designspace-navigation": "Navigation du designspace",
   "sidebar.designspace-navigation.dialog.add-source.label.layer": "Layer:",
   "sidebar.designspace-navigation.dialog.add-source.label.source-name":

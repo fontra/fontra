@@ -1,0 +1,9 @@
+steps:
+  - input: fontra-read
+    source: test-py/data/workflow/input-set-vertical-glyph-metrics.fontra
+  - filter: set-vertical-glyph-metrics
+    verticalOrigin: 880
+    yAdvance: 1000
+  - filter: set-vertical-glyph-metrics-from-anchors
+  - destination: output-set-vertical-glyph-metrics-from-anchors.fontra
+    output: fontra-write

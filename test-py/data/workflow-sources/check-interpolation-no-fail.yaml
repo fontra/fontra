@@ -1,0 +1,14 @@
+steps:
+  - input: fontra-read
+    source: test-py/data/workflow/input-check-interpolation.fontra
+  - filter: check-interpolation
+    fixWithFallback: true
+  - destination: output-check-interpolation-no-fail.fontra
+    output: fontra-write
+test-info:
+  continue-on-error: true
+  expected-log:
+    - level: 40
+      message:
+        "check-interpolation: glyph A can't be interpolated InterpolationError('paths
+        are not compatible')"

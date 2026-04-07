@@ -1,0 +1,151 @@
+{
+"name": "_ayah.ring1",
+"sources": [
+{
+"name": "",
+"layerName": "m01",
+"locationBase": "m01"
+}
+],
+"layers": {
+"m01": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": -391,
+"y": -25,
+"smooth": true
+},
+{
+"x": -269,
+"y": -25,
+"type": "cubic"
+},
+{
+"x": -171,
+"y": 73,
+"type": "cubic"
+},
+{
+"x": -171,
+"y": 195,
+"smooth": true
+},
+{
+"x": -171,
+"y": 316,
+"type": "cubic"
+},
+{
+"x": -269,
+"y": 414,
+"type": "cubic"
+},
+{
+"x": -391,
+"y": 414,
+"smooth": true
+},
+{
+"x": -512,
+"y": 414,
+"type": "cubic"
+},
+{
+"x": -610,
+"y": 316,
+"type": "cubic"
+},
+{
+"x": -610,
+"y": 195,
+"smooth": true
+},
+{
+"x": -610,
+"y": 73,
+"type": "cubic"
+},
+{
+"x": -512,
+"y": -25,
+"type": "cubic"
+}
+],
+"isClosed": true
+},
+{
+"points": [
+{
+"x": -391,
+"y": 15,
+"smooth": true
+},
+{
+"x": -490,
+"y": 15,
+"type": "cubic"
+},
+{
+"x": -570,
+"y": 95,
+"type": "cubic"
+},
+{
+"x": -570,
+"y": 195,
+"smooth": true
+},
+{
+"x": -570,
+"y": 294,
+"type": "cubic"
+},
+{
+"x": -490,
+"y": 374,
+"type": "cubic"
+},
+{
+"x": -391,
+"y": 374,
+"smooth": true
+},
+{
+"x": -291,
+"y": 374,
+"type": "cubic"
+},
+{
+"x": -211,
+"y": 294,
+"type": "cubic"
+},
+{
+"x": -211,
+"y": 195,
+"smooth": true
+},
+{
+"x": -211,
+"y": 95,
+"type": "cubic"
+},
+{
+"x": -291,
+"y": 15,
+"type": "cubic"
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 100
+}
+}
+}
+}

@@ -1,0 +1,6 @@
+steps:
+  - input: fontra-read
+    source: test-py/data/workflow/input-cross-axis-mappings.fontra
+  - filter: drop-cross-axis-mappings
+  - destination: output-drop-cross-axis-mappings.fontra
+    output: fontra-write

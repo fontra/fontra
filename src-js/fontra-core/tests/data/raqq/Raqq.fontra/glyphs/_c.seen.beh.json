@@ -1,0 +1,68 @@
+{
+"name": "_c.seen.beh",
+"sources": [
+{
+"name": "",
+"layerName": "m01",
+"locationBase": "m01"
+}
+],
+"layers": {
+"m01": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": -24,
+"y": 45
+},
+{
+"x": 41,
+"y": 45
+},
+{
+"x": 41,
+"y": 130
+},
+{
+"x": 22,
+"y": 136,
+"type": "cubic"
+},
+{
+"x": -4,
+"y": 153,
+"type": "cubic"
+},
+{
+"x": -5,
+"y": 202
+},
+{
+"x": -24,
+"y": 202
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 0,
+"anchors": [
+{
+"name": "entry",
+"x": 0,
+"y": 0
+},
+{
+"name": "exit",
+"x": 0,
+"y": 0
+}
+]
+}
+}
+}
+}

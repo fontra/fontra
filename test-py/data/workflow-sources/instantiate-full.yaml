@@ -1,0 +1,18 @@
+steps:
+  - input: fontra-read
+    source: test-common/fonts/MutatorSans.fontra
+  - filter: subset-glyphs
+    glyphNames:
+      - A
+      - B
+  - axisNames:
+      - weight
+      - width
+    filter: subset-axes
+  - filter: instantiate
+    location:
+      weight: 300
+      width: 400
+  - filter: round-coordinates
+  - destination: output-instantiate-full.fontra
+    output: fontra-write

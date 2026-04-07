@@ -1,0 +1,8 @@
+steps:
+  - input: fontra-read
+    source: test-py/data/workflow/input-variable-composites.fontra
+  - componentGlyphNames:
+      - VG_4E28_00
+    filter: shallow-decompose-composites
+  - destination: output-shallow-decompose-composites-single-component.fontra
+    output: fontra-write

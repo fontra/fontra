@@ -56,6 +56,7 @@ async def _copyFont(
     await destBackend.putAxes(await sourceBackend.getAxes())
     await destBackend.putSources(await sourceBackend.getSources())
     await destBackend.putCustomData(await sourceBackend.getCustomData())
+    await destBackend.putGlyphInfos(await sourceBackend.getGlyphInfos())
     glyphMap = await sourceBackend.getGlyphMap()
     glyphNamesToCopy = sorted(glyphMap)
     glyphNamesCopied: set[str] = set()
@@ -96,8 +97,10 @@ async def _copyFont(
                 if imageData is not None:
                     await destBackend.putBackgroundImage(imageIdentifier, imageData)
 
-    await destBackend.putKerning(await sourceBackend.getKerning())
+    # Must write features before kerning, as some backends depend on the features
+    # to do the correct RTL/LTR kerning shuffle.
     await destBackend.putFeatures(await sourceBackend.getFeatures())
+    await destBackend.putKerning(await sourceBackend.getKerning())
 
 
 async def copyGlyphs(

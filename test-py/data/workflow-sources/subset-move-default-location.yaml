@@ -1,0 +1,12 @@
+steps:
+  - input: fontra-read
+    source: test-py/data/workflow/input-move-default-location.fontra
+  - dropAxisNames:
+      - italic
+    filter: subset-axes
+  - filter: move-default-location
+    newDefaultUserLocation:
+      weight: 300
+      width: 400
+  - destination: output-move-default-location.fontra
+    output: fontra-write

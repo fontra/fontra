@@ -1,0 +1,60 @@
+{
+"name": "dammatan-ar",
+"sources": [
+{
+"name": "",
+"layerName": "m01",
+"locationBase": "m01"
+}
+],
+"layers": {
+"m01": {
+"glyph": {
+"components": [
+{
+"name": "damma-ar"
+},
+{
+"name": "damma-ar",
+"transformation": {
+"translateY": 134
+}
+}
+],
+"xAdvance": 150,
+"anchors": [
+{
+"name": "_damma",
+"x": 75,
+"y": 142
+}
+]
+}
+},
+"m01^Regular 25 Jun 22, 20:50": {
+"glyph": {
+"components": [
+{
+"name": "_dot",
+"customData": {
+"com.glyphsapp.component.alignment": -1
+}
+},
+{
+"name": "_dot",
+"transformation": {
+"translateY": 134
+},
+"customData": {
+"com.glyphsapp.component.alignment": -1
+}
+}
+],
+"xAdvance": 150
+},
+"customData": {
+"com.glyphsapp.layer.layerId": "CDCF1E84-7251-4EF5-B909-E7186DCEAE9B"
+}
+}
+}
+}

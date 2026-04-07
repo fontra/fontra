@@ -1,0 +1,41 @@
+{
+"name": "twodotsverticalabove-ar.vert",
+"sources": [
+{
+"name": "",
+"layerName": "m01",
+"locationBase": "m01"
+}
+],
+"layers": {
+"m01": {
+"glyph": {
+"components": [
+{
+"name": "dotabove-ar",
+"transformation": {
+"translateX": 6,
+"translateY": 37,
+"rotation": 2.999999999999923,
+"scaleX": 0.9999999999999999
+}
+},
+{
+"name": "dotabove-ar",
+"transformation": {
+"translateY": -13
+}
+}
+],
+"xAdvance": 110,
+"anchors": [
+{
+"name": "_top",
+"x": 77,
+"y": 17
+}
+]
+}
+}
+}
+}

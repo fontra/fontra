@@ -1,0 +1,21 @@
+steps:
+  - input: fontra-read
+    source: test-common/fonts/MutatorSans.fontra
+  - filter: subset-glyphs
+    glyphNames:
+      - E
+      - Aacute
+  - axisNames:
+      - weight
+    filter: subset-axes
+  - filter: move-default-location
+    newDefaultUserLocation:
+      weight: 431
+  - axes:
+      weight:
+        maxValue: 734
+        minValue: 223
+    filter: trim-axes
+  - filter: round-coordinates
+  - destination: output-round-coordinates.fontra
+    output: fontra-write

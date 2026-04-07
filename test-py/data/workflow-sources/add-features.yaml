@@ -1,0 +1,7 @@
+steps:
+  - input: fontra-read
+    source: test-py/data/workflow/input-merge-features-A.fontra
+  - featureFile: test-py/data/workflow/add-features.fea
+    filter: add-features
+  - destination: output-add-features.fontra
+    output: fontra-write

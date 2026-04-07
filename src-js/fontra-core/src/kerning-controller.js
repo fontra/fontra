@@ -21,8 +21,13 @@ export class KerningController {
     this.fontController.addChangeListener?.(
       { kerning: { [wildcard]: { values: null } } },
       (change, isExternalChange) => {
-        for (const [leftName, rightName] of getKernPairsFromChange(change)) {
-          this.clearPairCache(leftName, rightName);
+        if (!change) {
+          // reload all
+          this._pairFunctions = {};
+        } else {
+          for (const [leftName, rightName] of getKernPairsFromChange(change)) {
+            this.clearPairCache(leftName, rightName);
+          }
         }
       },
       false,
@@ -49,16 +54,15 @@ export class KerningController {
 
   _setup() {
     this._updatePairGroupMappings();
-
-    const locations = this.kernData.sourceIdentifiers.map(
-      (sourceIdentifier) => this.fontController.sources[sourceIdentifier].location
-    );
-    this.model = new DiscreteVariationModel(
-      locations,
-      this.fontController.fontAxesSourceSpace
-    );
-
     this._pairFunctions = {};
+  }
+
+  get model() {
+    return this.fontController.fontSourcesInstancer.model;
+  }
+
+  getNonSparseSourceIdentifiers() {
+    return this.fontController.fontSourcesInstancer.getNonSparseSourceIdentifiers();
   }
 
   _updatePairGroupMappings() {
@@ -70,13 +74,24 @@ export class KerningController {
     return this.kernData.sourceIdentifiers;
   }
 
+  get sourceIdentifierIndexMapping() {
+    const mapping = {};
+    for (const [i, sourceIdentifier] of enumerate(this.sourceIdentifiers)) {
+      mapping[sourceIdentifier] = i;
+    }
+    return mapping;
+  }
+
   get values() {
     return this.kernData.values;
   }
 
   instantiate(location) {
     const sourceIdentifier =
-      this.fontController.fontSourcesInstancer.getSourceIdentifierForLocation(location);
+      this.fontController.fontSourcesInstancer.getSourceIdentifierForLocation(
+        location,
+        false
+      );
 
     return new KerningInstance(this, location, sourceIdentifier);
   }
@@ -148,9 +163,11 @@ export class KerningController {
           }
         });
 
-      // Replace missing (nullish) values with zeros
-      const denseSourceValues = finalSourceValues.map((v) => (v == null ? 0 : v));
-      const deltas = this.model.getDeltas(denseSourceValues);
+      const mapping = this.sourceIdentifierIndexMapping;
+      const mappedSourceValues = this.getNonSparseSourceIdentifiers().map(
+        (sourceIdentifier) => finalSourceValues[mapping[sourceIdentifier]] ?? 0
+      );
+      const deltas = this.model.getDeltas(mappedSourceValues);
       return (location) => this.model.interpolateFromDeltas(location, deltas).instance;
     }
   }
@@ -334,10 +351,30 @@ export class KerningController {
           newValues.push(null);
         }
 
-        const pairFunction = this.getPairFunction(leftName, rightName);
-        assert(pairFunction);
+        // If the pair is sparse, ie. if not all sources have a non-null value,
+        // then we try to avoid inserting an interpolated value if this pair
+        // is an exception for a group-based pair. If the group fallback is the
+        // same as the interpolated value, we assume the exception is not needed
+        // at this location.
+        const isSparse = newValues.some((v) => v == null);
 
-        newValues.push(Math.round(pairFunction(location)));
+        const namesWithFallbacks = isSparse
+          ? [...this._getPairNamesWithFallbacks(leftName, rightName)]
+          : [[leftName, rightName]];
+
+        const interpolatedValueWithFallbacks = namesWithFallbacks
+          .map(([leftName, rightName]) =>
+            this.getPairFunction(leftName, rightName)?.(location)
+          )
+          .filter((v) => v != undefined);
+
+        const interpolatedValue =
+          !isSparse ||
+          interpolatedValueWithFallbacks[0] != interpolatedValueWithFallbacks[1]
+            ? Math.round(interpolatedValueWithFallbacks[0])
+            : null;
+
+        newValues.push(interpolatedValue);
         kernData.values[leftName][rightName] = newValues;
       }
     }
@@ -582,6 +619,7 @@ function addGroupPrefix(groupName) {
 }
 
 function getKernPairsFromChange(kerningChange) {
+  assert(kerningChange, "invalid change object");
   const pairs = [];
   for (const { path, change } of iterChanges(kerningChange)) {
     pairs.push([path.at(-1), change.a?.[0]]);

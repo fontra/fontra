@@ -11,7 +11,7 @@ from aiohttp import web
 
 from ..backends import getFileSystemBackend
 from ..core.fonthandler import FontHandler
-from ..core.protocols import ExportManager, ProjectManager
+from ..core.protocols import ExportManager, ProjectManager, ProjectOpenListener
 
 logger = logging.getLogger(__name__)
 
@@ -50,7 +50,7 @@ def existingFolderOrFontFile(path):
     path = pathlib.Path(path).resolve()
     ext = path.suffix.lower()
     if ext not in fileExtensions and not path.is_dir():
-        raise argparse.ArgumentError("invalid path")
+        raise argparse.ArgumentError(None, "invalid path")
     return path
 
 
@@ -61,6 +61,7 @@ class FileSystemProjectManager:
         maxFolderDepth: int = 3,
         readOnly: bool = False,
         exportManager: ExportManager | None = None,
+        projectOpenListener: ProjectOpenListener | None = None,
     ):
         self.rootPath = rootPath
         self.singleFilePath = None
@@ -71,6 +72,7 @@ class FileSystemProjectManager:
             self.rootPath = self.rootPath.parent
         self.fontHandlers: dict[str, FontHandler] = {}
         self.exportManager = exportManager
+        self.projectOpenListener = projectOpenListener
 
     async def aclose(self) -> None:
         for fontHandler in self.fontHandlers.values():
@@ -98,7 +100,10 @@ class FileSystemProjectManager:
             async def closeFontHandler():
                 logger.info(f"closing FontHandler for '{projectIdentifier}'")
                 del self.fontHandlers[projectIdentifier]
+                assert fontHandler is not None
                 await fontHandler.aclose()
+                if self.projectOpenListener is not None:
+                    self.projectOpenListener.projectClosed(projectIdentifier)
 
             logger.info(f"new FontHandler for '{projectIdentifier}'")
             fontHandler = FontHandler(
@@ -111,6 +116,8 @@ class FileSystemProjectManager:
             )
             await fontHandler.startTasks()
             self.fontHandlers[projectIdentifier] = fontHandler
+            if self.projectOpenListener is not None:
+                self.projectOpenListener.projectOpened(projectIdentifier)
         return fontHandler
 
     def _getProjectPath(self, path: str) -> PathLike | None:

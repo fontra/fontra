@@ -1,0 +1,29 @@
+{
+"name": "C.alt",
+"sources": [
+{
+"name": "",
+"layerName": "0fe08302",
+"locationBase": "0fe08302"
+}
+],
+"layers": {
+"0fe08302": {
+"glyph": {
+"components": [
+{
+"name": "A",
+"transformation": {
+"translateX": 500,
+"translateY": 50
+}
+},
+{
+"name": "A"
+}
+],
+"xAdvance": 1000
+}
+}
+}
+}

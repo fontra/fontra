@@ -1,0 +1,9 @@
+steps:
+  - input: fontra-read
+    source: test-py/data/workflow/input-generate-palt-vpal-feature.fontra
+  - filter: set-vertical-glyph-metrics
+    verticalOrigin: 880
+    yAdvance: 1000
+  - filter: generate-palt-vpal-feature
+  - destination: output-generate-palt-vpal-feature.fontra
+    output: fontra-write

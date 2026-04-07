@@ -1,0 +1,6 @@
+steps:
+  - input: fontra-read
+    source: test-py/data/workflow/input-drop-unreachable-glyphs.fontra
+  - filter: drop-unreachable-glyphs
+  - destination: output-drop-unreachable-glyphs-composed.fontra
+    output: fontra-write

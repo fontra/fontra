@@ -1,0 +1,6 @@
+steps:
+  - input: fontra-read
+    source: test-py/data/mutatorsans/MutatorSansLocationBase.fontra
+  - filter: decompose-composites
+  - destination: output-decompose-composites-location-base.fontra
+    output: fontra-write

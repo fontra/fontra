@@ -1,0 +1,11 @@
+steps:
+  - input: fontra-read
+    source: test-py/data/workflow/input1-A.fontra
+  - input: fontra-read
+    source: test-py/data/workflow/input1-B.fontra
+  - destination: output-merge-plain.fontra
+    output: fontra-write
+test-info:
+  expected-log:
+    - level: 30
+      message: "Merger: Glyph 'B' exists in both fonts"

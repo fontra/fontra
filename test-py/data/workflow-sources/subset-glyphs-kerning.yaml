@@ -1,0 +1,12 @@
+steps:
+  - input: fontra-read
+    source: test-common/fonts/MutatorSans.fontra
+  - filter: drop-shapes
+  - filter: subset-glyphs
+    glyphNames:
+      - A
+      - O
+      - T
+      - V
+  - destination: output-subset-glyphs-kerning.fontra
+    output: fontra-write

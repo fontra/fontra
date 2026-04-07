@@ -1,0 +1,65 @@
+{
+"name": "lam-ar.medi",
+"sources": [
+{
+"name": "",
+"layerName": "m01",
+"locationBase": "m01"
+}
+],
+"layers": {
+"m01": {
+"glyph": {
+"components": [
+{
+"name": "lam-ar.init",
+"customData": {
+"com.glyphsapp.component.alignment": -1
+}
+},
+{
+"name": "_p.lam",
+"transformation": {
+"translateX": 38
+},
+"customData": {
+"com.glyphsapp.component.alignment": -1
+}
+}
+],
+"xAdvance": 125,
+"anchors": [
+{
+"name": "entry",
+"x": 125,
+"y": 0
+},
+{
+"name": "exit",
+"x": 0,
+"y": 0
+}
+]
+}
+},
+"m01^4 Apr 23 at 01:10": {
+"glyph": {
+"components": [
+{
+"name": "behDotless-ar.medi.high",
+"transformation": {
+"translateX": -3
+},
+"customData": {
+"com.glyphsapp.component.alignment": -1
+}
+}
+],
+"xAdvance": 125
+},
+"customData": {
+"com.glyphsapp.layer.layerId": "0C5AA166-5080-455D-A1EC-207441B745FB"
+}
+}
+}
+}

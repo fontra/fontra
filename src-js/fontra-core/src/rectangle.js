@@ -201,6 +201,7 @@ export function rectRound(rect) {
 
 export function validateRect(rect) {
   if (
+    !rect ||
     !isNumber(rect.xMin) ||
     !isNumber(rect.yMin) ||
     !isNumber(rect.xMax) ||

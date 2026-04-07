@@ -16,39 +16,38 @@
 ],
 "sources": [
 {
-"name": "<default>",
-"layerName": "<default>",
-"location": {
-"italic": 0,
-"weight": 150,
-"width": 0
-}
+"name": "",
+"layerName": "light-condensed",
+"locationBase": "light-condensed"
 },
 {
 "name": "rotate_1",
-"layerName": "rotate_off",
+"layerName": "light-condensed^rotate_off",
 "location": {
 "rotate*1": 100
-}
+},
+"locationBase": "light-condensed"
 },
 {
 "name": "rotate_2",
-"layerName": "rotate_off",
+"layerName": "light-condensed^rotate_off",
 "location": {
 "rotate*2": 100
-}
+},
+"locationBase": "light-condensed"
 },
 {
 "name": "rotate_end",
-"layerName": "rotate_end",
+"layerName": "light-condensed^rotate_end",
 "location": {
 "rotate*1": 100,
 "rotate*2": 100
-}
+},
+"locationBase": "light-condensed"
 }
 ],
 "layers": {
-"<default>": {
+"light-condensed": {
 "glyph": {
 "path": {
 "contours": [
@@ -78,7 +77,7 @@
 "xAdvance": 750
 }
 },
-"rotate_end": {
+"light-condensed^rotate_end": {
 "glyph": {
 "path": {
 "contours": [
@@ -108,7 +107,7 @@
 "xAdvance": 750
 }
 },
-"rotate_off": {
+"light-condensed^rotate_off": {
 "glyph": {
 "path": {
 "contours": [

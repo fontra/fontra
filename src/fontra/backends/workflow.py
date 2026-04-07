@@ -3,6 +3,7 @@ from typing import Any
 
 import yaml
 
+from ..backends.base import ReadableBaseBackend
 from ..core.classes import (
     Axes,
     FontInfo,
@@ -16,7 +17,7 @@ from ..workflow.workflow import Workflow
 
 
 @dataclass(kw_only=True)
-class WorkflowBackend:
+class WorkflowBackend(ReadableBaseBackend):
     workflow: Workflow
     context: Any = None
     endPoint: ReadableFontBackend | None = field(init=False, default=None)
@@ -72,3 +73,7 @@ class WorkflowBackend:
     async def getUnitsPerEm(self) -> int:
         endPoint = await self._ensureSetup()
         return await endPoint.getUnitsPerEm()
+
+    async def getGlyphInfos(self) -> dict[str, Any]:
+        endPoint = await self._ensureSetup()
+        return await endPoint.getGlyphInfos()

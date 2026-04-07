@@ -221,6 +221,11 @@ export function* product(...args) {
   }
 }
 
+export function compare(a, b) {
+  // Return -1 when a < b, 1 when a > b, and 0 when a == b
+  return (a > b) - (a < b);
+}
+
 export function valueInRange(min, v, max) {
   return min <= v && v <= max;
 }
@@ -255,41 +260,25 @@ export function makeUPlusStringFromCodePoint(codePoint) {
 export async function writeToClipboard(clipboardObject) {
   if (!clipboardObject) return;
 
-  const clipboardItemObject = {};
-  for (const [key, value] of Object.entries(clipboardObject)) {
-    if (value instanceof Blob) {
-      assert(key === value.type);
-      clipboardItemObject[key] = value;
-    } else {
-      clipboardItemObject[key] = new Blob([value], { type: key });
-    }
-  }
-
   try {
-    await navigator.clipboard.write([new ClipboardItem(clipboardItemObject)]);
+    await navigator.clipboard.write([new ClipboardItem(clipboardObject)]);
   } catch (error) {
+    console.log("Error while writing to clipboard, falling back to text/plain", error);
     // Write at least the plain/text MIME type to the clipboard
     if (clipboardObject["text/plain"]) {
-      await navigator.clipboard.writeText(clipboardObject["text/plain"]);
+      await navigator.clipboard.writeText(await clipboardObject["text/plain"]);
     }
   }
 }
 
-export async function readClipboardTypes() {
-  const clipboardContents = await navigator.clipboard.read();
-  const clipboardTypes = [];
-  for (const item of clipboardContents) {
-    clipboardTypes.push(...item.types);
-  }
-  return clipboardTypes;
-}
-
-export async function readFromClipboard(type, plainText = true) {
+export async function readFromClipboard(types, plainText = true) {
   const clipboardContents = await navigator.clipboard.read();
   for (const item of clipboardContents) {
-    if (item.types.includes(type)) {
-      const blob = await item.getType(type);
-      return plainText ? await blob.text() : blob;
+    for (const type of types) {
+      if (item.types.includes(type)) {
+        const blob = await item.getType(type);
+        return plainText ? await blob.text() : blob;
+      }
     }
   }
   return undefined;
@@ -611,6 +600,16 @@ export function areCustomDatasCompatible(parents) {
       if (kA != kB) {
         return false;
       }
+
+      const vA = parent.customData[kA];
+      if (typeof vA == "object") {
+        const vB = referenceCustomData[kB];
+        try {
+          const _ = addItemwise(vA, vB);
+        } catch (error) {
+          return false;
+        }
+      }
     }
   }
   return true;
@@ -628,11 +627,19 @@ export function normalizeGuidelines(guidelines, resetLocked = false) {
   });
 }
 
+export function mapObject(obj, func) {
+  // Return a copy of the object, with each [key, value] passed through `func`
+  return Object.fromEntries(Object.entries(obj).map(func));
+}
+
+export function mapObjectKeys(obj, func) {
+  // Return a copy of the object, with each key passed through `func`
+  return mapObject(obj, ([key, value]) => [func(key), value]);
+}
+
 export function mapObjectValues(obj, func) {
   // Return a copy of the object, with each value passed through `func`
-  return Object.fromEntries(
-    Object.entries(obj).map(([key, value]) => [key, func(value)])
-  );
+  return mapObject(obj, ([key, value]) => [key, func(value)]);
 }
 
 export async function mapObjectValuesAsync(obj, func) {
@@ -865,4 +872,27 @@ export function stringCompare(a, b) {
 
 export function deepCopyObject(obj) {
   return JSON.parse(JSON.stringify(obj));
+}
+
+export async function asyncMap(iterable, func) {
+  const result = [];
+  for (const item of iterable) {
+    result.push(await func(item));
+  }
+  return result;
+}
+
+export function parseDataURL(dataURL) {
+  const [header, data] = dataURL.split(",");
+  const typeRegex = /data:(.+?\/.+?);/g;
+  const match = typeRegex.exec(header);
+  const type = match[1];
+  if (!type) {
+    throw Error("invalid data URL");
+  }
+  return { type, data };
+}
+
+export function objectsEqualSerialized(a, b) {
+  return JSON.stringify(a) === JSON.stringify(b);
 }

@@ -1,0 +1,14 @@
+steps:
+  - input: fontra-read
+    source: test-py/data/workflow/input-variable-composites.fontra
+  - filter: move-default-location
+    newDefaultUserLocation:
+      wght: 500
+  - axes:
+      wght:
+        maxValue: 900
+        minValue: 500
+    filter: trim-axes
+  - filter: trim-variable-glyphs
+  - destination: output-trim-variable-glyphs-3.fontra
+    output: fontra-write

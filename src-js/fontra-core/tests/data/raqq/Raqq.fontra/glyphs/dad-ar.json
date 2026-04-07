@@ -1,0 +1,32 @@
+{
+"name": "dad-ar",
+"sources": [
+{
+"name": "",
+"layerName": "m01",
+"locationBase": "m01"
+}
+],
+"layers": {
+"m01": {
+"glyph": {
+"components": [
+{
+"name": "sad-ar"
+},
+{
+"name": "dotabove-ar",
+"transformation": {
+"translateX": 398,
+"translateY": 247
+}
+}
+],
+"xAdvance": 883
+}
+}
+},
+"customData": {
+"com.glyphsapp.glyph-color": 0
+}
+}

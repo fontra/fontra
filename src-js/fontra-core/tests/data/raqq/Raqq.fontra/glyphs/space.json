@@ -1,0 +1,67 @@
+{
+"name": "space",
+"sources": [
+{
+"name": "",
+"layerName": "m01",
+"locationBase": "m01"
+},
+{
+"name": "Regular / 13 May 23 at 22:36",
+"layerName": "6A138485-2A93-422B-84D0-8184A8F6FA16",
+"location": {
+"Mashq": 10,
+"Spacing": -100
+}
+},
+{
+"name": "Regular / 17 May 23 at 18:37",
+"layerName": "2CDB55F1-6E7A-4AAF-AF70-8CD8F4A8FB2A",
+"location": {
+"Mashq": 10,
+"Spacing": 125
+}
+}
+],
+"layers": {
+"2CDB55F1-6E7A-4AAF-AF70-8CD8F4A8FB2A": {
+"glyph": {
+"xAdvance": 500,
+"anchors": [
+{
+"name": "alefabove",
+"x": 250,
+"y": 0
+}
+]
+}
+},
+"6A138485-2A93-422B-84D0-8184A8F6FA16": {
+"glyph": {
+"xAdvance": 20,
+"anchors": [
+{
+"name": "alefabove",
+"x": 0,
+"y": 0
+}
+]
+}
+},
+"m01": {
+"glyph": {
+"xAdvance": 400,
+"anchors": [
+{
+"name": "alefabove",
+"x": 200,
+"y": 0
+}
+]
+}
+}
+},
+"customData": {
+"com.glyphsapp.glyph-color": 9
+}
+}

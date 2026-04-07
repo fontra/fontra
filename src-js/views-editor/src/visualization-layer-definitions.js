@@ -126,34 +126,49 @@ registerVisualizationLayerDefinition({
   identifier: "fontra.undefined.glyph",
   name: "Undefined glyph",
   selectionFunc: glyphSelector("all"),
-  selectionFilter: (positionedGlyph) => positionedGlyph.isUndefined,
+  selectionFilter: (positionedGlyph) =>
+    positionedGlyph.isUndefined ||
+    (positionedGlyph.isEmpty && !positionedGlyph.isEditing),
   zIndex: 500,
   colors: {
     fillColor: "#0006",
+    emptyFillColor: "#0002",
   },
   colorsDarkMode: {
     fillColor: "#FFF6",
+    emptyFillColor: "#FFF2",
   },
   draw: (context, positionedGlyph, parameters, model, controller) => {
-    context.fillStyle = parameters.fillColor;
+    context.fillStyle = positionedGlyph.isUndefined
+      ? parameters.fillColor
+      : parameters.emptyFillColor;
     context.textAlign = "center";
     const lineDistance = 1.2;
 
     const glyphNameFontSize = 0.1 * positionedGlyph.glyph.xAdvance;
     const placeholderFontSize = 0.75 * positionedGlyph.glyph.xAdvance;
-    context.font = `${glyphNameFontSize}px fontra-ui-regular, sans-serif`;
+
     context.scale(1, -1);
-    context.fillText(positionedGlyph.glyphName, positionedGlyph.glyph.xAdvance / 2, 0);
-    if (positionedGlyph.character) {
-      const uniStr = makeUPlusStringFromCodePoint(
-        positionedGlyph.character.codePointAt(0)
-      );
+
+    if (positionedGlyph.isUndefined) {
+      context.font = `${glyphNameFontSize}px fontra-ui-regular, sans-serif`;
       context.fillText(
-        uniStr,
+        positionedGlyph.glyphName,
         positionedGlyph.glyph.xAdvance / 2,
-        -lineDistance * glyphNameFontSize
+        0
       );
+      if (positionedGlyph.character) {
+        const uniStr = makeUPlusStringFromCodePoint(
+          positionedGlyph.character.codePointAt(0)
+        );
+        context.fillText(
+          uniStr,
+          positionedGlyph.glyph.xAdvance / 2,
+          -lineDistance * glyphNameFontSize
+        );
+      }
     }
+
     const codePoint = positionedGlyph.character?.codePointAt(0);
     const { glyphString, direction } = guessGlyphPlaceholderString(
       codePoint ? [codePoint] : [],
@@ -316,8 +331,8 @@ registerVisualizationLayerDefinition({
     strokeWidth: 1,
     originMarkerRadius: 4,
   },
-  colors: { strokeColor: "#0006" },
-  colorsDarkMode: { strokeColor: "#FFF8" },
+  colors: { strokeColor: "#999" },
+  colorsDarkMode: { strokeColor: "#999" },
 
   draw: (context, positionedGlyph, parameters, model, controller) => {
     context.strokeStyle = parameters.strokeColor;
@@ -388,15 +403,15 @@ registerVisualizationLayerDefinition({
   userSwitchable: true,
   defaultOn: true,
   zIndex: 600,
-  screenParameters: { fontSize: 11 },
+  screenParameters: { fontSize: 10, marginFromTop: 6 },
   colors: { boxColor: "#FFFB", color: "#000" },
   colorsDarkMode: { boxColor: "#1118", color: "#FFF" },
   draw: (context, positionedGlyph, parameters, model, controller) => {
     const fontSize = parameters.fontSize;
+    const marginFromTop = parameters.marginFromTop;
 
-    const margin = 0.5 * fontSize;
-    const boxHeight = 1.68 * fontSize;
-    const bottomY = 0.75 * fontSize * -1 - boxHeight + margin;
+    const margin = 0.25 * fontSize;
+    const boxHeight = 1.2 * fontSize;
 
     context.font = `${fontSize}px fontra-ui-regular, sans-serif`;
     context.textAlign = "center";
@@ -412,14 +427,14 @@ registerVisualizationLayerDefinition({
       drawRoundRect(
         context,
         pt.x - width / 2,
-        -pt.y - bottomY + margin,
+        -pt.y + marginFromTop,
         width,
-        -boxHeight / 2 - 2 * margin,
+        boxHeight,
         boxHeight / 4 // corner radius
       );
 
       context.fillStyle = parameters.color;
-      context.fillText(strLine, pt.x, -pt.y - bottomY);
+      context.fillText(strLine, pt.x, -pt.y + marginFromTop + boxHeight - margin);
     }
   },
 });

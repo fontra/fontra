@@ -194,10 +194,6 @@ export function doPerformAction(actionIdentifier, event) {
 }
 
 export function getActionIdentifierFromKeyEvent(event) {
-  if (event.repeat) {
-    return null;
-  }
-
   loadActionsByBaseKey();
 
   const actionShortCuts = actionsByBaseKey[getBaseKeyFromKeyEvent(event)];
@@ -233,6 +229,11 @@ export function getActionIdentifierFromKeyEvent(event) {
 
     if (!matchEventModifiers(shortCut, event) || !actionCallbacks[actionIdentifier]) {
       continue;
+    }
+
+    if (event.repeat) {
+      event.preventDefault();
+      return null;
     }
 
     return actionIdentifier;

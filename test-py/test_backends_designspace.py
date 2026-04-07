@@ -7,10 +7,18 @@ from dataclasses import asdict, replace
 
 import pytest
 from fontTools.designspaceLib import DesignSpaceDocument
+from fontTools.misc import plistlib
+from fontTools.ufoLib import UFOReaderWriter
 
 from fontra.backends import getFileSystemBackend, newFileSystemBackend
 from fontra.backends.copy import copyFont
-from fontra.backends.designspace import DesignspaceBackend, UFOBackend, convertImageData
+from fontra.backends.designspace import (
+    DesignspaceBackend,
+    UFOBackend,
+    UFOFontInfo,
+    UFOLayer,
+    convertImageData,
+)
 from fontra.backends.null import NullBackend
 from fontra.core.classes import (
     Anchor,
@@ -69,6 +77,21 @@ def writableTestFont(tmpdir):
 
 
 @pytest.fixture
+def rtlTestFont():
+    return UFOBackend.fromPath(
+        dataDir / "right-to-left-kerning-ufo" / "right-to-left-kerning.ufo"
+    )
+
+
+@pytest.fixture
+def writableRTLTestFont(tmpdir):
+    sourcePath = dataDir / "right-to-left-kerning-ufo" / "right-to-left-kerning.ufo"
+    destPath = tmpdir / sourcePath.name
+    shutil.copytree(sourcePath, destPath)
+    return UFOBackend.fromPath(destPath)
+
+
+@pytest.fixture
 def writableTestFontSingleUFO(tmpdir):
     sourcePath = dataDir / "mutatorsans" / "MutatorSansLightCondensed.ufo"
     destPath = tmpdir / sourcePath.name
@@ -76,8 +99,8 @@ def writableTestFontSingleUFO(tmpdir):
     return UFOBackend.fromPath(destPath)
 
 
-def readGLIFData(glyphName, ufoLayers):
-    glyphSets = {layer.fontraLayerName: layer.glyphSet for layer in ufoLayers}
+def readGLIFData(glyphName, ufoLayers: list[UFOLayer]) -> dict[str, str]:
+    glyphSets = {layer.fontraLayerName: layer.glyphSetReader for layer in ufoLayers}
     return {
         layerName: glyphSet.getGLIF(glyphName).decode("utf-8").replace("\r\n", "\n")
         for layerName, glyphSet in glyphSets.items()
@@ -99,6 +122,32 @@ async def test_roundTripGlyph(writableTestFont, glyphName):
     for layerName in existingData:
         assert existingData[layerName] == newData[layerName], layerName
     assert existingData == newData  # just in case the keys differ
+
+
+async def test_styleName_familyName_designspace(writableTestFont):
+    async with aclosing(writableTestFont):
+        info = await writableTestFont.getFontInfo()
+        assert info.familyName == "MutatorMathTest"
+
+        sources = await writableTestFont.getSources()
+        for source in sources.values():
+            source.name = source.name + " Testing"
+
+        info.familyName = "New Family Name"
+        await writableTestFont.putFontInfo(info)
+        await writableTestFont.putSources(sources)
+
+    for dsSource in writableTestFont.dsDoc.sources:
+        reader = UFOReaderWriter(dsSource.path)
+        ufoInfo = UFOFontInfo()
+        reader.readInfo(ufoInfo)
+
+        assert ufoInfo.familyName == "New Family Name"
+        assert ufoInfo.styleName.endswith(" Testing")
+
+    reopenedFont = getFileSystemBackend(writableTestFont.path)
+    reopenedSources = await reopenedFont.getSources()
+    assert reopenedSources == sources
 
 
 @pytest.mark.parametrize("glyphName", ["A"])
@@ -127,6 +176,28 @@ async def test_putCustomDataSingleUFO(writableTestFontSingleUFO):
     await writableTestFontSingleUFO.putCustomData(customData)
     customData = await writableTestFontSingleUFO.getCustomData()
     assert 17 == len(customData)
+
+
+async def test_styleName_familyName_SingleUFO(writableTestFontSingleUFO):
+    async with aclosing(writableTestFontSingleUFO):
+        info = await writableTestFontSingleUFO.getFontInfo()
+        assert info.familyName == "MutatorMathTest"
+
+        sources = await writableTestFontSingleUFO.getSources()
+        [source] = sources.values()
+        assert source.name == "LightCondensed"
+
+        info.familyName = "New Family Name"
+        await writableTestFontSingleUFO.putFontInfo(info)
+        source.name = "New Style Name"
+        await writableTestFontSingleUFO.putSources(sources)
+
+    reader = UFOReaderWriter(writableTestFontSingleUFO.path)
+    ufoInfo = UFOFontInfo()
+    reader.readInfo(ufoInfo)
+
+    assert ufoInfo.familyName == "New Family Name"
+    assert ufoInfo.styleName == "New Style Name"
 
 
 @pytest.mark.parametrize(
@@ -173,7 +244,7 @@ async def test_addNewSparseSource(writableTestFont, location, expectedDSSource):
 
     await writableTestFont.putGlyph(glyphName, glyph, glyphMap[glyphName])
 
-    newDSDoc = DesignSpaceDocument.fromfile(writableTestFont.dsDoc.path)
+    newDSDoc = DesignSpaceDocument.fromfile(writableTestFont.path)
     newDSSources = unpackSources(newDSDoc.sources)
     assert dsSources == newDSSources[: len(dsSources)]
     assert len(newDSSources) == len(dsSources) + 1
@@ -183,7 +254,7 @@ async def test_addNewSparseSource(writableTestFont, location, expectedDSSource):
 
     assert {"glyphs.mid"} == ufoFileNamesPost - ufoFileNamesPre
 
-    reopenedBackend = getFileSystemBackend(writableTestFont.dsDoc.path)
+    reopenedBackend = getFileSystemBackend(writableTestFont.path)
     fontSources = await reopenedBackend.getSources()
     reopenedGlyph = await reopenedBackend.getGlyph(glyphName)
 
@@ -212,7 +283,7 @@ async def test_addNewDenseSource(writableTestFont):
 
     await writableTestFont.putGlyph(glyphName, glyph, glyphMap[glyphName])
 
-    newDSDoc = DesignSpaceDocument.fromfile(writableTestFont.dsDoc.path)
+    newDSDoc = DesignSpaceDocument.fromfile(writableTestFont.path)
     newDSSources = unpackSources(newDSDoc.sources)
     assert dsSources == newDSSources[: len(dsSources)]
     assert len(newDSSources) == len(dsSources) + 1
@@ -237,7 +308,7 @@ async def test_makeSourceDense(writableTestFont):
 
 
 async def test_makeSourceSparse(writableTestFont):
-    oldDSDoc = DesignSpaceDocument.fromfile(writableTestFont.dsDoc.path)
+    oldDSDoc = DesignSpaceDocument.fromfile(writableTestFont.path)
     [dsSource] = [
         dsSource for dsSource in oldDSDoc.sources if dsSource.name == "bold-wide"
     ]
@@ -251,12 +322,12 @@ async def test_makeSourceSparse(writableTestFont):
 
     await writableTestFont.putSources(sources)
 
-    reopenedBackend = getFileSystemBackend(writableTestFont.dsDoc.path)
+    reopenedBackend = getFileSystemBackend(writableTestFont.path)
     reopenedFontSources = await reopenedBackend.getSources()
     reopenedSource = reopenedFontSources["bold-wide"]
     assert reopenedSource.isSparse
 
-    newDSDoc = DesignSpaceDocument.fromfile(writableTestFont.dsDoc.path)
+    newDSDoc = DesignSpaceDocument.fromfile(writableTestFont.path)
     [dsSource] = [
         dsSource for dsSource in newDSDoc.sources if dsSource.name == "bold-wide"
     ]
@@ -558,7 +629,7 @@ async def test_putAxes(writableTestFont):
     )
     await writableTestFont.putAxes(axes)
 
-    path = writableTestFont.dsDoc.path
+    path = writableTestFont.path
     newFont = DesignspaceBackend.fromPath(path)
     newAxes = await newFont.getAxes()
     assert axes == newAxes
@@ -717,16 +788,22 @@ async def test_writeCorrectLayers(tmpdir, testFont):
     ] == fileNamesFromDir(tmpdir / "Test_LightCondensed.ufo")
 
 
-async def test_deleteGlyph(writableTestFont):
+async def test_deleteGlyph(writableTestFont: DesignspaceBackend) -> None:
     glyphName = "A"
-    assert any(glyphName in layer.glyphSet for layer in writableTestFont.ufoLayers)
     assert any(
-        glyphName in layer.glyphSet.contents for layer in writableTestFont.ufoLayers
+        glyphName in layer.glyphSetReader for layer in writableTestFont.ufoLayers
+    )
+    assert any(
+        glyphName in layer.glyphSetReader.contents
+        for layer in writableTestFont.ufoLayers
     )
     await writableTestFont.deleteGlyph(glyphName)
-    assert not any(glyphName in layer.glyphSet for layer in writableTestFont.ufoLayers)
     assert not any(
-        glyphName in layer.glyphSet.contents for layer in writableTestFont.ufoLayers
+        glyphName in layer.glyphSetReader for layer in writableTestFont.ufoLayers
+    )
+    assert not any(
+        glyphName in layer.glyphSetReader.contents
+        for layer in writableTestFont.ufoLayers
     )
     assert await writableTestFont.getGlyph(glyphName) is None
 
@@ -736,10 +813,43 @@ async def test_deleteGlyph(writableTestFont):
         assert glyphName not in lib.get("public.glyphOrder", [])
 
 
-async def test_deleteGlyphRaisesKeyError(writableTestFont):
+async def test_deleteGlyph_addGlyph(writableTestFont):
+    # Test that the public.glyphOrder is unchanged after we delete a glyph and
+    # then re-add it.
+
+    beforeGlyphOrders = [
+        dsSource.layer.reader.readLib().get("public.glyphOrder")
+        for dsSource in writableTestFont.dsSources
+    ]
+
+    glyphName = "A"
+    glyphMap = await writableTestFont.getGlyphMap()
+    glyph = await writableTestFont.getGlyph(glyphName)
+    await writableTestFont.deleteGlyph(glyphName)
+    assert await writableTestFont.getGlyph(glyphName) is None
+
+    await writableTestFont.putGlyph(glyphName, glyph, glyphMap[glyphName])
+
+    afterGlyphOrders = [
+        dsSource.layer.reader.readLib().get("public.glyphOrder")
+        for dsSource in writableTestFont.dsSources
+    ]
+
+    for beforeGlyphOrder, afterGlyphOrder in zip(
+        beforeGlyphOrders, afterGlyphOrders, strict=True
+    ):
+        if beforeGlyphOrder is not None:
+            assert glyphName in beforeGlyphOrder
+            assert glyphName in afterGlyphOrder
+        assert beforeGlyphOrder == afterGlyphOrder
+
+
+async def test_deleteUnknownGlyph(writableTestFont):
     glyphName = "A.doesnotexist"
-    with pytest.raises(KeyError, match="Glyph 'A.doesnotexist' does not exist"):
-        await writableTestFont.deleteGlyph(glyphName)
+    glyphMap = await writableTestFont.getGlyphMap()
+    assert glyphName not in glyphMap
+    # .deleteGlyph() should *not* raise an error if glyphName doesn't exist
+    await writableTestFont.deleteGlyph(glyphName)
 
 
 async def test_findGlyphsThatUseGlyph(writableTestFont):
@@ -866,7 +976,7 @@ async def test_putSources(writableTestFont):
 
     await writableTestFont.putSources(sources)
 
-    reopenedBackend = getFileSystemBackend(writableTestFont.dsDoc.path)
+    reopenedBackend = getFileSystemBackend(writableTestFont.path)
     reopenedSources = await reopenedBackend.getSources()
     testSource = reopenedSources["light-condensed"]
     assert testSource.lineMetricsHorizontalLayout["ascender"].value == 800
@@ -923,7 +1033,7 @@ async def test_putSources_source_name(writableTestFont):
         source.name = f"source{i}"
     await writableTestFont.putSources(fontSources)
 
-    reopenedBackend = getFileSystemBackend(writableTestFont.dsDoc.path)
+    reopenedBackend = getFileSystemBackend(writableTestFont.path)
     reopenedFontSources = await reopenedBackend.getSources()
 
     assert [s.name for s in reopenedFontSources.values()] == [
@@ -1011,7 +1121,7 @@ async def test_putFeatures(writableTestFont):
     async with aclosing(writableTestFont):
         await writableTestFont.putFeatures(OpenTypeFeatures(text=featureText))
 
-    reopenedBackend = getFileSystemBackend(writableTestFont.dsDoc.path)
+    reopenedBackend = getFileSystemBackend(writableTestFont.path)
     features = await reopenedBackend.getFeatures()
     assert features.text == featureText
 
@@ -1097,7 +1207,7 @@ async def test_putFontInfoCustomData(writableTestFont):
     async with aclosing(writableTestFont):
         await writableTestFont.putFontInfo(info)
 
-    reopenedBackend = getFileSystemBackend(writableTestFont.dsDoc.path)
+    reopenedBackend = getFileSystemBackend(writableTestFont.path)
     reopenedInfo = await reopenedBackend.getFontInfo()
     assert reopenedInfo.customData == info.customData
 
@@ -1113,7 +1223,7 @@ async def test_putFontInfoDeleteDescription(writableTestFont):
     del info.description
     await writableTestFont.putFontInfo(info)
 
-    reopenedBackend = getFileSystemBackend(writableTestFont.dsDoc.path)
+    reopenedBackend = getFileSystemBackend(writableTestFont.path)
     reopenedInfo = await reopenedBackend.getFontInfo()
     assert reopenedInfo == info
 
@@ -1123,7 +1233,7 @@ async def test_changeUnitsPerEmCheckFontInfo(writableTestFont):
     # change UnitsPerEm
     await writableTestFont.putUnitsPerEm(999)
 
-    reopenedBackend = getFileSystemBackend(writableTestFont.dsDoc.path)
+    reopenedBackend = getFileSystemBackend(writableTestFont.path)
     reopenedInfo = await reopenedBackend.getFontInfo()
     assert reopenedInfo == info
 
@@ -1178,7 +1288,7 @@ async def test_glyphMetricsVerticalLayout(writableTestFont):
 
     await writableTestFont.putGlyph("A", glyph, [ord("A")])
 
-    reopenedFont = getFileSystemBackend(writableTestFont.dsDoc.path)
+    reopenedFont = getFileSystemBackend(writableTestFont.path)
 
     reopenedGlyph = await reopenedFont.getGlyph("A")
     assert glyph == reopenedGlyph
@@ -1193,7 +1303,7 @@ async def test_kerning_read_write(writableTestFont):
 
     await writableTestFont.putKerning(kerning)
 
-    reopenedFont = getFileSystemBackend(writableTestFont.dsDoc.path)
+    reopenedFont = getFileSystemBackend(writableTestFont.path)
     reopenedKerning = await reopenedFont.getKerning()
     assert reopenedKerning["kern"].values["A"]["J"] == [None, -25, -30, -15, None]
     assert reopenedKerning["kern"].groupsSide1["A"] == [
@@ -1274,7 +1384,7 @@ async def test_sparse_master_background_layers(writableTestFont):
 
     await writableTestFont.putGlyph(glyphName, glyph, [ord(glyphName)])
 
-    reopenedBackend = getFileSystemBackend(writableTestFont.dsDoc.path)
+    reopenedBackend = getFileSystemBackend(writableTestFont.path)
     reopenedGlyph = await reopenedBackend.getGlyph(glyphName)
 
     assert glyph == reopenedGlyph
@@ -1282,7 +1392,7 @@ async def test_sparse_master_background_layers(writableTestFont):
 
 async def test_deterministicFontSourceIdentifiers(writableTestFont):
     dsDoc = writableTestFont.dsDoc
-    dsPath = dsDoc.path
+    dsPath = writableTestFont.path
     for source in dsDoc.sources:
         source.name = None
     dsDoc.write(dsPath)
@@ -1297,7 +1407,7 @@ async def test_deterministicFontSourceIdentifiers(writableTestFont):
 
 async def test_uniqueFontSourceIdentifiers(writableTestFont):
     dsDoc = writableTestFont.dsDoc
-    dsPath = dsDoc.path
+    dsPath = writableTestFont.path
     for source in dsDoc.sources:
         source.name = "non-unique-name"
     dsDoc.write(dsPath)
@@ -1305,6 +1415,336 @@ async def test_uniqueFontSourceIdentifiers(writableTestFont):
     backend = getFileSystemBackend(dsPath)
     sources = await backend.getSources()
     assert len(sources) == len(dsDoc.sources)
+
+
+async def test_missingUFOError(writableTestFont):
+    dsDoc = writableTestFont.dsDoc
+    dsPath = writableTestFont.path
+    dsDoc.sources[0].path += ".invalid"
+    dsDoc.write(dsPath)
+
+    with pytest.raises(FileNotFoundError, match=r".*\.invalid$"):
+        _ = getFileSystemBackend(dsPath)
+
+
+async def test_write_italicAngle(writableTestFont):
+    sources = await writableTestFont.getSources()
+    assert sources["light-condensed"].italicAngle == 0
+    sources["light-condensed"].italicAngle = -15
+    await writableTestFont.putSources(sources)
+
+    reopenedFont = getFileSystemBackend(writableTestFont.path)
+    reopenedSources = await reopenedFont.getSources()
+    assert reopenedSources["light-condensed"].italicAngle == -15
+
+
+async def test_rtl_kerning(writableRTLTestFont):
+    ufoPath = writableRTLTestFont.dsDoc.sources[0].path
+    reader = UFOReaderWriter(ufoPath)
+    ufoGroups = reader.readGroups()
+    ufoKerning = reader.readKerning()
+
+    allFontraKerning = await writableRTLTestFont.getKerning()
+    fontraKerning = allFontraKerning["kern"]
+
+    ltrPairs = [("V", "@A"), ("@T", "@o")]
+    rtlPairs = [("@yeh.isol", "@heh.fina"), ("tehArabic.isol", "@jim.isol.alt")]
+
+    _modifyFontraPairs(fontraKerning.values, ltrPairs, -10)
+    _modifyFontraPairs(fontraKerning.values, rtlPairs, -20)
+
+    _modifyUFOPairs(ufoKerning, ltrPairs, -10, False)
+    _modifyUFOPairs(ufoKerning, rtlPairs, -20, True)
+
+    await writableRTLTestFont.putKerning(allFontraKerning)
+
+    ufoGroupsAfter = reader.readGroups()
+    ufoKerningAfter = reader.readKerning()
+
+    assert ufoGroups == ufoGroupsAfter
+    assert ufoKerning == ufoKerningAfter
+
+
+def _modifyFontraPairs(kerningValues, pairs, delta):
+    for left, right in pairs:
+        kerningValues[left][right][0] += delta
+
+
+def _modifyUFOPairs(kerning, pairs, delta, swap):
+    if swap:
+        pairs = [(right, left) for left, right in pairs]
+
+    pairs = [(_toUfoGroup(left, 1), _toUfoGroup(right, 2)) for left, right in pairs]
+
+    for pair in pairs:
+        kerning[pair] += delta
+
+
+def _toUfoGroup(name, side):
+    return f"public.kern{side}.{name[1:]}" if name[0] == "@" else name
+
+
+async def test_glyphClassifications(rtlTestFont):
+    expectedLTRGlyphs = {
+        "A",
+        "B",
+        "C",
+        "O",
+        "T",
+        "V",
+        "W",
+        "a",
+        "b",
+        "c",
+        "d",
+        "e",
+        "four",
+        "four.denominator",
+        "four.numerator",
+        "four.tlf",
+        "fourinferior",
+        "foursuperior",
+        "o",
+        "one",
+        "one.denominator",
+        "one.numerator",
+        "one.tlf",
+        "oneinferior",
+        "onesuperior",
+        "ordfeminine",
+        "ordmasculine",
+        "three",
+        "three.denominator",
+        "three.numerator",
+        "three.tlf",
+        "threeinferior",
+        "threesuperior",
+        "two",
+        "two.denominator",
+        "two.numerator",
+        "two.tlf",
+        "twoinferior",
+        "twosuperior",
+        "v",
+        "w",
+        "z",
+        "zero",
+        "zero.denominator",
+        "zero.numerator",
+        "zero.tlf",
+        "zeroinferior",
+        "zerosuperior",
+    }
+    expectedRTLGlyphs = {
+        "alef",
+        "alef.fina",
+        "alef.isol",
+        "alefHamzeAbove",
+        "alefHamzeAbove.fina",
+        "alefHamzeAbove.isol",
+        "alefHamzeBelow",
+        "alefHamzeBelow.fina",
+        "alefHamzeBelow.isol",
+        "alefMaghsureh",
+        "alefMaghsureh.alt",
+        "alefMaghsureh.fina",
+        "alefMaghsureh.fina.alt",
+        "alefMaghsureh.isol",
+        "alefMaghsureh.isol.alt",
+        "allah",
+        "beh",
+        "beh.fina",
+        "beh.init",
+        "beh.isol",
+        "beh.medi",
+        "dal",
+        "dal.fina",
+        "dal.isol",
+        "eyn",
+        "eyn.alt",
+        "eyn.fina",
+        "eyn.fina.alt",
+        "eyn.fina.jump.alt",
+        "eyn.init",
+        "eyn.init.alt",
+        "eyn.isol",
+        "eyn.isol.alt",
+        "eyn.medi",
+        "feh",
+        "feh.fina",
+        "feh.init",
+        "feh.isol",
+        "feh.medi",
+        "ghaf",
+        "ghaf.fina",
+        "ghaf.init",
+        "ghaf.isol",
+        "ghaf.medi",
+        "hah",
+        "hah.alt",
+        "hah.fina",
+        "hah.fina.alt",
+        "hah.init",
+        "hah.init.alt",
+        "hah.isol",
+        "hah.isol.alt",
+        "hah.medi",
+        "hah.medi.alt",
+        "heh",
+        "heh.fina",
+        "heh.init",
+        "heh.isol",
+        "heh.medi",
+        "jim",
+        "jim.alt",
+        "jim.fina",
+        "jim.fina.alt",
+        "jim.init",
+        "jim.init.alt",
+        "jim.isol",
+        "jim.isol.alt",
+        "jim.medi",
+        "jim.medi.alt",
+        "kafArabic",
+        "kafArabic.fina",
+        "kafArabic.init",
+        "kafArabic.isol",
+        "kafArabic.medi",
+        "kheh",
+        "kheh.fina",
+        "kheh.init",
+        "kheh.isol",
+        "kheh.medi",
+        "lam",
+        "lam.fina",
+        "lam.init",
+        "lam.init_alef.fina",
+        "lam.init_alefHamzeAbove.fina",
+        "lam.init_alefHamzeBelow.fina",
+        "lam.isol",
+        "lam.medi",
+        "lam.medi_alef.fina",
+        "lam.medi_alefHamzeAbove.fina",
+        "lam.medi_alefHamzeBelow.fina",
+        "mim",
+        "mim.fina",
+        "mim.init",
+        "mim.isol",
+        "mim.medi",
+        "noon",
+        "noon.fina",
+        "noon.init",
+        "noon.isol",
+        "noon.medi",
+        "reh",
+        "reh.fina",
+        "reh.isol",
+        "sad",
+        "sad.fina",
+        "sad.init",
+        "sad.isol",
+        "sad.medi",
+        "shin",
+        "shin.fina",
+        "shin.init",
+        "shin.isol",
+        "shin.medi",
+        "sin",
+        "sin.fina",
+        "sin.init",
+        "sin.isol",
+        "sin.medi",
+        "ta",
+        "ta.fina",
+        "ta.init",
+        "ta.isol",
+        "ta.medi",
+        "teh",
+        "teh.fina",
+        "teh.init",
+        "teh.isol",
+        "teh.medi",
+        "tehArabic",
+        "tehArabic.fina",
+        "tehArabic.isol",
+        "unencodedrtlglyph",
+        "vav",
+        "vav.fina",
+        "vav.isol",
+        "yehArabic",
+        "yehArabic.fina",
+        "yehArabic.init",
+        "yehArabic.isol",
+        "yehArabic.medi",
+        "zad",
+        "zad.fina",
+        "zad.init",
+        "zad.isol",
+        "zad.medi",
+        "zal",
+        "zal.fina",
+        "zal.isol",
+        "zeh",
+        "zeh.fina",
+        "zeh.isol",
+    }
+    assert (rtlTestFont.ltrGlyphs, rtlTestFont.rtlGlyphs) == (
+        expectedLTRGlyphs,
+        expectedRTLGlyphs,
+    )
+
+
+async def test_putGlyphInfos(writableTestFont):
+    newGlyphsInfos = {
+        "dot": {"category": "Mark", "subcategory": "Nonspacing"},
+        "A": {"subcategory": "Ligature"},
+        "B": {"custom": "anything"},
+    }
+
+    async with aclosing(writableTestFont):
+        glyphInfos = await writableTestFont.getGlyphInfos()
+        assert glyphInfos == {}
+        await writableTestFont.putGlyphInfos(newGlyphsInfos)
+
+    reopenedFont = getFileSystemBackend(writableTestFont.path)
+    glyphInfos = await reopenedFont.getGlyphInfos()
+    assert glyphInfos == newGlyphsInfos
+
+
+async def test_noWriteOnRead(writableTestFont):
+    # Test that we don't write metainfo.plist when simply opening a font
+
+    varPath = writableTestFont.path
+    singlePath = writableTestFont.dsDoc.sources[0].path
+    await writableTestFont.aclose()
+
+    for fontPath in [varPath, singlePath]:
+        font = getFileSystemBackend(fontPath)
+        ufoPath = font.dsDoc.sources[0].path
+        await font.aclose()
+
+        metaInfoPath = pathlib.Path(ufoPath) / "metainfo.plist"
+        metaInfo = plistlib.loads(metaInfoPath.read_bytes())
+
+        # Serialize with non-standard formatting
+        metaInfoPath.write_bytes(plistlib.dumps(metaInfo, pretty_print=False))
+
+        metaInfoTextBefore = metaInfoPath.read_text()
+
+        # Open/read, metainfo.plist should not have changed
+        font = getFileSystemBackend(fontPath)
+        glyph = await font.getGlyph("A")
+        assert glyph is not None
+
+        metaInfoTextAfter = metaInfoPath.read_text()
+        assert metaInfoTextBefore == metaInfoTextAfter
+
+        # Write/close, *now* we expect a changed metainfo.plist
+        await font.putGlyph("A", glyph, [ord("A")])
+        await font.aclose()
+
+        metaInfoTextAfter = metaInfoPath.read_text()
+        assert metaInfoTextBefore != metaInfoTextAfter
 
 
 def fileNamesFromDir(path):

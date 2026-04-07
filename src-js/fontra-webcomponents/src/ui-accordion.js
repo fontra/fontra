@@ -1,6 +1,6 @@
 import * as html from "@fontra/core/html-utils.js";
 import { UnlitElement } from "@fontra/core/html-utils.js";
-import { enumerate } from "@fontra/core/utils.js";
+import { FocusKeeper, enumerate } from "@fontra/core/utils.js";
 
 export class Accordion extends UnlitElement {
   static styles = `
@@ -61,10 +61,6 @@ export class Accordion extends UnlitElement {
   render() {
     const itemElements = [];
     for (const [index, item] of enumerate(this.items || [])) {
-      if (item.hidden) {
-        continue;
-      }
-
       const id = item.id || `ui-accordion-item-${index}`;
 
       const headerElement = html.div(
@@ -155,4 +151,55 @@ function parentWithClass(element, className) {
     parent = parent.parentElement;
   } while (parent && !parent.classList.contains(className));
   return parent;
+}
+
+export function makeClickableIconHeader(iconPath, onClick) {
+  const focus = new FocusKeeper();
+  return html.div(
+    {
+      class: "clickable-icon-header",
+      style: "height: 1.2em; width: 1.2em;",
+      onmousedown: focus.save,
+      onclick: (event) => {
+        onClick(event);
+        focus.restore();
+      },
+    },
+    [
+      html.createDomElement("inline-svg", {
+        src: iconPath,
+      }),
+    ]
+  );
+}
+
+export function groupAccordionHeaderButtons(buttons) {
+  return html.div(
+    {
+      style: `display: grid;
+      grid-template-columns: repeat(${buttons.length}, auto);
+      gap: 0.15em;
+      `,
+    },
+    buttons
+  );
+}
+
+export function makeAccordionHeaderButton(button) {
+  let options = {
+    style: "width: 1.4em; height: 1.4em;",
+    src: `/tabler-icons/${button.icon}.svg`,
+    onclick: button.onclick,
+  };
+
+  if (button.id) {
+    options.id = button.id;
+  }
+
+  if (button.tooltip) {
+    options["data-tooltip"] = button.tooltip;
+    options["data-tooltipposition"] = button.tooltipposition ?? "bottom";
+  }
+
+  return html.createDomElement("icon-button", options);
 }

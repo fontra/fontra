@@ -1,0 +1,243 @@
+{
+"name": "alefMaksura-ar.fina.tooth",
+"sources": [
+{
+"name": "",
+"layerName": "m01",
+"locationBase": "m01"
+}
+],
+"layers": {
+"m01": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": 313,
+"y": -250,
+"smooth": true
+},
+{
+"x": 353,
+"y": -240,
+"type": "cubic"
+},
+{
+"x": 364,
+"y": -205,
+"type": "cubic"
+},
+{
+"x": 355,
+"y": -148,
+"smooth": true
+},
+{
+"x": 346,
+"y": -95,
+"type": "cubic"
+},
+{
+"x": 334,
+"y": -62,
+"type": "cubic"
+},
+{
+"x": 320,
+"y": -36,
+"smooth": true
+},
+{
+"x": 313,
+"y": -24,
+"type": "cubic"
+},
+{
+"x": 312,
+"y": -20,
+"type": "cubic"
+},
+{
+"x": 289,
+"y": -21,
+"smooth": true
+},
+{
+"x": 177,
+"y": -26,
+"type": "cubic"
+},
+{
+"x": 157,
+"y": -20,
+"type": "cubic"
+},
+{
+"x": 138,
+"y": -17,
+"smooth": true
+},
+{
+"x": 119,
+"y": -14,
+"type": "cubic"
+},
+{
+"x": 119,
+"y": -5,
+"type": "cubic"
+},
+{
+"x": 119,
+"y": 0
+},
+{
+"x": 119,
+"y": 117
+},
+{
+"x": 0,
+"y": 148
+},
+{
+"x": 0,
+"y": 0
+},
+{
+"x": 0,
+"y": -107,
+"type": "cubic"
+},
+{
+"x": 19,
+"y": -151,
+"type": "cubic"
+},
+{
+"x": 221,
+"y": -142,
+"smooth": true
+},
+{
+"x": 235,
+"y": -141,
+"type": "cubic"
+},
+{
+"x": 234,
+"y": -149,
+"type": "cubic"
+},
+{
+"x": 237,
+"y": -154
+},
+{
+"x": 144,
+"y": -166,
+"type": "cubic"
+},
+{
+"x": 56,
+"y": -156,
+"type": "cubic"
+},
+{
+"x": 6,
+"y": -127,
+"smooth": true
+},
+{
+"x": -6,
+"y": -120,
+"type": "cubic"
+},
+{
+"x": -14,
+"y": -130,
+"type": "cubic"
+},
+{
+"x": -21,
+"y": -141,
+"smooth": true
+},
+{
+"x": -37,
+"y": -168,
+"type": "cubic"
+},
+{
+"x": -67,
+"y": -198,
+"type": "cubic"
+},
+{
+"x": -84,
+"y": -198,
+"smooth": true
+},
+{
+"x": -102,
+"y": -198,
+"type": "cubic"
+},
+{
+"x": -105,
+"y": -211,
+"type": "cubic"
+},
+{
+"x": -93,
+"y": -223,
+"smooth": true
+},
+{
+"x": -34,
+"y": -279,
+"type": "cubic"
+},
+{
+"x": 205,
+"y": -276,
+"type": "cubic"
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 358,
+"anchors": [
+{
+"name": "bottom",
+"x": 348,
+"y": -230
+},
+{
+"name": "damma",
+"x": -88,
+"y": -82
+},
+{
+"name": "entry",
+"x": 9,
+"y": 0
+},
+{
+"name": "fatha",
+"x": -83,
+"y": 272
+},
+{
+"name": "kasra",
+"x": 197,
+"y": -308
+}
+]
+}
+}
+}
+}

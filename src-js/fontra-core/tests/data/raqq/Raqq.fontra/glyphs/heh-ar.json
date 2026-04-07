@@ -1,0 +1,236 @@
+{
+"name": "heh-ar",
+"sources": [
+{
+"name": "",
+"layerName": "m01",
+"locationBase": "m01"
+}
+],
+"layers": {
+"m01": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": 225,
+"y": -13,
+"smooth": true
+},
+{
+"x": 295,
+"y": -8,
+"type": "cubic"
+},
+{
+"x": 355,
+"y": 6,
+"type": "cubic"
+},
+{
+"x": 356,
+"y": 64,
+"smooth": true
+},
+{
+"x": 357,
+"y": 109,
+"type": "cubic"
+},
+{
+"x": 344,
+"y": 402,
+"type": "cubic"
+},
+{
+"x": 315,
+"y": 468,
+"smooth": true
+},
+{
+"x": 303,
+"y": 496,
+"type": "cubic"
+},
+{
+"x": 290,
+"y": 475,
+"type": "cubic"
+},
+{
+"x": 288,
+"y": 470,
+"smooth": true
+},
+{
+"x": 277,
+"y": 433,
+"type": "cubic"
+},
+{
+"x": 245,
+"y": 407,
+"type": "cubic"
+},
+{
+"x": 218,
+"y": 393,
+"smooth": true
+},
+{
+"x": 208,
+"y": 388,
+"type": "cubic"
+},
+{
+"x": 204,
+"y": 381,
+"type": "cubic"
+},
+{
+"x": 208,
+"y": 369,
+"smooth": true
+},
+{
+"x": 217,
+"y": 342,
+"type": "cubic"
+},
+{
+"x": 223,
+"y": 287,
+"type": "cubic"
+},
+{
+"x": 224,
+"y": 248
+},
+{
+"x": 284,
+"y": 354
+},
+{
+"x": 157,
+"y": 347,
+"type": "cubic"
+},
+{
+"x": 0,
+"y": 274,
+"type": "cubic"
+},
+{
+"x": 0,
+"y": 137,
+"smooth": true
+},
+{
+"x": 0,
+"y": 14,
+"type": "cubic"
+},
+{
+"x": 149,
+"y": -18,
+"type": "cubic"
+}
+],
+"isClosed": true
+},
+{
+"points": [
+{
+"x": 231,
+"y": 152,
+"smooth": true
+},
+{
+"x": 224,
+"y": 152,
+"type": "cubic"
+},
+{
+"x": 218,
+"y": 158,
+"type": "cubic"
+},
+{
+"x": 218,
+"y": 165,
+"smooth": true
+},
+{
+"x": 218,
+"y": 171,
+"type": "cubic"
+},
+{
+"x": 224,
+"y": 177,
+"type": "cubic"
+},
+{
+"x": 231,
+"y": 177,
+"smooth": true
+},
+{
+"x": 237,
+"y": 177,
+"type": "cubic"
+},
+{
+"x": 243,
+"y": 171,
+"type": "cubic"
+},
+{
+"x": 243,
+"y": 165,
+"smooth": true
+},
+{
+"x": 243,
+"y": 158,
+"type": "cubic"
+},
+{
+"x": 237,
+"y": 152,
+"type": "cubic"
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 356,
+"anchors": [
+{
+"name": "damma",
+"x": -53,
+"y": 114
+},
+{
+"name": "fatha",
+"x": 274,
+"y": 520
+},
+{
+"name": "kasra",
+"x": 260,
+"y": -60
+},
+{
+"name": "top",
+"x": 263,
+"y": 433
+}
+]
+}
+}
+}
+}

@@ -1,15 +1,60 @@
+import { Accordion } from "@fontra/web-components/ui-accordion.js";
 import * as html from "./html-utils.js";
 import { translate } from "./localization.js";
 
+const foldingStateKey = "";
+
 export class MultiPanelController {
-  constructor(panelClasses, viewController) {
+  constructor(panelClasses, viewController, panelIdentifier) {
+    this.panelIdentifier = panelIdentifier;
+    this.foldingStateLocalStorageKey = `multi-panel-${panelIdentifier}-folded`;
     this.panels = {};
 
-    this.selectedPanelIdentifier =
+    const { selectedPanelIdentifier, panelURLData } =
       getSelectedPanelIdentifierFromWindowLocation(panelClasses);
+
+    this.selectedPanelIdentifier = selectedPanelIdentifier;
 
     const panelContainer = document.querySelector("#multi-panel-panel-container");
     const headerContainer = document.querySelector("#multi-panel-header-container");
+    const headerItems = html.div({ id: "multi-panel-header-items" });
+
+    this.headerAccordion = new Accordion();
+    this.headerAccordion.appendStyle(`
+      .multi-panel-header {
+        cursor: pointer;
+        font-size: 1.15em;
+        font-weight: bold;
+        text-underline-offset: 0.15em;
+      }
+
+      .multi-panel-header:hover {
+        text-decoration: underline dotted;
+      }
+
+      .multi-panel-header.selected {
+        text-decoration: underline;
+      }
+
+      #multi-panel-header-items {
+        display: grid;
+        gap: 0.5em;
+      }
+    `);
+
+    this.headerAccordion.items = [
+      {
+        label: "",
+        content: headerItems,
+        open: localStorage.getItem(this.foldingStateLocalStorageKey) === "true",
+      },
+    ];
+
+    this.headerAccordion.onItemOpenClose = (item, openClose) => {
+      localStorage.setItem(this.foldingStateLocalStorageKey, `${!!openClose}`);
+    };
+
+    headerContainer.appendChild(this.headerAccordion);
 
     const observer = setupIntersectionObserver(panelContainer, this.panels);
 
@@ -27,7 +72,7 @@ export class MultiPanelController {
         headerElement.classList.add("selected");
       }
       headerElement.setAttribute("for", panelClass.id);
-      headerContainer.appendChild(headerElement);
+      headerItems.appendChild(headerElement);
 
       const panelElement = html.div({
         class: "multi-panel-panel",
@@ -38,35 +83,46 @@ export class MultiPanelController {
       panelContainer.appendChild(panelElement);
 
       this.panels[panelClass.id] = new panelClass(viewController, panelElement);
+      this.panels[panelClass.id].setURLData(panelURLData);
       observer.observe(panelElement);
     }
 
     window.addEventListener("popstate", (event) => {
-      this.selectPanel(getSelectedPanelIdentifierFromWindowLocation(panelClasses));
+      const { selectedPanelIdentifier, panelURLData } =
+        getSelectedPanelIdentifierFromWindowLocation(panelClasses);
+
+      this.selectPanel(selectedPanelIdentifier, panelURLData);
     });
   }
 
-  selectPanel(panelIdentifier) {
-    document
+  selectPanel(panelIdentifier, panelURLData) {
+    this.headerAccordion
       .querySelector(".multi-panel-header.selected")
       ?.classList.remove("selected");
 
-    const selectedHeader = document.querySelector(
+    const selectedHeader = this.headerAccordion.querySelector(
       `.multi-panel-header[for=${panelIdentifier}]`
     );
     selectedHeader?.classList.add("selected");
 
-    this.selectedPanelIdentifier = panelIdentifier;
-    for (const el of document.querySelectorAll(".multi-panel-panel")) {
-      el.hidden = el.id != this.selectedPanelIdentifier;
-      if (el.id == this.selectedPanelIdentifier) {
-        el.focus(); // So it can receive key events
+    if (this.selectedPanelIdentifier != panelIdentifier) {
+      this.selectedPanelIdentifier = panelIdentifier;
+
+      for (const el of document.querySelectorAll(".multi-panel-panel")) {
+        el.hidden = el.id != this.selectedPanelIdentifier;
+        if (el.id == this.selectedPanelIdentifier) {
+          el.focus(); // So it can receive key events
+        }
       }
+
+      const url = new URL(window.location);
+      url.hash = `#${this.selectedPanelIdentifier}`;
+      window.history.replaceState({}, "", url);
     }
 
-    const url = new URL(window.location);
-    url.hash = `#${this.selectedPanelIdentifier}`;
-    window.history.replaceState({}, "", url);
+    if (panelURLData) {
+      this.panels[this.selectedPanelIdentifier].setURLData(panelURLData);
+    }
   }
 
   get selectedPanel() {
@@ -110,13 +166,20 @@ export class MultiPanelBasePanel {
   initializePanel() {
     this.setupUI();
   }
+
+  setURLData(urlData) {
+    // optional override
+  }
 }
 
 function getSelectedPanelIdentifierFromWindowLocation(panelClasses) {
   const panelIdentifiers = panelClasses.map((p) => p.id);
   const url = new URL(window.location);
-  const selectedPanelIdentifier = url.hash?.slice(1);
-  return panelIdentifiers.includes(selectedPanelIdentifier)
+  let [selectedPanelIdentifier, panelURLData] = url.hash?.slice(1).split("#", 2);
+
+  selectedPanelIdentifier = panelIdentifiers.includes(selectedPanelIdentifier)
     ? selectedPanelIdentifier
     : panelIdentifiers[0];
+
+  return { selectedPanelIdentifier, panelURLData };
 }

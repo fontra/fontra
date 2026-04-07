@@ -81,6 +81,6 @@ def parseGLIF(data: str) -> StaticGlyph | None:
 def serializeStaticGlyphAsGLIF(
     glyphName: str, staticGlyph: StaticGlyph, codePoints: list[int]
 ) -> str:
-    layerGlyph = readGlyphOrCreate({}, glyphName, codePoints)
+    layerGlyph = readGlyphOrCreate(None, glyphName, codePoints)
     drawPointsFunc = populateUFOLayerGlyph(layerGlyph, staticGlyph)
     return writeGlyphToString(glyphName, layerGlyph, drawPointsFunc, validate=False)

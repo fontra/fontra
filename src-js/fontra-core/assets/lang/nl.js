@@ -5,6 +5,7 @@ export const strings = {
   "action-topics.export-as": "Exporteer als",
   "action-topics.glyph-editor-appearance": "Glyph editor uiterlijk",
   "action-topics.menu.edit": "Wijzig",
+  "action-topics.menu.file": "Archief",
   "action-topics.menu.glyph": "Glyph",
   "action-topics.menu.view": "Weergave",
   "action-topics.reference-font": "Referentiefont",
@@ -35,6 +36,7 @@ export const strings = {
   "action.export-as.rcjk": "RCJK (*.rcjk)",
   "action.export-as.ttf": "TrueType (*.ttf)",
   "action.export-as.ufo": "UFO (*.ufo)",
+  "action.export-as.woff2": "Webfont (*.woff2)",
   "action.glyph.add-background-image": "Add background image...",
   "action.glyph.add-source": "Voeg source toe...",
   "action.glyph.delete-source": "Verwijder source...",
@@ -236,9 +238,9 @@ export const strings = {
     "Plaats glyph vóór de geselecteerde glyph",
   "menubar.view.find-glyphs-that-use": "Zoek glyphs die '%0' gebruiken",
   "menubar.view.remove-selected-glyph-from-canvas":
-    "Verwijder de geselecteerde glyph van het canvas",
+    "Verwijder de geselecteerde glyph van het canvas...",
   "menubar.view.replace-selected-glyph-on-canvas":
-    "Vervang de geselecteerde glyph op het canvas",
+    "Vervang de geselecteerde glyph op het canvas...",
   "menubar.view.select-glyph-source-layer": "Select glyph/source/layer",
   "menubar.view.select-next-glyph": "Select next glyph",
   "menubar.view.select-next-source": "Selecteer de volgende source",
@@ -272,6 +274,14 @@ export const strings = {
   "shortcuts.tooltip.click-and-record": "Click and record a shortcut",
   "shortcuts.tooltip.reset-to-default": "Reset to default",
   "shortcuts.warning.exists": "Shortcut exists for: %0",
+  "sidebar.characters-glyphs": "Input characters and output glyphs",
+  "sidebar.characters-glyphs.input-characters": "Input characters",
+  "sidebar.characters-glyphs.output-glyphs": "Output glyphs",
+  "sidebar.characters-glyphs.shaping-debugger": "Shaping debugger",
+  "sidebar.characters-glyphs.shaping-debugger.options-menu-tooltip":
+    "Shaping debugger options",
+  "sidebar.characters-glyphs.shaping-debugger.show-ineffective-items":
+    "Show ineffective items",
   "sidebar.designspace-navigation": "Designspace navigatie",
   "sidebar.designspace-navigation.dialog.add-source.label.layer": "Layer:",
   "sidebar.designspace-navigation.dialog.add-source.label.source-name": "Source name:",

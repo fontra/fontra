@@ -1,7 +1,7 @@
 // Some deep CSS trickery going on here, as learned from:
 //    https://css-tricks.com/the-css-custom-property-toggle-trick/
 
-export function themeColorCSS(colors) {
+export function themeColorCSS(colors, element = ":host") {
   const definitions = [];
   const lightMode = [];
   const darkMode = [];
@@ -13,7 +13,7 @@ export function themeColorCSS(colors) {
     );
   }
   return `
-:host {
+${element} {
 ${indentLines(definitions, 2)}
 }
 `;

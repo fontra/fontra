@@ -1,0 +1,32 @@
+{
+"name": "yeh-ar",
+"sources": [
+{
+"name": "",
+"layerName": "m01",
+"locationBase": "m01"
+}
+],
+"layers": {
+"m01": {
+"glyph": {
+"components": [
+{
+"name": "alefMaksura-ar"
+},
+{
+"name": "twodotsverticalbelow-ar",
+"transformation": {
+"translateX": 350,
+"translateY": -245
+}
+}
+],
+"xAdvance": 395
+}
+}
+},
+"customData": {
+"com.glyphsapp.glyph-color": 0
+}
+}

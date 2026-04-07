@@ -3,6 +3,7 @@ from __future__ import annotations
 import logging
 import pathlib
 from dataclasses import dataclass, field, replace
+from typing import Any
 
 from ...core.async_property import async_cached_property
 from ...core.classes import Kerning, OpenTypeFeatures, VariableGlyph
@@ -35,6 +36,10 @@ class BaseGlyphSubsetter(BaseFilter):
         glyphMap, _ = await self._subsettedGlyphMapAndFeatures
         return glyphMap
 
+    async def processGlyphInfos(self, glyphInfos: dict[str, Any]) -> dict[str, Any]:
+        glyphMap = await self.getGlyphMap()
+        return filterGlyphDict(glyphInfos, glyphMap)
+
     @async_cached_property
     async def _subsettedGlyphMapAndFeatures(
         self,
@@ -44,7 +49,7 @@ class BaseGlyphSubsetter(BaseFilter):
 
         selectedGlyphs, features = await self._featuresClosure(selectedGlyphs)
         selectedGlyphs = await self._componentsClosure(selectedGlyphs)
-        glyphMap = filterGlyphMap(inputGlyphMap, selectedGlyphs)
+        glyphMap = filterGlyphDict(inputGlyphMap, selectedGlyphs)
         return glyphMap, features
 
     async def _buildSubsettedGlyphSet(
@@ -154,10 +159,10 @@ def getComponentNames(glyph):
     }
 
 
-def filterGlyphMap(glyphMap, glyphNames):
+def filterGlyphDict(glyphMap, glyphNames):
     return {
-        glyphName: codePoints
-        for glyphName, codePoints in glyphMap.items()
+        glyphName: value
+        for glyphName, value in glyphMap.items()
         if glyphName in glyphNames
     }
 

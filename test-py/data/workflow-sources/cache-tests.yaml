@@ -1,0 +1,7 @@
+steps:
+  - input: fontra-read
+    source: test-py/data/workflow/input1-A.fontra
+  - filter: memory-cache
+  - filter: disk-cache
+  - destination: input1-A.fontra
+    output: fontra-write

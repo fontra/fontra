@@ -1,0 +1,10 @@
+steps:
+  - input: fontra-read
+    source: test-py/data/workflow/input1-A.fontra
+  - filter: drop-unused-sources-and-layers
+  - dropAxisNames:
+      - width
+      - italic
+    filter: subset-axes
+  - destination: output-subset-axes.fontra
+    output: fontra-write

@@ -1,0 +1,12 @@
+steps:
+  - input: fontra-read
+    source: test-py/data/workflow/input1-A.fontra
+  - filter: drop-unused-sources-and-layers
+  - axisNames:
+      - weight
+    filter: subset-axes
+  - filter: drop-shapes
+  - cmapFile: test-py/data/workflow/amend-cmap-cmap.txt
+    filter: amend-cmap
+  - destination: output-amend-cmap.fontra
+    output: fontra-write

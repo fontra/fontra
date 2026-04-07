@@ -115,6 +115,10 @@ export class ChangeCollector {
   }
 }
 
+export function joinChanges(...changes) {
+  return new ChangeCollector().concat(...changes);
+}
+
 export function consolidateChanges(changes, prefixPath) {
   let change;
   let path;
@@ -546,4 +550,20 @@ export function* iterChanges(change, prefix) {
       yield change;
     }
   }
+}
+
+export function collectGlyphNames(change) {
+  const glyphNames = new Set();
+
+  for (const { path, change: thisChange } of iterChanges(change)) {
+    if (path.length >= 1 && path[0] == "glyphs") {
+      if (path.length == 1) {
+        glyphNames.add(thisChange.a[0]);
+      } else {
+        glyphNames.add(path[1]);
+      }
+    }
+  }
+
+  return [...glyphNames].sort();
 }

@@ -1,0 +1,18 @@
+steps:
+  - input: fontra-read
+    source: test-py/data/workflow/input1-A.fontra
+  - axisNames: []
+    filter: subset-axes
+  - fork-merge: null
+    steps:
+      - filter: subset-glyphs
+        glyphNames:
+          - B
+      - filter: scale
+        scaleFactor: 0.5
+  - destination: output-fork-merge.fontra
+    output: fontra-write
+test-info:
+  expected-log:
+    - level: 30
+      message: "Merger: Fonts have different units-per-em; A: 1000, B: 500"

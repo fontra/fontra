@@ -1,0 +1,42 @@
+{
+"name": "damma-ar",
+"sources": [
+{
+"name": "",
+"layerName": "m01",
+"locationBase": "m01"
+}
+],
+"layers": {
+"m01": {
+"glyph": {
+"components": [
+{
+"name": "fatha-ar"
+}
+],
+"xAdvance": 150,
+"anchors": [
+{
+"name": "_damma",
+"x": 75,
+"y": 75
+}
+]
+}
+},
+"m01^Regular 25 Jun 22, 20:51": {
+"glyph": {
+"components": [
+{
+"name": "_dot"
+}
+],
+"xAdvance": 150
+},
+"customData": {
+"com.glyphsapp.layer.layerId": "93F172D7-A510-49C9-8463-B87CFE29C250"
+}
+}
+}
+}

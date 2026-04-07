@@ -1,7 +1,105 @@
+import { applicationSettingsController } from "@fontra/core/application-settings.js";
+import { getGlyphInfoFromCodePoint } from "@fontra/core/glyph-data.js";
 import * as html from "@fontra/core/html-utils.js";
-import { labeledCheckbox } from "@fontra/core/ui-utils.js";
+import { features, languages, scripts } from "@fontra/core/opentype-tags.js";
+import { labeledCheckbox, labeledPopupSelect } from "@fontra/core/ui-utils.js";
 import { findNestedActiveElement } from "@fontra/core/utils.js";
+import { showMenu } from "@fontra/web-components/menu-panel.js";
+import {
+  Accordion,
+  makeAccordionHeaderButton,
+} from "@fontra/web-components/ui-accordion.js";
 import Panel from "./panel.js";
+
+// These features are on by default. See hb-ot-shape.cc
+const commonOnFeatures = [
+  "abvm",
+  "blwm",
+  "ccmp",
+  "locl",
+  "mark",
+  "mark-emulated",
+  "mkmk",
+  "mkmk-emulated",
+  "rlig",
+  "rvrn",
+  "rand",
+  "Harf",
+  "HARF",
+  "Buzz",
+  "BUZZ",
+];
+
+// These features are on by default for horizontal writing. See hb-ot-shape.cc
+const horizontalOnFeatures = new Set([
+  ...commonOnFeatures,
+  "calt",
+  "clig",
+  "curs",
+  "curs-emulated",
+  "dist",
+  "kern",
+  "kern-emulated",
+  "liga",
+  "rclt",
+]);
+
+// These features are on by default for vertical writing. See hb-ot-shape.cc
+const verticalOnFeatures = new Set([...commonOnFeatures, "vert"]);
+
+// HarfBuzz may toggle these features. See hb-ot-shape.cc
+const miscDynamicFeatures = [
+  "frac", // for automatic fractions
+  "numr", // for automatic fractions
+  "dnom", // for automatic fractions
+  "ltra",
+  "ltrm",
+  "rtla",
+  "rtlm",
+  "vkrn",
+];
+
+// HarfBuzz may toggle these features. See hb-ot-shaper-*.cc
+const dynamicFeatures = new Set([
+  ...miscDynamicFeatures,
+  "abvf", // indic, khmer, use
+  "abvs", // indic, khmer, myanmar, use
+  "akhn", // indic, use
+  "blwf", // indic, khmer, myanmar, use
+  "blws", // indic, khmer, myanmar, use
+  // "calt", // arabic, hangul
+  // "ccmp", // arabic, indic, khmer, myanmar, use
+  "cfar", // khmer
+  "cjct", // indic, use
+  "clig", // arabic, khmer
+  "cswh", // arabic
+  "fin2", // arabic
+  "fin3", // arabic
+  "fina", // arabic, use
+  "half", // indic, use
+  "haln", // indic, use
+  "init", // arabic, indic, use
+  "isol", // arabic, use
+  "liga", // arabic, indic, khmer. NOTE: khmer turns liga *off*
+  "ljmo", // hangul
+  // "locl", // arabic, indic, khmer, myanmar, use
+  "med2", // arabic
+  "medi", // arabic, use
+  "mset", // arabic
+  "nukt", // indic, use
+  "pref", // indic, khmer, myanmar, use
+  "pres", // indic, khmer, myanmar, use
+  "pstf", // indic, khmer, myanmar, use
+  "psts", // indic, khmer, myanmar, use
+  // "rclt", // arabic
+  "rkrf", // indic, use
+  // "rlig", // arabic
+  "rphf", // indic, myanmar, use
+  "stch", // arabic
+  "tjmo", // hangul
+  "vatu", // indic, use
+  "vjmo", // hangul
+]);
 
 export default class TextEntryPanel extends Panel {
   identifier = "text-entry";
@@ -9,11 +107,11 @@ export default class TextEntryPanel extends Panel {
 
   static styles = `
     .text-entry-section {
-      display: flex;
-      flex-direction: column;
+      display: grid;
+      grid-template-columns: auto;
       gap: 0.5em;
-      max-height: 100%;
-      overflow-y: auto;
+      height: 100%;
+      align-content: start;
     }
 
     #text-align-menu {
@@ -59,6 +157,11 @@ export default class TextEntryPanel extends Panel {
       resize: none;
       overflow-x: auto;
       box-sizing: content-box;
+      max-height: 22vh;
+    }
+
+    ui-accordion {
+      min-height: 0;
     }
   `;
 
@@ -69,9 +172,14 @@ export default class TextEntryPanel extends Panel {
     this.sceneController = this.editorController.sceneController;
     this.textSettings = this.editorController.sceneSettingsController.model;
 
+    this.textSettingsController.addKeyListener(
+      ["featureSettings", "applyTextShaping", "shaperInfo", "dumbShaperInfo"],
+      async (event) => this.updateFeatures(await this.getShaper())
+    );
+
     this.setupTextEntryElement();
     this.setupTextAlignElement();
-    this.setupApplyKerningElement();
+    this.setupAccordionElement();
     this.setupIntersectionObserver();
   }
 
@@ -111,11 +219,87 @@ export default class TextEntryPanel extends Panel {
                 }),
               ]
             ),
-            html.div({ id: "apply-kerning-checkbox" }),
+            html.div({ id: "text-settings-accordion" }),
           ]
         ),
       ]
     );
+  }
+
+  async getShaper() {
+    const applyTextShaping = this.textSettings.applyTextShaping;
+
+    const shaperInfoPromise = applyTextShaping
+      ? this.textSettings.shaperInfo
+      : this.textSettings.dumbShaperInfo;
+
+    if (!shaperInfoPromise) {
+      return null;
+    }
+
+    const { shaper, messages, canEmulateSomeGPOS } = await shaperInfoPromise;
+
+    if (applyTextShaping != this.textSettings.applyTextShaping) {
+      // The setting was changed since we were called: ignore, or else we may
+      // override the correct things that may have been set up before us.
+      return;
+    }
+
+    const errorMessages = messages.filter((message) => message.level != "warning");
+    const numberOfErrorsMessage = errorMessages.length == 1 ? "an error" : "errors";
+
+    this.updateShaperError(
+      errorMessages.length
+        ? `The OpenType feature code contains ${numberOfErrorsMessage}`
+        : null,
+      errorMessages[0]
+    );
+
+    return shaper;
+  }
+
+  _makeResetFeaturesButton(tableTag) {
+    return html.createDomElement("icon-button", {
+      "src": "/tabler-icons/refresh.svg",
+      "onclick": async (event) => {
+        const shaper = await this.getShaper();
+        if (!shaper) {
+          return;
+        }
+        const info = shaper.getFeatureInfo(tableTag);
+        const featureSettings = { ...this.textSettings.featureSettings };
+        Object.keys(info).forEach((featureTag) => {
+          delete featureSettings[featureTag];
+        });
+        this.textSettings.featureSettings = featureSettings;
+      },
+      "data-tooltip": `Reset ${tableTag} feature settings`,
+      "data-tooltipposition": "left",
+    });
+  }
+
+  get gsubFeaturesItem() {
+    return this.accordion.querySelector("#gsub-features-accordion-item");
+  }
+
+  get gposEmulatedFeaturesItem() {
+    return this.accordion.querySelector("#gpos-emulated-features-accordion-item");
+  }
+
+  get gposFeaturesItem() {
+    return this.accordion.querySelector("#gpos-features-accordion-item");
+  }
+
+  get gsubFeaturesElement() {
+    return this.accordion.querySelector("#gsub-features-contents");
+  }
+
+  get gposEmulatedFeaturesElement() {
+    return this.accordion.querySelector("#gpos-emulated-features-contents");
+  }
+
+  get gposFeaturesElement() {
+    return this.accordion.querySelector("#gpos-features-contents");
   }
 
   updateAlignElement(align) {
@@ -140,18 +324,6 @@ export default class TextEntryPanel extends Panel {
         this.textSettings.align = el.dataset.align;
       };
     }
-  }
-
-  setupApplyKerningElement() {
-    this.applyKerningCheckBox = labeledCheckbox(
-      "Apply kerning", // TODO: translate
-      this.textSettingsController,
-      "applyKerning",
-      {}
-    );
-
-    const placeHolder = this.contentElement.querySelector("#apply-kerning-checkbox");
-    placeHolder.replaceWith(this.applyKerningCheckBox);
   }
 
   setupTextEntryElement() {
@@ -189,15 +361,384 @@ export default class TextEntryPanel extends Panel {
 
     this.textSettingsController.addKeyListener(
       "text",
-      (event) => this.fixTextEntryHeight(),
+      (event) => {
+        this.adjustTextEntryAlignment();
+        this.fixTextEntryHeight();
+      },
       false
     );
+  }
+
+  setupAccordionElement() {
+    this.textSettingsController.addKeyListener("textScript", async (event) => {
+      const shaper = await this.getShaper();
+      if (shaper) {
+        this.updateLanguages(shaper.getScriptAndLanguageInfo());
+      }
+    });
+
+    this.accordion = new Accordion();
+    this.accordion.appendStyle(`
+      .features-container {
+        display: grid;
+        grid-template-columns: min-content auto;
+        align-items: center;
+        gap: 0.4em;
+        padding: 2px;
+      }
+
+      .feature-tag-button {
+        color: var(--text-color);
+        font-family: menlo, monospace;
+        cursor: pointer;
+        display: grid;
+        grid-template-columns: auto auto;
+        align-items: center;
+        justify-content: start;
+        gap: 0.4em;
+        width: 100%;
+      }
+
+      .feature-tag-button.emulated {
+        font-style: oblique;
+      }
+
+      .feature-tag-button > .fea-tag {
+        background-color: #BBB4;
+        padding: 0.1em 0.5em 0.1em 0.5em;
+        border-radius: 0.5em;
+      }
+
+      .feature-tag-button:hover > .fea-tag {
+        background-color: #88888848;
+      }
+
+      .feature-tag-button:active > .fea-tag {
+        background-color: #88888870;
+      }
+
+      .feature-tag-button > .fea-toggle {
+        width: 0.65em;
+        height: 0.65em;
+        border-radius: 1em;
+      }
+
+      .feature-tag-button.not-at-default > .fea-toggle {
+        outline: 1px solid #AAAA;
+        outline-offset: 1px;
+      }
+
+      .feature-tag-button.neutral > .fea-toggle {
+        background-color: #BBB9;
+      }
+
+      .feature-tag-button.on > .fea-toggle {
+        background-color: #00BB00;
+      }
+
+      .feature-tag-button.off > .fea-toggle {
+        background-color: #0000;
+      }
+
+
+      .feature-tag-label {
+        color: var(--text-color);
+        text-decoration-color: lightgray;
+        cursor: pointer;
+      }
+
+      icon-button {
+        width: 1.3em;
+        height: 1.3em;
+      }
+
+      #shaping-options-contents {
+        display: grid;
+        grid-template-columns: min-content auto;
+        align-items: center;
+        gap: 0.5em;
+      }
+
+      #shaping-options-contents > .labeled-checkbox {
+        grid-column: 1 / span 2;
+      }
+
+      #features-errors {
+        grid-column: 1 / span 2;
+        display: grid;
+        grid-template-columns: auto auto;
+        justify-content: start;
+        align-items: start;
+        gap: 0.5em;
+        border-radius: 0.5em;
+        background-color: #f885;
+        padding: 0.25em 0.25em 0.5em 0.25em;
+        cursor: pointer;
+        color: var(--foreground-color);
+      }
+
+      #features-errors.hidden {
+        display: none;
+      }
+
+      #features-errors > inline-svg {
+        display: inline-block;
+        width: 1.25em;
+        height: 1.25em;
+      }
+
+      #features-errors-message {
+        overflow: auto;
+        margin: 0;
+      }
+
+    `);
+
+    this.textScriptOptions = [{ label: "Automatic", value: null }];
+    this.textLanguageOptions = [{ label: "Default (dflt)", value: null }];
+
+    this.accordion.items = [
+      {
+        id: "shaping-options-accordion-item",
+        label: "Text shaping options",
+        open: true,
+
+        auxiliaryHeaderElement: makeAccordionHeaderButton({
+          icon: "menu-2",
+          id: "shaping-options-options-button",
+          tooltip: "Additional text shaping options", // TODO: translate
+          onclick: (event) => this.showTextShapingOptionsMenu(event),
+        }),
+
+        content: html.div({ id: "shaping-options-contents" }, [
+          labeledCheckbox(
+            "Apply text shaping and features", // TODO: translate
+            this.textSettingsController,
+            "applyTextShaping",
+            { class: "labeled-checkbox" }
+          ),
+          ...labeledPopupSelect(
+            "Direction:",
+            this.textSettingsController,
+            "textDirection",
+            [
+              { value: null, label: "Automatic" },
+              { value: "ltr", label: "Left-to-Right" },
+              { value: "rtl", label: "Right-to-Left" },
+            ]
+          ),
+          ...labeledPopupSelect(
+            "Script:",
+            this.textSettingsController,
+            "textScript",
+            this.textScriptOptions
+          ),
+          ...labeledPopupSelect(
+            "Language:",
+            this.textSettingsController,
+            "textLanguage",
+            this.textLanguageOptions
+          ),
+          html.a(
+            {
+              id: "features-errors",
+              class: "hidden",
+              href: "", // will get filled in later
+              target: `fontra.fontinfo.${this.editorController.projectIdentifier}`,
+            },
+            [
+              html.createDomElement("inline-svg", {
+                src: "/tabler-icons/bug.svg",
+              }),
+              html.div({ id: "features-errors-message" }, [""]),
+            ]
+          ),
+        ]),
+      },
+      {
+        id: "gsub-features-accordion-item",
+        label: "Substitution",
+        open: true,
+        hidden: true,
+        content: html.div(
+          { class: "features-container", id: "gsub-features-contents" },
+          []
+        ),
+        auxiliaryHeaderElement: this._makeResetFeaturesButton("GSUB"),
+      },
+      {
+        id: "gpos-emulated-features-accordion-item",
+        label: "Positioning from font data",
+        open: true,
+        hidden: true,
+        content: html.div(
+          { class: "features-container", id: "gpos-emulated-features-contents" },
+          []
+        ),
+        auxiliaryHeaderElement: this._makeResetFeaturesButton("GPOS-emulated"),
+      },
+      {
+        id: "gpos-features-accordion-item",
+        label: "Positioning",
+        open: true,
+        hidden: true,
+        content: html.div(
+          { class: "features-container", id: "gpos-features-contents" },
+          []
+        ),
+        auxiliaryHeaderElement: this._makeResetFeaturesButton("GPOS"),
+      },
+    ];
+
+    const placeHolder = this.contentElement.querySelector("#text-settings-accordion");
+    placeHolder.replaceWith(this.accordion);
+  }
+
+  showTextShapingOptionsMenu(event) {
+    const menuItems = [
+      {
+        title: "Disable ad-hoc mark detection",
+        callback: () => {
+          applicationSettingsController.model.disableAdHocMarks =
+            !applicationSettingsController.model.disableAdHocMarks;
+        },
+        checked: applicationSettingsController.model.disableAdHocMarks,
+      },
+    ];
+
+    const button = this.accordion.querySelector("#shaping-options-options-button");
+    const buttonRect = button.getBoundingClientRect();
+    showMenu(menuItems, { x: buttonRect.left, y: buttonRect.bottom });
+  }
+
+  updateShaperError(error, errorMessage) {
+    const errorElement = this.accordion.querySelector("#features-errors");
+    const messageElement = this.accordion.querySelector("#features-errors-message");
+    errorElement.classList.toggle("hidden", !error);
+    messageElement.innerText = error ?? "";
+
+    if (errorMessage) {
+      const opentypeFeaturesURL = new URL(window.location);
+      opentypeFeaturesURL.pathname = "fontinfo.html";
+      opentypeFeaturesURL.hash = `#opentype-feature-code-panel#C${errorMessage.span[0]}-${errorMessage.span[1]}`;
+      errorElement.href = opentypeFeaturesURL;
+    }
+  }
+
+  updateFeatures(shaper) {
+    if (!shaper) {
+      return;
+    }
+
+    const gsubFeatureInfo = shaper.getFeatureInfo("GSUB");
+    const gposEmulatedFeatureInfo = shaper.getFeatureInfo("GPOS-emulated");
+    const gposFeatureInfo = shaper.getFeatureInfo("GPOS");
+    const scriptAndLanguageInfo = shaper.getScriptAndLanguageInfo();
+
+    this.textScriptOptions.splice(
+      0,
+      Infinity,
+      { label: "Automatic", value: null },
+      ...Object.keys(scriptAndLanguageInfo).map((script) => ({
+        label: `${scripts[script] ?? script} (${script.trim()})`,
+        value: script,
+      }))
+    );
+
+    if (
+      this.textSettings.textScript &&
+      !this.textScriptOptions.find(
+        (item) => item.value === this.textSettings.textScript
+      )
+    ) {
+      this.textSettings.textScript = null;
+    }
+
+    this.updateLanguages(scriptAndLanguageInfo);
+
+    for (const [info, element, accordionItem] of [
+      [gsubFeatureInfo, this.gsubFeaturesElement, this.gsubFeaturesItem],
+      [
+        gposEmulatedFeatureInfo,
+        this.gposEmulatedFeaturesElement,
+        this.gposEmulatedFeaturesItem,
+      ],
+      [gposFeatureInfo, this.gposFeaturesElement, this.gposFeaturesItem],
+    ]) {
+      const tags = Object.keys(info).sort();
+      accordionItem.hidden = !tags.length;
+
+      element.innerHTML = "";
+
+      tags.forEach((tag) => {
+        const cleanTag = tag.slice(0, 4); // strip "-emulated"
+        const [featureDescription, url] = features[cleanTag] ?? ["", null];
+        const label = info[tag]?.uiLabelName || featureDescription;
+
+        // TODO: fix this for vertical layout once we support it.
+        const emulateDefaultValue = info[tag]?.defaultOn ?? true;
+        const defaultValue =
+          horizontalOnFeatures.has(tag) && emulateDefaultValue
+            ? true
+            : dynamicFeatures.has(tag)
+            ? undefined
+            : false;
+
+        element.append(
+          ...featureTagButton(this.textSettingsController, tag, label, {
+            url,
+            defaultValue,
+          })
+        );
+      });
+    }
+  }
+
+  updateLanguages(scriptAndLanguageInfo) {
+    const { textScript, textLanguage } = this.textSettingsController.model;
+    const languages = textScript ? scriptAndLanguageInfo[textScript] || [] : [];
+    const languageOptions = languages.map((language) => ({
+      label: `${languages[language] || language} (${language.trim()})`,
+      value: language,
+    }));
+
+    if (textLanguage && !languages.includes(textLanguage)) {
+      this.textSettingsController.model.textLanguage = null;
+    }
+
+    this.textLanguageOptions.splice(1, Infinity, ...languageOptions);
+  }
+
+  getFeatureInfo(shaper, tableTag) {
+    const info = shaper.getFeatureInfo(tableTag);
+    if (tableTag == "GPOS" && this.canEmulateSomeGPOS) {
+      info["curs-emulated"] = {};
+      info["kern-emulated"] = {};
+      info["mark-emulated"] = {};
+      info["mkmk-emulated"] = {};
+    }
+    return info;
   }
 
   fixTextEntryHeight() {
     // This adapts the text entry height to its content
     this.textEntryElement.style.height = "auto";
     this.textEntryElement.style.height = this.textEntryElement.scrollHeight + 14 + "px";
+  }
+
+  adjustTextEntryAlignment() {
+    if (!this.textEntryElement.value) {
+      return;
+    }
+    // Set the writing direction based on the first Letter in the text
+    for (const char of this.textEntryElement.value) {
+      const codePoint = char.codePointAt(0);
+      const info = getGlyphInfoFromCodePoint(codePoint);
+      if (info?.category === "Letter") {
+        this.textEntryElement.dir = info?.direction == "RTL" ? "rtl" : "ltr";
+        break;
+      }
+    }
   }
 
   setupIntersectionObserver() {
@@ -225,6 +766,83 @@ export default class TextEntryPanel extends Panel {
       this.focusTextEntry();
     }
   }
+}
+
+function featureTagButton(controller, featureTag, label, options) {
+  const controllerKey = options?.key ?? "featureSettings";
+  let state = controller.model[controllerKey]?.[featureTag];
+  const id = options?.id ?? `features-button-${featureTag}`;
+
+  const updateState = () => {
+    buttonElement.classList.toggle("tri-state", options.defaultValue === undefined);
+    buttonElement.classList.remove("neutral");
+    buttonElement.classList.remove("on");
+    buttonElement.classList.remove("off");
+    buttonElement.classList.toggle("not-at-default", state !== undefined);
+    switch (state === undefined ? options.defaultValue : state) {
+      case undefined:
+        buttonElement.classList.add("neutral");
+        break;
+      case false:
+        buttonElement.classList.add("off");
+        break;
+      default:
+        buttonElement.classList.add("on");
+    }
+  };
+
+  const toggleState = (reverse = false) => {
+    if (options.defaultValue !== undefined) {
+      state = state === undefined ? !options.defaultValue : !state;
+    } else {
+      switch (state) {
+        case undefined:
+          state = reverse ? false : true;
+          break;
+        case false:
+          state = reverse ? true : undefined;
+          break;
+        default:
+          state = reverse ? undefined : false;
+      }
+    }
+
+    const features = { ...controller.model[controllerKey] };
+
+    if (state !== options.defaultValue) {
+      features[featureTag] = state;
+    } else {
+      delete features[featureTag];
+    }
+
+    controller.model[controllerKey] = features;
+  };
+
+  const buttonElement = html.div(
+    {
+      class: "feature-tag-button",
+      onclick: (event) => toggleState(event.altKey),
+    },
+    [
+      html.div({ class: "fea-toggle" }),
+      html.div({ class: "fea-tag" }, [
+        featureTag.slice(0, 4).replaceAll(" ", "\u00A0"), // no-break space
+      ]),
+    ]
+  );
+
+  if (featureTag.endsWith("-emulated")) {
+    buttonElement.classList.add("emulated");
+  }
+
+  const labelElement = (options?.url ? html.a : html.div)(
+    { class: "feature-tag-label", href: options?.url, target: "_blank" },
+    [label]
+  );
+
+  updateState();
+
+  return [buttonElement, labelElement];
 }
 
 customElements.define("panel-text-entry", TextEntryPanel);

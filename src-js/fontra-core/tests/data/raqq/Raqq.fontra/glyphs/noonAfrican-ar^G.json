@@ -1,0 +1,25 @@
+{
+"name": "noonAfrican-ar",
+"sources": [
+{
+"name": "",
+"layerName": "m01",
+"locationBase": "m01"
+}
+],
+"layers": {
+"m01": {
+"glyph": {
+"components": [
+{
+"name": "noonghunna-ar"
+}
+],
+"xAdvance": 295
+}
+}
+},
+"customData": {
+"com.glyphsapp.glyph-color": 0
+}
+}

@@ -12,25 +12,7 @@ body {
 }
 
 #multi-panel-header-container {
-  display: grid;
-  align-content: start;
-  gap: 1em;
-  padding: 1em 1em 1em 1.2em;
-}
-
-.multi-panel-header {
-  cursor: pointer;
-  font-size: 1.25em;
-  font-weight: bold;
-  text-underline-offset: 0.15em;
-}
-
-.multi-panel-header:hover {
-  text-decoration: underline dotted;
-}
-
-.multi-panel-header.selected {
-  text-decoration: underline;
+  padding: 1em 1em 1em 1em;
 }
 
 .multi-panel-panel {

@@ -1,0 +1,14 @@
+steps:
+  - input: fontra-read
+    source: test-py/data/workflow/input1-A.fontra
+  - filter: subset-glyphs
+    glyphNames:
+      - A
+  - axes:
+      weight:
+        label: Thickness
+        name: Thickness
+        tag: THCK
+    filter: rename-axes
+  - destination: output-rename-axes.fontra
+    output: fontra-write

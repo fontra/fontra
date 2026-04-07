@@ -1,0 +1,50 @@
+{
+"name": "hamza-ar.alt",
+"sources": [
+{
+"name": "",
+"layerName": "m01",
+"locationBase": "m01"
+}
+],
+"layers": {
+"m01": {
+"glyph": {
+"components": [
+{
+"name": "_dot.circle"
+}
+],
+"xAdvance": 150,
+"anchors": [
+{
+"name": "_damma",
+"x": 75,
+"y": 75
+},
+{
+"name": "_hamza",
+"x": 75,
+"y": 75
+}
+]
+}
+},
+"m01^26 Aug 23 at 14:59": {
+"glyph": {
+"components": [
+{
+"name": "_dot",
+"customData": {
+"com.glyphsapp.component.alignment": -1
+}
+}
+],
+"xAdvance": 150
+},
+"customData": {
+"com.glyphsapp.layer.layerId": "683DD911-7D27-4050-902D-227E30672A01"
+}
+}
+}
+}

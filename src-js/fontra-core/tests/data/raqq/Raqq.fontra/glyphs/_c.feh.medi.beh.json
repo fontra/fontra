@@ -1,0 +1,68 @@
+{
+"name": "_c.feh.medi.beh",
+"sources": [
+{
+"name": "",
+"layerName": "m01",
+"locationBase": "m01"
+}
+],
+"layers": {
+"m01": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": -24,
+"y": 0
+},
+{
+"x": 69,
+"y": 0
+},
+{
+"x": 69,
+"y": 110
+},
+{
+"x": 30,
+"y": 108,
+"type": "cubic"
+},
+{
+"x": -5,
+"y": 162,
+"type": "cubic"
+},
+{
+"x": -5,
+"y": 212
+},
+{
+"x": -24,
+"y": 212
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 0,
+"anchors": [
+{
+"name": "entry",
+"x": 0,
+"y": 0
+},
+{
+"name": "exit",
+"x": 0,
+"y": 0
+}
+]
+}
+}
+}
+}

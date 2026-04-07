@@ -11,6 +11,7 @@ from functools import cached_property
 from typing import Any, AsyncGenerator, ClassVar
 
 from ...backends import getFileSystemBackend, newFileSystemBackend
+from ...backends.base import ReadableBaseBackend
 from ...backends.copy import copyFont
 from ...backends.filenames import stringToFileName
 from ...backends.null import NullBackend
@@ -89,7 +90,7 @@ class FontraWrite:
 
 
 @dataclass(kw_only=True)
-class BaseFilter:
+class BaseFilter(ReadableBaseBackend):
     input: ReadableFontBackend = field(init=False, default=NullBackend())
     actionName: ClassVar[str]
 
@@ -178,6 +179,10 @@ class BaseFilter:
         imageData = await self.validatedInput.getBackgroundImage(imageIdentifier)
         return await self.processBackgroundImage(imageData)
 
+    async def getGlyphInfos(self) -> dict[str, Any]:
+        glyphInfos = await self.validatedInput.getGlyphInfos()
+        return await self.processGlyphInfos(glyphInfos)
+
     # Default no-op process methods, to be overridden.
 
     # These methods should *not* modify the objects, but return modified *copies*
@@ -217,6 +222,9 @@ class BaseFilter:
         self, imageData: ImageData | None
     ) -> ImageData | None:
         return imageData
+
+    async def processGlyphInfos(self, glyphInfos):
+        return glyphInfos
 
 
 @registerFilterAction("memory-cache")

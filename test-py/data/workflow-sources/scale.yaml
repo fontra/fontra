@@ -1,0 +1,8 @@
+steps:
+  - input: fontra-read
+    source: test-py/data/workflow/input1-A.fontra
+    steps:
+      - filter: scale
+        scaleFactor: 0.75
+  - destination: output-scale.fontra
+    output: fontra-write

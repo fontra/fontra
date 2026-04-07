@@ -1,0 +1,7 @@
+steps:
+  - input: fontra-read
+    source: test-py/data/workflow/input-merge-kerning-A.fontra
+  - dropKern: true
+    filter: generate-kern-feature
+  - destination: output-generate-kern-feature.fontra
+    output: fontra-write

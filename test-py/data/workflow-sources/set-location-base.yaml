@@ -1,0 +1,13 @@
+steps:
+  - input: fontra-read
+    source: test-py/data/mutatorsans/MutatorSans.designspace
+  - filter: drop-features
+  - filter: subset-glyphs
+    glyphNames:
+      - B
+      - varcotest2
+  - filter: drop-shapes
+  - filter: clear-location-base
+  - filter: set-location-base
+  - destination: output-set-location-base.fontra
+    output: fontra-write

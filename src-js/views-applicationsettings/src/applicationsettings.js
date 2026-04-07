@@ -30,7 +30,11 @@ export class ApplicationSettingsController {
     const myMenuBar = makeFontraMenuBar(["File"], this);
     document.querySelector(".top-bar-container").appendChild(myMenuBar);
 
-    this.multiPanelController = new MultiPanelController(panelClasses, this);
+    this.multiPanelController = new MultiPanelController(
+      panelClasses,
+      this,
+      "application-settings"
+    );
 
     window.addEventListener("keydown", (event) => this.handleKeyDown(event));
   }

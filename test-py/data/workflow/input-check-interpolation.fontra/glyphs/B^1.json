@@ -1,0 +1,55 @@
+{
+"name": "B",
+"sources": [
+{
+"name": "<default>",
+"layerName": "<default>"
+},
+{
+"name": "weight=900",
+"layerName": "weight=900",
+"location": {
+"weight": 900
+}
+}
+],
+"layers": {
+"<default>": {
+"glyph": {
+"xAdvance": 500,
+"anchors": [
+{
+"name": "top",
+"x": 263,
+"y": 624
+},
+{
+"name": "bottom",
+"x": 248,
+"y": 39
+}
+]
+}
+},
+"weight=900": {
+"glyph": {
+"xAdvance": 500,
+"anchors": [
+{
+"name": "bottom",
+"x": 248,
+"y": 39
+},
+{
+"name": "top",
+"x": 263,
+"y": 624
+}
+]
+}
+}
+},
+"customData": {
+"fontra.glyph.note": "The anchor order is not identical between sources, but this shouldn't hinder interpolation."
+}
+}

@@ -13,6 +13,7 @@ from .classes import (
     ImageData,
     Kerning,
     OpenTypeFeatures,
+    ShaperFontData,
     VariableGlyph,
 )
 
@@ -49,6 +50,12 @@ class ReadableFontBackend(Protocol):
     async def getUnitsPerEm(self) -> int:
         pass
 
+    async def getShaperFontData(self) -> ShaperFontData | None:
+        pass
+
+    async def getGlyphInfos(self) -> dict[str, Any]:
+        pass
+
 
 @runtime_checkable
 class WritableFontBackend(ReadableFontBackend, Protocol):
@@ -82,6 +89,9 @@ class WritableFontBackend(ReadableFontBackend, Protocol):
         pass
 
     async def putUnitsPerEm(self, value: int) -> None:
+        pass
+
+    async def putGlyphInfos(self, glyphInfos: dict[str, Any]) -> None:
         pass
 
 
@@ -164,4 +174,13 @@ class ExportManager(Protocol):
         pass
 
     def getSupportedExportFormats(self) -> list[str]:
+        pass
+
+
+@runtime_checkable
+class ProjectOpenListener(Protocol):
+    def projectOpened(self, projectIdentifier: str) -> None:
+        pass
+
+    def projectClosed(self, projectIdentifier: str) -> None:
         pass

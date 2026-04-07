@@ -1,0 +1,13 @@
+steps:
+  - input: fontra-read
+    source: test-py/data/mutatorsans/MutatorSansLocationBase.fontra
+  - filter: subset-glyphs
+    glyphNames:
+      - A
+      - B
+  - filter: instantiate
+    location:
+      weight: 300
+      width: 400
+  - destination: output-instantiate-location-base.fontra
+    output: fontra-write

@@ -7,6 +7,7 @@ import {
   mapBackward,
   mapForward,
   normalizeLocation,
+  normalizeLocationSparse,
   normalizeValue,
   piecewiseLinearMap,
   supportScalar,
@@ -151,6 +152,10 @@ describe("var-model tests", () => {
   describe("normalizeLocation tests", () => {
     it("-1,0,1", () => {
       const axes = [{ name: "wght", minValue: 100, defaultValue: 400, maxValue: 900 }];
+      expect(normalizeLocation({}, axes)).to.deep.equal({ wght: 0.0 });
+      expect(normalizeLocation({ unknownAxis: 100 }, axes)).to.deep.equal({
+        wght: 0.0,
+      });
       expect(normalizeLocation({ wght: 400 }, axes)).to.deep.equal({ wght: 0.0 });
       expect(normalizeLocation({ wght: 100 }, axes)).to.deep.equal({ wght: -1.0 });
       expect(normalizeLocation({ wght: 900 }, axes)).to.deep.equal({ wght: 1.0 });
@@ -199,9 +204,28 @@ describe("var-model tests", () => {
     });
   });
 
+  describe("normalizeLocationSparse tests", () => {
+    it("-1,0,1", () => {
+      const axes = [{ name: "wght", minValue: 100, defaultValue: 400, maxValue: 900 }];
+      expect(normalizeLocationSparse({}, axes)).to.deep.equal({});
+      expect(normalizeLocationSparse({ unknownAxis: 100 }, axes)).to.deep.equal({});
+      expect(normalizeLocationSparse({ wght: 400 }, axes)).to.deep.equal({ wght: 0.0 });
+      expect(normalizeLocationSparse({ wght: 100 }, axes)).to.deep.equal({
+        wght: -1.0,
+      });
+      expect(normalizeLocationSparse({ wght: 900 }, axes)).to.deep.equal({ wght: 1.0 });
+      expect(normalizeLocationSparse({ wght: 650 }, axes)).to.deep.equal({ wght: 0.5 });
+      expect(normalizeLocationSparse({ wght: 1000 }, axes)).to.deep.equal({
+        wght: 1.0,
+      });
+      expect(normalizeLocationSparse({ wght: 0 }, axes)).to.deep.equal({ wght: -1.0 });
+    });
+  });
+
   describe("unnormalizeLocation tests", () => {
     it("-1,0,1", () => {
       const axes = [{ name: "wght", minValue: 100, defaultValue: 400, maxValue: 900 }];
+      expect(unnormalizeLocation({}, axes)).to.deep.equal({ wght: 400 });
       expect(unnormalizeLocation({ wght: 0 }, axes)).to.deep.equal({ wght: 400 });
       expect(unnormalizeLocation({ wght: -1 }, axes)).to.deep.equal({ wght: 100 });
       expect(unnormalizeLocation({ wght: 1 }, axes)).to.deep.equal({ wght: 900 });
@@ -212,6 +236,7 @@ describe("var-model tests", () => {
 
     it("0,0,1", () => {
       const axes = [{ name: "wght", minValue: 0, defaultValue: 0, maxValue: 1000 }];
+      expect(unnormalizeLocation({}, axes)).to.deep.equal({ wght: 0 });
       expect(unnormalizeLocation({ wght: 0 }, axes)).to.deep.equal({ wght: 0 });
       expect(unnormalizeLocation({ wght: -1 }, axes)).to.deep.equal({ wght: 0.0 });
       expect(unnormalizeLocation({ wght: 1 }, axes)).to.deep.equal({ wght: 1000 });
@@ -224,6 +249,7 @@ describe("var-model tests", () => {
       expect(unnormalizeLocation({ wght: -1 }, axes)).to.deep.equal({ wght: 0 });
       expect(unnormalizeLocation({ wght: -2 }, axes)).to.deep.equal({ wght: 0 });
       expect(unnormalizeLocation({ wght: -0.5 }, axes)).to.deep.equal({ wght: 500 });
+      expect(unnormalizeLocation({}, axes)).to.deep.equal({ wght: 1000 });
       expect(unnormalizeLocation({ wght: 0 }, axes)).to.deep.equal({ wght: 1000 });
       expect(unnormalizeLocation({ wght: 0.5 }, axes)).to.deep.equal({ wght: 1000 });
     });

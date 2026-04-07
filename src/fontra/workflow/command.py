@@ -33,7 +33,7 @@ sortedlevelNames = [
 def yaml_or_json(path):
     path = pathlib.Path(path)
     if not path.is_file():
-        raise argparse.ArgumentError(f"File not found: {path!r}")
+        raise argparse.ArgumentError(None, f"File not found: {path!r}")
     path = path.resolve()
     contents = path.read_text(encoding="utf-8")
     if path.suffix == ".json":
@@ -45,7 +45,7 @@ def yaml_or_json(path):
 def existing_folder(path):
     path = pathlib.Path(path)
     if not path.is_dir():
-        raise argparse.ArgumentError(f"Folder not found: {path!r}")
+        raise argparse.ArgumentError(None, f"Folder not found: {path!r}")
     path = path.resolve()
     return path
 

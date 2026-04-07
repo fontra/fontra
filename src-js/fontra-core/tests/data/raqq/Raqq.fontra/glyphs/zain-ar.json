@@ -1,0 +1,32 @@
+{
+"name": "zain-ar",
+"sources": [
+{
+"name": "",
+"layerName": "m01",
+"locationBase": "m01"
+}
+],
+"layers": {
+"m01": {
+"glyph": {
+"components": [
+{
+"name": "reh-ar"
+},
+{
+"name": "dotabove-ar.reh",
+"transformation": {
+"translateX": 143,
+"translateY": 161
+}
+}
+],
+"xAdvance": 450
+}
+}
+},
+"customData": {
+"com.glyphsapp.glyph-color": 0
+}
+}

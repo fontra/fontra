@@ -1,0 +1,5 @@
+steps:
+  - input: fontra-read
+    source: test-py/data/workflow/input-upconvert-legacy-kerning.fontra
+  - destination: output-upconvert-legacy-kerning.fontra
+    output: fontra-write

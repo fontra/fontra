@@ -1,0 +1,11 @@
+steps:
+  - input: fontra-read
+    source: test-py/data/workflow/input1-A.fontra
+  - filter: subset-glyphs
+    glyphNames:
+      - A
+  - axes:
+      - non-existent
+    filter: drop-axis-mappings
+  - destination: output-drop-axis-mapping-noop.fontra
+    output: fontra-write

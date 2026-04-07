@@ -10,6 +10,7 @@ import {
   enumerate,
   getCharFromCodePoint,
   makeUPlusStringFromCodePoint,
+  modulo,
   parseSelection,
   range,
   rgbaToHex,
@@ -29,7 +30,6 @@ export default class SelectionInfoPanel extends Panel {
   constructor(editorController) {
     super(editorController);
     this.throttledUpdate = throttleCalls((senderID) => this.update(senderID), 100);
-    this.fontController = this.editorController.fontController;
     this.sceneController = this.editorController.sceneController;
 
     this.sceneController.sceneSettingsController.addKeyListener(
@@ -144,19 +144,20 @@ export default class SelectionInfoPanel extends Panel {
     const instance = glyphController?.instance;
     this.haveInstance = !!instance;
 
-    const selectedGlyphInfo = this.sceneController.sceneModel.getSelectedGlyphInfo();
+    const positionedGlyph =
+      this.sceneController.sceneModel.getSelectedPositionedGlyph();
     const varGlyphController =
       await this.sceneController.sceneModel.getSelectedVariableGlyphController();
     const glyphLocked = !!varGlyphController?.glyph.customData["fontra.glyph.locked"];
 
     if (
-      selectedGlyphInfo?.isUndefined &&
-      selectedGlyphInfo.character &&
+      positionedGlyph?.isUndefined &&
+      positionedGlyph.character &&
       !codePoints.length
     ) {
       // Glyph does not yet exist in the font, but we can grab the unicode from
-      // selectedGlyphInfo.character anyway
-      codePoints = [selectedGlyphInfo.character.codePointAt(0)];
+      // positionedGlyph.character anyway
+      codePoints = [positionedGlyph.character.codePointAt(0)];
     }
 
     const codePointsStr = makeCodePointsString(codePoints);
@@ -718,6 +719,16 @@ export default class SelectionInfoPanel extends Panel {
   }
 
   _getDimensionsString(glyphController, pointIndices, componentIndices) {
+    if (pointIndices.length === 1 && componentIndices.length === 0) {
+      const handleDeltaString = this._getHandleDeltaString(
+        glyphController,
+        pointIndices
+      );
+      if (handleDeltaString) {
+        return handleDeltaString;
+      }
+    }
+
     const selectionRects = [];
     if (pointIndices.length) {
       const instance = glyphController.instance;
@@ -744,6 +755,42 @@ export default class SelectionInfoPanel extends Panel {
       width = round(width, 1);
       height = round(height, 1);
       return `↔ ${width} ↕ ${height}`;
+    }
+  }
+
+  _getHandleDeltaString(glyphController, pointIndices) {
+    if (pointIndices?.length !== 1) {
+      return null;
+    }
+    const path = glyphController.path;
+    const point = path.getPoint(pointIndices[0]);
+    if (!point) {
+      return null;
+    }
+    const { x, y, type } = point;
+    if (!type) {
+      return null;
+    }
+    const [contourIndex, pointIndex] = path.getContourAndPointIndex(pointIndices[0]);
+    const numPoints = path.getNumPointsOfContour(contourIndex);
+    const { isClosed } = path.contourInfo[contourIndex];
+
+    const wrap = isClosed ? modulo : (i, n) => (i >= 0 && i < n ? i : null);
+
+    const neighborIndices = [
+      wrap(pointIndex - 1, numPoints),
+      wrap(pointIndex + 1, numPoints),
+    ].filter((i) => i !== null);
+
+    const neighborPoints = neighborIndices
+      .map((i) => path.getContourPoint(contourIndex, i))
+      .filter((point) => !point.type);
+
+    if (neighborPoints.length === 1) {
+      const { x: baseX, y: baseY } = neighborPoints[0];
+      const dx = x - baseX;
+      const dy = y - baseY;
+      return `↔ ${dx} ↕ ${dy}`;
     }
   }
 

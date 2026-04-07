@@ -22,7 +22,6 @@ import {
 import { dialog, message } from "@fontra/web-components/modal-dialog.js";
 import "@fontra/web-components/range-slider.js";
 import { UIList } from "@fontra/web-components/ui-list.js";
-import { getSelectedGlyphInfo } from "./scene-model.js";
 
 import { Font } from "lib-font";
 
@@ -339,19 +338,17 @@ export default class ReferenceFontPanel extends Panel {
     const container = this.contentElement.querySelector(".reference-font-preview");
     container.innerHTML = "";
 
-    const selectedGlyphInfo = getSelectedGlyphInfo(
-      this.editorController.sceneSettings.selectedGlyph,
-      this.editorController.sceneSettings.glyphLines
-    );
+    const positionedGlyph =
+      this.editorController.sceneModel.getSelectedPositionedGlyph();
 
     let textToDisplay;
 
     if (this.model.charOverride) {
       textToDisplay = this.model.charOverride.charAt(0);
     } else {
-      if (selectedGlyphInfo) {
-        if (selectedGlyphInfo.glyphName.includes(".")) {
-          const baseGlyphName = selectedGlyphInfo.glyphName.split(".")[0];
+      if (positionedGlyph) {
+        if (positionedGlyph.glyphName.includes(".")) {
+          const baseGlyphName = positionedGlyph.glyphName.split(".")[0];
           const codePoint = (this.editorController.fontController.glyphMap[
             baseGlyphName
           ] || [])[0];
@@ -359,7 +356,7 @@ export default class ReferenceFontPanel extends Panel {
             textToDisplay = String.fromCodePoint(codePoint);
           }
         } else {
-          textToDisplay = selectedGlyphInfo.character;
+          textToDisplay = positionedGlyph.character;
         }
       }
     }

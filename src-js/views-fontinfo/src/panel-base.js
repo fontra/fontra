@@ -6,7 +6,7 @@ import { UndoStack, reverseUndoRecord } from "@fontra/core/font-controller.js";
 import * as html from "@fontra/core/html-utils.js";
 import { translate } from "@fontra/core/localization.js";
 import { MultiPanelBasePanel } from "@fontra/core/multi-panel.js";
-import { commandKeyProperty } from "@fontra/core/utils.js";
+import { commandKeyProperty, sleepAsync } from "@fontra/core/utils.js";
 
 export class BaseInfoPanel extends MultiPanelBasePanel {
   constructor(viewController, panelElement) {
@@ -76,6 +76,9 @@ export class BaseInfoPanel extends MultiPanelBasePanel {
     this.fontController.notifyEditListeners("editFinal", this);
 
     this.setupUI();
+
+    await sleepAsync(0);
+    undoRecord.info.contextCallbacks?.[isRedo ? "redoCallback" : "undoCallback"]?.();
   }
 
   pushUndoItem(changes, undoLabel) {
@@ -90,12 +93,13 @@ export class BaseInfoPanel extends MultiPanelBasePanel {
     this.undoStack.pushUndoRecord(undoRecord);
   }
 
-  async postChange(change, rollbackChange, undoLabel) {
+  async postChange(change, rollbackChange, undoLabel, contextCallbacks) {
     const undoRecord = {
       change: change,
       rollbackChange: rollbackChange,
       info: {
         label: undoLabel,
+        contextCallbacks: contextCallbacks,
       },
     };
 

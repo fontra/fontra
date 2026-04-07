@@ -21,6 +21,7 @@ dependencies = [
     "ufomerge>=1.8.0",
     "skia-pathops>=0.8.0.post1",
     "pillow>=11.0.0",
+    "ufo2ft>=3.7.0",
 ]
 dynamic = ["version"]
 requires-python = ">=3.10"
@@ -73,6 +74,7 @@ designspace = "fontra.backends.designspace:DesignspaceBackend"
 ufo = "fontra.backends.designspace:UFOBackend"
 ttf = "fontra.backends.opentype:OTFBackend"
 otf = "fontra.backends.opentype:OTFBackend"
+ttx = "fontra.backends.opentype:TTXBackend"
 woff = "fontra.backends.opentype:OTFBackend"
 woff2 = "fontra.backends.opentype:OTFBackend"
 fontra = "fontra.backends.fontra:FontraBackend"

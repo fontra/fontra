@@ -1,5 +1,5 @@
 import coreClasses from "./classes.json" with { type: "json" };
-import { fetchJSON, mapObjectValues } from "./utils.js";
+import { mapObjectValues } from "./utils.js";
 import { Layer, StaticGlyph, VariableGlyph } from "./var-glyph.js";
 import { VarPackedPath } from "./var-path.js";
 

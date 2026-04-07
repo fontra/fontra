@@ -290,14 +290,15 @@ export class ModalDialog extends SimpleElement {
 
   show() {
     const activeElement = document.activeElement;
-    this._savedCanvasElement =
-      activeElement?.id === "edit-canvas" ? activeElement : undefined;
+    this._savedActiveElement = activeElement?.classList.contains("focus-preferred")
+      ? activeElement
+      : undefined;
     this.dialogElement.showModal();
   }
 
   hide() {
     this.dialogElement.close();
-    this._savedCanvasElement?.focus();
+    this._savedActiveElement?.focus();
   }
 
   _handleKeyDown(event) {

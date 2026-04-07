@@ -1,0 +1,32 @@
+{
+"name": "alefMadda-ar",
+"sources": [
+{
+"name": "",
+"layerName": "m01",
+"locationBase": "m01"
+}
+],
+"layers": {
+"m01": {
+"glyph": {
+"components": [
+{
+"name": "alef-ar"
+},
+{
+"name": "madda-ar",
+"transformation": {
+"translateX": -138,
+"translateY": 551
+}
+}
+],
+"xAdvance": 658
+}
+}
+},
+"customData": {
+"com.glyphsapp.glyph-color": 0
+}
+}

@@ -1,0 +1,17 @@
+steps:
+  - input: fontra-read
+    source: test-py/data/workflow/input1-A.fontra
+  - filter: subset-glyphs
+    glyphNames: []
+  - axes:
+      weight:
+        hidden: true
+        valueLabels:
+          - elidable: true
+            name: Regular
+            value: 400
+          - name: Bold
+            value: 700
+    filter: adjust-axes
+  - destination: output-adjust-axes-set-axis-values.fontra
+    output: fontra-write

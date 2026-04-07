@@ -1,0 +1,35 @@
+{
+"name": "gafsarkashabove-ar",
+"sources": [
+{
+"name": "",
+"layerName": "m01",
+"locationBase": "m01"
+}
+],
+"layers": {
+"m01": {
+"glyph": {
+"components": [
+{
+"name": "dotabove-ar",
+"transformation": {
+"translateX": 3,
+"translateY": -3,
+"rotation": 2.999999999999923,
+"scaleX": 0.9999999999999999
+}
+}
+],
+"xAdvance": 110,
+"anchors": [
+{
+"name": "_gaf",
+"x": 79,
+"y": 36
+}
+]
+}
+}
+}
+}

@@ -444,11 +444,18 @@ class GlyphInstancer:
     @cached_property
     def deltas(self) -> DiscreteDeltas:
         layerGlyphs = self.activeLayerGlyphs
-        if not areGuidelinesCompatible(layerGlyphs) or any(
-            g.backgroundImage is not None for g in layerGlyphs
+        if (
+            not areGuidelinesCompatible(layerGlyphs)
+            or any(g.backgroundImage is not None for g in layerGlyphs)
+            or anchorsNeedSorting(layerGlyphs)
         ):
             layerGlyphs = [
-                replace(layerGlyph, guidelines=[], backgroundImage=None)
+                replace(
+                    layerGlyph,
+                    anchors=sorted(layerGlyph.anchors, key=lambda a: a.name or ""),
+                    guidelines=[],
+                    backgroundImage=None,
+                )
                 for layerGlyph in layerGlyphs
             ]
 
@@ -489,7 +496,7 @@ class GlyphInstance:
     parentLocation: dict[str, float]  # LocationCoordinateSystem.SOURCE
     fontInstancer: FontInstancer
 
-    async def getDecomposedPath(self, transform: Transform | None = None) -> PackedPath:
+    async def decomposed(self, transform: Transform | None = None) -> StaticGlyph:
         assert isinstance(self.glyph.path, PackedPath)
         paths: list[PackedPath] = [
             (
@@ -498,9 +505,25 @@ class GlyphInstance:
                 else self.glyph.path.transformed(transform)
             )
         ]
+        anchors: list[Anchor] = (
+            self.glyph.anchors
+            if transform is None
+            else [transformAnchor(anchor, transform) for anchor in self.glyph.anchors]
+        )
+
+        anchorsByName = {anchor.name: anchor for anchor in anchors}
+
+        compoAnchorsByName = {}
         for component in self.glyph.components:
-            paths.append(await self._getComponentPath(component, transform))
-        return joinPaths(paths)
+            compoGlyph = await self.decomposeComponent(component, transform)
+            assert isinstance(compoGlyph.path, PackedPath)
+            paths.append(compoGlyph.path)
+            for anchor in compoGlyph.anchors:
+                compoAnchorsByName[anchor.name] = anchor
+
+        anchors = list((compoAnchorsByName | anchorsByName).values())
+
+        return StaticGlyph(path=joinPaths(paths), anchors=anchors)
 
     async def drawPoints(
         self,
@@ -519,7 +542,8 @@ class GlyphInstance:
             self.glyph.components, self.componentTypes, strict=True
         ):
             if decomposeComponents or (isVarComponent and decomposeVarComponents):
-                paths.append(await self._getComponentPath(component))
+                compoGlyph = await self.decomposeComponent(component)
+                paths.append(compoGlyph.path)
             else:
                 components.append((component, isVarComponent))
 
@@ -536,22 +560,24 @@ class GlyphInstance:
             else:
                 pen.addComponent(component.name, component.transformation.toTransform())
 
-    async def _getComponentPath(
-        self, component, parentTransform: Transform | None = None
-    ) -> PackedPath:
+    async def decomposeComponent(
+        self,
+        component,
+        parentTransform: Transform | None = None,
+    ) -> StaticGlyph:
         try:
             instancer = await self.fontInstancer.getGlyphInstancer(component.name, True)
         except GlyphNotFoundError:
             self.fontInstancer.glyphError(
                 f"glyph {self.glyphName} references non-existing glyph: {component.name}"
             )
-            return PackedPath()
+            return StaticGlyph()
 
         instance = instancer.instantiate(self.parentLocation | component.location)
         transform = component.transformation.toTransform()
         if parentTransform is not None:
             transform = parentTransform.transform(transform)
-        return await instance.getDecomposedPath(transform)
+        return await instance.decomposed(transform)
 
     async def shallowDecomposeComponent(self, component: Component) -> StaticGlyph:
         try:
@@ -578,6 +604,11 @@ def transformComponent(component: Component, transform: Transform) -> Component:
             transform, component.transformation
         ),
     )
+
+
+def transformAnchor(anchor: Anchor, transform: Transform) -> Anchor:
+    x, y = transform.transformPoint((anchor.x, anchor.y))
+    return replace(anchor, x=x, y=y)
 
 
 @dataclass(kw_only=True)
@@ -702,6 +733,20 @@ def areCustomDatasCompatible(parents):
             return False
 
     return True
+
+
+def anchorsNeedSorting(layerGlyphs):
+    if not layerGlyphs:
+        return False
+
+    referenceAnchorNames = [a.name for a in layerGlyphs[0].anchors]
+
+    for layerGlyph in layerGlyphs[1:]:
+        anchorNames = [a.name for a in layerGlyph.anchors]
+        if anchorNames != referenceAnchorNames:
+            return True
+
+    return False
 
 
 @dataclass

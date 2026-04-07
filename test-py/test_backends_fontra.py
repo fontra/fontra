@@ -9,6 +9,8 @@ from fontra.backends import getFileSystemBackend, newFileSystemBackend
 from fontra.backends.copy import copyFont
 from fontra.backends.fontra import longestCommonPrefix
 from fontra.core.classes import ImageType, Kerning, OpenTypeFeatures
+from fontra.core.fonthandler import FontHandler
+from fontra.filesystem.projectmanager import FileSystemProjectManager
 
 dataDir = pathlib.Path(__file__).resolve().parent / "data"
 commonFontsDir = pathlib.Path(__file__).parent.parent / "test-common" / "fonts"
@@ -82,6 +84,14 @@ async def test_deleteGlyph(writableFontraFont):
     assert not writableFontraFont.getGlyphFilePath(glyphName).exists()
     reopenedFont = getFileSystemBackend(writableFontraFont.path)
     assert await reopenedFont.getGlyph(glyphName) is None
+
+
+async def test_deleteUnknownGlyph(writableFontraFont):
+    glyphName = "A.doesnotexist"
+    glyphMap = await writableFontraFont.getGlyphMap()
+    assert glyphName not in glyphMap
+    # .deleteGlyph() should *not* raise an error if glyphName doesn't exist
+    await writableFontraFont.deleteGlyph(glyphName)
 
 
 async def test_emptyFontraProject(tmpdir):
@@ -241,3 +251,79 @@ async def test_kerningEdgeCases(
             assert numLines == expectedNumLines
     else:
         assert not kerningPath.exists()
+
+
+async def test_externalChanges(writableFontraFont):
+    listenerFont = getFileSystemBackend(writableFontraFont.path)
+    listenerHandler = FontHandler(
+        backend=listenerFont,
+        projectIdentifier="test",
+        metaInfoProvider=FileSystemProjectManager(),
+    )
+
+    async with aclosing(listenerHandler):
+        await listenerHandler.startTasks()
+
+        glyphName = "A"
+
+        listenerGlyphMap = await listenerHandler.getGlyphMap()  # load in cache
+        listenerGlyph = await listenerHandler.getGlyph(glyphName)  # load in cache
+        listenerFontInfo = await listenerHandler.getFontInfo()  # load in cache
+        listenerKerning = await listenerHandler.getKerning()  # load in cache
+        listenerFeatures = await listenerHandler.getFeatures()  # load in cache
+
+        glyphMap = await writableFontraFont.getGlyphMap()
+        glyphMap[glyphName] = glyphMap[glyphName][:1]
+        glyph = await writableFontraFont.getGlyph(glyphName)
+        layerGlyph = glyph.layers[glyph.sources[0].layerName].glyph
+        layerGlyph.path.coordinates[0] = 999
+
+        fontInfo = await writableFontraFont.getFontInfo()
+        fontInfo.familyName += "TESTING"
+
+        kerning = await writableFontraFont.getKerning()
+        kerning["kern"].values["A"]["J"][1] = 999
+
+        features = await writableFontraFont.getFeatures()
+        features.text += "\n# TEST"
+
+        await writableFontraFont.putGlyph(glyphName, glyph, glyphMap[glyphName])
+        await writableFontraFont.putFontInfo(fontInfo)
+        await writableFontraFont.putKerning(kerning)
+        await writableFontraFont.putFeatures(features)
+
+        writableFontraFont.flush()
+
+        await asyncio.sleep(0.15)  # give the file watcher a moment to catch up
+
+        listenerGlyph = await listenerHandler.getGlyph(glyphName)
+        assert glyph == listenerGlyph
+
+        listenerFontInfo = await listenerHandler.getFontInfo()
+        assert fontInfo == listenerFontInfo
+
+        listenerKerning = await listenerHandler.getKerning()
+        assert kerning == listenerKerning
+
+        listenerFeatures = await listenerHandler.getFeatures()
+        assert features == listenerFeatures
+
+        listenerGlyphMap = await listenerHandler.getGlyphMap()
+        assert glyphMap == listenerGlyphMap
+
+
+async def test_putGlyphInfos(writableFontraFont):
+    newGlyphsInfos = {
+        "dot": {"category": "Mark", "subcategory": "Nonspacing"},
+        "A": {"subcategory": "Ligature"},
+        "B": {"custom": "anything"},
+    }
+
+    async with aclosing(writableFontraFont):
+        glyphInfos = await writableFontraFont.getGlyphInfos()
+        assert glyphInfos == {}
+        await writableFontraFont.putGlyphInfos(newGlyphsInfos)
+
+    reopenedFont = getFileSystemBackend(writableFontraFont.path)
+    glyphInfos = await reopenedFont.getGlyphInfos()
+    assert glyphInfos == newGlyphsInfos

@@ -4,6 +4,7 @@ import sys
 from dataclasses import dataclass, field, is_dataclass, replace
 from enum import Enum
 from functools import partial
+from types import NoneType
 from typing import Any, Optional, Union, get_args, get_origin, get_type_hints
 
 import cattrs
@@ -75,6 +76,7 @@ class Font:
     fontInfo: FontInfo = field(default_factory=FontInfo)
     glyphs: dict[str, VariableGlyph] = field(default_factory=dict)
     glyphMap: dict[str, list[int]] = field(default_factory=dict)
+    glyphInfos: CustomData = field(default_factory=dict)
     axes: Axes = field(default_factory=Axes)
     sources: dict[str, FontSource] = field(default_factory=dict)
     kerning: dict[str, Kerning] = field(default_factory=dict)
@@ -215,8 +217,8 @@ class BackgroundImage:
     customData: CustomData = field(default_factory=dict)
 
 
-# The ImageType and ImageData classes aren't part of the Font data structure,
-# but are used in the backend protocol.
+# The ImageType, ImageData, ShaperFontGlyphOrderSorting and ShaperFontData classes aren't part of
+# the Font data structure, but are used in the backend protocol.
 
 
 class ImageType(str, Enum):
@@ -228,6 +230,18 @@ class ImageType(str, Enum):
 @dataclass(kw_only=True)
 class ImageData:
     type: ImageType
+    data: bytes
+
+
+class ShaperFontGlyphOrderSorting(str, Enum):
+    # TODO: use StrEnum once we drop support for Python 3.10
+    FROMGLYPHMAP = "from-glyph-map"
+    SORTING = "sorted"
+
+
+@dataclass(kw_only=True)
+class ShaperFontData:
+    glyphOrderSorting: ShaperFontGlyphOrderSorting
     data: bytes
 
 
@@ -247,6 +261,11 @@ class StaticGlyph:
 
     def convertToPaths(self):
         return replace(self, path=self.path.asPath())
+
+    @property
+    def packedPath(self) -> PackedPath:
+        assert isinstance(self.path, PackedPath)
+        return self.path
 
 
 @dataclass(kw_only=True)
@@ -305,7 +324,7 @@ def makeSchema(*classes, schema=None):
             fieldDef = dict(type=tp)
             if is_dataclass(tp):
                 makeSchema(tp, schema=schema)
-            elif tp.__name__ == "Optional":
+            elif isOptionalType(tp):
                 [subtype, _] = get_args(tp)
                 fieldDef["type"] = subtype
                 fieldDef["optional"] = True
@@ -334,6 +353,21 @@ def makeSchema(*classes, schema=None):
                 makeSchema(tp, schema=schema)
             classFields[name] = fieldDef
     return schema
+
+
+def isOptionalType(tp):
+    if tp.__name__ == "Optional":
+        # type is spelled as Optional[sometype] in Python <= 3.13
+        return True
+
+    if tp.__name__ != "Union":
+        return False
+
+    # type is spelled as Optional[sometype] in Python >= 3.14
+    # *or* as sometype | None
+    assert tp.__name__ == "Union"
+    args = get_args(tp)
+    return len(args) == 2 and args[1] is NoneType
 
 
 # cattrs hooks + structure/unstructure support

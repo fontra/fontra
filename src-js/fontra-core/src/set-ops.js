@@ -103,3 +103,10 @@ export function setPopFirst(set) {
   set.delete(firstItem);
   return firstItem;
 }
+
+export function firstItemOfSet(set) {
+  // Return the first item of the set
+  for (const firstItem of set) {
+    return firstItem;
+  }
+}

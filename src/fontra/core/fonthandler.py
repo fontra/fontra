@@ -131,7 +131,7 @@ class FontHandler:
             writeKey, (writeFunc, connection, reloadPattern) = popFirstItem(
                 self._dataScheduledForWriting
             )
-            logger.info(f"write {writeKey} to backend")
+            logger.info(f"write to backend -- {funcName(writeFunc)} {writeKey}")
             try:
                 await writeFunc()
             except Exception as e:
@@ -216,6 +216,8 @@ class FontHandler:
                 value = await self.backend.getAxes()
             case "glyphMap":
                 value = await self.backend.getGlyphMap()
+            case "glyphInfos":
+                value = await self.backend.getGlyphInfos()
             case "customData":
                 value = await self.backend.getCustomData()
             case "unitsPerEm":
@@ -260,9 +262,13 @@ class FontHandler:
                 raise KeyError(key)
 
     @remoteMethod
-    async def getGlyphMap(self, *, connection):
+    async def getGlyphMap(self, *, connection=None):
         self.glyphMap = await self.getData("glyphMap")
         return self.glyphMap
+
+    @remoteMethod
+    async def getGlyphInfos(self, *, connection=None):
+        return await self.getData("glyphInfos")
 
     @remoteMethod
     async def getFontInfo(self, *, connection=None) -> FontInfo:
@@ -273,27 +279,27 @@ class FontHandler:
         return await self.getData("sources")
 
     @remoteMethod
-    async def getAxes(self, *, connection):
+    async def getAxes(self, *, connection=None):
         return await self.getData("axes")
 
     @remoteMethod
-    async def getUnitsPerEm(self, *, connection):
+    async def getUnitsPerEm(self, *, connection=None):
         return await self.getData("unitsPerEm")
 
     @remoteMethod
-    async def getFeatures(self, *, connection):
+    async def getFeatures(self, *, connection=None):
         return await self.getData("features")
 
     @remoteMethod
-    async def getKerning(self, *, connection):
+    async def getKerning(self, *, connection=None):
         return await self.getData("kerning")
 
     @remoteMethod
-    async def getCustomData(self, *, connection):
+    async def getCustomData(self, *, connection=None):
         return await self.getData("customData")
 
     @remoteMethod
-    async def getMetaInfo(self, *, connection):
+    async def getMetaInfo(self, *, connection=None):
         return await self.getData("metaInfo", connection=connection)
 
     @remoteMethod
@@ -307,6 +313,16 @@ class FontHandler:
             return None
         return dict(
             type=imageData.type, data=base64.b64encode(imageData.data).decode("ascii")
+        )
+
+    @remoteMethod
+    async def getShaperFontData(self, *, connection=None) -> dict | None:
+        shaperFontData = await self.backend.getShaperFontData()
+        if shaperFontData is None:
+            return None
+        return dict(
+            type=shaperFontData.glyphOrderSorting,
+            data=base64.b64encode(shaperFontData.data).decode("ascii"),
         )
 
     def _getClientData(self, connection, key, default=None):
@@ -649,6 +665,14 @@ def computeGlyphMapChange(glyphMapA, glyphMapB):
     diffGlyphNames = set()
 
     while True:
+        if indexA >= len(itemsA):
+            diffGlyphNames.update(item[0] for item in itemsB[indexB:])
+            break
+
+        if indexB >= len(itemsB):
+            diffGlyphNames.update(item[0] for item in itemsA[indexA:])
+            break
+
         itemA = itemsA[indexA]
         itemB = itemsB[indexB]
 
@@ -662,14 +686,6 @@ def computeGlyphMapChange(glyphMapA, glyphMapB):
             # itemA > itemB
             diffGlyphNames.add(itemB[0])
             indexB += 1
-
-        if indexA >= len(itemsA):
-            diffGlyphNames.update(item[0] for item in itemsB[indexB:])
-            break
-
-        if indexB >= len(itemsB):
-            diffGlyphNames.update(item[0] for item in itemsA[indexA:])
-            break
 
     glyphMapUpdates = {}
 
@@ -700,3 +716,12 @@ def makeGlyphMapChange(glyphMapUpdates):
         glyphMapChange["c"] = changes
 
     return glyphMapChange
+
+
+def funcName(f, fallback="unknown"):
+    if hasattr(f, "func"):
+        f = f.func
+    try:
+        return f.__name__
+    except AttributeError:
+        return fallback

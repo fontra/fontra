@@ -1,5 +1,5 @@
 import { VariationError } from "./errors.js";
-import { enumerate, isObjectEmpty, product, range, zip } from "./utils.js";
+import { assert, enumerate, isObjectEmpty, product, range, zip } from "./utils.js";
 import {
   VariationModel,
   makeSparseNormalizedLocation,
@@ -73,6 +73,10 @@ export class DiscreteVariationModel {
   }
 
   _getModel(key) {
+    if (!this._originalLocations.length) {
+      throw new VariationError("invalid interpolation model: there are no locations");
+    }
+
     let cachedModelInfo = this._models[key];
     if (!cachedModelInfo) {
       let model;

@@ -1,0 +1,75 @@
+{
+"fontInfo": {
+"familyName": "Cursive Attachment"
+},
+"sources": {
+"default": {
+"name": "Regular",
+"lineMetricsHorizontalLayout": {
+"ascender": {
+"value": 750,
+"zone": 16
+},
+"capHeight": {
+"value": 750,
+"zone": 16
+},
+"xHeight": {
+"value": 500,
+"zone": 16
+},
+"descender": {
+"value": -250,
+"zone": -16
+},
+"baseline": {
+"value": 0,
+"zone": -16
+}
+},
+"customData": {
+"postscriptBlueValues": [],
+"postscriptFamilyBlues": [],
+"postscriptFamilyOtherBlues": [],
+"postscriptOtherBlues": [],
+"postscriptStemSnapH": [],
+"postscriptStemSnapV": []
+}
+}
+},
+"customData": {
+"com.typemytype.robofont.compileSettings.autohint": true,
+"com.typemytype.robofont.compileSettings.checkOutlines": false,
+"com.typemytype.robofont.compileSettings.createDummyDSIG": true,
+"com.typemytype.robofont.compileSettings.decompose": false,
+"com.typemytype.robofont.compileSettings.generateFormat": 0,
+"com.typemytype.robofont.compileSettings.releaseMode": false,
+"com.typemytype.robofont.italicSlantOffset": 0,
+"com.typemytype.robofont.shouldAddPointsInSplineConversion": 1,
+"public.glyphOrder": [
+"A",
+"B",
+"C",
+"space",
+"A.alt",
+"B.alt",
+"C.alt",
+"alef-ar",
+"beh-ar",
+"teh-ar",
+"H",
+"dotbelowcomb",
+"dotaccentcomb",
+".notdef",
+"macroncomb",
+"H_H"
+],
+"xyz.fontra.lineMetricsHorizontalLayout.zones": {
+"ascender": 16,
+"baseline": -16,
+"capHeight": 16,
+"descender": -16,
+"xHeight": 16
+}
+}
+}

@@ -2,59 +2,39 @@
 "name": "E",
 "sources": [
 {
-"name": "LightCondensed",
-"layerName": "MutatorSansLightCondensed/foreground",
-"location": {
-"italic": 0,
-"weight": 150,
-"width": 0
-},
+"name": "",
+"layerName": "light-condensed",
+"locationBase": "light-condensed",
 "customData": {
 "fontra.development.status": 4
 }
 },
 {
-"name": "BoldCondensed",
-"layerName": "MutatorSansBoldCondensed/foreground",
-"location": {
-"italic": 0,
-"weight": 850,
-"width": 0
-},
+"name": "",
+"layerName": "bold-condensed",
+"locationBase": "bold-condensed",
 "customData": {
 "fontra.development.status": 3
 }
 },
 {
-"name": "LightWide",
-"layerName": "MutatorSansLightWide/foreground",
-"location": {
-"italic": 0,
-"weight": 150,
-"width": 1000
-}
+"name": "",
+"layerName": "light-wide",
+"locationBase": "light-wide"
 },
 {
-"name": "BoldWide",
-"layerName": "MutatorSansBoldWide/foreground",
-"location": {
-"italic": 0,
-"weight": 850,
-"width": 1000
-}
+"name": "",
+"layerName": "bold-wide",
+"locationBase": "bold-wide"
 },
 {
-"name": "support.crossbar",
-"layerName": "MutatorSansLightCondensed/support.crossbar",
-"location": {
-"italic": 0,
-"weight": 595,
-"width": 0
-}
+"name": "",
+"layerName": "support.crossbar",
+"locationBase": "support.crossbar"
 }
 ],
 "layers": {
-"MutatorSansBoldCondensed/foreground": {
+"bold-condensed": {
 "glyph": {
 "path": {
 "contours": [
@@ -156,7 +136,7 @@
 ]
 }
 },
-"MutatorSansBoldWide/foreground": {
+"bold-wide": {
 "glyph": {
 "path": {
 "contours": [
@@ -256,7 +236,7 @@
 ]
 }
 },
-"MutatorSansLightCondensed/foreground": {
+"light-condensed": {
 "glyph": {
 "path": {
 "contours": [
@@ -362,107 +342,7 @@
 ]
 }
 },
-"MutatorSansLightCondensed/support.crossbar": {
-"glyph": {
-"path": {
-"contours": [
-{
-"points": [
-{
-"x": 45.68544,
-"y": 0
-},
-{
-"x": 264.61744,
-"y": 0
-},
-{
-"x": 264.61744,
-"y": 771.5728
-},
-{
-"x": 45.68544,
-"y": 771.5728
-}
-],
-"isClosed": true
-},
-{
-"points": [
-{
-"x": 115.78639999999999,
-"y": 568.092448
-},
-{
-"x": 504.61744,
-"y": 568.092448
-},
-{
-"x": 504.61744,
-"y": 771.5728
-},
-{
-"x": 115.78639999999999,
-"y": 771.5728
-}
-],
-"isClosed": true
-},
-{
-"points": [
-{
-"x": 115.78639999999999,
-"y": 0
-},
-{
-"x": 504.61744,
-"y": 0
-},
-{
-"x": 504.61744,
-"y": 203.48035199999998
-},
-{
-"x": 115.78639999999999,
-"y": 203.48035199999998
-}
-],
-"isClosed": true
-},
-{
-"points": [
-{
-"x": 116,
-"y": 297
-},
-{
-"x": 475,
-"y": 297
-},
-{
-"x": 475,
-"y": 479
-},
-{
-"x": 116,
-"y": 479
-}
-],
-"isClosed": true
-}
-]
-},
-"xAdvance": 551,
-"anchors": [
-{
-"name": "top",
-"x": 282.15144,
-"y": 813.99416
-}
-]
-}
-},
-"MutatorSansLightWide/foreground": {
+"light-wide": {
 "glyph": {
 "path": {
 "contours": [
@@ -558,6 +438,106 @@
 "name": "top",
 "x": 532,
 "y": 746
+}
+]
+}
+},
+"support.crossbar": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": 45.68544,
+"y": 0
+},
+{
+"x": 264.61744,
+"y": 0
+},
+{
+"x": 264.61744,
+"y": 771.5728
+},
+{
+"x": 45.68544,
+"y": 771.5728
+}
+],
+"isClosed": true
+},
+{
+"points": [
+{
+"x": 115.78639999999999,
+"y": 568.092448
+},
+{
+"x": 504.61744,
+"y": 568.092448
+},
+{
+"x": 504.61744,
+"y": 771.5728
+},
+{
+"x": 115.78639999999999,
+"y": 771.5728
+}
+],
+"isClosed": true
+},
+{
+"points": [
+{
+"x": 115.78639999999999,
+"y": 0
+},
+{
+"x": 504.61744,
+"y": 0
+},
+{
+"x": 504.61744,
+"y": 203.48035199999998
+},
+{
+"x": 115.78639999999999,
+"y": 203.48035199999998
+}
+],
+"isClosed": true
+},
+{
+"points": [
+{
+"x": 116,
+"y": 297
+},
+{
+"x": 475,
+"y": 297
+},
+{
+"x": 475,
+"y": 479
+},
+{
+"x": 116,
+"y": 479
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 551,
+"anchors": [
+{
+"name": "top",
+"x": 282.15144,
+"y": 813.99416
 }
 ]
 }

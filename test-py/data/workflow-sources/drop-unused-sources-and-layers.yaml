@@ -1,0 +1,9 @@
+steps:
+  - input: fontra-read
+    source: test-py/data/workflow/input-drop-unused-sources-and-layers.fontra
+  - filter: subset-glyphs
+    glyphNames:
+      - S
+  - filter: drop-unused-sources-and-layers
+  - destination: output-drop-unused-sources-and-layers.fontra
+    output: fontra-write

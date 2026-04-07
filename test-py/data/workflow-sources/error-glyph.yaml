@@ -1,0 +1,11 @@
+steps:
+  - input: fontra-read
+    source: test-py/data/workflow/input-error-glyph.fontra
+  - destination: output-error-glyph.fontra
+    output: fontra-write
+test-info:
+  continue-on-error: true
+  expected-log:
+    - level: 40
+      message: "glyph A caused an error: JSONDecodeError('Expecting value: line 1 column
+        1 (char 0)')"

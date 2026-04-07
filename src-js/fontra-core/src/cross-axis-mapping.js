@@ -5,6 +5,7 @@ import {
   VariationModel,
   makeSparseNormalizedLocation,
   normalizeLocation,
+  normalizeLocationSparse,
   unnormalizeLocation,
 } from "./var-model.js";
 
@@ -23,15 +24,16 @@ export class CrossAxisMapping {
     const outputLocations = [];
 
     for (const { inputLocation, outputLocation } of this.mappings) {
+      // Input locations must be maximally sparse
       inputLocations.push(
         makeSparseNormalizedLocation(
           normalizeLocation(inputLocation, this.fontAxesSourceSpace)
         )
       );
+      // Output locations do NOT have to be maximally sparse, as a normalized axis value
+      // of 0 is a valid output value, and is distinct from a *missing* output value
       outputLocations.push(
-        makeSparseNormalizedLocation(
-          normalizeLocation(outputLocation, this.fontAxesSourceSpace)
-        )
+        normalizeLocationSparse(outputLocation, this.fontAxesSourceSpace)
       );
     }
 
