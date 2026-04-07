@@ -304,16 +304,19 @@ class SubsetAxes(BaseFilter):
         if not substitutions.rules:
             return substitutions
 
-        axes = (await self.fontInstancer.fontSourcesInstancer).fontAxesSourceSpace
-        keepAxisNames = self.getAxisNamesToKeep(axes)
-        axesByName = {axis.name: axis for axis in axes}
+        instancer = await self.fontInstancer.fontSourcesInstancer
+        defaultSourceLocation = instancer.defaultSourceLocation
+        keepAxisNames = self.getAxisNamesToKeep(instancer.fontAxes)
+        locationToDrop = {
+            name: value
+            for name, value in defaultSourceLocation.items()
+            if name not in keepAxisNames
+        }
 
         newRules = [
             replace(
                 rule,
-                conditionSets=filterConditionSets(
-                    rule.conditionSets, axesByName, keepAxisNames
-                ),
+                conditionSets=filterConditionSets(rule.conditionSets, locationToDrop),
             )
             for rule in substitutions.rules
         ]
@@ -324,16 +327,14 @@ class SubsetAxes(BaseFilter):
 
 
 def filterConditionSets(
-    conditionSets: list[SubstitutionConditionSet],
-    axesByName: dict[str, FontAxis],
-    keepAxisNames: set,
+    conditionSets: list[SubstitutionConditionSet], locationToDrop: dict[str, float]
 ) -> list[SubstitutionConditionSet]:
     newConditionSets = []
 
     conditionSet: SubstitutionConditionSet | None
 
     for conditionSet in conditionSets:
-        conditionSet = filterConditionSet(conditionSet, axesByName, keepAxisNames)
+        conditionSet = filterConditionSet(conditionSet, locationToDrop)
         if conditionSet is not None:
             newConditionSets.append(conditionSet)
 
@@ -341,28 +342,19 @@ def filterConditionSets(
 
 
 def filterConditionSet(
-    conditionSet: SubstitutionConditionSet,
-    axesByName: dict[str, FontAxis],
-    keepAxisNames: set,
+    conditionSet: SubstitutionConditionSet, locationToDrop: dict[str, float]
 ) -> SubstitutionConditionSet | None:
     newConditions = []
 
     for condition in conditionSet.conditions:
-        if condition.name not in axesByName:
-            continue
-
-        if condition.name not in keepAxisNames:
+        value = locationToDrop.get(condition.name)
+        if value is not None:
             # This axis is being dropped. If the axis default value is *not*
             # within the condition range, the condition is False and we return
             # None. If it is, then it depends on the other conditions in the set.
             # Note: An empty conditionSet is considered True.
-            axis = axesByName[condition.name]
-            if (
-                condition.minValue is not None
-                and condition.minValue > axis.defaultValue
-            ) or (
-                condition.maxValue is not None
-                and axis.defaultValue > condition.maxValue
+            if (condition.minValue is not None and value < condition.minValue) or (
+                condition.maxValue is not None and value > condition.maxValue
             ):
                 return None
         else:
