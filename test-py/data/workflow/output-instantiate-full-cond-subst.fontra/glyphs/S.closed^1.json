@@ -1,0 +1,241 @@
+{
+"name": "S.closed",
+"sources": [
+{
+"name": "default",
+"layerName": "default"
+}
+],
+"layers": {
+"default": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": 726,
+"y": 194,
+"smooth": true
+},
+{
+"x": 726,
+"y": 319,
+"type": "cubic"
+},
+{
+"x": 651,
+"y": 382,
+"type": "cubic"
+},
+{
+"x": 463,
+"y": 411,
+"smooth": true
+},
+{
+"x": 327,
+"y": 431,
+"smooth": true
+},
+{
+"x": 217,
+"y": 452,
+"type": "cubic"
+},
+{
+"x": 170,
+"y": 483,
+"type": "cubic"
+},
+{
+"x": 170,
+"y": 542,
+"smooth": true
+},
+{
+"x": 170,
+"y": 600,
+"type": "cubic"
+},
+{
+"x": 218,
+"y": 640,
+"type": "cubic"
+},
+{
+"x": 350,
+"y": 640,
+"smooth": true
+},
+{
+"x": 419,
+"y": 640,
+"smooth": true
+},
+{
+"x": 545,
+"y": 640,
+"type": "cubic"
+},
+{
+"x": 583,
+"y": 598,
+"type": "cubic"
+},
+{
+"x": 587,
+"y": 496
+},
+{
+"x": 701,
+"y": 496
+},
+{
+"x": 698,
+"y": 665,
+"type": "cubic"
+},
+{
+"x": 627,
+"y": 738,
+"type": "cubic"
+},
+{
+"x": 414,
+"y": 738,
+"smooth": true
+},
+{
+"x": 365,
+"y": 738,
+"smooth": true
+},
+{
+"x": 152,
+"y": 738,
+"type": "cubic"
+},
+{
+"x": 58,
+"y": 661,
+"type": "cubic"
+},
+{
+"x": 59,
+"y": 532,
+"smooth": true
+},
+{
+"x": 59,
+"y": 409,
+"type": "cubic"
+},
+{
+"x": 137,
+"y": 348,
+"type": "cubic"
+},
+{
+"x": 317,
+"y": 318,
+"smooth": true
+},
+{
+"x": 453,
+"y": 297,
+"smooth": true
+},
+{
+"x": 568,
+"y": 273,
+"type": "cubic"
+},
+{
+"x": 614,
+"y": 249,
+"type": "cubic"
+},
+{
+"x": 614,
+"y": 189,
+"smooth": true
+},
+{
+"x": 614,
+"y": 127,
+"type": "cubic"
+},
+{
+"x": 563,
+"y": 87,
+"type": "cubic"
+},
+{
+"x": 421,
+"y": 87,
+"smooth": true
+},
+{
+"x": 352,
+"y": 87,
+"smooth": true
+},
+{
+"x": 228,
+"y": 87,
+"type": "cubic"
+},
+{
+"x": 158,
+"y": 127,
+"type": "cubic"
+},
+{
+"x": 158,
+"y": 233
+},
+{
+"x": 49,
+"y": 233
+},
+{
+"x": 50,
+"y": 51,
+"type": "cubic"
+},
+{
+"x": 147,
+"y": -9,
+"type": "cubic"
+},
+{
+"x": 351,
+"y": -9,
+"smooth": true
+},
+{
+"x": 401,
+"y": -9,
+"smooth": true
+},
+{
+"x": 637,
+"y": -9,
+"type": "cubic"
+},
+{
+"x": 727,
+"y": 74,
+"type": "cubic"
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 774
+}
+}
+}
+}

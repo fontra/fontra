@@ -1,0 +1,55 @@
+{
+"fontInfo": {
+"familyName": "MutatorMathTest",
+"versionMajor": 1,
+"versionMinor": 2,
+"copyright": "License same as MutatorMath. BSD 3-clause. [test-token: C]",
+"licenseDescription": "License same as MutatorMath. BSD 3-clause. [test-token: C]",
+"vendorID": "LTTR"
+},
+"sources": {
+"7505d64a": {
+"name": "default",
+"lineMetricsHorizontalLayout": {
+"ascender": {
+"value": 725,
+"zone": 16
+},
+"capHeight": {
+"value": 725,
+"zone": 16
+},
+"xHeight": {
+"value": 500,
+"zone": 16
+},
+"descender": {
+"value": -200,
+"zone": -16
+},
+"baseline": {
+"value": 0,
+"zone": -16
+}
+}
+}
+},
+"conditionalSubstitutions": {
+"featureTags": [
+"rclt"
+],
+"rules": [
+{
+"name": "fold_S_terminals",
+"conditionSets": [
+{
+"conditions": []
+}
+],
+"substitutions": {
+"S": "S.closed"
+}
+}
+]
+}
+}

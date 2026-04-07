@@ -1,0 +1,17 @@
+TYPE
+kern
+
+GROUPS1
+A;A
+
+GROUPS2
+A;A
+
+VALUES
+side1;side2;7505d64a
+B;A;-3
+B;S;-9
+B;@A;-8
+S;A;-3
+S;S;-15
+S;@A;-14
