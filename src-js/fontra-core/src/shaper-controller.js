@@ -4,6 +4,7 @@ import { getGlyphInfoFromCodePoint, getGlyphInfoFromGlyphName } from "./glyph-da
 import { ObservableController } from "./observable-object.js";
 import { getShaper } from "./shaper.js";
 import { consolidateCalls, scheduleCalls } from "./utils.js";
+import { piecewiseLinearMap } from "./var-model.js";
 
 export class ShaperController {
   constructor(fontController, applicationSettingsController) {
@@ -166,6 +167,10 @@ export class ShaperController {
 
   async buildShaperFont(glyphOrder) {
     const features = await this.fontController.getFeatures();
+    const conditionalSubstitutions = prepareConditionalSubstitutions(
+      await this.fontController.getConditionalSubstitutions(),
+      this.fontController.fontAxes
+    );
 
     const glyphClasses = await this.getGlyphClasses();
 
@@ -182,7 +187,8 @@ export class ShaperController {
             defaultValue: axis.defaultValue,
             maxValue: axis.maxValue,
           })),
-        glyphClasses
+        glyphClasses,
+        [conditionalSubstitutions]
       );
     } catch (e) {
       console.error(e);
@@ -311,4 +317,37 @@ function ensureNotdef(glyphOrder) {
     glyphOrder.splice(index, 1);
   }
   glyphOrder.unshift(".notdef");
+}
+
+function prepareConditionalSubstitutions(substitutions, fontAxes) {
+  const axesByName = Object.fromEntries(fontAxes.map((axis) => [axis.name, axis]));
+  const mapFuncs = Object.fromEntries(
+    fontAxes.map((axis) => {
+      const mapping = axis.mapping
+        ? Object.fromEntries(axis.mapping.map(([a, b]) => [b, a]))
+        : null;
+      return [axis.name, mapping ? (v) => piecewiseLinearMap(v, mapping) : (v) => v];
+    })
+  );
+
+  const getMapFunc = (axisName) => mapFuncs[axisName] ?? ((v) => v);
+
+  return {
+    featureTags: substitutions.featureTags,
+    rules: substitutions.rules.map(({ conditionSets, substitutions }) => [
+      conditionSets.map(({ conditions }) =>
+        Object.fromEntries(
+          conditions.map(({ name, minValue, maxValue }) => {
+            const axis = axesByName[name];
+            const mapFunc = getMapFunc(name);
+            return [
+              axis.tag,
+              [mapFunc(minValue ?? axis.minValue), mapFunc(maxValue ?? axis.maxValue)],
+            ];
+          })
+        )
+      ),
+      substitutions,
+    ]),
+  };
 }

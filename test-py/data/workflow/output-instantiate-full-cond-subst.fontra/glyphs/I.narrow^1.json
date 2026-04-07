@@ -1,0 +1,41 @@
+{
+"name": "I.narrow",
+"sources": [
+{
+"name": "default",
+"layerName": "default"
+}
+],
+"layers": {
+"default": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": 74,
+"y": 0
+},
+{
+"x": 194,
+"y": 0
+},
+{
+"x": 194,
+"y": 725
+},
+{
+"x": 74,
+"y": 725
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 267
+}
+}
+}
+}

@@ -163,6 +163,7 @@ export class FontController {
         glyphInfos: "getGlyphInfos",
         features: "getFeatures",
         kerning: "getKerning",
+        conditionalSubstitutions: "getConditionalSubstitutions",
       };
       const methodName = methods[key];
       if (!methodName) {
@@ -187,6 +188,10 @@ export class FontController {
 
   async getKerning() {
     return await this.getData("kerning");
+  }
+
+  async getConditionalSubstitutions() {
+    return await this.getData("conditionalSubstitutions");
   }
 
   async getSources() {

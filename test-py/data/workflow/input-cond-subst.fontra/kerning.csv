@@ -1,0 +1,17 @@
+TYPE
+kern
+
+GROUPS1
+A;A
+
+GROUPS2
+A;A
+
+VALUES
+side1;side2;light-condensed;bold-condensed;light-wide;bold-wide;light-condensed-italic
+B;A;;-20;;;
+B;S;;-10;-25;;
+B;@A;;;-25;;
+S;A;;-20;;;
+S;S;;-10;-45;;
+S;@A;;;-45;;

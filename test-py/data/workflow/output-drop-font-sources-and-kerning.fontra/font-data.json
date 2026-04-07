@@ -38,5 +38,51 @@
 "defaultValue": 0
 }
 ]
+},
+"conditionalSubstitutions": {
+"featureTags": [
+"rclt"
+],
+"rules": [
+{
+"name": "rule_A_B",
+"conditionSets": [
+{
+"conditions": [
+{
+"name": "weight",
+"minValue": 100,
+"maxValue": 500
+}
+]
+}
+],
+"substitutions": {
+"A": "B"
+}
+},
+{
+"name": "rule_B_A",
+"conditionSets": [
+{
+"conditions": [
+{
+"name": "width",
+"minValue": 600,
+"maxValue": 700
+},
+{
+"name": "weight",
+"minValue": 200,
+"maxValue": 300
+}
+]
+}
+],
+"substitutions": {
+"B": "A"
+}
+}
+]
 }
 }

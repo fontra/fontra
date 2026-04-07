@@ -1776,6 +1776,42 @@ describe("shaper tests compare emulation with native", () => {
   }
 });
 
+describe("test conditional substitutions", () => {
+  it("test conditional substitutions", async () => {
+    const testFontPath = moduleDirName.parent.parent.parent.joinPath(
+      "test-common",
+      "fonts",
+      "MutatorSans.fontra"
+    );
+
+    const shapeFunc = await getEmulatedShapeFuncForPath(testFontPath);
+
+    const inputCodePoints = [..."IS"].map(ord);
+
+    const { glyphs: glyphs1 } = await shapeFunc(inputCodePoints);
+    const glyphNames1 = glyphs1.map((g) => g.glyphname);
+    expect(glyphNames1).to.deep.equal(["I.narrow", "S.closed"]);
+
+    const { glyphs: glyphs2 } = await shapeFunc(inputCodePoints, {
+      variations: { wght: 800, wdth: 800 },
+    });
+    const glyphNames2 = glyphs2.map((g) => g.glyphname);
+    expect(glyphNames2).to.deep.equal(["I", "S"]);
+
+    const { glyphs: glyphs3 } = await shapeFunc(inputCodePoints, {
+      variations: { wdth: 800 },
+    });
+    const glyphNames3 = glyphs3.map((g) => g.glyphname);
+    expect(glyphNames3).to.deep.equal(["I", "S.closed"]);
+
+    const { glyphs: glyphs4 } = await shapeFunc(inputCodePoints, {
+      variations: { wght: 800 },
+    });
+    const glyphNames4 = glyphs4.map((g) => g.glyphname);
+    expect(glyphNames4).to.deep.equal(["I.narrow", "S"]);
+  });
+});
+
 function stripGlyphIDs(glyphs) {
   return glyphs.map((glyph) => {
     glyph = { ...glyph };

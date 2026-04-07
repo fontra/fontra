@@ -13,6 +13,7 @@ from typing import Any, Callable, Sequence
 from ..core.async_property import async_property
 from ..core.classes import (
     Axes,
+    ConditionalSubstitutions,
     Font,
     FontInfo,
     FontSource,
@@ -200,6 +201,15 @@ class FontraBackend(WatchableBackend, WritableBaseBackend):
         assert isinstance(features, OpenTypeFeatures)
         self.fontData.features = deepcopy(features)
         self._scheduler.schedule(self._writeFeatures)
+
+    async def getConditionalSubstitutions(self) -> ConditionalSubstitutions:
+        return deepcopy(self.fontData.conditionalSubstitutions)
+
+    async def putConditionalSubstitutions(
+        self, substitutions: ConditionalSubstitutions
+    ) -> None:
+        self.fontData.conditionalSubstitutions = deepcopy(substitutions)
+        self._scheduler.schedule(self._writeFontData)
 
     async def getBackgroundImage(self, imageIdentifier: str) -> ImageData | None:
         for imageType in [ImageType.PNG, ImageType.JPEG]:

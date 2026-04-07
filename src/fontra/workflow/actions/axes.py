@@ -12,12 +12,14 @@ from fontTools.varLib.models import piecewiseLinearMap
 from ...core.async_property import async_cached_property
 from ...core.classes import (
     Axes,
+    ConditionalSubstitutions,
     DiscreteFontAxis,
     FontAxis,
     FontSource,
     GlyphSource,
     Kerning,
     Layer,
+    SubstitutionConditionSet,
     VariableGlyph,
     structure,
     unstructure,
@@ -296,6 +298,88 @@ class SubsetAxes(BaseFilter):
         mapping = {sourceIdentifier: sourceIdentifier for sourceIdentifier in sources}
         return mapKerningSourcesAndFilter(kerning, mapping)
 
+    async def processConditionalSubstitutions(
+        self, substitutions: ConditionalSubstitutions
+    ) -> ConditionalSubstitutions:
+        if not substitutions.rules:
+            return substitutions
+
+        instancer = await self.fontInstancer.fontSourcesInstancer
+        defaultSourceLocation = instancer.defaultSourceLocation
+        keepAxisNames = self.getAxisNamesToKeep(instancer.fontAxes)
+        locationToDrop = {
+            name: value
+            for name, value in defaultSourceLocation.items()
+            if name not in keepAxisNames
+        }
+
+        filterFunc = partial(filterSubstitutionCondition, locationToDrop)
+        return filterConditionalSubstitutions(substitutions, filterFunc)
+
+
+def filterSubstitutionCondition(locationToDrop, condition):
+    value = locationToDrop.get(condition.name)
+    if value is not None:
+        # This axis is being dropped. If the axis default value is *not*
+        # within the condition range, the condition is False and we return
+        # None. If it is, then it depends on the other conditions in the set.
+        # Note: An empty conditionSet is considered True.
+        if (condition.minValue is not None and value < condition.minValue) or (
+            condition.maxValue is not None and value > condition.maxValue
+        ):
+            return None, True
+        else:
+            return None, False
+
+    return condition, None
+
+
+def filterConditionalSubstitutions(substitutions, filterFunc):
+    newRules = [
+        replace(
+            rule,
+            conditionSets=filterConditionSets(rule.conditionSets, filterFunc),
+        )
+        for rule in substitutions.rules
+    ]
+
+    newRules = [rule for rule in newRules if rule.conditionSets]
+
+    return replace(substitutions, rules=newRules)
+
+
+def filterConditionSets(
+    conditionSets: list[SubstitutionConditionSet], filterFunc
+) -> list[SubstitutionConditionSet]:
+    newConditionSets = []
+
+    conditionSet: SubstitutionConditionSet | None
+
+    for conditionSet in conditionSets:
+        conditionSet = filterConditionSet(conditionSet, filterFunc)
+        if conditionSet is not None:
+            newConditionSets.append(conditionSet)
+
+    return newConditionSets
+
+
+def filterConditionSet(
+    conditionSet: SubstitutionConditionSet, filterFunc
+) -> SubstitutionConditionSet | None:
+    newConditions = []
+
+    for condition in conditionSet.conditions:
+        condition, isFalse = filterFunc(condition)
+        if condition is not None:
+            newConditions.append(condition)
+        elif isFalse:
+            # The condition is always false, tell our caller
+            return None
+        # else:
+        #   The condition is always true, keep going
+
+    return replace(conditionSet, conditions=newConditions)
+
 
 def getDefaultSourceLocation(axes):
     return {
@@ -427,6 +511,19 @@ class BaseMoveDefaultLocation(BaseFilter):
 
     async def processKerning(self, kerning: dict[str, Kerning]) -> dict[str, Kerning]:
         return await processKerningHelper(self, kerning)
+
+    async def processConditionalSubstitutions(
+        self, substitutions: ConditionalSubstitutions
+    ) -> ConditionalSubstitutions:
+        if not substitutions.rules:
+            return substitutions
+
+        locationToDrop = {
+            name: value for name, value in (await self.newDefaultSourceLocation).items()
+        }
+
+        filterFunc = partial(filterSubstitutionCondition, locationToDrop)
+        return filterConditionalSubstitutions(substitutions, filterFunc)
 
     def _filterAxisList(self, axes):
         raise NotImplementedError()
@@ -646,6 +743,37 @@ class TrimAxes(BaseFilter):
 
     async def processKerning(self, kerning: dict[str, Kerning]) -> dict[str, Kerning]:
         return await processKerningHelper(self, kerning)
+
+    async def processConditionalSubstitutions(
+        self, substitutions: ConditionalSubstitutions
+    ) -> ConditionalSubstitutions:
+        if not substitutions.rules:
+            return substitutions
+
+        _, trimmedRanges = await self._trimmedAxesAndSourceRanges
+
+        def filterFunc(condition):
+            rng = trimmedRanges.get(condition.name)
+            if rng is None:
+                return None, False  # ignore this condition
+
+            minValue = (
+                max(condition.minValue, rng.minValue)
+                if condition.minValue is not None
+                else None
+            )
+            maxValue = (
+                min(condition.maxValue, rng.maxValue)
+                if condition.maxValue is not None
+                else None
+            )
+            if minValue == maxValue:
+                # Range is empty now, this makes the entire condition set false
+                return None, True
+
+            return replace(condition, minValue=minValue, maxValue=maxValue), None
+
+        return filterConditionalSubstitutions(substitutions, filterFunc)
 
     async def getGlyph(self, glyphName: str) -> VariableGlyph:
         instancer = await self.fontInstancer.getGlyphInstancer(glyphName)

@@ -24,6 +24,7 @@ from fontra.core.classes import (
     Anchor,
     Axes,
     BackgroundImage,
+    ConditionalSubstitutions,
     CrossAxisMapping,
     FontAxis,
     FontInfo,
@@ -36,6 +37,9 @@ from fontra.core.classes import (
     LineMetric,
     OpenTypeFeatures,
     StaticGlyph,
+    SubstitionRule,
+    SubstitutionCondition,
+    SubstitutionConditionSet,
     unstructure,
 )
 
@@ -1745,6 +1749,57 @@ async def test_noWriteOnRead(writableTestFont):
 
         metaInfoTextAfter = metaInfoPath.read_text()
         assert metaInfoTextBefore != metaInfoTextAfter
+
+
+expectedConditionalSubstitutions = ConditionalSubstitutions(
+    featureTags=["rclt"],
+    rules=[
+        SubstitionRule(
+            name="fold_I_serifs",
+            conditionSets=[
+                SubstitutionConditionSet(
+                    conditions=[
+                        SubstitutionCondition(
+                            name="width", minValue=0.0, maxValue=328.0
+                        )
+                    ]
+                )
+            ],
+            substitutions={"I": "I.narrow"},
+        ),
+        SubstitionRule(
+            name="fold_S_terminals",
+            conditionSets=[
+                SubstitutionConditionSet(
+                    conditions=[
+                        SubstitutionCondition(
+                            name="width", minValue=0.0, maxValue=1000.0
+                        ),
+                        SubstitutionCondition(
+                            name="weight", minValue=0.0, maxValue=500.0
+                        ),
+                    ]
+                )
+            ],
+            substitutions={"S": "S.closed"},
+        ),
+    ],
+)
+
+
+async def test_readWriteConditionalSubstitutions(writableTestFont):
+    substitutions = await writableTestFont.getConditionalSubstitutions()
+    assert substitutions == expectedConditionalSubstitutions
+
+    modfiedExpected = deepcopy(expectedConditionalSubstitutions)
+    modfiedExpected.rules[1].substitutions["A"] = "B"
+
+    await writableTestFont.putConditionalSubstitutions(modfiedExpected)
+    await writableTestFont.aclose()
+
+    reopenedFont = getFileSystemBackend(writableTestFont.path)
+    reopenedSubstitutions = await reopenedFont.getConditionalSubstitutions()
+    assert reopenedSubstitutions == modfiedExpected
 
 
 def fileNamesFromDir(path):

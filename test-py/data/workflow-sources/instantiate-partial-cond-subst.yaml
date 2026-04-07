@@ -1,0 +1,13 @@
+steps:
+  - input: fontra-read
+    source: test-py/data/workflow/input-cond-subst.fontra
+  - axisNames:
+      - weight
+      - width
+    filter: subset-axes
+  - filter: instantiate
+    location:
+      width: 200
+  - filter: round-coordinates
+  - destination: output-instantiate-partial-cond-subst.fontra
+    output: fontra-write

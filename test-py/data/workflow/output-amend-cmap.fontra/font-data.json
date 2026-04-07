@@ -106,5 +106,29 @@
 }
 }
 }
+},
+"conditionalSubstitutions": {
+"featureTags": [
+"rclt"
+],
+"rules": [
+{
+"name": "rule_A_B",
+"conditionSets": [
+{
+"conditions": [
+{
+"name": "weight",
+"minValue": 100,
+"maxValue": 500
+}
+]
+}
+],
+"substitutions": {
+"A": "B"
+}
+}
+]
 }
 }

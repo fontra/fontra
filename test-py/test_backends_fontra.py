@@ -2,13 +2,22 @@ import asyncio
 import pathlib
 import shutil
 from contextlib import aclosing
+from copy import deepcopy
 
 import pytest
 
 from fontra.backends import getFileSystemBackend, newFileSystemBackend
 from fontra.backends.copy import copyFont
 from fontra.backends.fontra import longestCommonPrefix
-from fontra.core.classes import ImageType, Kerning, OpenTypeFeatures
+from fontra.core.classes import (
+    ConditionalSubstitutions,
+    ImageType,
+    Kerning,
+    OpenTypeFeatures,
+    SubstitionRule,
+    SubstitutionCondition,
+    SubstitutionConditionSet,
+)
 from fontra.core.fonthandler import FontHandler
 from fontra.filesystem.projectmanager import FileSystemProjectManager
 
@@ -327,3 +336,54 @@ async def test_putGlyphInfos(writableFontraFont):
     reopenedFont = getFileSystemBackend(writableFontraFont.path)
     glyphInfos = await reopenedFont.getGlyphInfos()
     assert glyphInfos == newGlyphsInfos
+
+
+expectedConditionalSubstitutions = ConditionalSubstitutions(
+    featureTags=["rclt"],
+    rules=[
+        SubstitionRule(
+            name="fold_I_serifs",
+            conditionSets=[
+                SubstitutionConditionSet(
+                    conditions=[
+                        SubstitutionCondition(
+                            name="width", minValue=0.0, maxValue=328.0
+                        )
+                    ]
+                )
+            ],
+            substitutions={"I": "I.narrow"},
+        ),
+        SubstitionRule(
+            name="fold_S_terminals",
+            conditionSets=[
+                SubstitutionConditionSet(
+                    conditions=[
+                        SubstitutionCondition(
+                            name="width", minValue=0.0, maxValue=1000.0
+                        ),
+                        SubstitutionCondition(
+                            name="weight", minValue=0.0, maxValue=500.0
+                        ),
+                    ]
+                )
+            ],
+            substitutions={"S": "S.closed"},
+        ),
+    ],
+)
+
+
+async def test_readWriteConditionalSubstitutions(writableFontraFont):
+    substitutions = await writableFontraFont.getConditionalSubstitutions()
+    assert substitutions == expectedConditionalSubstitutions
+
+    modfiedExpected = deepcopy(expectedConditionalSubstitutions)
+    modfiedExpected.rules[1].substitutions["A"] = "B"
+
+    await writableFontraFont.putConditionalSubstitutions(modfiedExpected)
+    await writableFontraFont.aclose()
+
+    reopenedFont = getFileSystemBackend(writableFontraFont.path)
+    reopenedSubstitutions = await reopenedFont.getConditionalSubstitutions()
+    assert reopenedSubstitutions == modfiedExpected

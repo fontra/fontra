@@ -102,6 +102,12 @@ export class FontraBackend {
     return this.fontData.unitsPerEm;
   }
 
+  async getConditionalSubstitutions() {
+    return (
+      this.fontData.conditionalSubstitutions ?? { featureTags: ["rclt"], rules: [] }
+    );
+  }
+
   async getKerning() {
     const kerningPath = this.path.joinPath(FontraBackend.kerningFileName);
     if (kerningPath.exists()) {

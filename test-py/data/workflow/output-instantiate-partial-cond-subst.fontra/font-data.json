@@ -1,0 +1,153 @@
+{
+"fontInfo": {
+"familyName": "MutatorMathTest",
+"versionMajor": 1,
+"versionMinor": 2,
+"copyright": "License same as MutatorMath. BSD 3-clause. [test-token: C]",
+"licenseDescription": "License same as MutatorMath. BSD 3-clause. [test-token: C]",
+"vendorID": "LTTR"
+},
+"axes": {
+"axes": [
+{
+"name": "weight",
+"label": "weight",
+"tag": "wght",
+"minValue": 100,
+"defaultValue": 100,
+"maxValue": 900,
+"mapping": [
+[
+100,
+150
+],
+[
+900,
+850
+]
+]
+}
+]
+},
+"sources": {
+"30916594": {
+"name": "weight=150",
+"location": {
+"weight": 150
+},
+"lineMetricsHorizontalLayout": {
+"ascender": {
+"value": 700,
+"zone": 16
+},
+"capHeight": {
+"value": 700,
+"zone": 16
+},
+"xHeight": {
+"value": 500,
+"zone": 16
+},
+"descender": {
+"value": -200,
+"zone": -16
+},
+"baseline": {
+"value": 0,
+"zone": -16
+}
+}
+},
+"6c8db0dd": {
+"name": "weight=595",
+"location": {
+"weight": 595
+},
+"lineMetricsHorizontalLayout": {
+"ascender": {
+"value": 764,
+"zone": 16
+},
+"capHeight": {
+"value": 764,
+"zone": 16
+},
+"xHeight": {
+"value": 500,
+"zone": 16
+},
+"descender": {
+"value": -200,
+"zone": -16
+},
+"baseline": {
+"value": 0,
+"zone": -16
+}
+}
+},
+"c196a981": {
+"name": "weight=850",
+"location": {
+"weight": 850
+},
+"lineMetricsHorizontalLayout": {
+"ascender": {
+"value": 800,
+"zone": 16
+},
+"capHeight": {
+"value": 800,
+"zone": 16
+},
+"xHeight": {
+"value": 500,
+"zone": 16
+},
+"descender": {
+"value": -200,
+"zone": -16
+},
+"baseline": {
+"value": 0,
+"zone": -16
+}
+}
+}
+},
+"conditionalSubstitutions": {
+"featureTags": [
+"rclt"
+],
+"rules": [
+{
+"name": "fold_I_serifs",
+"conditionSets": [
+{
+"conditions": []
+}
+],
+"substitutions": {
+"I": "I.narrow"
+}
+},
+{
+"name": "fold_S_terminals",
+"conditionSets": [
+{
+"conditions": [
+{
+"name": "weight",
+"minValue": 0,
+"maxValue": 500
+}
+]
+}
+],
+"substitutions": {
+"S": "S.closed"
+}
+}
+]
+}
+}

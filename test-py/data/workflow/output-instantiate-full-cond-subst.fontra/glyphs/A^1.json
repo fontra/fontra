@@ -1,0 +1,110 @@
+{
+"name": "A",
+"sources": [
+{
+"name": "default",
+"layerName": "default"
+}
+],
+"layers": {
+"default": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": 25,
+"y": 0
+},
+{
+"x": 129,
+"y": 0,
+"attrs": {
+"name": "test-name"
+}
+},
+{
+"x": 388,
+"y": 725,
+"attrs": {
+"identifier": "test-identifier"
+}
+},
+{
+"x": 297,
+"y": 725
+}
+],
+"isClosed": true
+},
+{
+"points": [
+{
+"x": 145,
+"y": 171
+},
+{
+"x": 611,
+"y": 171
+},
+{
+"x": 611,
+"y": 250
+},
+{
+"x": 145,
+"y": 250
+}
+],
+"isClosed": true
+},
+{
+"points": [
+{
+"x": 614,
+"y": 0
+},
+{
+"x": 748,
+"y": 0
+},
+{
+"x": 475,
+"y": 725
+},
+{
+"x": 350,
+"y": 725
+}
+],
+"isClosed": true
+},
+{
+"points": [
+{
+"x": 321,
+"y": 632
+},
+{
+"x": 440,
+"y": 632
+},
+{
+"x": 440,
+"y": 725
+},
+{
+"x": 321,
+"y": 725
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 775
+}
+}
+}
+}
