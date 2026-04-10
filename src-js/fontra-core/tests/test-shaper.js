@@ -1158,9 +1158,10 @@ feature liga {
   const { fontData, insertMarkers: markToLigatureInsertMarkers } = buildShaperFont(
     1000,
     markToLigatureInputGlyphOrder,
-    markToLigatureFeatureCode,
-    [],
-    markToLigatureGlyphClasses
+    {
+      featureSource: markToLigatureFeatureCode,
+      glyphClasses: markToLigatureGlyphClasses,
+    }
   );
 
   const testDataMarkToLigaturePositioning = [
@@ -1249,9 +1250,10 @@ table GDEF {
     const { fontData, insertMarkers } = buildShaperFont(
       1000,
       markToLigatureInputGlyphOrder,
-      gdefFeatureCode,
-      [],
-      markToLigatureGlyphClasses
+      {
+        featureSource: gdefFeatureCode,
+        glyphClasses: markToLigatureGlyphClasses,
+      }
     );
 
     expect(fontData).to.be.ok; // "truthy"
