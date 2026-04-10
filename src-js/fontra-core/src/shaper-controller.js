@@ -175,11 +175,9 @@ export class ShaperController {
     const glyphClasses = await this.getGlyphClasses();
 
     try {
-      return buildShaperFont(
-        this.fontController.unitsPerEm,
-        glyphOrder,
-        features.text,
-        this.fontController.axes.axes
+      return buildShaperFont(this.fontController.unitsPerEm, glyphOrder, {
+        featureSource: features.text,
+        axes: this.fontController.axes.axes
           .filter((axis) => !axis.values) // Filter out discrete axes
           .map((axis) => ({
             tag: axis.tag,
@@ -188,8 +186,8 @@ export class ShaperController {
             maxValue: axis.maxValue,
           })),
         glyphClasses,
-        [conditionalSubstitutions]
-      );
+        conditionalSubstitutions: [conditionalSubstitutions],
+      });
     } catch (e) {
       console.error(e);
       return {
