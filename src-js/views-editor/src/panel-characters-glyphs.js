@@ -239,6 +239,23 @@ export default class CharactersGlyphsPanel extends Panel {
       {
         key: "sourceLocation",
         title: "Feature source",
+        get: (item) => {
+          const parts = item.sourceLocation?.split(":");
+          if (parts && parts[0] == "<features>") {
+            const opentypeFeaturesURL = new URL(window.location);
+            opentypeFeaturesURL.pathname = "fontinfo.html";
+            opentypeFeaturesURL.hash = `#opentype-feature-code-panel#L${parts[1]}`;
+            return html.a(
+              {
+                href: opentypeFeaturesURL,
+                target: `fontra.fontinfo.${this.editorController.projectIdentifier}`,
+              },
+              [item.sourceLocation]
+            );
+          } else {
+            return item.sourceLocation;
+          }
+        },
       },
     ];
     this.shapingDebuggerList.appendStyle(`
@@ -246,6 +263,11 @@ export default class CharactersGlyphsPanel extends Panel {
         padding: 0em 0.2em 0em 0.2em;
         border-radius: 0.25em;
         font-family: monospace;
+      }
+
+      a {
+        color: unset;
+        text-decoration: unset;
       }
 
       .table-tag {
