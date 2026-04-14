@@ -228,10 +228,17 @@ export default class CharactersGlyphsPanel extends Panel {
     this.shapingDebuggerList.rowsElement.addEventListener("keydown", (event) =>
       this._shapingDebuggerHandleArrowLeftRight(event)
     );
+    this.shapingDebuggerList.showHeader = true;
     this.shapingDebuggerList.columnDescriptions = [
       {
         key: "formattedMessage",
         title: "Message",
+        width: 200,
+        minWidth: 100,
+      },
+      {
+        key: "sourceLocation",
+        title: "Feature source",
       },
     ];
     this.shapingDebuggerList.appendStyle(`
@@ -452,8 +459,6 @@ export default class CharactersGlyphsPanel extends Panel {
     // glyph index when doing RTL
     await this.sceneSettingsController.waitForKeyChange("positionedLines");
 
-    // const selectedMessage = this.sceneSettings.shapingDebuggerMessages[breakIndex];
-    // if (selectedMessage) {
     let selectedGlyph;
     const m = selectedMessage.message.match(/at (\d+(,\d+)*)/);
     if (m) {
