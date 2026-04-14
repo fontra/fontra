@@ -1,5 +1,9 @@
 # Changelog for Fontra
 
+## 2026-04-14 [version 2026.4.2]
+
+- [Windows] Add an .msi installer to the release assets. Contributed by Dr Anirban Mitra [Issue 209](https://github.com/fontra/fontra-pak/issues/209), [PR 238](https://github.com/fontra/fontra-pak/pull/238)
+
 ## 2026-04-08 [version 2026.4.1]
 
 ### New features
