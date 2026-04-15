@@ -244,7 +244,7 @@ export default class CharactersGlyphsPanel extends Panel {
           if (match) {
             const opentypeFeaturesURL = new URL(window.location);
             opentypeFeaturesURL.pathname = "fontinfo.html";
-            opentypeFeaturesURL.hash = `#opentype-feature-code-panel#L${match[1]}`;
+            opentypeFeaturesURL.hash = `#opentype-feature-code-panel#L${match[1]}:${match[2]}`;
             return html.a(
               {
                 href: opentypeFeaturesURL,
