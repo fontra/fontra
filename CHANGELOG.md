@@ -1,5 +1,11 @@
 # Changelog for Fontra
 
+## 2026-04-?? [version 2026.4.3]
+
+### Fixes
+
+- [opentype backend] When reading .ttf or .otf, don't error when the font has an older version of the OS/2 table. [Issue 2548](https://github.com/fontra/fontra/issues/2548), [PR 2549](https://github.com/fontra/fontra/pull/2549)
+
 ## 2026-04-14 [version 2026.4.2]
 
 - [Windows] Add an .msi installer to the release assets. Contributed by Dr Anirban Mitra [Issue 209](https://github.com/fontra/fontra-pak/issues/209), [PR 238](https://github.com/fontra/fontra-pak/pull/238)
