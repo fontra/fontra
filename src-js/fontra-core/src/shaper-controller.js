@@ -188,6 +188,7 @@ export class ShaperController {
           })),
         glyphClasses,
         conditionalSubstitutions: [conditionalSubstitutions],
+        compileDebg: true,
       });
     } catch (e) {
       console.error(e);

@@ -228,10 +228,37 @@ export default class CharactersGlyphsPanel extends Panel {
     this.shapingDebuggerList.rowsElement.addEventListener("keydown", (event) =>
       this._shapingDebuggerHandleArrowLeftRight(event)
     );
+    this.shapingDebuggerList.showHeader = true;
     this.shapingDebuggerList.columnDescriptions = [
       {
         key: "formattedMessage",
         title: "Message",
+        width: 200,
+        minWidth: 100,
+      },
+      {
+        key: "sourceLocation",
+        title: "Feature source",
+        get: (item) => {
+          const match = item.sourceLocation?.match(
+            /^<features>:(?<lineno>\d+):(?<column>\d+)/
+          );
+          if (match) {
+            const opentypeFeaturesURL = new URL(window.location);
+            opentypeFeaturesURL.pathname = "fontinfo.html";
+            const { lineno, column } = match.groups;
+            opentypeFeaturesURL.hash = `#opentype-feature-code-panel#L${lineno}:${column}`;
+            return html.a(
+              {
+                href: opentypeFeaturesURL,
+                target: `fontra.fontinfo.${this.editorController.projectIdentifier}`,
+              },
+              [item.sourceLocation]
+            );
+          } else {
+            return item.sourceLocation?.split(/\\|\//).at(-1);
+          }
+        },
       },
     ];
     this.shapingDebuggerList.appendStyle(`
@@ -239,6 +266,11 @@ export default class CharactersGlyphsPanel extends Panel {
         padding: 0em 0.2em 0em 0.2em;
         border-radius: 0.25em;
         font-family: monospace;
+      }
+
+      a {
+        color: unset;
+        text-decoration: unset;
       }
 
       .table-tag {
@@ -452,8 +484,6 @@ export default class CharactersGlyphsPanel extends Panel {
     // glyph index when doing RTL
     await this.sceneSettingsController.waitForKeyChange("positionedLines");
 
-    // const selectedMessage = this.sceneSettings.shapingDebuggerMessages[breakIndex];
-    // if (selectedMessage) {
     let selectedGlyph;
     const m = selectedMessage.message.match(/at (\d+(,\d+)*)/);
     if (m) {

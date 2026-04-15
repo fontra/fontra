@@ -465,7 +465,10 @@ export class OpenTypeFeatureCodePanel extends BaseInfoPanel {
       return;
     }
 
-    const match = urlData.match(/^(?<type>L|C)(?<N>\d+)(-(?<M>\d+))?$/);
+    const match = urlData.match(
+      /^(?<type>L|C)(?<N>\d+)((-(?<M>\d+))|(:(?<COL>\d+)))?$/
+    );
+
     if (!match) {
       return;
     }
@@ -473,13 +476,14 @@ export class OpenTypeFeatureCodePanel extends BaseInfoPanel {
     const lineNumbers = match.groups.type == "L";
     let N = parseInt(match.groups.N);
     let M = match.groups.M ? parseInt(match.groups.M) : undefined;
+    const COL = match.groups.COL ? parseInt(match.groups.COL) : 0;
 
     if (lineNumbers) {
       const doc = this.editorView.state.doc;
       if (N <= doc.lines) {
         const lineN = doc.line(N);
         const lineM = M >= N ? doc.line(Math.min(M, doc.lines)) : undefined;
-        N = lineN.from;
+        N = Math.min(lineN.from + COL, doc.length);
         M = Math.min((lineM ? lineM.to : lineN.to) + 1, doc.length);
       } else {
         N = doc.length;

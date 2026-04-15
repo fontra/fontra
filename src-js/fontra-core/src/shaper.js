@@ -282,13 +282,16 @@ class HBShaper extends ShaperBase {
     let glyphsFollowWritingDirection = true;
 
     const messageFunc = (buffer, font, message) => {
+      const match =
+        gposPhase || messages ? message.match(/(^start )?lookup (\d+)/) : null;
+      const lookupId = match ? parseInt(match[2]) : undefined;
+
       if (gposPhase) {
-        const match = message.match(/^start lookup (\d+)/);
-        if (match || message.startsWith("end table GPOS")) {
+        if (match?.[1] || message.startsWith("end table GPOS")) {
           let glyphs;
           const glyphObjects = this._glyphObjects;
           let didModify = false;
-          const beforeLookupId = match ? parseInt(match[1]) : undefined;
+          const beforeLookupId = lookupId;
 
           for (const { tag, lookupId } of this.insertMarkers ?? []) {
             if (
@@ -344,11 +347,24 @@ class HBShaper extends ShaperBase {
 
         const glyphsSerialized = JSON.stringify(glyphs);
 
+        const debugInfo = this.debugInfo;
+        const sourceInfo = debugInfo
+          ? debugInfo["com.github.fonttools.feaLib"]?.[gposPhase ? "GPOS" : "GSUB"]?.[
+              lookupId
+            ]
+          : undefined;
+        const sourceLocation = sourceInfo?.[1]
+          ? `${sourceInfo[0]} (${sourceInfo[1]})`
+          : sourceInfo
+          ? `${sourceInfo[0]}`
+          : undefined;
+
         messages.push({
           message,
           changed:
             this._previousGlyphsSerialized &&
             glyphsSerialized != this._previousGlyphsSerialized,
+          sourceLocation,
         });
 
         this._previousGlyphsSerialized = glyphsSerialized;
@@ -443,6 +459,17 @@ class HBShaper extends ShaperBase {
     }
 
     return result;
+  }
+
+  get debugInfo() {
+    if (this._debugInfo === undefined) {
+      const debgTable = this.face.reference_table("Debg");
+      this._debugInfo = debgTable
+        ? JSON.parse(new TextDecoder().decode(debgTable))
+        : null;
+    }
+
+    return this._debugInfo;
   }
 
   close() {
