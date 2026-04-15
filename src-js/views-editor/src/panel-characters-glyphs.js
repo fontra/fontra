@@ -256,7 +256,7 @@ export default class CharactersGlyphsPanel extends Panel {
               [item.sourceLocation]
             );
           } else {
-            return item.sourceLocation;
+            return item.sourceLocation?.split(/\\|\//).at(-1);
           }
         },
       },
