@@ -312,3 +312,11 @@ async def test_font_sources_names(fontPath, expectedNames):
     sources = await font.getSources()
     sourceNames = [s.name for s in sources.values()]
     assert sourceNames == expectedNames
+
+
+async def test_os2_version1():
+    # https://github.com/fontra/fontra/issues/2548
+    fontPath = dataDir / "noto" / "NotoSans-Regular.subset.os2-version1.otf"
+    font = getFileSystemBackend(fontPath)
+    sources = await font.getSources()
+    assert sources
