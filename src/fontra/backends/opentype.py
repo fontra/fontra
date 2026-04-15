@@ -43,6 +43,7 @@ shaperFontTables = {
     "head",
     "maxp",
     "name",
+    "Debg",
     "GDEF",
     "GSUB",
     "GPOS",
