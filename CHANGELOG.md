@@ -2,6 +2,10 @@
 
 ## 2026-04-?? [version 2026.4.3]
 
+### New features
+
+- [shaping debugger] Link lookups back to the feature source code, via the `Debg` table. [PR 2550](https://github.com/fontra/fontra/pull/2550)
+
 ### Fixes
 
 - [opentype backend] When reading .ttf or .otf, don't error when the font has an older version of the OS/2 table. [Issue 2548](https://github.com/fontra/fontra/issues/2548), [PR 2549](https://github.com/fontra/fontra/pull/2549)
