@@ -348,10 +348,15 @@ class HBShaper extends ShaperBase {
         const glyphsSerialized = JSON.stringify(glyphs);
 
         const debugInfo = this.debugInfo;
-        const sourceLocation = debugInfo
+        const sourceInfo = debugInfo
           ? debugInfo["com.github.fonttools.feaLib"]?.[gposPhase ? "GPOS" : "GSUB"]?.[
               lookupId
-            ]?.[0]
+            ]
+          : undefined;
+        const sourceLocation = sourceInfo?.[1]
+          ? `${sourceInfo[0]} (${sourceInfo[1]})`
+          : sourceInfo
+          ? `${sourceInfo[0]}`
           : undefined;
 
         messages.push({

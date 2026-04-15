@@ -240,11 +240,11 @@ export default class CharactersGlyphsPanel extends Panel {
         key: "sourceLocation",
         title: "Feature source",
         get: (item) => {
-          const parts = item.sourceLocation?.split(":");
-          if (parts && parts[0] == "<features>") {
+          const match = item.sourceLocation?.match(/^<features>:(\d+):(\d+)/);
+          if (match) {
             const opentypeFeaturesURL = new URL(window.location);
             opentypeFeaturesURL.pathname = "fontinfo.html";
-            opentypeFeaturesURL.hash = `#opentype-feature-code-panel#L${parts[1]}`;
+            opentypeFeaturesURL.hash = `#opentype-feature-code-panel#L${match[1]}`;
             return html.a(
               {
                 href: opentypeFeaturesURL,
