@@ -319,4 +319,10 @@ async def test_os2_version1():
     fontPath = dataDir / "noto" / "NotoSans-Regular.subset.os2-version1.otf"
     font = getFileSystemBackend(fontPath)
     sources = await font.getSources()
-    assert sources
+    assert len(sources) == 1
+    [source] = sources.values()
+    assert source.lineMetricsHorizontalLayout == {
+        "ascender": LineMetric(value=1069),
+        "baseline": LineMetric(value=0),
+        "descender": LineMetric(value=-293),
+    }
