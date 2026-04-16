@@ -14,7 +14,11 @@ def fontraPathToBezPath(fontraPath):
     def draw(pen):
         fontraPath.drawPoints(PointToSegmentPen(pen))
 
-    [path, *rest] = linesweeper.BezPath.from_drawable(SimpleNamespace(draw=draw))
+    paths = linesweeper.BezPath.from_drawable(SimpleNamespace(draw=draw))
+    if not paths:
+        return linesweeper.BezPath()
+
+    [path, *rest] = paths
     for p in rest:
         for el in p.elements():
             path.push(el)
