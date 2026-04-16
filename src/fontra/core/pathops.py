@@ -1,4 +1,6 @@
-import pathops
+from types import SimpleNamespace
+
+import linesweeper
 from fontTools.pens.pointPen import (
     GuessSmoothPointPen,
     PointToSegmentPen,
@@ -8,50 +10,53 @@ from fontTools.pens.pointPen import (
 from .path import PackedPathPointPen
 
 
-def skiaPathToFontraPath(skiaPath):
+def fontraPathToBezPath(fontraPath):
+    def draw(pen):
+        fontraPath.drawPoints(PointToSegmentPen(pen))
+
+    [path, *rest] = linesweeper.BezPath.from_drawable(SimpleNamespace(draw=draw))
+    for p in rest:
+        for el in p.elements():
+            path.push(el)
+
+    return path
+
+
+def bezPathToFontraPath(bezPath):
     pen = PackedPathPointPen()
-    skiaPath.draw(SegmentToPointPen(GuessSmoothPointPen(pen)))
+    for path in bezPath:
+        path.draw(SegmentToPointPen(GuessSmoothPointPen(pen)))
 
     return pen.getPath()
 
 
-def fontraPathToSkiaPath(fontraPath):
-    skiaPath = pathops.Path()
-    fontraPath.drawPoints(PointToSegmentPen(skiaPath.getPen()))
+def _pathOperation(pathA, pathB, pathOperation):
+    bezPathA = fontraPathToBezPath(pathA)
+    bezPathB = fontraPathToBezPath(pathB)
 
-    return skiaPath
-
-
-def skiaPathOperations(pathA, pathB, pathOperation):
-    skiaPathA = fontraPathToSkiaPath(pathA)
-    skiaPathB = fontraPathToSkiaPath(pathB)
-
-    skiaPath = pathops.op(
-        skiaPathA,
-        skiaPathB,
+    bezPath = linesweeper.binary_op(
+        bezPathA,
+        bezPathB,
+        "nonzero",
         pathOperation,
-        fix_winding=True,
-        keep_starting_points=True,
-        clockwise=False,
     )
 
-    return skiaPathToFontraPath(skiaPath)
+    return bezPathToFontraPath(bezPath)
 
 
 def unionPath(path):
-    skiaPath = fontraPathToSkiaPath(path)
-    skiaPathSimplifed = pathops.simplify(skiaPath, clockwise=skiaPath.clockwise)
-
-    return skiaPathToFontraPath(skiaPathSimplifed)
+    bezPath = fontraPathToBezPath(path)
+    bezPathSimplifed = linesweeper.simplify([bezPath])
+    return bezPathToFontraPath(bezPathSimplifed)
 
 
 def subtractPath(pathA, pathB):
-    return skiaPathOperations(pathA, pathB, pathops.PathOp.DIFFERENCE)
+    return _pathOperation(pathA, pathB, "difference")
 
 
 def intersectPath(pathA, pathB):
-    return skiaPathOperations(pathA, pathB, pathops.PathOp.INTERSECTION)
+    return _pathOperation(pathA, pathB, "intersection")
 
 
 def excludePath(pathA, pathB):
-    return skiaPathOperations(pathA, pathB, pathops.PathOp.XOR)
+    return _pathOperation(pathA, pathB, "xor")
