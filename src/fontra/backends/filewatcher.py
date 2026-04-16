@@ -45,7 +45,6 @@ class FileWatcher:
 
     def ignoreNextChange(self, path: os.PathLike | str):
         path = os.fspath(path)
-        print("XXXX", path)
         mtime = os.stat(path).st_mtime if os.path.exists(path) else None
         self._ignorePaths[path].add(mtime)
         self._ignorePathHashes[path] = fileContentHash(path)
