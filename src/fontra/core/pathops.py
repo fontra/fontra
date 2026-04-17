@@ -50,8 +50,8 @@ def _pathOperation(pathA, pathB, pathOperation):
 
 def unionPath(path):
     bezPath = fontraPathToBezPath(path)
-    bezPathSimplifed = linesweeper.simplify([bezPath])
-    return bezPathToFontraPath(bezPathSimplifed)
+    bezPathSimplified = linesweeper.simplify([bezPath])
+    return bezPathToFontraPath(bezPathSimplified)
 
 
 def subtractPath(pathA, pathB):
