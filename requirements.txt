@@ -8,4 +8,4 @@ ufo2ft==3.7.1
 ufoLib2==0.18.1
 ufomerge==1.9.6
 watchfiles==1.1.1
-skia-pathops==0.9.2
+linesweeper==0.2.0
