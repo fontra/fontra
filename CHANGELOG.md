@@ -1,5 +1,11 @@
 # Changelog for Fontra
 
+## 2026-04-?? [version 2026.4.4]
+
+### New features
+
+- [Windows installer] Add option to add a desktop shortcut. [fontra-pak Issue 239](https://github.com/fontra/fontra-pak/issues/239), [fontra-pak PR 240](https://github.com/fontra/fontra-pak/pull/240)
+
 ## 2026-04-15 [version 2026.4.3]
 
 ### New features
