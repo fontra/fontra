@@ -144,7 +144,6 @@ class HBShaper extends ShaperBase {
 
     const buffer = new hb.Buffer();
     buffer.addCodePoints(codePoints);
-    buffer.guessSegmentProperties(); // Set script, language and direction
 
     buffer.setClusterLevel(1); // HB_BUFFER_CLUSTER_LEVEL_MONOTONE_CHARACTERS
     if (direction) {
@@ -167,6 +166,8 @@ class HBShaper extends ShaperBase {
     if (language) {
       buffer.setLanguage(hb.otTagToLanguage(language));
     }
+
+    buffer.guessSegmentProperties(); // Guess script, language and direction if not provided.
 
     this.font.setVariations(variations || {});
 
