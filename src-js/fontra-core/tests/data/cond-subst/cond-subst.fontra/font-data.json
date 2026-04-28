@@ -1,0 +1,173 @@
+{
+"unitsPerEm": 2048,
+"fontInfo": {
+"familyName": "Cond Subst Test",
+"versionMajor": 1,
+"versionMinor": 0,
+"copyright": "",
+"trademark": "",
+"description": "",
+"sampleText": "",
+"designer": "",
+"designerURL": "",
+"manufacturer": "",
+"manufacturerURL": "",
+"licenseDescription": "",
+"licenseInfoURL": "",
+"vendorID": ""
+},
+"axes": {
+"axes": [
+{
+"name": "Weight",
+"label": "Weight",
+"tag": "wght",
+"minValue": 400,
+"defaultValue": 400,
+"maxValue": 900,
+"mapping": [
+[
+400,
+160
+],
+[
+500,
+203
+],
+[
+600,
+220
+],
+[
+700,
+253
+],
+[
+800,
+313
+],
+[
+900,
+384
+]
+]
+}
+]
+},
+"sources": {
+"Black": {
+"name": "Black",
+"location": {
+"Weight": 384
+},
+"lineMetricsHorizontalLayout": {
+"ascender": {
+"value": 1300,
+"zone": 20
+},
+"capHeight": {
+"value": 1300,
+"zone": 20
+},
+"xHeight": {
+"value": 850,
+"zone": 20
+},
+"descender": {
+"value": -300,
+"zone": -20
+},
+"baseline": {
+"value": 0,
+"zone": -20
+}
+}
+},
+"Regular": {
+"name": "Regular",
+"location": {
+"Weight": 160
+},
+"lineMetricsHorizontalLayout": {
+"ascender": {
+"value": 1300,
+"zone": 20
+},
+"capHeight": {
+"value": 1300,
+"zone": 20
+},
+"xHeight": {
+"value": 850,
+"zone": 20
+},
+"descender": {
+"value": -300,
+"zone": -20
+},
+"baseline": {
+"value": 0,
+"zone": -20
+}
+}
+}
+},
+"conditionalSubstitutions": {
+"featureTags": [
+"rvrn"
+],
+"rules": [
+{
+"name": "Weight.205",
+"conditionSets": [
+{
+"conditions": [
+{
+"name": "Weight",
+"minValue": 205,
+"maxValue": 384
+}
+]
+}
+],
+"substitutions": {
+"fi": "fi.rvrn"
+}
+},
+{
+"name": "Weight.280",
+"conditionSets": [
+{
+"conditions": [
+{
+"name": "Weight",
+"minValue": 280,
+"maxValue": 384
+}
+]
+}
+],
+"substitutions": {
+"cent": "cent.rvrn"
+}
+},
+{
+"name": "Weight.310",
+"conditionSets": [
+{
+"conditions": [
+{
+"name": "Weight",
+"minValue": 310,
+"maxValue": 384
+}
+]
+}
+],
+"substitutions": {
+"oslash": "oslash.rvrn"
+}
+}
+]
+}
+}

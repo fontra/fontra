@@ -1,0 +1,27 @@
+{
+"name": "cent.rvrn",
+"sources": [
+{
+"name": "",
+"layerName": "Regular",
+"locationBase": "Regular"
+},
+{
+"name": "",
+"layerName": "Black",
+"locationBase": "Black"
+}
+],
+"layers": {
+"Black": {
+"glyph": {
+"xAdvance": 800
+}
+},
+"Regular": {
+"glyph": {
+"xAdvance": 800
+}
+}
+}
+}
