@@ -1814,6 +1814,70 @@ describe("test conditional substitutions", () => {
   });
 });
 
+describe("test conditional substitutions with mapping", () => {
+  it("test conditional substitutions with mapping", async () => {
+    const testFontPath = moduleDirName.joinPath(
+      "data",
+      "cond-subst",
+      "cond-subst.fontra"
+    );
+
+    const shapeFunc = await getEmulatedShapeFuncForPath(testFontPath);
+
+    const inputCodePoints = [..."¢øﬁ"].map(ord);
+
+    const { glyphs: glyphs1 } = await shapeFunc(inputCodePoints);
+    const glyphNames1 = glyphs1.map((g) => g.glyphname);
+    expect(glyphNames1).to.deep.equal(["cent", "oslash", "fi"]);
+
+    const { glyphs: glyphs2 } = await shapeFunc(inputCodePoints, {
+      variations: { wght: 500 },
+    });
+    const glyphNames2 = glyphs2.map((g) => g.glyphname);
+    expect(glyphNames2).to.deep.equal(["cent", "oslash", "fi"]);
+
+    // Source coords *scaled* to User coords (but not unapplying avar)
+    // conditionalSubstitutions = {
+    //   featureTags: ["rvrn"],
+    //   rules: [
+    //     [[{ wght: [500.44642857142856, 900] }], { fi: "fi.rvrn" }],
+    //     [[{ wght: [667.8571428571429, 900] }], { cent: "cent.rvrn" }],
+    //     [[{ wght: [734.8214285714286, 900] }], { oslash: "oslash.rvrn" }],
+    //   ],
+    // };
+
+    const { glyphs: glyphs3 } = await shapeFunc(inputCodePoints, {
+      variations: { wght: 501 },
+    });
+    const glyphNames3 = glyphs3.map((g) => g.glyphname);
+    expect(glyphNames3).to.deep.equal(["cent", "oslash", "fi.rvrn"]);
+
+    const { glyphs: glyphs4 } = await shapeFunc(inputCodePoints, {
+      variations: { wght: 667 },
+    });
+    const glyphNames4 = glyphs4.map((g) => g.glyphname);
+    expect(glyphNames4).to.deep.equal(["cent", "oslash", "fi.rvrn"]);
+
+    const { glyphs: glyphs5 } = await shapeFunc(inputCodePoints, {
+      variations: { wght: 668 },
+    });
+    const glyphNames5 = glyphs5.map((g) => g.glyphname);
+    expect(glyphNames5).to.deep.equal(["cent.rvrn", "oslash", "fi.rvrn"]);
+
+    const { glyphs: glyphs6 } = await shapeFunc(inputCodePoints, {
+      variations: { wght: 734 },
+    });
+    const glyphNames6 = glyphs6.map((g) => g.glyphname);
+    expect(glyphNames6).to.deep.equal(["cent.rvrn", "oslash", "fi.rvrn"]);
+
+    const { glyphs: glyphs7 } = await shapeFunc(inputCodePoints, {
+      variations: { wght: 735 },
+    });
+    const glyphNames7 = glyphs7.map((g) => g.glyphname);
+    expect(glyphNames7).to.deep.equal(["cent.rvrn", "oslash.rvrn", "fi.rvrn"]);
+  });
+});
+
 function stripGlyphIDs(glyphs) {
   return glyphs.map((glyph) => {
     glyph = { ...glyph };
