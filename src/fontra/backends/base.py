@@ -93,4 +93,7 @@ class WritableBaseBackend(ReadableBaseBackend):
     async def putConditionalSubstitutions(
         self, substitutions: ConditionalSubstitutions
     ) -> None:
-        raise NotImplementedError()
+        if substitutions.rules:
+            raise NotImplementedError(
+                "writing conditional substitutions is not supported"
+            )
