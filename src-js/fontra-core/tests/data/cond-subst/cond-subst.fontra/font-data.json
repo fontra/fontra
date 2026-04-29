@@ -128,6 +128,15 @@
 "maxValue": 384
 }
 ]
+},
+{
+"conditions": [
+{
+"name": "Weight",
+"minValue": 170,
+"maxValue": 175
+}
+]
 }
 ],
 "substitutions": {
