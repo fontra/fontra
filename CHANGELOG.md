@@ -11,6 +11,7 @@
 - [fontra-pak] Reinstate export as .rcjk. This was accidentally removed when .rcjk was removed as an option for new fonts. [fontra-pak PR 244](https://github.com/fontra/fontra-pak/pull/244)
 - [rcjk] Fix .rcjk export by ignoring empty conditional substitutions. [PR 2557](https://github.com/fontra/fontra/pull/2557)
 - [conditional substitutions] Fix axis (`avar`) mapping logic for conditional substitutions. Previously Fontra could substitute glyphs at not quite the correct locations, if an axis had an `avar` mapping. [Issue 2556](https://github.com/fontra/fontra/issues/2556), [PR 2558](https://github.com/fontra/fontra/pull/2558)
+- [conditional substitutions] Fix previewing behavior when a rule has multiple condition sets. [build-shaper-font Issue 30](https://github.com/fontra/build-shaper-font/issues/30), [build-shaper-font PR 31](https://github.com/fontra/build-shaper-font/pull/31)
 
 ## 2026-04-15 [version 2026.4.3]
 
