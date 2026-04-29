@@ -1840,7 +1840,13 @@ describe("test conditional substitutions with mapping", () => {
     // conditionalSubstitutions = {
     //   featureTags: ["rvrn"],
     //   rules: [
-    //     [[{ wght: [500.44642857142856, 900] }], { fi: "fi.rvrn" }],
+    //     [
+    //       [
+    //         { wght: [500.44642857142856, 900] },
+    //         { wght: [422.32142857142856, 433.48214285714283] },
+    //       ],
+    //       { fi: "fi.rvrn" },
+    //     ],
     //     [[{ wght: [667.8571428571429, 900] }], { cent: "cent.rvrn" }],
     //     [[{ wght: [734.8214285714286, 900] }], { oslash: "oslash.rvrn" }],
     //   ],
@@ -1875,6 +1881,12 @@ describe("test conditional substitutions with mapping", () => {
     });
     const glyphNames7 = glyphs7.map((g) => g.glyphname);
     expect(glyphNames7).to.deep.equal(["cent.rvrn", "oslash.rvrn", "fi.rvrn"]);
+
+    const { glyphs: glyphs8 } = await shapeFunc(inputCodePoints, {
+      variations: { wght: 423 },
+    });
+    const glyphNames8 = glyphs8.map((g) => g.glyphname);
+    expect(glyphNames8).to.deep.equal(["cent", "oslash", "fi.rvrn"]);
   });
 });
 
