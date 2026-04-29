@@ -102,8 +102,7 @@ export class ShaperController {
           : getShaper(shaperSupport);
 
       if (textShaping && fontData) {
-        // The new shaper is good, help harfbuzzjs with GS and close the old one
-        this._previousShaper?.close();
+        // The new shaper is good
         this._previousShaper = shaper;
       }
 

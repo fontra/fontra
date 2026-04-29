@@ -1383,8 +1383,8 @@ class LineSetter {
       const codePoint = isUndefined ? fallbackCodePoint : codePointForGlyph;
 
       glyphs.push({
-        x: x + glyphInfo.x_offset,
-        y: y + glyphInfo.y_offset,
+        x: x + glyphInfo.xOffset,
+        y: y + glyphInfo.yOffset,
         kernValue,
         glyph: glyphInstance,
         varGlyph,
@@ -1399,8 +1399,8 @@ class LineSetter {
         glyphInfo,
       });
 
-      x += glyphInfo.x_advance + xAdvanceLayerDifference;
-      y += glyphInfo.y_advance + yAdvanceLayerDifference;
+      x += glyphInfo.xAdvance + xAdvanceLayerDifference;
+      y += glyphInfo.yAdvance + yAdvanceLayerDifference;
     }
 
     let offset = 0;

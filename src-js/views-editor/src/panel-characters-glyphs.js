@@ -416,9 +416,9 @@ export default class CharactersGlyphsPanel extends Panel {
 
     const glyphItems = positionedLine.glyphs.map((glyph) => ({
       glyphName: glyph.glyphName,
-      advance: glyph.glyphInfo.x_advance, // TODO: y_advance for vertical
-      dx: glyph.glyphInfo.x_offset,
-      dy: glyph.glyphInfo.y_offset,
+      advance: glyph.glyphInfo.xAdvance, // TODO: yAdvance for vertical
+      dx: glyph.glyphInfo.xOffset,
+      dy: glyph.glyphInfo.yOffset,
       cluster: glyph.cluster,
       originalAdvance: glyph.glyphInfo.mark ? 0 : Math.round(glyph.glyph.xAdvance), // TODO: yAdvance for vertical
     }));
