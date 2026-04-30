@@ -233,7 +233,7 @@ export default class CharactersGlyphsPanel extends Panel {
       {
         key: "formattedMessage",
         title: "Message",
-        width: 200,
+        width: 250,
         minWidth: 100,
       },
       {
