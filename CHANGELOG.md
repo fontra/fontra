@@ -1,5 +1,11 @@
 # Changelog for Fontra
 
+## 2026-05-?? [version 2026.5.0]
+
+### Fixes
+
+- [fontra-glyphs] Use the correct encoding when reading .plist files. This fixes read errors with certain .glyphs and .glyphspackage files. [fontra-glyphs Issue 140](https://github.com/fontra/fontra-glyphs/issues/140), [fontra-glyphs PR 141](https://github.com/fontra/fontra-glyphs/pull/141)
+
 ## 2026-04-29 [version 2026.4.4]
 
 ### New features
