@@ -253,7 +253,7 @@ export default class CharactersGlyphsPanel extends Panel {
                 href: opentypeFeaturesURL,
                 target: `fontra.fontinfo.${this.editorController.projectIdentifier}`,
               },
-              [item.sourceLocation]
+              [`${lineno}:${column}`]
             );
           } else {
             return item.sourceLocation?.split(/\\|\//).at(-1);
