@@ -613,7 +613,7 @@ export default class CharactersGlyphsPanel extends Panel {
         changedElement,
         ...repeat(level, () => html.span({ class: "indent-block" })),
         foldingChevron,
-        ...formatShaperMessage(message),
+        ...formatShaperMessage(message, messageItem.lookupName),
       ]);
     });
 
@@ -762,8 +762,12 @@ function sameGlyphNames(items1, items2) {
   return key1 == key2;
 }
 
-function formatShaperMessage(message) {
-  const parts = [message];
+function formatShaperMessage(message, lookupName) {
+  const parts = [
+    message
+      .replace(/(lookup \d+) (feature '.+?')/, `$2 $1`)
+      .replace(/lookup \d+/, lookupName ? `$& (${lookupName})` : "$&"),
+  ];
 
   for (const [cls, regex] of [
     ["ot-tag table-tag", /(?<=table )(GSUB|GPOS)/],
