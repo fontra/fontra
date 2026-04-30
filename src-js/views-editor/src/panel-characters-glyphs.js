@@ -285,6 +285,10 @@ export default class CharactersGlyphsPanel extends Panel {
         background-color: #C8F5;
       }
 
+      .lookup-name {
+        background-color: #CFC5;
+      }
+
       .indent-block {
         display: inline-block;
         width: 1em; // don't change: it'll change the icon size
@@ -766,13 +770,14 @@ function formatShaperMessage(message, lookupName) {
   const parts = [
     message
       .replace(/(lookup \d+) (feature '.+?')/, `$2 $1`)
-      .replace(/lookup \d+/, lookupName ? `$& (${lookupName})` : "$&"),
+      .replace(/lookup \d+/, lookupName ? `$& '${lookupName}'` : "$&"),
   ];
 
   for (const [cls, regex] of [
     ["ot-tag table-tag", /(?<=table )(GSUB|GPOS)/],
     ["ot-tag script-tag", /(?<=script tag )'(.+?)'/],
     ["ot-tag feature-tag", /(?<=feature )'(.+?)'/],
+    ["ot-tag lookup-name", /(?<=lookup \d+ )'(.+?)'/],
   ]) {
     const part = parts.at(-1);
     const m = part.match(regex);
