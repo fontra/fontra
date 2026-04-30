@@ -504,7 +504,7 @@ export class OpenTypeFeatureCodePanel extends BaseInfoPanel {
         ],
         0
       ),
-      scrollIntoView: true,
+      effects: EditorView.scrollIntoView(spanFrom, { y: "center" }),
     });
 
     this.editorView.focus();
