@@ -10,12 +10,12 @@
     "copy-webpack-plugin": "^14.0.0",
     "css-loader": "^7.1.4",
     "html-bundler-webpack-plugin": "^4.23.0",
-    "npm": "^11.12.1",
+    "npm": "^11.13.0",
     "prettier-plugin-organize-imports": "^4.3.0",
     "prettier-plugin-sort-json": "^4.2.0",
-    "ts-loader": "^9.5.4",
-    "typescript": "^6.0.2",
-    "webpack": "^5.105.4",
+    "ts-loader": "^9.5.7",
+    "typescript": "^6.0.3",
+    "webpack": "^5.106.2",
     "webpack-cli": "^7.0.2"
   },
   "workspaces": [
@@ -28,7 +28,7 @@
     "src-js/views-fontoverview"
   ],
   "dependencies": {
-    "@babel/preset-env": "^7.29.2",
+    "@babel/preset-env": "^7.29.3",
     "@babel/preset-typescript": "^7.28.5",
     "@codemirror/autocomplete": "^6.20.1",
     "@codemirror/highlight": "^0.19.8",
