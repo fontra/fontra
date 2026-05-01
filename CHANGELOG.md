@@ -8,6 +8,7 @@
 
 ### Fixes
 
+- [editor canvas] Fix display glitch with Safari on very large screens. Contributed by Qwerasd. [PR 2567](https://github.com/fontra/fontra/pull/2567)
 - [fontra-glyphs] Use the correct encoding when reading .plist files. This fixes read errors with certain .glyphs and .glyphspackage files. [fontra-glyphs Issue 140](https://github.com/fontra/fontra-glyphs/issues/140), [fontra-glyphs PR 141](https://github.com/fontra/fontra-glyphs/pull/141)
 
 ## 2026-04-29 [version 2026.4.4]
