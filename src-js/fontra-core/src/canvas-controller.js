@@ -92,10 +92,33 @@ export class CanvasController {
     const width = this.canvasWidth;
     const height = this.canvasHeight;
     const scale = this.devicePixelRatio;
-    this.canvas.width = Math.floor(width * scale);
-    this.canvas.height = Math.floor(height * scale);
-    this.canvas.style.width = width + "px";
-    this.canvas.style.height = height + "px";
+
+    // We want to be sure that we have at least enough pixels to cover the
+    // entire area of the canvas, accounting for dpi and browser scaling.
+    //
+    // To do this, we take the ceiling of the CSS pixel width and height
+    // values multiplied by the pixel ratio, which is a number that should
+    // be guaranteed to be equal to or greater than the final number of screen
+    // pixels that the canvas element (or rather its container) takes up.
+    this.canvas.width = Math.ceil(width * scale);
+    this.canvas.height = Math.ceil(height * scale);
+
+    // We then take those numbers and divide them back down by the scale
+    // and tell the browser to display the canvas at that many CSS pixels
+    // wide and tall. This should ensure that there is a 1 to 1 mapping
+    // between pixels in the canvas's data buffer and pixels as displayed
+    // on screen for the user.
+    //
+    // If we didn't do this, and just used the container's size, then the
+    // browser might end up stretching the canvas data very slightly to
+    // make it fit the final size. This isn't ideal but usually isn't
+    // noticeable except in Safari where the scaling is switched to
+    // nearest neighbor if the texture is more than 2K pixels wide,
+    // which can cause a column or row of pixels in the center of
+    // the canvas to be repeated and it's very noticeable.
+    this.canvas.style.width = this.canvas.width / scale + "px";
+    this.canvas.style.height = this.canvas.height / scale + "px";
+
     const parentOffsetX = this.canvas.parentElement.offsetLeft;
     const parentOffsetY = this.canvas.parentElement.offsetTop;
 
