@@ -238,7 +238,7 @@ export default class CharactersGlyphsPanel extends Panel {
       },
       {
         key: "sourceLocation",
-        title: "Feature source",
+        title: "Source location",
         get: (item) => {
           const match = item.sourceLocation?.match(
             /^<features>:(?<lineno>\d+):(?<column>\d+)/
