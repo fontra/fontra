@@ -362,11 +362,8 @@ class HBShaper extends ShaperBase {
               lookupId
             ]
           : undefined;
-        const sourceLocation = sourceInfo?.[1]
-          ? `${sourceInfo[0]} (${sourceInfo[1]})`
-          : sourceInfo
-          ? `${sourceInfo[0]}`
-          : undefined;
+        const sourceLocation = sourceInfo?.[0];
+        const lookupName = sourceInfo?.[1];
 
         messages.push({
           message,
@@ -374,6 +371,7 @@ class HBShaper extends ShaperBase {
             this._previousGlyphsSerialized &&
             glyphsSerialized != this._previousGlyphsSerialized,
           sourceLocation,
+          lookupName,
         });
 
         this._previousGlyphsSerialized = glyphsSerialized;
