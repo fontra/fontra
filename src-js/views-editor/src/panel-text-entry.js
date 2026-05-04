@@ -9,6 +9,7 @@ import {
   Accordion,
   makeAccordionHeaderButton,
 } from "@fontra/web-components/ui-accordion.js";
+import { Form } from "@fontra/web-components/ui-form.js";
 import Panel from "./panel.js";
 
 // These features are on by default. See hb-ot-shape.cc
@@ -179,6 +180,7 @@ export default class TextEntryPanel extends Panel {
 
     this.setupTextEntryElement();
     this.setupTextAlignElement();
+    this.setupTextSizeElement();
     this.setupAccordionElement();
     this.setupIntersectionObserver();
   }
@@ -219,6 +221,7 @@ export default class TextEntryPanel extends Panel {
                 }),
               ]
             ),
+            html.div({ id: "text-size-menu" }),
             html.div({ id: "text-settings-accordion" }),
           ]
         ),
@@ -324,6 +327,68 @@ export default class TextEntryPanel extends Panel {
         this.textSettings.align = el.dataset.align;
       };
     }
+  }
+
+  setupTextSizeElement() {
+    this.textSizeForm = new Form();
+    this.textSizeForm.id = "text-size-menu";
+    this.textSizeForm.labelWidth = "max-content";
+
+    this.textSizeForm.onFieldChange = async (fieldItem, value, valueStream) => {
+      switch (fieldItem.key) {
+        case "size":
+          {
+            this.textSettingsController.setItem("textSize", value, this);
+          }
+          break;
+      }
+    };
+
+    this.textSettingsController.addKeyListener(
+      "textSize",
+      (event) => {
+        this.textSizeForm.setValue("size", this.textSettings.textSize);
+      },
+      false
+    );
+
+    const formContents = [];
+
+    formContents.push({
+      type: "edit-number",
+      key: "size",
+      label: "Text size", // TODO: translate
+      value: this.textSettings.textSize,
+      minValue: 1,
+      integer: false,
+      numDigits: 2,
+      evaluateExpression: async (expression) =>
+        this._evaluateTextSizeExpression(expression),
+    });
+
+    this.textSizeForm.setFieldDescriptions(formContents);
+
+    const placeHolder = this.contentElement.querySelector("#text-size-menu");
+    placeHolder.replaceWith(this.textSizeForm);
+  }
+
+  _evaluateTextSizeExpression(expression) {
+    const value = parseInt(expression, 10);
+
+    // Invalid (empty or unparseable) input, default to the current size.
+    if (isNaN(value)) {
+      return this.textSettings.textSize;
+    }
+
+    const lc = expression.toLowerCase();
+
+    // Lower case ends with "px", convert to points to set the value.
+    if (lc.endsWith("px")) {
+      return value / window.devicePixelRatio;
+    }
+
+    // None of our special cases match, assume it's just points.
+    return value;
   }
 
   setupTextEntryElement() {

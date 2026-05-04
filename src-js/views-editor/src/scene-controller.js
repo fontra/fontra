@@ -338,7 +338,47 @@ export class SceneController {
         this.canvasController.getViewBox(),
         { senderID: this }
       );
+
+      this.fontController.ensureInitialized.then(() => {
+        this.sceneSettingsController.setItem(
+          "textSize",
+          this.canvasController.magnification * this.fontController.unitsPerEm,
+          { senderID: this }
+        );
+      });
     });
+
+    this.sceneSettingsController.addKeyListener(
+      "textSize",
+      (event) => {
+        if (event.senderInfo?.senderID === this) {
+          return;
+        }
+        if (!event.newValue) {
+          // Ignore null-ish
+          return;
+        }
+
+        // Clamp magnification value to appropriate range
+        // and update canvas controller with the new value.
+        this.canvasController.magnification = Math.min(
+          Math.max(
+            event.newValue / this.fontController.unitsPerEm,
+            this.canvasController.minMagnification
+          ),
+          this.canvasController.maxMagnification
+        );
+        this.canvasController.requestUpdate();
+
+        // Set the text size value back since it might have been clamped.
+        this.sceneSettingsController.setItem(
+          "textSize",
+          this.canvasController.magnification * this.fontController.unitsPerEm,
+          { senderID: this }
+        );
+      },
+      true
+    );
 
     // Update background layer glyphs
     this.sceneSettingsController.addKeyListener(
@@ -1840,6 +1880,7 @@ export const persistentSceneSettingsKeys = persistentSceneSettings.map(
 function getSceneSettingsDefaults() {
   return {
     text: "",
+    textSize: null,
     align: "center",
     editLayerName: null,
     characterLines: [],
