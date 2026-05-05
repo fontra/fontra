@@ -29,13 +29,13 @@ export class ServerInfoPanel extends MultiPanelBasePanel {
       container.appendChild(
         html.createDomElement("div", {
           class: "fontra-ui-server-info-panel-header",
-          innerHTML: entry[0] + ":",
+          textContent: entry[0] + ":",
         })
       );
       container.appendChild(
         html.createDomElement("div", {
           class: "fontra-ui-server-info-panel-plain",
-          innerHTML: entry[1],
+          textContent: entry[1],
         })
       );
       this.panelElement.appendChild(container);
