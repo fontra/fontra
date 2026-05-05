@@ -7,6 +7,8 @@ import { RemoteError } from "./errors.js";
 import { FontController } from "./font-controller.js";
 import { getRemoteProxy } from "./remote.js";
 
+/** @import { RemoteFont } from "remotefont" */
+
 export class ViewController {
   static titlePattern(displayName) {
     return `Fontra — ${displayName}`;
@@ -44,8 +46,14 @@ export class ViewController {
     return controller;
   }
 
+  /**
+   * @param {RemoteFont} font
+   * @param {string} projectIdentifier
+   */
   constructor(font, projectIdentifier) {
+    /** @type {FontController} */
     this.fontController = new FontController(font);
+    /** @type {string} */
     this.projectIdentifier = projectIdentifier;
 
     document.addEventListener("visibilitychange", (event) => {

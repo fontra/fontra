@@ -36,6 +36,9 @@ import {
 import { normalizeLocation, unnormalizeLocation } from "@fontra/core/var-model.js";
 import * as vector from "@fontra/core/vector.js";
 
+/** @import { ObservableController } from "@fontra/core/observable-object.js" */
+/** @import { Rectangle } from "@fontra/core/rectangle.js" */
+
 export class SceneModel {
   constructor(
     fontController,
@@ -43,7 +46,9 @@ export class SceneModel {
     isPointInPath,
     visualizationLayersSettings
   ) {
+    /** @type {FontController} */
     this.fontController = fontController;
+    /** @type {ObservableController<SceneSettings>} */
     this.sceneSettingsController = sceneSettingsController;
     this.sceneSettings = sceneSettingsController.model;
     this.isPointInPath = isPointInPath;
@@ -54,6 +59,8 @@ export class SceneModel {
     this.usedGlyphNames = new Set();
     this.cachedGlyphNames = new Set();
     this.updateSceneCancelSignal = {};
+    /** @type {Rectangle | undefined} */
+    this.selectionRect = undefined;
 
     this.sceneSettingsController.addKeyListener(
       [
@@ -1266,6 +1273,24 @@ function sorted(v) {
   v.sort((a, b) => a - b);
   return v;
 }
+
+/**
+ * @typedef {{
+ *   x: number,
+ *   y: number,
+ *   kernValue: number,
+ *   glyph: any,
+ *   varGlyph: any,
+ *   glyphName: string,
+ *   character: string,
+ *   cluster: any,
+ *   isUndefined: boolean,
+ *   isSelected: boolean,
+ *   isEditing: boolean,
+ *   isEmpty: boolean,
+ *   glyphInfo: any
+ * }} PositionedGlyph
+ */
 
 class LineSetter {
   constructor(

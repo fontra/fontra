@@ -65,6 +65,14 @@ import { dialog, message } from "@fontra/web-components/modal-dialog.js";
 import { EditBehaviorFactory } from "./edit-behavior.js";
 import { SceneModel } from "./scene-model.js";
 
+/** @import { Rectangle } from "@fontra/core/rectangle.js" */
+/** @import { FontController } from "@fontra/core/font-controller.js" */
+/** @import { CanvasController } from "@fontra/core/canvas-controller.js" */
+/** @import { applicationSettingsController } from "@fontra/core/application-settings.js" */
+/** @import { getShaper } from "@fontra/core/shaper.js" */
+
+/** @typedef {ReturnType<typeof getSceneSettingsDefaults>} SceneSettings */
+
 // Minimum pixels per em and maximum pixels per unit for zooming out and in.
 //
 // Note that these are not _screen pixels_, they are css "pixels" which are
@@ -83,14 +91,23 @@ const MIN_PIX_PER_EM = 5;
 const MAX_PIX_PER_UNIT = 200;
 
 export class SceneController {
+  /**
+   * @param {FontController} fontController
+   * @param {CanvasController} canvasController
+   * @param {typeof applicationSettingsController} applicationSettingsController
+   * @param {} visualizationLayersSettings
+   */
   constructor(
     fontController,
     canvasController,
     applicationSettingsController,
     visualizationLayersSettings
   ) {
+    /** @type {CanvasController} */
     this.canvasController = canvasController;
+    /** @type {typeof applicationSettingsController} */
     this.applicationSettings = applicationSettingsController.model;
+    /** @type {FontController} */
     this.fontController = fontController;
     this.autoViewBox = true;
 
@@ -103,6 +120,7 @@ export class SceneController {
       canvasController.context
     );
 
+    /** @type {SceneModel} */
     this.sceneModel = new SceneModel(
       fontController,
       this.sceneSettingsController,
@@ -127,7 +145,9 @@ export class SceneController {
   }
 
   setupSceneSettings() {
+    /** @type {ObservableController<SceneSettings>} */
     this.sceneSettingsController = new ObservableController(getSceneSettingsDefaults());
+    /** @type {SceneSettings} */
     this.sceneSettings = this.sceneSettingsController.model;
 
     this.sceneSettings.viewBox = this.canvasController.getViewBox();
@@ -1841,7 +1861,9 @@ function getSceneSettingsDefaults() {
   return {
     text: "",
     align: "center",
+    /** @type {string?} */
     editLayerName: null,
+    /** @type {ReturnType<typeof characterLinesFromString>} */
     characterLines: [],
     fontLocationUser: {},
     fontLocationSource: {},
@@ -1851,12 +1873,16 @@ function getSceneSettingsDefaults() {
     fontAxesShowHidden: false,
     fontAxesSkipMapping: false,
     glyphLocation: {},
+    /** @type {Glyph?} */
     selectedGlyph: null,
+    /** @type {string?} */
     selectedGlyphName: null,
+    /** @type {string?} */
     substituteGlyphName: null,
     selection: new Set(),
     hoverSelection: new Set(),
     combinedSelection: new Set(), // dynamic: selection | hoverSelection
+    /** @type {Rectangle?} */
     viewBox: null,
     positionedLines: [],
     backgroundImagesAreLocked: true,
@@ -1864,11 +1890,17 @@ function getSceneSettingsDefaults() {
     editingLayers: {},
     featureSettings: {},
     applyTextShaping: true,
+    /** @type {string?} */
     textDirection: null,
+    /** @type {string?} */
     textScript: null,
+    /** @type {string?} */
     textLanguage: null,
+    /** @type {ReturnType<typeof getShaper>?} */
     shaper: null,
+    /** @type {ReturnType<InstanceType<typeof ShaperController>["getShaper"]>?} */
     shaperInfo: null,
+    /** @type {ReturnType<InstanceType<typeof ShaperController>["getShaper"]>?} */
     dumbShaperInfo: null,
     glyphRenderInfoLineIndex: 0,
     shapingDebuggerEnabled: false,

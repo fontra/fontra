@@ -16,8 +16,52 @@ import {
 } from "@fontra/core/utils.js";
 import { subVectors } from "@fontra/core/vector.js";
 
+/** @import { CanvasController } from "@fontra/core/canvas-controller.js" */
+/** @import { SceneModel, PositionedGlyph } from "./scene-model.js" */
+
+/**
+ * @template [ScreenParams = unknown]
+ * @template [GlyphParams = unknown]
+ * @template [Colors = unknown]
+ * @template [ColorsDarkMode = unknown]
+ *
+ * @typedef {{
+ *   identifier: string,
+ *   name: string,
+ *   selectionFunc?: Function,
+ *   selectionFilter?: Function,
+ *   userSwitchable?: boolean,
+ *   defaultOn?: boolean,
+ *   zIndex: number,
+ *   dontTranslate?: boolean,
+ *   screenParameters?: ScreenParams,
+ *   glyphParameters?: GlyphParams,
+ *   colors?: Colors,
+ *   colorsDarkMode?: ColorsDarkMode,
+ *   draw: (
+ *     context: CanvasRenderingContext2D,
+ *     positionedGlyph: PositionedGlyph,
+ *     parameters: ScreenParams
+ *               & GlyphParams
+ *               & Colors
+ *               & ColorsDarkMode,
+ *     model: SceneModel,
+ *     controller: CanvasController,
+ *   ) => void,
+ * }} VisualizationLayerDefinition
+ */
+
+/** @type {VisualizationLayerDefinition[]} */
 export const visualizationLayerDefinitions = [];
 
+/**
+ * @template [A = unknown]
+ * @template [B = unknown]
+ * @template [C = unknown]
+ * @template [D = unknown]
+ *
+ * @param {VisualizationLayerDefinition<A,B,C,D>} newLayerDef
+ */
 export function registerVisualizationLayerDefinition(newLayerDef) {
   let index = 0;
   let layerDef;

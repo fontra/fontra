@@ -125,17 +125,20 @@ export class EditorController extends ViewController {
     const canvasController = new CanvasController(canvas, (magnification) =>
       this.canvasMagnificationChanged(magnification)
     );
+    /** @type {CanvasController} */
     this.canvasController = canvasController;
 
     this.fontController.addEditListener(
       async (...args) => await this.editListenerCallback(...args)
     );
 
+    /** @type {VisualizationLayers} */
     this.visualizationLayers = new VisualizationLayers(
       visualizationLayerDefinitions,
       this.isThemeDark
     );
 
+    /** @type {ObservableController<VisualizationLayers>} */
     this.visualizationLayersSettings = newVisualizationLayersSettings(
       this.visualizationLayers
     );
@@ -144,6 +147,7 @@ export class EditorController extends ViewController {
       this.canvasController.requestUpdate();
     }, true);
 
+    /** @type {SceneController} */
     this.sceneController = new SceneController(
       this.fontController,
       canvasController,
@@ -151,6 +155,7 @@ export class EditorController extends ViewController {
       this.visualizationLayersSettings
     );
 
+    /** @type {typeof this.sceneController.sceneSettingsController} */
     this.sceneSettingsController = this.sceneController.sceneSettingsController;
     this.sceneSettings = this.sceneSettingsController.model;
     this.sceneModel = this.sceneController.sceneModel;
@@ -164,6 +169,7 @@ export class EditorController extends ViewController {
       }
     );
 
+    /** @type {CJKDesignFrame} */
     this.cjkDesignFrame = new CJKDesignFrame(this);
 
     const sceneView = new SceneView(this.sceneModel, (model, controller) =>
@@ -173,12 +179,15 @@ export class EditorController extends ViewController {
     );
     canvasController.sceneView = sceneView;
 
+    /** @type {SceneView} */
     this.defaultSceneView = sceneView;
 
+    /** @type {VisualizationLayers} */
     this.cleanGlyphsLayers = new VisualizationLayers(
       [allGlyphsCleanVisualizationLayerDefinition],
       this.isThemeDark
     );
+    /** @type {SceneView} */
     this.cleanSceneView = new SceneView(this.sceneModel, (model, controller) => {
       this.cleanGlyphsLayers.drawVisualizationLayers(
         new VisualizationContext(model, controller)
@@ -3493,6 +3502,7 @@ function matchEvent(handlerDef, event) {
   return true;
 }
 
+/** @returns {ObservableController<VisualizationLayers>} visualizationLayers */
 function newVisualizationLayersSettings(visualizationLayers) {
   const settings = [];
   for (const definition of visualizationLayers.definitions) {

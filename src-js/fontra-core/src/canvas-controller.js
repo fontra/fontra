@@ -1,21 +1,36 @@
 import { normalizeRect, rectCenter, validateRect } from "./rectangle.js";
 import { assert, clamp, consolidateCalls, isNumber, withSavedState } from "./utils.js";
 
+/** @import { Rectangle } from "./rectangle.js" */
+/** @import { SceneView } from "./scene-view.js" */
+
 const DEFAULT_MIN_MAGNIFICATION = 0.005;
 const DEFAULT_MAX_MAGNIFICATION = 200;
 
 export class CanvasController {
+  /**
+   * @param {HTMLCanvasElement} canvas
+   * @param {undefined | (number) => void} magnificationChangedCallback
+   */
   constructor(canvas, magnificationChangedCallback) {
+    /** @type {HTMLCanvasElement} */
     this.canvas = canvas; // The HTML5 Canvas object
+    /** @type {CanvasRenderingContext2D} */
     this.context = canvas.getContext("2d");
+    /** @type {SceneView} */
     this.sceneView = undefined; // will be set later
 
+    /** @type {number} */
     this.magnification = 1;
+    /** @type {{ x: number, y: number }} */
     this.origin = { x: this.canvasWidth / 2, y: 0.85 * this.canvasHeight }; // TODO choose y based on initial canvas height
 
+    /** @type {number} */
     this._minMagnification = DEFAULT_MIN_MAGNIFICATION;
+    /** @type {number} */
     this._maxMagnification = DEFAULT_MAX_MAGNIFICATION;
 
+    /** @type {undefined | (number) => void} */
     this._magnificationChangedCallback = magnificationChangedCallback;
 
     const resizeObserver = new ResizeObserver((entries) => {
@@ -317,6 +332,7 @@ export class CanvasController {
     return 1 / this.magnification;
   }
 
+  /** @returns {Rectangle} */
   getViewBox() {
     const width = this.canvasWidth;
     const height = this.canvasHeight;
@@ -334,6 +350,7 @@ export class CanvasController {
     return viewBox;
   }
 
+  /** @param {Rectangle} viewBox */
   isActualViewBox(viewBox) {
     const canvasCenter = this.canvasPoint(rectCenter(viewBox));
     return (
@@ -345,6 +362,7 @@ export class CanvasController {
     );
   }
 
+  /** @param {Rectangle} viewBox */
   setViewBox(viewBox) {
     validateRect(viewBox);
     this.magnification = this._getProposedViewBoxMagnification(viewBox);
@@ -356,6 +374,7 @@ export class CanvasController {
     this._dispatchEvent("viewBoxChanged", "set-view-box");
   }
 
+  /** @param {Rectangle} viewBox */
   getProposedViewBoxClampAdjustment(viewBox) {
     const magnification = this._getProposedViewBoxMagnification(viewBox);
     if (magnification < this.minMagnification) {
@@ -366,6 +385,7 @@ export class CanvasController {
     return 1;
   }
 
+  /** @param {Rectangle} viewBox */
   _getProposedViewBoxMagnification(viewBox) {
     validateRect(viewBox);
     const width = this.canvasWidth;
@@ -377,6 +397,7 @@ export class CanvasController {
     return Math.min(magnificationX, magnificationY);
   }
 
+  /** @param {string} eventName */
   _dispatchEvent(eventName, detail) {
     const event = new CustomEvent(eventName, {
       bubbles: false,

@@ -1,5 +1,8 @@
 import { SimpleElement } from "@fontra/core/html-utils.js";
 
+/** @import { EditorController } from "@fontra/views-editor/editor.js" */
+/** @import { FontController } from "@fontra/core/font-controller.js" */
+
 export default class Panel extends SimpleElement {
   panelStyles = `
     .panel {
@@ -34,9 +37,12 @@ export default class Panel extends SimpleElement {
 
   constructor(editorController) {
     super();
+    /** @type {EditorController} */
     this.editorController = editorController;
+    /** @type {FontController} */
     this.fontController = editorController.fontController;
     this._appendStyle(this.panelStyles);
+    /** @type {Element} */
     this.contentElement = this.getContentElement();
     this.shadowRoot.appendChild(this.contentElement);
   }

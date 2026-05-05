@@ -2,22 +2,40 @@ import { assert, chain } from "./utils.js";
 
 export const controllerKey = Symbol("controller-key");
 
+/** @template T */
 export class ObservableController {
+  /**
+   * @typedef {{
+   *   key: string,
+   *   newValue: T[key],
+   *   oldValue: T[key],
+   *   senderInfo: any,
+   * }} Event
+   */
+
+  /** @typedef {(event: Event) => void} Listener */
+
+  /** @param {T} model */
   constructor(model) {
     if (!model) {
       model = {};
     }
+    /** @type {T} */
     this.model = newModelProxy(this, model);
     this._rawModel = model;
+    /** @type {Listener[]} */
     this._generalListeners = [];
+    /** @type {Record<string, Listener>} */
     this._keyListeners = {};
     this._senderInfoStack = [];
   }
 
+  /** @param {Listener} listener */
   addListener(listener, immediate = false) {
     this._generalListeners.push({ listener, immediate });
   }
 
+  /** @param {Listener} listener */
   removeListener(listener) {
     // Instead of using indexOf, we use filter, to ensure we also delete any duplicates
     this._generalListeners = this._generalListeners.filter(
@@ -25,6 +43,10 @@ export class ObservableController {
     );
   }
 
+  /**
+   * @param {string | string[]} keyOrKeys
+   * @param {Listener} listener
+   */
   addKeyListener(keyOrKeys, listener, immediate = false) {
     if (typeof keyOrKeys === "string") {
       keyOrKeys = [keyOrKeys];
@@ -37,6 +59,10 @@ export class ObservableController {
     }
   }
 
+  /**
+   * @param {string | string[]} keyOrKeys
+   * @param {Listener} listener
+   */
   removeKeyListener(keyOrKeys, listener) {
     if (typeof keyOrKeys === "string") {
       keyOrKeys = [keyOrKeys];
@@ -52,6 +78,11 @@ export class ObservableController {
     }
   }
 
+  /**
+   * @param {string} key
+   * @param {T[key]} newValue
+   * @param {any} senderInfo
+   */
   setItem(key, newValue, senderInfo) {
     const oldValue = this._rawModel[key];
     if (newValue !== oldValue) {
@@ -68,6 +99,7 @@ export class ObservableController {
     );
   }
 
+  /** @param {string | string[]} keyOrKeys */
   waitForKeyChange(keyOrKeys, immediate = false) {
     let resolvePromise;
 

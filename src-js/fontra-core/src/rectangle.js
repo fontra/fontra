@@ -1,5 +1,22 @@
 import { isNumber } from "./utils.js";
 
+/** @typedef {{
+ * x: number,
+ * y: number,
+ * }} Point */
+
+/** @typedef {{
+ * xMin: number,
+ * yMin: number,
+ * xMax: number,
+ * yMax: number
+ * }} Rectangle */
+
+/**
+ * @param {number} x
+ * @param {number} y
+ * @param {Rectangle} rect
+ */
 export function pointInRect(x, y, rect) {
   if (!rect) {
     return false;
@@ -7,6 +24,12 @@ export function pointInRect(x, y, rect) {
   return x >= rect.xMin && x <= rect.xMax && y >= rect.yMin && y <= rect.yMax;
 }
 
+/**
+ * @param {number} x
+ * @param {number} y
+ * @param {number} width
+ * @param {number} height
+ */
 export function centeredRect(x, y, width, height) {
   if (height === undefined) {
     height = width;
@@ -21,6 +44,7 @@ export function centeredRect(x, y, width, height) {
   };
 }
 
+/** @param {Rectangle} rect */
 export function normalizeRect(rect) {
   const nRect = {
     xMin: Math.min(rect.xMin, rect.xMax),
@@ -31,17 +55,18 @@ export function normalizeRect(rect) {
   return nRect;
 }
 
+/**
+ * Test for rectangle-rectangle intersection.
+ *
+ * @param {Rectangle} rect1 First bounding rectangle
+ * @param {Rectangle} rect2 Second bounding rectangle
+ *
+ * @returns {Rectangle | undefined} A rectangle or `undefined`.
+ *
+ * If the input rectangles intersect, returns the intersecting rectangle.
+ * Returns ``undefined`` if the input rectangles do not intersect.
+ */
 export function sectRect(rect1, rect2) {
-  // Test for rectangle-rectangle intersection.
-
-  // Args:
-  //     rect1: First bounding rectangle
-  //     rect2: Second bounding rectangle
-
-  // Returns:
-  //     A rectangle or undefined.
-  //     If the input rectangles intersect, returns the intersecting rectangle.
-  //     Returns ``undefined`` if the input rectangles do not intersect.
   const xMin = Math.max(rect1.xMin, rect2.xMin);
   const yMin = Math.max(rect1.yMin, rect2.yMin);
   const xMax = Math.min(rect1.xMax, rect2.xMax);
@@ -52,6 +77,15 @@ export function sectRect(rect1, rect2) {
   return { xMin: xMin, yMin: yMin, xMax: xMax, yMax: yMax };
 }
 
+/**
+ * Compute the bounding rectangle for all provided rectangles
+ *
+ * @param {Rectangle[]} rectangles
+ *
+ * @returns {Rectangle | undefined} A rectangle or `undefined`.
+ *
+ * If no rectangles are provided, return `undefined`.
+ */
 export function unionRect(...rectangles) {
   if (!rectangles.length) {
     return undefined;
@@ -71,6 +105,11 @@ export function unionRect(...rectangles) {
   return { xMin: xMin, yMin: yMin, xMax: xMax, yMax: yMax };
 }
 
+/**
+ * @param {Rectangle} rect
+ * @param {number} x
+ * @param {number} y
+ */
 export function offsetRect(rect, x, y) {
   return {
     xMin: rect.xMin + x,
@@ -80,6 +119,11 @@ export function offsetRect(rect, x, y) {
   };
 }
 
+/**
+ * @param {Rectangle} rect
+ * @param {number} sx
+ * @param {number} sy
+ */
 export function scaleRect(rect, sx, sy) {
   if (sy === undefined) {
     sy = sx;
@@ -92,6 +136,11 @@ export function scaleRect(rect, sx, sy) {
   };
 }
 
+/**
+ * @param {Rectangle} rect
+ * @param {number} dx
+ * @param {number} dy
+ */
 export function insetRect(rect, dx, dy) {
   return {
     xMin: rect.xMin + dx,
@@ -101,6 +150,10 @@ export function insetRect(rect, dx, dy) {
   };
 }
 
+/**
+ * @param {Rectangle} rect1
+ * @param {Rectangle} rect2
+ */
 export function equalRect(rect1, rect2) {
   return (
     rect1.xMin === rect2.xMin &&
@@ -110,10 +163,16 @@ export function equalRect(rect1, rect2) {
   );
 }
 
+/**
+ * @param {Rectangle} rect
+ *
+ * @returns {Point}
+ */
 export function rectCenter(rect) {
   return { x: (rect.xMin + rect.xMax) / 2, y: (rect.yMin + rect.yMax) / 2 };
 }
 
+/** @param {Rectangle} rect */
 export function rectSize(rect) {
   return {
     width: Math.abs(rect.xMax - rect.xMin),
@@ -121,6 +180,11 @@ export function rectSize(rect) {
   };
 }
 
+/**
+ * @param {[number, number, number, number]} array
+ *
+ * @returns {Rectangle}
+ */
 export function rectFromArray(array) {
   if (array.length != 4) {
     throw new Error("rect array must have length == 4");
@@ -128,15 +192,26 @@ export function rectFromArray(array) {
   return { xMin: array[0], yMin: array[1], xMax: array[2], yMax: array[3] };
 }
 
+/**
+ * @param {Rectangle} rect
+ *
+ * @returns {[number, number, number, number]}
+ */
 export function rectToArray(rect) {
   return [rect.xMin, rect.yMin, rect.xMax, rect.yMax];
 }
 
+/** @param {Rectangle} rect */
 export function isEmptyRect(rect) {
   const size = rectSize(rect);
   return size.width === 0 && size.height === 0;
 }
 
+/**
+ * @param {Point[]} points
+ *
+ * @returns {Rectangle | undefined}
+ */
 export function rectFromPoints(points) {
   if (!points.length) {
     return undefined;
@@ -155,6 +230,11 @@ export function rectFromPoints(points) {
   return { xMin, yMin, xMax, yMax };
 }
 
+/**
+ * @param {Rectangle} rect
+ *
+ * @returns {[Point, Point, Point, Point]}
+ */
 export function rectToPoints(rect) {
   return [
     { x: rect.xMin, y: rect.yMin },
@@ -164,8 +244,14 @@ export function rectToPoints(rect) {
   ];
 }
 
+/**
+ * @param {Rectangle} rect
+ * @param {Point} point
+ *
+ * @returns {Rectangle}
+ * Return the smallest rect that includes the original rect and the given point
+ */
 export function updateRect(rect, point) {
-  // Return the smallest rect that includes the original rect and the given point
   return {
     xMin: Math.min(rect.xMin, point.x),
     yMin: Math.min(rect.yMin, point.y),
@@ -174,6 +260,12 @@ export function updateRect(rect, point) {
   };
 }
 
+/**
+ * @param {Rectangle} rect
+ * @param {number} relativeMargin
+ *
+ * @returns {Rectangle}
+ */
 export function rectAddMargin(rect, relativeMargin) {
   const size = rectSize(rect);
   const inset =
@@ -183,6 +275,13 @@ export function rectAddMargin(rect, relativeMargin) {
   return insetRect(rect, -inset, -inset);
 }
 
+/**
+ * @param {Rectangle} rect
+ * @param {number} scaleFactor
+ * @param {Point} center
+ *
+ * @returns {Rectangle}
+ */
 export function rectScaleAroundCenter(rect, scaleFactor, center) {
   rect = offsetRect(rect, -center.x, -center.y);
   rect = scaleRect(rect, scaleFactor);
@@ -190,6 +289,11 @@ export function rectScaleAroundCenter(rect, scaleFactor, center) {
   return rect;
 }
 
+/**
+ * @param {Rectangle} rect
+ *
+ * @returns {Rectangle}
+ */
 export function rectRound(rect) {
   return {
     xMin: Math.round(rect.xMin),
@@ -199,6 +303,7 @@ export function rectRound(rect) {
   };
 }
 
+/** @param {Rectangle} rect */
 export function validateRect(rect) {
   if (
     !rect ||

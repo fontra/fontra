@@ -104,6 +104,7 @@ export class ShaperController {
 
       if (textShaping && fontData) {
         // The new shaper is good
+        /** @type {ReturnType<getShaper>} */
         this._previousShaper = shaper;
       }
 

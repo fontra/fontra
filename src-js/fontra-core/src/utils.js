@@ -189,6 +189,13 @@ export function* range(start, stop, step = 1) {
   }
 }
 
+/**
+ * @template T
+ *
+ * @param {Iterable<T>[]} iterables
+ *
+ * @returns {Generator<T>}
+ */
 export function* chain(...iterables) {
   // After Python's itertools.chain()
   for (const iterable of iterables) {

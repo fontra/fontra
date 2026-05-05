@@ -168,8 +168,11 @@ export default class TextEntryPanel extends Panel {
   constructor(editorController) {
     super(editorController);
 
+    /** @type {typeof this.editorController.sceneSettingsController} */
     this.textSettingsController = this.editorController.sceneSettingsController;
+    /** @type {typeof this.editorController.sceneController} */
     this.sceneController = this.editorController.sceneController;
+    /** @type {typeof this.editorController.sceneSettingsController.model} */
     this.textSettings = this.editorController.sceneSettingsController.model;
 
     this.textSettingsController.addKeyListener(

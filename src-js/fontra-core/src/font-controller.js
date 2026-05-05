@@ -41,7 +41,7 @@ import {
   mapForward,
 } from "./var-model.js";
 /**
- * @import { RemoteFont, FontSource } from 'remotefont';
+ * @import { RemoteFont, FontSource } from "remotefont";
  * */
 
 const GLYPH_CACHE_SIZE = 2000;
