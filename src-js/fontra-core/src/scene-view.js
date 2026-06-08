@@ -1,4 +1,4 @@
-import { withSavedState } from "./utils.js";
+import { withSavedState } from "./utils.ts";
 
 export class SceneView {
   constructor(model, drawFunc) {

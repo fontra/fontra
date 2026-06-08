@@ -1,7 +1,7 @@
 import { applyChange } from "@fontra/core/changes.js";
 import { FontSourcesInstancer } from "@fontra/core/font-sources-instancer.js";
 import { KerningController } from "@fontra/core/kerning-controller.js";
-import { deepCopyObject } from "@fontra/core/utils.js";
+import { deepCopyObject } from "@fontra/core/utils.ts";
 import { expect } from "chai";
 import { parametrize } from "./test-support.js";
 

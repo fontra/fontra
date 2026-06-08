@@ -12,6 +12,7 @@ const fallback = {
   stream: false,
   path: false,
   url: false,
+  module: false,
   buffer: import.meta.resolve("buffer"),
 };
 

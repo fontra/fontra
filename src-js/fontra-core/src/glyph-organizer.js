@@ -1,11 +1,15 @@
-import { getGlyphInfoFromCodePoint, getGlyphInfoFromGlyphName } from "./glyph-data.js";
+import {
+  getGlyphInfoFromCodePoint,
+  getGlyphInfoFromGlyphName,
+  getSuggestedGlyphName,
+} from "./glyph-data.js";
 import { block, script, scriptNames } from "./unicode-scripts-blocks.js";
 import {
   capitalizeFirstLetter,
   getBaseGlyphName,
   getCodePointFromGlyphItem,
   getGlyphNameExtension,
-} from "./utils.js";
+} from "./utils.ts";
 
 function getGlyphInfo(codePoint, glyphName) {
   return (
@@ -62,20 +66,42 @@ export class GlyphOrganizer {
   }
 
   setSearchString(searchString) {
-    const searchItems = searchString.split(/\s+/).filter((item) => item.length);
-    const hexSearchItems = searchItems
+    const searchStrings = searchString.split(/\s+/).filter((item) => item.length);
+
+    const singleCharSearchItems = searchStrings
       .filter((item) => [...item].length === 1) // num chars, not utf16 units!
+      .map((item) => item.codePointAt(0));
+
+    // If a search item is a 2-5 characters long hex string, prefixed by U+ or 0x,
+    // look for the character this hex code point represents
+    const literalHexSearchItems = searchStrings
       .map((item) => {
-        const hexCodePoint = item
-          .codePointAt(0)
-          .toString(16)
-          .toUpperCase()
-          .padStart(4, "0");
-        // Only match if there are no hex digits before and after
-        return new RegExp(`([^0-9A-F]|^)${hexCodePoint}([^0-9A-F]|$)`);
-      });
-    searchItems.push(...hexSearchItems);
-    this._glyphNamesListFilterFunc = (item) => glyphFilterFunc(item, searchItems);
+        const match = item.match(/(?<=U\+|0x)([0-9A-F]{2,5})$/i);
+        return match ? parseInt(match[0], 16) : undefined;
+      })
+      .filter((item) => item);
+
+    // If a search item is a single character, search for glyph names that contain
+    // the character's codepoint as an uppercase hex string. For example, if a search
+    // item is 'A', then search for glyph names containing '0041'.
+    // This functionality was requested by CJK designers who use hex code points in
+    // variable component glyphs.
+    const hexSearchItems = singleCharSearchItems.map((codePoint) => {
+      const hexCodePoint = codePoint.toString(16).toUpperCase().padStart(4, "0");
+      // Only match if there are no hex digits before and after
+      return new RegExp(`([^0-9A-F]|^)${hexCodePoint}([^0-9A-F]|$)`);
+    });
+
+    const regexSearchItems = [
+      ...searchStrings.map((s) => new RegExp(RegExp.escape(s))),
+      ...hexSearchItems,
+    ];
+
+    const codePointSearchItems = [...singleCharSearchItems, ...literalHexSearchItems];
+
+    this._codePointSearchItems = codePointSearchItems;
+    this._glyphNamesListFilterFunc = (item) =>
+      glyphFilterFunc(item, regexSearchItems, codePointSearchItems);
   }
 
   setGroupByKeys(groupByKeys) {
@@ -95,8 +121,26 @@ export class GlyphOrganizer {
     return glyphs;
   }
 
-  filterGlyphs(glyphs) {
-    return glyphs.filter(this._glyphNamesListFilterFunc);
+  filterGlyphs(glyphs, appendUndefinedCharacters = false) {
+    const filteredGlyphs = glyphs.filter(this._glyphNamesListFilterFunc);
+
+    if (appendUndefinedCharacters) {
+      for (const codePoint of this._codePointSearchItems) {
+        if (
+          filteredGlyphs.some((glyphItem) => glyphItem.codePoints.includes(codePoint))
+        ) {
+          continue;
+        }
+
+        filteredGlyphs.push({
+          glyphName: getSuggestedGlyphName(codePoint),
+          codePoints: [codePoint],
+          associatedCodePoints: [],
+        });
+      }
+    }
+
+    return filteredGlyphs;
   }
 
   groupGlyphs(glyphs) {
@@ -148,22 +192,20 @@ function compareGroupInfo(groupByEntryA, groupByEntryB) {
   return 0;
 }
 
-function glyphFilterFunc(item, searchItems) {
-  if (!searchItems.length) {
+function glyphFilterFunc(item, regexSearchItems, codePointSearchItems) {
+  if (!regexSearchItems.length && !codePointSearchItems.length) {
     return true;
   }
-  for (const searchItem of searchItems) {
-    if (item.glyphName.search(searchItem) >= 0) {
+
+  for (const regex of regexSearchItems) {
+    if (item.glyphName.search(regex) >= 0) {
       return true;
     }
-    if (item.codePoints[0] !== undefined) {
-      const char = String.fromCodePoint(item.codePoints[0]);
-      if (searchItem === char) {
-        return true;
-      }
-    }
   }
-  return false;
+
+  return item.codePoints.some((codePoint) => {
+    return codePointSearchItems.some((codePointItem) => codePointItem == codePoint);
+  });
 }
 
 function glyphItemSortFunc(item1, item2) {

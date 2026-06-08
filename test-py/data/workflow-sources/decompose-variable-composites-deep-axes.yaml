@@ -3,5 +3,5 @@ steps:
     source: test-py/data/workflow/input-variable-composites-deep-axes.fontra
   - filter: decompose-composites
     onlyVariableComposites: true
-  - destination: output-decompose-variable-composites-deep-axes.fontra
-    output: fontra-write
+  - output: fontra-write
+    destination: output-decompose-variable-composites-deep-axes.fontra

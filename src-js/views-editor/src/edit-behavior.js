@@ -11,7 +11,7 @@ import {
   parseSelection,
   reversed,
   unionIndexSets,
-} from "@fontra/core/utils.js";
+} from "@fontra/core/utils.ts";
 import { copyBackgroundImage, copyComponent } from "@fontra/core/var-glyph.js";
 import * as vector from "@fontra/core/vector.js";
 import {

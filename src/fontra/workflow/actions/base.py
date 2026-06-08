@@ -8,7 +8,7 @@ import tempfile
 from contextlib import aclosing, asynccontextmanager
 from dataclasses import dataclass, field
 from functools import cached_property
-from typing import Any, AsyncGenerator, ClassVar
+from typing import Any, AsyncGenerator, ClassVar, Coroutine
 
 from ...backends import getFileSystemBackend, newFileSystemBackend
 from ...backends.base import ReadableBaseBackend
@@ -104,19 +104,19 @@ class BaseFilter(ReadableBaseBackend):
     def fontInstancer(self):
         return FontInstancer(self.validatedInput)
 
-    @async_cached_property
-    def inputAxes(self):
+    @async_cached_property[Axes]
+    def inputAxes(self) -> Coroutine[Any, Any, Axes]:
         return self.validatedInput.getAxes()
 
-    @async_cached_property
+    @async_cached_property[dict[str, list[int]]]
     def inputGlyphMap(self):
         return self.validatedInput.getGlyphMap()
 
-    @async_cached_property
+    @async_cached_property[dict[str, FontSource]]
     def inputSources(self):
         return self.validatedInput.getSources()
 
-    @async_cached_property
+    @async_cached_property[dict[str, Kerning]]
     def inputKerning(self):
         return self.validatedInput.getKerning()
 

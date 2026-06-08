@@ -11,7 +11,7 @@ import {
   filterPathByPointIndices,
   getSelectionByContour,
 } from "@fontra/core/path-functions.js";
-import { rectCenter, rectSize } from "@fontra/core/rectangle.js";
+import { rectCenter, rectSize } from "@fontra/core/rectangle.ts";
 import { Transform } from "@fontra/core/transform.js";
 import {
   enumerate,
@@ -20,7 +20,7 @@ import {
   range,
   reversed,
   zip,
-} from "@fontra/core/utils.js";
+} from "@fontra/core/utils.ts";
 import { copyBackgroundImage, copyComponent } from "@fontra/core/var-glyph.js";
 import { VarPackedPath } from "@fontra/core/var-path.js";
 import { Form } from "@fontra/web-components/ui-form.js";

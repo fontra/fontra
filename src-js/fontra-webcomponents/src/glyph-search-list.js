@@ -8,7 +8,7 @@ import {
   guessCharFromGlyphName,
   makeUPlusStringFromCodePoint,
   throttleCalls,
-} from "@fontra/core/utils.js";
+} from "@fontra/core/utils.ts";
 import { GlyphSearchField } from "./glyph-search-field.js";
 import { UIList } from "./ui-list.js";
 
@@ -59,17 +59,14 @@ export class GlyphSearchList extends SimpleElement {
         title: "glyph name",
         width: "10em",
         isIdentifierKey: true,
-        cellFactory: (item, description) => {
-          const glyphName = item.glyphName;
-          return !this._fontGlyphMap || this._fontGlyphMap[glyphName]
-            ? glyphName
-            : html.span({ class: "dimmed" }, [glyphName]);
-        },
+        get: (item) => item.glyphName,
+        cellFactory: (item, description) => this._cellFactory(item, description),
       },
       {
         key: "unicode",
         width: "fit-content",
         get: (item) => item.codePoints.map(makeUPlusStringFromCodePoint).join(","),
+        cellFactory: (item, description) => this._cellFactory(item, description),
       },
     ];
     const glyphNamesList = new UIList();
@@ -98,6 +95,14 @@ export class GlyphSearchList extends SimpleElement {
     return glyphNamesList;
   }
 
+  _cellFactory(item, description) {
+    const glyphName = item.glyphName;
+    const valueString = description.get(item);
+    return !this._fontGlyphMap || this._fontGlyphMap[glyphName]
+      ? valueString
+      : html.span({ class: "dimmed" }, [valueString]);
+  }
+
   focusSearchField() {
     this.searchField.focusSearchField();
   }
@@ -124,6 +129,15 @@ export class GlyphSearchList extends SimpleElement {
     this.requestUpdate();
   }
 
+  get allowUnknownGlyphSearchResults() {
+    return this._allowUnknownGlyphSearchResults ?? false;
+  }
+
+  set allowUnknownGlyphSearchResults(allowUnknownGlyphSearchResults) {
+    this._allowUnknownGlyphSearchResults = allowUnknownGlyphSearchResults;
+    this.requestUpdate();
+  }
+
   updateGlyphNamesListContent() {
     this.glyphOrganizer.setSearchString(this.searchField.searchString);
     this.glyphsListItems = this.glyphOrganizer.sortGlyphs(
@@ -133,7 +147,10 @@ export class GlyphSearchList extends SimpleElement {
   }
 
   _setFilteredGlyphNamesListContent() {
-    const filteredGlyphItems = this.glyphOrganizer.filterGlyphs(this.glyphsListItems);
+    const filteredGlyphItems = this.glyphOrganizer.filterGlyphs(
+      this.glyphsListItems,
+      this.allowUnknownGlyphSearchResults
+    );
     this.glyphNamesList.setItems(filteredGlyphItems);
     this.glyphNamesList.hidden = filteredGlyphItems.length === 0;
   }

@@ -1,4 +1,4 @@
-import { assert, enumerate } from "./utils.js";
+import { assert, enumerate } from "./utils.ts";
 
 function getFontDefaults() {
   return { unitsPerEm: 1000, axes: { axes: [] } };

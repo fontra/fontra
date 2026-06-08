@@ -1,8 +1,10 @@
+from types import FunctionType
+
 from . import clipboard, pathops
 from .classes import structure, unstructure
 from .path import PackedPath
 
-apiFunctions = {}
+apiFunctions: dict[str, FunctionType] = {}
 
 
 def api(func):

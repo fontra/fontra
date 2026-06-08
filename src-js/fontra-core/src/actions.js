@@ -1,12 +1,12 @@
 import { translate } from "./localization.js";
-import { ObservableController } from "./observable-object.js";
+import { ObservableController } from "./observable-object.ts";
 import {
   assert,
   capitalizeFirstLetter,
   commandKeyProperty,
   isActiveElementTypeable,
   isMac,
-} from "./utils.js";
+} from "./utils.ts";
 
 // Action Info
 // const {

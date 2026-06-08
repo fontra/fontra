@@ -1,7 +1,7 @@
 import * as html from "@fontra/core/html-utils.js";
 import { addStyleSheet } from "@fontra/core/html-utils.js";
 import { MultiPanelBasePanel } from "@fontra/core/multi-panel.js";
-import { fetchJSON } from "@fontra/core/utils.js";
+import { fetchJSON } from "@fontra/core/utils.ts";
 
 const serverInfo = await fetchJSON("/serverinfo");
 
@@ -24,19 +24,13 @@ export class ServerInfoPanel extends MultiPanelBasePanel {
     this.panelElement.innerHTML = "";
     this.panelElement.style = "gap: 1em;";
 
-    Object.entries(serverInfo).flatMap((entry) => {
+    Object.entries(serverInfo).flatMap(([key, value]) => {
       const container = html.div({ class: "fontra-ui-server-info-panel-card" }, []);
       container.appendChild(
-        html.createDomElement("div", {
-          class: "fontra-ui-server-info-panel-header",
-          innerHTML: entry[0] + ":",
-        })
+        html.div({ class: "fontra-ui-server-info-panel-header" }, [key + ":"])
       );
       container.appendChild(
-        html.createDomElement("div", {
-          class: "fontra-ui-server-info-panel-plain",
-          innerHTML: entry[1],
-        })
+        html.div({ class: "fontra-ui-server-info-panel-plain" }, [value])
       );
       this.panelElement.appendChild(container);
     });

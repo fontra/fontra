@@ -15,12 +15,16 @@ repos:
     hooks:
       - id: flake8
 
-  - repo: https://github.com/pre-commit/mirrors-prettier
-    rev: v3.0.3
+  - repo: local
     hooks:
       - id: prettier
+        name: prettier
         exclude: "src/fontra/client/third-party"
         types_or: [css, javascript, json, xml, yaml, markdown, html, ts]
+        entry: prettier --write --list-different --ignore-unknown
+        language: node
+        require_serial: false
+        additional_dependencies: ["prettier@3.8.3"]
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
@@ -28,3 +32,11 @@ repos:
       - id: trailing-whitespace
       - id: end-of-file-fixer
       - id: check-yaml
+
+  - repo: local
+    hooks:
+      - id: run-tsc
+        name: Run `tsc` to type check all TypeScript files.
+        entry: tsc
+        language: system
+        pass_filenames: false

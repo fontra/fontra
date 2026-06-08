@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 import pathlib
 from dataclasses import dataclass, field, replace
-from typing import Any
+from typing import Any, Container
 
 from ...core.async_property import async_cached_property
 from ...core.classes import (
@@ -51,7 +51,7 @@ class BaseGlyphSubsetter(BaseFilter):
         glyphMap = await self.getGlyphMap()
         return filterGlyphDict(glyphInfos, glyphMap)
 
-    @async_cached_property
+    @async_cached_property[tuple[dict[str, list[int]], OpenTypeFeatures]]
     async def _subsettedGlyphMapAndFeatures(
         self,
     ) -> tuple[dict[str, list[int]], OpenTypeFeatures]:
@@ -179,7 +179,7 @@ def subsetGroups(groups, glyphNames):
 
 
 def subsetConditionalSubstitutions(
-    substitutions: ConditionalSubstitutions, glyphNames: set[str]
+    substitutions: ConditionalSubstitutions, glyphNames: Container[str]
 ) -> ConditionalSubstitutions:
     subsettedRules = [
         subsetSubstitutionRule(rule, glyphNames) for rule in substitutions.rules

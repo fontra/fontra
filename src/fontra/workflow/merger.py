@@ -32,6 +32,12 @@ logger = logging.getLogger(__name__)
 
 
 @dataclass(kw_only=True)
+class MergedSourcesInfo:
+    sources: dict[str, FontSource]
+    identifierMappingA: dict[str, str]
+
+
+@dataclass(kw_only=True)
 class FontBackendMerger(ReadableBaseBackend):
     inputA: ReadableFontBackend
     inputB: ReadableFontBackend
@@ -83,7 +89,7 @@ class FontBackendMerger(ReadableBaseBackend):
         fontInfoB = await self.inputB.getFontInfo()
         return FontInfo(**(unstructure(fontInfoA) | unstructure(fontInfoB)))
 
-    @async_cached_property
+    @async_cached_property[Axes]
     async def mergedAxes(self) -> Axes:
         axesA = await self.inputA.getAxes()
         axesB = await self.inputB.getAxes()
@@ -119,7 +125,7 @@ class FontBackendMerger(ReadableBaseBackend):
     async def getAxes(self) -> Axes:
         return await self.mergedAxes
 
-    @async_cached_property
+    @async_cached_property[MergedSourcesInfo]
     async def mergedSourcesInfo(self) -> MergedSourcesInfo:
         mergedAxes = await self.mergedAxes
         defaultLocation = {axis.name: axis.defaultValue for axis in mergedAxes.axes}
@@ -292,12 +298,6 @@ class FontBackendMerger(ReadableBaseBackend):
         glyphInfosA = await self.inputA.getGlyphInfos()
         glyphInfosB = await self.inputB.getGlyphInfos()
         return glyphInfosA | glyphInfosB
-
-
-@dataclass(kw_only=True)
-class MergedSourcesInfo:
-    sources: dict[str, FontSource]
-    identifierMappingA: dict[str, str]
 
 
 def sourcesByLocation(sources):

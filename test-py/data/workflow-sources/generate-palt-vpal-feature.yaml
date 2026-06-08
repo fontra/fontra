@@ -5,5 +5,5 @@ steps:
     verticalOrigin: 880
     yAdvance: 1000
   - filter: generate-palt-vpal-feature
-  - destination: output-generate-palt-vpal-feature.fontra
-    output: fontra-write
+  - output: fontra-write
+    destination: output-generate-palt-vpal-feature.fontra

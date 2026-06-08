@@ -385,7 +385,7 @@ class ShallowDecomposeComposites(BaseFilter):
 class TrimVariableGlyphs(BaseFilter):
     moveDefaultBehavior: MoveDefaultBehavior = MoveDefaultBehavior.any
 
-    @async_cached_property
+    @async_cached_property[dict[str, VariableGlyph]]
     async def trimmedGlyphs(self) -> dict[str, VariableGlyph]:
         fontInstancer = self.fontInstancer
 

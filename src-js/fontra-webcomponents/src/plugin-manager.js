@@ -1,7 +1,7 @@
 import * as html from "@fontra/core/html-utils.js";
 import { SimpleElement, createDomElement } from "@fontra/core/html-utils.js";
 import { translate } from "@fontra/core/localization.js";
-import { ObservableController } from "@fontra/core/observable-object.js";
+import { ObservableController } from "@fontra/core/observable-object.ts";
 import "@fontra/web-components/add-remove-buttons.js";
 import { dialogSetup, message } from "@fontra/web-components/modal-dialog.js";
 import { UIList } from "@fontra/web-components/ui-list.js";

@@ -7,5 +7,5 @@ steps:
       - B
   - filter: drop-shapes
   - filter: clear-location-base
-  - destination: output-clear-location-base.fontra
-    output: fontra-write
+  - output: fontra-write
+    destination: output-clear-location-base.fontra

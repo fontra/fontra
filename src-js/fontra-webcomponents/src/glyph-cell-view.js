@@ -6,7 +6,7 @@ import {
   symmetricDifference,
   union,
 } from "@fontra/core/set-ops.js";
-import { arrowKeyDeltas, assert, enumerate } from "@fontra/core/utils.js";
+import { arrowKeyDeltas, assert, enumerate } from "@fontra/core/utils.ts";
 import { GlyphCell } from "@fontra/web-components/glyph-cell.js";
 import { Accordion } from "@fontra/web-components/ui-accordion.js";
 
@@ -448,8 +448,8 @@ export class GlyphCellView extends HTMLElement {
         this._firstClickedCell = !firstSelectedCell
           ? this.getFirstGlyphCell()
           : cellCompare(lastSelectedCell, glyphCell) < 0
-          ? firstSelectedCell
-          : lastSelectedCell;
+            ? firstSelectedCell
+            : lastSelectedCell;
       }
     }
   }

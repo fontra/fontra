@@ -5,6 +5,7 @@ import {
   capitalizeFirstLetter,
   chain,
   clamp,
+  compare,
   consolidateCalls,
   dumpURLFragment,
   enumerate,
@@ -36,10 +37,9 @@ import {
   scheduleCalls,
   sleepAsync,
   splitGlyphNameExtension,
-  stringCompare,
   throttleCalls,
   withTimeout,
-} from "@fontra/core/utils.js";
+} from "@fontra/core/utils.ts";
 import { expect } from "chai";
 
 import { getTestData, parametrize } from "./test-support.js";
@@ -299,8 +299,8 @@ describe("makeUPlusStringFromCodePoint", () => {
   it("throws an exception when an invalid parameter is given", () => {
     expect(() => makeUPlusStringFromCodePoint("not-a-number")).to.throw();
   });
-  it("should not throw an exception for a falsy value", () => {
-    expect(() => makeUPlusStringFromCodePoint("")).to.not.throw();
+  it("should not throw an exception for undefined", () => {
+    expect(() => makeUPlusStringFromCodePoint(undefined)).to.not.throw();
   });
   it("make a number unicode hex", () => {
     expect(makeUPlusStringFromCodePoint(97)).equals("U+0061"); // a
@@ -784,16 +784,19 @@ describe("longestCommonPrefix", () => {
   });
 });
 
-describe("stringCompare", () => {
+describe("compare", () => {
   const testData = [
     { a: "A", b: "A", result: 0 },
     { a: "A", b: "AA", result: -1 },
     { a: "A", b: "B", result: -1 },
     { a: "BB", b: "B", result: 1 },
     { a: "B", b: "A", result: 1 },
+    { a: 1, b: 1, result: 0 },
+    { a: 0, b: 1, result: -1 },
+    { a: 1, b: 0, result: 1 },
   ];
 
-  parametrize("stringCompare test", testData, (testCase) => {
-    expect(stringCompare(testCase.a, testCase.b)).to.equal(testCase.result);
+  parametrize("compare test", testData, (testCase) => {
+    expect(compare(testCase.a, testCase.b)).to.equal(testCase.result);
   });
 });

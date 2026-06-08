@@ -3,7 +3,7 @@ import fs from "fs";
 
 import { recordChanges } from "@fontra/core/change-recorder.js";
 import { applyChange } from "@fontra/core/changes.js";
-import { deepCopyObject, enumerate } from "@fontra/core/utils.js";
+import { deepCopyObject, enumerate } from "@fontra/core/utils.ts";
 import { VarPackedPath } from "@fontra/core/var-path.js";
 
 const testData = [

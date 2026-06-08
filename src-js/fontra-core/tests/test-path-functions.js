@@ -7,7 +7,7 @@ import {
   splitPathAtPointIndices,
 } from "@fontra/core/path-functions.js";
 import { PathHitTester } from "@fontra/core/path-hit-tester.js";
-import { enumerate } from "@fontra/core/utils.js";
+import { enumerate } from "@fontra/core/utils.ts";
 import { VarPackedPath } from "@fontra/core/var-path.js";
 
 import { parametrize } from "./test-support.js";

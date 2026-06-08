@@ -7,12 +7,12 @@ steps:
   - filter: subset-glyphs
     glyphNames:
       - A
-  - axes:
+  - filter: adjust-axes
+    axes:
       weight:
         defaultValue: 400
         maxValue: 800
         minValue: 200
-    filter: adjust-axes
     remapSources: false
-  - destination: output-adjust-axes-no-source-remap.fontra
-    output: fontra-write
+  - output: fontra-write
+    destination: output-adjust-axes-no-source-remap.fontra

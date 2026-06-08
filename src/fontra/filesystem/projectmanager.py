@@ -89,7 +89,9 @@ class FileSystemProjectManager:
     async def projectAvailable(self, projectIdentifier: str, token: str) -> bool:
         return bool(self._getProjectPath(projectIdentifier))
 
-    async def getRemoteSubject(self, projectIdentifier: str, token: str) -> FontHandler:
+    async def getRemoteSubject(
+        self, projectIdentifier: str, token: str, readOnly: bool = False
+    ) -> FontHandler:
         fontHandler = self.fontHandlers.get(projectIdentifier)
         if fontHandler is None:
             projectPath = self._getProjectPath(projectIdentifier)
@@ -111,7 +113,7 @@ class FileSystemProjectManager:
                 projectIdentifier=fspath(projectPath),
                 metaInfoProvider=self,
                 exportManager=self.exportManager,
-                readOnly=self.readOnly,
+                readOnly=self.readOnly or readOnly,
                 allConnectionsClosedCallback=closeFontHandler,
             )
             await fontHandler.startTasks()

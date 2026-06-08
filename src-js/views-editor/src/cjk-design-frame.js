@@ -1,4 +1,4 @@
-import { assert, range } from "@fontra/core/utils.js";
+import { assert, range } from "@fontra/core/utils.ts";
 import {
   glyphSelector,
   registerVisualizationLayerDefinition,

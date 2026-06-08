@@ -1,6 +1,6 @@
 import * as html from "@fontra/core/html-utils.js";
 import { translate } from "@fontra/core/localization.js";
-import { clamp, hyphenatedToLabel } from "@fontra/core/utils.js";
+import { clamp, hyphenatedToLabel } from "@fontra/core/utils.ts";
 
 export const MIN_SIDEBAR_WIDTH = 200;
 export const MAX_SIDEBAR_WIDTH = 500;

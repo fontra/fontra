@@ -3,7 +3,7 @@ import {
   glyphSetsUIStyles,
 } from "@fontra/core/glyphsets-ui.js";
 import * as html from "@fontra/core/html-utils.js";
-import { glyphMapToItemList, isObjectEmpty } from "@fontra/core/utils.js";
+import { glyphMapToItemList, isObjectEmpty } from "@fontra/core/utils.ts";
 import "@fontra/web-components/glyph-search-list.js";
 import { Accordion } from "@fontra/web-components/ui-accordion.js";
 import Panel from "./panel.js";
@@ -33,6 +33,7 @@ export default class GlyphSearchPanel extends Panel {
     );
     this.editorController.fontController.ensureInitialized.then(() => {
       this.glyphSearch.glyphMap = this.editorController.fontController.glyphMap;
+      this.glyphSearch.allowUnknownGlyphSearchResults = true;
     });
 
     this.editorController.sceneSettingsController.addKeyListener(

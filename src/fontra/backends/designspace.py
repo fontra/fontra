@@ -365,7 +365,7 @@ class DesignspaceBackend(WatchableBackend, WritableBaseBackend):
     def familyName(self) -> str:
         return self._familyName if self._familyName is not None else "Untitled"
 
-    @async_property
+    @async_property[GlyphDependencies]
     async def glyphDependencies(self) -> GlyphDependencies:
         if self._glyphDependencies is not None:
             return self._glyphDependencies

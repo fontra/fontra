@@ -4,11 +4,11 @@ steps:
   - filter: subset-glyphs
     glyphNames:
       - A
-  - axes:
+  - filter: rename-axes
+    axes:
       weight:
         label: Thickness
         name: Thickness
         tag: THCK
-    filter: rename-axes
-  - destination: output-rename-axes.fontra
-    output: fontra-write
+  - output: fontra-write
+    destination: output-rename-axes.fontra

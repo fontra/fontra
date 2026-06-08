@@ -1,0 +1,7 @@
+steps:
+  - input: fontra-read
+    source: test-py/data/workflow/input1-A.fontra
+  - filter: drop-shapes
+  - filter: drop-kerning
+  - output: fontra-write
+    destination: output-drop-kerning.fontra

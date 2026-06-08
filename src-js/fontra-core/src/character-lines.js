@@ -1,5 +1,5 @@
 import { getCodePointFromGlyphName, getSuggestedGlyphName } from "./glyph-data.js";
-import { assert, splitGlyphNameExtension } from "./utils.js";
+import { assert, splitGlyphNameExtension } from "./utils.ts";
 
 export function characterLinesFromString(
   string,

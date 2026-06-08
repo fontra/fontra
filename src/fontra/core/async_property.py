@@ -1,19 +1,27 @@
 import asyncio
+from asyncio import Task
+from typing import Any, Callable, Coroutine, Generic, TypeVar
+
+_T_co = TypeVar("_T_co", covariant=True)
 
 
-class async_property:
+class async_property(Generic[_T_co]):
+    func: Callable[[Any], Coroutine[Any, Any, _T_co]]
+
     def __init__(self, func):
         self.func = func
 
-    def __get__(self, obj, objtype=None):
+    def __get__(self, obj, objtype=None) -> Coroutine[Any, Any, _T_co]:
         return self.func(obj)
 
 
-class async_cached_property:
+class async_cached_property(Generic[_T_co]):
+    func: Callable[[Any], Coroutine[Any, Any, _T_co]]
+
     def __init__(self, func):
         self.func = func
 
-    def __get__(self, obj, objtype=None):
+    def __get__(self, obj, objtype=None) -> Task[_T_co]:
         cachedFuture = getattr(obj, self.privateName, None)
         if cachedFuture is None:
             cachedFuture = asyncio.ensure_future(self.func(obj))

@@ -1,4 +1,4 @@
-import { assert, deepCopyObject } from "@fontra/core/utils.js";
+import { assert, deepCopyObject } from "@fontra/core/utils.ts";
 import { expect } from "chai";
 import { fileURLToPath } from "url";
 import { NodePath } from "./node-path.js";
@@ -8,8 +8,11 @@ import { parametrize } from "./test-support.js";
 import { buildShaperFont } from "build-shaper-font";
 
 import { guessDirectionFromCodePoints } from "@fontra/core/glyph-data.js";
-import { ObservableController } from "@fontra/core/observable-object.js";
-import { ShaperController } from "@fontra/core/shaper-controller.js";
+import { ObservableController } from "@fontra/core/observable-object.ts";
+import {
+  prepareConditionalSubstitutions,
+  ShaperController,
+} from "@fontra/core/shaper-controller.js";
 import {
   applyCursiveAttachments,
   applyKerning,
@@ -28,75 +31,82 @@ describe("shaper tests", () => {
 
   const testInputCodePoints = [..."😻VABCÄS"].map((c) => ord(c));
 
-  function getExpectedGlyphs(useGlyphObjects) {
+  function getExpectedGlyphs(useGlyphObjects, applyShaping = true) {
     return [
       {
         codepoint: 0,
         cluster: 0,
-        x_advance: 500,
-        y_advance: 0,
-        x_offset: 0,
-        y_offset: 0,
+        flags: 0,
+        xAdvance: 500,
+        yAdvance: 0,
+        xOffset: 0,
+        yOffset: 0,
         glyphname: ".notdef",
         mark: false,
       },
       {
         codepoint: 24,
         cluster: 1,
-        x_advance: useGlyphObjects ? 301 : 300,
-        y_advance: 0,
-        x_offset: 0,
-        y_offset: 0,
+        flags: 0,
+        xAdvance: !applyShaping ? 401 : useGlyphObjects ? 301 : 300,
+        yAdvance: 0,
+        xOffset: 0,
+        yOffset: 0,
         glyphname: "V",
         mark: false,
       },
       {
         codepoint: 1,
         cluster: 2,
-        x_advance: 396,
-        y_advance: 0,
-        x_offset: 0,
-        y_offset: 0,
+        flags: applyShaping ? 1 : 0,
+        xAdvance: 396,
+        yAdvance: 0,
+        xOffset: 0,
+        yOffset: 0,
         glyphname: "A",
         mark: false,
       },
       {
         codepoint: 4,
         cluster: 3,
-        x_advance: 443,
-        y_advance: 0,
-        x_offset: 0,
-        y_offset: 0,
+        flags: 0,
+        xAdvance: 443,
+        yAdvance: 0,
+        xOffset: 0,
+        yOffset: 0,
         glyphname: "B",
         mark: false,
       },
       {
         codepoint: 5,
         cluster: 4,
-        x_advance: 499,
-        y_advance: 0,
-        x_offset: 0,
-        y_offset: 0,
+        flags: 0,
+        xAdvance: 499,
+        yAdvance: 0,
+        xOffset: 0,
+        yOffset: 0,
         glyphname: "C",
         mark: false,
       },
       {
         codepoint: 3,
         cluster: 5,
-        x_advance: 396,
-        y_advance: 0,
-        x_offset: 0,
-        y_offset: 0,
+        flags: 0,
+        xAdvance: 396,
+        yAdvance: 0,
+        xOffset: 0,
+        yOffset: 0,
         glyphname: "Adieresis",
         mark: false,
       },
       {
         codepoint: 21,
         cluster: 6,
-        x_advance: 393,
-        y_advance: 0,
-        x_offset: 0,
-        y_offset: 0,
+        flags: 0,
+        xAdvance: 393,
+        yAdvance: 0,
+        xOffset: 0,
+        yOffset: 0,
         glyphname: "S",
         mark: false,
       },
@@ -197,7 +207,10 @@ describe("shaper tests", () => {
     });
     const { glyphs } = shaper.shape(testInputCodePoints, glyphObjects, {
       variations: { wght: 0, wdth: 0 },
-      features: "kern,-rvrn",
+      features: [
+        ["kern", true],
+        ["rvrn", false],
+      ],
     });
 
     expect(glyphs).to.deep.equal(getExpectedGlyphs(true));
@@ -208,7 +221,10 @@ describe("shaper tests", () => {
     const shaper = getShaper({ fontData });
     const { glyphs } = shaper.shape(testInputCodePoints, null, {
       variations: { wght: 0, wdth: 0 },
-      features: "kern,-rvrn",
+      features: [
+        ["kern", true],
+        ["rvrn", false],
+      ],
     });
 
     expect(glyphs).to.deep.equal(getExpectedGlyphs(false));
@@ -312,7 +328,7 @@ describe("shaper tests", () => {
       kerningPairFunc: (g1, g2) => kerning.getGlyphPairValue(g1, g2),
     });
 
-    expect(glyphs).to.deep.equal(getExpectedGlyphs(true));
+    expect(glyphs).to.deep.equal(getExpectedGlyphs(true, false));
   });
 
   it("test DumbShaper RTL", () => {
@@ -332,59 +348,76 @@ describe("shaper tests", () => {
     ]);
   });
 
-  const testInputCodePointsKerningSkipMarks = [..."V\u0304A"].map((c) => ord(c));
-  const expectedGlyphsKerningSkipMarks = [
-    {
-      codepoint: 24,
-      cluster: 0,
-      glyphname: "V",
-      mark: false,
-      x_advance: 301,
-      y_advance: 0,
-      x_offset: 0,
-      y_offset: 0,
-    },
-    {
-      codepoint: 51,
-      cluster: 1,
-      glyphname: "macroncomb",
-      mark: true,
-      x_advance: 0,
-      y_advance: 0,
-      x_offset: 0,
-      y_offset: 0,
-    },
-    {
-      codepoint: 1,
-      cluster: 2,
-      glyphname: "A",
-      mark: false,
-      x_advance: 396,
-      y_advance: 0,
-      x_offset: 0,
-      y_offset: 0,
-    },
-  ];
-
-  const defaultInsertMarkers = [
-    { tag: "curs", lookupId: undefined },
-    { tag: "kern", lookupId: undefined },
-    { tag: "mark", lookupId: undefined },
-    { tag: "mkmk", lookupId: undefined },
-  ];
-
   it("test applyKerning skip marks", () => {
-    const shaper = getShaper({
-      nominalGlyphFunc,
-      glyphOrder,
-      isGlyphMarkFunc,
-      insertMarkers: defaultInsertMarkers,
-    });
-    const { glyphs } = shaper.shape(testInputCodePointsKerningSkipMarks, glyphObjects, {
-      kerningPairFunc: (g1, g2) => kerning.getGlyphPairValue(g1, g2),
-    });
+    const glyphs = [
+      {
+        codepoint: 24,
+        cluster: 0,
+        glyphname: "V",
+        mark: false,
+        xAdvance: 401,
+        yAdvance: 0,
+        xOffset: 0,
+        yOffset: 0,
+      },
+      {
+        codepoint: 51,
+        cluster: 1,
+        glyphname: "macroncomb",
+        mark: true,
+        xAdvance: 0,
+        yAdvance: 0,
+        xOffset: 0,
+        yOffset: 0,
+      },
+      {
+        codepoint: 1,
+        cluster: 2,
+        glyphname: "A",
+        mark: false,
+        xAdvance: 396,
+        yAdvance: 0,
+        xOffset: 0,
+        yOffset: 0,
+      },
+    ];
 
-    expect(glyphs).to.deep.equal(expectedGlyphsKerningSkipMarks);
+    const expectedOutputGlyphs = [
+      {
+        codepoint: 24,
+        cluster: 0,
+        glyphname: "V",
+        mark: false,
+        xAdvance: 301,
+        yAdvance: 0,
+        xOffset: 0,
+        yOffset: 0,
+      },
+      {
+        codepoint: 51,
+        cluster: 1,
+        glyphname: "macroncomb",
+        mark: true,
+        xAdvance: 0,
+        yAdvance: 0,
+        xOffset: 0,
+        yOffset: 0,
+      },
+      {
+        codepoint: 1,
+        cluster: 2,
+        glyphname: "A",
+        mark: false,
+        xAdvance: 396,
+        yAdvance: 0,
+        xOffset: 0,
+        yOffset: 0,
+      },
+    ];
+
+    applyKerning(glyphs, (g1, g2) => kerning.getGlyphPairValue(g1, g2));
+
+    expect(glyphs).to.deep.equal(expectedOutputGlyphs);
   });
 
   it("test getGlyphNameCodePoint", () => {
@@ -436,85 +469,85 @@ describe("shaper tests", () => {
     { inputGlyphs: [], expectedGlyphs: [], rightToLeft: false },
     {
       inputGlyphs: [
-        { glyphname: "A", x_advance: 500, y_advance: 0, x_offset: 0, y_offset: 0 },
-        { glyphname: "B", x_advance: 500, y_advance: 0, x_offset: 0, y_offset: 0 },
+        { glyphname: "A", xAdvance: 500, yAdvance: 0, xOffset: 0, yOffset: 0 },
+        { glyphname: "B", xAdvance: 500, yAdvance: 0, xOffset: 0, yOffset: 0 },
       ],
       expectedGlyphs: [
-        { glyphname: "A", x_advance: 450, y_advance: 0, x_offset: 0, y_offset: 0 },
-        { glyphname: "B", x_advance: 475, y_advance: 0, x_offset: -25, y_offset: 150 },
+        { glyphname: "A", xAdvance: 450, yAdvance: 0, xOffset: 0, yOffset: 0 },
+        { glyphname: "B", xAdvance: 475, yAdvance: 0, xOffset: -25, yOffset: 150 },
       ],
       rightToLeft: false,
     },
     {
       inputGlyphs: [
-        { glyphname: "A", x_advance: 500, y_advance: 0, x_offset: 0, y_offset: 0 },
-        { glyphname: "B", x_advance: 500, y_advance: 0, x_offset: 0, y_offset: 0 },
-        { glyphname: "C", x_advance: 500, y_advance: 0, x_offset: 0, y_offset: 0 },
+        { glyphname: "A", xAdvance: 500, yAdvance: 0, xOffset: 0, yOffset: 0 },
+        { glyphname: "B", xAdvance: 500, yAdvance: 0, xOffset: 0, yOffset: 0 },
+        { glyphname: "C", xAdvance: 500, yAdvance: 0, xOffset: 0, yOffset: 0 },
       ],
       expectedGlyphs: [
-        { glyphname: "A", x_advance: 450, y_advance: 0, x_offset: 0, y_offset: 0 },
-        { glyphname: "B", x_advance: 425, y_advance: 0, x_offset: -25, y_offset: 150 },
-        { glyphname: "C", x_advance: 475, y_advance: 0, x_offset: -25, y_offset: 300 },
+        { glyphname: "A", xAdvance: 450, yAdvance: 0, xOffset: 0, yOffset: 0 },
+        { glyphname: "B", xAdvance: 425, yAdvance: 0, xOffset: -25, yOffset: 150 },
+        { glyphname: "C", xAdvance: 475, yAdvance: 0, xOffset: -25, yOffset: 300 },
       ],
       rightToLeft: false,
     },
     {
       inputGlyphs: [
-        { glyphname: "A", x_advance: 500, y_advance: 0, x_offset: 0, y_offset: 0 },
+        { glyphname: "A", xAdvance: 500, yAdvance: 0, xOffset: 0, yOffset: 0 },
         {
           glyphname: "mark",
-          x_advance: 0,
-          y_advance: 0,
-          x_offset: 0,
-          y_offset: 0,
+          xAdvance: 0,
+          yAdvance: 0,
+          xOffset: 0,
+          yOffset: 0,
           mark: true,
         },
-        { glyphname: "B", x_advance: 500, y_advance: 0, x_offset: 0, y_offset: 0 },
-        { glyphname: "C", x_advance: 500, y_advance: 0, x_offset: 0, y_offset: 0 },
+        { glyphname: "B", xAdvance: 500, yAdvance: 0, xOffset: 0, yOffset: 0 },
+        { glyphname: "C", xAdvance: 500, yAdvance: 0, xOffset: 0, yOffset: 0 },
       ],
       expectedGlyphs: [
-        { glyphname: "A", x_advance: 450, y_advance: 0, x_offset: 0, y_offset: 0 },
+        { glyphname: "A", xAdvance: 450, yAdvance: 0, xOffset: 0, yOffset: 0 },
         {
           glyphname: "mark",
-          x_advance: 0,
-          y_advance: 0,
-          x_offset: 0,
-          y_offset: 0,
+          xAdvance: 0,
+          yAdvance: 0,
+          xOffset: 0,
+          yOffset: 0,
           mark: true,
         },
-        { glyphname: "B", x_advance: 425, y_advance: 0, x_offset: -25, y_offset: 150 },
-        { glyphname: "C", x_advance: 475, y_advance: 0, x_offset: -25, y_offset: 300 },
+        { glyphname: "B", xAdvance: 425, yAdvance: 0, xOffset: -25, yOffset: 150 },
+        { glyphname: "C", xAdvance: 475, yAdvance: 0, xOffset: -25, yOffset: 300 },
       ],
       rightToLeft: false,
     },
     // RTL
     {
       inputGlyphs: [
-        { glyphname: "teh-ar", x_advance: 500, y_advance: 0, x_offset: 0, y_offset: 0 },
-        { glyphname: "beh-ar", x_advance: 500, y_advance: 0, x_offset: 0, y_offset: 0 },
+        { glyphname: "teh-ar", xAdvance: 500, yAdvance: 0, xOffset: 0, yOffset: 0 },
+        { glyphname: "beh-ar", xAdvance: 500, yAdvance: 0, xOffset: 0, yOffset: 0 },
         {
           glyphname: "alef-ar",
-          x_advance: 500,
-          y_advance: 0,
-          x_offset: 0,
-          y_offset: 0,
+          xAdvance: 500,
+          yAdvance: 0,
+          xOffset: 0,
+          yOffset: 0,
         },
       ],
       expectedGlyphs: [
-        { glyphname: "teh-ar", x_advance: 475, y_advance: 0, x_offset: 0, y_offset: 0 },
+        { glyphname: "teh-ar", xAdvance: 475, yAdvance: 0, xOffset: 0, yOffset: 0 },
         {
           glyphname: "beh-ar",
-          x_advance: 425,
-          y_advance: 0,
-          x_offset: -50,
-          y_offset: -150,
+          xAdvance: 425,
+          yAdvance: 0,
+          xOffset: -50,
+          yOffset: -150,
         },
         {
           glyphname: "alef-ar",
-          x_advance: 450,
-          y_advance: 0,
-          x_offset: -50,
-          y_offset: -300,
+          xAdvance: 450,
+          yAdvance: 0,
+          xOffset: -50,
+          yOffset: -300,
         },
       ],
       rightToLeft: true,
@@ -525,29 +558,29 @@ describe("shaper tests", () => {
       inputGlyphs: [
         {
           glyphname: "alef-ar",
-          x_advance: 500,
-          y_advance: 0,
-          x_offset: 0,
-          y_offset: 0,
+          xAdvance: 500,
+          yAdvance: 0,
+          xOffset: 0,
+          yOffset: 0,
         },
-        { glyphname: "beh-ar", x_advance: 500, y_advance: 0, x_offset: 0, y_offset: 0 },
-        { glyphname: "teh-ar", x_advance: 500, y_advance: 0, x_offset: 0, y_offset: 0 },
+        { glyphname: "beh-ar", xAdvance: 500, yAdvance: 0, xOffset: 0, yOffset: 0 },
+        { glyphname: "teh-ar", xAdvance: 500, yAdvance: 0, xOffset: 0, yOffset: 0 },
       ],
       expectedGlyphs: [
-        { glyphname: "alef-ar", x_advance: 50, y_advance: 0, x_offset: 0, y_offset: 0 },
+        { glyphname: "alef-ar", xAdvance: 50, yAdvance: 0, xOffset: 0, yOffset: 0 },
         {
           glyphname: "beh-ar",
-          x_advance: 0,
-          y_advance: 0,
-          x_offset: -475,
-          y_offset: 150,
+          xAdvance: 0,
+          yAdvance: 0,
+          xOffset: -475,
+          yOffset: 150,
         },
         {
           glyphname: "teh-ar",
-          x_advance: 25,
-          y_advance: 0,
-          x_offset: -475,
-          y_offset: 300,
+          xAdvance: 25,
+          yAdvance: 0,
+          xOffset: -475,
+          yOffset: 300,
         },
       ],
       rightToLeft: false,
@@ -611,218 +644,218 @@ describe("shaper tests", () => {
     { inputGlyphs: [], expectedGlyphs: [] },
     {
       inputGlyphs: [
-        { glyphname: "H", x_advance: 500, y_advance: 0, x_offset: 0, y_offset: 0 },
+        { glyphname: "H", xAdvance: 500, yAdvance: 0, xOffset: 0, yOffset: 0 },
       ],
       expectedGlyphs: [
-        { glyphname: "H", x_advance: 500, y_advance: 0, x_offset: 0, y_offset: 0 },
+        { glyphname: "H", xAdvance: 500, yAdvance: 0, xOffset: 0, yOffset: 0 },
       ],
     },
     {
       inputGlyphs: [
-        { glyphname: "H", x_advance: 500, y_advance: 0, x_offset: 0, y_offset: 0 },
+        { glyphname: "H", xAdvance: 500, yAdvance: 0, xOffset: 0, yOffset: 0 },
         {
           glyphname: "dotaccentcomb",
-          x_advance: 0,
-          y_advance: 0,
-          x_offset: 0,
-          y_offset: 0,
+          xAdvance: 0,
+          yAdvance: 0,
+          xOffset: 0,
+          yOffset: 0,
           mark: true,
         },
-        { glyphname: "H", x_advance: 500, y_advance: 0, x_offset: 0, y_offset: 0 },
+        { glyphname: "H", xAdvance: 500, yAdvance: 0, xOffset: 0, yOffset: 0 },
         {
           glyphname: "dotaccentcomb",
-          x_advance: 0,
-          y_advance: 0,
-          x_offset: 0,
-          y_offset: 0,
+          xAdvance: 0,
+          yAdvance: 0,
+          xOffset: 0,
+          yOffset: 0,
           mark: true,
         },
       ],
       expectedGlyphs: [
-        { glyphname: "H", x_advance: 500, y_advance: 0, x_offset: 0, y_offset: 0 },
+        { glyphname: "H", xAdvance: 500, yAdvance: 0, xOffset: 0, yOffset: 0 },
         {
           glyphname: "dotaccentcomb",
-          x_advance: 0,
-          y_advance: 0,
-          x_offset: -350,
-          y_offset: -10,
+          xAdvance: 0,
+          yAdvance: 0,
+          xOffset: -350,
+          yOffset: -10,
           mark: true,
         },
-        { glyphname: "H", x_advance: 500, y_advance: 0, x_offset: 0, y_offset: 0 },
+        { glyphname: "H", xAdvance: 500, yAdvance: 0, xOffset: 0, yOffset: 0 },
         {
           glyphname: "dotaccentcomb",
-          x_advance: 0,
-          y_advance: 0,
-          x_offset: -350,
-          y_offset: -10,
-          mark: true,
-        },
-      ],
-    },
-    {
-      inputGlyphs: [
-        { glyphname: "H", x_advance: 500, y_advance: 0, x_offset: 0, y_offset: 0 },
-        {
-          glyphname: "dotaccentcomb",
-          x_advance: 0,
-          y_advance: 0,
-          x_offset: 0,
-          y_offset: 0,
-          mark: true,
-        },
-        {
-          glyphname: "dotbelowcomb",
-          x_advance: 0,
-          y_advance: 0,
-          x_offset: 0,
-          y_offset: 0,
-          mark: true,
-        },
-      ],
-      expectedGlyphs: [
-        { glyphname: "H", x_advance: 500, y_advance: 0, x_offset: 0, y_offset: 0 },
-        {
-          glyphname: "dotaccentcomb",
-          x_advance: 0,
-          y_advance: 0,
-          x_offset: -350,
-          y_offset: -10,
-          mark: true,
-        },
-        {
-          glyphname: "dotbelowcomb",
-          x_advance: 0,
-          y_advance: 0,
-          x_offset: -350,
-          y_offset: 0,
+          xAdvance: 0,
+          yAdvance: 0,
+          xOffset: -350,
+          yOffset: -10,
           mark: true,
         },
       ],
     },
     {
       inputGlyphs: [
-        { glyphname: "H", x_advance: 500, y_advance: 0, x_offset: 0, y_offset: 0 },
+        { glyphname: "H", xAdvance: 500, yAdvance: 0, xOffset: 0, yOffset: 0 },
         {
           glyphname: "dotaccentcomb",
-          x_advance: 0,
-          y_advance: 0,
-          x_offset: 0,
-          y_offset: 0,
+          xAdvance: 0,
+          yAdvance: 0,
+          xOffset: 0,
+          yOffset: 0,
           mark: true,
         },
         {
-          glyphname: "dotaccentcomb",
-          x_advance: 0,
-          y_advance: 0,
-          x_offset: 0,
-          y_offset: 0,
-          mark: true,
-        },
-        {
-          glyphname: "dotaccentcomb",
-          x_advance: 0,
-          y_advance: 0,
-          x_offset: 0,
-          y_offset: 0,
+          glyphname: "dotbelowcomb",
+          xAdvance: 0,
+          yAdvance: 0,
+          xOffset: 0,
+          yOffset: 0,
           mark: true,
         },
       ],
       expectedGlyphs: [
-        { glyphname: "H", x_advance: 500, y_advance: 0, x_offset: 0, y_offset: 0 },
+        { glyphname: "H", xAdvance: 500, yAdvance: 0, xOffset: 0, yOffset: 0 },
         {
           glyphname: "dotaccentcomb",
-          x_advance: 0,
-          y_advance: 0,
-          x_offset: -350,
-          y_offset: -10,
+          xAdvance: 0,
+          yAdvance: 0,
+          xOffset: -350,
+          yOffset: -10,
           mark: true,
         },
         {
-          glyphname: "dotaccentcomb",
-          x_advance: 0,
-          y_advance: 0,
-          x_offset: -350,
-          y_offset: 160,
-          mark: true,
-        },
-        {
-          glyphname: "dotaccentcomb",
-          x_advance: 0,
-          y_advance: 0,
-          x_offset: -350,
-          y_offset: 330,
+          glyphname: "dotbelowcomb",
+          xAdvance: 0,
+          yAdvance: 0,
+          xOffset: -350,
+          yOffset: 0,
           mark: true,
         },
       ],
     },
     {
       inputGlyphs: [
-        { glyphname: "H", x_advance: 500, y_advance: 0, x_offset: 0, y_offset: 0 },
+        { glyphname: "H", xAdvance: 500, yAdvance: 0, xOffset: 0, yOffset: 0 },
         {
           glyphname: "dotaccentcomb",
-          x_advance: 0,
-          y_advance: 0,
-          x_offset: 0,
-          y_offset: 0,
+          xAdvance: 0,
+          yAdvance: 0,
+          xOffset: 0,
+          yOffset: 0,
           mark: true,
         },
         {
           glyphname: "dotaccentcomb",
-          x_advance: 0,
-          y_advance: 0,
-          x_offset: 0,
-          y_offset: 0,
+          xAdvance: 0,
+          yAdvance: 0,
+          xOffset: 0,
+          yOffset: 0,
           mark: true,
         },
         {
-          glyphname: "dotbelowcomb",
-          x_advance: 0,
-          y_advance: 0,
-          x_offset: 0,
-          y_offset: 0,
-          mark: true,
-        },
-        {
-          glyphname: "dotbelowcomb",
-          x_advance: 0,
-          y_advance: 0,
-          x_offset: 0,
-          y_offset: 0,
+          glyphname: "dotaccentcomb",
+          xAdvance: 0,
+          yAdvance: 0,
+          xOffset: 0,
+          yOffset: 0,
           mark: true,
         },
       ],
       expectedGlyphs: [
-        { glyphname: "H", x_advance: 500, y_advance: 0, x_offset: 0, y_offset: 0 },
+        { glyphname: "H", xAdvance: 500, yAdvance: 0, xOffset: 0, yOffset: 0 },
         {
           glyphname: "dotaccentcomb",
-          x_advance: 0,
-          y_advance: 0,
-          x_offset: -350,
-          y_offset: -10,
+          xAdvance: 0,
+          yAdvance: 0,
+          xOffset: -350,
+          yOffset: -10,
           mark: true,
         },
         {
           glyphname: "dotaccentcomb",
-          x_advance: 0,
-          y_advance: 0,
-          x_offset: -350,
-          y_offset: 160,
+          xAdvance: 0,
+          yAdvance: 0,
+          xOffset: -350,
+          yOffset: 160,
+          mark: true,
+        },
+        {
+          glyphname: "dotaccentcomb",
+          xAdvance: 0,
+          yAdvance: 0,
+          xOffset: -350,
+          yOffset: 330,
+          mark: true,
+        },
+      ],
+    },
+    {
+      inputGlyphs: [
+        { glyphname: "H", xAdvance: 500, yAdvance: 0, xOffset: 0, yOffset: 0 },
+        {
+          glyphname: "dotaccentcomb",
+          xAdvance: 0,
+          yAdvance: 0,
+          xOffset: 0,
+          yOffset: 0,
+          mark: true,
+        },
+        {
+          glyphname: "dotaccentcomb",
+          xAdvance: 0,
+          yAdvance: 0,
+          xOffset: 0,
+          yOffset: 0,
           mark: true,
         },
         {
           glyphname: "dotbelowcomb",
-          x_advance: 0,
-          y_advance: 0,
-          x_offset: -350,
-          y_offset: 0,
+          xAdvance: 0,
+          yAdvance: 0,
+          xOffset: 0,
+          yOffset: 0,
           mark: true,
         },
         {
           glyphname: "dotbelowcomb",
-          x_advance: 0,
-          y_advance: 0,
-          x_offset: -350,
-          y_offset: -170,
+          xAdvance: 0,
+          yAdvance: 0,
+          xOffset: 0,
+          yOffset: 0,
+          mark: true,
+        },
+      ],
+      expectedGlyphs: [
+        { glyphname: "H", xAdvance: 500, yAdvance: 0, xOffset: 0, yOffset: 0 },
+        {
+          glyphname: "dotaccentcomb",
+          xAdvance: 0,
+          yAdvance: 0,
+          xOffset: -350,
+          yOffset: -10,
+          mark: true,
+        },
+        {
+          glyphname: "dotaccentcomb",
+          xAdvance: 0,
+          yAdvance: 0,
+          xOffset: -350,
+          yOffset: 160,
+          mark: true,
+        },
+        {
+          glyphname: "dotbelowcomb",
+          xAdvance: 0,
+          yAdvance: 0,
+          xOffset: -350,
+          yOffset: 0,
+          mark: true,
+        },
+        {
+          glyphname: "dotbelowcomb",
+          xAdvance: 0,
+          yAdvance: 0,
+          xOffset: -350,
+          yOffset: -170,
           mark: true,
         },
       ],
@@ -832,72 +865,72 @@ describe("shaper tests", () => {
       inputGlyphs: [
         {
           glyphname: "dotaccentcomb",
-          x_advance: 0,
-          y_advance: 0,
-          x_offset: 0,
-          y_offset: 0,
+          xAdvance: 0,
+          yAdvance: 0,
+          xOffset: 0,
+          yOffset: 0,
           mark: true,
         },
         {
           glyphname: "dotaccentcomb",
-          x_advance: 0,
-          y_advance: 0,
-          x_offset: 0,
-          y_offset: 0,
+          xAdvance: 0,
+          yAdvance: 0,
+          xOffset: 0,
+          yOffset: 0,
           mark: true,
         },
         {
           glyphname: "dotbelowcomb",
-          x_advance: 0,
-          y_advance: 0,
-          x_offset: 0,
-          y_offset: 0,
+          xAdvance: 0,
+          yAdvance: 0,
+          xOffset: 0,
+          yOffset: 0,
           mark: true,
         },
         {
           glyphname: "dotbelowcomb",
-          x_advance: 0,
-          y_advance: 0,
-          x_offset: 0,
-          y_offset: 0,
+          xAdvance: 0,
+          yAdvance: 0,
+          xOffset: 0,
+          yOffset: 0,
           mark: true,
         },
-        { glyphname: "H", x_advance: 500, y_advance: 0, x_offset: 0, y_offset: 0 },
+        { glyphname: "H", xAdvance: 500, yAdvance: 0, xOffset: 0, yOffset: 0 },
       ],
       expectedGlyphs: [
         {
           glyphname: "dotaccentcomb",
-          x_advance: 0,
-          y_advance: 0,
-          x_offset: 150,
-          y_offset: 160,
+          xAdvance: 0,
+          yAdvance: 0,
+          xOffset: 150,
+          yOffset: 160,
           mark: true,
         },
         {
           glyphname: "dotaccentcomb",
-          x_advance: 0,
-          y_advance: 0,
-          x_offset: 150,
-          y_offset: -10,
+          xAdvance: 0,
+          yAdvance: 0,
+          xOffset: 150,
+          yOffset: -10,
           mark: true,
         },
         {
           glyphname: "dotbelowcomb",
-          x_advance: 0,
-          y_advance: 0,
-          x_offset: 150,
-          y_offset: -170,
+          xAdvance: 0,
+          yAdvance: 0,
+          xOffset: 150,
+          yOffset: -170,
           mark: true,
         },
         {
           glyphname: "dotbelowcomb",
-          x_advance: 0,
-          y_advance: 0,
-          x_offset: 150,
-          y_offset: 0,
+          xAdvance: 0,
+          yAdvance: 0,
+          xOffset: 150,
+          yOffset: 0,
           mark: true,
         },
-        { glyphname: "H", x_advance: 500, y_advance: 0, x_offset: 0, y_offset: 0 },
+        { glyphname: "H", xAdvance: 500, yAdvance: 0, xOffset: 0, yOffset: 0 },
       ],
       rightToLeft: true,
     },
@@ -916,96 +949,96 @@ describe("shaper tests", () => {
   const testDataMarkToBasePositioning = [
     {
       inputGlyphs: [
-        { glyphname: "H", x_advance: 500, y_advance: 0, x_offset: 0, y_offset: 0 },
+        { glyphname: "H", xAdvance: 500, yAdvance: 0, xOffset: 0, yOffset: 0 },
         {
           glyphname: "dotaccentcomb",
-          x_advance: 0,
-          y_advance: 0,
-          x_offset: 0,
-          y_offset: 0,
+          xAdvance: 0,
+          yAdvance: 0,
+          xOffset: 0,
+          yOffset: 0,
           mark: true,
         },
         {
           glyphname: "dotbelowcomb",
-          x_advance: 0,
-          y_advance: 0,
-          x_offset: 0,
-          y_offset: 0,
+          xAdvance: 0,
+          yAdvance: 0,
+          xOffset: 0,
+          yOffset: 0,
           mark: true,
         },
       ],
       expectedGlyphs: [
-        { glyphname: "H", x_advance: 500, y_advance: 0, x_offset: 0, y_offset: 0 },
+        { glyphname: "H", xAdvance: 500, yAdvance: 0, xOffset: 0, yOffset: 0 },
         {
           glyphname: "dotaccentcomb",
-          x_advance: 0,
-          y_advance: 0,
-          x_offset: -350,
-          y_offset: -10,
+          xAdvance: 0,
+          yAdvance: 0,
+          xOffset: -350,
+          yOffset: -10,
           mark: true,
         },
         {
           glyphname: "dotbelowcomb",
-          x_advance: 0,
-          y_advance: 0,
-          x_offset: -350,
-          y_offset: 0,
+          xAdvance: 0,
+          yAdvance: 0,
+          xOffset: -350,
+          yOffset: 0,
           mark: true,
         },
       ],
     },
     {
       inputGlyphs: [
-        { glyphname: "H", x_advance: 500, y_advance: 0, x_offset: 0, y_offset: 0 },
+        { glyphname: "H", xAdvance: 500, yAdvance: 0, xOffset: 0, yOffset: 0 },
         {
           glyphname: "dotaccentcomb",
-          x_advance: 0,
-          y_advance: 0,
-          x_offset: 0,
-          y_offset: 0,
+          xAdvance: 0,
+          yAdvance: 0,
+          xOffset: 0,
+          yOffset: 0,
           mark: true,
         },
         {
           glyphname: "dotaccentcomb",
-          x_advance: 0,
-          y_advance: 0,
-          x_offset: 0,
-          y_offset: 0,
+          xAdvance: 0,
+          yAdvance: 0,
+          xOffset: 0,
+          yOffset: 0,
           mark: true,
         },
         {
           glyphname: "dotaccentcomb",
-          x_advance: 0,
-          y_advance: 0,
-          x_offset: 0,
-          y_offset: 0,
+          xAdvance: 0,
+          yAdvance: 0,
+          xOffset: 0,
+          yOffset: 0,
           mark: true,
         },
       ],
       expectedGlyphs: [
-        { glyphname: "H", x_advance: 500, y_advance: 0, x_offset: 0, y_offset: 0 },
+        { glyphname: "H", xAdvance: 500, yAdvance: 0, xOffset: 0, yOffset: 0 },
         {
           glyphname: "dotaccentcomb",
-          x_advance: 0,
-          y_advance: 0,
-          x_offset: -350,
-          y_offset: -10,
+          xAdvance: 0,
+          yAdvance: 0,
+          xOffset: -350,
+          yOffset: -10,
           mark: true,
         },
         {
           glyphname: "dotaccentcomb",
-          x_advance: 0,
-          y_advance: 0,
-          x_offset: -350,
-          y_offset: -10,
+          xAdvance: 0,
+          yAdvance: 0,
+          xOffset: -350,
+          yOffset: -10,
           mark: true,
         },
         {
           glyphname: "dotaccentcomb",
-          x_advance: 0,
-          y_advance: 0,
-          x_offset: -350,
-          y_offset: -10,
+          xAdvance: 0,
+          yAdvance: 0,
+          xOffset: -350,
+          yOffset: -10,
           mark: true,
         },
       ],
@@ -1028,96 +1061,96 @@ describe("shaper tests", () => {
   const testDataMarkToMarkPositioning = [
     {
       inputGlyphs: [
-        { glyphname: "H", x_advance: 500, y_advance: 0, x_offset: 0, y_offset: 0 },
+        { glyphname: "H", xAdvance: 500, yAdvance: 0, xOffset: 0, yOffset: 0 },
         {
           glyphname: "dotaccentcomb",
-          x_advance: 0,
-          y_advance: 0,
-          x_offset: 0,
-          y_offset: 0,
+          xAdvance: 0,
+          yAdvance: 0,
+          xOffset: 0,
+          yOffset: 0,
           mark: true,
         },
         {
           glyphname: "dotbelowcomb",
-          x_advance: 0,
-          y_advance: 0,
-          x_offset: 0,
-          y_offset: 0,
+          xAdvance: 0,
+          yAdvance: 0,
+          xOffset: 0,
+          yOffset: 0,
           mark: true,
         },
       ],
       expectedGlyphs: [
-        { glyphname: "H", x_advance: 500, y_advance: 0, x_offset: 0, y_offset: 0 },
+        { glyphname: "H", xAdvance: 500, yAdvance: 0, xOffset: 0, yOffset: 0 },
         {
           glyphname: "dotaccentcomb",
-          x_advance: 0,
-          y_advance: 0,
-          x_offset: 0,
-          y_offset: 0,
+          xAdvance: 0,
+          yAdvance: 0,
+          xOffset: 0,
+          yOffset: 0,
           mark: true,
         },
         {
           glyphname: "dotbelowcomb",
-          x_advance: 0,
-          y_advance: 0,
-          x_offset: 0,
-          y_offset: 0,
+          xAdvance: 0,
+          yAdvance: 0,
+          xOffset: 0,
+          yOffset: 0,
           mark: true,
         },
       ],
     },
     {
       inputGlyphs: [
-        { glyphname: "H", x_advance: 500, y_advance: 0, x_offset: 0, y_offset: 0 },
+        { glyphname: "H", xAdvance: 500, yAdvance: 0, xOffset: 0, yOffset: 0 },
         {
           glyphname: "dotaccentcomb",
-          x_advance: 0,
-          y_advance: 0,
-          x_offset: 0,
-          y_offset: 0,
+          xAdvance: 0,
+          yAdvance: 0,
+          xOffset: 0,
+          yOffset: 0,
           mark: true,
         },
         {
           glyphname: "dotaccentcomb",
-          x_advance: 0,
-          y_advance: 0,
-          x_offset: 0,
-          y_offset: 0,
+          xAdvance: 0,
+          yAdvance: 0,
+          xOffset: 0,
+          yOffset: 0,
           mark: true,
         },
         {
           glyphname: "dotaccentcomb",
-          x_advance: 0,
-          y_advance: 0,
-          x_offset: 0,
-          y_offset: 0,
+          xAdvance: 0,
+          yAdvance: 0,
+          xOffset: 0,
+          yOffset: 0,
           mark: true,
         },
       ],
       expectedGlyphs: [
-        { glyphname: "H", x_advance: 500, y_advance: 0, x_offset: 0, y_offset: 0 },
+        { glyphname: "H", xAdvance: 500, yAdvance: 0, xOffset: 0, yOffset: 0 },
         {
           glyphname: "dotaccentcomb",
-          x_advance: 0,
-          y_advance: 0,
-          x_offset: 0,
-          y_offset: 0,
+          xAdvance: 0,
+          yAdvance: 0,
+          xOffset: 0,
+          yOffset: 0,
           mark: true,
         },
         {
           glyphname: "dotaccentcomb",
-          x_advance: 0,
-          y_advance: 0,
-          x_offset: 0,
-          y_offset: 170,
+          xAdvance: 0,
+          yAdvance: 0,
+          xOffset: 0,
+          yOffset: 170,
           mark: true,
         },
         {
           glyphname: "dotaccentcomb",
-          x_advance: 0,
-          y_advance: 0,
-          x_offset: 0,
-          y_offset: 340,
+          xAdvance: 0,
+          yAdvance: 0,
+          xOffset: 0,
+          yOffset: 340,
           mark: true,
         },
       ],
@@ -1171,50 +1204,55 @@ feature liga {
         {
           codepoint: 2,
           cluster: 0,
-          x_advance: 800,
-          y_advance: 0,
-          x_offset: 0,
-          y_offset: 0,
+          flags: 0,
+          xAdvance: 800,
+          yAdvance: 0,
+          xOffset: 0,
+          yOffset: 0,
           glyphname: "H_H",
           mark: false,
         },
         {
           codepoint: 5,
           cluster: 0,
-          x_advance: 0,
-          y_advance: 0,
-          x_offset: -720,
-          y_offset: -14,
+          flags: 0,
+          xAdvance: 0,
+          yAdvance: 0,
+          xOffset: -720,
+          yOffset: -14,
           glyphname: "macroncomb",
           mark: true,
         },
         {
           codepoint: 3,
           cluster: 0,
-          x_advance: 0,
-          y_advance: 0,
-          x_offset: -650,
-          y_offset: 140,
+          flags: 0,
+          xAdvance: 0,
+          yAdvance: 0,
+          xOffset: -650,
+          yOffset: 140,
           glyphname: "dotaccentcomb",
           mark: true,
         },
         {
           codepoint: 3,
           cluster: 4,
-          x_advance: 0,
-          y_advance: 0,
-          x_offset: -350,
-          y_offset: -10,
+          flags: 1,
+          xAdvance: 0,
+          yAdvance: 0,
+          xOffset: -350,
+          yOffset: -10,
           glyphname: "dotaccentcomb",
           mark: true,
         },
         {
           codepoint: 5,
           cluster: 5,
-          x_advance: 0,
-          y_advance: 0,
-          x_offset: -420,
-          y_offset: 156,
+          flags: 1,
+          xAdvance: 0,
+          yAdvance: 0,
+          xOffset: -420,
+          yOffset: 156,
           glyphname: "macroncomb",
           mark: true,
         },
@@ -1272,22 +1310,24 @@ table GDEF {
       {
         cluster: 0,
         codepoint: 1,
+        flags: 0,
         glyphname: "H",
         mark: false,
-        x_advance: 500,
-        x_offset: 0,
-        y_advance: 0,
-        y_offset: 0,
+        xAdvance: 500,
+        xOffset: 0,
+        yAdvance: 0,
+        yOffset: 0,
       },
       {
         cluster: 1,
         codepoint: 5,
+        flags: 1,
         glyphname: "macroncomb",
         mark: false,
-        x_advance: 500,
-        x_offset: 0,
-        y_advance: 0,
-        y_offset: 0,
+        xAdvance: 500,
+        xOffset: 0,
+        yAdvance: 0,
+        yOffset: 0,
       },
     ];
 
@@ -1396,10 +1436,10 @@ describe("shaper tests compare emulation with native", () => {
         expectedGlyphs: [
           {
             cluster: 0,
-            x_advance: 800,
-            y_advance: 0,
-            x_offset: 0,
-            y_offset: 0,
+            xAdvance: 800,
+            yAdvance: 0,
+            xOffset: 0,
+            yOffset: 0,
             glyphname: "H_H",
             mark: false,
           },
@@ -1410,28 +1450,28 @@ describe("shaper tests compare emulation with native", () => {
         expectedGlyphs: [
           {
             cluster: 0,
-            x_advance: 450,
-            y_advance: 0,
-            x_offset: 0,
-            y_offset: 0,
+            xAdvance: 450,
+            yAdvance: 0,
+            xOffset: 0,
+            yOffset: 0,
             glyphname: "A",
             mark: false,
           },
           {
             cluster: 1,
-            x_advance: 425,
-            y_advance: 0,
-            x_offset: -25,
-            y_offset: 150,
+            xAdvance: 425,
+            yAdvance: 0,
+            xOffset: -25,
+            yOffset: 150,
             glyphname: "B",
             mark: false,
           },
           {
             cluster: 2,
-            x_advance: 475,
-            y_advance: 0,
-            x_offset: -25,
-            y_offset: 300,
+            xAdvance: 475,
+            yAdvance: 0,
+            xOffset: -25,
+            yOffset: 300,
             glyphname: "C",
             mark: false,
           },
@@ -1442,64 +1482,64 @@ describe("shaper tests compare emulation with native", () => {
         expectedGlyphs: [
           {
             cluster: 0,
-            x_advance: 800,
-            y_advance: 0,
-            x_offset: 0,
-            y_offset: 0,
+            xAdvance: 800,
+            yAdvance: 0,
+            xOffset: 0,
+            yOffset: 0,
             glyphname: "H_H",
             mark: false,
           },
           {
             cluster: 0,
-            x_advance: 0,
-            y_advance: 0,
-            x_offset: -650,
-            y_offset: 0,
+            xAdvance: 0,
+            yAdvance: 0,
+            xOffset: -650,
+            yOffset: 0,
             glyphname: "dotbelowcomb",
             mark: true,
           },
           {
             cluster: 0,
-            x_advance: 0,
-            y_advance: 0,
-            x_offset: -720,
-            y_offset: -14,
+            xAdvance: 0,
+            yAdvance: 0,
+            xOffset: -720,
+            yOffset: -14,
             glyphname: "macroncomb",
             mark: true,
           },
           {
             cluster: 0,
-            x_advance: 0,
-            y_advance: 0,
-            x_offset: -650,
-            y_offset: 140,
+            xAdvance: 0,
+            yAdvance: 0,
+            xOffset: -650,
+            yOffset: 140,
             glyphname: "dotaccentcomb",
             mark: true,
           },
           {
             cluster: 5,
-            x_advance: 0,
-            y_advance: 0,
-            x_offset: -350,
-            y_offset: 0,
+            xAdvance: 0,
+            yAdvance: 0,
+            xOffset: -350,
+            yOffset: 0,
             glyphname: "dotbelowcomb",
             mark: true,
           },
           {
             cluster: 5,
-            x_advance: 0,
-            y_advance: 0,
-            x_offset: -350,
-            y_offset: -10,
+            xAdvance: 0,
+            yAdvance: 0,
+            xOffset: -350,
+            yOffset: -10,
             glyphname: "dotaccentcomb",
             mark: true,
           },
           {
             cluster: 7,
-            x_advance: 0,
-            y_advance: 0,
-            x_offset: -420,
-            y_offset: 156,
+            xAdvance: 0,
+            yAdvance: 0,
+            xOffset: -420,
+            yOffset: 156,
             glyphname: "macroncomb",
             mark: true,
           },
@@ -1510,19 +1550,19 @@ describe("shaper tests compare emulation with native", () => {
         expectedGlyphs: [
           {
             cluster: 0,
-            x_advance: 500,
-            y_advance: 0,
-            x_offset: 0,
-            y_offset: 0,
+            xAdvance: 500,
+            yAdvance: 0,
+            xOffset: 0,
+            yOffset: 0,
             glyphname: "H",
             mark: false,
           },
           {
             cluster: 1,
-            x_advance: 0,
-            y_advance: 0,
-            x_offset: -420,
-            y_offset: -14,
+            xAdvance: 0,
+            yAdvance: 0,
+            xOffset: -420,
+            yOffset: -14,
             glyphname: "macroncomb",
             mark: true,
           },
@@ -1530,32 +1570,32 @@ describe("shaper tests compare emulation with native", () => {
       },
       {
         input: "H̄",
-        features: "ss03",
+        features: [["ss03", true]],
         expectedGlyphs: [
           {
             cluster: 0,
-            x_advance: 500,
-            y_advance: 0,
-            x_offset: 0,
-            y_offset: 0,
+            xAdvance: 500,
+            yAdvance: 0,
+            xOffset: 0,
+            yOffset: 0,
             glyphname: "H",
             mark: false,
           },
           {
             cluster: 0,
-            x_advance: 500,
-            y_advance: 0,
-            x_offset: 0,
-            y_offset: 0,
+            xAdvance: 500,
+            yAdvance: 0,
+            xOffset: 0,
+            yOffset: 0,
             glyphname: "A",
             mark: false,
           },
           {
             cluster: 1,
-            x_advance: 0,
-            y_advance: 0,
-            x_offset: -920,
-            y_offset: -14,
+            xAdvance: 0,
+            yAdvance: 0,
+            xOffset: -920,
+            yOffset: -14,
             glyphname: "macroncomb",
             mark: true,
           },
@@ -1573,10 +1613,10 @@ describe("shaper tests compare emulation with native", () => {
         expectedGlyphs: [
           {
             cluster: 0,
-            x_advance: 658,
-            y_advance: 0,
-            x_offset: 0,
-            y_offset: 0,
+            xAdvance: 658,
+            yAdvance: 0,
+            xOffset: 0,
+            yOffset: 0,
             glyphname: "alef-ar",
             mark: false,
           },
@@ -1588,19 +1628,19 @@ describe("shaper tests compare emulation with native", () => {
         expectedGlyphs: [
           {
             cluster: 0,
-            x_advance: 0,
-            y_advance: 0,
-            x_offset: 5,
-            y_offset: 191,
+            xAdvance: 0,
+            yAdvance: 0,
+            xOffset: 5,
+            yOffset: 191,
             glyphname: "dotabove-ar",
             mark: true,
           },
           {
             cluster: 0,
-            x_advance: 295,
-            y_advance: 0,
-            x_offset: 0,
-            y_offset: 0,
+            xAdvance: 295,
+            yAdvance: 0,
+            xOffset: 0,
+            yOffset: 0,
             glyphname: "noonghunna-ar",
             mark: false,
           },
@@ -1612,91 +1652,91 @@ describe("shaper tests compare emulation with native", () => {
         expectedGlyphs: [
           {
             cluster: 5,
-            x_advance: 0,
-            y_advance: 0,
-            x_offset: 593,
-            y_offset: 93,
+            xAdvance: 0,
+            yAdvance: 0,
+            xOffset: 593,
+            yOffset: 93,
             glyphname: "fatha-ar",
             mark: true,
           },
           {
             cluster: 4,
-            x_advance: 0,
-            y_advance: 0,
-            x_offset: 803,
-            y_offset: 264,
+            xAdvance: 0,
+            yAdvance: 0,
+            xOffset: 803,
+            yOffset: 264,
             glyphname: "twodotsverticalabove-ar",
             mark: true,
           },
           {
             cluster: 4,
-            x_advance: 984,
-            y_advance: 0,
-            x_offset: 0,
-            y_offset: 0,
+            xAdvance: 984,
+            yAdvance: 0,
+            xOffset: 0,
+            yOffset: 0,
             glyphname: "behDotless-ar.fina",
             mark: false,
           },
           {
             cluster: 3,
-            x_advance: 0,
-            y_advance: 0,
-            x_offset: -9,
-            y_offset: 392,
+            xAdvance: 0,
+            yAdvance: 0,
+            xOffset: -9,
+            yOffset: 392,
             glyphname: "dotabove-ar.beh",
             mark: true,
           },
           {
             cluster: 3,
-            x_advance: 0,
-            y_advance: 0,
-            x_offset: 0,
-            y_offset: 0,
+            xAdvance: 0,
+            yAdvance: 0,
+            xOffset: 0,
+            yOffset: 0,
             glyphname: "_c.seen.beh",
             mark: false,
           },
           {
             cluster: 3,
-            x_advance: 130,
-            y_advance: 0,
-            x_offset: 0,
-            y_offset: 0,
+            xAdvance: 130,
+            yAdvance: 0,
+            xOffset: 0,
+            yOffset: 0,
             glyphname: "behDotless-ar.init.high",
             mark: false,
           },
           {
             cluster: 0,
-            x_advance: 0,
-            y_advance: 0,
-            x_offset: 491,
-            y_offset: 594,
+            xAdvance: 0,
+            yAdvance: 0,
+            xOffset: 491,
+            yOffset: 594,
             glyphname: "fatha-ar",
             mark: true,
           },
           {
             cluster: 0,
-            x_advance: 0,
-            y_advance: 0,
-            x_offset: 673,
-            y_offset: 432,
+            xAdvance: 0,
+            yAdvance: 0,
+            xOffset: 673,
+            yOffset: 432,
             glyphname: "fatha-ar",
             mark: true,
           },
           {
             cluster: 0,
-            x_advance: 0,
-            y_advance: 0,
-            x_offset: 553,
-            y_offset: 394,
+            xAdvance: 0,
+            yAdvance: 0,
+            xOffset: 553,
+            yOffset: 394,
             glyphname: "dotabove-ar",
             mark: true,
           },
           {
             cluster: 0,
-            x_advance: 960,
-            y_advance: 0,
-            x_offset: 400,
-            y_offset: 0,
+            xAdvance: 960,
+            yAdvance: 0,
+            xOffset: 400,
+            yOffset: 0,
             glyphname: "fehDotless_alef-ar",
             mark: false,
           },
@@ -1708,37 +1748,37 @@ describe("shaper tests compare emulation with native", () => {
         expectedGlyphs: [
           {
             cluster: 1,
-            x_advance: 177,
-            y_advance: 0,
-            x_offset: 0,
-            y_offset: 0,
+            xAdvance: 177,
+            yAdvance: 0,
+            xOffset: 0,
+            yOffset: 0,
             glyphname: "lam-ar.fina",
             mark: false,
           },
           {
             cluster: 0,
-            x_advance: 0,
-            y_advance: 0,
-            x_offset: -31,
-            y_offset: 381,
+            xAdvance: 0,
+            yAdvance: 0,
+            xOffset: -31,
+            yOffset: 381,
             glyphname: "twodotsverticalabove-ar",
             mark: true,
           },
           {
             cluster: 0,
-            x_advance: 174,
-            y_advance: 0,
-            x_offset: 0,
-            y_offset: 0,
+            xAdvance: 174,
+            yAdvance: 0,
+            xOffset: 0,
+            yOffset: 0,
             glyphname: "_c.feh.init.beh",
             mark: false,
           },
           {
             cluster: 0,
-            x_advance: 220,
-            y_advance: 0,
-            x_offset: -114,
-            y_offset: 0,
+            xAdvance: 220,
+            yAdvance: 0,
+            xOffset: -114,
+            yOffset: 0,
             glyphname: "fehDotless-ar.init",
             mark: false,
           },
@@ -1763,9 +1803,9 @@ describe("shaper tests compare emulation with native", () => {
         direction,
       });
 
-      // console.log(JSON.stringify(stripGlyphIDs(nativeGlyphs)));
-
-      expect(stripGlyphIDs(nativeGlyphs)).to.deep.equal(testCase.expectedGlyphs);
+      expect(stripGlyphIDsAndFlags(nativeGlyphs)).to.deep.equal(
+        testCase.expectedGlyphs
+      );
 
       const { glyphs: emulatedGlyphs } = await emulatedShapeFunc(testInputCodePoints, {
         variations: testCase.variations,
@@ -1773,7 +1813,9 @@ describe("shaper tests compare emulation with native", () => {
         direction,
       });
 
-      expect(stripGlyphIDs(emulatedGlyphs)).to.deep.equal(testCase.expectedGlyphs);
+      expect(stripGlyphIDsAndFlags(emulatedGlyphs)).to.deep.equal(
+        testCase.expectedGlyphs
+      );
     });
   }
 });
@@ -1814,10 +1856,177 @@ describe("test conditional substitutions", () => {
   });
 });
 
-function stripGlyphIDs(glyphs) {
+describe("test conditional substitutions with mapping", () => {
+  it("test conditional substitutions with mapping", async () => {
+    const testFontPath = moduleDirName.joinPath(
+      "data",
+      "cond-subst",
+      "cond-subst.fontra"
+    );
+
+    const shapeFunc = await getEmulatedShapeFuncForPath(testFontPath);
+
+    const inputCodePoints = [..."¢øﬁ"].map(ord);
+
+    const { glyphs: glyphs1 } = await shapeFunc(inputCodePoints);
+    const glyphNames1 = glyphs1.map((g) => g.glyphname);
+    expect(glyphNames1).to.deep.equal(["cent", "oslash", "fi"]);
+
+    const { glyphs: glyphs2 } = await shapeFunc(inputCodePoints, {
+      variations: { wght: 500 },
+    });
+    const glyphNames2 = glyphs2.map((g) => g.glyphname);
+    expect(glyphNames2).to.deep.equal(["cent", "oslash", "fi"]);
+
+    // Source coords *scaled* to User coords (but not unapplying avar)
+    // conditionalSubstitutions = {
+    //   featureTags: ["rvrn"],
+    //   rules: [
+    //     [
+    //       [
+    //         { wght: [500.44642857142856, 900] },
+    //         { wght: [422.32142857142856, 433.48214285714283] },
+    //       ],
+    //       { fi: "fi.rvrn" },
+    //     ],
+    //     [[{ wght: [667.8571428571429, 900] }], { cent: "cent.rvrn" }],
+    //     [[{ wght: [734.8214285714286, 900] }], { oslash: "oslash.rvrn" }],
+    //   ],
+    // };
+
+    const { glyphs: glyphs3 } = await shapeFunc(inputCodePoints, {
+      variations: { wght: 501 },
+    });
+    const glyphNames3 = glyphs3.map((g) => g.glyphname);
+    expect(glyphNames3).to.deep.equal(["cent", "oslash", "fi.rvrn"]);
+
+    const { glyphs: glyphs4 } = await shapeFunc(inputCodePoints, {
+      variations: { wght: 667 },
+    });
+    const glyphNames4 = glyphs4.map((g) => g.glyphname);
+    expect(glyphNames4).to.deep.equal(["cent", "oslash", "fi.rvrn"]);
+
+    const { glyphs: glyphs5 } = await shapeFunc(inputCodePoints, {
+      variations: { wght: 668 },
+    });
+    const glyphNames5 = glyphs5.map((g) => g.glyphname);
+    expect(glyphNames5).to.deep.equal(["cent.rvrn", "oslash", "fi.rvrn"]);
+
+    const { glyphs: glyphs6 } = await shapeFunc(inputCodePoints, {
+      variations: { wght: 734 },
+    });
+    const glyphNames6 = glyphs6.map((g) => g.glyphname);
+    expect(glyphNames6).to.deep.equal(["cent.rvrn", "oslash", "fi.rvrn"]);
+
+    const { glyphs: glyphs7 } = await shapeFunc(inputCodePoints, {
+      variations: { wght: 735 },
+    });
+    const glyphNames7 = glyphs7.map((g) => g.glyphname);
+    expect(glyphNames7).to.deep.equal(["cent.rvrn", "oslash.rvrn", "fi.rvrn"]);
+
+    const { glyphs: glyphs8 } = await shapeFunc(inputCodePoints, {
+      variations: { wght: 423 },
+    });
+    const glyphNames8 = glyphs8.map((g) => g.glyphname);
+    expect(glyphNames8).to.deep.equal(["cent", "oslash", "fi.rvrn"]);
+  });
+});
+
+describe("prepareConditionalSubstitutions ", () => {
+  const axes = [
+    { name: "Weight", tag: "wght", minValue: 200, defaultValue: 400, maxValue: 700 },
+  ];
+  const glyphMap = { "A": [], "A.alt": [] };
+
+  it("prepareConditionalSubstitutions with correct inputs", () => {
+    const substitutions = {
+      featureTags: ["rvrn"],
+      rules: [
+        {
+          name: "Weight rule",
+          conditionSets: [
+            { conditions: [{ name: "Weight", minValue: 200, maxValue: 400 }] },
+          ],
+          substitutions: { A: "A.alt" },
+        },
+      ],
+    };
+
+    const substForBuildShaperFont = prepareConditionalSubstitutions(
+      substitutions,
+      axes,
+      axes,
+      glyphMap
+    );
+
+    expect(substForBuildShaperFont).to.deep.equal({
+      featureTags: ["rvrn"],
+      rules: [[[{ wght: [200, 400] }], { A: "A.alt" }]],
+    });
+  });
+
+  it("prepareConditionalSubstitutions with incorrect axis inputs", () => {
+    const substitutions = {
+      featureTags: ["rvrn"],
+      rules: [
+        {
+          name: "Weight rule",
+          conditionSets: [
+            // unknown axis name (misspelled)
+            { conditions: [{ name: "weight", minValue: 200, maxValue: 400 }] },
+          ],
+          substitutions: { A: "A.alt" },
+        },
+      ],
+    };
+
+    const substForBuildShaperFont = prepareConditionalSubstitutions(
+      substitutions,
+      axes,
+      axes,
+      glyphMap
+    );
+
+    expect(substForBuildShaperFont).to.deep.equal({
+      featureTags: ["rvrn"],
+      rules: [[[{}], { A: "A.alt" }]],
+    });
+  });
+
+  it("prepareConditionalSubstitutions with incorrect glyph name inputs", () => {
+    const substitutions = {
+      featureTags: ["rvrn"],
+      rules: [
+        {
+          name: "Weight rule",
+          conditionSets: [
+            { conditions: [{ name: "Weight", minValue: 200, maxValue: 400 }] },
+          ],
+          // non-existent glyph name
+          substitutions: { A: "B" },
+        },
+      ],
+    };
+
+    const substForBuildShaperFont = prepareConditionalSubstitutions(
+      substitutions,
+      axes,
+      axes,
+      glyphMap
+    );
+
+    expect(substForBuildShaperFont).to.deep.equal({
+      featureTags: ["rvrn"],
+      rules: [[[{ wght: [200, 400] }], {}]],
+    });
+  });
+});
+
+function stripGlyphIDsAndFlags(glyphs) {
   return glyphs.map((glyph) => {
     glyph = { ...glyph };
     delete glyph.codepoint;
+    delete glyph.flags;
     return glyph;
   });
 }

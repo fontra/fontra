@@ -6,7 +6,7 @@ import {
   makeCharacterMapFromGlyphMap,
   makeGlyphMapFromCharacterMap,
 } from "@fontra/core/cmap.js";
-import { enumerate } from "@fontra/core/utils.js";
+import { enumerate } from "@fontra/core/utils.ts";
 
 describe("characterMap tests", () => {
   const makeGlyphMapFromCharacterMap_testData = [

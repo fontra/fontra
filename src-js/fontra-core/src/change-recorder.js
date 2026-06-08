@@ -1,5 +1,5 @@
 import { ChangeCollector, applyChange } from "./changes.js";
-import { range } from "./utils.js";
+import { range } from "./utils.ts";
 import VarArray from "./var-array.js";
 import { VarPackedPath } from "./var-path.js";
 

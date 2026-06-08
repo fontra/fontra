@@ -1,5 +1,5 @@
 import { Bezier } from "bezier-js";
-import { enumerate, range } from "./utils.js";
+import { enumerate, range } from "./utils.ts";
 import {
   addVectors,
   dotVector,

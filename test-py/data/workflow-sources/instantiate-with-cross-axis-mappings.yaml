@@ -1,0 +1,9 @@
+steps:
+  - input: fontra-read
+    source: test-py/data/workflow/input-cross-axis-mappings.fontra
+  - filter: instantiate
+    applyCrossAxisMappings: true
+    location:
+      Diagonal: 40
+  - output: fontra-write
+    destination: output-instantiate-with-cross-axis-mappings.fontra

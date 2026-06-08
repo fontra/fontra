@@ -2,5 +2,5 @@ steps:
   - input: fontra-read
     source: test-py/data/workflow/input-variable-composites.fontra
   - filter: shallow-decompose-composites
-  - destination: output-shallow-decompose-composites.fontra
-    output: fontra-write
+  - output: fontra-write
+    destination: output-shallow-decompose-composites.fontra

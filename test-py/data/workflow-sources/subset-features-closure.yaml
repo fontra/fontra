@@ -5,8 +5,8 @@ steps:
     glyphNames:
       - A
     layoutHandling: closure
-  - destination: output-subset-features.fontra
-    output: fontra-write
+  - output: fontra-write
+    destination: output-subset-features.fontra
 test-info:
   expected-log:
     - level: 30

@@ -1,5 +1,5 @@
 import { VariationError } from "./errors.js";
-import { assert, enumerate, isObjectEmpty, product, range, zip } from "./utils.js";
+import { assert, enumerate, isObjectEmpty, product, range, zip } from "./utils.ts";
 import {
   VariationModel,
   makeSparseNormalizedLocation,

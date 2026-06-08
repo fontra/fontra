@@ -92,6 +92,7 @@ export const strings = {
   "axes.preset.slant": "Penché",
   "axes.preset.weight": "Graisse",
   "axes.preset.width": "Largeur",
+  "axes.properties.hidden": "Hidden axis",
   "axes.range": "Range",
   "axes.range.axis-type": "Type d'axe",
   "axes.range.axis-type.continuous": "Continue",
@@ -307,6 +308,8 @@ export const strings = {
     "Show effective location",
   "sidebar.designspace-navigation.font-axes-view-options-menu.show-hidden-axes":
     "Monter les axes cachés",
+  "sidebar.designspace-navigation.font-axes-view-options-menu.show-only-effective-location":
+    "Show only effective location",
   "sidebar.designspace-navigation.font-axes.edit": "Éditer les axes de la fonte",
   "sidebar.designspace-navigation.font-axes.reset":
     "Réinitialiser les axes de la fonte",

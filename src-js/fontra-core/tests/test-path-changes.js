@@ -2,7 +2,7 @@ import { expect } from "chai";
 import fs from "fs";
 
 import { applyChange } from "@fontra/core/changes.js";
-import { deepCopyObject } from "@fontra/core/utils.js";
+import { deepCopyObject } from "@fontra/core/utils.ts";
 import { VarPackedPath } from "@fontra/core/var-path.js";
 
 import { dirname, join } from "path";

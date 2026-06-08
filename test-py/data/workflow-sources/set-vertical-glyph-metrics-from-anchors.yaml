@@ -5,5 +5,5 @@ steps:
     verticalOrigin: 880
     yAdvance: 1000
   - filter: set-vertical-glyph-metrics-from-anchors
-  - destination: output-set-vertical-glyph-metrics-from-anchors.fontra
-    output: fontra-write
+  - output: fontra-write
+    destination: output-set-vertical-glyph-metrics-from-anchors.fontra

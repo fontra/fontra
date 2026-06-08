@@ -1,4 +1,4 @@
-import { ObservableController } from "./observable-object.js";
+import { ObservableController } from "./observable-object.ts";
 
 function setupThemeOverride(value) {
   const rootElement = document.querySelector("html");

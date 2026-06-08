@@ -2,7 +2,7 @@ import { expect } from "chai";
 
 import { StaticGlyphController } from "@fontra/core/glyph-controller.js";
 import { getDecomposedIdentity } from "@fontra/core/transform.js";
-import { range } from "@fontra/core/utils.js";
+import { range } from "@fontra/core/utils.ts";
 import { StaticGlyph, VariableGlyph } from "@fontra/core/var-glyph.js";
 import { VarPackedPath } from "@fontra/core/var-path.js";
 import { parametrize } from "./test-support.js";

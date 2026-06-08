@@ -11,7 +11,7 @@ import {
   reversed,
   uniqueID,
   zip,
-} from "./utils.js";
+} from "./utils.ts";
 import {
   POINT_TYPE_OFF_CURVE_CUBIC,
   POINT_TYPE_OFF_CURVE_QUAD,

@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Any
 
 import yaml
@@ -14,18 +15,20 @@ from ..core.classes import (
 )
 from ..core.protocols import ReadableFontBackend
 from ..workflow.workflow import Workflow
+from .filewatcher import Change
+from .watchable import WatchableBackend
 
 
 @dataclass(kw_only=True)
-class WorkflowBackend(ReadableBaseBackend):
+class WorkflowBackend(WatchableBackend, ReadableBaseBackend):
     workflow: Workflow
-    context: Any = None
+    path: Path | None = None
+    context: Any = field(init=False, default=None)
     endPoint: ReadableFontBackend | None = field(init=False, default=None)
 
     @classmethod
-    def fromPath(cls, path):
-        config = yaml.safe_load(path.read_text())
-        return cls(workflow=Workflow(config=config, parentDir=path.parent))
+    def fromPath(cls, path: Path):
+        return cls(workflow=_loadFromPath(path), path=path)
 
     async def _ensureSetup(self) -> ReadableFontBackend:
         if self.endPoint is None:
@@ -77,3 +80,21 @@ class WorkflowBackend(ReadableBaseBackend):
     async def getGlyphInfos(self) -> dict[str, Any]:
         endPoint = await self._ensureSetup()
         return await endPoint.getGlyphInfos()
+
+    async def fileWatcherProcessChanges(
+        self, changes: set[tuple[Change, str]]
+    ) -> dict[str, Any] | None:
+        assert self.path is not None
+        self.context = None
+        self.endPoint = None
+        self.workflow = _loadFromPath(self.path)
+        return None  # Reload all
+
+    def fileWatcherWasInstalled(self) -> None:
+        if self.path is not None:
+            self.fileWatcherSetPaths([self.path])
+
+
+def _loadFromPath(path: Path) -> Workflow:
+    config = yaml.safe_load(path.read_text())
+    return Workflow(config=config, parentDir=path.parent)

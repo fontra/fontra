@@ -11,16 +11,21 @@ export class DesignspaceLocation extends UnlitElement {
   static styles = `
     ${themeColorCSS(colors)}
 
-    :host {
+    .grid-wrapper {
+      height: 100%;
+      width: 100%;
       display: grid;
       grid-template-columns: 25% auto;
       gap: 0.3em;
       overflow: auto;
     }
 
+    .grid-wrapper.only-show-phantom-axes {
+      row-gap: 0;
+    }
+
     .slider-label {
       text-align: right;
-      overflow: hidden; /* this needs to be set so that width respects fit-content */
       text-overflow: ellipsis;
       vertical-align: middle;
       margin-top: 1px;
@@ -34,6 +39,10 @@ export class DesignspaceLocation extends UnlitElement {
     .slider-group {
       display: grid;
       gap: 0.1em;
+    }
+
+    .slider-group > .slider-disabled:only-child {
+      transform: translate(0, 0.25em);
     }
 
     .info-box {
@@ -68,6 +77,7 @@ export class DesignspaceLocation extends UnlitElement {
   static properties = {
     axes: { type: Array },
     phantomAxes: { type: Array },
+    onlyShowPhantomAxes: { type: Boolean },
   };
 
   get model() {
@@ -158,7 +168,12 @@ export class DesignspaceLocation extends UnlitElement {
       }
       this._setupAxis(elements, axis, phantomAxesByName[axis.name]);
     }
-    return elements;
+
+    const gridWrapper = html.div({ class: "grid-wrapper" }, elements);
+    if (this.onlyShowPhantomAxes) {
+      gridWrapper.classList.add("only-show-phantom-axes");
+    }
+    return [gridWrapper];
   }
 
   _setupAxis(elements, axis, phantomAxis) {
@@ -183,6 +198,8 @@ export class DesignspaceLocation extends UnlitElement {
         }
       </div>`
     );
+
+    const sliderGroupContents = [];
     elements.push(
       html.div(
         {
@@ -192,9 +209,12 @@ export class DesignspaceLocation extends UnlitElement {
         [axis.name]
       )
     );
-    const slider = this._createSlider(axis, modelValue);
-    this._sliders[axis.name] = slider;
-    const sliderGroupContents = [slider];
+    if (!this.onlyShowPhantomAxes) {
+      const slider = this._createSlider(axis, modelValue);
+      this._sliders[axis.name] = slider;
+      sliderGroupContents.push(slider);
+    }
+
     if (phantomAxis) {
       const phantomSlider = this._createSlider(phantomAxis, phantomModelValue, true);
       this._phantomSliders[axis.name] = phantomSlider;
@@ -214,6 +234,7 @@ export class DesignspaceLocation extends UnlitElement {
         }
       },
       disabled: sliderDisabled,
+      class: sliderDisabled ? "slider-disabled" : "",
     };
     if (axis.values) {
       // Discrete axis

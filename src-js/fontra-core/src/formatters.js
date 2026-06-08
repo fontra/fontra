@@ -1,4 +1,4 @@
-import { assert } from "./utils.js";
+import { assert } from "./utils.ts";
 export function isString(value) {
   return typeof value === "string" || value instanceof String;
 }

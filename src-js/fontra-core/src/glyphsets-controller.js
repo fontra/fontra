@@ -1,7 +1,7 @@
 import { getGlyphMapProxy } from "./cmap.js";
-import { ObservableController } from "./observable-object.js";
+import { ObservableController } from "./observable-object.ts";
 import { parseGlyphSet, redirectGlyphSetURL } from "./parse-glyphset.js";
-import { assert, friendlyHttpStatus, sleepAsync } from "./utils.js";
+import { assert, friendlyHttpStatus, sleepAsync } from "./utils.ts";
 
 export const THIS_FONTS_GLYPHSET = "";
 export const PROJECT_GLYPH_SETS_CUSTOM_DATA_KEY = "fontra.projectGlyphSets";

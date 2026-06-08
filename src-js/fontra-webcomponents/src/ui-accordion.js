@@ -1,6 +1,6 @@
 import * as html from "@fontra/core/html-utils.js";
 import { UnlitElement } from "@fontra/core/html-utils.js";
-import { FocusKeeper, enumerate } from "@fontra/core/utils.js";
+import { FocusKeeper, enumerate } from "@fontra/core/utils.ts";
 
 export class Accordion extends UnlitElement {
   static styles = `

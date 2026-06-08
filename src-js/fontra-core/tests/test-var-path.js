@@ -3,7 +3,7 @@ import { expect } from "chai";
 import { parametrize } from "./test-support.js";
 
 import { Transform } from "@fontra/core/transform.js";
-import { enumerate } from "@fontra/core/utils.js";
+import { enumerate } from "@fontra/core/utils.ts";
 import VarArray from "@fontra/core/var-array.js";
 import {
   POINT_TYPE_OFF_CURVE_CUBIC,

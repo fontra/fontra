@@ -8,7 +8,7 @@ import {
   dumpURLFragment,
   isObjectEmpty,
   readObjectFromURLFragment,
-} from "./utils.js";
+} from "./utils.ts";
 
 const mapMenuItemKeyToFunction = {
   File: getFileMenuItems,
@@ -100,6 +100,20 @@ function getHelpMenu() {
           enabled: () => true,
           callback: () => {
             window.open("https://github.com/fontra", "fontra.github");
+          },
+        },
+        {
+          title: "Blog",
+          enabled: () => true,
+          callback: () => {
+            window.open("https://blog.fontra.xyz", "fontra.blog");
+          },
+        },
+        {
+          title: "Discord",
+          enabled: () => true,
+          callback: () => {
+            window.open("https://discord.gg/SeZWugEYzd", "fontra.discord");
           },
         },
       ];

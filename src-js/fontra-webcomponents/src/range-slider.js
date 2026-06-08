@@ -1,12 +1,14 @@
 import * as html from "@fontra/core/html-utils.js";
-import { clamp, round } from "@fontra/core/utils.js";
+import { clamp, round } from "@fontra/core/utils.ts";
 import { themeColorCSS } from "./theme-support.js";
 
 const colors = {
   "thumb-color": ["#333", "#ddd"],
   "thumb-color-at-default": ["#ccc", "#777"],
   "track-color": ["#ccc", "#222"],
-  "disabled-color": ["#ddd", "#2e2e2e"],
+  "disabled-thumb-color": ["#b8b8b8", "#aaa"],
+  "disabled-thumb-color-at-default": ["#e5e5e5", "#666"],
+  "disabled-track-color": ["#e5e5e5", "#363636"],
   "disabled-text-color": ["#999", "#aaa"],
 };
 
@@ -23,20 +25,19 @@ export class RangeSlider extends html.UnlitElement {
 
     .wrapper {
       position: relative;
-      display: flex;
+      display: grid;
+      grid-template-columns: min-content auto;
       gap: 0.5em;
       font-family: fontra-ui-regular, sans-serif;
       font-feature-settings: "tnum" 1;
     }
 
     .wrapper.disabled {
-      height: var(--thumb-height);
       margin-top: -3px;
     }
 
     .range-container {
-      position: relative;
-      flex-grow: 1;
+      padding: 0;
     }
 
     /* Chrome, Safari, Edge, Opera */
@@ -57,12 +58,11 @@ export class RangeSlider extends html.UnlitElement {
       margin: 0;
       width: 100%;
       background: transparent;
-      height: 1rem;
       vertical-align: middle;
     }
 
     .slider:disabled {
-      height: calc(1rem * var(--disabled-factor));
+
     }
 
     /* Special styling for WebKit/Blink */
@@ -79,13 +79,13 @@ export class RangeSlider extends html.UnlitElement {
 
     .slider:disabled::-webkit-slider-thumb {
       height: calc(var(--thumb-height) * var(--disabled-factor));
-      background: var(--disabled-color);
+      background: var(--disabled-thumb-color);
       cursor: unset;
       margin-top: calc(-4.5px * var(--disabled-factor));
     }
 
     .slider.is-at-default:disabled::-webkit-slider-thumb {
-      background: var(--disabled-color);
+      background: var(--disabled-thumb-color-at-default);
     }
 
     .slider.is-at-default::-webkit-slider-thumb {
@@ -100,7 +100,7 @@ export class RangeSlider extends html.UnlitElement {
 
     .slider:disabled::-webkit-slider-runnable-track {
       height: calc(var(--track-height) * var(--disabled-factor));
-      background: var(--disabled-color);
+      background: var(--disabled-track-color);
     }
 
     /* Firefox */
@@ -114,7 +114,7 @@ export class RangeSlider extends html.UnlitElement {
 
     .slider:disabled::-moz-range-thumb {
       height: calc(var(--thumb-height) * var(--disabled-factor));
-      background: var(--disabled-color);
+      background: var(--disabled-thumb-color);
       cursor: unset;
     }
 
@@ -123,7 +123,7 @@ export class RangeSlider extends html.UnlitElement {
     }
 
     .slider.is-at-default:disabled::-moz-range-thumb {
-      background: var(--disabled-color);
+      background: var(--disabled-thumb-color-at-default);
     }
 
     .slider::-moz-range-track {
@@ -135,7 +135,7 @@ export class RangeSlider extends html.UnlitElement {
     .slider:disabled::-moz-range-track {
       border-radius: calc(5px * var(--disabled-factor));
       height: calc(var(--track-height) * var(--disabled-factor));
-      background: var(--disabled-color);
+      background: var(--disabled-track-color);
     }
 
     .range-container > input + div {
@@ -143,37 +143,11 @@ export class RangeSlider extends html.UnlitElement {
       z-index: -1;
     }
 
-    .range-container > .range-slider-options {
-      position: relative;
-      padding: 0 10px; // half of var(--thumb-width). Not recognised if referenced by variable
-    }
-
-    .range-container > .range-slider-options > span {
-      display: block;
-      position: relative;
-      left: calc(var(--offset));
-      width: 2px;
-      height: 5.5px;
-      opacity: 0.65;
-      background: dimgray;
-    }
-
     input {
       width: inherit;
     }
 
-    .numeric-input > div {
-      opacity: 0.3;
-      font-size: 1em;
-      padding: 5px;
-      pointer-events: none;
-    }
-
-    .numeric-input > .slider-input {
-      position: relative;
-    }
-
-    .numeric-input > .slider-input > .slider-numeric-input {
+    .numeric-input > .slider-numeric-input {
       width: 40px;
       border-radius: 6px;
 
@@ -183,6 +157,7 @@ export class RangeSlider extends html.UnlitElement {
       color: var(--ui-element-foreground-color);
 
       padding: 2px 3px;
+      margin: 0;
 
       text-align: center;
       font-family: fontra-ui-regular;
@@ -191,10 +166,11 @@ export class RangeSlider extends html.UnlitElement {
       vertical-align: middle;
     }
 
-    .numeric-input > .slider-input > .slider-numeric-input:disabled {
+    .numeric-input > .slider-numeric-input:disabled {
       background-color: unset;
       color: var(--disabled-text-color);
-      padding: 0 3px;
+      padding: 0;
+      margin: 0;
       font-size: 0.8em;
       border-radius: unset;
     }
@@ -216,8 +192,9 @@ export class RangeSlider extends html.UnlitElement {
       width: 1px;
       background: var(--track-color);
     }
+
     .tickmark.disabled {
-      background: var(--disabled-color);
+      background: var(--disabled-track-color);
     }
   `;
 
@@ -397,30 +374,28 @@ export class RangeSlider extends html.UnlitElement {
       },
       [
         html.div({ class: "numeric-input" }, [
-          html.section({ class: "slider-input" }, [
-            (this.numberInput = html.input({
-              disabled: this.disabled,
-              type: "number",
-              class: "slider-numeric-input",
-              value,
-              step: this.step,
-              required: "required",
-              min: this.minValue,
-              max: this.maxValue,
-              pattern: "[0-9]+",
-              onkeydown: (event) => this.onKeyDown(event),
-              onchange: (event) => {
-                const value = this.getValueFromEventTarget(event);
-                this.value = value;
-                const callbackEvent = { value };
-                if (this.sawMouseDown) {
-                  callbackEvent.dragBegin = true;
-                }
-                this.sawMouseDown = false;
-                this.onChangeCallback(callbackEvent);
-              },
-            })),
-          ]),
+          (this.numberInput = html.input({
+            disabled: this.disabled,
+            type: "number",
+            class: "slider-numeric-input",
+            value,
+            step: this.step,
+            required: "required",
+            min: this.minValue,
+            max: this.maxValue,
+            pattern: "[0-9]+",
+            onkeydown: (event) => this.onKeyDown(event),
+            onchange: (event) => {
+              const value = this.getValueFromEventTarget(event);
+              this.value = value;
+              const callbackEvent = { value };
+              if (this.sawMouseDown) {
+                callbackEvent.dragBegin = true;
+              }
+              this.sawMouseDown = false;
+              this.onChangeCallback(callbackEvent);
+            },
+          })),
         ]),
         html.div(
           {

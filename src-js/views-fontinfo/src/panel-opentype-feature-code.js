@@ -44,7 +44,7 @@ import { applicationSettingsController } from "@fontra/core/application-settings
 import * as html from "@fontra/core/html-utils.js";
 import { addStyleSheet } from "@fontra/core/html-utils.js";
 import { ShaperController } from "@fontra/core/shaper-controller.js";
-import { compare, scheduleCalls } from "@fontra/core/utils.js";
+import { compare, scheduleCalls } from "@fontra/core/utils.ts";
 import { themeColorCSS } from "@fontra/web-components/theme-support.js";
 import { Tag } from "@lezer/highlight";
 import { BaseInfoPanel } from "./panel-base.js";
@@ -504,7 +504,7 @@ export class OpenTypeFeatureCodePanel extends BaseInfoPanel {
         ],
         0
       ),
-      scrollIntoView: true,
+      effects: EditorView.scrollIntoView(spanFrom, { y: "center" }),
     });
 
     this.editorView.focus();

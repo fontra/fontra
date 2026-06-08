@@ -5,17 +5,17 @@ steps:
     glyphNames:
       - E
       - Aacute
-  - axisNames:
+  - filter: subset-axes
+    axisNames:
       - weight
-    filter: subset-axes
   - filter: move-default-location
     newDefaultUserLocation:
       weight: 431
-  - axes:
+  - filter: trim-axes
+    axes:
       weight:
         maxValue: 734
         minValue: 223
-    filter: trim-axes
   - filter: round-coordinates
-  - destination: output-round-coordinates.fontra
-    output: fontra-write
+  - output: fontra-write
+    destination: output-round-coordinates.fontra

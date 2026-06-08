@@ -2,7 +2,7 @@
 
 import { VariationError } from "./errors.js";
 import { isSuperset } from "./set-ops.js";
-import { clamp, reversedEnumerate, round } from "./utils.js";
+import { clamp, reversedEnumerate, round } from "./utils.ts";
 import { addItemwise, mulScalar, subItemwise } from "./var-funcs.js";
 
 export class VariationModel {

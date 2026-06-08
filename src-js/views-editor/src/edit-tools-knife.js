@@ -1,6 +1,6 @@
 import { translate } from "@fontra/core/localization.js";
 import { slicePaths } from "@fontra/core/path-functions.js";
-import { mapObjectValues, zip } from "@fontra/core/utils.js";
+import { mapObjectValues, zip } from "@fontra/core/utils.ts";
 import * as vector from "@fontra/core/vector.js";
 import { constrainHorVerDiag } from "./edit-behavior.js";
 import { BaseTool, shouldInitiateDrag } from "./edit-tools-base.js";

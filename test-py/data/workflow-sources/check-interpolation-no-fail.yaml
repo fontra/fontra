@@ -3,8 +3,8 @@ steps:
     source: test-py/data/workflow/input-check-interpolation.fontra
   - filter: check-interpolation
     fixWithFallback: true
-  - destination: output-check-interpolation-no-fail.fontra
-    output: fontra-write
+  - output: fontra-write
+    destination: output-check-interpolation-no-fail.fontra
 test-info:
   continue-on-error: true
   expected-log:

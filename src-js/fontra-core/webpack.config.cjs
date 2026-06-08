@@ -25,9 +25,6 @@ module.exports = {
           context: path.resolve(__dirname, "assets"),
           from: "**/*",
         },
-        {
-          from: "node_modules/harfbuzzjs/hb.wasm",
-        },
       ],
     }),
     new WatchRunPlugin(),

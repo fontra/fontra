@@ -4,8 +4,8 @@ steps:
   - filter: subset-glyphs
     glyphNames:
       - A
-  - axes:
+  - filter: drop-axis-mappings
+    axes:
       - non-existent
-    filter: drop-axis-mappings
-  - destination: output-drop-axis-mapping-noop.fontra
-    output: fontra-write
+  - output: fontra-write
+    destination: output-drop-axis-mapping-noop.fontra

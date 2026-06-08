@@ -1,8 +1,8 @@
 steps:
   - input: fontra-read
     source: test-py/data/workflow/input-generate-palt-vpal-feature.fontra
-  - axisNames: []
-    filter: subset-axes
+  - filter: subset-axes
+    axisNames: []
   - filter: set-vertical-glyph-metrics
     verticalOrigin: 880
     yAdvance: 1000
@@ -10,5 +10,5 @@ steps:
     languageSystems:
       - - kana
         - dflt
-  - destination: output-generate-palt-vpal-feature-single-source.fontra
-    output: fontra-write
+  - output: fontra-write
+    destination: output-generate-palt-vpal-feature-single-source.fontra

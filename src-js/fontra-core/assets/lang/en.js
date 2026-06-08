@@ -92,6 +92,7 @@ export const strings = {
   "axes.preset.slant": "Slant",
   "axes.preset.weight": "Weight",
   "axes.preset.width": "Width",
+  "axes.properties.hidden": "Hidden axis",
   "axes.range": "Range",
   "axes.range.axis-type": "Axis type",
   "axes.range.axis-type.continuous": "Continuous",
@@ -299,6 +300,8 @@ export const strings = {
     "Show effective location",
   "sidebar.designspace-navigation.font-axes-view-options-menu.show-hidden-axes":
     "Show hidden axes",
+  "sidebar.designspace-navigation.font-axes-view-options-menu.show-only-effective-location":
+    "Show only effective location",
   "sidebar.designspace-navigation.font-axes.edit": "Edit font axes",
   "sidebar.designspace-navigation.font-axes.reset": "Reset font axes",
   "sidebar.designspace-navigation.glyph-axes": "Glyph axes",

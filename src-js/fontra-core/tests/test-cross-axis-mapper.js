@@ -1,4 +1,4 @@
-import { CrossAxisMapping } from "@fontra/core/cross-axis-mapping.js";
+import { CrossAxisMapper } from "@fontra/core/cross-axis-mapper.js";
 import { expect } from "chai";
 import { parametrize } from "./test-support.js";
 
@@ -61,22 +61,22 @@ describe("CrossAxisMapping Tests", () => {
   ];
 
   parametrize("CrossAxisMapping.mapLocation", testData, (testItem) => {
-    const mam = new CrossAxisMapping(axes, mappings);
-    expect(mam.mapLocation(testItem.inputLocation)).to.deep.equal(
+    const mapper = new CrossAxisMapper(axes, mappings);
+    expect(mapper.mapLocation(testItem.inputLocation)).to.deep.equal(
       testItem.outputLocation
     );
   });
 
   it("Test empty mappings", () => {
-    const mam = new CrossAxisMapping(axes, []);
+    const mapper = new CrossAxisMapper(axes, []);
     const loc = { a: 12, b: 31 };
-    expect(mam.mapLocation(loc)).to.deep.equal(loc);
+    expect(mapper.mapLocation(loc)).to.deep.equal(loc);
   });
 
   it("Test undefined mappings", () => {
-    const mam = new CrossAxisMapping(axes, undefined);
+    const mapper = new CrossAxisMapper(axes, undefined);
     const loc = { a: 12, b: 31 };
-    expect(mam.mapLocation(loc)).to.deep.equal(loc);
+    expect(mapper.mapLocation(loc)).to.deep.equal(loc);
   });
 
   it("Test mappings with output at default while input not at default", () => {
@@ -92,21 +92,21 @@ describe("CrossAxisMapping Tests", () => {
       },
     ];
 
-    const mam = new CrossAxisMapping(axes, mappings);
-    expect(mam.mapLocation({})).to.deep.equal({ a: 0, b: 0 });
-    expect(mam.mapLocation({ a: 50 })).to.deep.equal({ a: 50, b: 0 });
-    expect(mam.mapLocation({ a: 100 })).to.deep.equal({ a: 100, b: 0 });
-    expect(mam.mapLocation({ b: 50 })).to.deep.equal({ a: 0, b: 50 });
-    expect(mam.mapLocation({ b: 100 })).to.deep.equal({ a: 0, b: 100 });
+    const mapper = new CrossAxisMapper(axes, mappings);
+    expect(mapper.mapLocation({})).to.deep.equal({ a: 0, b: 0 });
+    expect(mapper.mapLocation({ a: 50 })).to.deep.equal({ a: 50, b: 0 });
+    expect(mapper.mapLocation({ a: 100 })).to.deep.equal({ a: 100, b: 0 });
+    expect(mapper.mapLocation({ b: 50 })).to.deep.equal({ a: 0, b: 50 });
+    expect(mapper.mapLocation({ b: 100 })).to.deep.equal({ a: 0, b: 100 });
     // Test that b wins, setting a to 0
-    expect(mam.mapLocation({ a: 100, b: 1 })).to.deep.equal({ a: 0, b: 1 });
-    expect(mam.mapLocation({ a: 10, b: 50 })).to.deep.equal({ a: 0, b: 50 });
-    expect(mam.mapLocation({ a: 50, b: 50 })).to.deep.equal({ a: 0, b: 50 });
-    expect(mam.mapLocation({ a: 50, b: 100 })).to.deep.equal({ a: 0, b: 100 });
+    expect(mapper.mapLocation({ a: 100, b: 1 })).to.deep.equal({ a: 0, b: 1 });
+    expect(mapper.mapLocation({ a: 10, b: 50 })).to.deep.equal({ a: 0, b: 50 });
+    expect(mapper.mapLocation({ a: 50, b: 50 })).to.deep.equal({ a: 0, b: 50 });
+    expect(mapper.mapLocation({ a: 50, b: 100 })).to.deep.equal({ a: 0, b: 100 });
   });
 
   it("Test invalid mappings", () => {
-    const mam = new CrossAxisMapping(axes, [
+    const mapper = new CrossAxisMapper(axes, [
       {
         inputLocation: {},
         outputLocation: {},
@@ -117,7 +117,7 @@ describe("CrossAxisMapping Tests", () => {
       },
     ]);
     const loc = { a: 12, b: 31 };
-    expect(mam.mapLocation(loc)).to.deep.equal(loc);
+    expect(mapper.mapLocation(loc)).to.deep.equal(loc);
   });
 });
 

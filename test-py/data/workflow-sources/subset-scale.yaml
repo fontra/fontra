@@ -18,5 +18,5 @@ steps:
           - C
           - D
       - filter: drop-background-images
-  - destination: output-subset-scale.fontra
-    output: fontra-write
+  - output: fontra-write
+    destination: output-subset-scale.fontra

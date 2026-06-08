@@ -1,0 +1,240 @@
+{
+"axes": {
+"axes": [
+{
+"name": "width",
+"label": "width",
+"tag": "wdth",
+"minValue": 0,
+"defaultValue": 0,
+"maxValue": 1000
+},
+{
+"name": "weight",
+"label": "weight",
+"tag": "wght",
+"minValue": 100,
+"defaultValue": 100,
+"maxValue": 900,
+"mapping": [
+[
+100,
+150
+],
+[
+900,
+850
+]
+]
+},
+{
+"name": "italic",
+"label": "italic",
+"tag": "ital",
+"values": [
+0,
+1
+],
+"defaultValue": 0
+}
+]
+},
+"sources": {
+"3aa9223b": {
+"name": "Support",
+"location": {
+"italic": 0,
+"weight": 595,
+"width": 0
+},
+"lineMetricsHorizontalLayout": {
+"ascender": {
+"value": 800,
+"zone": 16
+},
+"capHeight": {
+"value": 750,
+"zone": 16
+},
+"xHeight": {
+"value": 500,
+"zone": 16
+},
+"baseline": {
+"value": 0,
+"zone": -16
+},
+"descender": {
+"value": -250,
+"zone": -16
+}
+}
+},
+"5bea6334": {
+"name": "LightCondensed",
+"location": {
+"italic": 0,
+"weight": 150,
+"width": 0
+},
+"lineMetricsHorizontalLayout": {
+"ascender": {
+"value": 800,
+"zone": 16
+},
+"capHeight": {
+"value": 750,
+"zone": 16
+},
+"xHeight": {
+"value": 500,
+"zone": 16
+},
+"baseline": {
+"value": 0,
+"zone": -16
+},
+"descender": {
+"value": -250,
+"zone": -16
+}
+}
+},
+"5d4e7f1d": {
+"name": "BoldWide",
+"location": {
+"italic": 0,
+"weight": 850,
+"width": 1000
+},
+"lineMetricsHorizontalLayout": {
+"ascender": {
+"value": 800,
+"zone": 16
+},
+"capHeight": {
+"value": 750,
+"zone": 16
+},
+"xHeight": {
+"value": 500,
+"zone": 16
+},
+"baseline": {
+"value": 0,
+"zone": -16
+},
+"descender": {
+"value": -250,
+"zone": -16
+}
+}
+},
+"d7abd222": {
+"name": "LightWide",
+"location": {
+"italic": 0,
+"weight": 150,
+"width": 1000
+},
+"lineMetricsHorizontalLayout": {
+"ascender": {
+"value": 800,
+"zone": 16
+},
+"capHeight": {
+"value": 750,
+"zone": 16
+},
+"xHeight": {
+"value": 500,
+"zone": 16
+},
+"baseline": {
+"value": 0,
+"zone": -16
+},
+"descender": {
+"value": -250,
+"zone": -16
+}
+}
+},
+"f22d1bbd": {
+"name": "BoldCondensed",
+"location": {
+"italic": 0,
+"weight": 850,
+"width": 0
+},
+"lineMetricsHorizontalLayout": {
+"ascender": {
+"value": 800,
+"zone": 16
+},
+"capHeight": {
+"value": 750,
+"zone": 16
+},
+"xHeight": {
+"value": 500,
+"zone": 16
+},
+"baseline": {
+"value": 0,
+"zone": -16
+},
+"descender": {
+"value": -250,
+"zone": -16
+}
+}
+}
+},
+"conditionalSubstitutions": {
+"featureTags": [
+"rclt"
+],
+"rules": [
+{
+"name": "rule_A_B",
+"conditionSets": [
+{
+"conditions": [
+{
+"name": "weight",
+"minValue": 100,
+"maxValue": 500
+}
+]
+}
+],
+"substitutions": {
+"A": "B"
+}
+},
+{
+"name": "rule_B_A",
+"conditionSets": [
+{
+"conditions": [
+{
+"name": "width",
+"minValue": 600,
+"maxValue": 700
+},
+{
+"name": "weight",
+"minValue": 200,
+"maxValue": 300
+}
+]
+}
+],
+"substitutions": {
+"B": "A"
+}
+}
+]
+}
+}

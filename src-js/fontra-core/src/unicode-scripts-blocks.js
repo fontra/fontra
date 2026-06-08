@@ -1,4 +1,4 @@
-import { bisect_right } from "./utils.js";
+import { bisect_right } from "./utils.ts";
 
 // This module is derived from fontTools.unicodedata.*
 

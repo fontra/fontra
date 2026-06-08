@@ -1,6 +1,6 @@
 import * as html from "@fontra/core/html-utils.js";
 import { translate } from "@fontra/core/localization.js";
-import { throttleCalls } from "@fontra/core/utils.js";
+import { throttleCalls } from "@fontra/core/utils.ts";
 import Panel from "./panel.js";
 
 export default class GlyphNotePanel extends Panel {

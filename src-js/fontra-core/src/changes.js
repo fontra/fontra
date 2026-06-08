@@ -1,4 +1,4 @@
-import { deepCopyObject } from "./utils.js";
+import { deepCopyObject } from "./utils.ts";
 
 export class ChangeCollector {
   constructor(parentCollector, path) {

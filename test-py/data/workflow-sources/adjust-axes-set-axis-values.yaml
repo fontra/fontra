@@ -3,7 +3,8 @@ steps:
     source: test-py/data/workflow/input1-A.fontra
   - filter: subset-glyphs
     glyphNames: []
-  - axes:
+  - filter: adjust-axes
+    axes:
       weight:
         hidden: true
         valueLabels:
@@ -12,6 +13,5 @@ steps:
             value: 400
           - name: Bold
             value: 700
-    filter: adjust-axes
-  - destination: output-adjust-axes-set-axis-values.fontra
-    output: fontra-write
+  - output: fontra-write
+    destination: output-adjust-axes-set-axis-values.fontra

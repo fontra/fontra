@@ -2,5 +2,5 @@ steps:
   - input: fontra-read
     source: test-py/data/workflow/input-variable-composites.fontra
   - filter: trim-variable-glyphs
-  - destination: output-trim-variable-glyphs-1.fontra
-    output: fontra-write
+  - output: fontra-write
+    destination: output-trim-variable-glyphs-1.fontra

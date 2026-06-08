@@ -10,7 +10,7 @@ import {
   range,
   round,
   throttleCalls,
-} from "@fontra/core/utils.js";
+} from "@fontra/core/utils.ts";
 import { showMenu } from "@fontra/web-components/menu-panel.js";
 import {
   Accordion,
@@ -233,12 +233,12 @@ export default class CharactersGlyphsPanel extends Panel {
       {
         key: "formattedMessage",
         title: "Message",
-        width: 200,
+        width: 250,
         minWidth: 100,
       },
       {
         key: "sourceLocation",
-        title: "Feature source",
+        title: "Source location",
         get: (item) => {
           const match = item.sourceLocation?.match(
             /^<features>:(?<lineno>\d+):(?<column>\d+)/
@@ -253,7 +253,7 @@ export default class CharactersGlyphsPanel extends Panel {
                 href: opentypeFeaturesURL,
                 target: `fontra.fontinfo.${this.editorController.projectIdentifier}`,
               },
-              [item.sourceLocation]
+              [`${lineno}:${column}`]
             );
           } else {
             return item.sourceLocation?.split(/\\|\//).at(-1);
@@ -283,6 +283,10 @@ export default class CharactersGlyphsPanel extends Panel {
 
       .feature-tag {
         background-color: #C8F5;
+      }
+
+      .lookup-name {
+        background-color: #CFC5;
       }
 
       .indent-block {
@@ -416,9 +420,9 @@ export default class CharactersGlyphsPanel extends Panel {
 
     const glyphItems = positionedLine.glyphs.map((glyph) => ({
       glyphName: glyph.glyphName,
-      advance: glyph.glyphInfo.x_advance, // TODO: y_advance for vertical
-      dx: glyph.glyphInfo.x_offset,
-      dy: glyph.glyphInfo.y_offset,
+      advance: glyph.glyphInfo.xAdvance, // TODO: yAdvance for vertical
+      dx: glyph.glyphInfo.xOffset,
+      dy: glyph.glyphInfo.yOffset,
       cluster: glyph.cluster,
       originalAdvance: glyph.glyphInfo.mark ? 0 : Math.round(glyph.glyph.xAdvance), // TODO: yAdvance for vertical
     }));
@@ -613,7 +617,7 @@ export default class CharactersGlyphsPanel extends Panel {
         changedElement,
         ...repeat(level, () => html.span({ class: "indent-block" })),
         foldingChevron,
-        ...formatShaperMessage(message),
+        ...formatShaperMessage(message, messageItem.lookupName),
       ]);
     });
 
@@ -762,13 +766,18 @@ function sameGlyphNames(items1, items2) {
   return key1 == key2;
 }
 
-function formatShaperMessage(message) {
-  const parts = [message];
+function formatShaperMessage(message, lookupName) {
+  const parts = [
+    message
+      .replace(/(lookup \d+) (feature '.+?')/, `$2 $1`)
+      .replace(/lookup \d+/, lookupName ? `$& '${lookupName}'` : "$&"),
+  ];
 
   for (const [cls, regex] of [
     ["ot-tag table-tag", /(?<=table )(GSUB|GPOS)/],
     ["ot-tag script-tag", /(?<=script tag )'(.+?)'/],
     ["ot-tag feature-tag", /(?<=feature )'(.+?)'/],
+    ["ot-tag lookup-name", /(?<=lookup \d+ )'(.+?)'/],
   ]) {
     const part = parts.at(-1);
     const m = part.match(regex);

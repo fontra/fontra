@@ -9,5 +9,5 @@ steps:
   - filter: drop-shapes
   - filter: clear-location-base
   - filter: set-location-base
-  - destination: output-set-location-base.fontra
-    output: fontra-write
+  - output: fontra-write
+    destination: output-set-location-base.fontra

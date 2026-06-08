@@ -1,8 +1,8 @@
 steps:
   - input: fontra-read
     source: test-py/data/workflow/input-error-glyph.fontra
-  - destination: output-error-glyph.fontra
-    output: fontra-write
+  - output: fontra-write
+    destination: output-error-glyph.fontra
 test-info:
   continue-on-error: true
   expected-log:

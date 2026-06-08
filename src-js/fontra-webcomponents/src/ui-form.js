@@ -7,7 +7,7 @@ import {
   hyphenatedToCamelCase,
   round,
   scheduleCalls,
-} from "@fontra/core/utils.js";
+} from "@fontra/core/utils.ts";
 import { RangeSlider } from "@fontra/web-components/range-slider.js";
 import "@fontra/web-components/rotary-control.js";
 

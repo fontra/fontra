@@ -14,7 +14,7 @@ import { staticGlyphToGLIF } from "@fontra/core/glyph-glif.js";
 import { pathToSVG } from "@fontra/core/glyph-svg.js";
 import * as html from "@fontra/core/html-utils.js";
 import { loaderSpinner } from "@fontra/core/loader-spinner.js";
-import { ObservableController } from "@fontra/core/observable-object.js";
+import { ObservableController } from "@fontra/core/observable-object.ts";
 import {
   deleteSelectedPoints,
   filterPathByPointIndices,
@@ -28,7 +28,7 @@ import {
   rectScaleAroundCenter,
   rectSize,
   rectToArray,
-} from "@fontra/core/rectangle.js";
+} from "@fontra/core/rectangle.ts";
 import { SceneView } from "@fontra/core/scene-view.js";
 import { isSuperset } from "@fontra/core/set-ops.js";
 import { themeController } from "@fontra/core/theme-settings.js";
@@ -55,7 +55,7 @@ import {
   unionIndexSets,
   writeObjectToURLFragment,
   writeToClipboard,
-} from "@fontra/core/utils.js";
+} from "@fontra/core/utils.ts";
 import { addItemwise, mulScalar, subItemwise } from "@fontra/core/var-funcs.js";
 import { StaticGlyph, VariableGlyph, copyComponent } from "@fontra/core/var-glyph.js";
 import { locationToString, makeSparseLocation } from "@fontra/core/var-model.js";
@@ -3026,8 +3026,8 @@ export class EditorController extends ViewController {
         const glyphNames = glyphName
           ? [glyphName]
           : truncate
-          ? usedBy.slice(0, MAX_NUM_GLYPHS)
-          : usedBy;
+            ? usedBy.slice(0, MAX_NUM_GLYPHS)
+            : usedBy;
 
         const glyphInfos = glyphNames.map((glyphName) =>
           this.sceneController.glyphInfoFromGlyphName(glyphName)
@@ -3061,6 +3061,7 @@ export class EditorController extends ViewController {
     if (!showOnlyGlyphsInFont && !isObjectEmpty(this.sceneSettings.combinedGlyphMap)) {
       glyphSearch.glyphMap = this.sceneSettings.combinedGlyphMap;
       glyphSearch.fontGlyphMap = this.fontController.glyphMap;
+      glyphSearch.allowUnknownGlyphSearchResults = true;
     } else {
       glyphSearch.glyphMap = this.fontController.glyphMap;
     }

@@ -1,4 +1,4 @@
-import { ObservableController } from "./observable-object.js";
+import { ObservableController } from "./observable-object.ts";
 
 export const applicationSettingsController = new ObservableController({
   clipboardFormat: "glif",

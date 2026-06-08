@@ -11,14 +11,14 @@ import {
   select,
   span,
 } from "@fontra/core/html-utils.js";
-import { ObservableController } from "@fontra/core/observable-object.js";
+import { ObservableController } from "@fontra/core/observable-object.ts";
 import { getOPFS } from "@fontra/core/opfs.js";
 import {
   fetchJSON,
   fileNameExtension,
   modulo,
   withTimeout,
-} from "@fontra/core/utils.js";
+} from "@fontra/core/utils.ts";
 import { dialog, message } from "@fontra/web-components/modal-dialog.js";
 import "@fontra/web-components/range-slider.js";
 import { UIList } from "@fontra/web-components/ui-list.js";

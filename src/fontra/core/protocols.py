@@ -151,7 +151,9 @@ class ProjectManager(Protocol):
     async def projectAvailable(self, projectIdentifier: str, token: str) -> bool:
         pass
 
-    async def getRemoteSubject(self, projectIdentifier: str, token: str) -> Any:
+    async def getRemoteSubject(
+        self, projectIdentifier: str, token: str, readOnly: bool = False
+    ) -> Any:
         pass
 
     async def getProjectList(self, token: str) -> list[str]:

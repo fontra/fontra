@@ -314,10 +314,10 @@ export function compute(expression, functions, variables) {
           return op === "MUL"
             ? result * right
             : op === "DIV"
-            ? result / right
-            : op === "MOD"
-            ? result % right
-            : 0;
+              ? result / right
+              : op === "MOD"
+                ? result % right
+                : 0;
         },
         false
       );

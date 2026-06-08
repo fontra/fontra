@@ -5,13 +5,13 @@ steps:
     glyphNames:
       - A
       - B
-  - axes:
+  - filter: trim-axes
+    axes:
       weight:
         maxValue: 300
         minValue: 100
       width:
         maxValue: 400
         minValue: 0
-    filter: trim-axes
-  - destination: output-trim-axes-location-base.fontra
-    output: fontra-write
+  - output: fontra-write
+    destination: output-trim-axes-location-base.fontra

@@ -6,8 +6,8 @@ steps:
       designer: Joe Font Designer
       familyName: A Brand New Font
       unknownName: Unknown, will be warned about
-  - destination: output-set-font-info.fontra
-    output: fontra-write
+  - output: fontra-write
+    destination: output-set-font-info.fontra
 test-info:
   expected-log:
     - level: 40

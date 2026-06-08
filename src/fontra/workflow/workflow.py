@@ -76,7 +76,7 @@ def getAction(
     return action
 
 
-_actionStepClasses = {}
+_actionStepClasses: dict[str, type] = {}
 
 
 def registerActionStepClass(actionType):

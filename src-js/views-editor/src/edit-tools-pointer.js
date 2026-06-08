@@ -12,7 +12,7 @@ import {
   offsetRect,
   pointInRect,
   rectSize,
-} from "@fontra/core/rectangle.js";
+} from "@fontra/core/rectangle.ts";
 import {
   difference,
   isSuperset,
@@ -27,7 +27,7 @@ import {
   enumerate,
   parseSelection,
   range,
-} from "@fontra/core/utils.js";
+} from "@fontra/core/utils.ts";
 import { copyBackgroundImage, copyComponent } from "@fontra/core/var-glyph.js";
 import { VarPackedPath } from "@fontra/core/var-path.js";
 import * as vector from "@fontra/core/vector.js";
@@ -748,8 +748,8 @@ function getSelectModeFunction(event) {
       ? difference
       : symmetricDifference
     : event[commandKeyProperty]
-    ? union
-    : replace;
+      ? union
+      : replace;
 }
 
 registerVisualizationLayerDefinition({

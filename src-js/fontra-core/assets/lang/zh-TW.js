@@ -92,6 +92,7 @@ export const strings = {
   "axes.preset.slant": "傾斜角度",
   "axes.preset.weight": "字重",
   "axes.preset.width": "字寬",
+  "axes.properties.hidden": "Hidden axis",
   "axes.range": "範圍",
   "axes.range.axis-type": "參數軸類型",
   "axes.range.axis-type.continuous": "連續",
@@ -286,6 +287,8 @@ export const strings = {
     "顯示有效位置",
   "sidebar.designspace-navigation.font-axes-view-options-menu.show-hidden-axes":
     "顯示隱藏參數軸",
+  "sidebar.designspace-navigation.font-axes-view-options-menu.show-only-effective-location":
+    "Show only effective location",
   "sidebar.designspace-navigation.font-axes.edit": "編輯字型參數軸",
   "sidebar.designspace-navigation.font-axes.reset": "重設字型參數軸",
   "sidebar.designspace-navigation.glyph-axes": "字形參數軸",

@@ -92,6 +92,7 @@ export const strings = {
   "axes.preset.slant": "Pahilig",
   "axes.preset.weight": "Timbang",
   "axes.preset.width": "Lapad",
+  "axes.properties.hidden": "Hidden axis",
   "axes.range": "Saklaw",
   "axes.range.axis-type": "Uri ng aksis",
   "axes.range.axis-type.continuous": "Tuloy-tuloy",
@@ -310,6 +311,8 @@ export const strings = {
     "Ipakita ang epektibong lokasyon",
   "sidebar.designspace-navigation.font-axes-view-options-menu.show-hidden-axes":
     "Ipakita ang mga nakatagong axes",
+  "sidebar.designspace-navigation.font-axes-view-options-menu.show-only-effective-location":
+    "Show only effective location",
   "sidebar.designspace-navigation.font-axes.edit": "I-edit ang mga font axes",
   "sidebar.designspace-navigation.font-axes.reset": "I-reset ang mga font axes",
   "sidebar.designspace-navigation.glyph-axes": "Mga palakol ng Glyph",

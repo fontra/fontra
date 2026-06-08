@@ -610,7 +610,7 @@ def popFirstItem(d):
     return (key, d.pop(key))
 
 
-_tasks = set()
+_tasks: set[asyncio.Task] = set()
 
 
 def taskDoneCallback(task):

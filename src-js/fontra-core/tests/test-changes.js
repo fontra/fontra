@@ -9,7 +9,7 @@ import {
   matchChangePath,
   matchChangePattern,
 } from "@fontra/core/changes.js";
-import { deepCopyObject } from "@fontra/core/utils.js";
+import { deepCopyObject } from "@fontra/core/utils.ts";
 import { getTestData } from "./test-support.js";
 
 describe("applyChange Tests", () => {

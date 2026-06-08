@@ -13,14 +13,12 @@ module.exports = (_env, argv) => {
         new HtmlBundlerPlugin({
           entry: {
             landing: require.resolve("@fontra/projectmanager-filesystem/landing.html"),
-            applicationsettings: require.resolve(
-              "@fontra/views-applicationsettings/applicationsettings.html"
-            ),
+            applicationsettings:
+              require.resolve("@fontra/views-applicationsettings/applicationsettings.html"),
             editor: require.resolve("@fontra/views-editor/editor.html"),
             fontinfo: require.resolve("@fontra/views-fontinfo/fontinfo.html"),
-            fontoverview: require.resolve(
-              "@fontra/views-fontoverview/fontoverview.html"
-            ),
+            fontoverview:
+              require.resolve("@fontra/views-fontoverview/fontoverview.html"),
           },
           js: {
             // JS output filename, relative to `output.path` Webpack option

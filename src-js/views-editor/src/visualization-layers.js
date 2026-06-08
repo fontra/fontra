@@ -1,4 +1,4 @@
-import { withSavedState } from "@fontra/core/utils.js";
+import { withSavedState } from "@fontra/core/utils.ts";
 import { mulScalar } from "@fontra/core/var-funcs.js";
 import { equalGlyphSelection } from "./scene-controller.js";
 

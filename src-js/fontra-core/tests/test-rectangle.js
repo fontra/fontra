@@ -22,7 +22,7 @@ import {
   unionRect,
   updateRect,
   validateRect,
-} from "@fontra/core/rectangle.js";
+} from "@fontra/core/rectangle.ts";
 import { parametrize } from "./test-support.js";
 
 describe("pointInRect", () => {

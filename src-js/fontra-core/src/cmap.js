@@ -1,4 +1,4 @@
-import { makeUPlusStringFromCodePoint } from "./utils.js";
+import { makeUPlusStringFromCodePoint } from "./utils.ts";
 
 //
 // A `characterMap` is an object with integer numbers representing unicode code

@@ -9,12 +9,12 @@ import {
 } from "./changes.js";
 import { getClassSchema } from "./classes.js";
 import { getGlyphMapProxy, makeCharacterMapFromGlyphMap } from "./cmap.js";
-import { CrossAxisMapping } from "./cross-axis-mapping.js";
+import { CrossAxisMapper } from "./cross-axis-mapper.js";
 import { FontSourcesInstancer } from "./font-sources-instancer.js";
 import { StaticGlyphController, VariableGlyphController } from "./glyph-controller.js";
 import { KerningController } from "./kerning-controller.js";
 import { LRUCache } from "./lru-cache.js";
-import { ObservableController } from "./observable-object.js";
+import { ObservableController } from "./observable-object.ts";
 import { setPopFirst } from "./set-ops.js";
 import { TaskPool } from "./task-pool.js";
 import {
@@ -30,7 +30,7 @@ import {
   sleepAsync,
   throttleCalls,
   uniqueID,
-} from "./utils.js";
+} from "./utils.ts";
 import { StaticGlyph, VariableGlyph } from "./var-glyph.js";
 import {
   locationToName,
@@ -674,8 +674,12 @@ export class FontController {
     return instanceController;
   }
 
+  get fallbackXAdvance() {
+    return this.unitsPerEm / 2;
+  }
+
   getDummyGlyphInstanceController(glyphName = "<dummy>") {
-    const dummyGlyph = StaticGlyph.fromObject({ xAdvance: this.unitsPerEm / 2 });
+    const dummyGlyph = StaticGlyph.fromObject({ xAdvance: this.fallbackXAdvance });
     return new StaticGlyphController(glyphName, dummyGlyph, undefined);
   }
 
@@ -1007,7 +1011,7 @@ export class FontController {
 
   get crossAxisMapping() {
     if (!this._crossAxisMapping) {
-      this._crossAxisMapping = new CrossAxisMapping(
+      this._crossAxisMapping = new CrossAxisMapper(
         this.fontAxesSourceSpace,
         this.axes.mappings
       );

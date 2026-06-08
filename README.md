@@ -21,7 +21,7 @@ Fontra Pak is also available as [Flatpak](https://github.com/fontra/fontra-flatp
 
 - Ensure you have **Python >= 3.10** installed, preferably from [python.org](https://www.python.org/downloads/)
 
-- Ensure you have **Node.js >= 20** installed, preferably from [nodejs.org](https://nodejs.org/en/download/)
+- Ensure you have **Node.js >= 24** installed, preferably from [nodejs.org](https://nodejs.org/en/download/)
 
 #### Setup
 
@@ -98,8 +98,8 @@ The following list of features is not complete, but gives you a rough idea of wh
 - Read .ttf + variable .ttf ✅
 - Read .otf + variable .otf ✅
 - Read .ttx ✅
-- Write .ttf + variable .ttf (For “hot fixes”. Currently not planned, will still require export step.)
-- Write .otf + variable .otf ✅ (Via “export as” in Fontra Pak)
+- Direct edit/Write .ttf/.otf + variable .ttf/.otf (For “hot fixes”. Currently not planned, will still require export step.)
+- Write .ttf/.otf + variable .ttf/.otf ✅ (Via “export as” in Fontra Pak)
 - Respond to external .ttf and .otf changes (automatic reload) ✅
 - Respond to external .fontra, .glyphs and .glyphspackage changes (automatic reload) ✅
 - Read .glyphs and .glyphspackage ✅ (Via [fontra-glyphs](https://github.com/fontra/fontra-glyphs))

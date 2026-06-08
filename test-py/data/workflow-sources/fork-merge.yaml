@@ -1,8 +1,8 @@
 steps:
   - input: fontra-read
     source: test-py/data/workflow/input1-A.fontra
-  - axisNames: []
-    filter: subset-axes
+  - filter: subset-axes
+    axisNames: []
   - fork-merge: null
     steps:
       - filter: subset-glyphs
@@ -10,8 +10,8 @@ steps:
           - B
       - filter: scale
         scaleFactor: 0.5
-  - destination: output-fork-merge.fontra
-    output: fontra-write
+  - output: fontra-write
+    destination: output-fork-merge.fontra
 test-info:
   expected-log:
     - level: 30

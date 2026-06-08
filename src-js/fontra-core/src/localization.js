@@ -1,4 +1,4 @@
-import { ObservableController } from "./observable-object.js";
+import { ObservableController } from "./observable-object.ts";
 
 // Don't edit this block, see scripts/rebuild_languages.py
 export const languages = [

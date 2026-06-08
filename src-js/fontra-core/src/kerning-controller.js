@@ -1,7 +1,7 @@
 import { recordChanges } from "./change-recorder.js";
 import { ChangeCollector, iterChanges, wildcard } from "./changes.js";
 import { DiscreteVariationModel } from "./discrete-variation-model.js";
-import { assert, enumerate, isObjectEmpty, throttleCalls, zip } from "./utils.js";
+import { assert, enumerate, isObjectEmpty, throttleCalls, zip } from "./utils.ts";
 
 export class KerningController {
   constructor(kernTag, kerning, fontController) {

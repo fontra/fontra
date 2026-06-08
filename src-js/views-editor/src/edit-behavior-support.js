@@ -1,4 +1,4 @@
-import { boolInt, modulo, reversed } from "@fontra/core/utils.js";
+import { boolInt, modulo, reversed } from "@fontra/core/utils.ts";
 
 // Or-able constants for rule definitions
 export const NIL = 1 << 0; // Does not exist

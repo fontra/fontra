@@ -30,19 +30,19 @@ unicode;name;category;subCategory;case;direction;script;description;production
 000D;CR;Separator;;;;;CARRIAGE RETURN;
 007F;DEL;Separator;;;;;DELETE;
 0020;space;Separator;Space;;;;SPACE;
-0021;exclam;Punctuation;;upper;;;EXCLAMATION MARK;
-0022;quotedbl;Punctuation;Quote;;;;QUOTATION MARK;
+0021;exclam;Punctuation;;upper;BIDI;;EXCLAMATION MARK;
+0022;quotedbl;Punctuation;Quote;;BIDI;;QUOTATION MARK;
 0023;numbersign;Punctuation;;;;;NUMBER SIGN;
 0024;dollar;Symbol;Currency;;;;DOLLAR SIGN;
 0025;percent;Symbol;Math;;;;PERCENT SIGN;
 0026;ampersand;Symbol;;;;;AMPERSAND;
-0027;quotesingle;Punctuation;Quote;;;;APOSTROPHE;
-0028;parenleft;Punctuation;Parenthesis;;;;LEFT PARENTHESIS;
-0029;parenright;Punctuation;Parenthesis;;;;RIGHT PARENTHESIS;
-002A;asterisk;Punctuation;;;;;ASTERISK;
+0027;quotesingle;Punctuation;Quote;;BIDI;;APOSTROPHE;
+0028;parenleft;Punctuation;Parenthesis;;BIDI;;LEFT PARENTHESIS;
+0029;parenright;Punctuation;Parenthesis;;BIDI;;RIGHT PARENTHESIS;
+002A;asterisk;Punctuation;;;BIDI;;ASTERISK;
 002B;plus;Symbol;Math;;;;PLUS SIGN;
-002C;comma;Punctuation;;;;;COMMA;
-002D;hyphen;Punctuation;Dash;;;;HYPHEN-MINUS;
+002C;comma;Punctuation;;;BIDI;;COMMA;
+002D;hyphen;Punctuation;Dash;;BIDI;;HYPHEN-MINUS;
 002E;period;Punctuation;;;;;FULL STOP;
 002F;slash;Punctuation;;;;;SOLIDUS;
 0030;zero;Number;Decimal Digit;;;;DIGIT ZERO;
@@ -56,11 +56,11 @@ unicode;name;category;subCategory;case;direction;script;description;production
 0038;eight;Number;Decimal Digit;;;;DIGIT EIGHT;
 0039;nine;Number;Decimal Digit;;;;DIGIT NINE;
 003A;colon;Punctuation;;;;;COLON;
-003B;semicolon;Punctuation;;;;;SEMICOLON;
+003B;semicolon;Punctuation;;;BIDI;;SEMICOLON;
 003C;less;Symbol;Math;lower;;;LESS-THAN SIGN;
 003D;equal;Symbol;Math;;;;EQUALS SIGN;
 003E;greater;Symbol;Math;lower;;;GREATER-THAN SIGN;
-003F;question;Punctuation;;upper;;;QUESTION MARK;
+003F;question;Punctuation;;upper;BIDI;;QUESTION MARK;
 0040;at;Symbol;;;;;COMMERCIAL AT;
 0041;A;Letter;;upper;;latin;LATIN CAPITAL LETTER A;
 0042;B;Letter;;upper;;latin;LATIN CAPITAL LETTER B;
@@ -88,10 +88,10 @@ unicode;name;category;subCategory;case;direction;script;description;production
 0058;X;Letter;;upper;;latin;LATIN CAPITAL LETTER X;
 0059;Y;Letter;;upper;;latin;LATIN CAPITAL LETTER Y;
 005A;Z;Letter;;upper;;latin;LATIN CAPITAL LETTER Z;
-005B;bracketleft;Punctuation;Parenthesis;;;;LEFT SQUARE BRACKET;
-005D;bracketright;Punctuation;Parenthesis;;;;RIGHT SQUARE BRACKET;
-005C;backslash;Punctuation;;;;;REVERSE SOLIDUS;
-005F;underscore;Punctuation;Dash;;;;LOW LINE;
+005B;bracketleft;Punctuation;Parenthesis;;BIDI;;LEFT SQUARE BRACKET;
+005D;bracketright;Punctuation;Parenthesis;;BIDI;;RIGHT SQUARE BRACKET;
+005C;backslash;Punctuation;;;BIDI;;REVERSE SOLIDUS;
+005F;underscore;Punctuation;Dash;;BIDI;;LOW LINE;
 0061;a;Letter;;lower;;latin;LATIN SMALL LETTER A;
 0062;b;Letter;;lower;;latin;LATIN SMALL LETTER B;
 0063;c;Letter;;lower;;latin;LATIN SMALL LETTER C;
@@ -118,12 +118,12 @@ unicode;name;category;subCategory;case;direction;script;description;production
 0078;x;Letter;;lower;;latin;LATIN SMALL LETTER X;
 0079;y;Letter;;lower;;latin;LATIN SMALL LETTER Y;
 007A;z;Letter;;lower;;latin;LATIN SMALL LETTER Z;
-007B;braceleft;Punctuation;Parenthesis;;;;LEFT CURLY BRACKET;
-007D;braceright;Punctuation;Parenthesis;;;;RIGHT CURLY BRACKET;
+007B;braceleft;Punctuation;Parenthesis;;BIDI;;LEFT CURLY BRACKET;
+007D;braceright;Punctuation;Parenthesis;;BIDI;;RIGHT CURLY BRACKET;
 007C;bar;Symbol;;;;;VERTICAL LINE;
 007E;asciitilde;Symbol;Math;;;;TILDE;
 00A0;nbspace;Separator;Space;;;;NO-BREAK SPACE;uni00A0
-00A1;exclamdown;Punctuation;;lower;;;INVERTED EXCLAMATION MARK;
+00A1;exclamdown;Punctuation;;lower;BIDI;;INVERTED EXCLAMATION MARK;
 00A2;cent;Symbol;Currency;;;;CENT SIGN;
 00A3;sterling;Symbol;Currency;;;;POUND SIGN;
 00A4;currency;Symbol;Currency;;;;CURRENCY SIGN;
@@ -1919,7 +1919,7 @@ A66F;vzmetcomb-cy;Mark;Nonspacing;;;cyrillic;COMBINING CYRILLIC VZMET;uniA66F
 A670;tenmillionscomb-cy;Mark;Enclosing;;;cyrillic;COMBINING CYRILLIC TEN MILLIONS SIGN;uniA670
 A671;hundredmillionscomb-cy;Mark;Enclosing;;;cyrillic;COMBINING CYRILLIC HUNDRED MILLIONS SIGN;uniA671
 A672;thousandmillionscomb-cy;Mark;Enclosing;;;cyrillic;COMBINING CYRILLIC THOUSAND MILLIONS SIGN;uniA672
-A673;asterisk-cy;Punctuation;;;;cyrillic;SLAVONIC ASTERISK;uniA673
+A673;asterisk-cy;Punctuation;;;BIDI;cyrillic;SLAVONIC ASTERISK;uniA673
 A674;ieukrainiancomb-cy;Mark;Nonspacing;;;cyrillic;COMBINING CYRILLIC LETTER UKRAINIAN IE;uniA674
 A675;icomb-cy;Mark;Nonspacing;;;cyrillic;COMBINING CYRILLIC LETTER I;uniA675
 A676;yicomb-cy;Mark;Nonspacing;;;cyrillic;COMBINING CYRILLIC LETTER YI;uniA676
@@ -1930,8 +1930,8 @@ A67A;softsigncomb-cy;Mark;Nonspacing;;;cyrillic;COMBINING CYRILLIC LETTER SOFT S
 A67B;omegacomb-cy;Mark;Nonspacing;;;cyrillic;COMBINING CYRILLIC LETTER OMEGA;uniA67B
 A67C;kavykacomb-cy;Mark;Nonspacing;;;cyrillic;COMBINING CYRILLIC KAVYKA;uniA67C
 A67D;payerokcomb-cy;Mark;Nonspacing;;;cyrillic;COMBINING CYRILLIC PAYEROK;uniA67D
-A67E;kavyka-cy;Punctuation;;;;cyrillic;CYRILLIC KAVYKA;uniA67E
-A67F;payerok-cy;Letter;Modifier;;;cyrillic;CYRILLIC PAYEROK;uniA67F
+A67E;kavyka-cy;Punctuation;;;BIDI;cyrillic;CYRILLIC KAVYKA;uniA67E
+A67F;payerok-cy;Letter;Modifier;;BIDI;cyrillic;CYRILLIC PAYEROK;uniA67F
 A680;Dwe-cy;Letter;;upper;;cyrillic;CYRILLIC CAPITAL LETTER DWE;uniA680
 A681;dwe-cy;Letter;;lower;;cyrillic;CYRILLIC SMALL LETTER DWE;uniA681
 A682;Dzwe-cy;Letter;;upper;;cyrillic;CYRILLIC CAPITAL LETTER DZWE;uniA682
@@ -2224,86 +2224,86 @@ FB17;men_xeh-arm;Letter;Ligature;lower;;armenian;ARMENIAN SMALL LIGATURE MEN XEH
 10FD;aen-georgian;Letter;;lower;;georgian;GEORGIAN LETTER AEN;uni10FD
 10FE;hardSign-georgian;Letter;;lower;;georgian;GEORGIAN LETTER HARD SIGN;uni10FE
 10FF;labial-georgian;Letter;;lower;;georgian;GEORGIAN LETTER LABIAL SIGN;uni10FF
-10A0;An-oldgeorgian;Letter;;upper;;georgian;Old GEORGIAN CAPITAL LETTER AN;uni10A0
-10A1;Ban-oldgeorgian;Letter;;upper;;georgian;Old GEORGIAN CAPITAL LETTER BAN;uni10A1
-10A2;Gan-oldgeorgian;Letter;;upper;;georgian;Old GEORGIAN CAPITAL LETTER GAN;uni10A2
-10A3;Don-oldgeorgian;Letter;;upper;;georgian;Old GEORGIAN CAPITAL LETTER DON;uni10A3
-10A4;En-oldgeorgian;Letter;;upper;;georgian;Old GEORGIAN CAPITAL LETTER EN;uni10A4
-10A5;Vin-oldgeorgian;Letter;;upper;;georgian;Old GEORGIAN CAPITAL LETTER VIN;uni10A5
-10A6;Zen-oldgeorgian;Letter;;upper;;georgian;Old GEORGIAN CAPITAL LETTER ZEN;uni10A6
-10A7;Tan-oldgeorgian;Letter;;upper;;georgian;Old GEORGIAN CAPITAL LETTER TAN;uni10A7
-10A8;In-oldgeorgian;Letter;;upper;;georgian;Old GEORGIAN CAPITAL LETTER IN;uni10A8
-10A9;Kan-oldgeorgian;Letter;;upper;;georgian;Old GEORGIAN CAPITAL LETTER KAN;uni10A9
-10AA;Las-oldgeorgian;Letter;;upper;;georgian;Old GEORGIAN CAPITAL LETTER LAS;uni10AA
-10AB;Man-oldgeorgian;Letter;;upper;;georgian;Old GEORGIAN CAPITAL LETTER MAN;uni10AB
-10AC;Nar-oldgeorgian;Letter;;upper;;georgian;Old GEORGIAN CAPITAL LETTER NAR;uni10AC
-10AD;On-oldgeorgian;Letter;;upper;;georgian;Old GEORGIAN CAPITAL LETTER ON;uni10AD
-10AE;Par-oldgeorgian;Letter;;upper;;georgian;Old GEORGIAN CAPITAL LETTER PAR;uni10AE
-10AF;Zhar-oldgeorgian;Letter;;upper;;georgian;Old GEORGIAN CAPITAL LETTER ZHAR;uni10AF
-10B0;Rae-oldgeorgian;Letter;;upper;;georgian;Old GEORGIAN CAPITAL LETTER RAE;uni10B0
-10B1;San-oldgeorgian;Letter;;upper;;georgian;Old GEORGIAN CAPITAL LETTER SAN;uni10B1
-10B2;Tar-oldgeorgian;Letter;;upper;;georgian;Old GEORGIAN CAPITAL LETTER TAR;uni10B2
-10B3;Un-oldgeorgian;Letter;;upper;;georgian;Old GEORGIAN CAPITAL LETTER UN;uni10B3
-10B4;Phar-oldgeorgian;Letter;;upper;;georgian;Old GEORGIAN CAPITAL LETTER PHAR;uni10B4
-10B5;Khar-oldgeorgian;Letter;;upper;;georgian;Old GEORGIAN CAPITAL LETTER KHAR;uni10B5
-10B6;Ghan-oldgeorgian;Letter;;upper;;georgian;Old GEORGIAN CAPITAL LETTER GHAN;uni10B6
-10B7;Qar-oldgeorgian;Letter;;upper;;georgian;Old GEORGIAN CAPITAL LETTER QAR;uni10B7
-10B8;Shin-oldgeorgian;Letter;;upper;;georgian;Old GEORGIAN CAPITAL LETTER SHIN;uni10B8
-10B9;Chin-oldgeorgian;Letter;;upper;;georgian;Old GEORGIAN CAPITAL LETTER CHIN;uni10B9
-10BA;Can-oldgeorgian;Letter;;upper;;georgian;Old GEORGIAN CAPITAL LETTER CAN;uni10BA
-10BB;Jil-oldgeorgian;Letter;;upper;;georgian;Old GEORGIAN CAPITAL LETTER JIL;uni10BB
-10BC;Cil-oldgeorgian;Letter;;upper;;georgian;Old GEORGIAN CAPITAL LETTER CIL;uni10BC
-10BD;Char-oldgeorgian;Letter;;upper;;georgian;Old GEORGIAN CAPITAL LETTER CHAR;uni10BD
-10BE;Xan-oldgeorgian;Letter;;upper;;georgian;Old GEORGIAN CAPITAL LETTER XAN;uni10BE
-10BF;Jhan-oldgeorgian;Letter;;upper;;georgian;Old GEORGIAN CAPITAL LETTER JHAN;uni10BF
-10C0;Hae-oldgeorgian;Letter;;upper;;georgian;Old GEORGIAN CAPITAL LETTER HAE;uni10C0
-10C1;He-oldgeorgian;Letter;;upper;;georgian;Old GEORGIAN CAPITAL LETTER HE;uni10C1
-10C2;Hie-oldgeorgian;Letter;;upper;;georgian;Old GEORGIAN CAPITAL LETTER HIE;uni10C2
-10C3;We-oldgeorgian;Letter;;upper;;georgian;Old GEORGIAN CAPITAL LETTER WE;uni10C3
-10C4;Har-oldgeorgian;Letter;;upper;;georgian;Old GEORGIAN CAPITAL LETTER HAR;uni10C4
-10C5;Hoe-oldgeorgian;Letter;;upper;;georgian;Old GEORGIAN CAPITAL LETTER HOE;uni10C5
-10C7;Yn-oldgeorgian;Letter;;upper;;georgian;Old GEORGIAN CAPITAL LETTER YN;uni10C7
-10CD;Aen-oldgeorgian;Letter;;upper;;georgian;Old GEORGIAN CAPITAL LETTER AEN;uni10CD
-2D00;an-oldgeorgian;Letter;;lower;;georgian;Old GEORGIAN LETTER AN;uni2D00
-2D01;ban-oldgeorgian;Letter;;lower;;georgian;Old GEORGIAN LETTER BAN;uni2D01
-2D02;gan-oldgeorgian;Letter;;lower;;georgian;Old GEORGIAN LETTER GAN;uni2D02
-2D03;don-oldgeorgian;Letter;;lower;;georgian;Old GEORGIAN LETTER DON;uni2D03
-2D04;en-oldgeorgian;Letter;;lower;;georgian;Old GEORGIAN LETTER EN;uni2D04
-2D05;vin-oldgeorgian;Letter;;lower;;georgian;Old GEORGIAN LETTER VIN;uni2D05
-2D06;zen-oldgeorgian;Letter;;lower;;georgian;Old GEORGIAN LETTER ZEN;uni2D06
-2D07;tan-oldgeorgian;Letter;;lower;;georgian;Old GEORGIAN LETTER TAN;uni2D07
-2D08;in-oldgeorgian;Letter;;lower;;georgian;Old GEORGIAN LETTER IN;uni2D08
-2D09;kan-oldgeorgian;Letter;;lower;;georgian;Old GEORGIAN LETTER KAN;uni2D09
-2D0A;las-oldgeorgian;Letter;;lower;;georgian;Old GEORGIAN LETTER LAS;uni2D0A
-2D0B;man-oldgeorgian;Letter;;lower;;georgian;Old GEORGIAN LETTER MAN;uni2D0B
-2D0C;nar-oldgeorgian;Letter;;lower;;georgian;Old GEORGIAN LETTER NAR;uni2D0C
-2D0D;on-oldgeorgian;Letter;;lower;;georgian;Old GEORGIAN LETTER ON;uni2D0D
-2D0E;par-oldgeorgian;Letter;;lower;;georgian;Old GEORGIAN LETTER PAR;uni2D0E
-2D0F;zhar-oldgeorgian;Letter;;lower;;georgian;Old GEORGIAN LETTER ZHAR;uni2D0F
-2D10;rae-oldgeorgian;Letter;;lower;;georgian;Old GEORGIAN LETTER RAE;uni2D10
-2D11;san-oldgeorgian;Letter;;lower;;georgian;Old GEORGIAN LETTER SAN;uni2D11
-2D12;tar-oldgeorgian;Letter;;lower;;georgian;Old GEORGIAN LETTER TAR;uni2D12
-2D13;un-oldgeorgian;Letter;;lower;;georgian;Old GEORGIAN LETTER UN;uni2D13
-2D14;phar-oldgeorgian;Letter;;lower;;georgian;Old GEORGIAN LETTER PHAR;uni2D14
-2D15;khar-oldgeorgian;Letter;;lower;;georgian;Old GEORGIAN LETTER KHAR;uni2D15
-2D16;ghan-oldgeorgian;Letter;;lower;;georgian;Old GEORGIAN LETTER GHAN;uni2D16
-2D17;qar-oldgeorgian;Letter;;lower;;georgian;Old GEORGIAN LETTER QAR;uni2D17
-2D18;shin-oldgeorgian;Letter;;lower;;georgian;Old GEORGIAN LETTER SHIN;uni2D18
-2D19;chin-oldgeorgian;Letter;;lower;;georgian;Old GEORGIAN LETTER CHIN;uni2D19
-2D1A;can-oldgeorgian;Letter;;lower;;georgian;Old GEORGIAN LETTER CAN;uni2D1A
-2D1B;jil-oldgeorgian;Letter;;lower;;georgian;Old GEORGIAN LETTER JIL;uni2D1B
-2D1C;cil-oldgeorgian;Letter;;lower;;georgian;Old GEORGIAN LETTER CIL;uni2D1C
-2D1D;char-oldgeorgian;Letter;;lower;;georgian;Old GEORGIAN LETTER CHAR;uni2D1D
-2D1E;xan-oldgeorgian;Letter;;lower;;georgian;Old GEORGIAN LETTER XAN;uni2D1E
-2D1F;jhan-oldgeorgian;Letter;;lower;;georgian;Old GEORGIAN LETTER JHAN;uni2D1F
-2D20;hae-oldgeorgian;Letter;;lower;;georgian;Old GEORGIAN LETTER HAE;uni2D20
-2D21;he-oldgeorgian;Letter;;lower;;georgian;Old GEORGIAN LETTER HE;uni2D21
-2D22;hie-oldgeorgian;Letter;;lower;;georgian;Old GEORGIAN LETTER HIE;uni2D22
-2D23;we-oldgeorgian;Letter;;lower;;georgian;Old GEORGIAN LETTER WE;uni2D23
-2D24;har-oldgeorgian;Letter;;lower;;georgian;Old GEORGIAN LETTER HAR;uni2D24
-2D25;hoe-oldgeorgian;Letter;;lower;;georgian;Old GEORGIAN LETTER HOE;uni2D25
-2D27;yn-oldgeorgian;Letter;;lower;;georgian;Old GEORGIAN LETTER YN;uni2D27
-2D2D;aen-oldgeorgian;Letter;;lower;;georgian;Old GEORGIAN LETTER AEN;uni2D2D
+10A0;An-oldgeorgian;Letter;;upper;;old georgian;Old GEORGIAN CAPITAL LETTER AN;uni10A0
+10A1;Ban-oldgeorgian;Letter;;upper;;old georgian;Old GEORGIAN CAPITAL LETTER BAN;uni10A1
+10A2;Gan-oldgeorgian;Letter;;upper;;old georgian;Old GEORGIAN CAPITAL LETTER GAN;uni10A2
+10A3;Don-oldgeorgian;Letter;;upper;;old georgian;Old GEORGIAN CAPITAL LETTER DON;uni10A3
+10A4;En-oldgeorgian;Letter;;upper;;old georgian;Old GEORGIAN CAPITAL LETTER EN;uni10A4
+10A5;Vin-oldgeorgian;Letter;;upper;;old georgian;Old GEORGIAN CAPITAL LETTER VIN;uni10A5
+10A6;Zen-oldgeorgian;Letter;;upper;;old georgian;Old GEORGIAN CAPITAL LETTER ZEN;uni10A6
+10A7;Tan-oldgeorgian;Letter;;upper;;old georgian;Old GEORGIAN CAPITAL LETTER TAN;uni10A7
+10A8;In-oldgeorgian;Letter;;upper;;old georgian;Old GEORGIAN CAPITAL LETTER IN;uni10A8
+10A9;Kan-oldgeorgian;Letter;;upper;;old georgian;Old GEORGIAN CAPITAL LETTER KAN;uni10A9
+10AA;Las-oldgeorgian;Letter;;upper;;old georgian;Old GEORGIAN CAPITAL LETTER LAS;uni10AA
+10AB;Man-oldgeorgian;Letter;;upper;;old georgian;Old GEORGIAN CAPITAL LETTER MAN;uni10AB
+10AC;Nar-oldgeorgian;Letter;;upper;;old georgian;Old GEORGIAN CAPITAL LETTER NAR;uni10AC
+10AD;On-oldgeorgian;Letter;;upper;;old georgian;Old GEORGIAN CAPITAL LETTER ON;uni10AD
+10AE;Par-oldgeorgian;Letter;;upper;;old georgian;Old GEORGIAN CAPITAL LETTER PAR;uni10AE
+10AF;Zhar-oldgeorgian;Letter;;upper;;old georgian;Old GEORGIAN CAPITAL LETTER ZHAR;uni10AF
+10B0;Rae-oldgeorgian;Letter;;upper;;old georgian;Old GEORGIAN CAPITAL LETTER RAE;uni10B0
+10B1;San-oldgeorgian;Letter;;upper;;old georgian;Old GEORGIAN CAPITAL LETTER SAN;uni10B1
+10B2;Tar-oldgeorgian;Letter;;upper;;old georgian;Old GEORGIAN CAPITAL LETTER TAR;uni10B2
+10B3;Un-oldgeorgian;Letter;;upper;;old georgian;Old GEORGIAN CAPITAL LETTER UN;uni10B3
+10B4;Phar-oldgeorgian;Letter;;upper;;old georgian;Old GEORGIAN CAPITAL LETTER PHAR;uni10B4
+10B5;Khar-oldgeorgian;Letter;;upper;;old georgian;Old GEORGIAN CAPITAL LETTER KHAR;uni10B5
+10B6;Ghan-oldgeorgian;Letter;;upper;;old georgian;Old GEORGIAN CAPITAL LETTER GHAN;uni10B6
+10B7;Qar-oldgeorgian;Letter;;upper;;old georgian;Old GEORGIAN CAPITAL LETTER QAR;uni10B7
+10B8;Shin-oldgeorgian;Letter;;upper;;old georgian;Old GEORGIAN CAPITAL LETTER SHIN;uni10B8
+10B9;Chin-oldgeorgian;Letter;;upper;;old georgian;Old GEORGIAN CAPITAL LETTER CHIN;uni10B9
+10BA;Can-oldgeorgian;Letter;;upper;;old georgian;Old GEORGIAN CAPITAL LETTER CAN;uni10BA
+10BB;Jil-oldgeorgian;Letter;;upper;;old georgian;Old GEORGIAN CAPITAL LETTER JIL;uni10BB
+10BC;Cil-oldgeorgian;Letter;;upper;;old georgian;Old GEORGIAN CAPITAL LETTER CIL;uni10BC
+10BD;Char-oldgeorgian;Letter;;upper;;old georgian;Old GEORGIAN CAPITAL LETTER CHAR;uni10BD
+10BE;Xan-oldgeorgian;Letter;;upper;;old georgian;Old GEORGIAN CAPITAL LETTER XAN;uni10BE
+10BF;Jhan-oldgeorgian;Letter;;upper;;old georgian;Old GEORGIAN CAPITAL LETTER JHAN;uni10BF
+10C0;Hae-oldgeorgian;Letter;;upper;;old georgian;Old GEORGIAN CAPITAL LETTER HAE;uni10C0
+10C1;He-oldgeorgian;Letter;;upper;;old georgian;Old GEORGIAN CAPITAL LETTER HE;uni10C1
+10C2;Hie-oldgeorgian;Letter;;upper;;old georgian;Old GEORGIAN CAPITAL LETTER HIE;uni10C2
+10C3;We-oldgeorgian;Letter;;upper;;old georgian;Old GEORGIAN CAPITAL LETTER WE;uni10C3
+10C4;Har-oldgeorgian;Letter;;upper;;old georgian;Old GEORGIAN CAPITAL LETTER HAR;uni10C4
+10C5;Hoe-oldgeorgian;Letter;;upper;;old georgian;Old GEORGIAN CAPITAL LETTER HOE;uni10C5
+10C7;Yn-oldgeorgian;Letter;;upper;;old georgian;Old GEORGIAN CAPITAL LETTER YN;uni10C7
+10CD;Aen-oldgeorgian;Letter;;upper;;old georgian;Old GEORGIAN CAPITAL LETTER AEN;uni10CD
+2D00;an-oldgeorgian;Letter;;lower;;old georgian;Old GEORGIAN LETTER AN;uni2D00
+2D01;ban-oldgeorgian;Letter;;lower;;old georgian;Old GEORGIAN LETTER BAN;uni2D01
+2D02;gan-oldgeorgian;Letter;;lower;;old georgian;Old GEORGIAN LETTER GAN;uni2D02
+2D03;don-oldgeorgian;Letter;;lower;;old georgian;Old GEORGIAN LETTER DON;uni2D03
+2D04;en-oldgeorgian;Letter;;lower;;old georgian;Old GEORGIAN LETTER EN;uni2D04
+2D05;vin-oldgeorgian;Letter;;lower;;old georgian;Old GEORGIAN LETTER VIN;uni2D05
+2D06;zen-oldgeorgian;Letter;;lower;;old georgian;Old GEORGIAN LETTER ZEN;uni2D06
+2D07;tan-oldgeorgian;Letter;;lower;;old georgian;Old GEORGIAN LETTER TAN;uni2D07
+2D08;in-oldgeorgian;Letter;;lower;;old georgian;Old GEORGIAN LETTER IN;uni2D08
+2D09;kan-oldgeorgian;Letter;;lower;;old georgian;Old GEORGIAN LETTER KAN;uni2D09
+2D0A;las-oldgeorgian;Letter;;lower;;old georgian;Old GEORGIAN LETTER LAS;uni2D0A
+2D0B;man-oldgeorgian;Letter;;lower;;old georgian;Old GEORGIAN LETTER MAN;uni2D0B
+2D0C;nar-oldgeorgian;Letter;;lower;;old georgian;Old GEORGIAN LETTER NAR;uni2D0C
+2D0D;on-oldgeorgian;Letter;;lower;;old georgian;Old GEORGIAN LETTER ON;uni2D0D
+2D0E;par-oldgeorgian;Letter;;lower;;old georgian;Old GEORGIAN LETTER PAR;uni2D0E
+2D0F;zhar-oldgeorgian;Letter;;lower;;old georgian;Old GEORGIAN LETTER ZHAR;uni2D0F
+2D10;rae-oldgeorgian;Letter;;lower;;old georgian;Old GEORGIAN LETTER RAE;uni2D10
+2D11;san-oldgeorgian;Letter;;lower;;old georgian;Old GEORGIAN LETTER SAN;uni2D11
+2D12;tar-oldgeorgian;Letter;;lower;;old georgian;Old GEORGIAN LETTER TAR;uni2D12
+2D13;un-oldgeorgian;Letter;;lower;;old georgian;Old GEORGIAN LETTER UN;uni2D13
+2D14;phar-oldgeorgian;Letter;;lower;;old georgian;Old GEORGIAN LETTER PHAR;uni2D14
+2D15;khar-oldgeorgian;Letter;;lower;;old georgian;Old GEORGIAN LETTER KHAR;uni2D15
+2D16;ghan-oldgeorgian;Letter;;lower;;old georgian;Old GEORGIAN LETTER GHAN;uni2D16
+2D17;qar-oldgeorgian;Letter;;lower;;old georgian;Old GEORGIAN LETTER QAR;uni2D17
+2D18;shin-oldgeorgian;Letter;;lower;;old georgian;Old GEORGIAN LETTER SHIN;uni2D18
+2D19;chin-oldgeorgian;Letter;;lower;;old georgian;Old GEORGIAN LETTER CHIN;uni2D19
+2D1A;can-oldgeorgian;Letter;;lower;;old georgian;Old GEORGIAN LETTER CAN;uni2D1A
+2D1B;jil-oldgeorgian;Letter;;lower;;old georgian;Old GEORGIAN LETTER JIL;uni2D1B
+2D1C;cil-oldgeorgian;Letter;;lower;;old georgian;Old GEORGIAN LETTER CIL;uni2D1C
+2D1D;char-oldgeorgian;Letter;;lower;;old georgian;Old GEORGIAN LETTER CHAR;uni2D1D
+2D1E;xan-oldgeorgian;Letter;;lower;;old georgian;Old GEORGIAN LETTER XAN;uni2D1E
+2D1F;jhan-oldgeorgian;Letter;;lower;;old georgian;Old GEORGIAN LETTER JHAN;uni2D1F
+2D20;hae-oldgeorgian;Letter;;lower;;old georgian;Old GEORGIAN LETTER HAE;uni2D20
+2D21;he-oldgeorgian;Letter;;lower;;old georgian;Old GEORGIAN LETTER HE;uni2D21
+2D22;hie-oldgeorgian;Letter;;lower;;old georgian;Old GEORGIAN LETTER HIE;uni2D22
+2D23;we-oldgeorgian;Letter;;lower;;old georgian;Old GEORGIAN LETTER WE;uni2D23
+2D24;har-oldgeorgian;Letter;;lower;;old georgian;Old GEORGIAN LETTER HAR;uni2D24
+2D25;hoe-oldgeorgian;Letter;;lower;;old georgian;Old GEORGIAN LETTER HOE;uni2D25
+2D27;yn-oldgeorgian;Letter;;lower;;old georgian;Old GEORGIAN LETTER YN;uni2D27
+2D2D;aen-oldgeorgian;Letter;;lower;;old georgian;Old GEORGIAN LETTER AEN;uni2D2D
 10FB;paragraph-georgian;Punctuation;;;;georgian;GEORGIAN PARAGRAPH SEPARATOR;uni10FB
 10FC;narMod-georgian;Letter;Modifier;;;georgian;MODIFIER LETTER GEORGIAN NAR;uni10FC
 10C80;A-rovas;Letter;;upper;RTL;rovas;OLD HUNGARIAN CAPITAL LETTER A;u10C80
@@ -3699,6 +3699,86 @@ AA5F;tripleDanda-cham;Punctuation;;;;cham;CHAM PUNCTUATION TRIPLE DANDA;uniAA5F
 11141;danda-chakma;Punctuation;;;;chakma;CHAKMA DANDA;u11141
 11142;dandaDouble-chakma;Punctuation;;;;chakma;CHAKMA DOUBLE DANDA;u11142
 11143;question-chakma;Punctuation;;;;chakma;CHAKMA QUESTION MARK;u11143
+11380;a-tutg;Letter;;;;tulu tigalari;TULU-TIGALARI LETTER A;u11380
+11381;aa-tutg;Letter;;;;tulu tigalari;TULU-TIGALARI LETTER AA;u11381
+11382;i-tutg;Letter;;;;tulu tigalari;TULU-TIGALARI LETTER I;u11382
+11383;ii-tutg;Letter;;;;tulu tigalari;TULU-TIGALARI LETTER II;u11383
+11384;u-tutg;Letter;;;;tulu tigalari;TULU-TIGALARI LETTER U;u11384
+11385;uu-tutg;Letter;;;;tulu tigalari;TULU-TIGALARI LETTER UU;u11385
+11386;rVocalic-tutg;Letter;;;;tulu tigalari;TULU-TIGALARI LETTER VOCALIC R;u11386
+11387;rrVocalic-tutg;Letter;;;;tulu tigalari;TULU-TIGALARI LETTER VOCALIC RR;u11387
+11388;lVocalic-tutg;Letter;;;;tulu tigalari;TULU-TIGALARI LETTER VOCALIC L;u11388
+11389;llVocalic-tutg;Letter;;;;tulu tigalari;TULU-TIGALARI LETTER VOCALIC LL;u11389
+1138B;ee-tutg;Letter;;;;tulu tigalari;TULU-TIGALARI LETTER EE;u1138B
+1138E;ai-tutg;Letter;;;;tulu tigalari;TULU-TIGALARI LETTER AI;u1138E
+11390;oo-tutg;Letter;;;;tulu tigalari;TULU-TIGALARI LETTER OO;u11390
+11391;au-tutg;Letter;;;;tulu tigalari;TULU-TIGALARI LETTER AU;u11391
+11392;ka-tutg;Letter;;;;tulu tigalari;TULU-TIGALARI LETTER KA;u11392
+11393;kha-tutg;Letter;;;;tulu tigalari;TULU-TIGALARI LETTER KHA;u11393
+11394;ga-tutg;Letter;;;;tulu tigalari;TULU-TIGALARI LETTER GA;u11394
+11395;gha-tutg;Letter;;;;tulu tigalari;TULU-TIGALARI LETTER GHA;u11395
+11396;nga-tutg;Letter;;;;tulu tigalari;TULU-TIGALARI LETTER NGA;u11396
+11397;ca-tutg;Letter;;;;tulu tigalari;TULU-TIGALARI LETTER CA;u11397
+11398;cha-tutg;Letter;;;;tulu tigalari;TULU-TIGALARI LETTER CHA;u11398
+11399;ja-tutg;Letter;;;;tulu tigalari;TULU-TIGALARI LETTER JA;u11399
+1139A;jha-tutg;Letter;;;;tulu tigalari;TULU-TIGALARI LETTER JHA;u1139A
+1139B;nya-tutg;Letter;;;;tulu tigalari;TULU-TIGALARI LETTER NYA;u1139B
+1139C;tta-tutg;Letter;;;;tulu tigalari;TULU-TIGALARI LETTER TTA;u1139C
+1139D;ttha-tutg;Letter;;;;tulu tigalari;TULU-TIGALARI LETTER TTHA;u1139D
+1139E;dda-tutg;Letter;;;;tulu tigalari;TULU-TIGALARI LETTER DDA;u1139E
+1139F;ddha-tutg;Letter;;;;tulu tigalari;TULU-TIGALARI LETTER DDHA;u1139F
+113A0;nna-tutg;Letter;;;;tulu tigalari;TULU-TIGALARI LETTER NNA;u113A0
+113A1;ta-tutg;Letter;;;;tulu tigalari;TULU-TIGALARI LETTER TA;u113A1
+113A2;tha-tutg;Letter;;;;tulu tigalari;TULU-TIGALARI LETTER THA;u113A2
+113A3;da-tutg;Letter;;;;tulu tigalari;TULU-TIGALARI LETTER DA;u113A3
+113A4;dha-tutg;Letter;;;;tulu tigalari;TULU-TIGALARI LETTER DHA;u113A4
+113A5;na-tutg;Letter;;;;tulu tigalari;TULU-TIGALARI LETTER NA;u113A5
+113A6;pa-tutg;Letter;;;;tulu tigalari;TULU-TIGALARI LETTER PA;u113A6
+113A7;pha-tutg;Letter;;;;tulu tigalari;TULU-TIGALARI LETTER PHA;u113A7
+113A8;ba-tutg;Letter;;;;tulu tigalari;TULU-TIGALARI LETTER BA;u113A8
+113A9;bha-tutg;Letter;;;;tulu tigalari;TULU-TIGALARI LETTER BHA;u113A9
+113AA;ma-tutg;Letter;;;;tulu tigalari;TULU-TIGALARI LETTER MA;u113AA
+113AB;ya-tutg;Letter;;;;tulu tigalari;TULU-TIGALARI LETTER YA;u113AB
+113AC;ra-tutg;Letter;;;;tulu tigalari;TULU-TIGALARI LETTER RA;u113AC
+113AD;la-tutg;Letter;;;;tulu tigalari;TULU-TIGALARI LETTER LA;u113AD
+113AE;va-tutg;Letter;;;;tulu tigalari;TULU-TIGALARI LETTER VA;u113AE
+113AF;sha-tutg;Letter;;;;tulu tigalari;TULU-TIGALARI LETTER SHA;u113AF
+113B0;ssa-tutg;Letter;;;;tulu tigalari;TULU-TIGALARI LETTER SSA;u113B0
+113B1;sa-tutg;Letter;;;;tulu tigalari;TULU-TIGALARI LETTER SA;u113B1
+113B2;ha-tutg;Letter;;;;tulu tigalari;TULU-TIGALARI LETTER HA;u113B2
+113B3;lla-tutg;Letter;;;;tulu tigalari;TULU-TIGALARI LETTER LLA;u113B3
+113B4;rra-tutg;Letter;;;;tulu tigalari;TULU-TIGALARI LETTER RRA;u113B4
+113B5;llla-tutg;Letter;;;;tulu tigalari;TULU-TIGALARI LETTER LLLA;u113B5
+113B7;avagraha-tutg;Letter;;;;tulu tigalari;TULU-TIGALARI SIGN AVAGRAHA;u113B7
+113B8;aaMatra-tutg;Mark;Spacing;;;tulu tigalari;TULU-TIGALARI VOWEL SIGN AA;u113B8
+113B9;iMatra-tutg;Mark;Spacing;;;tulu tigalari;TULU-TIGALARI VOWEL SIGN I;u113B9
+113BA;iiMatra-tutg;Mark;Spacing;;;tulu tigalari;TULU-TIGALARI VOWEL SIGN II;u113BA
+113BB;uMatra-tutg;Mark;Nonspacing;;;tulu tigalari;TULU-TIGALARI VOWEL SIGN U;u113BB
+113BC;uuMatra-tutg;Mark;Nonspacing;;;tulu tigalari;TULU-TIGALARI VOWEL SIGN UU;u113BC
+113BD;rVocalicMatra-tutg;Mark;Nonspacing;;;tulu tigalari;TULU-TIGALARI VOWEL SIGN VOCALIC R;u113BD
+113BE;rrVocalicMatra-tutg;Mark;Nonspacing;;;tulu tigalari;TULU-TIGALARI VOWEL SIGN VOCALIC RR;u113BE
+113BF;lVocalicMatra-tutg;Mark;Nonspacing;;;tulu tigalari;TULU-TIGALARI VOWEL SIGN VOCALIC L;u113BF
+113C0;llVocalicMatra-tutg;Mark;Nonspacing;;;tulu tigalari;TULU-TIGALARI VOWEL SIGN VOCALIC LL;u113C0
+113C2;eeMatra-tutg;Mark;Spacing;;;tulu tigalari;TULU-TIGALARI VOWEL SIGN EE;u113C2
+113C5;aiMatra-tutg;Mark;Spacing;;;tulu tigalari;TULU-TIGALARI VOWEL SIGN AI;u113C5
+113C7;ooMatra-tutg;Mark;Spacing;;;tulu tigalari;TULU-TIGALARI VOWEL SIGN OO;u113C7
+113C8;auMatra-tutg;Mark;Spacing;;;tulu tigalari;TULU-TIGALARI VOWEL SIGN AU;u113C8
+113C9;auLength-tutg;Mark;Spacing;;;tulu tigalari;TULU-TIGALARI AU LENGTH MARK;u113C9
+113CA;candraAnunasika-tutg;Mark;Spacing;;;tulu tigalari;TULU-TIGALARI SIGN CANDRA ANUNASIKA;u113CA
+113CC;anusvara-tutg;Mark;Spacing;;;tulu tigalari;TULU-TIGALARI SIGN ANUSVARA;u113CC
+113CD;visarga-tutg;Mark;Spacing;;;tulu tigalari;TULU-TIGALARI SIGN VISARGA;u113CD
+113CE;virama-tutg;Mark;Nonspacing;;;tulu tigalari;TULU-TIGALARI SIGN VIRAMA;u113CE
+113CF;loopedVirama-tutg;Mark;Spacing;;;tulu tigalari;TULU-TIGALARI SIGN LOOPED VIRAMA;u113CF
+113D0;conjoiner-tutg;Mark;Nonspacing;;;tulu tigalari;TULU-TIGALARI CONJOINER;u113D0
+113D1;repha-tutg;Letter;;;;tulu tigalari;TULU-TIGALARI REPHA;u113D1
+113D2;gemination-tutg;Mark;Nonspacing;;;tulu tigalari;TULU-TIGALARI GEMINATION MARK;u113D2
+113D3;pluta-tutg;Letter;;;;tulu tigalari;TULU-TIGALARI SIGN PLUTA;u113D3
+113D4;danda-tutg;Punctuation;;;;tulu tigalari;TULU-TIGALARI DANDA;u113D4
+113D5;dbldanda-tutg;Punctuation;;;;tulu tigalari;TULU-TIGALARI DOUBLE DANDA;u113D5
+113D7;omPushpika-tutg;Punctuation;;;;tulu tigalari;TULU-TIGALARI SIGN OM PUSHPIKA;u113D7
+113D8;shriiPushpika-tutg;Punctuation;;;;tulu tigalari;TULU-TIGALARI SIGN SHRII PUSHPIKA;u113D8
+113E1;svarita-tutg;Mark;Nonspacing;;;tulu tigalari;TULU-TIGALARI VEDIC TONE SVARITA;u113E1
+113E2;anudatta-tutg;Mark;Nonspacing;;;tulu tigalari;TULU-TIGALARI VEDIC TONE ANUDATTA;u113E2
 11900;a-divesakuru;Letter;;;;divesakuru;DIVES AKURU LETTER A;u11900
 11901;aa-divesakuru;Letter;;;;divesakuru;DIVES AKURU LETTER AA;u11901
 11902;i-divesakuru;Letter;;;;divesakuru;DIVES AKURU LETTER I;u11902
@@ -5794,7 +5874,7 @@ FBC1;tahbelowSymbol-ar;Punctuation;;;RTL;arabic;ARABIC SYMBOL SMALL TAH BELOW;un
 06E4;maddalong-ar;Mark;Nonspacing;;RTL;arabic;ARABIC SMALL HIGH MADDA;uni06E4
 06E7;yehabove-ar;Mark;Nonspacing;;RTL;arabic;ARABIC SMALL HIGH YEH;uni06E7
 06E8;noonabove-ar;Mark;Nonspacing;;RTL;arabic;ARABIC SMALL HIGH NOON;uni06E8
-06E9;sajdah-ar;Symbol;;;;arabic;ARABIC PLACE OF SAJDAH;uni06E9
+06E9;sajdah-ar;Symbol;;;BIDI;arabic;ARABIC PLACE OF SAJDAH;uni06E9
 06EA;rhombusStopbelow-ar;Mark;Nonspacing;;RTL;arabic;ARABIC EMPTY CENTRE LOW STOP;uni06EA
 06EB;rhombusStopabove-ar;Mark;Nonspacing;;RTL;arabic;ARABIC EMPTY CENTRE HIGH STOP;uni06EB
 06EC;dotStopabove-ar;Mark;Nonspacing;;RTL;arabic;ARABIC ROUNDED HIGH STOP WITH FILLED CENTRE;uni06EC
@@ -5830,8 +5910,8 @@ FBC1;tahbelowSymbol-ar;Punctuation;;;RTL;arabic;ARABIC SYMBOL SMALL TAH BELOW;un
 066B;decimalseparator-ar;Number;;;;arabic;ARABIC DECIMAL SEPARATOR;uni066B
 066C;thousandseparator-ar;Number;;;;arabic;ARABIC THOUSANDS SEPARATOR;uni066C
 066D;asterisk-ar;Punctuation;;;RTL;arabic;ARABIC FIVE POINTED STAR;uni066D
-FD3E;parenleft-ar;Punctuation;Parenthesis;;;arabic;ORNATE LEFT PARENTHESIS;uniFD3E
-FD3F;parenright-ar;Punctuation;Parenthesis;;;arabic;ORNATE RIGHT PARENTHESIS;uniFD3F
+FD3E;parenleft-ar;Punctuation;Parenthesis;;BIDI;arabic;ORNATE LEFT PARENTHESIS;uniFD3E
+FD3F;parenright-ar;Punctuation;Parenthesis;;BIDI;arabic;ORNATE RIGHT PARENTHESIS;uniFD3F
 0601;year-ar;Punctuation;;;RTL;arabic;ARABIC SIGN SANAH;uni0601
 0602;footnotemarker-ar;Punctuation;;;RTL;arabic;ARABIC FOOTNOTE MARKER;uni0602
 0603;pagenumber-ar;Punctuation;;;RTL;arabic;ARABIC SIGN SAFHA;uni0603
@@ -8592,11 +8672,11 @@ A839;quantity-northindic;Symbol;;;;;NORTH INDIC QUANTITY MARK;uniA839
 1099;nine-shan;Number;Decimal Digit;;;myanmar;MYANMAR SHAN DIGIT NINE;uni1099
 109A;tone1-khamti;Mark;Spacing Combining;;;myanmar;MYANMAR SIGN KHAMTI TONE-1;uni109A
 109B;tone3-khamti;Mark;Spacing Combining;;;myanmar;MYANMAR SIGN KHAMTI TONE-3;uni109B
-109C;a-aiton;Mark;Spacing Combining;;;myanmar;MYANMAR VOWEL SIGN AITON A;uni109C
-109D;aiMark-aiton;Mark;Nonspacing;;;myanmar;MYANMAR VOWEL SIGN AITON AI;uni109D
+109C;aAiton-myanmar;Mark;Spacing Combining;;;myanmar;MYANMAR VOWEL SIGN AITON A;uni109C
+109D;aiAitonMark-myanmar;Mark;Nonspacing;;;myanmar;MYANMAR VOWEL SIGN AITON AI;uni109D
 109E;oneSymbol-shan;Symbol;;;;myanmar;MYANMAR SYMBOL SHAN ONE;uni109E
 109F;exclam-shan;Symbol;;;;myanmar;MYANMAR SYMBOL SHAN EXCLAMATION;uni109F
-AA77;exclam-aiton;Symbol;;;;myanmar;MYANMAR SYMBOL AITON EXCLAMATION;uniAA77
+AA77;exclamAiton-myanmar;Symbol;;;;myanmar;MYANMAR SYMBOL AITON EXCLAMATION;uniAA77
 AA60;ga-khamti;Letter;;;;myanmar;MYANMAR LETTER KHAMTI GA;uniAA60
 AA61;ca-khamti;Letter;;;;myanmar;MYANMAR LETTER KHAMTI CA;uniAA61
 AA62;cha-khamti;Letter;;;;myanmar;MYANMAR LETTER KHAMTI CHA;uniAA62
@@ -8620,9 +8700,9 @@ AA73;ra-khamti;Letter;;;;myanmar;MYANMAR LETTER KHAMTI RA;uniAA73
 AA74;oay-khamti;Letter;;;;myanmar;MYANMAR LOGOGRAM KHAMTI OAY;uniAA74
 AA75;qn-khamti;Letter;;;;myanmar;MYANMAR LOGOGRAM KHAMTI QN;uniAA75
 AA76;hm-khamti;Letter;;;;myanmar;MYANMAR LOGOGRAM KHAMTI HM;uniAA76
-AA78;oneSymbol-aiton;Symbol;;;;myanmar;MYANMAR SYMBOL AITON ONE;uniAA78
-AA79;twoSymbol-aiton;Symbol;;;;myanmar;MYANMAR SYMBOL AITON TWO;uniAA79
-AA7A;ra-aiton;Letter;;;;myanmar;MYANMAR LETTER AITON RA;uniAA7A
+AA78;oneAitonSymbol-myanmar;Symbol;;;;myanmar;MYANMAR SYMBOL AITON ONE;uniAA78
+AA79;twoAitonSymbol-myanmar;Symbol;;;;myanmar;MYANMAR SYMBOL AITON TWO;uniAA79
+AA7A;raAiton-myanmar;Letter;;;;myanmar;MYANMAR LETTER AITON RA;uniAA7A
 AA7B;tone-paokaren;Mark;Spacing Combining;;;myanmar;MYANMAR SIGN PAO KAREN TONE;uniAA7B
 AA7C;tone2-tailaing;Mark;Nonspacing;;;myanmar;MYANMAR SIGN TAI LAING TONE-2;uniAA7C
 AA7D;tone5-tailaing;Mark;Spacing Combining;;;myanmar;MYANMAR SIGN TAI LAING TONE-5;uniAA7D
@@ -9745,15 +9825,15 @@ A9FE;bha-tailaing;Letter;;;;myanmar;MYANMAR LETTER TAI LAING BHA;uniA9FE
 301E;quotedoubleprime;Punctuation;Quote;;;;DOUBLE PRIME QUOTATION MARK;uni301E
 301F;lowquotedoubleprime;Punctuation;Quote;;;;LOW DOUBLE PRIME QUOTATION MARK;uni301F
 3020;postalmarkface;Symbol;;;;;POSTAL MARK FACE;uni3020
-3021;one-hangzhou;Number;;;;han;HANGZHOU NUMERAL ONE;uni3021
-3022;two-hangzhou;Number;;;;han;HANGZHOU NUMERAL TWO;uni3022
-3023;three-hangzhou;Number;;;;han;HANGZHOU NUMERAL THREE;uni3023
-3024;four-hangzhou;Number;;;;han;HANGZHOU NUMERAL FOUR;uni3024
-3025;five-hangzhou;Number;;;;han;HANGZHOU NUMERAL FIVE;uni3025
-3026;six-hangzhou;Number;;;;han;HANGZHOU NUMERAL SIX;uni3026
-3027;seven-hangzhou;Number;;;;han;HANGZHOU NUMERAL SEVEN;uni3027
-3028;eight-hangzhou;Number;;;;han;HANGZHOU NUMERAL EIGHT;uni3028
-3029;nine-hangzhou;Number;;;;han;HANGZHOU NUMERAL NINE;uni3029
+3021;one-han;Number;;;;han;HANGZHOU NUMERAL ONE;uni3021
+3022;two-han;Number;;;;han;HANGZHOU NUMERAL TWO;uni3022
+3023;three-han;Number;;;;han;HANGZHOU NUMERAL THREE;uni3023
+3024;four-han;Number;;;;han;HANGZHOU NUMERAL FOUR;uni3024
+3025;five-han;Number;;;;han;HANGZHOU NUMERAL FIVE;uni3025
+3026;six-han;Number;;;;han;HANGZHOU NUMERAL SIX;uni3026
+3027;seven-han;Number;;;;han;HANGZHOU NUMERAL SEVEN;uni3027
+3028;eight-han;Number;;;;han;HANGZHOU NUMERAL EIGHT;uni3028
+3029;nine-han;Number;;;;han;HANGZHOU NUMERAL NINE;uni3029
 302A;leveltone-han;Mark;Nonspacing;;;han;IDEOGRAPHIC LEVEL TONE MARK;uni302A
 302B;risingtone-han;Mark;Nonspacing;;;han;IDEOGRAPHIC RISING TONE MARK;uni302B
 302C;departingtone-han;Mark;Nonspacing;;;han;IDEOGRAPHIC DEPARTING TONE MARK;uni302C
@@ -9768,9 +9848,9 @@ A9FE;bha-tailaing;Letter;;;;myanmar;MYANMAR LETTER TAI LAING BHA;uniA9FE
 3035;repeatLowerhalf-kana;Letter;Modifier;;;kana;VERTICAL KANA REPEAT MARK LOWER HALF;uni3035
 3036;postalmark.circled;Symbol;;;;;CIRCLED POSTAL MARK;uni3036
 3037;telegraphLineFeed-han;Symbol;;;;han;IDEOGRAPHIC TELEGRAPH LINE FEED SEPARATOR SYMBOL;uni3037
-3038;ten-hangzhou;Number;;;;han;HANGZHOU NUMERAL TEN;uni3038
-3039;twenty-hangzhou;Number;;;;han;HANGZHOU NUMERAL TWENTY;uni3039
-303A;thirty-hangzhou;Number;;;;han;HANGZHOU NUMERAL THIRTY;uni303A
+3038;ten-han;Number;;;;han;HANGZHOU NUMERAL TEN;uni3038
+3039;twenty-han;Number;;;;han;HANGZHOU NUMERAL TWENTY;uni3039
+303A;thirty-han;Number;;;;han;HANGZHOU NUMERAL THIRTY;uni303A
 303B;ninojiten-han;Letter;Modifier;;;han;VERTICAL IDEOGRAPHIC ITERATION MARK;uni303B
 303C;masumark;Letter;;;;;MASU MARK;uni303C
 303D;partalternationmark;Punctuation;;;;;PART ALTERNATION MARK;uni303D
@@ -23761,6 +23841,31 @@ ABBF;ya-cherokee;Letter;;lower;;cherokee;CHEROKEE SMALL LETTER YA;uniABBF
 16EE;arlaug-runic;Symbol;;;;runic;RUNIC ARLAUG SYMBOL;uni16EE
 16EF;tvimadur-runic;Symbol;;;;runic;RUNIC TVIMADUR SYMBOL;uni16EF
 16F0;belgthor-runic;Symbol;;;;runic;RUNIC BELGTHOR SYMBOL;uni16F0
+1700;a-baybayin;Letter;;;;tagalog;TAGALOG LETTER A;uni1700
+1701;i-baybayin;Letter;;;;tagalog;TAGALOG LETTER I;uni1701
+1702;u-baybayin;Letter;;;;tagalog;TAGALOG LETTER U;uni1702
+170A;ba-baybayin;Letter;;;;tagalog;TAGALOG LETTER BA;uni170A
+1703;ka-baybayin;Letter;;;;tagalog;TAGALOG LETTER KA;uni1703
+1707;da-baybayin;Letter;;;;tagalog;TAGALOG LETTER DA;uni1707
+1704;ga-baybayin;Letter;;;;tagalog;TAGALOG LETTER GA;uni1704
+1711;ha-baybayin;Letter;;;;tagalog;TAGALOG LETTER HA;uni1711
+170E;la-baybayin;Letter;;;;tagalog;TAGALOG LETTER LA;uni170E
+170B;ma-baybayin;Letter;;;;tagalog;TAGALOG LETTER MA;uni170B
+1708;na-baybayin;Letter;;;;tagalog;TAGALOG LETTER NA;uni1708
+1705;nga-baybayin;Letter;;;;tagalog;TAGALOG LETTER NGA;uni1705
+1709;pa-baybayin;Letter;;;;tagalog;TAGALOG LETTER PA;uni1709
+170D;ra-baybayin;Letter;;;;tagalog;TAGALOG LETTER RA;uni170D
+1710;sa-baybayin;Letter;;;;tagalog;TAGALOG LETTER SA;uni1710
+1706;ta-baybayin;Letter;;;;tagalog;TAGALOG LETTER TA;uni1706
+170F;wa-baybayin;Letter;;;;tagalog;TAGALOG LETTER WA;uni170F
+170C;ya-baybayin;Letter;;;;tagalog;TAGALOG LETTER YA;uni170C
+171F;raArchaic-baybayin;Letter;;;;tagalog;TAGALOG LETTER ARCHAIC RA;uni171F
+1712;iPatinig-baybayin;Mark;Nonspacing;;;tagalog;TAGALOG VOWEL SIGN I;uni1712
+1713;uPatinig-baybayin;Mark;Nonspacing;;;tagalog;TAGALOG VOWEL SIGN U;uni1713
+1714;virama-baybayin;Mark;Nonspacing;;;tagalog;TAGALOG SIGN VIRAMA;uni1714
+1715;pamudpod-baybayin;Mark;Spacing;;;tagalog;TAGALOG SIGN PAMUDPOD;uni1715
+1735;isabantas-baybayin;Punctuation;;;;tagalog;PHILIPPINE SINGLE PUNCTUATION;uni1735
+1736;dalawabantas-baybayin;Punctuation;;;;tagalog;PHILIPPINE DOUBLE PUNCTUATION;uni1736
 18B0;oy-canadian;Letter;;;;canadian;CANADIAN SYLLABICS OY;uni18B0
 18B1;ay-canadian;Letter;;;;canadian;CANADIAN SYLLABICS AY;uni18B1
 18B2;aay-canadian;Letter;;;;canadian;CANADIAN SYLLABICS AAY;uni18B2

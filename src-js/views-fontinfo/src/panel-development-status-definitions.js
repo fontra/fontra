@@ -2,7 +2,7 @@ import { recordChanges } from "@fontra/core/change-recorder.js";
 import * as html from "@fontra/core/html-utils.js";
 import { addStyleSheet } from "@fontra/core/html-utils.js";
 import { translate } from "@fontra/core/localization.js";
-import { enumerate, hexToRgba, range, rgbaToHex } from "@fontra/core/utils.js";
+import { enumerate, hexToRgba, range, rgbaToHex } from "@fontra/core/utils.ts";
 import { message } from "@fontra/web-components/modal-dialog.js";
 import { BaseInfoPanel } from "./panel-base.js";
 

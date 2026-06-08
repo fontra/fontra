@@ -12,7 +12,7 @@ import {
   round,
   throttleCalls,
   updateObject,
-} from "@fontra/core/utils.js";
+} from "@fontra/core/utils.ts";
 import { MenuItemDivider } from "@fontra/web-components/menu-panel.js";
 import { dialog, message } from "@fontra/web-components/modal-dialog.js";
 import { BaseTool, shouldInitiateDrag } from "./edit-tools-base.js";

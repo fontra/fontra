@@ -3,8 +3,8 @@ steps:
     source: test-py/data/workflow/input2-A.fontra
   - input: fontra-read
     source: test-py/data/workflow/input2-B.fontra
-  - destination: output-merge-axes.fontra
-    output: fontra-write
+  - output: fontra-write
+    destination: output-merge-axes.fontra
 test-info:
   expected-log:
     - level: 40

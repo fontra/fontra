@@ -6,8 +6,8 @@ steps:
     glyphNames:
       - B
   - filter: drop-shapes
-  - axisNames:
+  - filter: subset-axes
+    axisNames:
       - weight
-    filter: subset-axes
-  - destination: output-subset-axes-location-base.fontra
-    output: fontra-write
+  - output: fontra-write
+    destination: output-subset-axes-location-base.fontra

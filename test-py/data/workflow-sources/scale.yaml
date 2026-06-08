@@ -4,5 +4,5 @@ steps:
     steps:
       - filter: scale
         scaleFactor: 0.75
-  - destination: output-scale.fontra
-    output: fontra-write
+  - output: fontra-write
+    destination: output-scale.fontra

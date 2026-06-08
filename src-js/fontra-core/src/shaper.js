@@ -1,7 +1,5 @@
-import hbPromise from "harfbuzzjs";
-import { assert, enumerate, mapObjectValues, range, reversed } from "./utils.js";
-
-const hb = await hbPromise;
+import * as hb from "harfbuzzjs";
+import { assert, enumerate, mapObjectValues, range, reversed } from "./utils.ts";
 
 export function getShaper(shaperSupport) {
   const shaperClass = shaperSupport.fontData ? HBShaper : DumbShaper;
@@ -15,8 +13,13 @@ const EMULATED_FEATURE_TAGS = ["curs", "kern", "mark", "mkmk"];
 
 class ShaperBase {
   constructor(shaperSupport) {
-    const { nominalGlyphFunc, glyphOrder, isGlyphMarkFunc, insertMarkers } =
-      shaperSupport;
+    const {
+      nominalGlyphFunc,
+      glyphOrder,
+      isGlyphMarkFunc,
+      insertMarkers,
+      fallbackXAdvance,
+    } = shaperSupport;
 
     this.glyphOrder = glyphOrder;
     this.isGlyphMarkFunc = isGlyphMarkFunc;
@@ -30,6 +33,7 @@ class ShaperBase {
           !!this.insertMarkers.find(({ tag }) => tag === emulatedTag),
       ])
     );
+    this.fallbackXAdvance = fallbackXAdvance ?? 500;
 
     if (glyphOrder) {
       this.glyphNameToID = {};
@@ -114,11 +118,11 @@ class HBShaper extends ShaperBase {
     super(shaperSupport);
     const { fontData } = shaperSupport;
 
-    this.blob = hb.createBlob(fontData);
-    this.face = hb.createFace(this.blob, 0);
-    this.font = hb.createFont(this.face);
+    this.blob = new hb.Blob(fontData);
+    this.face = new hb.Face(this.blob, 0);
+    this.font = new hb.Font(this.face);
 
-    this.fontFuncs = hb.createFontFuncs();
+    this.fontFuncs = new hb.FontFuncs();
 
     if (this.nominalGlyph) {
       this.fontFuncs.setNominalGlyphFunc((font, codePoint) =>
@@ -134,7 +138,6 @@ class HBShaper extends ShaperBase {
 
     const subFont = this.font.subFont();
     subFont.setFuncs(this.fontFuncs);
-    this.font.destroy();
     this.font = subFont;
   }
 
@@ -145,13 +148,23 @@ class HBShaper extends ShaperBase {
       return { glyphs: [], requiredGlyphs: [], direction };
     }
 
-    const buffer = hb.createBuffer();
+    const buffer = new hb.Buffer();
     buffer.addCodePoints(codePoints);
-    buffer.guessSegmentProperties(); // Set script, language and direction
 
     buffer.setClusterLevel(1); // HB_BUFFER_CLUSTER_LEVEL_MONOTONE_CHARACTERS
     if (direction) {
-      buffer.setDirection(direction);
+      let hbDirection;
+      switch (direction) {
+        case "ltr":
+          hbDirection = hb.Direction.LTR;
+          break;
+        case "rtl":
+          hbDirection = hb.Direction.RTL;
+          break;
+        default:
+          throw new Error(`Unknown or unsupported direction: ${direction}`);
+      }
+      buffer.setDirection(hbDirection);
     }
     if (script) {
       buffer.setScript(hb.otTagToScript(script));
@@ -160,7 +173,13 @@ class HBShaper extends ShaperBase {
       buffer.setLanguage(hb.otTagToLanguage(language));
     }
 
-    this.font.setVariations(variations || {});
+    buffer.guessSegmentProperties(); // Guess script, language and direction if not provided.
+
+    this.font.setVariations(
+      Object.entries(variations || {}).map(
+        ([axis, value]) => new hb.Variation(axis, value)
+      )
+    );
 
     this._messages = options.trace ? [] : null;
     this._glyphsAtBreakIndex = null;
@@ -182,10 +201,13 @@ class HBShaper extends ShaperBase {
       messageFunc(buffer, this.font, "start processing");
     }
 
-    hb.shape(this.font, buffer, features);
+    hb.shape(
+      this.font,
+      buffer,
+      (features ?? []).map(([tag, value]) => new hb.Feature(tag, value))
+    );
 
     const glyphs = this.getGlyphInfoFromBuffer(buffer);
-    buffer.destroy();
 
     // If we are *not* using the message API (we're not tracing, and *all* insertMarkers
     // indicate that emulation should be done "at the end"), then we may still have some
@@ -223,13 +245,14 @@ class HBShaper extends ShaperBase {
   getGlyphInfoFromBuffer(buffer) {
     const glyphs = buffer.getGlyphInfosAndPositions();
 
-    const bufferContainsUnicode = buffer.getContentType() != "GLYPHS";
+    const bufferContainsUnicode =
+      buffer.getContentType() != hb.BufferContentType.GLYPHS;
 
     if (bufferContainsUnicode) {
       // Convert Unicode code points to glyph IDs
       glyphs.forEach((glyph) => {
         const glyphName = this.nominalGlyph(glyph.codepoint);
-        glyph.codepoint = glyphName ? this.glyphNameToID[glyphName] ?? 0 : 0;
+        glyph.codepoint = glyphName ? (this.glyphNameToID[glyphName] ?? 0) : 0;
       });
     }
 
@@ -237,22 +260,24 @@ class HBShaper extends ShaperBase {
       const glyphName = this.glyphOrder
         ? this.glyphOrder[glyph.codepoint]
         : this.font.glyphName(glyph.codepoint);
-      if (glyph.x_advance == undefined || bufferContainsUnicode) {
+      if (glyph.xAdvance == undefined || bufferContainsUnicode) {
         // 1. During the GSUB phase, the positioning fields are undefined, so
         //    we fill them in so we can render something.
         // 2. When the buffer has been populated with code points, the
         //    positioning fields are still zero, which doesn't render nice.
-        glyph.x_advance = this._glyphObjects[glyphName]?.xAdvance ?? 500;
-        glyph.y_advance = 0; // TODO
-        glyph.x_offset = 0;
-        glyph.y_offset = 0;
+        glyph.xAdvance = Math.round(
+          this._glyphObjects[glyphName]?.xAdvance ?? this.fallbackXAdvance
+        );
+        glyph.yAdvance = 0; // TODO
+        glyph.xOffset = 0;
+        glyph.yOffset = 0;
       }
 
       glyph.glyphname = glyphName;
-      glyph.mark = this.face.getGlyphClass(glyph.codepoint) == "MARK";
+      glyph.mark = this.face.getGlyphClass(glyph.codepoint) == hb.GlyphClass.MARK;
 
       if (glyph.mark) {
-        glyph.x_advance = 0; // Force marks to be zero-width
+        glyph.xAdvance = 0; // Force marks to be zero-width
       }
     });
 
@@ -353,11 +378,8 @@ class HBShaper extends ShaperBase {
               lookupId
             ]
           : undefined;
-        const sourceLocation = sourceInfo?.[1]
-          ? `${sourceInfo[0]} (${sourceInfo[1]})`
-          : sourceInfo
-          ? `${sourceInfo[0]}`
-          : undefined;
+        const sourceLocation = sourceInfo?.[0];
+        const lookupName = sourceInfo?.[1];
 
         messages.push({
           message,
@@ -365,6 +387,7 @@ class HBShaper extends ShaperBase {
             this._previousGlyphsSerialized &&
             glyphsSerialized != this._previousGlyphsSerialized,
           sourceLocation,
+          lookupName,
         });
 
         this._previousGlyphsSerialized = glyphsSerialized;
@@ -397,12 +420,12 @@ class HBShaper extends ShaperBase {
 
   _getNominalGlyph(font, codePoint) {
     const glyphName = this.nominalGlyph(codePoint);
-    return glyphName ? this.glyphNameToID[glyphName] ?? 0 : 0;
+    return glyphName ? (this.glyphNameToID[glyphName] ?? 0) : 0;
   }
 
   _getHAdvanceFunc(font, glyphID) {
     const glyphName = this.glyphOrder[glyphID];
-    return Math.round(this._glyphObjects[glyphName]?.xAdvance ?? 500);
+    return Math.round(this._glyphObjects[glyphName]?.xAdvance ?? this.fallbackXAdvance);
   }
 
   getFeatureInfo(otTableTag) {
@@ -463,19 +486,13 @@ class HBShaper extends ShaperBase {
 
   get debugInfo() {
     if (this._debugInfo === undefined) {
-      const debgTable = this.face.reference_table("Debg");
+      const debgTable = this.face.referenceTable("Debg");
       this._debugInfo = debgTable
         ? JSON.parse(new TextDecoder().decode(debgTable))
         : null;
     }
 
     return this._debugInfo;
-  }
-
-  close() {
-    this.font.destroy();
-    this.face.destroy();
-    this.blob.destroy();
   }
 }
 
@@ -534,18 +551,19 @@ class DumbShaper extends ShaperBase {
 
     for (const [i, codePoint] of enumerate(codePoints)) {
       const glyphName = this.nominalGlyph(codePoint);
-      const xAdvance = Math.round(glyphObjects[glyphName]?.xAdvance ?? 500);
-      const isMark = this.isGlyphMarkFunc(glyphName);
 
       glyphs.push({
         codepoint: glyphName ? this.glyphNameToID[glyphName] : 0,
         cluster: i,
+        flags: 0,
         glyphname: glyphName ?? ".notdef",
-        mark: isMark,
-        x_advance: isMark ? 0 : xAdvance,
-        y_advance: 0,
-        x_offset: 0,
-        y_offset: 0,
+        mark: false,
+        xAdvance: Math.round(
+          glyphObjects[glyphName]?.xAdvance ?? this.fallbackXAdvance
+        ),
+        yAdvance: 0,
+        xOffset: 0,
+        yOffset: 0,
       });
     }
 
@@ -553,30 +571,17 @@ class DumbShaper extends ShaperBase {
       glyphs.reverse();
     }
 
-    const skipFeatures = this._getInitialSkipEmulatedFeatures(options.emulatedFeatures);
-    this.applyEmulatedPositioning(
-      glyphs,
-      glyphObjects,
-      skipFeatures,
-      options.kerningPairFunc,
-      options.direction
-    );
-
     const requiredGlyphs = glyphs.map((g) => g.glyphname);
 
-    return { glyphs, requiredGlyphs };
+    return { glyphs, requiredGlyphs, direction };
   }
 
   getFeatureInfo(otTableTag) {
-    return super.getFeatureInfo(otTableTag) ?? {};
+    return {};
   }
 
   getScriptAndLanguageInfo() {
     return {};
-  }
-
-  close() {
-    // noop
   }
 }
 
@@ -610,10 +615,10 @@ export function applyKerning(
       const kernValue = Math.round(pairFunc(previousGlyphName, glyphName) ?? 0);
       if (kernValue) {
         if (rightToLeft) {
-          glyph.x_advance += kernValue;
-          glyph.x_offset += kernValue;
+          glyph.xAdvance += kernValue;
+          glyph.xOffset += kernValue;
         } else {
-          previousGlyph.x_advance += kernValue;
+          previousGlyph.xAdvance += kernValue;
         }
         messageFunc?.(glyphs, `kerned glyphs at ${displayIndex - 1},${displayIndex}`);
         didModify = true;
@@ -682,16 +687,16 @@ export function applyCursiveAttachments(
         );
 
         // Horizontal adjustment
-        previousGlyph.x_advance = Math.max(
+        previousGlyph.xAdvance = Math.max(
           0,
-          Math.round(previousGlyph.x_advance + exitAnchor.x - previousXAdvance)
+          Math.round(previousGlyph.xAdvance + exitAnchor.x - previousXAdvance)
         );
-        glyph.x_advance = Math.max(0, glyph.x_advance - Math.round(entryAnchor.x));
-        glyph.x_offset -= Math.round(entryAnchor.x);
+        glyph.xAdvance = Math.max(0, glyph.xAdvance - Math.round(entryAnchor.x));
+        glyph.xOffset -= Math.round(entryAnchor.x);
 
         // Vertical adjustment
-        glyph.y_offset = Math.round(
-          previousGlyph.y_offset + exitAnchor.y - entryAnchor.y
+        glyph.yOffset = Math.round(
+          previousGlyph.yOffset + exitAnchor.y - entryAnchor.y
         );
 
         didModify = true;
@@ -793,8 +798,8 @@ function _applyMarkPositioning(
           glyphObject.propagatedAnchors,
           "",
           "",
-          glyph.x_offset - (rightToLeft ? 0 : glyph.x_advance),
-          glyph.y_offset
+          glyph.xOffset - (rightToLeft ? 0 : glyph.xAdvance),
+          glyph.yOffset
         );
 
         if (ligatureProps & IS_LIG_BASE) {
@@ -812,7 +817,7 @@ function _applyMarkPositioning(
             baseAnchors.splice(-1, 1, {
               ...moveAnchors(
                 baseAnchors.at(-1),
-                rightToLeft ? glyph.x_advance : -glyph.x_advance
+                rightToLeft ? glyph.xAdvance : -glyph.xAdvance
               ),
               ...newBaseAnchors,
             });
@@ -844,8 +849,8 @@ function _applyMarkPositioning(
             `attaching mark glyph at ${glyphIndex} to glyph at ${baseAnchor.glyphIndex}`
           );
 
-          glyph.x_offset = Math.round(baseAnchor.x - markAnchor.x);
-          glyph.y_offset = Math.round(baseAnchor.y - markAnchor.y);
+          glyph.xOffset = Math.round(baseAnchor.x - markAnchor.x);
+          glyph.yOffset = Math.round(baseAnchor.y - markAnchor.y);
           didModify = true;
 
           messageFunc?.(
@@ -868,8 +873,8 @@ function _applyMarkPositioning(
         for (const [anchorName, markAnchor] of Object.entries(markBaseAnchors)) {
           baseAnchors[componentIndex][anchorName] = {
             name: anchorName,
-            x: markAnchor.x + glyph.x_offset,
-            y: markAnchor.y + glyph.y_offset,
+            x: markAnchor.x + glyph.xOffset,
+            y: markAnchor.y + glyph.yOffset,
             glyphIndex,
           };
         }

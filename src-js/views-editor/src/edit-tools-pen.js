@@ -7,7 +7,7 @@ import {
 import { translate } from "@fontra/core/localization.js";
 import { insertHandles, insertPoint, scalePoint } from "@fontra/core/path-functions.js";
 import { isEqualSet } from "@fontra/core/set-ops.js";
-import { modulo, parseSelection } from "@fontra/core/utils.js";
+import { modulo, parseSelection } from "@fontra/core/utils.ts";
 import { VarPackedPath } from "@fontra/core/var-path.js";
 import * as vector from "@fontra/core/vector.js";
 import { constrainHorVerDiag } from "./edit-behavior.js";

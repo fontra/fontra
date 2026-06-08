@@ -92,6 +92,7 @@ export const strings = {
   "axes.preset.slant": "Slant",
   "axes.preset.weight": "Weight",
   "axes.preset.width": "Width",
+  "axes.properties.hidden": "Hidden axis",
   "axes.range": "補完軸の範囲",
   "axes.range.axis-type": "補完軸の種類",
   "axes.range.axis-type.continuous": "連続",
@@ -301,6 +302,8 @@ export const strings = {
     "有効な補完軸の値を表示",
   "sidebar.designspace-navigation.font-axes-view-options-menu.show-hidden-axes":
     "非表示の補完軸を表示",
+  "sidebar.designspace-navigation.font-axes-view-options-menu.show-only-effective-location":
+    "Show only effective location",
   "sidebar.designspace-navigation.font-axes.edit": "フォントの補完軸を編集",
   "sidebar.designspace-navigation.font-axes.reset": "フォントの補完軸をリセット",
   "sidebar.designspace-navigation.glyph-axes": "グリフの補完軸",

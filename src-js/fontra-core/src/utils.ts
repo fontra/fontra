@@ -1,8 +1,12 @@
 import { strFromU8, strToU8, unzlibSync, zlibSync } from "fflate";
+import type { Point } from "./rectangle.ts";
 import { Transform } from "./transform.js";
+import { addItemwise } from "./var-funcs.js";
 
-export function objectsEqual(obj1, obj2) {
-  // Shallow object compare. Arguments may be null or undefined
+/**
+ * Shallow object compare. Arguments may be null or undefined
+ */
+export function objectsEqual(obj1: any, obj2: any) {
   if (!obj1 || !obj2) {
     return obj1 === obj2;
   }
@@ -18,7 +22,7 @@ export function objectsEqual(obj1, obj2) {
   return true;
 }
 
-export function withSavedState(context, func) {
+export function withSavedState(context: CanvasRenderingContext2D, func: () => void) {
   context.save();
   try {
     func();
@@ -27,13 +31,19 @@ export function withSavedState(context, func) {
   }
 }
 
-export function consolidateCalls(func) {
-  // Return a function that will request `func` to be called in the next
-  // iteration of the event loop. If it gets called again before `func` was
-  // actually called, ignore the call.
-  // This ensures that multiple calls within the same event loop cycle get
-  // consolidated into a single call.
-  // Useful for things like "request update".
+/**
+ * Return a function that will request `func` to be called in the next
+ * iteration of the event loop. If it gets called again before `func` was
+ * actually called, ignore the call.
+ *
+ * This ensures that multiple calls within the same event loop cycle get
+ * consolidated into a single call.
+ *
+ * Useful for things like "request update".
+ */
+export function consolidateCalls<Fn extends (...args: any[]) => void>(
+  func: Fn
+): (...args: Parameters<Fn>) => void {
   let didSchedule = false;
 
   return (...args) => {
@@ -48,13 +58,22 @@ export function consolidateCalls(func) {
   };
 }
 
-export function scheduleCalls(func, timeout = 0) {
-  // Schedule calls to func with a timer. If a previously scheduled call
-  // has not yet run, cancel it and let the new one override it.
-  // Returns a wrapped function that should be called instead of func.
-  // This is useful for calls triggered by events that can supersede
-  // previous calls; it avoids scheduling many redundant tasks.
-  let timeoutID = null;
+export type TimeoutID = ReturnType<typeof setTimeout>;
+
+/**
+ * Schedule calls to func with a timer. If a previously scheduled call
+ * has not yet run, cancel it and let the new one override it.
+ *
+ * Returns a wrapped function that should be called instead of func.
+ *
+ * This is useful for calls triggered by events that can supersede
+ * previous calls; it avoids scheduling many redundant tasks.
+ */
+export function scheduleCalls<Fn extends (...args: any[]) => void>(
+  func: Fn,
+  timeout = 0
+): (...args: Parameters<Fn>) => TimeoutID {
+  let timeoutID: TimeoutID | null = null;
   return (...args) => {
     if (timeoutID !== null) {
       clearTimeout(timeoutID);
@@ -67,12 +86,17 @@ export function scheduleCalls(func, timeout = 0) {
   };
 }
 
-export function throttleCalls(func, minTime) {
-  // Return a wrapped function. If the function gets called before
-  // minTime (in ms) has elapsed since the last call, don't call
-  // the function.
+/**
+ * Return a wrapped function. If the function gets called before
+ * minTime (in ms) has elapsed since the last call, don't call
+ * the function.
+ */
+export function throttleCalls<Fn extends (...args: any[]) => void>(
+  func: Fn,
+  minTime = 0
+): (...args: Parameters<Fn>) => TimeoutID | null {
   let lastTime = 0;
-  let timeoutID = null;
+  let timeoutID: TimeoutID | null = null;
   return (...args) => {
     if (timeoutID !== null) {
       clearTimeout(timeoutID);
@@ -94,7 +118,7 @@ export function throttleCalls(func, minTime) {
   };
 }
 
-export function parseCookies(str) {
+export function parseCookies(str: string) {
   // https://www.geekstrick.com/snippets/how-to-parse-cookies-in-javascript/
   if (!str.trim()) {
     return {};
@@ -103,21 +127,24 @@ export function parseCookies(str) {
     .split(";")
     .filter((s) => s)
     .map((v) => v.split("="))
-    .reduce((acc, v) => {
-      acc[decodeURIComponent(v[0].trim())] = decodeURIComponent(v[1].trim());
-      return acc;
-    }, {});
+    .reduce(
+      (acc, v) => {
+        acc[decodeURIComponent(v[0].trim())] = decodeURIComponent(v[1].trim());
+        return acc;
+      },
+      {} as Record<string, string>
+    );
 }
 
-export function capitalizeFirstLetter(s) {
+export function capitalizeFirstLetter(s: String) {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
-export function hyphenatedToCamelCase(s) {
+export function hyphenatedToCamelCase(s: string) {
   return s.replace(/-([a-z])/g, (m) => m[1].toUpperCase());
 }
 
-export function hyphenatedToLabel(s) {
+export function hyphenatedToLabel(s: string) {
   return capitalizeFirstLetter(s).replaceAll("-", " ");
 }
 
@@ -141,25 +168,32 @@ export const arrowKeyDeltas = {
   ArrowRight: [1, 0],
 };
 
-export function modulo(v, n) {
-  // Modulo with Python behavior for negative values of `v`
-  // Assumes `n` to be positive
+/**
+ * Modulo with Python behavior for negative values of `v`
+ *
+ * Assumes `n` to be positive
+ */
+export function modulo(v: number, n: number) {
   return v >= 0 ? v % n : ((v % n) + n) % n;
 }
 
-export function boolInt(v) {
-  // Return 1 if `v` is true-y, 0 if `v` is false-y
+/**
+ * Return 1 if `v` is true-y, 0 if `v` is false-y
+ */
+export function boolInt(v: boolean) {
   return v ? 1 : 0;
 }
 
-export function* reversed(seq) {
-  // Like Python's reversed(seq) builtin
+/**
+ * Like Python's reversed(seq) builtin
+ */
+export function* reversed<T>(seq: T[]) {
   for (let i = seq.length - 1; i >= 0; i--) {
     yield seq[i];
   }
 }
 
-export function* enumerate(iterable, start = 0) {
+export function* enumerate<T>(iterable: Iterable<T>, start = 0) {
   let i = start;
   for (const item of iterable) {
     yield [i, item];
@@ -167,13 +201,13 @@ export function* enumerate(iterable, start = 0) {
   }
 }
 
-export function* reversedEnumerate(seq) {
+export function* reversedEnumerate<T>(seq: T[]) {
   for (let i = seq.length - 1; i >= 0; i--) {
     yield [i, seq[i]];
   }
 }
 
-export function* range(start, stop, step = 1) {
+export function* range(start: number, stop?: number, step = 1) {
   if (stop === undefined) {
     stop = start;
     start = 0;
@@ -189,8 +223,10 @@ export function* range(start, stop, step = 1) {
   }
 }
 
-export function* chain(...iterables) {
-  // After Python's itertools.chain()
+/**
+ * After Python's itertools.chain()
+ */
+export function* chain<T>(...iterables: Iterable<T>[]) {
   for (const iterable of iterables) {
     for (const item of iterable) {
       yield item;
@@ -198,9 +234,12 @@ export function* chain(...iterables) {
   }
 }
 
-export function* product(...args) {
-  // Cartesian product of input iterables.  Equivalent to nested for-loops.
-  // After Python's itertools.product()
+/**
+ * Cartesian product of input iterables. Equivalent to nested for-loops.
+ *
+ * After Python's itertools.product()
+ */
+export function* product<T>(...args: Iterable<T>[]): Generator<T[], void, unknown> {
   if (!args.length) {
     yield [];
     return;
@@ -221,23 +260,37 @@ export function* product(...args) {
   }
 }
 
-export function compare(a, b) {
-  // Return -1 when a < b, 1 when a > b, and 0 when a == b
-  return (a > b) - (a < b);
+/**
+ * Compares two values which can either be numbers or strings.
+ *
+ * This uses the JavaScript `<` and `>` operators, which means that strings
+ * are compared by the values of their UTF-16 code units, starting at index
+ * zero, until a difference is found or one string runs out of code units
+ * (in which case the longer string is considered greater).
+ *
+ * Generally speaking, if strings are being sorted in order to be shown to
+ * the user then this function should not be used. Instead, use the function
+ * `String.localeCompare` or `Intl.Collator`, since they provide locale-aware
+ * collation and ordering, which the `<` and `>` operators do not.
+ *
+ * Return -1 when a < b, 1 when a > b, and 0 when a == b
+ */
+export function compare<T extends number | string>(a: T, b: T): -1 | 0 | 1 {
+  return (+(a > b) - +(a < b)) as -1 | 0 | 1;
 }
 
-export function valueInRange(min, v, max) {
+export function valueInRange(min: number, v: number, max: number) {
   return min <= v && v <= max;
 }
 
-export function parseSelection(selection) {
-  const result = {};
+export function parseSelection(selection: string[]) {
+  const result: Record<string, number[]> = {};
   for (const item of selection) {
     const [tp, index] = item.split("/");
     if (result[tp] === undefined) {
       result[tp] = [];
     }
-    result[tp].push(parseInt(index));
+    result[tp].push(parseInt(index, 10));
   }
   for (const indices of Object.values(result)) {
     // Ensure indices are sorted
@@ -246,18 +299,20 @@ export function parseSelection(selection) {
   return result;
 }
 
-export function makeUPlusStringFromCodePoint(codePoint) {
-  if (codePoint && typeof codePoint != "number") {
+export function makeUPlusStringFromCodePoint(codePoint: number | undefined) {
+  if (codePoint !== undefined && typeof codePoint !== "number") {
     throw new Error(
-      `codePoint argument must be a number or falsey; ${typeof codePoint} found`
+      `codePoint argument must be a number or undefined; ${typeof codePoint} found`
     );
   }
-  return typeof codePoint == "number"
+  return typeof codePoint === "number"
     ? "U+" + codePoint.toString(16).toUpperCase().padStart(4, "0")
     : "";
 }
 
-export async function writeToClipboard(clipboardObject) {
+export async function writeToClipboard(
+  clipboardObject: ConstructorParameters<typeof ClipboardItem>[0]
+) {
   if (!clipboardObject) return;
 
   try {
@@ -265,13 +320,13 @@ export async function writeToClipboard(clipboardObject) {
   } catch (error) {
     console.log("Error while writing to clipboard, falling back to text/plain", error);
     // Write at least the plain/text MIME type to the clipboard
-    if (clipboardObject["text/plain"]) {
+    if (typeof clipboardObject["text/plain"] === "string") {
       await navigator.clipboard.writeText(await clipboardObject["text/plain"]);
     }
   }
 }
 
-export async function readFromClipboard(types, plainText = true) {
+export async function readFromClipboard(types: string[], plainText = true) {
   const clipboardContents = await navigator.clipboard.read();
   for (const item of clipboardContents) {
     for (const type of types) {
@@ -284,19 +339,22 @@ export async function readFromClipboard(types, plainText = true) {
   return undefined;
 }
 
-export function getCharFromCodePoint(codePoint) {
-  return codePoint != undefined ? String.fromCodePoint(codePoint) : "";
+export function getCharFromCodePoint(codePoint: number | undefined) {
+  return codePoint !== undefined ? String.fromCodePoint(codePoint) : "";
 }
 
-export function guessCharFromGlyphName(glyphName) {
-  // Search for a 4-5 char hex string in the glyph name.
-  // Interpret the hex string as a unicode code point and convert to a
-  // character. Else, return an empty string.
+/**
+ * Search for a 4-5 char hex string in the glyph name.
+ *
+ * Interpret the hex string as a unicode code point and convert to a
+ * character. Else, return an empty string.
+ */
+export function guessCharFromGlyphName(glyphName: string) {
   const match = glyphName.match(/(^|[^0-9A-F])([0-9A-F]{4,5})($|[^0-9A-F])/);
   return match ? String.fromCodePoint(parseInt(match[2], 16)) : "";
 }
 
-export async function fetchJSON(url, options) {
+export async function fetchJSON(url: string, options: Parameters<typeof fetch>[1]) {
   const response = await fetch(url, options);
   return await response.json();
 }
@@ -306,39 +364,42 @@ const nonTypeableInputTypes = new Set(["range", "checkbox", "radio", "button"]);
 export function isActiveElementTypeable() {
   const element = findNestedActiveElement(document.activeElement);
 
+  if (!(element instanceof HTMLElement)) {
+    return false;
+  }
+
   if (element.isContentEditable) {
     return true;
   }
-  if (element.tagName.toLowerCase() === "textarea") {
+  if (element instanceof HTMLTextAreaElement) {
     return true;
   }
-  if (
-    element.tagName.toLowerCase() === "input" &&
-    !nonTypeableInputTypes.has(element.type)
-  ) {
+  if (element instanceof HTMLInputElement && !nonTypeableInputTypes.has(element.type)) {
     return true;
   }
   return false;
 }
 
-export function findNestedActiveElement(element) {
-  // If the element element is part of a Web Component's Shadow DOM, take
-  // *its* active element, recursively.
+/**
+ * If the element element is part of a Web Component's Shadow DOM, take
+ * *its* active element, recursively.
+ */
+export function findNestedActiveElement(element?: Element | null): Element | null {
   if (!element) {
     element = document.activeElement;
   }
-  return element.shadowRoot && element.shadowRoot.activeElement
+  return element?.shadowRoot?.activeElement
     ? findNestedActiveElement(element.shadowRoot.activeElement)
     : element;
 }
 
-export function fileNameExtension(name) {
+export function fileNameExtension(name: string) {
   return name.split(".").pop();
 }
 
 const ARRAY_EXTEND_CHUNK_SIZE = 1024;
 
-export function arrayExtend(thisArray, itemsArray) {
+export function arrayExtend<T>(thisArray: T[], itemsArray: T[]) {
   // arrayExtend() is meant as a JS version of Python's list.extend().
   // array.push(...items) has an implementation-defined upper limit
   // in terms of numbers of items (the call stack will overflow).
@@ -350,7 +411,7 @@ export function arrayExtend(thisArray, itemsArray) {
   }
 }
 
-export function rgbaToCSS(rgba) {
+export function rgbaToCSS(rgba: [number, number, number, number]) {
   const channels = rgba.slice(0, 3).map((channel) => Math.round(channel * 255));
   const alpha = rgba[3];
   if (alpha !== undefined && 0 <= alpha && alpha < 1) {
@@ -359,7 +420,9 @@ export function rgbaToCSS(rgba) {
   return `rgb(${channels.join(",")})`;
 }
 
-export function hexToRgba(hexColor) {
+export type HexColor = `#${string}`;
+
+export function hexToRgba(hexColor: HexColor): [number, number, number, number] {
   let c = hexColor.substring(1).split("");
   let r = [];
   if (/^#[A-Fa-f0-9]{8}$/.test(hexColor) || /^#[A-Fa-f0-9]{6}$/.test(hexColor)) {
@@ -378,10 +441,12 @@ export function hexToRgba(hexColor) {
   if (r.length === 3) {
     r.push(1);
   }
-  return r;
+  return r as [number, number, number, number];
 }
 
-export function rgbaToHex(rgba) {
+export function rgbaToHex(
+  rgba: [number, number, number] | [number, number, number, number]
+) {
   if (rgba.length != 3 && rgba.length != 4) {
     throw new Error("rgba argument has to have 3 or 4 items in array");
   }
@@ -396,13 +461,13 @@ export function rgbaToHex(rgba) {
   return `#${channels.join("")}`;
 }
 
-export function clamp(number, min, max) {
+export function clamp(number: number, min: number, max: number) {
   return Math.max(Math.min(number, max), min);
 }
 
 const _digitFactors = [1, 10, 100, 1000, 10000];
 
-export function round(number, nDigits = 0) {
+export function round(number: number, nDigits = 0) {
   if (nDigits === 0) {
     return Math.round(number);
   }
@@ -413,21 +478,25 @@ export function round(number, nDigits = 0) {
   return Math.round(number * factor) / factor;
 }
 
-export function unionIndexSets(...indexSets) {
+export function unionIndexSets(...indexSets: number[][]) {
   indexSets = indexSets.filter((item) => !!item);
   return [...new Set(indexSets.flat())].sort((a, b) => a - b);
 }
 
-export function withTimeout(thenable, timeout) {
-  // Return a promise that resolves when `thenable` resolves before
-  // `timeout` ms have passed, or else gets rejected with an error.
-  // Example:
-  // try {
-  //   await withTimeout(somePromise, 1000);
-  // catch (error) {
-  //   // the promise timed out
-  // }
-  return new Promise((resolve, reject) => {
+/**
+ * Return a promise that resolves when `thenable` resolves before
+ * `timeout` ms have passed, or else gets rejected with an error.
+ * Example:
+ * ```ts
+ * try {
+ *   await withTimeout(somePromise, 1000);
+ * catch (error) {
+ *   // the promise timed out
+ * }
+ * ```
+ */
+export function withTimeout(thenable: Promise<any>, timeout: number) {
+  return new Promise<void>((resolve, reject) => {
     const timerID = setTimeout(() => reject(new Error("timeout")), timeout);
     thenable.then(() => {
       clearTimeout(timerID);
@@ -436,9 +505,9 @@ export function withTimeout(thenable, timeout) {
   });
 }
 
-export function memoize(func) {
+export function memoize<Fn extends (...args: any[]) => any>(func: Fn): Fn {
   const cache = new Map();
-  return (...args) => {
+  return ((...args) => {
     const cacheKey = JSON.stringify(args);
     if (cache.has(cacheKey)) {
       return cache.get(cacheKey);
@@ -446,11 +515,11 @@ export function memoize(func) {
     const result = func(...args);
     cache.set(cacheKey, result);
     return result;
-  };
+  }) as Fn;
 }
 
-export function escapeHTMLCharacters(dangerousString) {
-  const encodedSymbolMap = {
+export function escapeHTMLCharacters(dangerousString: string) {
+  const encodedSymbolMap: Record<string, string> = {
     // '"': '&quot;',
     // '\'': '&#39;',
     "&": "&amp;",
@@ -464,7 +533,7 @@ export function escapeHTMLCharacters(dangerousString) {
   return safeCharacters.join("");
 }
 
-export function* zip(...args) {
+export function* zip(...args: Iterable<any>[]) {
   const iterators = args.map((arg) => iter(arg));
   while (true) {
     const results = iterators.map((it) => it.next());
@@ -478,13 +547,13 @@ export function* zip(...args) {
   }
 }
 
-export function* iter(iterable) {
+export function* iter<T>(iterable: Iterable<T>) {
   for (const item of iterable) {
     yield item;
   }
 }
 
-export function splitGlyphNameExtension(glyphName, separator = ".") {
+export function splitGlyphNameExtension(glyphName: string, separator = ".") {
   const separatorIndex = glyphName.indexOf(separator);
   const baseGlyphName =
     separatorIndex >= 1 ? glyphName.slice(0, separatorIndex) : glyphName;
@@ -492,25 +561,30 @@ export function splitGlyphNameExtension(glyphName, separator = ".") {
   return [baseGlyphName, extension];
 }
 
-export function getBaseGlyphName(glyphName) {
+export function getBaseGlyphName(glyphName: string) {
   const i = glyphName.indexOf(".");
   return i >= 1 ? glyphName.slice(0, i) : glyphName;
 }
 
-export function getGlyphNameExtension(glyphName) {
+export function getGlyphNameExtension(glyphName: string) {
   const i = glyphName.lastIndexOf(".");
   return i >= 1 ? glyphName.slice(i) : "";
 }
 
-export function isObjectEmpty(obj) {
-  // Return true if `obj` has no properties
+/**
+ * Return true if `obj` has no properties
+ */
+export function isObjectEmpty(obj: any) {
   for (const _ in obj) {
     return false;
   }
   return true;
 }
 
-export async function timeIt(func, label) {
+export async function timeIt<Fn extends () => any>(
+  func: Fn,
+  label: string
+): Promise<ReturnType<Fn>> {
   const t = performance.now();
   const returnValue = await func();
   const elapsed = round(performance.now() - t, 1);
@@ -518,17 +592,17 @@ export async function timeIt(func, label) {
   return returnValue;
 }
 
-export function base64ToBytes(base64) {
+export function base64ToBytes(base64: string) {
   const binString = atob(base64);
-  return Uint8Array.from(binString, (m) => m.codePointAt(0));
+  return Uint8Array.from(binString, (m) => m.codePointAt(0) as number);
 }
 
-export function bytesToBase64(bytes) {
+export function bytesToBase64(bytes: Iterable<number>) {
   const binString = String.fromCodePoint(...bytes);
   return btoa(binString);
 }
 
-export function loadURLFragment(fragment) {
+export function loadURLFragment(fragment: string) {
   if (fragment[0] != "#") {
     throw new Error("assert -- invalid fragment");
   }
@@ -539,17 +613,21 @@ export function loadURLFragment(fragment) {
   }
 }
 
-export function dumpURLFragment(obj) {
+export function dumpURLFragment(obj: any) {
   return "#" + bytesToBase64(zlibSync(strToU8(JSON.stringify(obj))));
 }
 
 export function readObjectFromURLFragment() {
+  // @ts-ignore Typescript complains that window.location is missing some
+  // URL properties, but none of those matter for turning it in to one.
   const url = new URL(window.location);
   return url.hash ? loadURLFragment(url.hash) : {};
 }
 
-export function writeObjectToURLFragment(obj, replace = false) {
+export function writeObjectToURLFragment(obj: any, replace = false) {
   const newFragment = dumpURLFragment(obj);
+  // @ts-ignore Typescript complains that window.location is missing some
+  // URL properties, but none of those matter for turning it in to one.
   const url = new URL(window.location);
   if (url.hash === newFragment) {
     return;
@@ -562,7 +640,15 @@ export function writeObjectToURLFragment(obj, replace = false) {
   }
 }
 
-export function areGuidelinesCompatible(parents) {
+/**
+ * Checks whether the `guidelines` arrays of all `parents`
+ * are matching by comparing the `name` field of each item.
+ */
+export function areGuidelinesCompatible<
+  T extends {
+    guidelines: { name: string }[];
+  },
+>(parents: T[]) {
   const referenceGuidelines = parents[0].guidelines;
   if (!referenceGuidelines) {
     return false;
@@ -584,7 +670,11 @@ export function areGuidelinesCompatible(parents) {
   return true;
 }
 
-export function areCustomDatasCompatible(parents) {
+export function areCustomDatasCompatible<
+  T extends {
+    customData: any;
+  },
+>(parents: T[]) {
   const referenceCustomData = parents[0].customData;
   if (!referenceCustomData) {
     return false;
@@ -602,7 +692,7 @@ export function areCustomDatasCompatible(parents) {
       }
 
       const vA = parent.customData[kA];
-      if (typeof vA == "object") {
+      if (typeof vA === "object") {
         const vB = referenceCustomData[kB];
         try {
           const _ = addItemwise(vA, vB);
@@ -615,9 +705,19 @@ export function areCustomDatasCompatible(parents) {
   return true;
 }
 
+// TODO: This should be temporary, in the future we should generate types
+//       for Guideline and others based on the python class definitions.
+export type Guideline = {
+  x: number;
+  y: number;
+  angle: number;
+  locked?: boolean;
+  name?: string;
+};
+
 const identityGuideline = { x: 0, y: 0, angle: 0 };
 
-export function normalizeGuidelines(guidelines, resetLocked = false) {
+export function normalizeGuidelines(guidelines: Guideline[], resetLocked = false) {
   return guidelines.map((guideline) => {
     return {
       ...identityGuideline,
@@ -627,36 +727,57 @@ export function normalizeGuidelines(guidelines, resetLocked = false) {
   });
 }
 
-export function mapObject(obj, func) {
+type ObjectKey = string | number | symbol;
+
+export function mapObject<O extends {}>(
+  obj: O,
+  func: (entry: [keyof O, any]) => [ObjectKey, any]
+): any {
   // Return a copy of the object, with each [key, value] passed through `func`
-  return Object.fromEntries(Object.entries(obj).map(func));
+  return Object.fromEntries(
+    Object.entries(obj).map(([k, v]) => func([k as keyof O, v]))
+  );
 }
 
-export function mapObjectKeys(obj, func) {
+export function mapObjectKeys<O extends {}>(
+  obj: O,
+  func: (key: keyof O) => ObjectKey
+): any {
   // Return a copy of the object, with each key passed through `func`
   return mapObject(obj, ([key, value]) => [func(key), value]);
 }
 
-export function mapObjectValues(obj, func) {
+export function mapObjectValues<O extends {}>(
+  obj: O,
+  func: (value: O[keyof O]) => any
+): any {
   // Return a copy of the object, with each value passed through `func`
   return mapObject(obj, ([key, value]) => [key, func(value)]);
 }
 
-export async function mapObjectValuesAsync(obj, func) {
+export async function mapObjectValuesAsync<O extends {}>(
+  obj: O,
+  func: (value: O[keyof O]) => any
+): Promise<any> {
   // Return a copy of the object, with each value passed through `func`
-  const result = {};
+  const result: any = {};
   for (const [key, value] of Object.entries(obj)) {
-    result[key] = await func(value);
+    result[key] = await func(value as O[keyof O]);
   }
   return result;
 }
 
-export function filterObject(obj, func) {
+export function filterObject<O extends {}>(
+  obj: O,
+  func: (key: keyof O, value: O[keyof O]) => boolean
+): Partial<O> {
   // Return a copy of the object containing the items for which `func(key, value)`
   // returns `true`.
   return Object.fromEntries(
-    Object.entries(obj).filter(([key, value]) => func(key, value))
-  );
+    Object.entries(obj).filter(([key, value]) =>
+      func(key as keyof O, value as O[keyof O])
+    )
+  ) as Partial<O>;
 }
 
 let _uniqueID = 1;
@@ -664,13 +785,13 @@ export function uniqueID() {
   return _uniqueID++;
 }
 
-export function assert(condition, message) {
+export function assert(condition: boolean, message: string): asserts condition {
   if (!condition) {
     throw new Error(`assert failed${message ? ` -- ${message}` : ""}`);
   }
 }
 
-export function pointCompareFunc(pointA, pointB) {
+export function pointCompareFunc(pointA: Point, pointB: Point) {
   let d = pointA.x - pointB.x;
   if (Math.abs(d) < 0.00000001) {
     d = pointA.y - pointB.y;
@@ -678,11 +799,11 @@ export function pointCompareFunc(pointA, pointB) {
   return d;
 }
 
-export function sleepAsync(ms) {
+export function sleepAsync(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-export function readFileOrBlobAsDataURL(fileOrBlob) {
+export function readFileOrBlobAsDataURL(fileOrBlob: File | Blob) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = (event) => resolve(reader.result);
@@ -691,13 +812,18 @@ export function readFileOrBlobAsDataURL(fileOrBlob) {
   });
 }
 
-export function colorizeImage(inputImage, color) {
+export function colorizeImage(
+  inputImage: HTMLImageElement,
+  color: CanvasRenderingContext2D["fillStyle"]
+) {
   const w = inputImage.naturalWidth;
   const h = inputImage.naturalHeight;
   const canvas = document.createElement("canvas");
   canvas.width = w;
   canvas.height = h;
   const context = canvas.getContext("2d");
+
+  assert(context !== null, "successfully acquired canvas rendering context");
 
   // First step, draw the image
   context.drawImage(inputImage, 0, 0, w, h);
@@ -712,6 +838,8 @@ export function colorizeImage(inputImage, color) {
 
   return new Promise((resolve, reject) => {
     canvas.toBlob((blob) => {
+      assert(blob !== null, "successfully converted canvas to blob");
+
       const outputImage = new Image();
       outputImage.width = inputImage.width;
       outputImage.height = inputImage.height;
@@ -726,7 +854,9 @@ export function colorizeImage(inputImage, color) {
 }
 
 export class FocusKeeper {
-  get save() {
+  _focusedElement: Element | null = null;
+
+  get save(): (event: any) => void {
     // Return a bound method that can be used as an event handler
     return (event) => {
       this._focusedElement = findNestedActiveElement();
@@ -734,11 +864,14 @@ export class FocusKeeper {
   }
 
   restore() {
-    this._focusedElement?.focus();
+    // @ts-ignore typescript doesn't like that some Elements don't have `focus`
+    // but it doesn't matter since we do an optional invocation anyway so if it
+    // doesn't exist it won't cause any problems.
+    this._focusedElement?.focus?.();
   }
 }
 
-export function glyphMapToItemList(glyphMap) {
+export function glyphMapToItemList(glyphMap: Record<string, number[]>) {
   return Object.entries(glyphMap).map(([glyphName, codePoints]) => ({
     glyphName,
     codePoints,
@@ -746,7 +879,10 @@ export function glyphMapToItemList(glyphMap) {
   }));
 }
 
-export function getAssociatedCodePoints(glyphName, glyphMap) {
+export function getAssociatedCodePoints(
+  glyphName: string,
+  glyphMap: Record<string, number[]>
+) {
   return getBaseGlyphName(glyphName)
     .split("_")
     .filter((baseGlyphName) => baseGlyphName !== glyphName)
@@ -754,26 +890,23 @@ export function getAssociatedCodePoints(glyphName, glyphMap) {
     .filter((codePoint) => codePoint);
 }
 
-export function getCodePointFromGlyphItem(glyphItem) {
+// TODO: proper typing for glyphs
+export function getCodePointFromGlyphItem(glyphItem: any) {
   return glyphItem.codePoints[0] || glyphItem.associatedCodePoints[0];
 }
 
-export function bisect_right(a, x) {
-  // Return the index where to insert item x in list a, assuming a is sorted.
-  //
-  // The return value i is such that all e in a[:i] have e <= x, and all e in
-  // a[i:] have e > x.  So if x already appears in the list, a.insert(i, x) will
-  // insert just after the rightmost x already there.
-  //
-  // Optional args lo (default 0) and hi (default len(a)) bound the
-  // slice of a to be searched.
-  //
-  // A custom key function can be supplied to customize the sort order.
-
+/**
+ * Return the index where to insert item x in list a, assuming a is sorted.
+ *
+ * The return value i is such that all e in a[:i] have e <= x, and all e in
+ * a[i:] have e > x.  So if x already appears in the list, a.insert(i, x) will
+ * insert just after the rightmost x already there.
+ *
+ * Optional args lo (default 0) and hi (default len(a)) bound the
+ * slice of a to be searched.
+ */
+export function bisect_right<T>(a: T[], x: T, lo = 0, hi = a.length) {
   // This is adapted from the Python implementation
-
-  let lo = 0;
-  let hi = a.length;
 
   while (lo < hi) {
     const mid = Math.floor((lo + hi) / 2);
@@ -787,11 +920,15 @@ export function bisect_right(a, x) {
   return lo;
 }
 
-export function isNumber(n) {
+export function isNumber(n: any) {
   return !isNaN(n) && typeof n === "number" && n !== Infinity && n !== -Infinity;
 }
 
-export function updateObject(obj, prop, value) {
+export function updateObject<O extends {}>(
+  obj: O,
+  prop: keyof O,
+  value: O[typeof prop]
+): O {
   obj = { ...obj };
   if (value === undefined) {
     delete obj[prop];
@@ -801,15 +938,15 @@ export function updateObject(obj, prop, value) {
   return obj;
 }
 
-export function longestCommonPrefix(strings) {
+export function longestCommonPrefix(strings: string[]) {
   if (!strings.length) {
     return "";
   }
 
   const firstString = strings[0];
-  let i;
+  let i = 0;
 
-  for (i = 0; ; i++) {
+  for (; ; i++) {
     const c = firstString[i];
     if (c === undefined) {
       break;
@@ -866,15 +1003,14 @@ export const friendlyHttpStatus = {
   505: "HTTP Version Not Supported",
 };
 
-export function stringCompare(a, b) {
-  return a < b ? -1 : a === b ? 0 : 1;
-}
-
-export function deepCopyObject(obj) {
+export function deepCopyObject<O extends {}>(obj: O): O {
   return JSON.parse(JSON.stringify(obj));
 }
 
-export async function asyncMap(iterable, func) {
+export async function asyncMap<T>(
+  iterable: Iterable<T>,
+  func: (value: T) => T
+): Promise<T[]> {
   const result = [];
   for (const item of iterable) {
     result.push(await func(item));
@@ -882,17 +1018,17 @@ export async function asyncMap(iterable, func) {
   return result;
 }
 
-export function parseDataURL(dataURL) {
+export function parseDataURL(dataURL: string) {
   const [header, data] = dataURL.split(",");
   const typeRegex = /data:(.+?\/.+?);/g;
   const match = typeRegex.exec(header);
-  const type = match[1];
-  if (!type) {
+  if (match === null || match.length < 1) {
     throw Error("invalid data URL");
   }
+  const type = match[1];
   return { type, data };
 }
 
-export function objectsEqualSerialized(a, b) {
+export function objectsEqualSerialized(a: any, b: any) {
   return JSON.stringify(a) === JSON.stringify(b);
 }

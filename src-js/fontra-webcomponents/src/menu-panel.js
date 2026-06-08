@@ -12,7 +12,7 @@ import {
   findNestedActiveElement,
   reversed,
   sleepAsync,
-} from "@fontra/core/utils.js";
+} from "@fontra/core/utils.ts";
 import { InlineSVG } from "@fontra/web-components/inline-svg.js";
 import { themeColorCSS } from "./theme-support.js";
 

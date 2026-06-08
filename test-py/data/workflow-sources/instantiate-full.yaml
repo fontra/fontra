@@ -5,14 +5,14 @@ steps:
     glyphNames:
       - A
       - B
-  - axisNames:
+  - filter: subset-axes
+    axisNames:
       - weight
       - width
-    filter: subset-axes
   - filter: instantiate
     location:
       weight: 300
       width: 400
   - filter: round-coordinates
-  - destination: output-instantiate-full.fontra
-    output: fontra-write
+  - output: fontra-write
+    destination: output-instantiate-full.fontra

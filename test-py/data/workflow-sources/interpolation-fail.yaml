@@ -1,12 +1,12 @@
 steps:
   - input: fontra-read
     source: test-py/data/workflow/input-interpolation-fail.fontra
-  - axes:
+  - filter: trim-axes
+    axes:
       weight:
         maxValue: 600
-    filter: trim-axes
-  - destination: output-interpolation-fail.fontra
-    output: fontra-write
+  - output: fontra-write
+    destination: output-interpolation-fail.fontra
 test-info:
   expected-log:
     - level: 40

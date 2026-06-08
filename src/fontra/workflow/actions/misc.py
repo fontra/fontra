@@ -128,6 +128,13 @@ class CheckInterpolation(BaseFilter):
         return glyph
 
 
+@registerFilterAction("drop-kerning")
+@dataclass(kw_only=True)
+class DropKerning(BaseFilter):
+    async def processKerning(self, kerning):
+        return {}
+
+
 @registerFilterAction("drop-font-sources-and-kerning")
 @dataclass(kw_only=True)
 class DropFontSources(BaseFilter):

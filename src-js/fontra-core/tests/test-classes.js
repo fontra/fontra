@@ -9,7 +9,7 @@ if (nodeMajor < 20) {
 }
 
 import coreClasses from "@fontra/core/classes.json" with { type: "json" };
-import { enumerate, range } from "@fontra/core/utils.js";
+import { enumerate, range } from "@fontra/core/utils.ts";
 import { Layer, StaticGlyph, VariableGlyph } from "@fontra/core/var-glyph.js";
 import { VarPackedPath } from "@fontra/core/var-path.js";
 import { readRepoPathAsJSON } from "./test-support.js";

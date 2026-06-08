@@ -8,5 +8,5 @@ steps:
       - O
       - T
       - V
-  - destination: output-subset-glyphs-kerning.fontra
-    output: fontra-write
+  - output: fontra-write
+    destination: output-subset-glyphs-kerning.fontra

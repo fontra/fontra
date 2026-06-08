@@ -9,5 +9,5 @@ steps:
     newDefaultUserLocation:
       weight: 300
       width: 400
-  - destination: output-move-default-location-base.fontra
-    output: fontra-write
+  - output: fontra-write
+    destination: output-move-default-location-base.fontra

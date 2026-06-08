@@ -18,7 +18,7 @@ import {
   rectToPoints,
   sectRect,
   unionRect,
-} from "@fontra/core/rectangle.js";
+} from "@fontra/core/rectangle.ts";
 import { difference, isEqualSet, union, updateSet } from "@fontra/core/set-ops.js";
 import { MAX_UNICODE } from "@fontra/core/shaper.js";
 import { decomposedToTransform } from "@fontra/core/transform.js";
@@ -32,7 +32,7 @@ import {
   range,
   reversed,
   valueInRange,
-} from "@fontra/core/utils.js";
+} from "@fontra/core/utils.ts";
 import { normalizeLocation, unnormalizeLocation } from "@fontra/core/var-model.js";
 import * as vector from "@fontra/core/vector.js";
 
@@ -505,10 +505,9 @@ export class SceneModel {
         .map(([k, v]) => [k.slice(0, 4), v])
     );
 
-    const featuresString = featureEntries
-      .filter(([k, v]) => v != undefined && !k.endsWith("-emulated"))
-      .map(([k, v]) => (v ? (v > 1 ? `${k}=${v}` : k) : `-${k}`))
-      .join(",");
+    const nativeFeatures = featureEntries.filter(
+      ([k, v]) => v != undefined && !k.endsWith("-emulated")
+    );
 
     const shaperLocation = this.getShaperLocation(
       this.sceneSettings.fontLocationSourceMapped
@@ -525,7 +524,7 @@ export class SceneModel {
 
     const shaperOptions = {
       variations: shaperLocation,
-      features: featuresString,
+      features: nativeFeatures,
       direction: this.sceneSettings.textDirection,
       script: this.sceneSettings.textScript,
       language: this.sceneSettings.textLanguage,
@@ -1338,8 +1337,8 @@ class LineSetter {
       const glyphName =
         glyphInfo.codepoint != 0 || fallbackCodePoint >= MAX_UNICODE
           ? glyphInfo.glyphname
-          : fallbackCharacterMap[fallbackCodePoint] ??
-            getSuggestedGlyphName(fallbackCodePoint);
+          : (fallbackCharacterMap[fallbackCodePoint] ??
+            getSuggestedGlyphName(fallbackCodePoint));
 
       const isSelectedGlyph = glyphIndex == selectedGlyphIndex;
 
@@ -1383,8 +1382,8 @@ class LineSetter {
       const codePoint = isUndefined ? fallbackCodePoint : codePointForGlyph;
 
       glyphs.push({
-        x: x + glyphInfo.x_offset,
-        y: y + glyphInfo.y_offset,
+        x: x + glyphInfo.xOffset,
+        y: y + glyphInfo.yOffset,
         kernValue,
         glyph: glyphInstance,
         varGlyph,
@@ -1399,8 +1398,8 @@ class LineSetter {
         glyphInfo,
       });
 
-      x += glyphInfo.x_advance + xAdvanceLayerDifference;
-      y += glyphInfo.y_advance + yAdvanceLayerDifference;
+      x += glyphInfo.xAdvance + xAdvanceLayerDifference;
+      y += glyphInfo.yAdvance + yAdvanceLayerDifference;
     }
 
     let offset = 0;

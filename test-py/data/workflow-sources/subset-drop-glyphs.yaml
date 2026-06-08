@@ -1,7 +1,7 @@
 steps:
   - input: fontra-read
     source: test-py/data/workflow/input1-A.fontra
-  - dropGlyphNamesFile: test-py/data/workflow/subset-drop-glyph-names.txt
-    filter: subset-glyphs
-  - destination: output-subset-keep-drop-glyphs.fontra
-    output: fontra-write
+  - filter: subset-glyphs
+    dropGlyphNamesFile: test-py/data/workflow/subset-drop-glyph-names.txt
+  - output: fontra-write
+    destination: output-subset-keep-drop-glyphs.fontra

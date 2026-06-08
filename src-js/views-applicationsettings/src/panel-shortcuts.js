@@ -13,7 +13,7 @@ import * as html from "@fontra/core/html-utils.js";
 import { addStyleSheet } from "@fontra/core/html-utils.js";
 import { translate } from "@fontra/core/localization.js";
 import { MultiPanelBasePanel } from "@fontra/core/multi-panel.js";
-import { commandKeyProperty, isMac } from "@fontra/core/utils.js";
+import { commandKeyProperty, isMac } from "@fontra/core/utils.ts";
 import { IconButton } from "@fontra/web-components/icon-button.js"; // required for the icon buttons
 import { dialog, message } from "@fontra/web-components/modal-dialog.js";
 

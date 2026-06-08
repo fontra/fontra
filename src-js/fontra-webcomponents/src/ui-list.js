@@ -417,8 +417,8 @@ export class UIList extends UnlitElement {
           const formattedValue = formatter
             ? formatter.toString(value)
             : value == undefined
-            ? ""
-            : value;
+              ? ""
+              : value;
 
           const classString = `text-cell ${colDesc.key} ${colDesc.align || "left"}`;
           if (colDesc.editable) {

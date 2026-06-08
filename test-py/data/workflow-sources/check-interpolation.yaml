@@ -2,8 +2,8 @@ steps:
   - input: fontra-read
     source: test-py/data/workflow/input-check-interpolation.fontra
   - filter: check-interpolation
-  - destination: output-check-interpolation.fontra
-    output: fontra-write
+  - output: fontra-write
+    destination: output-check-interpolation.fontra
 test-info:
   continue-on-error: true
   expected-log:

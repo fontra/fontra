@@ -1,4 +1,4 @@
-import { assert, withTimeout } from "./utils.js";
+import { assert, withTimeout } from "./utils.ts";
 
 export async function getOPFS() {
   return new FileSystem(

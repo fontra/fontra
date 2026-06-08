@@ -6,7 +6,7 @@ import { UndoStack, reverseUndoRecord } from "@fontra/core/font-controller.js";
 import * as html from "@fontra/core/html-utils.js";
 import { translate } from "@fontra/core/localization.js";
 import { MultiPanelBasePanel } from "@fontra/core/multi-panel.js";
-import { commandKeyProperty, sleepAsync } from "@fontra/core/utils.js";
+import { commandKeyProperty, sleepAsync } from "@fontra/core/utils.ts";
 
 export class BaseInfoPanel extends MultiPanelBasePanel {
   constructor(viewController, panelElement) {

@@ -1,5 +1,5 @@
-import { equalRect, normalizeRect, sectRect } from "./rectangle.js";
-import { compare, reversed } from "./utils.js";
+import { equalRect, normalizeRect, sectRect } from "./rectangle.ts";
+import { compare, reversed } from "./utils.ts";
 
 export function pointInConvexPolygon(x, y, polygon) {
   // Adapted from a comment on

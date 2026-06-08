@@ -4,5 +4,5 @@ steps:
   - filter: convert-to-quadratics
     maximumError: 1
     reverseDirection: false
-  - destination: output-convert-to-quadratics.fontra
-    output: fontra-write
+  - output: fontra-write
+    destination: output-convert-to-quadratics.fontra

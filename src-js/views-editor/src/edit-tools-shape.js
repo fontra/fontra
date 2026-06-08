@@ -1,5 +1,5 @@
-import * as rectangle from "@fontra/core/rectangle.js";
-import { commandKeyProperty, range } from "@fontra/core/utils.js";
+import * as rectangle from "@fontra/core/rectangle.ts";
+import { commandKeyProperty, range } from "@fontra/core/utils.ts";
 import { VarPackedPath, packContour } from "@fontra/core/var-path.js";
 import { BaseTool, shouldInitiateDrag } from "./edit-tools-base.js";
 import {

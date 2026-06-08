@@ -1,6 +1,6 @@
 import { guessGlyphPlaceholderString } from "@fontra/core/glyph-data.js";
 import { translate } from "@fontra/core/localization.js";
-import { rectToPoints } from "@fontra/core/rectangle.js";
+import { rectToPoints } from "@fontra/core/rectangle.ts";
 import { difference, isSuperset, union } from "@fontra/core/set-ops.js";
 import { decomposedToTransform } from "@fontra/core/transform.js";
 import {
@@ -13,7 +13,7 @@ import {
   round,
   unionIndexSets,
   withSavedState,
-} from "@fontra/core/utils.js";
+} from "@fontra/core/utils.ts";
 import { subVectors } from "@fontra/core/vector.js";
 
 export const visualizationLayerDefinitions = [];

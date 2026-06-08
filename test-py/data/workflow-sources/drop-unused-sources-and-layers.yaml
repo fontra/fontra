@@ -5,5 +5,5 @@ steps:
     glyphNames:
       - S
   - filter: drop-unused-sources-and-layers
-  - destination: output-drop-unused-sources-and-layers.fontra
-    output: fontra-write
+  - output: fontra-write
+    destination: output-drop-unused-sources-and-layers.fontra

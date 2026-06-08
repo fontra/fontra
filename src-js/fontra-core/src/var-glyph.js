@@ -1,5 +1,5 @@
 import { getDecomposedIdentity } from "./transform.js";
-import { deepCopyObject, mapObjectValues, normalizeGuidelines, zip } from "./utils.js";
+import { deepCopyObject, mapObjectValues, normalizeGuidelines, zip } from "./utils.ts";
 import { VarPackedPath } from "./var-path.js";
 
 export class VariableGlyph {

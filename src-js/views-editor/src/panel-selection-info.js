@@ -2,7 +2,7 @@ import { applicationSettingsController } from "@fontra/core/application-settings
 import { recordChanges } from "@fontra/core/change-recorder.js";
 import * as html from "@fontra/core/html-utils.js";
 import { translate } from "@fontra/core/localization.js";
-import { rectFromPoints, rectSize, unionRect } from "@fontra/core/rectangle.js";
+import { rectFromPoints, rectSize, unionRect } from "@fontra/core/rectangle.ts";
 import { compute, nameCapture } from "@fontra/core/simple-compute.js";
 import { getDecomposedIdentity } from "@fontra/core/transform.js";
 import {
@@ -17,7 +17,7 @@ import {
   round,
   splitGlyphNameExtension,
   throttleCalls,
-} from "@fontra/core/utils.js";
+} from "@fontra/core/utils.ts";
 import { showMenu } from "@fontra/web-components/menu-panel.js";
 import { dialog } from "@fontra/web-components/modal-dialog.js";
 import { Form } from "@fontra/web-components/ui-form.js";
@@ -188,8 +188,8 @@ export default class SelectionInfoPanel extends Panel {
             this.fontController.readOnly
               ? "sidebar.selection-info.glyph-locking.tooltip.read-only"
               : glyphLocked
-              ? "sidebar.selection-info.glyph-locking.tooltip.unlock"
-              : "sidebar.selection-info.glyph-locking.tooltip.lock"
+                ? "sidebar.selection-info.glyph-locking.tooltip.unlock"
+                : "sidebar.selection-info.glyph-locking.tooltip.lock"
           ),
           "data-tooltipposition": "left",
         }),

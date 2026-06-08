@@ -1,0 +1,68 @@
+{
+"name": "A",
+"sources": [
+{
+"name": "LightCondensed",
+"layerName": "MutatorSansLightCondensed/foreground",
+"location": {
+"italic": 0,
+"weight": 150,
+"width": 0
+}
+},
+{
+"name": "BoldCondensed",
+"layerName": "MutatorSansBoldCondensed/foreground",
+"location": {
+"italic": 0,
+"weight": 850,
+"width": 0
+}
+},
+{
+"name": "LightWide",
+"layerName": "MutatorSansLightWide/foreground",
+"location": {
+"italic": 0,
+"weight": 150,
+"width": 1000
+}
+},
+{
+"name": "BoldWide",
+"layerName": "MutatorSansBoldWide/foreground",
+"location": {
+"italic": 0,
+"weight": 850,
+"width": 1000
+}
+}
+],
+"layers": {
+"MutatorSansBoldCondensed/foreground": {
+"glyph": {
+"xAdvance": 740
+}
+},
+"MutatorSansBoldWide/foreground": {
+"glyph": {
+"xAdvance": 1290
+}
+},
+"MutatorSansLightCondensed/foreground": {
+"glyph": {
+"xAdvance": 396
+}
+},
+"MutatorSansLightCondensed/support": {
+"glyph": {
+"xAdvance": 930
+}
+},
+"MutatorSansLightWide/foreground": {
+"glyph": {
+"xAdvance": 1190
+}
+}
+}
+}

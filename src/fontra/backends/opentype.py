@@ -440,7 +440,11 @@ def unpackFontSources(
     locations = set()
 
     gdefTable = font.get("GDEF")
-    if gdefTable is not None and getattr(gdefTable.table, "VarStore", None) is not None:
+    if (
+        fvarAxes
+        and gdefTable is not None
+        and getattr(gdefTable.table, "VarStore", None) is not None
+    ):
         locations |= {
             locationToTuple(loc)
             for loc in getLocationsFromVarstore(gdefTable.table.VarStore, fvarAxes)

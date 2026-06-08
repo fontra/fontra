@@ -1,7 +1,7 @@
 import { Bezier } from "bezier-js";
 import { convexHull } from "./convex-hull.js";
 import { VariationError } from "./errors.js";
-import { centeredRect, pointInRect, rectFromPoints, updateRect } from "./rectangle.js";
+import { centeredRect, pointInRect, rectFromPoints, updateRect } from "./rectangle.ts";
 import {
   arrayExtend,
   assert,
@@ -10,7 +10,7 @@ import {
   objectsEqualSerialized,
   range,
   reversed,
-} from "./utils.js";
+} from "./utils.ts";
 import VarArray from "./var-array.js";
 
 export const POINT_TYPE_OFF_CURVE_QUAD = "quad";

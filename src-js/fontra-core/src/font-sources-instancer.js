@@ -4,7 +4,7 @@ import {
   areCustomDatasCompatible,
   areGuidelinesCompatible,
   normalizeGuidelines,
-} from "./utils.js";
+} from "./utils.ts";
 import { locationToString } from "./var-model.js";
 
 export class FontSourcesInstancer {

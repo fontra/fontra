@@ -12,5 +12,5 @@ steps:
           - T
           - V
       - filter: round-coordinates
-  - destination: output-subset-scale-kerning.fontra
-    output: fontra-write
+  - output: fontra-write
+    destination: output-subset-scale-kerning.fontra

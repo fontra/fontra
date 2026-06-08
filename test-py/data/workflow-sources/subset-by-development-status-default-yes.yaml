@@ -6,5 +6,5 @@ steps:
     statuses:
       - 4
   - filter: drop-unreachable-glyphs
-  - destination: output-subset-by-development-status-yes.fontra
-    output: fontra-write
+  - output: fontra-write
+    destination: output-subset-by-development-status-yes.fontra

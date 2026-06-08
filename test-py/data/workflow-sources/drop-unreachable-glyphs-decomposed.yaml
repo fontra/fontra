@@ -3,5 +3,5 @@ steps:
     source: test-py/data/workflow/input-drop-unreachable-glyphs.fontra
   - filter: decompose-composites
   - filter: drop-unreachable-glyphs
-  - destination: output-drop-unreachable-glyphs-decomposed.fontra
-    output: fontra-write
+  - output: fontra-write
+    destination: output-drop-unreachable-glyphs-decomposed.fontra

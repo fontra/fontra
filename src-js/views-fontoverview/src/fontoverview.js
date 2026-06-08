@@ -21,7 +21,7 @@ import {
 import * as html from "@fontra/core/html-utils.js";
 import { loaderSpinner } from "@fontra/core/loader-spinner.js";
 import { translate } from "@fontra/core/localization.js";
-import { ObservableController } from "@fontra/core/observable-object.js";
+import { ObservableController } from "@fontra/core/observable-object.ts";
 import { labeledTextInput } from "@fontra/core/ui-utils.js";
 import {
   assert,
@@ -39,7 +39,7 @@ import {
   sleepAsync,
   writeObjectToURLFragment,
   writeToClipboard,
-} from "@fontra/core/utils.js";
+} from "@fontra/core/utils.ts";
 import { VariableGlyph } from "@fontra/core/var-glyph.js";
 import { ViewController } from "@fontra/core/view-controller.js";
 import { GlyphCellView } from "@fontra/web-components/glyph-cell-view.js";
@@ -350,7 +350,7 @@ export class FontOverviewController extends ViewController {
       combinedItemList = this.glyphOrganizer.sortGlyphs(combinedItemList);
     }
 
-    const glyphItemList = this.glyphOrganizer.filterGlyphs(combinedItemList);
+    const glyphItemList = this.glyphOrganizer.filterGlyphs(combinedItemList, true);
     const glyphSections = this.glyphOrganizer.groupGlyphs(glyphItemList);
     this.glyphCellView.setGlyphSections(glyphSections);
 
