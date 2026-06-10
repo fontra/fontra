@@ -120,6 +120,8 @@ export const strings = {
   "background-image.labels.colorize": "填色",
   "background-image.labels.opacity": "透明度",
   "canvas.clean-view-and-hand-tool": "预览与拖拽工具",
+  "conditional-substitutions.new": "New rule",
+  "conditional-substitutions.title": "Conditional substitutions",
   "cross-axis-mapping.axis-participates": "选中后，该参数轴参与映射",
   "cross-axis-mapping.delete": "删除跨轴映射",
   "cross-axis-mapping.description": "描述",

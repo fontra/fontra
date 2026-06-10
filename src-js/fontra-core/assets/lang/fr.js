@@ -120,6 +120,8 @@ export const strings = {
   "background-image.labels.colorize": "Coloriser",
   "background-image.labels.opacity": "Transparence",
   "canvas.clean-view-and-hand-tool": "Prévisualisation et outil de déplacement",
+  "conditional-substitutions.new": "New rule",
+  "conditional-substitutions.title": "Conditional substitutions",
   "cross-axis-mapping.axis-participates": "Si coché, l'axe participera au mapping",
   "cross-axis-mapping.delete": "Delete cross-axis mapping",
   "cross-axis-mapping.description": "Description",
