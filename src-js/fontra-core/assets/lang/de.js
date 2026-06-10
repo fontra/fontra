@@ -120,7 +120,7 @@ export const strings = {
   "background-image.labels.colorize": "Färbung",
   "background-image.labels.opacity": "Transparenz",
   "canvas.clean-view-and-hand-tool": "Ungehinderte Sicht und Hand Werkzeug",
-  "conditional-substitutions.new": "New rule",
+  "conditional-substitutions.new": "New conditional substitution rule",
   "conditional-substitutions.title": "Conditional substitutions",
   "cross-axis-mapping.axis-participates":
     "Wenn markiert, dann ist diese Achse teil des Mappings",

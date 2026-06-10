@@ -120,7 +120,7 @@ export const strings = {
   "background-image.labels.colorize": "彩色",
   "background-image.labels.opacity": "透明度",
   "canvas.clean-view-and-hand-tool": "塗りのプレビューと手のひらツール",
-  "conditional-substitutions.new": "New rule",
+  "conditional-substitutions.new": "New conditional substitution rule",
   "conditional-substitutions.title": "Conditional substitutions",
   "cross-axis-mapping.axis-participates":
     "チェックすると、この補完軸がマッピング内で有効になります",

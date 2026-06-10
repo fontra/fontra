@@ -120,7 +120,7 @@ export const strings = {
   "background-image.labels.colorize": "Kulayan",
   "background-image.labels.opacity": "Kadiliman",
   "canvas.clean-view-and-hand-tool": "Malinis na Pananaw at Kagamitan sa Kamay",
-  "conditional-substitutions.new": "New rule",
+  "conditional-substitutions.new": "New conditional substitution rule",
   "conditional-substitutions.title": "Conditional substitutions",
   "cross-axis-mapping.axis-participates":
     "Kapag nasuri, ang aksis na ito ay nakikilahok sa pagmamapa",
