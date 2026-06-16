@@ -250,6 +250,8 @@ class FontHandler:
                 await self.writableBackend.putGlyphMap(value)
             case "customData":
                 await self.writableBackend.putCustomData(value)
+            case "conditionalSubstitutions":
+                await self.writableBackend.putConditionalSubstitutions(value)
             case "unitsPerEm":
                 await self.writableBackend.putUnitsPerEm(value)
             case "features":
