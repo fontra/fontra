@@ -217,12 +217,13 @@ export function popupSelect(controller, key, popupItems, options) {
   });
 
   const menu = new PopupMenu(findLabel(), () =>
-    popupItems.map(({ value, label }) => ({
+    popupItems.map(({ value, label, callback }) => ({
       title: label,
       checked: value === controller.model[key],
       callback: () => {
         controller.model[key] = value;
         menu.valueLabel = label;
+        callback?.();
       },
     }))
   );
