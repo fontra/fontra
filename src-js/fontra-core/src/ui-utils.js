@@ -208,8 +208,9 @@ export function labeledTextInput(label, controller, key, options) {
 
 export function popupSelect(controller, key, popupItems, options) {
   function findLabel() {
-    const option = popupItems.find(({ value }) => value === controller.model[key]);
-    return option?.label || "";
+    const { getLabel, label } =
+      popupItems.find(({ value }) => value === controller.model[key]) ?? {};
+    return getLabel?.() ?? label ?? "";
   }
 
   controller.addKeyListener(key, (event) => {
@@ -217,12 +218,12 @@ export function popupSelect(controller, key, popupItems, options) {
   });
 
   const menu = new PopupMenu(findLabel(), () =>
-    popupItems.map(({ value, label, callback }) => ({
-      title: label,
+    popupItems.map(({ value, getLabel, label, callback }) => ({
+      title: getLabel ?? label,
       checked: value === controller.model[key],
       callback: () => {
         controller.model[key] = value;
-        menu.valueLabel = label;
+        menu.valueLabel = getLabel?.() ?? label;
         callback?.();
       },
     }))
