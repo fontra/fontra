@@ -453,7 +453,7 @@ export const strings = {
   "sidebar.selection-info.component.transformation": "Transformação",
   "sidebar.selection-info.component.translate": "Transladar",
   "sidebar.selection-info.dialog.unlock-glyph.title":
-    "Tem certeza que deseja desbloquear o glifo %0?",
+    "Tem a certeza que deseja desbloquear o glifo %0?",
   "sidebar.selection-info.dimensions": "Dimensões",
   "sidebar.selection-info.glyph-locking.tooltip.lock": "Bloquear glifo",
   "sidebar.selection-info.glyph-locking.tooltip.read-only":
@@ -506,7 +506,7 @@ export const strings = {
   "sidebar.selection-transformation.title": "Transformação",
   "sidebar.text-entry": "Entrada de Texto",
   "sidebar.text-entry.apply-text-shaping":
-    "Aplicar modelagem de texto e recursos OpenType",
+    "Aplicar modelação de texto e recursos OpenType",
   "sidebar.text-entry.automatic": "Automático",
   "sidebar.text-entry.direction": "Direção",
   "sidebar.text-entry.direction.left-to-right": "Da esquerda para direita",
@@ -556,7 +556,7 @@ export const strings = {
   "sources.button.go-to-nearest-source": "Ir para a origem mais próxima",
   "sources.button.new-font-source": "Nova origem de fonte...",
   "sources.button.new-glyph-source": "Nova fonte",
-  "sources.dialog.add-source.label.source-name": "Nome da Origem",
+  "sources.dialog.add-source.label.source-name": "Nome da origem",
   "sources.dialog.add-source.title": "Adicionar origem da fonte",
   "sources.dialog.cannot-edit-source.title": "Não é possivel editar a origem da fonte",
   "sources.dialog.delete.message":
@@ -583,7 +583,7 @@ export const strings = {
   "sources.labels.name": "Nome",
   "sources.labels.x-height": "Altura de x",
   "sources.title": "Origens",
-  "sources.tooltip.delete-source": "Excluir origem 0%",
+  "sources.tooltip.delete-source": "Excluir origem",
   "sources.undo.delete": "excluir origem 0%",
   "sources.untitled-source": "Origem sem nome",
   "sources.warning.empty-source-name": "O nome de origem não pode estar vazio",
