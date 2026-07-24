@@ -17,11 +17,16 @@ export const languages = [
   { code: "es", langEn: "Spanish", langLang: "Español", status: "beta" },
   {
     code: "pt-BR",
-    langEn: "Portuguese (BR)",
-    langLang: "Português (BR)",
+    langEn: "Portuguese (Brazil)",
+    langLang: "Português (Brasil)",
     status: "beta",
   },
-  { code: "pt-PT", langEn: "Portuguese", langLang: "Português", status: "beta" },
+  {
+    code: "pt-PT",
+    langEn: "Portuguese (Portugal)",
+    langLang: "Português (Portugal)",
+    status: "beta",
+  },
   { code: "tl", langEn: "Filipino", langLang: "Tagalog", status: "beta" },
 ];
 

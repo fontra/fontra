@@ -383,7 +383,7 @@ export const strings = {
     "editar propiedades del recurso",
   "sidebar.designspace-navigation.source.activate": "activar %0",
   "sidebar.designspace-navigation.source.deactivate": "desactivar %0",
-  "sidebar.designspace-navigation.undo.and-layer": "y capa",
+  "sidebar.designspace-navigation.undo.and-layer": " y capa",
   "sidebar.designspace-navigation.undo.delete-source": "eliminar el recurso %0",
   "sidebar.designspace-navigation.warning.delete-associated-layer":
     "Eliminar también la capa asociada %0",
