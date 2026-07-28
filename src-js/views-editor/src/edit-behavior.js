@@ -1258,7 +1258,7 @@ const alternateRules = [
   // Selected off-curve locked between two selected smooth points
   [    ANY|NIL,    ANY|NIL,    SMO|SEL,    OFF|SEL,    SMO|SEL,    ANY|NIL,    false,      "DontMove"],
 
-]
+];
 
 // prettier-ignore
 const alternateConstrainRules = alternateRules.concat([
