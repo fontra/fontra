@@ -226,13 +226,11 @@ export function compute(expression, functions, variables) {
     },
 
     FuncValue: function () {
-      if (
-        !(
-          i + 1 < tokens.length &&
-          tokens[i].token === "VARIABLE" &&
-          tokens[i + 1].token === "LBR"
-        )
-      ) {
+      if (!(
+        i + 1 < tokens.length &&
+        tokens[i].token === "VARIABLE" &&
+        tokens[i + 1].token === "LBR"
+      )) {
         return this.ScalarValue();
       }
 
