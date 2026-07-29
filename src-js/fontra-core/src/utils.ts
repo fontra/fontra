@@ -1055,3 +1055,18 @@ export function parseDataURL(dataURL: string) {
 export function objectsEqualSerialized(a: any, b: any) {
   return JSON.stringify(a) === JSON.stringify(b);
 }
+
+export function disambiguateGlyphName(
+  glyphName: string,
+  referenceObject: Record<string, any>
+) {
+  let count = 0;
+  let suffix;
+
+  do {
+    suffix = `.alt${count ? count : ""}`;
+    count++;
+  } while (glyphName + suffix in referenceObject);
+
+  return glyphName + suffix;
+}

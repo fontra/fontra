@@ -2,7 +2,12 @@ import { getGlyphMapProxy } from "./cmap.js";
 import { translate } from "./localization.js";
 import { ObservableController } from "./observable-object.ts";
 import { parseGlyphSet, redirectGlyphSetURL } from "./parse-glyphset.js";
-import { assert, friendlyHttpStatus, sleepAsync } from "./utils.ts";
+import {
+  assert,
+  disambiguateGlyphName,
+  friendlyHttpStatus,
+  sleepAsync,
+} from "./utils.ts";
 
 export const THIS_FONTS_GLYPHSET = "";
 export const PROJECT_GLYPH_SETS_CUSTOM_DATA_KEY = "fontra.projectGlyphSets";
@@ -285,16 +290,4 @@ function getMyGlyphSetsController() {
 
 export function getMyGlyphSets() {
   return myGlyphSetsController.model.settings;
-}
-
-function disambiguateGlyphName(glyphName, referenceObject) {
-  let count = 0;
-  let suffix;
-
-  do {
-    suffix = `.alt${count ? count : ""}`;
-    count++;
-  } while (glyphName + suffix in referenceObject);
-
-  return glyphName + suffix;
 }
