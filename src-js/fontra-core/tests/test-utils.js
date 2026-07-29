@@ -7,6 +7,7 @@ import {
   clamp,
   compare,
   consolidateCalls,
+  disambiguateGlyphName,
   dumpURLFragment,
   enumerate,
   fileNameExtension,
@@ -798,5 +799,22 @@ describe("compare", () => {
 
   parametrize("compare test", testData, (testCase) => {
     expect(compare(testCase.a, testCase.b)).to.equal(testCase.result);
+  });
+});
+
+describe("disambiguateGlyphName", () => {
+  const testData = [
+    { name: "A", reference: {}, result: "A" },
+    { name: "A", reference: { A: null }, result: "A.alt" },
+    { name: "A", reference: { "A": null, "A.alt": null }, result: "A.alt1" },
+    {
+      name: "A",
+      reference: { "A": null, "A.alt": null, "A.alt1": null },
+      result: "A.alt2",
+    },
+  ];
+
+  parametrize("compare test", testData, ({ name, reference, result }) => {
+    expect(disambiguateGlyphName(name, reference)).to.equal(result);
   });
 });
