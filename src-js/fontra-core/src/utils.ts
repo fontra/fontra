@@ -1061,12 +1061,12 @@ export function disambiguateGlyphName(
   referenceObject: Record<string, any>
 ) {
   let count = 0;
-  let suffix;
+  let suffix = "";
 
-  do {
+  while (glyphName + suffix in referenceObject) {
     suffix = `.alt${count ? count : ""}`;
     count++;
-  } while (glyphName + suffix in referenceObject);
+  }
 
   return glyphName + suffix;
 }
