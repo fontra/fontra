@@ -6,7 +6,7 @@
     "build-shaper-font": "^0.1.8",
     "fflate": "^0.8.3",
     "harfbuzzjs": "^1.4.0",
-    "lib-font": "^3.0.1",
+    "lib-font": "^3.0.4",
     "tsc": "^2.0.4"
   },
   "exports": {
