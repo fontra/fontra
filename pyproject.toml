@@ -13,15 +13,15 @@ authors = [
 keywords = ["font", "fonts"]
 license = {text = "GNU General Public License v3"}
 dependencies = [
-    "aiohttp>=3.14.1",
+    "aiohttp>=3.14.3",
     "cattrs>=23.1.2",
     "fonttools[ufo,unicode,woff]>=4.63.0",
     "watchfiles>=1.2.0",
     "pyyaml>=6.0.1",
-    "ufomerge>=1.8.0",
+    "ufomerge>=1.9.7",
     "skia-pathops>=0.8.0.post1",
     "pillow>=12.3.0",
-    "ufo2ft>=3.8.2",
+    "ufo2ft>=3.9.0",
 ]
 dynamic = ["version"]
 requires-python = ">=3.10"
