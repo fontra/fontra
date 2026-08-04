@@ -13,14 +13,14 @@
     "copy-webpack-plugin": "^14.0.0",
     "css-loader": "^7.1.4",
     "html-bundler-webpack-plugin": "^4.23.2",
-    "npm": "^11.16.0",
-    "prettier": "3.8.3",
+    "npm": "^12.0.1",
+    "prettier": "3.9.6",
     "prettier-plugin-organize-imports": "^4.3.0",
     "prettier-plugin-sort-json": "^4.2.0",
-    "ts-loader": "^9.6.0",
-    "typescript": "^6.0.3",
-    "webpack": "^5.107.2",
-    "webpack-cli": "^7.0.3"
+    "ts-loader": "^9.6.2",
+    "typescript": "^7.0.2",
+    "webpack": "^5.109.2",
+    "webpack-cli": "^7.2.2"
   },
   "workspaces": [
     "src-js/fontra-core",
@@ -32,12 +32,12 @@
     "src-js/views-fontoverview"
   ],
   "dependencies": {
-    "@babel/preset-env": "^7.29.7",
-    "@babel/preset-typescript": "^7.29.7",
-    "@codemirror/autocomplete": "^6.20.2",
+    "@babel/preset-env": "^8.0.2",
+    "@babel/preset-typescript": "^8.0.1",
+    "@codemirror/autocomplete": "^6.20.3",
     "@codemirror/highlight": "^0.19.8",
     "@codemirror/history": "^0.19.2",
-    "@codemirror/language": "^6.12.3",
+    "@codemirror/language": "^6.12.4",
     "@codemirror/legacy-modes": "^6.5.3",
     "@lezer/highlight": "^1.2.3",
     "babel-loader": "^10.1.1",

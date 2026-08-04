@@ -243,8 +243,8 @@ export class SourcesPanel extends BaseInfoPanel {
       return;
     }
     const dialog = await dialogSetup(
-      "Are you sure you want to delete the selected font source?", // TODO: translation
-      "Deleting a font source may result in kerning being lost or glyphs to become invalid.", // TODO: translation
+      translate("sources.dialog.delete.title"),
+      translate("sources.dialog.delete.message"),
       [
         { title: translate("dialog.cancel"), isCancelButton: true },
         { title: translate("dialog.delete"), isDefaultButton: true, result: "ok" },
@@ -857,18 +857,17 @@ input {
   }
 
   async askChangeIsSparseOkayCancel(onOff) {
-    const message = onOff
-      ? `This will delete any kerning for this source.`
-      : `This will add interpolated kerning and line metrics for this source.`;
-
-    const dialog = await dialogSetup(
-      `Are you sure you want to turn the "Is Sparse" flag ${onOff ? "on" : "off"}?`,
-      message,
-      [
-        { title: translate("dialog.cancel"), isCancelButton: true },
-        { title: translate("dialog.okay"), isDefaultButton: true, result: "ok" },
-      ]
+    const title = translate(
+      onOff ? "sources.dialog.sparse-on.title" : "sources.dialog.sparse-off.title"
     );
+    const message = translate(
+      onOff ? "sources.dialog.sparse-on.message" : "sources.dialog.sparse-off.message"
+    );
+
+    const dialog = await dialogSetup(title, message, [
+      { title: translate("dialog.cancel"), isCancelButton: true },
+      { title: translate("dialog.okay"), isDefaultButton: true, result: "ok" },
+    ]);
 
     return !!(await dialog.run());
   }

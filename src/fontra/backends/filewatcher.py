@@ -1,8 +1,7 @@
 import asyncio
-import hashlib
 import logging
 import os
-from collections import defaultdict
+from collections import defaultdict, deque
 from dataclasses import dataclass, field
 from typing import Awaitable, Callable, Iterable
 
@@ -17,10 +16,11 @@ class FileWatcher:
     paths: set[str] = field(init=False, default_factory=set)
     _stopEvent: asyncio.Event = field(init=False, default=asyncio.Event())
     _task: asyncio.Task | None = field(init=False, default=None)
-    _ignorePaths: dict[str, set[float | None]] = field(
-        init=False, default_factory=lambda: defaultdict(set)
+    # We keep a deque of a small amount of modification times per file, just in
+    # case we receive a changed event for a change after we've made another change
+    _ignorePaths: dict[str, deque[float | None]] = field(
+        init=False, default_factory=lambda: defaultdict(lambda: deque(maxlen=4))
     )
-    _ignorePathHashes: dict[str, bytes | None] = field(init=False, default_factory=dict)
 
     async def aclose(self) -> None:
         if self._task is None:
@@ -45,9 +45,7 @@ class FileWatcher:
 
     def ignoreNextChange(self, path: os.PathLike | str):
         path = os.fspath(path)
-        mtime = os.stat(path).st_mtime if os.path.exists(path) else None
-        self._ignorePaths[path].add(mtime)
-        self._ignorePathHashes[path] = fileContentHash(path)
+        self._ignorePaths[path].appendleft(getModificationTime(path))
 
     def _startWatching(self) -> None:
         # Stop the current loop after a delay, so that it can process pending changes.
@@ -75,17 +73,11 @@ class FileWatcher:
             # Can we ignore this changes based on a recorded modification time?
             mtimes = self._ignorePaths.get(path)
             if mtimes is not None:
-                mtime = os.stat(path).st_mtime if os.path.exists(path) else None
+                mtime = getModificationTime(path)
                 if mtime in mtimes:
-                    mtimes.remove(mtime)
-                    if not mtimes:
-                        del self._ignorePaths[path]
                     continue
-
-            # We still want to ignore the change if the contents didn't really change.
-            contentHash = self._ignorePathHashes.pop(path, None)
-            if contentHash is not None and contentHash == fileContentHash(path):
-                continue
+                # We have a true external change
+                del self._ignorePaths[path]
 
             filteredChanges.add((change, path))
 
@@ -116,9 +108,5 @@ async def setEventAfterDelay(event, delay=0.1) -> None:
     event.set()
 
 
-def fileContentHash(path: str) -> bytes | None:
-    if not os.path.isfile(path):
-        return None
-
-    with open(path, "rb") as f:
-        return hashlib.sha256(f.read()).digest()
+def getModificationTime(path) -> float | None:
+    return os.stat(path).st_mtime if os.path.exists(path) else None

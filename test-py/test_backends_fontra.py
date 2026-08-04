@@ -14,9 +14,9 @@ from fontra.core.classes import (
     ImageType,
     Kerning,
     OpenTypeFeatures,
-    SubstitionRule,
     SubstitutionCondition,
     SubstitutionConditionSet,
+    SubstitutionRule,
 )
 from fontra.core.fonthandler import FontHandler
 from fontra.filesystem.projectmanager import FileSystemProjectManager
@@ -341,7 +341,7 @@ async def test_putGlyphInfos(writableFontraFont):
 expectedConditionalSubstitutions = ConditionalSubstitutions(
     featureTags=["rclt"],
     rules=[
-        SubstitionRule(
+        SubstitutionRule(
             name="fold_I_serifs",
             conditionSets=[
                 SubstitutionConditionSet(
@@ -354,7 +354,7 @@ expectedConditionalSubstitutions = ConditionalSubstitutions(
             ],
             substitutions={"I": "I.narrow"},
         ),
-        SubstitionRule(
+        SubstitutionRule(
             name="fold_S_terminals",
             conditionSets=[
                 SubstitutionConditionSet(

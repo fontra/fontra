@@ -25,6 +25,7 @@ import {
   boolInt,
   commandKeyProperty,
   enumerate,
+  modulo,
   parseSelection,
   range,
 } from "@fontra/core/utils.ts";
@@ -709,6 +710,62 @@ export class PointerTool extends BaseTool {
 
   get scalingEditBehavior() {
     return false;
+  }
+
+  handleKeyDown(event) {
+    if (event.key !== "Tab" || !this.sceneSettings.selectedGlyph?.isEditing) {
+      return;
+    }
+
+    const glyph = this.sceneModel.getSelectedPositionedGlyph()?.glyph;
+    if (!glyph) {
+      return;
+    }
+
+    event.preventDefault();
+    event.stopImmediatePropagation();
+
+    const selectionTypes = ["point", "component", "anchor", "guideline"];
+
+    const parsedSelection = parseSelection(this.sceneSettings.selection);
+
+    const numItems = {
+      point: glyph.path.numPoints,
+      component: glyph.components.length,
+      anchor: glyph.anchors.length,
+      guideline: glyph.guidelines.length,
+    };
+
+    const selectionType =
+      selectionTypes.find((tp) => parsedSelection[tp]) ??
+      selectionTypes.find((tp) => numItems[tp]);
+
+    if (!selectionType) {
+      return;
+    }
+
+    const currentSelection = parsedSelection[selectionType];
+    const currentIndex = currentSelection?.at(event.shiftKey ? 0 : -1);
+    const numSelectionItems = numItems[selectionType];
+    const delta = event.shiftKey ? -1 : 1;
+
+    const newIndex = currentSelection
+      ? event.altKey && selectionType == "point"
+        ? // if we are selecting points, and the alt key is pressed,
+          // go to the next or previous contour
+          glyph.path.getAbsolutePointIndex(
+            modulo(
+              glyph.path.getContourIndex(currentIndex) + delta,
+              glyph.path.numContours
+            ),
+            event.shiftKey ? -1 : 0
+          )
+        : modulo(currentIndex + delta, numSelectionItems)
+      : event.shiftKey
+        ? numSelectionItems - 1
+        : 0;
+
+    this.sceneSettings.selection = new Set([`${selectionType}/${newIndex}`]);
   }
 
   activate() {

@@ -5,8 +5,8 @@
     "bezier-js": "^6.1.4",
     "build-shaper-font": "^0.1.8",
     "fflate": "^0.8.3",
-    "harfbuzzjs": "^1.2.0",
-    "lib-font": "^3.0.1",
+    "harfbuzzjs": "^1.4.0",
+    "lib-font": "^3.0.4",
     "tsc": "^2.0.4"
   },
   "exports": {
@@ -15,7 +15,7 @@
     "./assets/*": "./assets/*"
   },
   "scripts": {
-    "test": "mocha tests --reporter spec"
+    "test": "mocha tests --extension js --extension ts --reporter spec"
   },
   "type": "module",
   "devDependencies": {

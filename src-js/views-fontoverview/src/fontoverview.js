@@ -4,6 +4,10 @@ import {
   registerActionCallbacks,
 } from "@fontra/core/actions.js";
 import { applicationSettingsController } from "@fontra/core/application-settings.js";
+import {
+  setupLocationDependencies,
+  ShowLocationSettings,
+} from "@fontra/core/axis-ui.js";
 import { Backend } from "@fontra/core/backend-api.js";
 import { recordChanges } from "@fontra/core/change-recorder.js";
 import { reverseUndoRecord, UndoStack } from "@fontra/core/font-controller.js";
@@ -20,7 +24,7 @@ import {
 } from "@fontra/core/glyphsets-controller.js";
 import * as html from "@fontra/core/html-utils.js";
 import { loaderSpinner } from "@fontra/core/loader-spinner.js";
-import { translate } from "@fontra/core/localization.js";
+import { translate, translatePlural } from "@fontra/core/localization.js";
 import { ObservableController } from "@fontra/core/observable-object.ts";
 import { labeledTextInput } from "@fontra/core/ui-utils.js";
 import {
@@ -28,6 +32,7 @@ import {
   asyncMap,
   consolidateCalls,
   dumpURLFragment,
+  eventIsCausedByWritingURLFragment,
   glyphMapToItemList,
   isActiveElementTypeable,
   modulo,
@@ -49,7 +54,11 @@ import { FontOverviewNavigation } from "./panel-navigation.js";
 
 const persistentSettings = [
   { key: "searchString" },
-  { key: "fontLocationUser" },
+  { key: "fontLocationUser", infoKey: "location" },
+  { key: "fontAxesUseSourceCoordinates" },
+  { key: "fontAxesShowEffectiveLocation" },
+  { key: "hiddenFontAxesShowEffectiveLocation" },
+  { key: "fontAxesSkipMapping" },
   { key: "glyphSelection", toJSON: (v) => [...v], fromJSON: (v) => new Set(v) },
   { key: "closedGlyphSections", toJSON: (v) => [...v], fromJSON: (v) => new Set(v) },
   {
@@ -68,9 +77,14 @@ function getDefaultFontOverviewSettings() {
     searchString: "",
     fontLocationUser: {},
     fontLocationSource: {},
+    fontLocationSourceMapped: {},
+    fontAxesUseSourceCoordinates: false,
+    fontAxesShowEffectiveLocation: ShowLocationSettings.DontShowEffectiveLocation,
+    hiddenFontAxesShowEffectiveLocation: ShowLocationSettings.DontShowEffectiveLocation,
+    fontAxesSkipMapping: false,
     glyphSelection: new Set(),
     closedGlyphSections: new Set(),
-    closedNavigationSections: new Set(),
+    closedNavigationSections: new Set(["hidden-font-axes"]),
     groupByKeys: [],
     projectGlyphSets: {},
     myGlyphSets: {},
@@ -87,7 +101,7 @@ const CELL_MAGNIFICATION_MAX = 4;
 
 export class FontOverviewController extends ViewController {
   static titlePattern(displayName) {
-    return `Fontra Font Overview — ${displayName}`;
+    return `Font Overview — ${displayName}`;
   }
 
   constructor(font, projectIdentifier) {
@@ -118,6 +132,9 @@ export class FontOverviewController extends ViewController {
       { actionIdentifier: "action.paste" },
       { actionIdentifier: "action.delete" },
       MenuItemDivider,
+      { actionIdentifier: "action.copy-glyphname" },
+      { actionIdentifier: "action.copy-character" },
+      MenuItemDivider,
       { actionIdentifier: "action.select-all" },
       { actionIdentifier: "action.select-none" },
     ];
@@ -146,7 +163,9 @@ export class FontOverviewController extends ViewController {
     window.name = `fontra.fontoverview.${this.projectIdentifier}`;
 
     window.addEventListener("popstate", (event) => {
-      this._updateFromWindowLocation();
+      if (!eventIsCausedByWritingURLFragment()) {
+        this._updateFromWindowLocation();
+      }
     });
 
     this.fontOverviewSettingsController = new ObservableController({
@@ -196,7 +215,7 @@ export class FontOverviewController extends ViewController {
       }
     );
 
-    this._setupLocationDependencies();
+    setupLocationDependencies(this.fontController, this.fontOverviewSettingsController);
 
     this._updateFromWindowLocation();
 
@@ -208,7 +227,7 @@ export class FontOverviewController extends ViewController {
 
     glyphCellViewContainer.appendChild(
       html.div({ id: "font-overview-no-glyphs" }, [
-        translate("(No glyphs found)"), // TODO: translation
+        translate("font-overview.dialog.no-glyphs-found"),
       ])
     );
 
@@ -216,8 +235,7 @@ export class FontOverviewController extends ViewController {
 
     this.glyphCellView = new GlyphCellView(
       this.fontController,
-      this.fontOverviewSettingsController,
-      { locationKey: "fontLocationSource" }
+      this.fontOverviewSettingsController
     );
 
     this.fontOverviewSettingsController.addKeyListener("cellMagnification", (event) => {
@@ -261,38 +279,6 @@ export class FontOverviewController extends ViewController {
     this.undoStack.clear();
   }
 
-  _setupLocationDependencies() {
-    // TODO: This currently does *not* do avar-2 / cross-axis-mapping
-    // - We need the "user location" to send to the editor
-    // - We would need the "mapped source location" for the glyph cells
-    // - We use the "user location" to store in the fontoverview URL fragment
-    // - Mapping from "user" to "source" to "mapped source" is easy
-    // - The reverse is not: see CrossAxisMapping.unmapLocation()
-
-    this.fontOverviewSettingsController.addKeyListener(
-      "fontLocationSource",
-      (event) => {
-        if (!event.senderInfo?.fromFontLocationUser) {
-          this.fontOverviewSettingsController.setItem(
-            "fontLocationUser",
-            this.fontController.mapSourceLocationToUserLocation(event.newValue),
-            { fromFontLocationSource: true }
-          );
-        }
-      }
-    );
-
-    this.fontOverviewSettingsController.addKeyListener("fontLocationUser", (event) => {
-      if (!event.senderInfo?.fromFontLocationSource) {
-        this.fontOverviewSettingsController.setItem(
-          "fontLocationSource",
-          this.fontController.mapUserLocationToSourceLocation(event.newValue),
-          { fromFontLocationUser: true }
-        );
-      }
-    });
-  }
-
   _updateFromWindowLocation() {
     const viewInfo = readObjectFromURLFragment();
     if (!viewInfo) {
@@ -301,8 +287,8 @@ export class FontOverviewController extends ViewController {
     }
     const defaultSettings = getDefaultFontOverviewSettings();
     this.fontOverviewSettingsController.withSenderInfo({ senderID: this }, () => {
-      for (const { key, fromJSON } of persistentSettings) {
-        const value = viewInfo[key];
+      for (const { key, infoKey, fromJSON } of persistentSettings) {
+        const value = viewInfo[infoKey ?? key];
         if (value !== undefined) {
           this.fontOverviewSettings[key] = fromJSON?.(value) || value;
         } else {
@@ -325,8 +311,8 @@ export class FontOverviewController extends ViewController {
 
   _updateWindowLocation() {
     const viewInfo = Object.fromEntries(
-      persistentSettings.map(({ key, toJSON }) => [
-        key,
+      persistentSettings.map(({ key, infoKey, toJSON }) => [
+        infoKey ?? key,
         toJSON?.(this.fontOverviewSettings[key]) || this.fontOverviewSettings[key],
       ])
     );
@@ -361,15 +347,8 @@ export class FontOverviewController extends ViewController {
     if (this.glyphCellView.glyphSelection?.size) {
       // If we have a selection, make sure the (beginning of) the selection
       // is visible. But wait until the next event cycle.
-      // FIXME: this currently does not work if the first selected cell
-      // does not exist yet (is too far out of view)
       await sleepAsync(0);
-      const firstSelectedCell = this.glyphCellView.findFirstSelectedCell();
-      firstSelectedCell?.scrollIntoView({
-        behavior: "auto",
-        block: "nearest",
-        inline: "nearest",
-      });
+      this.glyphCellView.scrollFirstSelectedGlyphIntoView();
     }
   }
 
@@ -442,6 +421,28 @@ export class FontOverviewController extends ViewController {
     );
 
     registerActionCallbacks(
+      "action.copy-glyphname",
+      () => this.doCopyGlyphNames(),
+      () => !!this.glyphCellView.glyphSelection?.size,
+      () =>
+        translatePlural(
+          "action.copy-glyphname",
+          this.glyphCellView.glyphSelection?.size ?? 0
+        )
+    );
+
+    registerActionCallbacks(
+      "action.copy-character",
+      () => this.doCopyCharacters(),
+      () => !!this.glyphCellView.glyphSelection?.size,
+      () =>
+        translatePlural(
+          "action.copy-character",
+          this.glyphCellView.glyphSelection?.size ?? 0
+        )
+    );
+
+    registerActionCallbacks(
       "action.paste",
       () => this.doPaste(),
       () => this.canPaste()
@@ -455,10 +456,12 @@ export class FontOverviewController extends ViewController {
 
     registerActionCallbacks(
       "action.select-all",
-      () =>
-        (this.glyphCellView.glyphSelection = new Set(
-          Object.keys(this.fontController.glyphMap)
-        )),
+      async () => {
+        const { combinedGlyphMap } = await this.glyphSetsController.getCombinedGlyphMap(
+          this._fontGlyphItemList
+        );
+        this.glyphCellView.glyphSelection = new Set(Object.keys(combinedGlyphMap));
+      },
       () => true
     );
 
@@ -622,6 +625,26 @@ export class FontOverviewController extends ViewController {
     );
 
     return { svgString, glifString };
+  }
+
+  async doCopyGlyphNames() {
+    await writeToClipboard({
+      "text/plain": Array.from(this.glyphCellView.glyphSelection).join(" "),
+    });
+  }
+
+  async doCopyCharacters() {
+    const { combinedGlyphMap } = await this.glyphSetsController.getCombinedGlyphMap(
+      this._fontGlyphItemList
+    );
+
+    await writeToClipboard({
+      "text/plain": Array.from(this.glyphCellView.glyphSelection)
+        .map((glyphName) => combinedGlyphMap[glyphName][0])
+        .filter((codePoint) => codePoint)
+        .map((codePoint) => String.fromCodePoint(codePoint))
+        .join(""),
+    });
   }
 
   canPaste() {
@@ -991,18 +1014,31 @@ async function runDialogReplaceGlyphs(glyphNames, glyphMap) {
     controller.model.behavior = PASTE_REPLACE;
   }
 
-  // TODO translation
-  const dialog = await dialogSetup("Replace existing glyphs?", null, [
-    { title: translate("dialog.cancel"), resultValue: "cancel", isCancelButton: true },
-    { title: translate("dialog.okay"), resultValue: "ok", isDefaultButton: true },
-  ]);
+  const dialog = await dialogSetup(
+    translate("font-overview.dialog.replace-existing-glyphs"),
+    null,
+    [
+      {
+        title: translate("dialog.cancel"),
+        resultValue: "cancel",
+        isCancelButton: true,
+      },
+      { title: translate("dialog.okay"), resultValue: "ok", isDefaultButton: true },
+    ]
+  );
 
   const radioGroup = [];
 
   for (const [label, value] of [
-    ["Replace existing glyphs", PASTE_REPLACE],
-    ["Add a suffix to duplicate glyph names", PASTE_ADD_SUFFIX_TO_DUPLICATES],
-    ["Add a suffix to all pasted glyph names", PASTE_ADD_SUFFIX_TO_ALL],
+    [translate("font-overview.dialog.option.replace-existing-glyphs"), PASTE_REPLACE],
+    [
+      translate("font-overview.dialog.option.add-suffix-to-duplicates"),
+      PASTE_ADD_SUFFIX_TO_DUPLICATES,
+    ],
+    [
+      translate("font-overview.dialog.option.add-suffix-to-all-pasted"),
+      PASTE_ADD_SUFFIX_TO_ALL,
+    ],
   ]) {
     radioGroup.push(
       html.input({
@@ -1032,7 +1068,12 @@ async function runDialogReplaceGlyphs(glyphNames, glyphMap) {
         gap: 0.25em;
       `,
       },
-      labeledTextInput("Suffix:", controller, "suffix", { id: "suffix-text-input" })
+      labeledTextInput(
+        translate("font-overview.dialog.label.suffix"),
+        controller,
+        "suffix",
+        { id: "suffix-text-input" }
+      )
     ),
     html.div({ id: "warning-string" }, [""])
   );
@@ -1078,6 +1119,7 @@ function makeOverwriteGlyphsWarningString(
 ) {
   glyphNames = glyphNames.filter((glyphName) => glyphMap[glyphName]);
 
+  // TODO: translate
   if (glyphNames.length <= 1) {
     return glyphNames.length
       ? `⚠️ Glyph '${glyphNames[0]}' will be overwritten.`

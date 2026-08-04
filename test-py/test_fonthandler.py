@@ -70,12 +70,17 @@ async def test_fontHandler_basic(testFontHandler):
 @pytest.mark.asyncio
 async def test_fontHandler_externalChange(testFontHandler):
     async with aclosing(testFontHandler):
+        # Fetch features before starting the background tasks, to avoid
+        # timing issue with restarting the watcher when the included .fea
+        # paths are added
+        features = await testFontHandler.getFeatures()
         await testFontHandler.startTasks()
         glyph = await testFontHandler.getGlyph("A")
         layerName, layer = firstLayerItem(glyph)
         assert 20 == layer.glyph.path.coordinates[0]
         fontInfo = await testFontHandler.getFontInfo()
         assert "License same as MutatorMath" in fontInfo.copyright
+        assert "# testing external write" not in features.text
 
         dsDoc = testFontHandler.backend.dsDoc
         ufoPath = pathlib.Path(dsDoc.sources[0].path)
@@ -83,6 +88,8 @@ async def test_fontHandler_externalChange(testFontHandler):
         glifData = glifPath.read_text()
         glifData = glifData.replace('x="20"', 'x="-100"')
         glifPath.write_text(glifData)
+        includedFeaturePath = ufoPath.parent / "MutatorSans_features.fea"
+        includedFeaturePath.write_text("# testing external write\n")
 
         fontInfoPath = ufoPath / "fontinfo.plist"
         fontInfoData = fontInfoPath.read_text()
@@ -95,6 +102,8 @@ async def test_fontHandler_externalChange(testFontHandler):
         assert 20 == layer.glyph.path.coordinates[0]
         fontInfo = await testFontHandler.getFontInfo()
         assert "License same as MutatorMath" in fontInfo.copyright
+        features = await testFontHandler.getFeatures()
+        assert "# testing external write" not in features.text
 
         await asyncio.sleep(0.3)
 
@@ -105,6 +114,8 @@ async def test_fontHandler_externalChange(testFontHandler):
         assert -100 == layer.glyph.path.coordinates[0]
         fontInfo = await testFontHandler.getFontInfo()
         assert "License same as MutatorMath" not in fontInfo.copyright
+        features = await testFontHandler.getFeatures()
+        assert "# testing external write" in features.text
 
 
 @pytest.mark.asyncio

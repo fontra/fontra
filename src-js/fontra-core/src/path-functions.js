@@ -1194,3 +1194,148 @@ function cleanupPointAttributes(path) {
     path.pointAttributes = null;
   }
 }
+
+export function convertCurveType(
+  path,
+  selectedPointIndices,
+  numQuadraticOffCurvePoints
+) {
+  const segments = convertCurveTypeSegments(
+    path,
+    selectedPointIndices,
+    numQuadraticOffCurvePoints
+  );
+
+  if (numQuadraticOffCurvePoints) {
+    convertSegmentsToQuadratic(path, segments, numQuadraticOffCurvePoints);
+  } else {
+    convertSegmentsToCubic(path, segments);
+  }
+
+  return path;
+}
+
+export function canConvertCurveType(
+  path,
+  selectedPointIndices,
+  numQuadraticOffCurvePoints
+) {
+  return !!convertCurveTypeSegments(
+    path,
+    selectedPointIndices,
+    numQuadraticOffCurvePoints
+  ).length;
+}
+
+function convertCurveTypeSegments(
+  path,
+  selectedPointIndices,
+  numQuadraticOffCurvePoints
+) {
+  const sel = new Set(selectedPointIndices);
+  const sourceSegmentTypes = numQuadraticOffCurvePoints
+    ? ["cubic"]
+    : ["quad", "quadBlob"];
+  const targetSegmentType = numQuadraticOffCurvePoints ? "quad" : "cubic";
+
+  const segments = [];
+
+  for (const contourIndex of range(path.numContours)) {
+    for (const { type, pointIndices } of path.iterContourSegmentPointIndices(
+      contourIndex
+    )) {
+      if (
+        sourceSegmentTypes.includes(type) &&
+        pointIndices.length > 2 &&
+        ((sel.has(pointIndices[0]) && sel.has(pointIndices.at(-1))) ||
+          pointIndices.slice(1, -1).some((i) => sel.has(i)))
+      ) {
+        const startPoint = path.getAbsolutePointIndex(contourIndex, 0);
+        segments.push({
+          type,
+          contourIndex,
+          pointIndices: pointIndices.map((i) => i - startPoint),
+        });
+      }
+    }
+  }
+
+  segments.reverse(); // Change from the end, so we don't invalidate point indices
+
+  return segments;
+}
+
+function convertSegmentsToCubic(path, segments) {
+  for (const { type, contourIndex, pointIndices } of segments) {
+    const contourFragment = {
+      isClosed: false,
+      points: getPoints(path, contourIndex, pointIndices),
+    };
+    const [h1, h2] = computeHandlesFromFragment("cubic", contourFragment);
+
+    replaceOffCurvePoints(path, contourIndex, pointIndices, [h1, h2]);
+  }
+}
+
+function convertSegmentsToQuadratic(path, segments, numQuadraticOffCurvePoints) {
+  for (const { type, contourIndex, pointIndices } of segments) {
+    if (type !== "cubic" || pointIndices.length !== 4) {
+      continue;
+    }
+    // Maybe TODO if type == "quad" && pointIndices.length != numQuadraticOffCurvePoints:
+    //   refit?
+
+    const points = getPoints(path, contourIndex, pointIndices);
+    const bez = new Bezier(...points);
+    const ts = [...range(1, numQuadraticOffCurvePoints)].map(
+      (i) => i / numQuadraticOffCurvePoints
+    );
+
+    const tangentLines = ts.map((t) => {
+      const point1 = bez.compute(t);
+      const point2 = vector.addVectors(point1, bez.derivative(t));
+      return { point1, point2 };
+    });
+
+    tangentLines.splice(0, 0, { point1: points[0], point2: points[1] });
+    tangentLines.push({ point1: points[2], point2: points[3] });
+
+    assert(tangentLines.length === numQuadraticOffCurvePoints + 1);
+
+    const offCurvePoints = [];
+
+    for (const i of range(numQuadraticOffCurvePoints)) {
+      const intersection = vector.intersect(
+        tangentLines[i].point1,
+        tangentLines[i].point2,
+        tangentLines[i + 1].point1,
+        tangentLines[i + 1].point2
+      );
+
+      if (!intersection) {
+        // Edge case we can't handle, give up
+        return;
+      }
+
+      offCurvePoints.push({ x: intersection.x, y: intersection.y, type: "quad" });
+    }
+
+    replaceOffCurvePoints(path, contourIndex, pointIndices, offCurvePoints);
+  }
+}
+
+function getPoints(path, contourIndex, pointIndices) {
+  return pointIndices.map((i) => path.getContourPoint(contourIndex, i));
+}
+
+function replaceOffCurvePoints(path, contourIndex, pointIndices, offCurvePoints) {
+  let insertionIndex = pointIndices[0] + 1;
+  for (const _ of range(pointIndices.length - 2)) {
+    path.deletePoint(contourIndex, insertionIndex);
+  }
+
+  for (const point of offCurvePoints) {
+    path.insertPoint(contourIndex, insertionIndex, point);
+    insertionIndex++;
+  }
+}

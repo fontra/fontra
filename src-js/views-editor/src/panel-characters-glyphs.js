@@ -75,7 +75,7 @@ export default class CharactersGlyphsPanel extends Panel {
       },
       {
         key: "codePoint",
-        title: "Unicode",
+        title: translate("sidebar.selection-info.unicode"),
         width: "5em",
         get: (item) =>
           item.codePoint
@@ -84,7 +84,7 @@ export default class CharactersGlyphsPanel extends Panel {
       },
       {
         key: "unicodeName",
-        title: "Unicode name",
+        title: translate("sidebar.characters-glyphs.unicode-name"),
         width: 170,
         minWidth: 80,
         get: (item) =>
@@ -94,14 +94,14 @@ export default class CharactersGlyphsPanel extends Panel {
       },
       {
         key: "script",
-        title: "Script",
+        title: translate("sidebar.text-entry.script"),
         width: "4em",
         get: (item) =>
           item.codePoint ? getGlyphInfoFromCodePoint(item.codePoint)?.script : "",
       },
       {
         key: "index",
-        title: "Index",
+        title: translate("sidebar.characters-glyphs.index"),
         width: "3em",
       },
     ];
@@ -167,13 +167,13 @@ export default class CharactersGlyphsPanel extends Panel {
     const glyphListColumnDescriptions = [
       {
         key: "glyphName",
-        title: "Glyph",
+        title: translate("action-topics.menu.glyph"),
         width: 100,
         minWidth: 50,
       },
       {
         key: "advance",
-        title: "Advance",
+        title: translate("sidebar.characters-glyphs.advance"),
         width: "5em",
         align: "right",
         get: (item) => {
@@ -198,7 +198,7 @@ export default class CharactersGlyphsPanel extends Panel {
       },
       {
         key: "cluster",
-        title: "cluster",
+        title: translate("sidebar.characters-glyphs.cluster"),
         width: "3em",
         align: "right",
       },

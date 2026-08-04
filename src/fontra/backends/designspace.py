@@ -64,9 +64,9 @@ from ..core.classes import (
     OpenTypeFeatures,
     RGBAColor,
     StaticGlyph,
-    SubstitionRule,
     SubstitutionCondition,
     SubstitutionConditionSet,
+    SubstitutionRule,
     VariableGlyph,
 )
 from ..core.glyphdependencies import GlyphDependencies
@@ -76,6 +76,7 @@ from ..core.subprocess import runInSubProcess
 from ..core.varutils import locationToTuple, makeDenseLocation, makeSparseLocation
 from .base import WritableBaseBackend
 from .filewatcher import Change
+from .includedfeaturefiles import extractIncludedFeatureFiles
 from .ufo_utils import extractGlyphNameAndCodePoints
 from .watchable import WatchableBackend
 
@@ -92,6 +93,7 @@ GLYPH_SOURCE_CUSTOM_DATA_LIB_KEY = "xyz.fontra.glyph.source.customData"
 LINE_METRICS_HOR_ZONES_KEY = "xyz.fontra.lineMetricsHorizontalLayout.zones"
 GLYPH_NOTE_LIB_KEY = "fontra.glyph.note"
 RF_GUIDELINE_LOCK_LIB_PREFIX = "com.typemytype.robofont.guideline.locked."
+CROSS_AXIS_MAPPING_INFO_LIB_KEY = "xyz.fontra.cross-axis-mapping-info"
 
 
 defaultUFOInfoAttrs = {
@@ -330,6 +332,7 @@ class DesignspaceBackend(WatchableBackend, WritableBaseBackend):
         self.setOverlapSimpleFlag = False
         self._familyName: str | None = None
         self._defaultFontInfo: UFOFontInfo | None = None
+        self._includedFeaturePaths: list[pathlib.Path] = []
         self._initialize(dsDoc)
         self._implicitDefaultLocationBase: str | None = None
 
@@ -407,14 +410,20 @@ class DesignspaceBackend(WatchableBackend, WritableBaseBackend):
             defaultLocation[dsAxis.name] = dsAxis.map_forward(dsAxis.default)
         self.axes = axes
 
+        crossAxisMappingInactive = {
+            info["index"]: info.get("inactive", False)
+            for info in self.dsDoc.lib.get(CROSS_AXIS_MAPPING_INFO_LIB_KEY, [])
+        }
+
         self.axisMappings = [
             CrossAxisMapping(
                 description=mapping.description,
                 groupDescription=mapping.groupDescription,
                 inputLocation=dict(mapping.inputLocation),
                 outputLocation=dict(mapping.outputLocation),
+                inactive=crossAxisMappingInactive.get(index, False),
             )
-            for mapping in self.dsDoc.axisMappings
+            for index, mapping in enumerate(self.dsDoc.axisMappings)
         ]
 
         self.axisNames = set(defaultLocation)
@@ -1235,13 +1244,21 @@ class DesignspaceBackend(WatchableBackend, WritableBaseBackend):
 
             self.dsDoc.addAxisDescriptor(**axisParameters)
 
-        for mapping in axes.mappings:
+        crossAxisMappingInfo = []
+
+        for index, mapping in enumerate(axes.mappings):
             self.dsDoc.addAxisMappingDescriptor(
                 description=mapping.description,
                 groupDescription=mapping.groupDescription,
                 inputLocation=mapping.inputLocation,
                 outputLocation=mapping.outputLocation,
             )
+            if mapping.inactive:
+                crossAxisMappingInfo.append({"index": index, "inactive": True})
+
+        storeInDict(
+            self.dsDoc.lib, CROSS_AXIS_MAPPING_INFO_LIB_KEY, crossAxisMappingInfo
+        )
 
         self.updateAxisInfo()
         self._writeDesignSpaceDocument()
@@ -1490,6 +1507,9 @@ class DesignspaceBackend(WatchableBackend, WritableBaseBackend):
 
     def _getFeaturesSync(self) -> OpenTypeFeatures:
         featureText = self.defaultReader.readFeatures()
+
+        self._updateIncludedFeaturePaths(featureText)
+
         try:
             resolvedFeatureText = resolveFeatureIncludes(
                 featureText, self.ufoDir, set(self.glyphMap)
@@ -1499,7 +1519,17 @@ class DesignspaceBackend(WatchableBackend, WritableBaseBackend):
         else:
             if resolvedFeatureText != featureText:
                 featureText = featuresWarning + resolvedFeatureText
+
         return OpenTypeFeatures(language="fea", text=featureText)
+
+    def updateIncludedFeaturePaths(self) -> None:
+        self._updateIncludedFeaturePaths(self.defaultReader.readFeatures())
+
+    def _updateIncludedFeaturePaths(self, featureText: str) -> None:
+        self._includedFeaturePaths = extractIncludedFeatureFiles(
+            featureText, pathlib.Path(self.defaultUFOLayer.path).parent
+        )
+        self._updatePathsToWatch()
 
     async def putFeatures(self, features: OpenTypeFeatures) -> None:
         if features.language != "fea":
@@ -1509,11 +1539,9 @@ class DesignspaceBackend(WatchableBackend, WritableBaseBackend):
             return
 
         paths = sorted(set(self.ufoLayers.iterAttrs("path")))
-        defaultPath = self.defaultUFOLayer.path if paths else None
         for path in paths:
             writer = self.ufoManager.getWriter(path)
-            featureText = features.text if path == defaultPath else ""
-            writer.writeFeatures(featureText)
+            writer.writeFeatures(features.text)
             self.fileWatcherIgnoreNextChange(os.path.join(path, FEATURES_FILENAME))
 
         self.resetGlyphDirections()
@@ -1658,7 +1686,7 @@ class DesignspaceBackend(WatchableBackend, WritableBaseBackend):
         if self.dsDoc.path:
             paths.append(self.dsDoc.path)
 
-        self.fileWatcherSetPaths(paths)
+        self.fileWatcherSetPaths(paths + self._includedFeaturePaths)
 
     async def fileWatcherProcessChanges(
         self, changes: set[tuple[Change, str]]
@@ -1733,9 +1761,10 @@ class DesignspaceBackend(WatchableBackend, WritableBaseBackend):
             if fileName in {KERNING_FILENAME, GROUPS_FILENAME}:
                 changedItems.reloadPattern["kerning"] = None
 
-            if fileName == FEATURES_FILENAME:
+            if fileSuffix == ".fea":
                 changedItems.reloadPattern["features"] = None
                 self.resetGlyphDirections()
+                self.updateIncludedFeaturePaths()
 
         if changedItems.rebuildGlyphSetContents:
             #
@@ -1886,12 +1915,12 @@ def packAxisLabels(valueLabels):
     ]
 
 
-def unpackRules(dsRules: list[RuleDescriptor]) -> list[SubstitionRule]:
+def unpackRules(dsRules: list[RuleDescriptor]) -> list[SubstitutionRule]:
     return [unpackRule(dsRule) for dsRule in dsRules]
 
 
-def unpackRule(dsRule: RuleDescriptor) -> SubstitionRule:
-    return SubstitionRule(
+def unpackRule(dsRule: RuleDescriptor) -> SubstitutionRule:
+    return SubstitutionRule(
         name=dsRule.name,
         conditionSets=[
             SubstitutionConditionSet(
@@ -1913,11 +1942,11 @@ def unpackCondition(dsCondition: dict) -> SubstitutionCondition:
     )
 
 
-def packRules(rules: list[SubstitionRule]) -> list[RuleDescriptor]:
+def packRules(rules: list[SubstitutionRule]) -> list[RuleDescriptor]:
     return [packRule(rule) for rule in rules]
 
 
-def packRule(rule: SubstitionRule) -> RuleDescriptor:
+def packRule(rule: SubstitutionRule) -> RuleDescriptor:
     return RuleDescriptor(
         name=rule.name,
         conditionSets=[

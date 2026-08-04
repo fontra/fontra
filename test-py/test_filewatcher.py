@@ -1,5 +1,7 @@
 import asyncio
+import os
 import pathlib
+import shutil
 from contextlib import aclosing
 
 from watchfiles import Change
@@ -65,12 +67,14 @@ async def test_filewatcher_basic(tmpdir):
     ) == sorted(collectedChanges)
 
 
-async def test_filewatcher_ignoreNextChange(tmpdir):
-    testDir = pathlib.Path(tmpdir) / "folder_to_watch"
+async def test_filewatcher_ignoreNextChange(tmp_path):
+    testDir = tmp_path / "folder_to_watch"
     testDir.mkdir()
 
     testPath = testDir / "testing.txt"
     testPath.write_text("testing")
+
+    testSwapPath = tmp_path / "testing_swap.txt"
 
     collectedChanges = []
 
@@ -95,24 +99,18 @@ async def test_filewatcher_ignoreNextChange(tmpdir):
         await asyncio.sleep(delay)
 
         testPath.write_text("hello2")
-        # this should cause the next event (caused byt the *previous* write)
+        # this should cause the next event (caused by the *previous* write)
         # to be ignored
         watcher.ignoreNextChange(testPath)
         await asyncio.sleep(delay)
 
-        # We also want subsequent writes that don't change the contents to
-        # be ignored
-        watcher.ignoreNextChange(testPath)
-        testPath.write_text("hello2")  # same contents
-        await asyncio.sleep(delay)
+        # Cause a file changed event, but with the same mtime, to emulate
+        # OneDrive and iCloud shared folder behavior
+        shutil.copy2(testPath, testSwapPath)  # keeps mtime
+        os.replace(testSwapPath, testPath)  # also keeps mtime
 
-        # But if a subsequent write writes *different* content, we do want
-        # to receive an event
-        watcher.ignoreNextChange(testPath)
-        testPath.write_text("hello3")
         await asyncio.sleep(delay)
 
     assert [
         ("folder_to_watch/testing.txt", "hello"),
-        ("folder_to_watch/testing.txt", "hello3"),
     ] == collectedChanges

@@ -37,9 +37,9 @@ from fontra.core.classes import (
     LineMetric,
     OpenTypeFeatures,
     StaticGlyph,
-    SubstitionRule,
     SubstitutionCondition,
     SubstitutionConditionSet,
+    SubstitutionRule,
     unstructure,
 )
 
@@ -70,7 +70,7 @@ def testFontSingleUFO():
 def writableTestFont(tmpdir):
     mutatorPath = dataDir / "mutatorsans"
     for sourcePath in mutatorPath.iterdir():
-        if sourcePath.suffix not in {".designspace", ".ufo"}:
+        if sourcePath.suffix not in {".designspace", ".ufo", ".fea"}:
             continue
         destPath = tmpdir / sourcePath.name
         if sourcePath.is_dir():
@@ -1111,12 +1111,15 @@ async def test_putAxes_with_mappings(tmpdir):
     outputPath = tmpdir / "TmpFont.designspace"
     outputBackend = newFileSystemBackend(outputPath)
 
+    axes = deepcopy(expectedAxesWithMappings)
+    axes.mappings[-1].inactive = True
+
     async with aclosing(outputBackend):
-        await outputBackend.putAxes(expectedAxesWithMappings)
+        await outputBackend.putAxes(axes)
 
     reopenedBackend = getFileSystemBackend(outputPath)
     roundTrippedAxes = await reopenedBackend.getAxes()
-    assert expectedAxesWithMappings == roundTrippedAxes
+    assert axes == roundTrippedAxes
 
 
 async def test_putFeatures(writableTestFont):
@@ -1754,7 +1757,7 @@ async def test_noWriteOnRead(writableTestFont):
 expectedConditionalSubstitutions = ConditionalSubstitutions(
     featureTags=["rclt"],
     rules=[
-        SubstitionRule(
+        SubstitutionRule(
             name="fold_I_serifs",
             conditionSets=[
                 SubstitutionConditionSet(
@@ -1767,7 +1770,7 @@ expectedConditionalSubstitutions = ConditionalSubstitutions(
             ],
             substitutions={"I": "I.narrow"},
         ),
-        SubstitionRule(
+        SubstitutionRule(
             name="fold_S_terminals",
             conditionSets=[
                 SubstitutionConditionSet(

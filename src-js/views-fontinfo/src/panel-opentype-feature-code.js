@@ -43,6 +43,7 @@ import {
 import { applicationSettingsController } from "@fontra/core/application-settings.js";
 import * as html from "@fontra/core/html-utils.js";
 import { addStyleSheet } from "@fontra/core/html-utils.js";
+import { translate } from "@fontra/core/localization.js";
 import { ShaperController } from "@fontra/core/shaper-controller.js";
 import { compare, scheduleCalls } from "@fontra/core/utils.ts";
 import { themeColorCSS } from "@fontra/web-components/theme-support.js";
@@ -294,7 +295,7 @@ export class OpenTypeFeatureCodePanel extends BaseInfoPanel {
     );
     container.appendChild(
       html.div({ class: "font-info-opentype-feature-code-header" }, [
-        "OpenType Feature Code", // TODO: translation
+        translate("opentype-feature-code.title"),
       ])
     );
 

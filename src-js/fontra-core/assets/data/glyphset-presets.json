@@ -12,24 +12,76 @@
         "url": "https://cdn.jsdelivr.net/gh/googlefonts/glyphsets/data/results/txt/nice-names/GF_Arabic_Core.txt"
       },
       {
+        "name": "GF Arabic Core Exclusive",
+        "url": "https://cdn.jsdelivr.net/gh/googlefonts/glyphsets/data/results/txt/nice-names/GF_Arabic_Core_Exclusive.txt"
+      },
+      {
         "name": "GF Arabic Plus",
         "url": "https://cdn.jsdelivr.net/gh/googlefonts/glyphsets/data/results/txt/nice-names/GF_Arabic_Plus.txt"
+      },
+      {
+        "name": "GF Arabic Plus Exclusive",
+        "url": "https://cdn.jsdelivr.net/gh/googlefonts/glyphsets/data/results/txt/nice-names/GF_Arabic_Plus_Exclusive.txt"
       },
       {
         "name": "GF Cyrillic Core",
         "url": "https://cdn.jsdelivr.net/gh/googlefonts/glyphsets/data/results/txt/nice-names/GF_Cyrillic_Core.txt"
       },
       {
+        "name": "GF Cyrillic Core Exclusive",
+        "url": "https://cdn.jsdelivr.net/gh/googlefonts/glyphsets/data/results/txt/nice-names/GF_Cyrillic_Core_Exclusive.txt"
+      },
+      {
+        "name": "GF Cyrillic Core Italic Localizations",
+        "url": "https://cdn.jsdelivr.net/gh/googlefonts/glyphsets/data/results/txt/nice-names/GF_Cyrillic_Core_Italic_Localizations.txt"
+      },
+      {
+        "name": "GF Cyrillic Core Roman Localizations",
+        "url": "https://cdn.jsdelivr.net/gh/googlefonts/glyphsets/data/results/txt/nice-names/GF_Cyrillic_Core_Roman_Localizations.txt"
+      },
+      {
         "name": "GF Cyrillic Historical",
         "url": "https://cdn.jsdelivr.net/gh/googlefonts/glyphsets/data/results/txt/nice-names/GF_Cyrillic_Historical.txt"
+      },
+      {
+        "name": "GF Cyrillic Historical Italic Localizations",
+        "url": "https://cdn.jsdelivr.net/gh/googlefonts/glyphsets/data/results/txt/nice-names/GF_Cyrillic_Historical_Italic_Localizations.txt"
+      },
+      {
+        "name": "GF Cyrillic Historical Roman Localizations",
+        "url": "https://cdn.jsdelivr.net/gh/googlefonts/glyphsets/data/results/txt/nice-names/GF_Cyrillic_Historical_Roman_Localizations.txt"
       },
       {
         "name": "GF Cyrillic Plus",
         "url": "https://cdn.jsdelivr.net/gh/googlefonts/glyphsets/data/results/txt/nice-names/GF_Cyrillic_Plus.txt"
       },
       {
+        "name": "GF Cyrillic Plus Exclusive",
+        "url": "https://cdn.jsdelivr.net/gh/googlefonts/glyphsets/data/results/txt/nice-names/GF_Cyrillic_Plus_Exclusive.txt"
+      },
+      {
+        "name": "GF Cyrillic Plus Italic Localizations",
+        "url": "https://cdn.jsdelivr.net/gh/googlefonts/glyphsets/data/results/txt/nice-names/GF_Cyrillic_Plus_Italic_Localizations.txt"
+      },
+      {
+        "name": "GF Cyrillic Plus Roman Localizations",
+        "url": "https://cdn.jsdelivr.net/gh/googlefonts/glyphsets/data/results/txt/nice-names/GF_Cyrillic_Plus_Roman_Localizations.txt"
+      },
+      {
         "name": "GF Cyrillic Pro",
         "url": "https://cdn.jsdelivr.net/gh/googlefonts/glyphsets/data/results/txt/nice-names/GF_Cyrillic_Pro.txt"
+      },
+      {
+        "name": "GF Cyrillic Pro Exclusive",
+        "url": "https://cdn.jsdelivr.net/gh/googlefonts/glyphsets/data/results/txt/nice-names/GF_Cyrillic_Pro_Exclusive.txt"
+      },
+      {
+        "name": "GF Cyrillic Pro Italic Localizations",
+        "url": "https://cdn.jsdelivr.net/gh/googlefonts/glyphsets/data/results/txt/nice-names/GF_Cyrillic_Pro_Italic_Localizations.txt"
+      },
+      {
+        "name": "GF Cyrillic Pro Roman Localizations",
+        "url": "https://cdn.jsdelivr.net/gh/googlefonts/glyphsets/data/results/txt/nice-names/GF_Cyrillic_Pro_Roman_Localizations.txt"
       },
       {
         "name": "GF Greek AncientMusicalSymbols",
@@ -46,6 +98,10 @@
       {
         "name": "GF Greek Core",
         "url": "https://cdn.jsdelivr.net/gh/googlefonts/glyphsets/data/results/txt/nice-names/GF_Greek_Core.txt"
+      },
+      {
+        "name": "GF Greek Core Exclusive",
+        "url": "https://cdn.jsdelivr.net/gh/googlefonts/glyphsets/data/results/txt/nice-names/GF_Greek_Core_Exclusive.txt"
       },
       {
         "name": "GF Greek Expert",

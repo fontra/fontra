@@ -1,7 +1,13 @@
 import { getGlyphMapProxy } from "./cmap.js";
+import { translate } from "./localization.js";
 import { ObservableController } from "./observable-object.ts";
 import { parseGlyphSet, redirectGlyphSetURL } from "./parse-glyphset.js";
-import { assert, friendlyHttpStatus, sleepAsync } from "./utils.ts";
+import {
+  assert,
+  disambiguateGlyphName,
+  friendlyHttpStatus,
+  sleepAsync,
+} from "./utils.ts";
 
 export const THIS_FONTS_GLYPHSET = "";
 export const PROJECT_GLYPH_SETS_CUSTOM_DATA_KEY = "fontra.projectGlyphSets";
@@ -21,8 +27,10 @@ export class GlyphSetsController {
 
   async getCombinedGlyphMap(fontGlyphItemList) {
     /*
-      Merge selected glyph sets. When multiple glyph sets define a character
-      but the glyph name does not match:
+      Merge selected glyph sets.
+
+      When multiple glyph sets define a character but the glyph name does not
+      match:
       - If the font defines this character, take the font's glyph name for it
       - Else take the glyph name from the first glyph set that defines the
         character
@@ -30,8 +38,13 @@ export class GlyphSetsController {
       should be sorted.
       If the conflicting glyph name references multiple code points, we bail,
       as it is not clear how to resolve.
+
+      When a glyph set defines a glyph name, and a glyph by that name exists in
+      the font, but the code points do not match between them:
+      - Disambiguate the glyph name by adding a suffix: .alt, .alt1, .alt2 etc.
     */
     const fontCharacterMap = this.fontController.characterMap;
+    const fontGlyphMap = this.fontController.glyphMap;
     const combinedCharacterMap = {};
     const combinedGlyphMap = getGlyphMapProxy({}, combinedCharacterMap);
 
@@ -52,18 +65,27 @@ export class GlyphSetsController {
     ).filter((glyphSet) => glyphSet);
 
     for (const glyphSet of glyphSets) {
-      for (const { glyphName, codePoints } of glyphSet) {
+      for (let { glyphName, codePoints } of glyphSet) {
         const singleCodePoint = codePoints.length === 1 ? codePoints[0] : null;
-        const foundGlyphName =
-          singleCodePoint !== null
-            ? combinedCharacterMap[singleCodePoint] || fontCharacterMap[singleCodePoint]
-            : null;
 
-        if (foundGlyphName) {
-          if (!combinedGlyphMap[foundGlyphName]) {
-            combinedGlyphMap[foundGlyphName] = codePoints;
-          }
-        } else if (!combinedGlyphMap[glyphName]) {
+        glyphName =
+          singleCodePoint !== null
+            ? (combinedCharacterMap[singleCodePoint] ??
+              fontCharacterMap[singleCodePoint] ??
+              glyphName)
+            : glyphName;
+
+        if (
+          singleCodePoint !== null &&
+          glyphName in fontGlyphMap &&
+          fontCharacterMap[singleCodePoint] != glyphName
+        ) {
+          // The glyph exists in the font, but it is encoded differently than in the
+          // current glyph set. We need to change the glyph name to prevent confusion.
+          glyphName = disambiguateGlyphName(glyphName, fontGlyphMap);
+        }
+
+        if (!combinedGlyphMap[glyphName]) {
           combinedGlyphMap[glyphName] = codePoints;
         }
       }
@@ -250,7 +272,10 @@ export class GlyphSetsController {
 export function readProjectGlyphSets(fontController) {
   return Object.fromEntries(
     [
-      { name: "This font's glyphs", url: THIS_FONTS_GLYPHSET },
+      {
+        name: translate("glyph-organizing.this-fonts-glyphs"),
+        url: THIS_FONTS_GLYPHSET,
+      },
       ...(fontController.customData[PROJECT_GLYPH_SETS_CUSTOM_DATA_KEY] || []),
     ].map((glyphSet) => [glyphSet.url, glyphSet])
   );

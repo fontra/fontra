@@ -35,7 +35,7 @@ export class MenuPanel extends SimpleElement {
     if (event.target?.closest?.("menu-bar")) {
       return;
     }
-    for (const element of MenuPanel.openMenuPanels) {
+    for (const element of Array.from(MenuPanel.openMenuPanels)) {
       element.dismiss();
       if (element.context === "menu-bar" && !element.childOf) {
         dispatchCustomEvent(window, "menu-bar:close-menu");
@@ -65,6 +65,8 @@ export class MenuPanel extends SimpleElement {
       font-size: 1rem;
       user-select: none;
       cursor: default;
+      max-height: calc(100vh - 0.3em);
+      overflow: auto;
     }
 
     .menu-container {
@@ -261,6 +263,8 @@ export class MenuPanel extends SimpleElement {
           ]),
         ];
 
+        let didSeeMouseDown = false;
+
         itemElement = html.div(
           {
             class: classNames.join(" "),
@@ -271,6 +275,7 @@ export class MenuPanel extends SimpleElement {
               }
             },
             onmousedown: (event) => {
+              didSeeMouseDown = true;
               event.preventDefault();
               event.stopImmediatePropagation();
             },
@@ -278,6 +283,14 @@ export class MenuPanel extends SimpleElement {
               this.selectItem(null);
             },
             onmouseup: (event) => {
+              if (
+                !mouseMovedWhileDown &&
+                !didSeeMouseDown &&
+                event.type !== "keydown"
+              ) {
+                return;
+              }
+              didSeeMouseDown = false;
               event.preventDefault();
               event.stopImmediatePropagation();
               if (item.enabled()) {
@@ -325,7 +338,7 @@ export class MenuPanel extends SimpleElement {
     }
 
     if (item) {
-      for (const panel of MenuPanel.openMenuPanels) {
+      for (const panel of Array.from(MenuPanel.openMenuPanels)) {
         panel.setActive(panel === this);
         if (panel.childOf === this) {
           panel.dismiss();
@@ -335,15 +348,14 @@ export class MenuPanel extends SimpleElement {
       item.classList.add("selected");
 
       if (item.classList.contains("with-submenu")) {
-        const { y } = this.getBoundingClientRect();
         const itemRect = item.getBoundingClientRect();
 
         this.submenu = new MenuPanel(this.menuItems[item.dataset.index].getItems(), {
           hidden: true,
           immediatelyActive: false,
           position: {
-            x: itemRect.width,
-            y: itemRect.y - y - 4,
+            x: itemRect.right,
+            y: itemRect.y - 3.5,
           },
           childOf: this,
           context: this.context,
@@ -352,12 +364,18 @@ export class MenuPanel extends SimpleElement {
             this.dismiss();
           },
         });
-        this.menuElement.appendChild(this.submenu);
+        document.body.appendChild(this.submenu);
         if (!fromChild) {
           this.submenu.show({ animated: true });
         }
         item.classList.add("has-open-submenu");
       }
+
+      item.scrollIntoView({
+        behavior: "auto",
+        block: "nearest",
+        inline: "nearest",
+      });
     }
   }
 
@@ -469,6 +487,11 @@ customElements.define("menu-panel", MenuPanel);
 
 window.addEventListener("blur", (event) => MenuPanel.closeMenuPanels(event));
 window.addEventListener("mousedown", (event) => MenuPanel.closeMenuPanels(event));
+
+let mouseMovedWhileDown = false;
+window.addEventListener("mousemove", (event) => {
+  mouseMovedWhileDown = !!event.buttons;
+});
 
 function getMenuContainer() {
   // This is tightly coupled to modal-dialog.js

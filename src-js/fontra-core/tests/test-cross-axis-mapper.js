@@ -3,7 +3,12 @@ import { expect } from "chai";
 import { parametrize } from "./test-support.js";
 
 describe("CrossAxisMapping Tests", () => {
-  const axes = [newAxis("Diagonal"), newAxis("Horizontal"), newAxis("Vertical")];
+  const axes = [
+    newAxis("Diagonal"),
+    newAxis("Horizontal"),
+    newAxis("Vertical"),
+    { name: "DiscreteAxis", values: [0, 1], defaultValue: 0 },
+  ];
 
   const mappings = [
     {

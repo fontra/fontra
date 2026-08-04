@@ -16,6 +16,8 @@ import * as html from "@fontra/core/html-utils.js";
 import { loaderSpinner } from "@fontra/core/loader-spinner.js";
 import { ObservableController } from "@fontra/core/observable-object.ts";
 import {
+  canConvertCurveType,
+  convertCurveType,
   deleteSelectedPoints,
   filterPathByPointIndices,
 } from "@fontra/core/path-functions.js";
@@ -36,7 +38,9 @@ import { getDecomposedIdentity } from "@fontra/core/transform.js";
 import { labeledCheckbox, labeledTextInput, pickFile } from "@fontra/core/ui-utils.js";
 import {
   commandKeyProperty,
+  deepCopyObject,
   enumerate,
+  eventIsCausedByWritingURLFragment,
   fetchJSON,
   hyphenatedToCamelCase,
   hyphenatedToLabel,
@@ -72,7 +76,11 @@ import { PenTool } from "./edit-tools-pen.js";
 import { PointerTools } from "./edit-tools-pointer.js";
 import { PowerRulerTool } from "./edit-tools-power-ruler.js";
 import { ShapeTool } from "./edit-tools-shape.js";
-import { SceneController, persistentSceneSettingsKeys } from "./scene-controller.js";
+import {
+  SceneController,
+  numQuadraticOffCurvePointsOptions,
+  persistentSceneSettingsKeys,
+} from "./scene-controller.js";
 import { MIN_SIDEBAR_WIDTH, Sidebar } from "./sidebar.js";
 import {
   allGlyphsCleanVisualizationLayerDefinition,
@@ -105,6 +113,10 @@ const PASTE_BEHAVIOR_REPLACE = "replace";
 const PASTE_BEHAVIOR_ADD = "add";
 
 export class EditorController extends ViewController {
+  static titlePattern(displayName) {
+    return `Glyph Editor — ${displayName}`;
+  }
+
   constructor(font, projectIdentifier) {
     super(font, projectIdentifier);
     const canvas = document.querySelector("#edit-canvas");
@@ -158,7 +170,10 @@ export class EditorController extends ViewController {
     this.sceneSettingsController.addKeyListener(
       [...persistentSceneSettingsKeys, "glyphLocation"],
       (event) => {
-        if (event.senderInfo?.senderID !== this && !event.senderInfo?.adjustViewBox) {
+        if (
+          !event.senderInfoStack.find((senderInfo) => senderInfo.senderID === this) &&
+          !event.senderInfo?.adjustViewBox
+        ) {
           this.updateWindowLocation(); // scheduled with delay
         }
       }
@@ -262,14 +277,40 @@ export class EditorController extends ViewController {
     window.addEventListener("keydown", (event) => this.keyDownHandler(event));
     window.addEventListener("keyup", (event) => this.keyUpHandler(event));
 
+    this.canvasController.canvas.addEventListener("pointerdown", (event) =>
+      this.pointerDownHandler(event)
+    );
+    this.canvasController.canvas.addEventListener("pointerup", (event) =>
+      this.pointerUpHandler(event)
+    );
+
     this.enteredText = "";
     this.updateWindowLocation = scheduleCalls(
       (event) => this._updateWindowLocation(),
       200
     );
 
+    // The "popstate" event fires when the active history entry changes.
+    //
+    // We need to listen for this event so we can load the view state from
+    // the URL fragment, since the document does not reload if all that is
+    // different between the previous URL and the new one is the fragment.
     window.addEventListener("popstate", (event) => {
-      this.setupFromWindowLocation();
+      // When we write the URL fragment from our own code, with a call to our
+      // `writeObjectToURLFragment` function, this will also trigger the event.
+      //
+      // I'm not entirely sure that is what should happen based on the
+      // spec, but all 3 major browsers do it, so maybe it is correct.
+      //
+      // Regardless, we need to differentiate between a `popstate` caused by
+      // the user navigating with the forward/back buttons in their browser
+      // and one caused by us writing the URL fragment.
+      //
+      // We only need to run the setup function when it *wasn't* us who changed
+      // the URL (since if we did then we should already be in the right state).
+      if (!eventIsCausedByWritingURLFragment()) {
+        this.setupFromWindowLocation();
+      }
     });
 
     this.updateWithDelay();
@@ -521,6 +562,23 @@ export class EditorController extends ViewController {
 
     {
       const topic = "0035-action-topics.menu.glyph";
+
+      registerAction(
+        "action.glyph.convert-curves-to-cubic",
+        { topic },
+        () => this.doConvertCurveType(null),
+        () => this.canConvertCurveType(null)
+      );
+
+      for (const numQuadraticOffCurvePoints of numQuadraticOffCurvePointsOptions) {
+        registerAction(
+          `action.glyph.convert-curves-to-quadratic-${numQuadraticOffCurvePoints}`,
+          { topic },
+          () => this.doConvertCurveType(numQuadraticOffCurvePoints),
+          () => this.canConvertCurveType(numQuadraticOffCurvePoints)
+        );
+      }
+
       registerAction(
         "action.glyph.add-background-image",
         { topic },
@@ -1919,10 +1977,10 @@ export class EditorController extends ViewController {
       } else {
         await this._pasteReplaceGlyph(pasteVarGlyph);
       }
-      // Force even trigger for fontLocationSourceMapped, as the glyph's
+      // Force event trigger for fontLocationSource, as the glyph's
       // source list may have changed
-      this.sceneSettings.fontLocationSourceMapped = {
-        ...this.sceneSettings.fontLocationSourceMapped,
+      this.sceneSettings.fontLocationSource = {
+        ...this.sceneSettings.fontLocationSource,
       };
       this.sceneSettings.glyphLocation = { ...this.sceneSettings.glyphLocation };
     } else {
@@ -2144,8 +2202,8 @@ export class EditorController extends ViewController {
             defaultPasteGlyph;
           layerGlyph.path.appendPath(pasteGlyph.path);
           layerGlyph.components.push(...pasteGlyph.components.map(copyComponent));
-          layerGlyph.anchors.push(...pasteGlyph.anchors);
-          layerGlyph.guidelines.push(...pasteGlyph.guidelines);
+          layerGlyph.anchors.push(...pasteGlyph.anchors.map(deepCopyObject));
+          layerGlyph.guidelines.push(...pasteGlyph.guidelines.map(deepCopyObject));
           if (pasteGlyph.backgroundImage) {
             layerGlyph.backgroundImage = pasteGlyph.backgroundImage;
             if (!this.sceneSettings.backgroundImagesAreLocked) {
@@ -2346,13 +2404,11 @@ export class EditorController extends ViewController {
       if (!editedAnchorName.length) {
         warnings.push(`⚠️ ${translate("warning.name-must-not-be-empty")}`);
       }
-      if (
-        !(
-          nameController.model.anchorName ||
-          nameController.model.anchorX ||
-          nameController.model.anchorY
-        )
-      ) {
+      if (!(
+        nameController.model.anchorName ||
+        nameController.model.anchorX ||
+        nameController.model.anchorY
+      )) {
         warnings.push("");
       }
       for (const n of ["X", "Y"]) {
@@ -2924,6 +2980,40 @@ export class EditorController extends ViewController {
     this.sceneController.selection = newSelection;
   }
 
+  async doConvertCurveType(numQuadraticOffCurvePoints) {
+    const { point: pointSelection } = parseSelection(this.sceneController.selection);
+
+    await this.sceneController.editLayersAndRecordChanges((layerGlyphs) => {
+      for (const layerGlyph of Object.values(layerGlyphs)) {
+        if (pointSelection) {
+          convertCurveType(layerGlyph.path, pointSelection, numQuadraticOffCurvePoints);
+        }
+      }
+      this.sceneController.selection = new Set();
+      return translate(
+        !numQuadraticOffCurvePoints
+          ? "action.glyph.convert-curves-to-cubic"
+          : `action.glyph.convert-curves-to-quadratic-${numQuadraticOffCurvePoints}`
+      );
+    });
+  }
+
+  canConvertCurveType(numQuadraticOffCurvePoints) {
+    const { point: pointSelection } = parseSelection(this.sceneController.selection);
+
+    if (!pointSelection) {
+      return false;
+    }
+
+    const path = this.sceneModel.getSelectedPositionedGlyph()?.glyph.instance.path;
+
+    if (!path) {
+      return false;
+    }
+
+    return canConvertCurveType(path, pointSelection, numQuadraticOffCurvePoints);
+  }
+
   doSelectPreviousNextSource(selectPrevious) {
     const panel = this.getSidebarPanel("designspace-navigation");
     panel?.doSelectPreviousNextSource(selectPrevious);
@@ -3109,6 +3199,39 @@ export class EditorController extends ViewController {
     this.insertGlyphInfos([glyphInfo], where, true);
   }
 
+  pointerDownHandler(event) {
+    if (
+      event.button !== 1 ||
+      event.altKey ||
+      event.shitKey ||
+      event.ctrlKey ||
+      event.metaKey
+    ) {
+      return;
+    }
+
+    this.canvasController.canvas.setPointerCapture(event.pointerId);
+
+    this.savedSelectedToolIdentifier = this.selectedToolIdentifier;
+    this.setSelectedTool("hand-tool");
+  }
+
+  pointerUpHandler(event) {
+    if (
+      event.button !== 1 ||
+      event.altKey ||
+      event.shitKey ||
+      event.ctrlKey ||
+      event.metaKey
+    ) {
+      return;
+    }
+
+    this.canvasController.canvas.releasePointerCapture(event.pointerId);
+
+    this.setSelectedTool(this.savedSelectedToolIdentifier);
+  }
+
   keyUpHandler(event) {
     if (
       this._matchingKeyUpHandler &&
@@ -3181,10 +3304,10 @@ export class EditorController extends ViewController {
   async externalChange(change, isLiveChange) {
     await super.externalChange(change, isLiveChange);
 
-    // Force event trigger for fontLocationSourceMapped, as the glyph's
+    // Force event trigger for fontLocationSource, as the glyph's
     // source list may have changed
-    this.sceneSettings.fontLocationSourceMapped = {
-      ...this.sceneSettings.fontLocationSourceMapped,
+    this.sceneSettings.fontLocationSource = {
+      ...this.sceneSettings.fontLocationSource,
     };
     this.sceneSettings.glyphLocation = { ...this.sceneSettings.glyphLocation };
     await this.sceneModel.updateScene();
@@ -3211,9 +3334,9 @@ export class EditorController extends ViewController {
   }
 
   async setupFromWindowLocation() {
-    this.sceneSettingsController.withSenderInfo({ senderID: this }, () =>
-      this._setupFromWindowLocation()
-    );
+    this.sceneSettingsController.withSenderInfo({ senderID: this }, async () => {
+      await this._setupFromWindowLocation();
+    });
   }
 
   async _setupFromWindowLocation() {
@@ -3301,7 +3424,7 @@ export class EditorController extends ViewController {
 
   _zoom(factor) {
     let viewBox = this.sceneSettings.viewBox;
-    const selBox = this.sceneController.getSelectionBounds();
+    const selBox = this.sceneController.getSelectionBounds(false);
     const center = rectCenter(selBox || viewBox);
     viewBox = rectScaleAroundCenter(viewBox, factor, center);
 

@@ -94,7 +94,7 @@ def main():
         languageCode = headers[3][columnIndex]
         languageStatus = headers[4][columnIndex]
         assert languageCode
-        if not languageStatus.strip():
+        if not languageStatus.strip() or "not ready" in languageStatus:
             continue
 
         languages.append(

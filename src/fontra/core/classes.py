@@ -46,6 +46,7 @@ class CrossAxisMapping:
     groupDescription: Optional[str] = None
     inputLocation: Location
     outputLocation: Location
+    inactive: bool = False
 
 
 @dataclass(kw_only=True)
@@ -74,7 +75,7 @@ class SubstitutionConditionSet:
 
 
 @dataclass(kw_only=True)
-class SubstitionRule:
+class SubstitutionRule:
     name: Optional[str] = None
     conditionSets: list[SubstitutionConditionSet]
     substitutions: dict[str, str]
@@ -85,7 +86,7 @@ class ConditionalSubstitutions:
     # processing="first": ["rvrn"]
     # processing="last": ["rclt"]
     featureTags: list[str] = field(default_factory=lambda: ["rclt"])
-    rules: list[SubstitionRule] = field(default_factory=list)
+    rules: list[SubstitutionRule] = field(default_factory=list)
 
 
 @dataclass(kw_only=True)
@@ -503,6 +504,7 @@ def registerHook(cls, omitIfDefault=True, **fieldHooks):
 
 
 # The order in which the hooks are registered is significant, for unclear reasons
+registerHook(CrossAxisMapping)
 registerHook(DecomposedTransform)
 registerHook(
     Component,

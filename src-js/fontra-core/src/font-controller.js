@@ -1390,6 +1390,7 @@ function ensureDenseSources(sources) {
 export function ensureDenseSource(source) {
   return {
     ...source,
+    isSparse: !!source.isSparse,
     location: source.location || {},
     lineMetricsHorizontalLayout: mapObjectValues(
       source.lineMetricsHorizontalLayout || {},

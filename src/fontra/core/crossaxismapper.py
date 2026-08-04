@@ -20,7 +20,9 @@ class CrossAxisMapper:
     mappings: list[CrossAxisMapping] = field(default_factory=list)
 
     def __post_init__(self) -> None:
-        if not self.mappings:
+        mappings = [mapping for mapping in self.mappings if not mapping.inactive]
+
+        if not mappings:
             self.model = None
             return
 
@@ -37,7 +39,7 @@ class CrossAxisMapper:
         inputLocations = []
         outputLocations = []
 
-        for mapping in self.mappings:
+        for mapping in mappings:
             # Input locations must be maximally sparse
             inputLocations.append(
                 makeSparseNormalizedLocation(

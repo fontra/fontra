@@ -1,3 +1,7 @@
+import {
+  makeFontAxisAccordionItems,
+  setShowEffectiveLocationDefaults,
+} from "@fontra/core/axis-ui.js";
 import { groupByKeys, groupByProperties } from "@fontra/core/glyph-organizer.js";
 import {
   CheckboxGroup,
@@ -9,10 +13,15 @@ import { translate } from "@fontra/core/localization.js";
 import { ObservableController } from "@fontra/core/observable-object.ts";
 import { difference, symmetricDifference, union } from "@fontra/core/set-ops.js";
 import { popupSelect } from "@fontra/core/ui-utils.js";
-import { scheduleCalls } from "@fontra/core/utils.ts";
+import { scheduleCalls, sleepAsync } from "@fontra/core/utils.ts";
 import { DesignspaceLocation } from "@fontra/web-components/designspace-location.js";
 import { GlyphSearchField } from "@fontra/web-components/glyph-search-field.js";
-import { Accordion } from "@fontra/web-components/ui-accordion.js";
+import { showMenu } from "@fontra/web-components/menu-panel.js";
+import {
+  Accordion,
+  groupAccordionHeaderButtons,
+  makeAccordionHeaderButton,
+} from "@fontra/web-components/ui-accordion.js";
 
 export class FontOverviewNavigation extends HTMLElement {
   constructor(fontOverviewController) {
@@ -23,10 +32,13 @@ export class FontOverviewNavigation extends HTMLElement {
       fontOverviewController.fontOverviewSettingsController;
     this.fontOverviewSettings = this.fontOverviewSettingsController.model;
 
+    this.projectIdentifier = fontOverviewController.projectIdentifier;
+
     this._setupUI();
   }
 
   async _setupUI() {
+    setShowEffectiveLocationDefaults(this.fontController, this.fontOverviewSettings);
     this.appendChild(
       new GlyphSearchField({
         settingsController: this.fontOverviewSettingsController,
@@ -51,7 +63,7 @@ export class FontOverviewNavigation extends HTMLElement {
 
     accordion.appendStyle(
       `
-      .font-source-location-container {
+      #font-source-location-container {
         display: grid;
         gap: 0.5em;
       }
@@ -80,17 +92,26 @@ export class FontOverviewNavigation extends HTMLElement {
       }
     );
 
+    const { updateFontAxes, fontAxesAccordionItem, hiddenFontAxesAccordionItem } =
+      makeFontAxisAccordionItems(
+        this.projectIdentifier,
+        this.fontController,
+        this.fontOverviewSettingsController,
+        accordion
+      );
+
     const accordionItems = [
       {
-        label: translate("sources.labels.location"),
+        label: translate("font-overview.popup.source"),
         id: "location",
-        content: html.div({ class: "font-source-location-container" }, [
+        content: html.div({ id: "font-source-location-container" }, [
           await this._makeFontSourcePopup(),
-          this._makeFontSourceSliders(),
         ]),
       },
+      fontAxesAccordionItem,
+      hiddenFontAxesAccordionItem,
       {
-        label: "Group by", // TODO: translate
+        label: translate("glyph-organizing.group-by"),
         id: "group-by",
         content: this.groupByCheckboxGroup.makeCheckboxUI(groupByProperties),
       },
@@ -108,6 +129,9 @@ export class FontOverviewNavigation extends HTMLElement {
     this.appendChild(
       html.div({ class: "font-overview-navigation-section" }, [accordion])
     );
+
+    await sleepAsync(0);
+    updateFontAxes();
   }
 
   async _makeFontSourcePopup() {
@@ -173,39 +197,6 @@ export class FontOverviewNavigation extends HTMLElement {
     );
 
     return popupSelect(controller, "value", popupItems);
-  }
-
-  _makeFontSourceSliders() {
-    const locationElement = new DesignspaceLocation();
-    locationElement.axes = this.fontController.axes.axes;
-    locationElement.values = { ...this.fontOverviewSettings.fontLocationUser };
-
-    this.fontOverviewSettingsController.addKeyListener("fontLocationUser", (event) => {
-      if (!event.senderInfo?.sentFromSliders) {
-        locationElement.values = { ...event.newValue };
-      }
-    });
-
-    locationElement.addEventListener(
-      "locationChanged",
-      scheduleCalls((event) => {
-        this.fontOverviewSettingsController.setItem(
-          "fontLocationUser",
-          { ...locationElement.values },
-          { sentFromSliders: true }
-        );
-      })
-    );
-
-    this.fontController.addChangeListener(
-      { axes: null },
-      (change, isExternalChange) => {
-        locationElement.axes = this.fontController.axes.axes;
-        locationElement.values = { ...this.fontOverviewSettings.fontLocationUser };
-      }
-    );
-
-    return locationElement;
   }
 }
 

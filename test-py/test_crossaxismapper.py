@@ -1,6 +1,6 @@
 import pytest
 
-from fontra.core.classes import Axes, CrossAxisMapping, FontAxis
+from fontra.core.classes import Axes, CrossAxisMapping, DiscreteFontAxis, FontAxis
 from fontra.core.crossaxismapper import CrossAxisMapper
 
 
@@ -15,6 +15,14 @@ axes = Axes(
         newTestAxis("Diagonal"),
         newTestAxis("Horizontal"),
         newTestAxis("Vertical"),
+        # Add a discrete axis to test we don't crash in their presence
+        DiscreteFontAxis(
+            name="DiscreteAxis",
+            label="DiscreteAxis",
+            tag="Disc",
+            values=[0, 1],
+            defaultValue=0,
+        ),
     ],
     mappings=[
         CrossAxisMapping(

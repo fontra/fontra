@@ -1,11 +1,98 @@
 # Changelog for Fontra
 
-## 2026-06-?? [version 2026.6.2]
+## 2026-07-?? [version 2026.7.3]
+
+### Fixes
+
+- Fixes behavior when a character is not encoded, but the (suggested) glyph name for it does exist in the font. [PR 2724](https://github.com/fontra/fontra/pull/2724)
+
+## 2026-07-23 [version 2026.7.2]
+
+### New features
+
+- [languages] Add Spanish translations contributed by Adolfo Jayme Barrientos, Miguel A. Contreras, Gen Ramirez and Romina Hernández. [PR 2717](https://github.com/fontra/fontra/pull/2717), [PR 2718](https://github.com/fontra/fontra/pull/2718)
+- [languages] Add Portuguese translations contributed by Hallef Henrique P. Sousa, Eduardo Omine and Hugo Carvalho. [PR 2708](https://github.com/fontra/fontra/pull/2708), [PR 2710](https://github.com/fontra/fontra/pull/2710), [PR 2711](https://github.com/fontra/fontra/pull/2711), [PR 2714](https://github.com/fontra/fontra/pull/2714), [PR 2718](https://github.com/fontra/fontra/pull/2718)
 
 ### Improvements
 
-[fontra-workflow] Add a `drop-kerning` filter. [PR 2622](https://github.com/fontra/fontra/pull/2622)
-[fontra-pak] Fix "check for updates" functionality. [fontra-pak PR 252](https://github.com/fontra/fontra-pak/pull/252)
+- [languages] Added more French strings contributed by Gaëtan Baehr. [PR 2717](https://github.com/fontra/fontra/pull/2717)
+- [languages] Added more opportunities for localizations. [PR 2709](https://github.com/fontra/fontra/pull/2709)
+- [languages] Add missing Dutch translations. [PR 2713](https://github.com/fontra/fontra/pull/2713)
+
+## 2026-07-17 [version 2026.7.1]
+
+### Improvements
+
+- [designspace] Respond to external changes in include()'d feature files. [PR 2703](https://github.com/fontra/fontra/pull/2703)
+- [fontra-glyphs] Respond to external changes in include()'d feature files. [fontra-glyphs PR 151](https://github.com/fontra/fontra-glyphs/pull/151)
+
+### Fixes
+
+- [fontra-glyphs] Fix handling of external feature files. [fontra-glyphs Issue 149](https://github.com/fontra/fontra-glyphs/issues/149), [fontra-glyphs PR 150](https://github.com/fontra/fontra-glyphs/pull/150)
+- Fix unintended "linking" issue with pasting a single anchor (or guideline) into multiple sources. [Issue 2705](https://github.com/fontra/fontra/issues/2705), [PR 2707](https://github.com/fontra/fontra/pull/2707)
+- [menu bar] Fixes regression with submenus. [PR 2696](https://github.com/fontra/fontra/pull/2696)
+- [Fontra Pak export/designspace] Fix/work around TTF/OTF export problem by writing features to all source UFOs. [PR 2697](https://github.com/fontra/fontra/pull/2697)
+
+## 2026-07-10 [version 2026.7.0]
+
+### New features
+
+- [font overview] Support cross-axis mappings, put hidden axes in a separate section, and in general bring the axes UI in line with the glyph editor. [Issue 2652](https://github.com/fontra/fontra/issues/2652), [PR 2691](https://github.com/fontra/fontra/pull/2691)
+- [font overview] Allow quick glyph selection by typing a glyph name or a character. [Issue 2677](https://github.com/fontra/fontra/issues/2677), [PR 2682](https://github.com/fontra/fontra/pull/2682)
+- [font overview] Add "Copy Glyph Name(s) and "Copy Character(s)" context menus. [Issue 2676](https://github.com/fontra/fontra/issues/2676), [PR 2681](https://github.com/fontra/fontra/pull/2681)
+
+### Improvements
+
+- [menus] Make menus behave well when the items don't fit the viewport. [PR 2694](https://github.com/fontra/fontra/pull/2694)
+- [editor] Improve zoom in/out behavior when there is no selection. This used to use the scene center, and now uses the view port center, which behaves much better with larger texts. [Issue 2686](https://github.com/fontra/fontra/issues/2686), [PR 2687](https://github.com/fontra/fontra/pull/2687)
+- [font overview] Change the behavior of "Select All" to really select all, and not skip glyphs that aren't in the font (but are in the combined selected glyph sets) [PR 2681](https://github.com/fontra/fontra/pull/2681)
+- [glyphsets] Updated the Google Fonts glyphsets to 1.1.3. [Issue 2673](https://github.com/fontra/fontra/issues/2673), [PR 2675](https://github.com/fontra/fontra/pull/2675)
+- [languages] Some new strings and some improved strings for Simplified Chinese and Traditional Chinese, contributed by 湖远星（Lake桑）. [PR 2674](https://github.com/fontra/fontra/pull/2674)
+
+### Fixes
+
+- Fix bug with font source interpolation after toggling the "Is Sparse" flag. [PR 2693](https://github.com/fontra/fontra/pull/2693)
+- [font overview, Firefox] Prevent opening two tabs instead of one when typing Enter to open the selection in the glyph editor. [Issue 2678](https://github.com/fontra/fontra/issues/2678) [PR 2680](https://github.com/fontra/fontra/pull/2680)
+
+## 2026-06-28 [version 2026.6.5]
+
+### Fixes
+
+- [languages] Fix caching behavior for language files (UI strings), to ensure we always see the latest version. [Issue 2668](https://github.com/fontra/fontra/issues/2668), [PR 2669](https://github.com/fontra/fontra/pull/2669)
+- [tests] Ensure tests written in TypeScript are run as part of the test suite. [Issue 2664](https://github.com/fontra/fontra/issues/2664), [PR 2670](https://github.com/fontra/fontra/pull/2670)
+
+## 2026-06-26 [version 2026.6.4]
+
+### New features
+
+- [editor] Add contextual menus for curve type conversion (to cubic, to quadratic). [Issue 151](https://github.com/fontra/fontra/issues/151), [Issue 2662](https://github.com/fontra/fontra/issues/2662), [PR 2666](https://github.com/fontra/fontra/pull/2666)
+- [editor] Use tab key to cycle through the selectable items (points, components, anchors, guidelines). [Issue 2638](https://github.com/fontra/fontra/issues/2638), [PR 2645](https://github.com/fontra/fontra/pull/2645)
+
+### Improvements
+
+- [Safari] Work around Safari performance problem with long canvas texts. Found and fixed by Qwerasd [Issue 2654](https://github.com/fontra/fontra/issues/2654), [PR 2665](https://github.com/fontra/fontra/pull/2665)
+- [editor] Make the middle mouse button a shortcut for the hand tool (for panning), as is common in drawing applications. [Issue 2659](https://github.com/fontra/fontra/issues/2659), [PR 2661](https://github.com/fontra/fontra/pull/2661)
+- [browser] Keep forward history when using the browser back button. [PR 2660](https://github.com/fontra/fontra/pull/2660)
+- Make page/view titles more consistent, remove "Fontra" prefixes. [Issue 2650](https://github.com/fontra/fontra/issues/2650), [PR 2657](https://github.com/fontra/fontra/pull/2657)
+
+### Fixes
+
+- Work around a problem with dead-key text input on Chromium browsers on Windows. [Issue 2628](https://github.com/fontra/fontra/issues/2628), [PR 2631](https://github.com/fontra/fontra/pull/2631)
+
+## 2026-06-15 [version 2026.6.3]
+
+### Fixes
+
+- Fix erratic behavior when .fontra data is stored in a folder that is managed by iCloud. [Issue 2626](https://github.com/fontra/fontra/issues/2626), [PR 2630](https://github.com/fontra/fontra/pull/2630)
+
+## 2026-06-11 [version 2026.6.2]
+
+### Improvements
+
+- [cross-axis-mappings] Add checkbox to deactivate individual mappings. [PR 2627](https://github.com/fontra/fontra/pull/2627)
+- [cross-axis-mappings] Improve behavior in the presence of discrete axes, by ignoring them. [Issue 2623](https://github.com/fontra/fontra/issues/2623), [PR 2624](https://github.com/fontra/fontra/pull/2624), [PR 2625](https://github.com/fontra/fontra/pull/2625)
+- [fontra-workflow] Add a `drop-kerning` filter. [PR 2622](https://github.com/fontra/fontra/pull/2622)
+- [fontra-pak] Fix "check for updates" functionality. [fontra-pak PR 252](https://github.com/fontra/fontra-pak/pull/252)
 
 ## 2026-06-08 [version 2026.6.1]
 

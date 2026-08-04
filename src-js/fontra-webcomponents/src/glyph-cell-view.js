@@ -1,3 +1,4 @@
+import { getActionIdentifierFromKeyEvent } from "@fontra/core/actions.js";
 import * as html from "@fontra/core/html-utils.js";
 import { translate } from "@fontra/core/localization.js";
 import {
@@ -6,7 +7,13 @@ import {
   symmetricDifference,
   union,
 } from "@fontra/core/set-ops.js";
-import { arrowKeyDeltas, assert, enumerate } from "@fontra/core/utils.ts";
+import {
+  arrowKeyDeltas,
+  assert,
+  compare,
+  enumerate,
+  sleepAsync,
+} from "@fontra/core/utils.ts";
 import { GlyphCell } from "@fontra/web-components/glyph-cell.js";
 import { Accordion } from "@fontra/web-components/ui-accordion.js";
 
@@ -84,9 +91,67 @@ export class GlyphCellView extends HTMLElement {
     //   this.magnification = this.magnification * zoomFactor;
     // });
 
+    this._setupHiddenTextEntry();
+
     this.appendChild(this.getContentElement());
 
     this.addEventListener("keydown", (event) => this.handleKeyDown(event));
+  }
+
+  _setupHiddenTextEntry() {
+    let timerId;
+
+    html.addStyleSheet(
+      `
+      input[type="text"].hidden-text-entry {
+        position: sticky;
+        left: 0;
+        top: 0;
+        width: 0;
+        height: 0;
+        margin: 0;
+        padding: 0;
+        opacity: 0%;
+      }
+    `,
+      this
+    );
+    this.hiddenTextEntry = html.input({
+      type: "text",
+      class: "hidden-text-entry",
+      oninput: (event) => {
+        clearTimeout(timerId);
+        timerId = setTimeout(() => (this.hiddenTextEntry.value = ""), 500);
+
+        const targetString = this.hiddenTextEntry.value;
+        if (!targetString) {
+          return;
+        }
+
+        const characters = [...targetString];
+
+        const codePoint =
+          characters.length === 1 ? targetString.codePointAt(0) : undefined;
+
+        const { foundAccordionItem, foundGlyph } = findGlyphInSections(
+          targetString,
+          codePoint,
+          this.accordion.items
+        );
+
+        if (!foundAccordionItem || !foundGlyph) {
+          return;
+        }
+
+        this.accordion.openCloseAccordionItem(foundAccordionItem, true);
+
+        this._resetSelectionHelpers();
+        this.glyphSelection = new Set([foundGlyph.glyphName]);
+        setTimeout(() => this.scrollFirstSelectedGlyphIntoView(), 0);
+      },
+    });
+
+    this.appendChild(this.hiddenTextEntry);
   }
 
   connectedCallback() {
@@ -334,6 +399,33 @@ export class GlyphCellView extends HTMLElement {
     this.settingsController.model[this.closedGlyphSectionsKey] = selection;
   }
 
+  async scrollFirstSelectedGlyphIntoView() {
+    if (!this.glyphSelection.size) {
+      return;
+    }
+
+    const { glyph, item } = findFirstSelectedGlyphItem(
+      this.accordion.items,
+      this.glyphSelection
+    );
+
+    if (!glyph) {
+      return;
+    }
+
+    while (item.glyphsToAdd.length && item.glyphsToAdd.includes(glyph)) {
+      this._addCellsIfNeeded(item);
+      await sleepAsync(0);
+    }
+
+    const firstSelectedCell = this.findFirstSelectedCell();
+    firstSelectedCell?.scrollIntoView({
+      behavior: "auto",
+      block: "nearest",
+      inline: "nearest",
+    });
+  }
+
   findFirstSelectedCell() {
     let firstSelectedCell = undefined;
     if (!this.glyphSelection.size) {
@@ -405,7 +497,7 @@ export class GlyphCellView extends HTMLElement {
         // If indeed a double-click comes, the timer is cancelled.
         this._selectionTimerID = setTimeout(() => {
           this.glyphSelection = new Set([glyphName]);
-        }, 500);
+        }, 800);
       }
     } else {
       if (event.metaKey || event.altKey) {
@@ -609,7 +701,18 @@ export class GlyphCellView extends HTMLElement {
     if (event.key in arrowKeyDeltas) {
       this.handleArrowKeys(event);
     } else if (event.key == "Enter") {
+      event.preventDefault();
+      event.stopImmediatePropagation();
       this.onOpenSelectedGlyphs?.(event);
+    } else if (
+      !(event.metaKey || event.ctrlKey) &&
+      event.target !== this.hiddenTextEntry &&
+      !getActionIdentifierFromKeyEvent(event)
+    ) {
+      event.stopImmediatePropagation();
+      const keyEvent = new event.constructor(event.type, event);
+      this.hiddenTextEntry.focus();
+      this.hiddenTextEntry.dispatchEvent(keyEvent);
     }
   }
 
@@ -848,4 +951,35 @@ function makeGlyphCountString(glyphs, glyphMap) {
   return numGlyphs === numDefinedGlyphs
     ? `(${numGlyphs})`
     : `(${numDefinedGlyphs}/${numGlyphs})`;
+}
+
+function findGlyphInSections(targetString, codePoint, items) {
+  const matches = [];
+
+  for (const item of items) {
+    for (const glyph of item.section.resolvedGlyphs ?? []) {
+      if (
+        glyph.glyphName.startsWith(targetString) ||
+        glyph.codePoints.includes(codePoint)
+      ) {
+        matches.push({ foundAccordionItem: item, foundGlyph: glyph });
+      }
+    }
+  }
+
+  matches.sort((a, b) => compare(a.foundGlyph.glyphName, b.foundGlyph.glyphName));
+
+  return matches[0] ?? {};
+}
+
+function findFirstSelectedGlyphItem(items, glyphSelection) {
+  for (const item of items) {
+    for (const glyph of item.section.resolvedGlyphs ?? []) {
+      if (glyphSelection.has(glyph.glyphName)) {
+        return { item, glyph };
+      }
+    }
+  }
+
+  return {};
 }

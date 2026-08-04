@@ -7,6 +7,7 @@ export type Event<T, K extends keyof T> = {
   newValue: T[K];
   oldValue: T[K];
   senderInfo: any;
+  senderInfoStack: any[];
 };
 
 export type Listener<T> = (event: Event<T, keyof T>) => void;
@@ -108,13 +109,22 @@ export class ObservableController<T extends {}> {
 
   waitForKeyChange<K extends keyof T>(
     keyOrKeys: K | K[],
-    immediate = false
-  ): Promise<Event<T, keyof T>> {
+    immediate = false,
+    timeout?: number
+  ): Promise<Event<T, keyof T> | null> {
     return new Promise((resolve) => {
       const tempListener: Listener<T> = (event) => {
         this.removeKeyListener(keyOrKeys, tempListener);
+        clearTimeout(timerID);
         resolve(event);
       };
+
+      const timerID = timeout
+        ? setTimeout(() => {
+            this.removeKeyListener(keyOrKeys, tempListener);
+            resolve(null);
+          }, timeout)
+        : undefined;
 
       this.addKeyListener(keyOrKeys, tempListener, immediate);
     });
@@ -149,10 +159,20 @@ export class ObservableController<T extends {}> {
     senderInfo?: any
   ) {
     // Schedule the calls in the event loop rather than call immediately
-    if (!senderInfo && this._senderInfoStack.length) {
+    const senderInfoStack = Array.from(this._senderInfoStack);
+    if (!senderInfo && senderInfoStack.length) {
       senderInfo = this._senderInfoStack.at(-1);
+    } else if (senderInfo) {
+      senderInfoStack.push(senderInfo);
     }
-    const event: Event<T, K> = { key, newValue, oldValue, senderInfo };
+
+    const event: Event<T, K> = {
+      key,
+      newValue,
+      oldValue,
+      senderInfo,
+      senderInfoStack,
+    };
     for (const item of chain(this._generalListeners, this._keyListeners[key] || [])) {
       if (item.immediate) {
         item.listener(event);

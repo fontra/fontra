@@ -2,6 +2,7 @@ import { expect } from "chai";
 import fs from "fs";
 
 import {
+  convertCurveType,
   insertPoint,
   slicePaths,
   splitPathAtPointIndices,
@@ -358,6 +359,120 @@ describe("Path Functions tests", () => {
       // console.log(JSON.stringify(resultPaths));
 
       expect(resultPaths).to.deep.equal(testCase.expectedPaths);
+    }
+  );
+
+  function testContour(type) {
+    return {
+      points: [
+        { x: 0, y: 0 },
+        { x: 0, y: 60, type: type },
+        { x: 40, y: 100, type: type },
+        { x: 100, y: 100 },
+      ],
+      isClosed: false,
+    };
+  }
+
+  parametrize(
+    "convertCurveType tests",
+    [
+      {
+        path: [testContour("quad")],
+        pointIndices: [1],
+        numQuadraticOffCurvePoints: 2,
+        expectedPath: [testContour("quad")],
+      },
+      {
+        path: [testContour("cubic")],
+        pointIndices: [1],
+        numQuadraticOffCurvePoints: null,
+        expectedPath: [testContour("cubic")],
+      },
+      {
+        path: [testContour("quad")],
+        pointIndices: [1],
+        numQuadraticOffCurvePoints: null,
+        expectedPath: [
+          {
+            points: [
+              { x: 0, y: 0 },
+              { x: 0, y: 78.90827164782256, type: "cubic" },
+              { x: 21.091728352177427, y: 100, type: "cubic" },
+              { x: 100, y: 100 },
+            ],
+            isClosed: false,
+          },
+        ],
+      },
+      {
+        path: [testContour("cubic")],
+        pointIndices: [1],
+        numQuadraticOffCurvePoints: 2,
+        expectedPath: [
+          {
+            points: [
+              { x: 0, y: 0 },
+              { x: 0, y: 45, type: "quad" },
+              { x: 55, y: 100, type: "quad" },
+              { x: 100, y: 100 },
+            ],
+            isClosed: false,
+          },
+        ],
+      },
+      {
+        path: [smallRectPath[0], testContour("cubic"), testContour("cubic")],
+        pointIndices: [5, 9],
+        numQuadraticOffCurvePoints: 2,
+        expectedPath: [
+          smallRectPath[0],
+          {
+            points: [
+              { x: 0, y: 0 },
+              { x: 0, y: 45, type: "quad" },
+              { x: 55, y: 100, type: "quad" },
+              { x: 100, y: 100 },
+            ],
+            isClosed: false,
+          },
+          {
+            points: [
+              { x: 0, y: 0 },
+              { x: 0, y: 45, type: "quad" },
+              { x: 55, y: 100, type: "quad" },
+              { x: 100, y: 100 },
+            ],
+            isClosed: false,
+          },
+        ],
+      },
+      {
+        path: [testContour("cubic")],
+        pointIndices: [1],
+        numQuadraticOffCurvePoints: 3,
+        expectedPath: [
+          {
+            points: [
+              { x: 0, y: 0 },
+              { x: 0, y: 29.6969696969697, type: "quad" },
+              { x: 24.94623655913979, y: 75.05376344086024, type: "quad" },
+              { x: 70.30303030303028, y: 100, type: "quad" },
+              { x: 100, y: 100 },
+            ],
+            isClosed: false,
+          },
+        ],
+      },
+    ],
+    (testCase) => {
+      const path = convertCurveType(
+        VarPackedPath.fromUnpackedContours(testCase.path),
+        testCase.pointIndices,
+        testCase.numQuadraticOffCurvePoints
+      ).unpackedContours();
+
+      expect(path).to.deep.equal(testCase.expectedPath);
     }
   );
 });

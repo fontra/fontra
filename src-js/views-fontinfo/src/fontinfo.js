@@ -22,7 +22,7 @@ const panelClasses = [
 
 export class FontInfoController extends ViewController {
   static titlePattern(displayName) {
-    return `Fontra Font Info — ${displayName}`;
+    return `Font Info — ${displayName}`;
   }
 
   async start() {

@@ -1,4 +1,9 @@
 import { registerAction } from "@fontra/core/actions.js";
+import {
+  ShowLocationSettings,
+  setShowEffectiveLocationDefaults,
+  setupLocationDependencies,
+} from "@fontra/core/axis-ui.js";
 import { recordChanges } from "@fontra/core/change-recorder.js";
 import {
   ChangeCollector,
@@ -65,12 +70,6 @@ import { dialog, message } from "@fontra/web-components/modal-dialog.js";
 import { EditBehaviorFactory } from "./edit-behavior.js";
 import { SceneModel } from "./scene-model.js";
 
-export const ShowLocationSettings = Object.freeze({
-  DontShowEffectiveLocation: 0,
-  ShowEffectiveLocation: 1,
-  OnlyShowEffectiveLocation: 2,
-});
-
 // Minimum pixels per em and maximum pixels per unit for zooming out and in.
 //
 // Note that these are not _screen pixels_, they are css "pixels" which are
@@ -87,6 +86,8 @@ export const ShowLocationSettings = Object.freeze({
 // be some merit to letting users configure this to their own taste.
 const MIN_PIX_PER_EM = 5;
 const MAX_PIX_PER_UNIT = 200;
+
+export const numQuadraticOffCurvePointsOptions = [1, 2, 3, 4, 5];
 
 export class SceneController {
   constructor(
@@ -140,7 +141,7 @@ export class SceneController {
     this.sceneSettings.myGlyphSets = getMyGlyphSets();
 
     this.fontController.ensureInitialized.then(() => {
-      this._setShowEffectiveLocationDefaults();
+      setShowEffectiveLocationDefaults(this.fontController, this.sceneSettings);
 
       this.sceneSettingsController.setItem(
         "projectGlyphSets",
@@ -202,86 +203,7 @@ export class SceneController {
       true
     );
 
-    // Set up the dependencies between fontLocationUser, fontLocationSource and
-    // fontLocationSourceMapped
-    const locationDependencies = [
-      [
-        "fontLocationUser",
-        "fontLocationSource",
-        "mapUserLocationToSourceLocation",
-        false,
-      ],
-      [
-        "fontLocationSource",
-        "fontLocationUser",
-        "mapSourceLocationToUserLocation",
-        false,
-      ],
-      [
-        "fontLocationSource",
-        "fontLocationSourceMapped",
-        "mapSourceLocationToMappedSourceLocation",
-        true,
-      ],
-      [
-        "fontLocationSourceMapped",
-        "fontLocationSource",
-        "mapMappedSourceLocationToSourceLocation",
-        true,
-      ],
-    ];
-
-    for (const [
-      sourceKey,
-      destinationKey,
-      mapMethodName,
-      maySkip,
-    ] of locationDependencies) {
-      const mapMethod = this.fontController[mapMethodName].bind(this.fontController);
-
-      this.sceneSettingsController.addKeyListener(
-        sourceKey,
-        (event) => {
-          if (event.senderInfo?.senderStack?.includes(destinationKey)) {
-            return;
-          }
-
-          const mapFunc =
-            maySkip && this.sceneSettings.fontAxesSkipMapping
-              ? (loc) => loc
-              : mapMethod;
-
-          this.sceneSettingsController.setItem(
-            destinationKey,
-            mapFunc(event.newValue),
-            {
-              senderStack: (event.senderInfo?.senderStack || []).concat([
-                sourceKey,
-                destinationKey,
-              ]),
-            }
-          );
-        },
-        true
-      );
-    }
-
-    // Trigger recalculating the mapped location
-    this.sceneSettingsController.addKeyListener("fontAxesSkipMapping", (event) => {
-      this.sceneSettings.fontLocationSource = {
-        ...this.sceneSettings.fontLocationSource,
-      };
-    });
-
-    this.fontController.addChangeListener(
-      { axes: null },
-      (change, isExternalChange) => {
-        // the CrossAxisMapping may have changed, force to re-sync the location
-        this.sceneSettings.fontLocationSource = {
-          ...this.sceneSettings.fontLocationSource,
-        };
-      }
-    );
+    setupLocationDependencies(this.fontController, this.sceneSettingsController);
 
     // Set up convenience property "selectedGlyphName"
     this.sceneSettingsController.addKeyListener(
@@ -381,29 +303,6 @@ export class SceneController {
     );
   }
 
-  _setShowEffectiveLocationDefaults() {
-    // If for each of the sets of non-hidden and hidden axes there exists a
-    // cross-axis mapping that influences it, activate "ShowEffectiveLocation"
-    // by default (used in panel-designspace-navigation.js)
-    for (const [key, hidden] of [
-      ["fontAxesShowEffectiveLocation", false],
-      ["hiddenFontAxesShowEffectiveLocation", true],
-    ]) {
-      const axisNames = new Set(
-        this.fontController.fontAxes
-          .filter((axis) => !!axis.hidden == hidden)
-          .map((axis) => axis.name)
-      );
-      if (
-        this.fontController.axes.mappings.some(({ outputLocation }) =>
-          Object.keys(outputLocation).some((key) => axisNames.has(key))
-        )
-      ) {
-        this.sceneSettings[key] = ShowLocationSettings.ShowEffectiveLocation;
-      }
-    }
-  }
-
   setCanvasMagnificationLimits() {
     // The lower magnification limit is implemented relative to UPM
     // to provide a consistent em size when zoomed all the way out.
@@ -456,7 +355,7 @@ export class SceneController {
       }
 
       if (waitKeyBefore) {
-        await this.sceneSettingsController.waitForKeyChange(waitKeyBefore);
+        await this.sceneSettingsController.waitForKeyChange(waitKeyBefore, false, 20);
       }
 
       if (
@@ -480,7 +379,7 @@ export class SceneController {
       }
 
       if (waitKeyAfter) {
-        await this.sceneSettingsController.waitForKeyChange(waitKeyAfter);
+        await this.sceneSettingsController.waitForKeyChange(waitKeyAfter, false, 20);
       }
     }
   }
@@ -1113,6 +1012,15 @@ export class SceneController {
       { actionIdentifier: "action.reverse-contour" },
       { actionIdentifier: "action.set-contour-start" },
       {
+        title: translate("action.glyph.convert-curves"),
+        getItems: () => [
+          { actionIdentifier: "action.glyph.convert-curves-to-cubic" },
+          ...numQuadraticOffCurvePointsOptions.map((i) => ({
+            actionIdentifier: `action.glyph.convert-curves-to-quadratic-${i}`,
+          })),
+        ],
+      },
+      {
         title: () =>
           translatePlural(
             "action.decompose-component",
@@ -1542,8 +1450,8 @@ export class SceneController {
     return addSourceChanges;
   }
 
-  getSelectionBounds() {
-    return this.sceneModel.getSelectionBounds();
+  getSelectionBounds(considerSceneBounds = true) {
+    return this.sceneModel.getSelectionBounds(considerSceneBounds);
   }
 
   getUndoRedoInfo(isRedo) {

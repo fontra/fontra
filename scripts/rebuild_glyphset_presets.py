@@ -20,20 +20,24 @@ def fetchJSON(url):
 
 # Unauthenticated: max. 60 request per hour, authenticated 5000 per hour
 # https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api?apiVersion=2022-11-28#primary-rate-limit-for-unauthenticated-users
-def getGitHubDirectoryInfo(org, repo, path):
-    dirURL = f"https://api.github.com/repos/{org}/{repo}/contents/{path}"
+def getGitHubDirectoryInfo(org, repo, path, ref=None):
+    refString = f"?ref={ref}" if ref is not None else ""
+    dirURL = f"https://api.github.com/repos/{org}/{repo}/contents/{path}{refString}"
     return fetchJSON(dirURL)
 
 
-def jsDelivrURL(org, repo, path):
-    return f"https://cdn.jsdelivr.net/gh/{org}/{repo}/{path}"
+def jsDelivrURL(org, repo, path, ref=None):
+    refString = f"@{ref}" if ref is not None else ""
+    return f"https://cdn.jsdelivr.net/gh/{org}/{repo}{refString}/{path}"
 
 
 def getGoogleFontsGlyphSets():
     sourceURL = "https://github.com/googlefonts/glyphsets"
 
+    ref = None  # Can be a version tag or a branch name. For now: don't pin.
+
     dirContents = getGitHubDirectoryInfo(
-        "googlefonts", "glyphsets", "data/results/txt/nice-names/"
+        "googlefonts", "glyphsets", "data/results/txt/nice-names/", ref
     )
 
     glyphSets = []
@@ -45,7 +49,7 @@ def getGoogleFontsGlyphSets():
         glyphSets.append(
             {
                 "name": name,
-                "url": jsDelivrURL("googlefonts", "glyphsets", dirInfo["path"]),
+                "url": jsDelivrURL("googlefonts", "glyphsets", dirInfo["path"], ref),
             }
         )
 

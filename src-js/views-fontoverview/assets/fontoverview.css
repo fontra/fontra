@@ -22,17 +22,25 @@ font-overview-navigation {
   flex-direction: column;
   height: 100%;
   padding: 1em;
-  gap: 1em;
+  gap: 0.5em;
 }
 
 .font-overview-navigation-section {
   flex: 1;
-  overflow: hidden;
+  height: calc(
+    100% - 5em
+  ); /* FIXME: 100% makes it too tall, and I don't understand why */
 }
 
 #glyph-cell-view-container {
   overflow: auto;
   padding: 1em;
+}
+
+glyph-cell-view {
+  position: relative;
+  display: grid;
+  gap: 0;
 }
 
 .font-source-selector {

@@ -126,6 +126,7 @@ export class MenuBar extends SimpleElement {
     if (this.currentSelection) {
       this.currentSelection.classList.remove("current");
       if (this.menuPanel) {
+        this.submenuPanel?.dismiss();
         this.contentElement.removeChild(this.menuPanel);
       }
     }

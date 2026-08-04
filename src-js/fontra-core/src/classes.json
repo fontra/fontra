@@ -476,6 +476,9 @@
     "outputLocation": {
       "type": "dict",
       "subtype": "float"
+    },
+    "inactive": {
+      "type": "bool"
     }
   },
   "FontSource": {
@@ -558,10 +561,10 @@
     },
     "rules": {
       "type": "list",
-      "subtype": "SubstitionRule"
+      "subtype": "SubstitutionRule"
     }
   },
-  "SubstitionRule": {
+  "SubstitutionRule": {
     "name": {
       "type": "str",
       "optional": true
