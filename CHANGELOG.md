@@ -6,6 +6,10 @@
 
 - Fixes behavior when a character is not encoded, but the (suggested) glyph name for it does exist in the font. [PR 2724](https://github.com/fontra/fontra/pull/2724)
 
+### Improvements
+
+- Spanish, Italian, Portuguese, Chinese, French improvements. [PR 2732](https://github.com/fontra/fontra/pull/2732)
+
 ## 2026-07-23 [version 2026.7.2]
 
 ### New features
