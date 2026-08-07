@@ -531,6 +531,8 @@ export const strings = {
   "sidebar.user-settings.glyph": "Aspetto dell'editor di glifi",
   "sidebar.user-settings.glyph.anchornames": "Nomi delle ancore",
   "sidebar.user-settings.glyph.background-image": "Immagine di sfondo",
+  "sidebar.user-settings.glyph.background-nodes-and-handles":
+    "Nodes and handles for background layers",
   "sidebar.user-settings.glyph.baseline": "Linea di base",
   "sidebar.user-settings.glyph.cjkframe": "Frame di progettazione CJK",
   "sidebar.user-settings.glyph.component": "Nomi e indici dei componenti",
