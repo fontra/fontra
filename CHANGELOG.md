@@ -2,13 +2,18 @@
 
 ## 2026-07-?? [version 2026.7.3]
 
+### New features
+
+- Initial Italian translation. [PR 2732](https://github.com/fontra/fontra/pull/2732)
+- Separate Spanish for Spain and Latin America. [PR 2732](https://github.com/fontra/fontra/pull/2732)
+
 ### Fixes
 
 - Fixes behavior when a character is not encoded, but the (suggested) glyph name for it does exist in the font. [PR 2724](https://github.com/fontra/fontra/pull/2724)
 
 ### Improvements
 
-- Spanish, Italian, Portuguese, Chinese, French improvements. [PR 2732](https://github.com/fontra/fontra/pull/2732)
+- Spanish, Portuguese, Chinese, French improvements. [PR 2732](https://github.com/fontra/fontra/pull/2732)
 
 ## 2026-07-23 [version 2026.7.2]
 
