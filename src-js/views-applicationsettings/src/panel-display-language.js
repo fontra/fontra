@@ -12,11 +12,10 @@ addStyleSheet(`
   `);
 
 const translationStatusStyle = `
-  background-color: #AAAA;
+  background-color: #BBB5;
   padding: 0em 0.3em 0.1em 0.3em;
   margin-left: 0.3em;
   border-radius: 0.4em;
-  color: white;
   font-size: 0.9em;
 `;
 
