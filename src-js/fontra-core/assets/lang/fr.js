@@ -532,6 +532,8 @@ export const strings = {
   "sidebar.user-settings.glyph": "Apparence de l'éditeur de glyphes",
   "sidebar.user-settings.glyph.anchornames": "Noms d'ancrage",
   "sidebar.user-settings.glyph.background-image": "Image d'arrière-plan",
+  "sidebar.user-settings.glyph.background-nodes-and-handles":
+    "Nodes and handles for background layers",
   "sidebar.user-settings.glyph.baseline": "Ligne de base",
   "sidebar.user-settings.glyph.cjkframe": "Cadre de conception CJK",
   "sidebar.user-settings.glyph.component": "Noms et indices des composants",

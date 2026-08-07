@@ -510,6 +510,8 @@ export const strings = {
   "sidebar.user-settings.glyph": "Glyph editor uiterlijk",
   "sidebar.user-settings.glyph.anchornames": "Ankernamen",
   "sidebar.user-settings.glyph.background-image": "Achtergrondafbeelding",
+  "sidebar.user-settings.glyph.background-nodes-and-handles":
+    "Nodes and handles for background layers",
   "sidebar.user-settings.glyph.baseline": "Basislijn",
   "sidebar.user-settings.glyph.cjkframe": "CJK Design Frame",
   "sidebar.user-settings.glyph.component": "Component namen en indexen",

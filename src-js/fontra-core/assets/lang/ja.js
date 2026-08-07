@@ -501,6 +501,8 @@ export const strings = {
   "sidebar.user-settings.glyph": "グリフエディターの表示設定",
   "sidebar.user-settings.glyph.anchornames": "アンカー名を表示",
   "sidebar.user-settings.glyph.background-image": "背景画像を表示",
+  "sidebar.user-settings.glyph.background-nodes-and-handles":
+    "Nodes and handles for background layers",
   "sidebar.user-settings.glyph.baseline": "ベースラインを表示",
   "sidebar.user-settings.glyph.cjkframe": "CJKデザインフレームを表示",
   "sidebar.user-settings.glyph.component": "コンポーネント名とシェイプの順番を表示",

@@ -526,6 +526,8 @@ export const strings = {
   "sidebar.user-settings.glyph": "Aparência do editor de glifos",
   "sidebar.user-settings.glyph.anchornames": "Nome das âncoras",
   "sidebar.user-settings.glyph.background-image": "Imagem de fundo",
+  "sidebar.user-settings.glyph.background-nodes-and-handles":
+    "Nodes and handles for background layers",
   "sidebar.user-settings.glyph.baseline": "Linha de base",
   "sidebar.user-settings.glyph.cjkframe": "Moldura de design CJK",
   "sidebar.user-settings.glyph.component": "Nomes e índices dos componentes",

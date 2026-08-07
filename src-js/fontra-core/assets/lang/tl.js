@@ -519,6 +519,8 @@ export const strings = {
   "sidebar.user-settings.glyph": "Hitsura ng editor ng Glyph",
   "sidebar.user-settings.glyph.anchornames": "Mga pangalan ng angkla",
   "sidebar.user-settings.glyph.background-image": "Larawan sa background",
+  "sidebar.user-settings.glyph.background-nodes-and-handles":
+    "Nodes and handles for background layers",
   "sidebar.user-settings.glyph.baseline": "Baseline",
   "sidebar.user-settings.glyph.cjkframe": "Disenyo ng Frame ng CJK",
   "sidebar.user-settings.glyph.component": "Mga pangalan at indeks ng bahagi",

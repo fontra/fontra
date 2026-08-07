@@ -474,6 +474,8 @@ export const strings = {
   "sidebar.user-settings.glyph": "字形编辑器外观",
   "sidebar.user-settings.glyph.anchornames": "锚点名称",
   "sidebar.user-settings.glyph.background-image": "背景图片",
+  "sidebar.user-settings.glyph.background-nodes-and-handles":
+    "Nodes and handles for background layers",
   "sidebar.user-settings.glyph.baseline": "基线",
   "sidebar.user-settings.glyph.cjkframe": "汉字字面框",
   "sidebar.user-settings.glyph.component": "部件名称与序号",
