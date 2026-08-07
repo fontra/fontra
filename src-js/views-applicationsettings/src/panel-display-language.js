@@ -11,6 +11,15 @@ addStyleSheet(`
   }
   `);
 
+const translationStatusStyle = `
+  background-color: #AAAA;
+  padding: 0em 0.3em 0.1em 0.3em;
+  margin-left: 0.3em;
+  border-radius: 0.4em;
+  color: white;
+  font-size: 0.9em;
+`;
+
 export class DisplayLanguagePanel extends MultiPanelBasePanel {
   static title = "application-settings.display-language.title";
   static id = "display-language-panel";
@@ -30,16 +39,20 @@ export class DisplayLanguagePanel extends MultiPanelBasePanel {
 
   cards() {
     const languageOptions = languages.map((lang) => {
-      let displayName = `${lang.langLang} / ${lang.langEn}`;
-      if (lang.status != "done") {
-        const statusString = translate(
-          `application-settings.display-language.status.${lang.status}`
-        );
-        displayName += ` (${statusString})`;
-      }
+      const displayName = `${lang.langLang} / ${lang.langEn}`;
+
       return {
         key: lang.code,
-        displayName: displayName,
+        displayName: html.span({}, [
+          displayName,
+          lang.status != "done"
+            ? html.span({ style: translationStatusStyle }, [
+                translate(
+                  `application-settings.display-language.status.${lang.status}`
+                ),
+              ])
+            : "",
+        ]),
       };
     });
     return [
