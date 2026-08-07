@@ -4,7 +4,7 @@
 
 ### New features
 
-- Optionally show handles and nodes in background layers. To toggle, use the "Nodes and handles for background layers" menu in "View -> Glyph editor appearance". [PR](https://github.com/fontra/fontra/pull/2733)
+- Optionally show handles and nodes in background layers. To toggle, use the "Nodes and handles for background layers" menu in "View -> Glyph editor appearance". [PR 2733](https://github.com/fontra/fontra/pull/2733)
 - Initial Italian translation. [PR 2732](https://github.com/fontra/fontra/pull/2732)
 - Separate Spanish for Spain and Latin America. [PR 2732](https://github.com/fontra/fontra/pull/2732)
 
