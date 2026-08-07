@@ -524,7 +524,7 @@ export const strings = {
   "sidebar.user-settings.glyph.anchornames": "Nombres de anclas",
   "sidebar.user-settings.glyph.background-image": "Imagen de fondo",
   "sidebar.user-settings.glyph.background-nodes-and-handles":
-    "Nodes and handles for background layers",
+    "Nodos y manejadores para capas de fondo",
   "sidebar.user-settings.glyph.baseline": "Línea de base",
   "sidebar.user-settings.glyph.cjkframe": "Marco de diseño CJK",
   "sidebar.user-settings.glyph.component": "Nombres e índices de componentes",
