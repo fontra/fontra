@@ -1544,6 +1544,67 @@ registerVisualizationLayerDefinition({
 });
 
 registerVisualizationLayerDefinition({
+  identifier: "fontra.edit.background.layers.nodes-and-handles",
+  name: "sidebar.user-settings.glyph.background-nodes-and-handles",
+  userSwitchable: true,
+  defaultOn: false,
+  selectionFunc: glyphSelector("editing"),
+  zIndex: 490,
+  screenParameters: {
+    strokeWidth: 0.5,
+    cornerSize: 5.5,
+    smoothSize: 5.5,
+    handleSize: 4.5,
+  },
+  colors: { backgroundColor: "#DDDF", editColor: "#BBFF" },
+  colorsDarkMode: { backgroundColor: "#555F", editColor: "#559F" },
+
+  draw: (context, positionedGlyph, parameters, model, controller) => {
+    context.lineWidth = parameters.strokeWidth;
+
+    context.strokeStyle = parameters.backgroundColor;
+    context.fillStyle = parameters.backgroundColor;
+
+    drawBackgroundHandlesAndNodes(
+      context,
+      Object.values(model.backgroundLayerGlyphs || {}),
+      parameters.cornerSize,
+      parameters.smoothSize,
+      parameters.handleSize
+    );
+
+    context.strokeStyle = parameters.editColor;
+    context.fillStyle = parameters.editColor;
+
+    drawBackgroundHandlesAndNodes(
+      context,
+      Object.values(model.editingLayerGlyphs || {}),
+      parameters.cornerSize,
+      parameters.smoothSize,
+      parameters.handleSize
+    );
+  },
+});
+
+function drawBackgroundHandlesAndNodes(
+  context,
+  glyphs,
+  cornerSize,
+  smoothSize,
+  handleSize
+) {
+  for (const glyph of glyphs) {
+    for (const [pt1, pt2] of glyph.path.iterHandles()) {
+      strokeLine(context, pt1.x, pt1.y, pt2.x, pt2.y);
+    }
+
+    for (const pt of glyph.path.iterPoints()) {
+      fillNode(context, pt, cornerSize, smoothSize, handleSize);
+    }
+  }
+}
+
+registerVisualizationLayerDefinition({
   identifier: "fontra.edit.background.layers",
   name: "Background glyph layers",
   selectionFunc: glyphSelector("editing"),
@@ -1552,8 +1613,8 @@ registerVisualizationLayerDefinition({
     strokeWidth: 1,
     anchorRadius: 4,
   },
-  colors: { color: "#AAA8", colorAnchor: "#AAA7" },
-  colorsDarkMode: { color: "#8888", colorAnchor: "#8887" },
+  colors: { color: "#CCCF", colorAnchor: "#DDDF" },
+  colorsDarkMode: { color: "#666F", colorAnchor: "#555F" },
   draw: (context, positionedGlyph, parameters, model, controller) => {
     context.lineJoin = "round";
     context.lineWidth = parameters.strokeWidth;
@@ -1579,8 +1640,8 @@ registerVisualizationLayerDefinition({
     strokeWidth: 1,
     anchorRadius: 4,
   },
-  colors: { color: "#66FA", colorAnchor: "#66F5" },
-  colorsDarkMode: { color: "#88FA", colorAnchor: "#88F7" },
+  colors: { color: "#99FF", colorAnchor: "#AAFF" },
+  colorsDarkMode: { color: "#559F", colorAnchor: "#558F" },
   draw: (context, positionedGlyph, parameters, model, controller) => {
     const primaryEditingInstance = positionedGlyph.glyph;
     context.lineJoin = "round";
