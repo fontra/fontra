@@ -142,13 +142,6 @@ export class FontOverviewController extends ViewController {
     return menuItems;
   }
 
-  getViewMenuItems() {
-    return [
-      { actionIdentifier: "action.zoom-in" },
-      { actionIdentifier: "action.zoom-out" },
-    ];
-  }
-
   async start() {
     await loaderSpinner(this._start());
   }
