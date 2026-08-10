@@ -30,7 +30,7 @@ export class FontInfoController extends ViewController {
 
     this.initActions();
 
-    const myMenuBar = makeFontraMenuBar(["File", "Edit", "Font"], this);
+    const myMenuBar = makeFontraMenuBar(["File", "Edit", "View", "Font"], this);
     document.querySelector(".top-bar-container").appendChild(myMenuBar);
 
     this.multiPanelController = new MultiPanelController(
