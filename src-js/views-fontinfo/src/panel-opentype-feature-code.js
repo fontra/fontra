@@ -27,7 +27,8 @@ import {
 import { simpleMode } from "@codemirror/legacy-modes/mode/simple-mode";
 import { lintKeymap } from "@codemirror/lint";
 import { highlightSelectionMatches, searchKeymap } from "@codemirror/search";
-import { EditorSelection, EditorState } from "@codemirror/state";
+import { Compartment, EditorSelection, EditorState } from "@codemirror/state";
+
 import {
   crosshairCursor,
   drawSelection,
@@ -227,50 +228,69 @@ const openTypeFeatureLanguage = new LanguageSupport(openTypeFeatureCodeStreamLan
   openTypeFeatureCodeHighlighter,
 ]);
 
-const customTheme = EditorView.theme({
-  ".cm-cursor": {
-    borderLeft: "2px solid var(--fontra-red-color)",
-  },
-  ".cm-gutters": {
-    backgroundColor: "var(--ui-element-background-color)",
-    color: "var(--horizontal-rule-color)",
-    borderRight: "1px solid var(--horizontal-rule-color)",
-  },
-  ".cm-activeLine": {
-    backgroundColor: "#8D8D8D10",
-  },
-  ".cm-activeLineGutter": {
-    backgroundColor: "transparent",
-    color: "var(--ui-element-foreground-color)",
-  },
-  ".cm-scroller > .cm-selectionLayer .cm-selectionBackground": {
-    backgroundColor: "#BBB5",
-  },
-  "&.cm-focused > .cm-scroller > .cm-selectionLayer .cm-selectionBackground": {
-    backgroundColor: "#A6CCF250",
-  },
-  ".cm-selectionMatch": {
-    backgroundColor: "#99ff7750",
-  },
-  ".cm-tooltip": {
-    backgroundColor: "var(--background-color)",
-    border: "0.5px solid gray",
-    borderRadius: "4px",
-    boxShadow: "2px 3px 10px #00000020",
-    padding: "0.5em 0",
-    fontFamily: "monospace",
-    fontSize: "1.1em",
-  },
-  ".cm-tooltip-autocomplete": {
-    "& > ul > li[aria-selected]": {
-      backgroundColor: "var(--fontra-red-color)",
+const themeConfig = new Compartment();
+const OT_CODE_EDITOR_FONT_SCALE_BASE = 1.05;
+const OT_CODE_EDITOR_FONT_SCALE_MINIMUM = -6;
+const OT_CODE_EDITOR_FONT_SCALE_KEY = "fontra-opentype-code-editor-font-scale";
+
+function getCustomFontScale() {
+  return parseFloat(localStorage.getItem(OT_CODE_EDITOR_FONT_SCALE_KEY) ?? 0);
+}
+
+function getCustomThemeData() {
+  const fontScale = 100 * OT_CODE_EDITOR_FONT_SCALE_BASE ** getCustomFontScale();
+
+  return {
+    ".cm-content": {
+      fontSize: `${fontScale}%`,
     },
-  },
-  ".cm-tooltip.cm-completionInfo": {
-    fontSize: "1em",
-    padding: "0.5em 0.8em 0.7em 0.8em",
-  },
-});
+    ".cm-cursor": {
+      borderLeft: "2px solid var(--fontra-red-color)",
+    },
+    ".cm-gutters": {
+      fontSize: `${fontScale}%`,
+      backgroundColor: "var(--ui-element-background-color)",
+      color: "var(--horizontal-rule-color)",
+      borderRight: "1px solid var(--horizontal-rule-color)",
+    },
+    ".cm-activeLine": {
+      backgroundColor: "#8D8D8D10",
+    },
+    ".cm-activeLineGutter": {
+      backgroundColor: "transparent",
+      color: "var(--ui-element-foreground-color)",
+    },
+    ".cm-scroller > .cm-selectionLayer .cm-selectionBackground": {
+      backgroundColor: "#BBB5",
+    },
+    "&.cm-focused > .cm-scroller > .cm-selectionLayer .cm-selectionBackground": {
+      backgroundColor: "#A6CCF250",
+    },
+    ".cm-selectionMatch": {
+      backgroundColor: "#99ff7750",
+    },
+    ".cm-tooltip": {
+      backgroundColor: "var(--background-color)",
+      border: "0.5px solid gray",
+      borderRadius: "4px",
+      boxShadow: "2px 3px 10px #00000020",
+      padding: "0.5em 0",
+      fontFamily: "monospace",
+      fontSize: "1.1em",
+    },
+    ".cm-tooltip-autocomplete": {
+      "& > ul > li[aria-selected]": {
+        backgroundColor: "var(--fontra-red-color)",
+      },
+    },
+    ".cm-tooltip.cm-completionInfo": {
+      fontSize: "1em",
+      padding: "0.5em 0.8em 0.7em 0.8em",
+    },
+  };
+}
+
+const zoomFactor = 1.05;
 
 export class OpenTypeFeatureCodePanel extends BaseInfoPanel {
   static title = "opentype-feature-code.title";
@@ -338,7 +358,7 @@ export class OpenTypeFeatureCodePanel extends BaseInfoPanel {
       extensions: [
         openTypeFeatureLanguage,
         customSetup,
-        customTheme,
+        themeConfig.of(EditorView.theme(getCustomThemeData())),
         EditorView.lineWrapping,
         EditorView.updateListener.of((update) => {
           if (update.docChanged) {
@@ -534,6 +554,33 @@ export class OpenTypeFeatureCodePanel extends BaseInfoPanel {
     if (onOff && this.editorView) {
       this.editorView.focus();
     }
+  }
+
+  zoomIn() {
+    this.doZoom(1);
+  }
+
+  canZoomIn() {
+    return true;
+  }
+
+  zoomOut() {
+    this.doZoom(-1);
+  }
+
+  canZoomOut() {
+    return getCustomFontScale() > OT_CODE_EDITOR_FONT_SCALE_MINIMUM;
+  }
+
+  doZoom(delta) {
+    localStorage.setItem(
+      OT_CODE_EDITOR_FONT_SCALE_KEY,
+      Math.max(getCustomFontScale() + delta, OT_CODE_EDITOR_FONT_SCALE_MINIMUM)
+    );
+
+    this.editorView.dispatch({
+      effects: themeConfig.reconfigure(EditorView.theme(getCustomThemeData())),
+    });
   }
 }
 
