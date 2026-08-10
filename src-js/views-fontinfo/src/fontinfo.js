@@ -73,6 +73,17 @@ export class FontInfoController extends ViewController {
       () => this.canUndoRedo(true),
       () => this.getUndoRedoLabel(true)
     );
+
+    registerActionCallbacks(
+      "action.zoom-in",
+      () => this.zoomIn(),
+      () => this.canZoomIn()
+    );
+    registerActionCallbacks(
+      "action.zoom-out",
+      () => this.zoomOut(),
+      () => this.canZoomOut()
+    );
   }
 
   getUndoRedoLabel(isRedo) {
@@ -85,5 +96,21 @@ export class FontInfoController extends ViewController {
 
   doUndoRedo(isRedo) {
     return this.multiPanelController.selectedPanel?.doUndoRedo(isRedo);
+  }
+
+  zoomIn() {
+    this.multiPanelController.selectedPanel?.zoomIn?.();
+  }
+
+  canZoomIn() {
+    return this.multiPanelController.selectedPanel?.canZoomIn?.();
+  }
+
+  zoomOut() {
+    this.multiPanelController.selectedPanel?.zoomOut?.();
+  }
+
+  canZoomOut() {
+    return this.multiPanelController.selectedPanel?.canZoomOut?.();
   }
 }
