@@ -21,13 +21,13 @@
         <dimension name="Bend-2" xvalue="0"/>
       </location>
     </source>
-    <source filename="DemoAvar2-NLI_Bend-middle-1.ufo" stylename="Bend-middle-1">
+    <source filename="DemoAvar2-NLI_Bend-handle.ufo" stylename="Bend-handle-1">
       <location>
         <dimension name="Bend" xvalue="100"/>
         <dimension name="Bend-2" xvalue="0"/>
       </location>
     </source>
-    <source filename="DemoAvar2-NLI_Bend-middle-2.ufo" stylename="Bend-middle-2">
+    <source filename="DemoAvar2-NLI_Bend-handle.ufo" stylename="Bend-handle-2">
       <location>
         <dimension name="Bend" xvalue="0"/>
         <dimension name="Bend-2" xvalue="100"/>
