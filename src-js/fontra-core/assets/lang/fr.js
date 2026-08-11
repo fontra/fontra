@@ -120,8 +120,8 @@ export const strings = {
   "background-image.labels.colorize": "Colorer",
   "background-image.labels.opacity": "Opacité",
   "canvas.clean-view-and-hand-tool": "Vue épurée et outil main",
-  "conditional-substitutions.new": "New conditional substitution rule",
-  "conditional-substitutions.title": "Conditional substitutions",
+  "conditional-substitutions.new": "Nouvelle règle de substitution conditionnelle",
+  "conditional-substitutions.title": "Substitutions conditionnelles",
   "cross-axis-mapping.axis-participates":
     "Lorsqu'il est coché, cet axe participe au mappage",
   "cross-axis-mapping.delete": "Supprimer le mappage inter-axes",

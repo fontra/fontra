@@ -125,6 +125,8 @@ export const strings = {
   "background-image.labels.colorize": "Colorir",
   "background-image.labels.opacity": "Opacidade",
   "canvas.clean-view-and-hand-tool": "Limpar visualização e ferramenta mão",
+  "conditional-substitutions.new": "Nova regra de substituição condicional",
+  "conditional-substitutions.title": "Substituições condicionais",
   "cross-axis-mapping.axis-participates":
     "Quando marcado, este eixo participa no mapeamento",
   "cross-axis-mapping.delete": "Excluir mapeamento de eixo cruzado",

@@ -120,8 +120,8 @@ export const strings = {
   "background-image.labels.colorize": "Kleuren",
   "background-image.labels.opacity": "Opaciteit",
   "canvas.clean-view-and-hand-tool": "Schone weergave en Hand gereedschap",
-  "conditional-substitutions.new": "New conditional substitution rule",
-  "conditional-substitutions.title": "Conditional substitutions",
+  "conditional-substitutions.new": "Nieuwe conditionele regel",
+  "conditional-substitutions.title": "Conditionele regels",
   "cross-axis-mapping.axis-participates":
     "Indien aangevinkt doet deze as mee in de mapping",
   "cross-axis-mapping.delete": "Verwijder asoverschrijdende mapping",

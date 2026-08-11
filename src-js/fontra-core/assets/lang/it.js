@@ -125,6 +125,8 @@ export const strings = {
   "background-image.labels.colorize": "Colora",
   "background-image.labels.opacity": "Opacità",
   "canvas.clean-view-and-hand-tool": "Vista Pulita e Strumento Mano",
+  "conditional-substitutions.new": "Nuova regola di sostituzione condizionale",
+  "conditional-substitutions.title": "Sostituzioni condizionali",
   "cross-axis-mapping.axis-participates":
     "Se selezionato, questo asse partecipa alla mappatura",
   "cross-axis-mapping.delete": "Elimina mappatura inter-asse",
