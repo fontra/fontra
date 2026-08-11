@@ -1,5 +1,36 @@
 # Changelog for Fontra
 
+## 2026-07-?? [version 2026.7.3]
+
+### New features
+
+- [fontra-glyphs] Support reading of Glyphs-specific feature variation syntax. [fontra-glyphs Issue 144](https://github.com/fontra/fontra-glyphs/issues/144), [fontra-glyphs PR 154](https://github.com/fontra/fontra-glyphs/pull/154), [PR 2736](https://github.com/fontra/fontra/pull/2736)
+- Allow the font size in the OpenType code editor to be changed with Zoom In and Zoom out menu items (command/control plus/minus) in the (new) View menu. [Issue 2470](https://github.com/fontra/fontra/issues/2470), [PR 2735](https://github.com/fontra/fontra/pull/2735)
+- Optionally show handles and nodes in background layers. To toggle, use the "Nodes and handles for background layers" menu in "View -> Glyph editor appearance". [PR 2733](https://github.com/fontra/fontra/pull/2733)
+- Initial Italian translation. [PR 2732](https://github.com/fontra/fontra/pull/2732)
+- Separate Spanish for Spain and Latin America. [PR 2732](https://github.com/fontra/fontra/pull/2732)
+
+### Fixes
+
+- Fixes behavior when a character is not encoded, but the (suggested) glyph name for it does exist in the font. [PR 2724](https://github.com/fontra/fontra/pull/2724)
+
+### Improvements
+
+- Spanish, Portuguese, Chinese, French improvements. [PR 2732](https://github.com/fontra/fontra/pull/2732)
+
+## 2026-07-23 [version 2026.7.2]
+
+### New features
+
+- [languages] Add Spanish translations contributed by Adolfo Jayme Barrientos, Miguel A. Contreras, Gen Ramirez and Romina Hernández. [PR 2717](https://github.com/fontra/fontra/pull/2717), [PR 2718](https://github.com/fontra/fontra/pull/2718)
+- [languages] Add Portuguese translations contributed by Hallef Henrique P. Sousa, Eduardo Omine and Hugo Carvalho. [PR 2708](https://github.com/fontra/fontra/pull/2708), [PR 2710](https://github.com/fontra/fontra/pull/2710), [PR 2711](https://github.com/fontra/fontra/pull/2711), [PR 2714](https://github.com/fontra/fontra/pull/2714), [PR 2718](https://github.com/fontra/fontra/pull/2718)
+
+### Improvements
+
+- [languages] Added more French strings contributed by Gaëtan Baehr. [PR 2717](https://github.com/fontra/fontra/pull/2717)
+- [languages] Added more opportunities for localizations. [PR 2709](https://github.com/fontra/fontra/pull/2709)
+- [languages] Add missing Dutch translations. [PR 2713](https://github.com/fontra/fontra/pull/2713)
+
 ## 2026-07-17 [version 2026.7.1]
 
 ### Improvements

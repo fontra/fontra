@@ -32,7 +32,7 @@ export class FontInfoController extends ViewController {
 
     this.initActions();
 
-    const myMenuBar = makeFontraMenuBar(["File", "Edit", "Font"], this);
+    const myMenuBar = makeFontraMenuBar(["File", "Edit", "View", "Font"], this);
     document.querySelector(".top-bar-container").appendChild(myMenuBar);
 
     this.multiPanelController = new MultiPanelController(
@@ -75,6 +75,17 @@ export class FontInfoController extends ViewController {
       () => this.canUndoRedo(true),
       () => this.getUndoRedoLabel(true)
     );
+
+    registerActionCallbacks(
+      "action.zoom-in",
+      () => this.zoomIn(),
+      () => this.canZoomIn()
+    );
+    registerActionCallbacks(
+      "action.zoom-out",
+      () => this.zoomOut(),
+      () => this.canZoomOut()
+    );
   }
 
   getUndoRedoLabel(isRedo) {
@@ -87,5 +98,21 @@ export class FontInfoController extends ViewController {
 
   doUndoRedo(isRedo) {
     return this.multiPanelController.selectedPanel?.doUndoRedo(isRedo);
+  }
+
+  zoomIn() {
+    this.multiPanelController.selectedPanel?.zoomIn?.();
+  }
+
+  canZoomIn() {
+    return this.multiPanelController.selectedPanel?.canZoomIn?.();
+  }
+
+  zoomOut() {
+    this.multiPanelController.selectedPanel?.zoomOut?.();
+  }
+
+  canZoomOut() {
+    return this.multiPanelController.selectedPanel?.canZoomOut?.();
   }
 }

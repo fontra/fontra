@@ -16,24 +16,4 @@
       <point x="50" y="50" type="line"/>
     </contour>
   </outline>
-  <lib>
-    <dict>
-      <key>xyz.fontra.layer-names</key>
-      <dict>
-        <key>DemoAvar2-NLI_Bend-end/public.default</key>
-        <string>Bend-end</string>
-        <key>DemoAvar2-NLI_Bend-middle-1/public.default</key>
-        <string>Bend-middle-1</string>
-        <key>DemoAvar2-NLI_Bend-middle-2/public.default</key>
-        <string>Bend-middle-2</string>
-        <key>DemoAvar2-NLI_Regular/public.default</key>
-        <string>&lt;default&gt;</string>
-      </dict>
-      <key>xyz.fontra.source-names</key>
-      <dict>
-        <key>Regular</key>
-        <string>&lt;default&gt;</string>
-      </dict>
-    </dict>
-  </lib>
 </glyph>

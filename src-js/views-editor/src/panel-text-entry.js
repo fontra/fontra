@@ -1,6 +1,7 @@
 import { applicationSettingsController } from "@fontra/core/application-settings.js";
 import { getGlyphInfoFromCodePoint } from "@fontra/core/glyph-data.js";
 import * as html from "@fontra/core/html-utils.js";
+import { translate } from "@fontra/core/localization.js";
 import { features, languages, scripts } from "@fontra/core/opentype-tags.js";
 import { labeledCheckbox, labeledPopupSelect } from "@fontra/core/ui-utils.js";
 import { findNestedActiveElement } from "@fontra/core/utils.ts";
@@ -273,7 +274,7 @@ export default class TextEntryPanel extends Panel {
         });
         this.textSettings.featureSettings = featureSettings;
       },
-      "data-tooltip": `Reset ${tableTag} feature settings`,
+      "data-tooltip": translate("sidebar.text-entry.reset-features", tableTag),
       "data-tooltipposition": "left",
     });
   }
@@ -494,47 +495,55 @@ export default class TextEntryPanel extends Panel {
 
     `);
 
-    this.textScriptOptions = [{ label: "Automatic", value: null }];
+    this.textScriptOptions = [
+      { label: translate("sidebar.text-entry.automatic"), value: null },
+    ];
     this.textLanguageOptions = [{ label: "Default (dflt)", value: null }];
 
     this.accordion.items = [
       {
         id: "shaping-options-accordion-item",
-        label: "Text shaping options",
+        label: translate("sidebar.text-entry.text-shaping-options"),
         open: true,
 
         auxiliaryHeaderElement: makeAccordionHeaderButton({
           icon: "menu-2",
           id: "shaping-options-options-button",
-          tooltip: "Additional text shaping options", // TODO: translate
+          tooltip: translate("sidebar.text-entry.text-shaping.options.tooltip"),
           onclick: (event) => this.showTextShapingOptionsMenu(event),
         }),
 
         content: html.div({ id: "shaping-options-contents" }, [
           labeledCheckbox(
-            "Apply text shaping and features", // TODO: translate
+            translate("sidebar.text-entry.apply-text-shaping"),
             this.textSettingsController,
             "applyTextShaping",
             { class: "labeled-checkbox" }
           ),
           ...labeledPopupSelect(
-            "Direction:",
+            translate("sidebar.text-entry.direction"),
             this.textSettingsController,
             "textDirection",
             [
-              { value: null, label: "Automatic" },
-              { value: "ltr", label: "Left-to-Right" },
-              { value: "rtl", label: "Right-to-Left" },
+              { value: null, label: translate("sidebar.text-entry.automatic") },
+              {
+                value: "ltr",
+                label: translate("sidebar.text-entry.direction.left-to-right"),
+              },
+              {
+                value: "rtl",
+                label: translate("sidebar.text-entry.direction.right-to-left"),
+              },
             ]
           ),
           ...labeledPopupSelect(
-            "Script:",
+            translate("sidebar.text-entry.script"),
             this.textSettingsController,
             "textScript",
             this.textScriptOptions
           ),
           ...labeledPopupSelect(
-            "Language:",
+            translate("sidebar.reference-font.language"),
             this.textSettingsController,
             "textLanguage",
             this.textLanguageOptions
@@ -557,7 +566,7 @@ export default class TextEntryPanel extends Panel {
       },
       {
         id: "gsub-features-accordion-item",
-        label: "Substitution",
+        label: translate("sidebar.text-entry.section.substitution"),
         open: true,
         hidden: true,
         content: html.div(
@@ -568,7 +577,7 @@ export default class TextEntryPanel extends Panel {
       },
       {
         id: "gpos-emulated-features-accordion-item",
-        label: "Positioning from font data",
+        label: translate("sidebar.text-entry.section.positioning-from-font-data"),
         open: true,
         hidden: true,
         content: html.div(
@@ -579,7 +588,7 @@ export default class TextEntryPanel extends Panel {
       },
       {
         id: "gpos-features-accordion-item",
-        label: "Positioning",
+        label: translate("sidebar.text-entry.section.positioning"),
         open: true,
         hidden: true,
         content: html.div(
@@ -638,7 +647,7 @@ export default class TextEntryPanel extends Panel {
     this.textScriptOptions.splice(
       0,
       Infinity,
-      { label: "Automatic", value: null },
+      { label: translate("sidebar.text-entry.automatic"), value: null },
       ...Object.keys(scriptAndLanguageInfo).map((script) => ({
         label: `${scripts[script] ?? script} (${script.trim()})`,
         value: script,

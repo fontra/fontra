@@ -102,7 +102,7 @@ export class FontOverviewNavigation extends HTMLElement {
 
     const accordionItems = [
       {
-        label: "Source",
+        label: translate("font-overview.popup.source"),
         id: "location",
         content: html.div({ id: "font-source-location-container" }, [
           await this._makeFontSourcePopup(),
@@ -111,7 +111,7 @@ export class FontOverviewNavigation extends HTMLElement {
       fontAxesAccordionItem,
       hiddenFontAxesAccordionItem,
       {
-        label: "Group by", // TODO: translate
+        label: translate("glyph-organizing.group-by"),
         id: "group-by",
         content: this.groupByCheckboxGroup.makeCheckboxUI(groupByProperties),
       },

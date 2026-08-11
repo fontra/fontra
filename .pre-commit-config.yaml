@@ -24,7 +24,7 @@ repos:
         entry: prettier --write --list-different --ignore-unknown
         language: node
         require_serial: false
-        additional_dependencies: ["prettier@3.8.3"]
+        additional_dependencies: ["prettier@3.9.4"]
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
