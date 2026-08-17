@@ -824,7 +824,10 @@ export class EditorController extends ViewController {
       false
     );
 
-    await this.fontController.subscribeChanges({ kerning: null, features: null }, true);
+    await this.fontController.subscribeChanges(
+      { kerning: null, features: null, conditionalSubstitutions: null },
+      true
+    );
 
     const blankFont = new FontFace("AdobeBlank", `url("/fonts/AdobeBlank.woff2")`, {});
     document.fonts.add(blankFont);
