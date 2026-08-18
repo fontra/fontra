@@ -3,7 +3,7 @@ import { DefaultFormatter } from "./formatters.js";
 import * as html from "./html-utils.js";
 import { uniqueID, zip } from "./utils.ts";
 
-const containerClassName = "fontra-ui-sortable-list-container";
+const containerClassNamePrefix = "fontra-ui-sortable-list-container-";
 const draggingClassName = "fontra-ui-sortable-list-dragging";
 
 html.addStyleSheet(`
@@ -12,7 +12,12 @@ html.addStyleSheet(`
 }
 `);
 
+let containerCounter = 0;
+
 export function setupSortableList(listContainer) {
+  const containerClassName = containerClassNamePrefix + containerCounter;
+  containerCounter += 1;
+
   listContainer.classList.add(containerClassName);
   let originalItems;
   // We need to compare the vertical middle of the dragged item with the sibling,
@@ -25,6 +30,12 @@ export function setupSortableList(listContainer) {
     const draggingItem = listContainer.querySelector(
       `.${containerClassName} > .${draggingClassName}`
     );
+
+    if (!draggingItem) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      return;
+    }
 
     // Getting all items except currently dragging and making array of them
     const siblings = [
@@ -55,6 +66,7 @@ export function setupSortableList(listContainer) {
       event.stopImmediatePropagation();
       return;
     }
+
     setTimeout(() => {
       event.target.classList.add(draggingClassName);
     }, 0);
@@ -70,6 +82,13 @@ export function setupSortableList(listContainer) {
     const draggingItem = listContainer.querySelector(
       `.${containerClassName} > .${draggingClassName}`
     );
+
+    if (!draggingItem) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      return;
+    }
+
     draggingItem.classList.remove(draggingClassName);
 
     const currentItems = [
