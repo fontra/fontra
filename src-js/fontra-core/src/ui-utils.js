@@ -188,7 +188,11 @@ export function textInput(controller, key, options) {
   const inputID = options?.id || `input-${uniqueID()}-${key}`;
   const formatter = options?.formatter || DefaultFormatter;
 
-  const inputElement = html.input({ type: options?.type || "text", id: inputID });
+  const inputElement = html.input({
+    type: options?.type || "text",
+    id: inputID,
+    placeholder: options.placeholder,
+  });
   if (options?.class) {
     inputElement.className = options.class;
   }
