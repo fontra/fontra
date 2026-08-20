@@ -487,10 +487,15 @@ class RuleBox extends HTMLElement {
     this.append(
       html.div(
         { style: "display: flex; gap: 0.5em; align-items: center;" },
-        labeledTextInput("Name", ruleController, "name", {
-          class: "fontra-ui-font-info-conditional-substitutions-rule-name-input",
-          continuous: false,
-        })
+        labeledTextInput(
+          "Rule name", // TODO: translate
+          ruleController,
+          "name",
+          {
+            class: "fontra-ui-font-info-conditional-substitutions-rule-name-input",
+            continuous: false,
+          }
+        )
       )
     );
 
@@ -533,7 +538,7 @@ class RuleBox extends HTMLElement {
             (index) => rule.conditionSets[index]
           );
           rule.conditionSets = newConditionSets;
-        }, "reorder condition sets");
+        }, "reorder condition sets"); // TODO: translate
 
         this._updateContents();
       });
