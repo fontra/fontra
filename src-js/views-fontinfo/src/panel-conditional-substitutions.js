@@ -296,6 +296,13 @@ ${themeColorCSS(colors, ":root")}
 
 .fontra-ui-font-info-conditional-substitutions-conditionset {
   display: grid;
+  gap: 0.5em;
+  align-items: start;
+  grid-template-columns: auto min-content;
+}
+
+.fontra-ui-font-info-conditional-substitutions-conditionset-box {
+  display: grid;
   grid-template-columns: max-content max-content max-content;
   gap: 0.5em;
   padding: 0.5em;
@@ -336,14 +343,16 @@ input::placeholder {
   font-weight: bold;
 }
 
-.delete-substitution-button:hover,
-input:hover + .delete-substitution-button,
-span:hover + input + .delete-substitution-button,
-input:hover + span + input + .delete-substitution-button {
+.fontra-ui-font-info-conditional-substitutions-conditionset:hover > .auto-show-delete-button,
+.fontra-ui-font-info-conditional-substitutions-conditionset-box:hover + .auto-show-delete-button,
+.auto-show-delete-button:hover,
+input:hover + .auto-show-delete-button,
+span:hover + input + .auto-show-delete-button,
+input:hover + span + input + .auto-show-delete-button {
   opacity: 100%;
 }
 
-.delete-substitution-button {
+.auto-show-delete-button {
   opacity: 0;
   transition: 120ms;
 }
@@ -626,7 +635,28 @@ class RuleBox extends HTMLElement {
         "draggable": conditionSets.length > 1,
         "data-originalIndex": index,
       },
-      elements
+      [
+        html.div(
+          {
+            class: "fontra-ui-font-info-conditional-substitutions-conditionset-box",
+          },
+          elements
+        ),
+        html.createDomElement("icon-button", {
+          "class":
+            "fontra-ui-font-info-conditional-substitutions-panel-icon auto-show-delete-button",
+          "src": "/tabler-icons/trash.svg",
+          "onclick": (event) => {
+            this.editRule((rule) => {
+              rule.conditionSets.splice(index, 1);
+            }, translate("conditional-substitutions.condition-set.undo-remove"));
+            this._updateContents();
+          },
+          "data-tooltip": translate("conditional-substitutions.condition-set.remove"),
+          "data-tooltipposition": "bottom",
+          "tabIndex": -1,
+        }),
+      ]
     );
   }
 
@@ -751,7 +781,7 @@ class RuleBox extends HTMLElement {
           outputTextInput,
           html.createDomElement("icon-button", {
             "class":
-              "fontra-ui-font-info-conditional-substitutions-panel-icon delete-substitution-button",
+              "fontra-ui-font-info-conditional-substitutions-panel-icon auto-show-delete-button",
             "src": "/tabler-icons/trash.svg",
             "onclick": (event) => editSubstitution(input, null, null),
             "data-tooltip": translate("conditional-substitutions.substitutions.remove"),
