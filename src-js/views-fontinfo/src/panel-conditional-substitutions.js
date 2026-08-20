@@ -608,7 +608,7 @@ class RuleBox extends HTMLElement {
 
       this.editRule((rule) => {
         rule.conditionSets[index].conditions = newConditions;
-      }, `edit ${name}.${event.key}`);
+      }, translate("conditional-substitutions.condition-set.undo"));
     });
 
     return html.div(
