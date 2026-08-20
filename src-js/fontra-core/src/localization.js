@@ -14,7 +14,7 @@ export const languages = [
   { code: "de", langEn: "German", langLang: "Deutsch", status: "wip" },
   { code: "nl", langEn: "Dutch", langLang: "Nederlands", status: "beta" },
   { code: "fr", langEn: "French", langLang: "Français", status: "beta" },
-  { code: "it", langEn: "Italian", langLang: "Italiano", status: "beta" },
+  { code: "it", langEn: "Italian", langLang: "Italiano", status: "wip" },
   {
     code: "es-ES",
     langEn: "Spanish (Spain)",
@@ -40,6 +40,7 @@ export const languages = [
     status: "beta",
   },
   { code: "tl", langEn: "Filipino", langLang: "Tagalog", status: "beta" },
+  { code: "ru", langEn: "Russian", langLang: "Русский", status: "wip" },
 ];
 
 const debugTranslation = false;

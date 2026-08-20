@@ -146,7 +146,7 @@ export const strings = {
   "development-status-definitions.button.new": "Nova definição de estado",
   "development-status-definitions.dialog.cannot-edit-status-definition.title":
     "Não é possível editar o valor da definição de estado",
-  "development-status-definitions.label.is-default": "É padrão",
+  "development-status-definitions.label.is-default": "É o padrão",
   "development-status-definitions.title": "Definições de estado",
   "development-status-definitions.tooltip.color":
     "Especificar a cor para essa definição de estado",
@@ -155,7 +155,7 @@ export const strings = {
     "Se marcado, este estado será usado como reserva quando um estado de uma matriz não for definido",
   "development-status-definitions.undo.change": "alterar definição de estado",
   "development-status-definitions.undo.change-is-default":
-    'alterar definição de estado "É padrão"',
+    'alterar definição de estado "É o padrão"',
   "development-status-definitions.undo.delete": "excluir definição de estado %0",
   "development-status-definitions.warning.positive-number":
     "Valor precisa ser um número positivo.",
