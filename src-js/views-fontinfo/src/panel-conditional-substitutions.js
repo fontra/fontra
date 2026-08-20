@@ -510,17 +510,26 @@ class RuleBox extends HTMLElement {
       })
     );
 
-    const conditionSetElement = html.div(
-      { class: "conditionsets-container" },
-      this.rule.conditionSets.map((conditionSet, index) =>
+    const conditionSetElement = html.div({ class: "conditionsets-container" }, [
+      ...this.rule.conditionSets.map((conditionSet, index) =>
         this._makeConditionSetElement(
           index,
           this.rule.conditionSets,
           conditionSet.conditions,
           this.fontController.axes.axes.filter((axis) => !axis.values)
         )
-      )
-    );
+      ),
+      makePlusButton(
+        () => {
+          this.editRule((rule) => {
+            rule.conditionSets.push({ conditions: [] });
+          }, translate("conditional-substitutions.condition-set.undo-new"));
+          this._updateContents();
+        },
+        "conditional-substitutions.condition-set.new",
+        "right"
+      ),
+    ]);
 
     if (this.rule.conditionSets.length > 1) {
       setupSortableList(conditionSetElement);
@@ -608,7 +617,7 @@ class RuleBox extends HTMLElement {
 
       this.editRule((rule) => {
         rule.conditionSets[index].conditions = newConditions;
-      }, translate("conditional-substitutions.condition-set.undo"));
+      }, translate("conditional-substitutions.condition-set.undo-edit"));
     });
 
     return html.div(
@@ -796,13 +805,13 @@ function elementIsAllSelected(el) {
   return el.selectionStart === 0 && el.selectionEnd === el.value.length;
 }
 
-function makePlusButton(callback, tooltipKey) {
+function makePlusButton(callback, tooltipKey, tooltipPosition = "bottom") {
   return html.button(
     {
       "onclick": callback,
       "class": "plus-button",
       "data-tooltip": translate(tooltipKey),
-      "data-tooltipposition": "bottom",
+      "data-tooltipposition": tooltipPosition,
     },
     [new InlineSVG("/images/plus.svg")]
   );
