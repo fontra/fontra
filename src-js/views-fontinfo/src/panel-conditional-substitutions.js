@@ -119,8 +119,8 @@ export class ConditionalSubstitutionsPanel extends BaseInfoPanel {
             type: "button",
             class: "fontra-button",
             style: `justify-self: start;`,
-            value: translate("conditional-substitutions.new"),
-            onclick: (event) => this.newConditionalSubstitution(),
+            value: translate("conditional-substitutions.rule.new"),
+            onclick: (event) => this.newRule(),
           }),
           html.div(
             { style: "display: flex; gap: 0.5em; align-items: center;" },
@@ -213,6 +213,17 @@ export class ConditionalSubstitutionsPanel extends BaseInfoPanel {
     );
 
     return [feaTagsPopupLabel, feaTagsPopupSelect];
+  }
+
+  newRule() {
+    this.editConditionalSubstitutions((conditionalSubstitutions) => {
+      conditionalSubstitutions.rules.push({
+        name: "",
+        conditionSets: [{ conditions: [] }],
+        substitutions: {},
+      });
+    }, translate("conditional-substitutions.rule.undo-new"));
+    this.setupUI(true);
   }
 
   editConditionalSubstitutions(editFunc, undoLabel) {
@@ -435,7 +446,7 @@ class RuleBox extends HTMLElement {
   }
 
   deleteRule() {
-    const undoLabel = translate("conditional-substitutions.undo.delete");
+    const undoLabel = translate("conditional-substitutions.rule.undo-remove");
     const root = {
       conditionalSubstitutions: this.conditionalSubstitutions,
     };
@@ -513,7 +524,7 @@ class RuleBox extends HTMLElement {
         "class": "fontra-ui-font-info-conditional-substitutions-panel-icon",
         "src": "/tabler-icons/trash.svg",
         "onclick": (event) => this.deleteRule(),
-        "data-tooltip": translate("conditional-substitutions.delete-rule"),
+        "data-tooltip": translate("conditional-substitutions.rule.remove"),
         "data-tooltipposition": "left",
         "tabIndex": -1,
       })
