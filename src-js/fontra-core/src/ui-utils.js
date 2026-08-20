@@ -191,7 +191,7 @@ export function textInput(controller, key, options) {
   const inputElement = html.input({
     type: options?.type || "text",
     id: inputID,
-    placeholder: options.placeholder,
+    placeholder: options.placeholder ?? "",
   });
   if (options?.class) {
     inputElement.className = options.class;
