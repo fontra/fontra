@@ -173,7 +173,8 @@ export class ConditionalSubstitutionsPanel extends BaseInfoPanel {
         ? ` (${processingController.model.customFeatureTags.join(", ")})`
         : "";
       return (
-        translate("conditional-substitutions.rule-processing.feature-tags") + tagsString
+        translate("conditional-substitutions.rule-processing.feature-tags.menu-title") +
+        tagsString
       );
     };
 
