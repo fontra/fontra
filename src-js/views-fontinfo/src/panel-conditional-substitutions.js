@@ -488,7 +488,7 @@ class RuleBox extends HTMLElement {
       html.div(
         { style: "display: flex; gap: 0.5em; align-items: center;" },
         labeledTextInput(
-          "Rule name", // TODO: translate
+          translate("conditional-substitutions.rule.name"),
           ruleController,
           "name",
           {
@@ -538,7 +538,7 @@ class RuleBox extends HTMLElement {
             (index) => rule.conditionSets[index]
           );
           rule.conditionSets = newConditionSets;
-        }, "reorder condition sets"); // TODO: translate
+        }, translate("conditional-substitutions.condition-sets.undo-reorder"));
 
         this._updateContents();
       });
@@ -548,8 +548,12 @@ class RuleBox extends HTMLElement {
       html.div(
         { class: "fontra-ui-font-info-conditional-substitutions-rule-content" },
         [
-          html.span({ class: "section-header" }, ["Condition Sets"]), // TODO: translate
-          html.span({ class: "section-header" }, ["Substitutions"]), // TODO: translate
+          html.span({ class: "section-header" }, [
+            translate("conditional-substitutions.condition-sets.title"),
+          ]),
+          html.span({ class: "section-header" }, [
+            translate("conditional-substitutions.substitutions.title"),
+          ]),
           conditionSetElement,
           this._makeSubstitutionsList(this.rule.substitutions, options),
         ]
@@ -562,10 +566,13 @@ class RuleBox extends HTMLElement {
       conditionSet.map((item) => [item.name, item])
     );
 
+    const minLabel = translate("conditional-substitutions.condition.min");
+    const maxLabel = translate("conditional-substitutions.condition.max");
+
     const elements = [
       html.span({}),
-      html.span({ class: "min-max-header" }, ["min"]),
-      html.span({ class: "min-max-header" }, ["max"]),
+      html.span({ class: "min-max-header" }, [minLabel]),
+      html.span({ class: "min-max-header" }, [maxLabel]),
     ];
     const model = {};
     const controller = new ObservableController(model);
@@ -573,7 +580,10 @@ class RuleBox extends HTMLElement {
     axes.forEach(({ name }) => {
       elements.push(html.span({ class: "conditionset-axis-name" }, [name])); // axis name label
 
-      for (const property of ["minValue", "maxValue"]) {
+      for (const [property, placeholder] of [
+        ["minValue", minLabel],
+        ["maxValue", maxLabel],
+      ]) {
         const key = `${name}.${property}`;
         model[key] = conditionSetByName[name]?.[property] ?? null;
 
@@ -581,7 +591,7 @@ class RuleBox extends HTMLElement {
           textInput(controller, key, {
             formatter: OptionalNumberFormatter,
             continuous: false,
-            placeholder: property.slice(0, 3),
+            placeholder,
           })
         );
       }
