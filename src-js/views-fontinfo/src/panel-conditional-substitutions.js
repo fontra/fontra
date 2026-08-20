@@ -102,7 +102,7 @@ export class ConditionalSubstitutionsPanel extends BaseInfoPanel {
         reordered.push(ruleBox.rule);
         ruleBox.ruleIndex = index;
       }
-      const undoLabel = translate("conditional-substitutions.undo.reorder");
+      const undoLabel = translate("conditional-substitutions.rules.undo-reorder");
       this.replaceRules(reordered, undoLabel);
     });
 
