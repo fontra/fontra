@@ -145,8 +145,6 @@ export class ConditionalSubstitutionsPanel extends BaseInfoPanel {
   }
 
   _setupFeatureTagsPopup() {
-    // TODO: translate
-
     const tags = this.conditionalSubstitutions.featureTags;
     const tagMap = { rvrn: "rvrn", rclt: "rclt" };
     const processingValue = tags.length == 1 ? (tagMap[tags[0]] ?? "custom") : "custom";
@@ -160,36 +158,46 @@ export class ConditionalSubstitutionsPanel extends BaseInfoPanel {
       if (event.newValue != "custom") {
         this.editConditionalSubstitutions((conditionalSubstitutions) => {
           conditionalSubstitutions.featureTags = [event.newValue];
-        }, "edit feature tags");
+        }, translate("conditional-substitutions.rule-processing.feature-tags.undo"));
       }
     });
 
     processingController.addKeyListener("customFeatureTags", (event) => {
       this.editConditionalSubstitutions((conditionalSubstitutions) => {
         conditionalSubstitutions.featureTags = event.newValue;
-      }, "edit feature tags");
+      }, translate("conditional-substitutions.rule-processing.feature-tags.undo"));
     });
 
     const getCustomLabel = () => {
       const tagsString = processingController.model.customFeatureTags.length
         ? ` (${processingController.model.customFeatureTags.join(", ")})`
         : "";
-      return `Custom OpenType feature tags...${tagsString}`;
+      return (
+        translate("conditional-substitutions.rule-processing.feature-tags") + tagsString
+      );
     };
 
     const [feaTagsPopupLabel, feaTagsPopupSelect] = labeledPopupSelect(
-      "Rule processing:",
+      translate("conditional-substitutions.rule-processing.title"),
       processingController,
       "processing",
       [
-        { value: "rclt", label: "After other OpenType features (rclt)" },
-        { value: "rvrn", label: "Before other OpenType features (rvrn)" },
+        {
+          value: "rclt",
+          label: translate("conditional-substitutions.rule-processing.after"),
+        },
+        {
+          value: "rvrn",
+          label: translate("conditional-substitutions.rule-processing.before"),
+        },
         {
           value: "custom",
           getLabel: getCustomLabel,
           callback: async () => {
             const answer = await askString(
-              "Enter one or more four-character feature tags:", // TODO: translate
+              translate(
+                "conditional-substitutions.rule-processing.feature-tags.enter.title"
+              ),
               processingController.model.customFeatureTags.join(", ")
             );
             if (answer) {
