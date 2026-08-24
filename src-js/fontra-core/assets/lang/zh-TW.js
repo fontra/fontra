@@ -534,6 +534,8 @@ export const strings = {
   "sources.warning.unique-location": "不可同其他源的位置重合",
   "sources.warning.unique-source-name": "不可同其他源重名",
   "toggle-fullscreen": "切換全螢幕",
+  "unused.max": "max",
+  "unused.min": "min",
   "warning.entry-exists": "%0 已存在，請使用不同的數值。",
   "warning.must-be-number": "%0 數值必須為數字",
   "warning.name-must-be-unique": "不可同其他名稱重名",
