@@ -578,6 +578,8 @@ export const strings = {
   "sources.warning.unique-location": "Die Location muss einzigartig sein",
   "sources.warning.unique-source-name": "Der Source-Name muss einzigartig sein",
   "toggle-fullscreen": "Vollbild einschalten",
+  "unused.max": "max",
+  "unused.min": "min",
   "warning.entry-exists": "%0 existiert bereits, bitte verwende einen anderen Wert.",
   "warning.must-be-number": "Der Wert %0 muss eine Zahl sein",
   "warning.name-must-be-unique": "Der Name muss einzigartig sein",

@@ -111,6 +111,10 @@ describe("character-lines", () => {
       input: "/Nonstandard.with.ext",
       expectedLines: [[{ character: undefined, glyphName: "Nonstandard.with.ext" }]],
     },
+    {
+      input: "/glyphname\\ with\\ spaces",
+      expectedLines: [[{ character: undefined, glyphName: "glyphname with spaces" }]],
+    },
   ];
 
   const fallbackGlyphMap = { "outlier": [ord("$")], "Nonstandard.with.ext": [] };
@@ -159,6 +163,10 @@ describe("character-lines", () => {
       expectedOutput: "/?/A",
     },
     { input: [[{ character: "R", glyphName: "outlier" }]], expectedOutput: "R" },
+    {
+      input: [[{ character: null, glyphName: "glyphname with spaces" }]],
+      expectedOutput: "/glyphname\\ with\\ spaces",
+    },
   ];
 
   parametrize(

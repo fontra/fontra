@@ -572,6 +572,8 @@ export const strings = {
     "ソースの補完軸上の座標は他のソースと異なる必要があります。",
   "sources.warning.unique-source-name": "ソース名は他のソースと異なる必要があります。",
   "toggle-fullscreen": "フルスクリーンを切り替え",
+  "unused.max": "max",
+  "unused.min": "min",
   "warning.entry-exists": "%0はすでに存在しているため、他の値を使用してください。",
   "warning.must-be-number": "%0の値は数値である必要があります。",
   "warning.name-must-be-unique": "名前は他と異なる必要があります。",

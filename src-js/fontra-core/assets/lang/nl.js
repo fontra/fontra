@@ -577,6 +577,8 @@ export const strings = {
   "sources.warning.unique-location": "De sourcelocatie moet uniek zijn",
   "sources.warning.unique-source-name": "De sourcenaam moet uniek zijn",
   "toggle-fullscreen": "Schakel volledig scherm",
+  "unused.max": "max",
+  "unused.min": "min",
   "warning.entry-exists": "%0 bestaat al, gebruik een andere waarde.",
   "warning.must-be-number": "De %0 waarde moet een getal zijn",
   "warning.name-must-be-unique": "De naam moet uniek zijn",

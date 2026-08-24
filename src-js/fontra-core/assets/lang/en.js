@@ -566,6 +566,8 @@ export const strings = {
   "sources.warning.unique-location": "The source location must be unique",
   "sources.warning.unique-source-name": "The source name must be unique",
   "toggle-fullscreen": "Toggle Fullscreen",
+  "unused.max": "max",
+  "unused.min": "min",
   "warning.entry-exists": "%0 exists already, please use a different value.",
   "warning.must-be-number": "The %0 value must be a number",
   "warning.name-must-be-unique": "The name must be unique",

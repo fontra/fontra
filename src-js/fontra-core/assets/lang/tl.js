@@ -589,6 +589,8 @@ export const strings = {
   "sources.warning.unique-location": "Dapat na natatangi ang lokasyon ng pinagmulan",
   "sources.warning.unique-source-name": "Dapat na natatangi ang pangalan ng pinagmulan",
   "toggle-fullscreen": "I-toggle ang Fullscreen",
+  "unused.max": "max",
+  "unused.min": "min",
   "warning.entry-exists": "Mayroon nang %0, mangyaring gumamit ng ibang halaga.",
   "warning.must-be-number": "Ang halagang %0 ay dapat isang numero",
   "warning.name-must-be-unique": "Dapat na kakaiba ang pangalan",

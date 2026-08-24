@@ -3104,7 +3104,9 @@ export class EditorController extends ViewController {
     switch (await theDialog.run()) {
       case "copy": {
         const glyphNamesString = chunks(usedBy, 16)
-          .map((chunked) => chunked.map((glyphName) => "/" + glyphName).join(""))
+          .map((chunked) =>
+            chunked.map((glyphName) => "/" + glyphName.replaceAll(" ", "\\ ")).join("")
+          )
           .join("\n");
         const clipboardObject = {
           "text/plain": glyphNamesString,

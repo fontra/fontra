@@ -969,7 +969,7 @@ function openGlyphsInEditor(
       viewInfo.text +=
         0x002f === codePoints[0] ? "//" : String.fromCodePoint(codePoints[0]);
     } else {
-      viewInfo.text += `/${glyphName}`;
+      viewInfo.text += `/${glyphName.replaceAll(" ", "\\ ")}`;
     }
   }
 
