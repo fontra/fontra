@@ -31,13 +31,19 @@ export class ConditionalSubstitutionsPanel extends BaseInfoPanel {
     super.initializePanel();
 
     this.fontController.addChangeListener(
-      { conditionalSubstitutions: null, axes: null },
+      { conditionalSubstitutions: null },
       (change, isExternalChange) => {
         if (isExternalChange) {
           this.setupUI();
           this.undoStack.clear();
         }
       },
+      false
+    );
+
+    this.fontController.addChangeListener(
+      { axes: null },
+      (change, isExternalChange) => this.setupUI(),
       false
     );
 
