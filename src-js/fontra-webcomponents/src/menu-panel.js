@@ -48,6 +48,7 @@ export class MenuPanel extends SimpleElement {
     "foreground-color": ["black", "white"],
     "background-active-color": ["var(--fontra-red-color)", "var(--fontra-red-color)"],
     "foreground-active-color": ["white", "white"],
+    "background-color-with-open-submenu": ["#dedede", "#555"],
   };
 
   static styles = `
@@ -90,7 +91,7 @@ export class MenuPanel extends SimpleElement {
     }
 
     .has-open-submenu {
-      background-color: #dedede;
+      background-color: var(--background-color-with-open-submenu);
     }
 
     .context-menu-item.enabled {
