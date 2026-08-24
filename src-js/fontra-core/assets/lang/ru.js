@@ -120,6 +120,33 @@ export const strings = {
   "background-image.labels.colorize": "Окрасить",
   "background-image.labels.opacity": "Непрозрачность",
   "canvas.clean-view-and-hand-tool": "Режим просмотра и «Рука»",
+  "conditional-substitutions.condition-set.new": "Новый набор условий",
+  "conditional-substitutions.condition-set.remove": "Удалить набор условий",
+  "conditional-substitutions.condition-set.undo-edit": "изменение набора условий",
+  "conditional-substitutions.condition-set.undo-new": "создание набора условий",
+  "conditional-substitutions.condition-set.undo-remove": "удаление набора условий",
+  "conditional-substitutions.condition-sets.title": "Наборы условий",
+  "conditional-substitutions.condition-sets.undo-reorder":
+    "изменение порядка наборов условий",
+  "conditional-substitutions.rule-processing.after":
+    "После остальных фич OpenType (rclt)",
+  "conditional-substitutions.rule-processing.before":
+    "До остальных фич OpenType (rvrn)",
+  "conditional-substitutions.rule-processing.feature-tags.enter.title":
+    "Введите один или несколько четырёхбуквенных тегов фич",
+  "conditional-substitutions.rule-processing.feature-tags.menu-title":
+    "Свои теги фич OpenType...",
+  "conditional-substitutions.rule-processing.feature-tags.undo": "правку тегов фич",
+  "conditional-substitutions.rule-processing.title": "Обработка правил",
+  "conditional-substitutions.rule.name": "Имя правила",
+  "conditional-substitutions.rule.new": "Новое правило условной замены",
+  "conditional-substitutions.rule.remove": "Удалить правило",
+  "conditional-substitutions.rule.undo-new": "создание правила",
+  "conditional-substitutions.rule.undo-remove": "удаление правила",
+  "conditional-substitutions.substitutions.new": "Новая замена",
+  "conditional-substitutions.substitutions.remove": "Удалить замену",
+  "conditional-substitutions.substitutions.title": "Замены",
+  "conditional-substitutions.title": "Условные замены",
   "cross-axis-mapping.axis-participates":
     "Если включить, ось будет участвовать в сопоставлении",
   "cross-axis-mapping.delete": "Удалить межосевое сопоставление",

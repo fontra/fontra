@@ -125,7 +125,34 @@ export const strings = {
   "background-image.labels.colorize": "Colorear",
   "background-image.labels.opacity": "Opacidad",
   "canvas.clean-view-and-hand-tool": "Limpiar vista y herramienta mano",
-  "conditional-substitutions.new": "Nueva regla de sustitución condicional",
+  "conditional-substitutions.condition-set.new": "Nuevo conjunto de condiciones",
+  "conditional-substitutions.condition-set.remove": "Remover conjunto de condiciones",
+  "conditional-substitutions.condition-set.undo-edit": "editar conjunto de condiciones",
+  "conditional-substitutions.condition-set.undo-new": "nuevo conjunto de condiciones",
+  "conditional-substitutions.condition-set.undo-remove":
+    "remover conjunto de condiciones",
+  "conditional-substitutions.condition-sets.title": "Conjunto de condiciones",
+  "conditional-substitutions.condition-sets.undo-reorder":
+    "reordenar conjunto de condiciones",
+  "conditional-substitutions.rule-processing.after":
+    "Después de otra función OpenType (rclt)",
+  "conditional-substitutions.rule-processing.before":
+    "Antes de otra función OpenType (rvrn)",
+  "conditional-substitutions.rule-processing.feature-tags.enter.title":
+    "Inserta una ou más etiquetas de funciones OT de cuatro caracteres",
+  "conditional-substitutions.rule-processing.feature-tags.menu-title":
+    "Etiquetas de funciones OpenType personalizadas…",
+  "conditional-substitutions.rule-processing.feature-tags.undo":
+    "editar etiquetas de funciones OT",
+  "conditional-substitutions.rule-processing.title": "Procesamiento de reglas",
+  "conditional-substitutions.rule.name": "Nombre de regla",
+  "conditional-substitutions.rule.new": "Nueva regla de sustitución condicional",
+  "conditional-substitutions.rule.remove": "Remover regla",
+  "conditional-substitutions.rule.undo-new": "nueva regla",
+  "conditional-substitutions.rule.undo-remove": "remover regla",
+  "conditional-substitutions.substitutions.new": "Nueva sustituición",
+  "conditional-substitutions.substitutions.remove": "Remover sustituición",
+  "conditional-substitutions.substitutions.title": "Sustituciones",
   "conditional-substitutions.title": "Sustituciones condicionales",
   "cross-axis-mapping.axis-participates":
     "Si está marcado, este eje participa en el mapeo",
