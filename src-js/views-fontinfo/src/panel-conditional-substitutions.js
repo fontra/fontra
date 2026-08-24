@@ -1,6 +1,6 @@
+import { RangeRangeSlider } from "@fontra/web-components/range-range-slider.js";
 import { themeColorCSS } from "@fontra/web-components/theme-support.js";
 import { InlineSVG } from "@fontra/web-components/inline-svg.js";
-import { OptionalNumberFormatter } from "@fontra/core/formatters.js";
 import { recordChanges } from "@fontra/core/change-recorder.js";
 import * as html from "@fontra/core/html-utils.js";
 import { addStyleSheet } from "@fontra/core/html-utils.js";
@@ -14,7 +14,7 @@ import {
 } from "@fontra/core/ui-utils.js";
 import { assert, compare, enumerate, range } from "@fontra/core/utils.ts";
 import { askString } from "@fontra/web-components/modal-dialog.js";
-// import { mapAxesFromUserSpaceToSourceSpace } from "@fontra/core/var-model.js";
+import { mapAxesFromUserSpaceToSourceSpace } from "@fontra/core/var-model.js";
 import { BaseInfoPanel } from "./panel-base.js";
 
 const glyphNamesOptionsId =
@@ -31,7 +31,7 @@ export class ConditionalSubstitutionsPanel extends BaseInfoPanel {
     super.initializePanel();
 
     this.fontController.addChangeListener(
-      { conditionalSubstitutions: null },
+      { conditionalSubstitutions: null, axes: null },
       (change, isExternalChange) => {
         if (isExternalChange) {
           this.setupUI();
@@ -67,10 +67,10 @@ export class ConditionalSubstitutionsPanel extends BaseInfoPanel {
     this.conditionalSubstitutions =
       await this.fontController.getConditionalSubstitutions();
 
-    // // Map to source space and filter out discrete axes
-    // this.fontAxesSourceSpace = mapAxesFromUserSpaceToSourceSpace(
-    //   this.fontController.axes.axes
-    // ).filter((axis) => axis.minValue !== undefined);
+    // Map to source space and filter out discrete axes
+    this.fontAxesSourceSpace = mapAxesFromUserSpaceToSourceSpace(
+      this.fontController.axes.axes
+    ).filter((axis) => axis.minValue !== undefined);
 
     const container = html.div({
       id: "conditional-substitutions-rule-container",
@@ -314,7 +314,8 @@ ${themeColorCSS(colors, ":root")}
 
 .fontra-ui-font-info-conditional-substitutions-conditionset-box {
   display: grid;
-  grid-template-columns: max-content max-content max-content;
+  grid-template-columns: max-content max-content;
+  align-items: center;
   gap: 0.5em;
   padding: 0.5em;
   border-radius: 0.5em;
@@ -536,7 +537,7 @@ class RuleBox extends HTMLElement {
           index,
           this.rule.conditionSets,
           conditionSet.conditions,
-          this.fontController.axes.axes.filter((axis) => !axis.values)
+          this.fontAxesSourceSpace
         )
       ),
       makePlusButton(
@@ -598,46 +599,45 @@ class RuleBox extends HTMLElement {
     const minLabel = translate("conditional-substitutions.condition.min");
     const maxLabel = translate("conditional-substitutions.condition.max");
 
-    const elements = [
-      html.span({}),
-      html.span({ class: "min-max-header" }, [minLabel]),
-      html.span({ class: "min-max-header" }, [maxLabel]),
-    ];
-    const model = {};
-    const controller = new ObservableController(model);
+    const elements = [];
 
-    axes.forEach(({ name }) => {
+    axes.forEach(({ name, minValue, maxValue }) => {
       elements.push(html.span({ class: "conditionset-axis-name" }, [name])); // axis name label
 
-      for (const [property, placeholder] of [
-        ["minValue", minLabel],
-        ["maxValue", maxLabel],
-      ]) {
-        const key = `${name}.${property}`;
-        model[key] = conditionSetByName[name]?.[property] ?? null;
+      const slider = new RangeRangeSlider();
+      slider.minValue = minValue;
+      slider.maxValue = maxValue;
+      slider.minLabel = minLabel;
+      slider.maxLabel = maxLabel;
+      slider.valueLow = conditionSetByName[name]?.minValue ?? null;
+      slider.valueHigh = conditionSetByName[name]?.maxValue ?? null;
+      slider.style = "width: 20em;";
+      slider.onChangeCallback = () => {
+        const conditionSet =
+          this.conditionalSubstitutions.rules[this.ruleIndex].conditionSets[index]
+            .conditions;
 
-        elements.push(
-          textInput(controller, key, {
-            formatter: OptionalNumberFormatter,
-            continuous: false,
-            placeholder,
-          })
+        const conditionSetByName = Object.fromEntries(
+          conditionSet.map((item) => [item.name, item])
         );
-      }
-    });
 
-    controller.addListener((event) => {
-      const newConditions = axes
-        .map(({ name }) => ({
-          name,
-          minValue: model[`${name}.minValue`],
-          maxValue: model[`${name}.maxValue`],
-        }))
-        .filter(({ minValue, maxValue }) => minValue != null || maxValue != null);
+        const newConditions = axes
+          .map(({ name: axisName }) =>
+            axisName == name
+              ? { name, minValue: slider.valueLow, maxValue: slider.valueHigh }
+              : {
+                  name: axisName,
+                  minValue: conditionSetByName[axisName]?.minValue ?? null,
+                  maxValue: conditionSetByName[axisName]?.maxValue ?? null,
+                }
+          )
+          .filter(({ minValue, maxValue }) => minValue != null || maxValue != null);
 
-      this.editRule((rule) => {
-        rule.conditionSets[index].conditions = newConditions;
-      }, translate("conditional-substitutions.condition-set.undo-edit"));
+        this.editRule((rule) => {
+          rule.conditionSets[index].conditions = newConditions;
+        }, translate("conditional-substitutions.condition-set.undo-edit"));
+      };
+      elements.push(slider);
     });
 
     return html.div(
