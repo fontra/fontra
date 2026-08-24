@@ -293,7 +293,7 @@ export class MenuPanel extends SimpleElement {
               didSeeMouseDown = false;
               event.preventDefault();
               event.stopImmediatePropagation();
-              if (item.enabled()) {
+              if (item.enabled() && !(typeof item.getItems === "function")) {
                 if (item.actionIdentifier) {
                   doPerformAction(item.actionIdentifier, event);
                 } else {
