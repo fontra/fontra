@@ -602,9 +602,6 @@ class RuleBox extends HTMLElement {
       conditionSet.map((item) => [item.name, item])
     );
 
-    const minLabel = translate("conditional-substitutions.condition.min");
-    const maxLabel = translate("conditional-substitutions.condition.max");
-
     const elements = [];
 
     axes.forEach(({ name, minValue, maxValue }) => {
@@ -613,8 +610,6 @@ class RuleBox extends HTMLElement {
       const slider = new RangeRangeSlider();
       slider.minValue = minValue;
       slider.maxValue = maxValue;
-      slider.minLabel = minLabel;
-      slider.maxLabel = maxLabel;
       slider.valueLow = conditionSetByName[name]?.minValue ?? null;
       slider.valueHigh = conditionSetByName[name]?.maxValue ?? null;
       slider.style = "width: 20em;";

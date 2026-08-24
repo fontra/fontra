@@ -180,8 +180,6 @@ export class RangeRangeSlider extends html.UnlitElement {
   static properties = {
     minValue: { type: Number },
     maxValue: { type: Number },
-    minLabel: { type: String },
-    maxLabel: { type: String },
     onChangeCallback: { type: Function },
   };
 
@@ -192,8 +190,6 @@ export class RangeRangeSlider extends html.UnlitElement {
     this.maxValue = 100;
     this._valueLow = null;
     this._valueHigh = null;
-    this.minLabel = "min";
-    this.maxLabel = "max";
     this.onChangeCallback = (target) => {};
   }
 
@@ -318,7 +314,7 @@ export class RangeRangeSlider extends html.UnlitElement {
         type: "number",
         class: "numeric-input",
         step: "any",
-        placeholder: isLow ? this.minLabel : this.maxLabel,
+        placeholder: isLow ? this.minValue : this.maxValue,
         min: this.minValue,
         max: this.maxValue,
         pattern: "[0-9]+",
