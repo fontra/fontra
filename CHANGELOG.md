@@ -4,6 +4,7 @@
 
 ### New features
 
+- Added a new font info panel to author and edit conditional substitutions (Designspace "Rules"). [Issue 2688](https://github.com/fontra/fontra/issues/2688), [PR 2743](https://github.com/fontra/fontra/pull/2743)
 - [fontra-glyphs] Support reading of Glyphs-specific feature variation syntax. [fontra-glyphs Issue 144](https://github.com/fontra/fontra-glyphs/issues/144), [fontra-glyphs PR 154](https://github.com/fontra/fontra-glyphs/pull/154), [PR 2736](https://github.com/fontra/fontra/pull/2736)
 - Allow the font size in the OpenType code editor to be changed with Zoom In and Zoom out menu items (command/control plus/minus) in the (new) View menu. [Issue 2470](https://github.com/fontra/fontra/issues/2470), [PR 2735](https://github.com/fontra/fontra/pull/2735)
 - Optionally show handles and nodes in background layers. To toggle, use the "Nodes and handles for background layers" menu in "View -> Glyph editor appearance". [PR 2733](https://github.com/fontra/fontra/pull/2733)
