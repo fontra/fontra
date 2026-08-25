@@ -431,7 +431,7 @@ export class UIList extends UnlitElement {
               class: classString,
               value: formattedValue,
               readOnly: true, // Default: true, will be changed within ondblclick -> _makeCellEditor
-              placeholder: colDesc.placeholder,
+              placeholder: colDesc.placeholder ?? "",
             });
             cell.ondblclick = this._makeCellEditor(cell, colDesc, item);
           } else {
