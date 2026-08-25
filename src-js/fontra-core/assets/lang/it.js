@@ -125,6 +125,33 @@ export const strings = {
   "background-image.labels.colorize": "Colora",
   "background-image.labels.opacity": "Opacità",
   "canvas.clean-view-and-hand-tool": "Vista pulita e strumento mano",
+  "conditional-substitutions.condition-set.new": "Nuovo set di condizioni",
+  "conditional-substitutions.condition-set.remove": "Rimuovi set di condizioni",
+  "conditional-substitutions.condition-set.undo-edit": "modifica set di condizioni",
+  "conditional-substitutions.condition-set.undo-new": "nuovo set di condizioni",
+  "conditional-substitutions.condition-set.undo-remove": "rimuovi set di condizioni",
+  "conditional-substitutions.condition-sets.title": "Set di condizioni",
+  "conditional-substitutions.condition-sets.undo-reorder": "riordina set di condizioni",
+  "conditional-substitutions.rule-processing.after":
+    "Dopo altre funzionalità OpenType (rclt)",
+  "conditional-substitutions.rule-processing.before":
+    "Prima di altre funzionalità OpenType (rvrn)",
+  "conditional-substitutions.rule-processing.feature-tags.enter.title":
+    "Inserire uno o più tag funzionalità OT di quattro caratteri",
+  "conditional-substitutions.rule-processing.feature-tags.menu-title":
+    "Tag funzionalità OpenType personalizzati…",
+  "conditional-substitutions.rule-processing.feature-tags.undo":
+    "modifica tag funzionalità",
+  "conditional-substitutions.rule-processing.title": "Elaborazione delle regole",
+  "conditional-substitutions.rule.name": "Nome della regola",
+  "conditional-substitutions.rule.new": "Nuova regola di sostituzione condizionale",
+  "conditional-substitutions.rule.remove": "Rimuovi regola",
+  "conditional-substitutions.rule.undo-new": "nuova regola",
+  "conditional-substitutions.rule.undo-remove": "rimuovi regola",
+  "conditional-substitutions.substitutions.new": "Nuova sostituizione",
+  "conditional-substitutions.substitutions.remove": "Rimuovi sostituizione",
+  "conditional-substitutions.substitutions.title": "Sostituzioni",
+  "conditional-substitutions.title": "Sostituzioni condizionali",
   "cross-axis-mapping.axis-participates":
     "Se selezionato, questo asse partecipa alla mappatura",
   "cross-axis-mapping.delete": "Elimina mappatura inter-asse",

@@ -5,6 +5,7 @@ import { translate } from "@fontra/core/localization.js";
 import { MultiPanelController } from "@fontra/core/multi-panel.js";
 import { ViewController } from "@fontra/core/view-controller.js";
 import { AxesPanel } from "./panel-axes.js";
+import { ConditionalSubstitutionsPanel } from "./panel-conditional-substitutions.js";
 import { CrossAxisMappingPanel } from "./panel-cross-axis-mapping.js";
 import { DevelopmentStatusDefinitionsPanel } from "./panel-development-status-definitions.js";
 import { FontInfoPanel } from "./panel-font-info.js";
@@ -16,6 +17,7 @@ const panelClasses = [
   AxesPanel,
   SourcesPanel,
   OpenTypeFeatureCodePanel,
+  ConditionalSubstitutionsPanel,
   CrossAxisMappingPanel,
   DevelopmentStatusDefinitionsPanel,
 ];

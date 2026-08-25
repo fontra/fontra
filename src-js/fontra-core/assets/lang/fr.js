@@ -120,6 +120,32 @@ export const strings = {
   "background-image.labels.colorize": "Colorer",
   "background-image.labels.opacity": "Opacité",
   "canvas.clean-view-and-hand-tool": "Vue épurée et outil main",
+  "conditional-substitutions.condition-set.new": "New condition set",
+  "conditional-substitutions.condition-set.remove": "Remove condition set",
+  "conditional-substitutions.condition-set.undo-edit": "edit condition set",
+  "conditional-substitutions.condition-set.undo-new": "new condition set",
+  "conditional-substitutions.condition-set.undo-remove": "remove condition set",
+  "conditional-substitutions.condition-sets.title": "Condition sets",
+  "conditional-substitutions.condition-sets.undo-reorder": "reorder condition sets",
+  "conditional-substitutions.rule-processing.after":
+    "After other OpenType features (rclt)",
+  "conditional-substitutions.rule-processing.before":
+    "Before other OpenType features (rvrn)",
+  "conditional-substitutions.rule-processing.feature-tags.enter.title":
+    "Enter one or more four-character feature tags",
+  "conditional-substitutions.rule-processing.feature-tags.menu-title":
+    "Custom OpenType feature tags...",
+  "conditional-substitutions.rule-processing.feature-tags.undo": "edit feature tags",
+  "conditional-substitutions.rule-processing.title": "Rule processing",
+  "conditional-substitutions.rule.name": "Rule name",
+  "conditional-substitutions.rule.new": "Nouvelle règle de substitution conditionnelle",
+  "conditional-substitutions.rule.remove": "Remove rule",
+  "conditional-substitutions.rule.undo-new": "new rule",
+  "conditional-substitutions.rule.undo-remove": "remove rule",
+  "conditional-substitutions.substitutions.new": "New substitution",
+  "conditional-substitutions.substitutions.remove": "Remove substitution",
+  "conditional-substitutions.substitutions.title": "Substitutions",
+  "conditional-substitutions.title": "Substitutions conditionnelles",
   "cross-axis-mapping.axis-participates":
     "Lorsqu'il est coché, cet axe participe au mappage",
   "cross-axis-mapping.delete": "Supprimer le mappage inter-axes",

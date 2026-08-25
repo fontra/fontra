@@ -519,9 +519,12 @@ export class SceneController {
       true
     );
 
-    this.fontController.addChangeListener({ features: null, glyphInfos: null }, () => {
-      this.updateShaperInfo();
-    });
+    this.fontController.addChangeListener(
+      { features: null, glyphInfos: null, conditionalSubstitutions: null },
+      () => {
+        this.updateShaperInfo();
+      }
+    );
 
     this.shaperController.addInvalidateShaperListener(() => {
       this.updateShaperInfo();

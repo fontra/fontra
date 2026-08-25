@@ -185,6 +185,7 @@ function getFontMenuItems(viewController) {
     ["axes.title", "#axes-panel"],
     ["sources.title", "#sources-panel"],
     ["opentype-feature-code.title", "#opentype-feature-code-panel"],
+    ["conditional-substitutions.title", "#conditional-substitutions-panel"],
     ["cross-axis-mapping.title", "#cross-axis-mapping-panel"],
     ["development-status-definitions.title", "#development-status-definitions-panel"],
     [undefined, undefined], // divider

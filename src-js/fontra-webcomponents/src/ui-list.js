@@ -125,6 +125,11 @@ export class UIList extends UnlitElement {
       white-space: nowrap;
     }
 
+    .text-cell::placeholder {
+      opacity: 0.7;
+      color: #999;
+    }
+
     .list-cell.editing,
     .text-cell.editing {
       text-overflow: clip;
@@ -426,6 +431,7 @@ export class UIList extends UnlitElement {
               class: classString,
               value: formattedValue,
               readOnly: true, // Default: true, will be changed within ondblclick -> _makeCellEditor
+              placeholder: colDesc.placeholder ?? "",
             });
             cell.ondblclick = this._makeCellEditor(cell, colDesc, item);
           } else {

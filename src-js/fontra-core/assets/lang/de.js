@@ -120,6 +120,32 @@ export const strings = {
   "background-image.labels.colorize": "Färbung",
   "background-image.labels.opacity": "Transparenz",
   "canvas.clean-view-and-hand-tool": "Ungehinderte Sicht und Hand Werkzeug",
+  "conditional-substitutions.condition-set.new": "New condition set",
+  "conditional-substitutions.condition-set.remove": "Remove condition set",
+  "conditional-substitutions.condition-set.undo-edit": "edit condition set",
+  "conditional-substitutions.condition-set.undo-new": "new condition set",
+  "conditional-substitutions.condition-set.undo-remove": "remove condition set",
+  "conditional-substitutions.condition-sets.title": "Condition sets",
+  "conditional-substitutions.condition-sets.undo-reorder": "reorder condition sets",
+  "conditional-substitutions.rule-processing.after":
+    "After other OpenType features (rclt)",
+  "conditional-substitutions.rule-processing.before":
+    "Before other OpenType features (rvrn)",
+  "conditional-substitutions.rule-processing.feature-tags.enter.title":
+    "Enter one or more four-character feature tags",
+  "conditional-substitutions.rule-processing.feature-tags.menu-title":
+    "Custom OpenType feature tags...",
+  "conditional-substitutions.rule-processing.feature-tags.undo": "edit feature tags",
+  "conditional-substitutions.rule-processing.title": "Rule processing",
+  "conditional-substitutions.rule.name": "Rule name",
+  "conditional-substitutions.rule.new": "New conditional substitution rule",
+  "conditional-substitutions.rule.remove": "Remove rule",
+  "conditional-substitutions.rule.undo-new": "new rule",
+  "conditional-substitutions.rule.undo-remove": "remove rule",
+  "conditional-substitutions.substitutions.new": "New substitution",
+  "conditional-substitutions.substitutions.remove": "Remove substitution",
+  "conditional-substitutions.substitutions.title": "Substitutions",
+  "conditional-substitutions.title": "Conditional substitutions",
   "cross-axis-mapping.axis-participates":
     "Wenn markiert, dann ist diese Achse teil des Mappings",
   "cross-axis-mapping.delete": "Achsübergreifendes Mapping entfernen",
