@@ -453,7 +453,7 @@ export class VariableGlyphController {
       }
     }
 
-    if (layerName != undefined) {
+    if (layerName != undefined && sourceIndex != undefined) {
       return await this.getLayerGlyphController(layerName, sourceIndex, getGlyphFunc);
     }
 
