@@ -181,6 +181,8 @@ const fontOverviewInfoKeys = [
 
 function getFontMenuItems(viewController) {
   const menuItems = [
+    ["font-overview.title", null],
+    [undefined, undefined], // divider
     ["font-info.title", "#font-info-panel"],
     ["axes.title", "#axes-panel"],
     ["sources.title", "#sources-panel"],
@@ -188,8 +190,6 @@ function getFontMenuItems(viewController) {
     ["conditional-substitutions.title", "#conditional-substitutions-panel"],
     ["cross-axis-mapping.title", "#cross-axis-mapping-panel"],
     ["development-status-definitions.title", "#development-status-definitions-panel"],
-    [undefined, undefined], // divider
-    ["font-overview.title", null],
   ];
   return menuItems.map(([title, panelID]) =>
     title
