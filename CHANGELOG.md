@@ -14,6 +14,7 @@
 
 ### Fixes
 
+- Fix editing the left sidebearing in the Selection Info panel: move anchors and guidelines as well. [Issue 2745](https://github.com/fontra/fontra/issues/2745), [PR 2746](https://github.com/fontra/fontra/pull/2746)
 - Support glyph names with spaces. [Issue 2740](https://github.com/fontra/fontra/issues/2740), [PR 2741](https://github.com/fontra/fontra/pull/2741)
 - Fix the menu item background color in dark mode when the item has a submenu; Don't dismiss a menu panel when clicking on an item with a submenu. [PR 2739](https://github.com/fontra/fontra/pull/2739)
 - Fixes behavior when a character is not encoded, but the (suggested) glyph name for it does exist in the font. [PR 2724](https://github.com/fontra/fontra/pull/2724)
