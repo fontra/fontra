@@ -254,12 +254,7 @@ export default class SelectionInfoPanel extends Panel {
                 -layerGlyph.xAdvance,
                 undefined
               );
-              for (const i of range(0, layerGlyph.path.coordinates.length, 2)) {
-                layerGlyph.path.coordinates[i] += translationX;
-              }
-              for (const compo of layerGlyph.components) {
-                compo.transformation.translateX += translationX;
-              }
+              layerGlyph.move(translationX, 0);
               layerGlyph.xAdvance += translationX;
             },
           },
