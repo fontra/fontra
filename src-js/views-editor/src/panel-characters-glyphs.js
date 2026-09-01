@@ -35,7 +35,7 @@ export default class CharactersGlyphsPanel extends Panel {
 
   constructor(editorController) {
     super(editorController);
-    this.throttledUpdate = throttleCalls((senderID) => this.update(senderID), 100);
+    this.throttledUpdate = throttleCalls((arg) => this.update(arg), 100);
     this.sceneSettingsController =
       this.editorController.sceneController.sceneSettingsController;
     this.sceneSettings = this.editorController.sceneController.sceneSettings;
@@ -59,6 +59,13 @@ export default class CharactersGlyphsPanel extends Panel {
         this.updateShapingDebuggerMessages(
           this.sceneSettings.shapingDebuggerMessages ?? []
         )
+    );
+
+    applicationSettingsController.addKeyListener(
+      "outputGlyphsShowKerningForAdvance",
+      (event) => {
+        this.glyphList.columnDescriptions = this._getGlyphListColumnDescriptions();
+      }
     );
 
     this.sceneSettingsController.addKeyListener("shapingDebuggerBreakIndex", (event) =>
@@ -162,49 +169,8 @@ export default class CharactersGlyphsPanel extends Panel {
       showMenu(menuItems, event);
     });
 
-    const showKern = true; // could become a toggle
-
-    const glyphListColumnDescriptions = [
-      {
-        key: "glyphName",
-        title: translate("action-topics.menu.glyph"),
-        width: 100,
-        minWidth: 50,
-      },
-      {
-        key: "advance",
-        title: translate("sidebar.characters-glyphs.advance"),
-        width: "5em",
-        align: "right",
-        get: (item) => {
-          const kern = item.advance - item.originalAdvance;
-          const sign = kern < 0 ? "\u2212" : "+";
-          return kern && showKern
-            ? `${item.originalAdvance}\u200A${sign}\u200A${Math.abs(kern)}`
-            : item.advance;
-        },
-      },
-      {
-        key: "dx",
-        title: "ΔX",
-        width: "3em",
-        align: "right",
-      },
-      {
-        key: "dy",
-        title: "ΔY",
-        width: "3em",
-        align: "right",
-      },
-      {
-        key: "cluster",
-        title: translate("sidebar.characters-glyphs.cluster"),
-        width: "3em",
-        align: "right",
-      },
-    ];
     this.glyphList = new UIList();
-    this.glyphList.columnDescriptions = glyphListColumnDescriptions;
+    this.glyphList.columnDescriptions = this._getGlyphListColumnDescriptions();
     this.glyphList.showHeader = true;
     this.glyphList.minHeight = "5em";
     this.glyphList.settingsStorageKey = "chars-glyphs-glyph-list";
@@ -352,6 +318,15 @@ export default class CharactersGlyphsPanel extends Panel {
         label: translate("sidebar.characters-glyphs.output-glyphs"),
         open: true,
         content: this.glyphList,
+        auxiliaryHeaderElement: makeAccordionHeaderButton({
+          icon: "menu-2",
+          id: "output-glyphs-options-button",
+          tooltip: translate(
+            "sidebar.characters-glyphs.output-glyphs.options-menu-tooltip"
+          ),
+          tooltipposition: "left",
+          onclick: (event) => this.showOutputGlyphsOptionsMenu(event),
+        }),
       },
     ];
 
@@ -361,6 +336,51 @@ export default class CharactersGlyphsPanel extends Panel {
     return html.div({ class: "panel" }, [
       html.div({ class: "main-section" }, [this.accordion]),
     ]);
+  }
+
+  _getGlyphListColumnDescriptions() {
+    const showKern =
+      applicationSettingsController.model.outputGlyphsShowKerningForAdvance;
+
+    return [
+      {
+        key: "glyphName",
+        title: translate("action-topics.menu.glyph"),
+        width: 100,
+        minWidth: 50,
+      },
+      {
+        key: "advance",
+        title: translate("sidebar.characters-glyphs.advance"),
+        width: "5em",
+        align: "right",
+        get: (item) => {
+          const kern = item.advance - item.originalAdvance;
+          const sign = kern < 0 ? "\u2212" : "+"; // U+2212: MINUS SIGN
+          return kern && showKern
+            ? `${item.originalAdvance}\u200A${sign}\u200A${Math.abs(kern)}`
+            : item.advance;
+        },
+      },
+      {
+        key: "dx",
+        title: "ΔX",
+        width: "3em",
+        align: "right",
+      },
+      {
+        key: "dy",
+        title: "ΔY",
+        width: "3em",
+        align: "right",
+      },
+      {
+        key: "cluster",
+        title: translate("sidebar.characters-glyphs.cluster"),
+        width: "3em",
+        align: "right",
+      },
+    ];
   }
 
   _accordionItemOpenClose(item, open) {
@@ -385,6 +405,25 @@ export default class CharactersGlyphsPanel extends Panel {
     ];
 
     const button = this.accordion.querySelector("#shaping-debugger-options-button");
+    const buttonRect = button.getBoundingClientRect();
+    showMenu(menuItems, { x: buttonRect.left, y: buttonRect.bottom });
+  }
+
+  showOutputGlyphsOptionsMenu() {
+    const menuItems = [
+      {
+        title: translate(
+          "sidebar.characters-glyphs.output-glyphs.show-kerning-for-advance"
+        ),
+        callback: () => {
+          applicationSettingsController.model.outputGlyphsShowKerningForAdvance =
+            !applicationSettingsController.model.outputGlyphsShowKerningForAdvance;
+        },
+        checked: applicationSettingsController.model.outputGlyphsShowKerningForAdvance,
+      },
+    ];
+
+    const button = this.accordion.querySelector("#output-glyphs-options-button");
     const buttonRect = button.getBoundingClientRect();
     showMenu(menuItems, { x: buttonRect.left, y: buttonRect.bottom });
   }
