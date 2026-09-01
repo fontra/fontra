@@ -1148,6 +1148,19 @@ class KerningTool extends MetricsBaseTool {
       return {};
     }
 
+    const shaper = this.sceneSettings.shaper;
+
+    if (
+      shaper.getFeatureInfo("GPOS")["kern"] &&
+      !shaper.insertMarkers.find((item) => item.tag === "kern")
+    ) {
+      message(
+        translate("dialog.cant-edit-kerning.title"),
+        translate("dialog.cant-edit-kerning.content.manually-written-feature")
+      );
+      return {};
+    }
+
     const pairSelectors = [];
     const values = [];
     for (const handle of this.selectedHandles) {
