@@ -1143,6 +1143,11 @@ class KerningTool extends MetricsBaseTool {
       return {};
     }
 
+    if (!this.sceneSettings.applyTextShaping) {
+      this.showDialogTextShapingOff();
+      return {};
+    }
+
     const pairSelectors = [];
     const values = [];
     for (const handle of this.selectedHandles) {
@@ -1205,6 +1210,28 @@ class KerningTool extends MetricsBaseTool {
     );
     if (result === "goToNearestSource") {
       this.editor.goToNearestSource(false);
+    }
+  }
+
+  async showDialogTextShapingOff() {
+    const result = await dialog(
+      translate("dialog.cant-edit-kerning.title"),
+      translate("dialog.cant-edit-kerning.content.apply-text-shaping-must-be-on"),
+      [
+        {
+          title: translate("dialog.cancel"),
+          resultValue: "cancel",
+          isCancelButton: true,
+        },
+        {
+          title: translate("dialog.yes"),
+          resultValue: "turn-on",
+          isDefaultButton: true,
+        },
+      ]
+    );
+    if (result === "turn-on") {
+      this.sceneSettings.applyTextShaping = true;
     }
   }
 
