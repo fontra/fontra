@@ -346,6 +346,10 @@ export const strings = {
   "sidebar.characters-glyphs.index": "Индекс",
   "sidebar.characters-glyphs.input-characters": "Входные знаки",
   "sidebar.characters-glyphs.output-glyphs": "Выходные глифы",
+  "sidebar.characters-glyphs.output-glyphs.options-menu-tooltip":
+    "Output glyphs display options",
+  "sidebar.characters-glyphs.output-glyphs.show-kerning-for-advance":
+    "Show kerning in Advance column",
   "sidebar.characters-glyphs.shaping-debugger": "Отладчик формирования",
   "sidebar.characters-glyphs.shaping-debugger.options-menu-tooltip":
     "Параметры отладчика формирования текста",

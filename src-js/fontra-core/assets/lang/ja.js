@@ -348,6 +348,10 @@ export const strings = {
   "sidebar.characters-glyphs.index": "Index",
   "sidebar.characters-glyphs.input-characters": "Input characters",
   "sidebar.characters-glyphs.output-glyphs": "Output glyphs",
+  "sidebar.characters-glyphs.output-glyphs.options-menu-tooltip":
+    "Output glyphs display options",
+  "sidebar.characters-glyphs.output-glyphs.show-kerning-for-advance":
+    "Show kerning in Advance column",
   "sidebar.characters-glyphs.shaping-debugger": "Shaping debugger",
   "sidebar.characters-glyphs.shaping-debugger.options-menu-tooltip":
     "Shaping debugger options",

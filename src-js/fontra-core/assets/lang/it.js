@@ -367,6 +367,10 @@ export const strings = {
   "sidebar.characters-glyphs.index": "Indice",
   "sidebar.characters-glyphs.input-characters": "Caratteri di ingresso",
   "sidebar.characters-glyphs.output-glyphs": "Glifi di uscita",
+  "sidebar.characters-glyphs.output-glyphs.options-menu-tooltip":
+    "Output glyphs display options",
+  "sidebar.characters-glyphs.output-glyphs.show-kerning-for-advance":
+    "Show kerning in Advance column",
   "sidebar.characters-glyphs.shaping-debugger": "Debugger di modellazione testo",
   "sidebar.characters-glyphs.shaping-debugger.options-menu-tooltip":
     "Opzioni debugger di modellazione testo",
