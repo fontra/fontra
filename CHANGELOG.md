@@ -4,6 +4,7 @@
 
 ### Fixes
 
+- [woff/woff2] Fix shaping and OpenType features for woff/woff2 fonts. [PR 2753](https://github.com/fontra/fontra/pull/2753)
 - Remove confusing kerning visualization when "Apply text shaping and features" is off. [PR 2748](https://github.com/fontra/fontra/pull/2748)
 - Refuse to edit kerning when it can't or won't be shown. [Issue 2692](https://github.com/fontra/fontra/issues/2692), [PR 2750](https://github.com/fontra/fontra/pull/2750)
 
