@@ -6,6 +6,10 @@
 
 - Remove confusing kerning visualization when "Apply text shaping and features" is off. [PR 2748](https://github.com/fontra/fontra/pull/2748)
 
+### Improvements
+
+- [shaping debugger] Make showing kerning as part of the advance width field opt-out. [Issue 2522](https://github.com/fontra/fontra/issues/2522), [PR 2749](https://github.com/fontra/fontra/pull/2749)
+
 ## 2026-08-29 [version 2026.8.0]
 
 ### New features
