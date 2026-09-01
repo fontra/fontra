@@ -1084,7 +1084,7 @@ class KerningTool extends MetricsBaseTool {
       return;
     }
 
-    const { editContext, values } = this.getEditContext();
+    const { editContext, values } = await this.getEditContext();
     if (!editContext) {
       return;
     }
@@ -1123,7 +1123,7 @@ class KerningTool extends MetricsBaseTool {
 
     deltaX *= this.getStepValue(event);
 
-    const { editContext, values } = this.getEditContext();
+    const { editContext, values } = await this.getEditContext();
     if (!editContext) {
       return;
     }
@@ -1136,7 +1136,7 @@ class KerningTool extends MetricsBaseTool {
     this.pushUndoItem(changes, undoLabel);
   }
 
-  getEditContext(wantValues = true) {
+  async getEditContext(wantValues = true) {
     const sourceIdentifier = this.getSourceIdentifier();
     if (!sourceIdentifier && wantValues) {
       this.showDialogLocationNotAtSource();
@@ -1300,7 +1300,7 @@ class KerningTool extends MetricsBaseTool {
   }
 
   async deleteSelectedKerningPairs(forThisSource) {
-    const { editContext, values } = this.getEditContext(forThisSource);
+    const { editContext, values } = await this.getEditContext(forThisSource);
     if (!editContext) {
       return;
     }
