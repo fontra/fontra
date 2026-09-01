@@ -1154,10 +1154,7 @@ class KerningTool extends MetricsBaseTool {
       shaper.getFeatureInfo("GPOS")["kern"] &&
       !shaper.insertMarkers.find((item) => item.tag === "kern")
     ) {
-      message(
-        translate("dialog.cant-edit-kerning.title"),
-        translate("dialog.cant-edit-kerning.content.manually-written-feature")
-      );
+      this.showDialogManualKernFeature();
       return {};
     }
 
@@ -1246,6 +1243,13 @@ class KerningTool extends MetricsBaseTool {
     if (result === "turn-on") {
       this.sceneSettings.applyTextShaping = true;
     }
+  }
+
+  showDialogManualKernFeature() {
+    message(
+      translate("dialog.cant-edit-kerning.title"),
+      translate("dialog.cant-edit-kerning.content.manually-written-feature")
+    );
   }
 
   getSourceIdentifier() {
