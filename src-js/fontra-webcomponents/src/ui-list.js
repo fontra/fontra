@@ -270,6 +270,7 @@ export class UIList extends UnlitElement {
     }
 
     this.setItems(this.items);
+    this.restoreSettings();
     this.requestUpdate();
   }
 
