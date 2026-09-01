@@ -246,6 +246,7 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
                     del font[tableTag]
 
             f = io.BytesIO()
+            font.flavor = None
             font.save(f)
 
         data = f.getvalue()

@@ -246,6 +246,27 @@ async def test_getShaperFontData_ttx():
     ]
 
 
+async def test_getShaperFontData_woff2():
+    path = dataDir / "mutatorsans" / "MutatorSans.subset.woff2"
+    font = getFileSystemBackend(path)
+    shaperFontData = await font.getShaperFontData()
+    assert shaperFontData is not None
+    f = io.BytesIO(shaperFontData.data)
+    font = TTFont(f)
+    assert font.flavor is None
+    assert sorted(font.keys()) == [
+        "GDEF",
+        "GPOS",
+        "GSUB",
+        "GlyphOrder",
+        "fvar",
+        "head",
+        "maxp",
+        "name",
+        "post",
+    ]
+
+
 async def test_getSources(testFontMutatorSans):
     sources = await testFontMutatorSans.getSources()
     assert len(sources) == 4
