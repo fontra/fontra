@@ -355,6 +355,10 @@ export const strings = {
   "sidebar.characters-glyphs.index": "Index",
   "sidebar.characters-glyphs.input-characters": "Mga karakter sa pag-input",
   "sidebar.characters-glyphs.output-glyphs": "Mga output glyph",
+  "sidebar.characters-glyphs.output-glyphs.options-menu-tooltip":
+    "Output glyphs display options",
+  "sidebar.characters-glyphs.output-glyphs.show-kerning-for-advance":
+    "Show kerning in Advance column",
   "sidebar.characters-glyphs.shaping-debugger": "Shaping debugger",
   "sidebar.characters-glyphs.shaping-debugger.options-menu-tooltip":
     "Shaping debugger options",

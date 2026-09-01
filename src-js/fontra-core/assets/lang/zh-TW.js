@@ -333,6 +333,10 @@ export const strings = {
   "sidebar.characters-glyphs.index": "索引",
   "sidebar.characters-glyphs.input-characters": "輸入字元",
   "sidebar.characters-glyphs.output-glyphs": "輸出字形",
+  "sidebar.characters-glyphs.output-glyphs.options-menu-tooltip":
+    "Output glyphs display options",
+  "sidebar.characters-glyphs.output-glyphs.show-kerning-for-advance":
+    "Show kerning in Advance column",
   "sidebar.characters-glyphs.shaping-debugger": "文字成形偵錯器",
   "sidebar.characters-glyphs.shaping-debugger.options-menu-tooltip":
     "文字成形偵錯器選項",
