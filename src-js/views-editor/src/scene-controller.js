@@ -715,7 +715,11 @@ export class SceneController {
 
     const [minX, maxX] = this.sceneModel.getTextHorizontalExtents();
 
-    if (this.scrollAdjustBehavior === "text-align" && this._previousTextExtents) {
+    if (
+      this.scrollAdjustBehavior === "text-align" &&
+      this._previousTextExtents &&
+      !this.autoViewBox
+    ) {
       const [minXPre, maxXPre] = this._previousTextExtents;
       originXDelta = minX - minXPre;
     } else if (
