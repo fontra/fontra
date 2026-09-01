@@ -35,7 +35,7 @@ export default class CharactersGlyphsPanel extends Panel {
 
   constructor(editorController) {
     super(editorController);
-    this.throttledUpdate = throttleCalls((arg) => this.update(arg), 100);
+    this.throttledUpdate = throttleCalls(() => this.update(), 100);
     this.sceneSettingsController =
       this.editorController.sceneController.sceneSettingsController;
     this.sceneSettings = this.editorController.sceneController.sceneSettings;
