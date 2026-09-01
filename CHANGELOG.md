@@ -1,5 +1,11 @@
 # Changelog for Fontra
 
+## 2026-09-?? [version 2026.9.0]
+
+### Fixes
+
+- Remove confusing kerning visualization when "Apply text shaping and features" is off. [PR 2748](https://github.com/fontra/fontra/pull/2748)
+
 ## 2026-08-29 [version 2026.8.0]
 
 ### New features
