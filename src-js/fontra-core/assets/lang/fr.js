@@ -188,6 +188,10 @@ export const strings = {
     "L'emplacement n'est pas sur une source pour les glyphes suivants : %0",
   "dialog.cant-edit-glyph.content.locked-glyph": "Le glyphe est verrouillé.",
   "dialog.cant-edit-glyph.title": "Ce n'est pas possible de modifier le glyphe «%0»",
+  "dialog.cant-edit-kerning.content.apply-text-shaping-must-be-on":
+    'The "Apply text shaping and features" option must be on. Would you like to turn it on?',
+  "dialog.cant-edit-kerning.content.manually-written-feature":
+    "There is a manually written 'kern' OpenType feature without an \"# Automatic Code\" insertion marker.",
   "dialog.cant-edit-kerning.title": "Ce n'est pas possible de modifier le crénage",
   "dialog.cant-edit-sidebearings.title":
     "Ce n'est pas possible de modifier les approches",

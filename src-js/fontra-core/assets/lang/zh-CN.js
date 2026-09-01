@@ -182,6 +182,10 @@ export const strings = {
     "以下字形的当前位置不是一个源：%0",
   "dialog.cant-edit-glyph.content.locked-glyph": "该字形已被锁定。",
   "dialog.cant-edit-glyph.title": "无法编辑字形 “%0”",
+  "dialog.cant-edit-kerning.content.apply-text-shaping-must-be-on":
+    'The "Apply text shaping and features" option must be on. Would you like to turn it on?',
+  "dialog.cant-edit-kerning.content.manually-written-feature":
+    "There is a manually written 'kern' OpenType feature without an \"# Automatic Code\" insertion marker.",
   "dialog.cant-edit-kerning.title": "无法编辑字偶距",
   "dialog.cant-edit-sidebearings.title": "无法编辑字边距",
   "dialog.create": "创建",

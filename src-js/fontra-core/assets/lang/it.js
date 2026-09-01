@@ -194,6 +194,10 @@ export const strings = {
     "La posizione non si trova su una sorgente per i seguenti glifi: %0",
   "dialog.cant-edit-glyph.content.locked-glyph": "Il glifo è bloccato.",
   "dialog.cant-edit-glyph.title": "Non è possibile modificare il glifo “%0”",
+  "dialog.cant-edit-kerning.content.apply-text-shaping-must-be-on":
+    'The "Apply text shaping and features" option must be on. Would you like to turn it on?',
+  "dialog.cant-edit-kerning.content.manually-written-feature":
+    "There is a manually written 'kern' OpenType feature without an \"# Automatic Code\" insertion marker.",
   "dialog.cant-edit-kerning.title": "Non è possibile modificare la crenatura",
   "dialog.cant-edit-sidebearings.title":
     "Non è possibile modificare gli spazi laterali",

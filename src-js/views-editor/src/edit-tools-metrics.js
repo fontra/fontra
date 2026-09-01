@@ -1084,7 +1084,7 @@ class KerningTool extends MetricsBaseTool {
       return;
     }
 
-    const { editContext, values } = this.getEditContext();
+    const { editContext, values } = await this.getEditContext();
     if (!editContext) {
       return;
     }
@@ -1123,7 +1123,7 @@ class KerningTool extends MetricsBaseTool {
 
     deltaX *= this.getStepValue(event);
 
-    const { editContext, values } = this.getEditContext();
+    const { editContext, values } = await this.getEditContext();
     if (!editContext) {
       return;
     }
@@ -1136,10 +1136,25 @@ class KerningTool extends MetricsBaseTool {
     this.pushUndoItem(changes, undoLabel);
   }
 
-  getEditContext(wantValues = true) {
+  async getEditContext(wantValues = true) {
     const sourceIdentifier = this.getSourceIdentifier();
     if (!sourceIdentifier && wantValues) {
       this.showDialogLocationNotAtSource();
+      return {};
+    }
+
+    if (!this.sceneSettings.applyTextShaping) {
+      this.showDialogTextShapingOff();
+      return {};
+    }
+
+    const shaper = this.sceneSettings.shaper;
+
+    if (
+      shaper.getFeatureInfo("GPOS")["kern"] &&
+      !shaper.insertMarkers.find((item) => item.tag === "kern")
+    ) {
+      this.showDialogManualKernFeature();
       return {};
     }
 
@@ -1208,6 +1223,35 @@ class KerningTool extends MetricsBaseTool {
     }
   }
 
+  async showDialogTextShapingOff() {
+    const result = await dialog(
+      translate("dialog.cant-edit-kerning.title"),
+      translate("dialog.cant-edit-kerning.content.apply-text-shaping-must-be-on"),
+      [
+        {
+          title: translate("dialog.cancel"),
+          resultValue: "cancel",
+          isCancelButton: true,
+        },
+        {
+          title: translate("dialog.yes"),
+          resultValue: "turn-on",
+          isDefaultButton: true,
+        },
+      ]
+    );
+    if (result === "turn-on") {
+      this.sceneSettings.applyTextShaping = true;
+    }
+  }
+
+  showDialogManualKernFeature() {
+    message(
+      translate("dialog.cant-edit-kerning.title"),
+      translate("dialog.cant-edit-kerning.content.manually-written-feature")
+    );
+  }
+
   getSourceIdentifier() {
     return this.fontController.fontSourcesInstancer.getSourceIdentifierForLocation(
       this.sceneSettings.fontLocationSourceMapped,
@@ -1273,7 +1317,7 @@ class KerningTool extends MetricsBaseTool {
   }
 
   async deleteSelectedKerningPairs(forThisSource) {
-    const { editContext, values } = this.getEditContext(forThisSource);
+    const { editContext, values } = await this.getEditContext(forThisSource);
     if (!editContext) {
       return;
     }
