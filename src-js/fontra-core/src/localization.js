@@ -40,7 +40,7 @@ export const languages = [
     status: "beta",
   },
   { code: "tl", langEn: "Filipino", langLang: "Tagalog", status: "beta" },
-  { code: "ru", langEn: "Russian", langLang: "Русский", status: "wip" },
+  { code: "ru", langEn: "Russian", langLang: "Русский", status: "beta" },
 ];
 
 const debugTranslation = false;
