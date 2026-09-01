@@ -285,7 +285,7 @@ addStyleSheet(`
 }
 
 select {
-  font-family: "fontra-ui-regular";
+  font-family: "fontra-ui-regular", sans-serif;
 }
 
 .fontra-ui-font-info-axes-panel-axis-box-header {
