@@ -664,7 +664,6 @@ class SidebearingTool extends MetricsBaseTool {
   }
 
   async showDialogLocationNotAtSource(glyphNames) {
-    const glyphName = this.sceneSettings.selectedGlyphName;
     const result = await dialog(
       translate("dialog.cant-edit-sidebearings.title"),
       translate(
@@ -1188,7 +1187,6 @@ class KerningTool extends MetricsBaseTool {
   }
 
   async showDialogLocationNotAtSource() {
-    const glyphName = this.sceneSettings.selectedGlyphName;
     const result = await dialog(
       translate("dialog.cant-edit-kerning.title"),
       translate("dialog.cant-edit-glyph.content.location-not-at-source"),
