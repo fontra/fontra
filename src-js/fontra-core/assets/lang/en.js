@@ -187,6 +187,10 @@ export const strings = {
     "The location is not at a source for the following glyphs: %0",
   "dialog.cant-edit-glyph.content.locked-glyph": "The glyph is locked.",
   "dialog.cant-edit-glyph.title": "Can’t edit glyph “%0”",
+  "dialog.cant-edit-kerning.content.apply-text-shaping-must-be-on":
+    'The "Apply text shaping and features" option must be on. Would you like to turn it on?',
+  "dialog.cant-edit-kerning.content.manually-written-feature":
+    "There is a manually written 'kern' OpenType feature without an \"# Automatic Code\" insertion marker.",
   "dialog.cant-edit-kerning.title": "Can’t edit kerning",
   "dialog.cant-edit-sidebearings.title": "Can’t edit sidebearings",
   "dialog.create": "Create",

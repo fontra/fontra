@@ -188,6 +188,10 @@ export const strings = {
     "Положение не соответствует мастеру для следующих глифов: %0",
   "dialog.cant-edit-glyph.content.locked-glyph": "Глиф заблокирован.",
   "dialog.cant-edit-glyph.title": "Не удается править глиф «%0»",
+  "dialog.cant-edit-kerning.content.apply-text-shaping-must-be-on":
+    'The "Apply text shaping and features" option must be on. Would you like to turn it on?',
+  "dialog.cant-edit-kerning.content.manually-written-feature":
+    "There is a manually written 'kern' OpenType feature without an \"# Automatic Code\" insertion marker.",
   "dialog.cant-edit-kerning.title": "Не удается править кернинг",
   "dialog.cant-edit-sidebearings.title": "Не удается править полуапроши",
   "dialog.create": "Создать",

@@ -196,6 +196,10 @@ export const strings = {
     "La ubicación no corresponde a una matriz para los siguientes glifos: %0",
   "dialog.cant-edit-glyph.content.locked-glyph": "El glifo está bloqueado.",
   "dialog.cant-edit-glyph.title": 'No se puede editar el glifo "%0"',
+  "dialog.cant-edit-kerning.content.apply-text-shaping-must-be-on":
+    'The "Apply text shaping and features" option must be on. Would you like to turn it on?',
+  "dialog.cant-edit-kerning.content.manually-written-feature":
+    "There is a manually written 'kern' OpenType feature without an \"# Automatic Code\" insertion marker.",
   "dialog.cant-edit-kerning.title": "No se puede editar el kerning",
   "dialog.cant-edit-sidebearings.title": "No se pueden editar los márgenes laterales",
   "dialog.create": "Crear",

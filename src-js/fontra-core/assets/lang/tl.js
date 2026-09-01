@@ -188,6 +188,10 @@ export const strings = {
     "Ang lokasyon ay wala sa pinagmulan para sa mga sumusunod na glyph: %0",
   "dialog.cant-edit-glyph.content.locked-glyph": "Naka-lock ang gliph.",
   "dialog.cant-edit-glyph.title": "Hindi ma-edit ang gliph na “%0”",
+  "dialog.cant-edit-kerning.content.apply-text-shaping-must-be-on":
+    'The "Apply text shaping and features" option must be on. Would you like to turn it on?',
+  "dialog.cant-edit-kerning.content.manually-written-feature":
+    "There is a manually written 'kern' OpenType feature without an \"# Automatic Code\" insertion marker.",
   "dialog.cant-edit-kerning.title": "Hindi ma-edit ang kerning",
   "dialog.cant-edit-sidebearings.title": "Hindi ma-edit ang mga sidebearing",
   "dialog.create": "Gumawa",
