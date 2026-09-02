@@ -100,7 +100,9 @@ export class ConditionalSubstitutionsPanel extends BaseInfoPanel {
       );
     }
 
-    setupSortableList(container);
+    if (!this.fontController.readOnly) {
+      setupSortableList(container);
+    }
 
     container.addEventListener("reordered", (event) => {
       const reordered = [];
@@ -201,6 +203,12 @@ export class ConditionalSubstitutionsPanel extends BaseInfoPanel {
           value: "custom",
           getLabel: getCustomLabel,
           callback: async () => {
+            if (this.fontController.readOnly) {
+              showDialogCannotEditReadOnly();
+              this.setupUI();
+              return;
+            }
+
             const answer = await askString(
               translate(
                 "conditional-substitutions.rule-processing.feature-tags.enter.title"
@@ -238,6 +246,12 @@ export class ConditionalSubstitutionsPanel extends BaseInfoPanel {
   }
 
   editConditionalSubstitutions(editFunc, undoLabel) {
+    if (this.fontController.readOnly) {
+      showDialogCannotEditReadOnly();
+      this.setupUI();
+      return;
+    }
+
     const root = {
       conditionalSubstitutions: this.conditionalSubstitutions,
     };
@@ -251,6 +265,11 @@ export class ConditionalSubstitutionsPanel extends BaseInfoPanel {
   }
 
   async replaceRules(updatedRules, undoLabel) {
+    if (this.fontController.readOnly) {
+      showDialogCannotEditReadOnly();
+      return;
+    }
+
     const root = {
       conditionalSubstitutions: this.conditionalSubstitutions,
     };
@@ -432,7 +451,7 @@ class RuleBox extends HTMLElement {
       "fontra-ui-font-info-conditional-substitutions-panel-conditional-substitutions-rule-box"
     );
 
-    this.draggable = true;
+    this.draggable = !fontController.readOnly;
     this.fontController = fontController;
     this.fontAxesSourceSpace = fontAxesSourceSpace;
     this.conditionalSubstitutions = conditionalSubstitutions;
@@ -445,6 +464,12 @@ class RuleBox extends HTMLElement {
   }
 
   editRule(editFunc, undoLabel) {
+    if (this.fontController.readOnly) {
+      showDialogCannotEditReadOnly();
+      this._updateContents();
+      return;
+    }
+
     const root = {
       conditionalSubstitutions: this.conditionalSubstitutions,
     };
@@ -458,6 +483,11 @@ class RuleBox extends HTMLElement {
   }
 
   deleteRule() {
+    if (this.fontController.readOnly) {
+      showDialogCannotEditReadOnly();
+      return;
+    }
+
     const undoLabel = translate("conditional-substitutions.rule.undo-remove");
     const root = {
       conditionalSubstitutions: this.conditionalSubstitutions,
@@ -810,10 +840,13 @@ class RuleBox extends HTMLElement {
       .flat();
 
     elements.push(
-      makePlusButton(
-        () => this._updateContents({ addNewSubstitution: true }),
-        "conditional-substitutions.substitutions.new"
-      )
+      makePlusButton(() => {
+        if (this.fontController.readOnly) {
+          showDialogCannotEditReadOnly();
+          return;
+        }
+        this._updateContents({ addNewSubstitution: true });
+      }, "conditional-substitutions.substitutions.new")
     );
 
     if (options.addNewSubstitution) {
