@@ -7,6 +7,7 @@ import * as html from "@fontra/core/html-utils.js";
 import { translate } from "@fontra/core/localization.js";
 import { MultiPanelBasePanel } from "@fontra/core/multi-panel.js";
 import { commandKeyProperty, sleepAsync } from "@fontra/core/utils.ts";
+import { message } from "@fontra/web-components/modal-dialog.js";
 
 export class BaseInfoPanel extends MultiPanelBasePanel {
   constructor(viewController, panelElement) {
@@ -114,4 +115,11 @@ export class BaseInfoPanel extends MultiPanelBasePanel {
     // TODO handle error
     this.fontController.notifyEditListeners("editFinal", this);
   }
+}
+
+export async function showDialogCannotEditReadOnly() {
+  await message(
+    translate("dialog.cant-edit-font.title"),
+    translate("dialog.cant-edit-glyph.content")
+  );
 }
