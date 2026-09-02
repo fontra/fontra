@@ -38,7 +38,7 @@ import { dialogSetup, message } from "@fontra/web-components/modal-dialog.js";
 import { Accordion } from "@fontra/web-components/ui-accordion.js";
 import { UIList } from "@fontra/web-components/ui-list.js";
 import { updateRemoveButton } from "./panel-axes.js";
-import { BaseInfoPanel } from "./panel-base.js";
+import { showDialogCannotEditReadOnly, BaseInfoPanel } from "./panel-base.js";
 
 addStyleSheet(`
 .font-sources-container {
@@ -233,12 +233,18 @@ export class SourcesPanel extends BaseInfoPanel {
         this.fontAxesSourceSpace,
         await this.fontController.getSources(),
         this.selectedSourceIdentifier,
-        this.selectedSourceIdentifier === this.fontController.defaultSourceIdentifier
+        this.selectedSourceIdentifier === this.fontController.defaultSourceIdentifier,
+        this.fontController.readOnly
       )
     );
   }
 
   async deleteSource() {
+    if (this.fontController.readOnly) {
+      showDialogCannotEditReadOnly();
+      return;
+    }
+
     if (!this.selectedSourceIdentifier) {
       return;
     }
@@ -296,6 +302,11 @@ export class SourcesPanel extends BaseInfoPanel {
   }
 
   async newSource() {
+    if (this.fontController.readOnly) {
+      showDialogCannotEditReadOnly();
+      return;
+    }
+
     const newSource = await this._sourcePropertiesRunDialog();
     if (!newSource) {
       return;
@@ -554,7 +565,14 @@ addStyleSheet(`
 `);
 
 class SourceBox extends HTMLElement {
-  constructor(sourcesPanel, fontAxesSourceSpace, sources, sourceIdentifier, isDefault) {
+  constructor(
+    sourcesPanel,
+    fontAxesSourceSpace,
+    sources,
+    sourceIdentifier,
+    isDefault,
+    readOnly
+  ) {
     super();
     this.sourcesPanel = sourcesPanel;
     this.classList.add("fontra-ui-font-info-sources-panel-source-box");
@@ -562,6 +580,7 @@ class SourceBox extends HTMLElement {
     this.sources = sources;
     this.sourceIdentifier = sourceIdentifier;
     this.isDefault = isDefault;
+    this.readOnly = readOnly;
     this.controllers = {};
     this.customDataKeys = openTypeSettingsFontSourcesLevel.map((item) => item.key);
     this._updateContents();
@@ -638,6 +657,12 @@ class SourceBox extends HTMLElement {
   }
 
   editSource(editFunc, undoLabel, preChanges) {
+    if (this.sourcesPanel.fontController.readOnly) {
+      showDialogCannotEditReadOnly();
+      this._updateContents();
+      return;
+    }
+
     const root = { sources: this.sources };
     let changes = recordChanges(root, (root) => {
       editFunc(root.sources[this.sourceIdentifier]);
@@ -826,6 +851,12 @@ input {
         this.controllers.customData,
         openTypeSettings
       );
+
+      if (this.sourcesPanel.fontController.readOnly) {
+        customDataList.addRemoveButton.disableAddButton = true;
+        customDataList.addRemoveButton.disableRemoveButton = true;
+      }
+
       accordionItems.push(
         {
           label: getLabelFromKey("lineMetricsHorizontalLayout"),
@@ -838,7 +869,7 @@ input {
         {
           label: getLabelFromKey("guidelines"),
           id: "guidelines",
-          content: buildFontGuidelineList(this.controllers.guidelines),
+          content: buildFontGuidelineList(this.controllers.guidelines, this.readOnly),
           open: Object.keys(this.source.guidelines).length > 0,
         },
         {
@@ -935,7 +966,7 @@ function buildElementLineMetricsHor(controller) {
   );
 }
 
-function buildFontGuidelineList(controller) {
+function buildFontGuidelineList(controller, readOnly) {
   const model = controller.model;
 
   const makeItem = (label) => {
@@ -1042,6 +1073,11 @@ function buildFontGuidelineList(controller) {
     removeButtonCallback: deleteSelectedItem,
     disableRemoveButton: true,
   });
+
+  if (readOnly) {
+    addRemoveButton.disableAddButton = true;
+    addRemoveButton.disableRemoveButton = true;
+  }
 
   updateRemoveButton(labelList, addRemoveButton);
 
