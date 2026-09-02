@@ -180,6 +180,7 @@ export const strings = {
   "dialog.add": "Add",
   "dialog.cancel": "Cancel",
   "dialog.cant-create-glyph.title": "Can’t create glyph “%0”",
+  "dialog.cant-edit-font.title": "Can't make changes",
   "dialog.cant-edit-glyph.content": "The font is read-only.",
   "dialog.cant-edit-glyph.content.location-not-at-source":
     "The location is not at a source.",

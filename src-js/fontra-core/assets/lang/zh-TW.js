@@ -176,6 +176,7 @@ export const strings = {
   "dialog.add": "新增",
   "dialog.cancel": "取消",
   "dialog.cant-create-glyph.title": "無法建立字形「%0」",
+  "dialog.cant-edit-font.title": "Can't make changes",
   "dialog.cant-edit-glyph.content": "此字型檔為唯讀。",
   "dialog.cant-edit-glyph.content.location-not-at-source": "目前位置不是一個源。",
   "dialog.cant-edit-glyph.content.location-not-at-source-for-glyphs":

@@ -181,6 +181,7 @@ export const strings = {
   "dialog.add": "Voeg toe",
   "dialog.cancel": "Annuleren",
   "dialog.cant-create-glyph.title": "Kan glyph %0 niet aanmaken",
+  "dialog.cant-edit-font.title": "Can't make changes",
   "dialog.cant-edit-glyph.content": "Het font is read-only",
   "dialog.cant-edit-glyph.content.location-not-at-source":
     "De locatie is niet op een source",

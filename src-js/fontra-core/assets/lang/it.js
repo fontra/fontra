@@ -187,6 +187,7 @@ export const strings = {
   "dialog.add": "Aggiungi",
   "dialog.cancel": "Annulla",
   "dialog.cant-create-glyph.title": "Non è possibile creare il glifo “%0”",
+  "dialog.cant-edit-font.title": "Can't make changes",
   "dialog.cant-edit-glyph.content": "Il font è in sola lettura.",
   "dialog.cant-edit-glyph.content.location-not-at-source":
     "La posizione non si trova su una sorgente.",
