@@ -15,7 +15,7 @@ import {
 import { assert, compare, enumerate, range } from "@fontra/core/utils.ts";
 import { askString } from "@fontra/web-components/modal-dialog.js";
 import { mapAxesFromUserSpaceToSourceSpace } from "@fontra/core/var-model.js";
-import { BaseInfoPanel } from "./panel-base.js";
+import { showDialogCannotEditReadOnly, BaseInfoPanel } from "./panel-base.js";
 
 const glyphNamesOptionsId =
   "fontra-ui-font-info-conditional-substitutions-glyph-names-options";
@@ -222,6 +222,11 @@ export class ConditionalSubstitutionsPanel extends BaseInfoPanel {
   }
 
   newRule() {
+    if (this.fontController.readOnly) {
+      showDialogCannotEditReadOnly();
+      return;
+    }
+
     this.editConditionalSubstitutions((conditionalSubstitutions) => {
       conditionalSubstitutions.rules.push({
         name: "",
