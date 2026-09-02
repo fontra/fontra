@@ -11,6 +11,7 @@
 
 ### Improvements
 
+- [font info] Make sure various font info can't be edited when in read-only mode. [PR 2759](https://github.com/fontra/fontra/pull/2759)
 - [shaping debugger] Make showing kerning as part of the advance width field opt-out. [Issue 2522](https://github.com/fontra/fontra/issues/2522), [PR 2749](https://github.com/fontra/fontra/pull/2749)
 
 ## 2026-08-29 [version 2026.8.0]
