@@ -17,7 +17,7 @@ import "@fontra/web-components/add-remove-buttons.js";
 import { IconButton } from "@fontra/web-components/icon-button.js"; // for <icon-button>
 import { dialogSetup } from "@fontra/web-components/modal-dialog.js";
 import { UIList } from "@fontra/web-components/ui-list.js";
-import { BaseInfoPanel } from "./panel-base.js";
+import { showDialogCannotEditReadOnly, BaseInfoPanel } from "./panel-base.js";
 
 const presetAxes = [
   {
@@ -84,11 +84,18 @@ export class AxesPanel extends BaseInfoPanel {
     const axes = this.fontController.axes;
     for (const index of range(axes.axes.length)) {
       axisContainer.appendChild(
-        new AxisBox(axes, index, this.postChange.bind(this), this.deleteAxis.bind(this))
+        new AxisBox(
+          axes,
+          index,
+          this.postChange.bind(this),
+          this.deleteAxis.bind(this),
+          this.fontController.readOnly
+        )
       );
     }
-
-    setupSortableList(axisContainer);
+    if (!this.fontController.readOnly) {
+      setupSortableList(axisContainer);
+    }
 
     axisContainer.addEventListener("reordered", (event) => {
       const reorderedAxes = [];
@@ -117,6 +124,11 @@ export class AxesPanel extends BaseInfoPanel {
   }
 
   async newAxis() {
+    if (this.fontController.readOnly) {
+      showDialogCannotEditReadOnly();
+      return;
+    }
+
     const dialog = await dialogSetup(translate("axes.create"), "", [
       { title: translate("dialog.cancel"), isCancelButton: true },
       { title: translate("axes.add"), resultValue: "ok", isDefaultButton: true },
@@ -228,6 +240,11 @@ export class AxesPanel extends BaseInfoPanel {
   }
 
   async deleteAxis(axisIndex) {
+    if (this.fontController.readOnly) {
+      showDialogCannotEditReadOnly();
+      return;
+    }
+
     const undoLabel = translate(
       "axes.undo.delete",
       this.fontController.axes.axes[axisIndex].name
@@ -298,14 +315,15 @@ select {
 `);
 
 class AxisBox extends HTMLElement {
-  constructor(axes, axisIndex, postChange, deleteAxis) {
+  constructor(axes, axisIndex, postChange, deleteAxis, readOnly) {
     super();
     this.classList.add("fontra-ui-font-info-axes-panel-axis-box");
-    this.draggable = true;
+    this.draggable = !readOnly;
     this.axes = axes;
     this.axisIndex = axisIndex;
     this.postChange = postChange;
     this.deleteAxis = deleteAxis;
+    this.readOnly = readOnly;
     this._updateContents();
   }
 
@@ -314,6 +332,12 @@ class AxisBox extends HTMLElement {
   }
 
   editAxis(editFunc, undoLabel) {
+    if (this.readOnly) {
+      showDialogCannotEditReadOnly();
+      this._updateContents();
+      return;
+    }
+
     const root = { axes: this.axes };
     const changes = recordChanges(root, (root) => {
       editFunc(root.axes.axes[this.axisIndex]);
@@ -324,6 +348,12 @@ class AxisBox extends HTMLElement {
   }
 
   replaceAxis(newAxis, undoLabel) {
+    if (this.readOnly) {
+      showDialogCannotEditReadOnly();
+      this._updateContents();
+      return;
+    }
+
     const root = { axes: this.axes };
     const changes = recordChanges(root, (root) => {
       root.axes.axes[this.axisIndex] = newAxis;

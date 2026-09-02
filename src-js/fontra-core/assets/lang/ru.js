@@ -181,6 +181,7 @@ export const strings = {
   "dialog.add": "Добавить",
   "dialog.cancel": "Отменить",
   "dialog.cant-create-glyph.title": "Не удается создать глиф «%0»",
+  "dialog.cant-edit-font.title": "Can't make changes",
   "dialog.cant-edit-glyph.content": "Этот шрифт только для чтения.",
   "dialog.cant-edit-glyph.content.location-not-at-source":
     "Положение не соответствует ни одному мастеру.",
@@ -189,9 +190,9 @@ export const strings = {
   "dialog.cant-edit-glyph.content.locked-glyph": "Глиф заблокирован.",
   "dialog.cant-edit-glyph.title": "Не удается править глиф «%0»",
   "dialog.cant-edit-kerning.content.apply-text-shaping-must-be-on":
-    'The "Apply text shaping and features" option must be on. Would you like to turn it on?',
+    "Опция «Применить формирование текста и фичи» должна быть включена. Хотите включить её?",
   "dialog.cant-edit-kerning.content.manually-written-feature":
-    "There is a manually written 'kern' OpenType feature without an \"# Automatic Code\" insertion marker.",
+    "Обнаружена созданная вручную фича OpenType «kern» без маркера вставки «# Automatic Code»",
   "dialog.cant-edit-kerning.title": "Не удается править кернинг",
   "dialog.cant-edit-sidebearings.title": "Не удается править полуапроши",
   "dialog.create": "Создать",
@@ -351,9 +352,9 @@ export const strings = {
   "sidebar.characters-glyphs.input-characters": "Входные знаки",
   "sidebar.characters-glyphs.output-glyphs": "Выходные глифы",
   "sidebar.characters-glyphs.output-glyphs.options-menu-tooltip":
-    "Output glyphs display options",
+    "Параметры отображения выходных глифов",
   "sidebar.characters-glyphs.output-glyphs.show-kerning-for-advance":
-    "Show kerning in Advance column",
+    "Показывать кернинг в столбце «Ширина»",
   "sidebar.characters-glyphs.shaping-debugger": "Отладчик формирования",
   "sidebar.characters-glyphs.shaping-debugger.options-menu-tooltip":
     "Параметры отладчика формирования текста",

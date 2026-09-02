@@ -189,6 +189,7 @@ export const strings = {
   "dialog.add": "Añadir",
   "dialog.cancel": "Cancelar",
   "dialog.cant-create-glyph.title": 'No se puede crear el glifo "%0"',
+  "dialog.cant-edit-font.title": "Can't make changes",
   "dialog.cant-edit-glyph.content": "La fuente es de solo lectura.",
   "dialog.cant-edit-glyph.content.location-not-at-source":
     "La ubicación no corresponde a una matriz.",

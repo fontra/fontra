@@ -4,7 +4,7 @@ import { addStyleSheet } from "@fontra/core/html-utils.js";
 import { translate } from "@fontra/core/localization.js";
 import { enumerate, hexToRgba, range, rgbaToHex } from "@fontra/core/utils.ts";
 import { message } from "@fontra/web-components/modal-dialog.js";
-import { BaseInfoPanel } from "./panel-base.js";
+import { showDialogCannotEditReadOnly, BaseInfoPanel } from "./panel-base.js";
 
 const defaultStatusFieldDefinitions = {
   "fontra.sourceStatusFieldDefinitions": [
@@ -85,6 +85,11 @@ export class DevelopmentStatusDefinitionsPanel extends BaseInfoPanel {
   }
 
   async newStatusDefinition() {
+    if (this.fontController.readOnly) {
+      showDialogCannotEditReadOnly();
+      return;
+    }
+
     const statusFieldDefinitions =
       this.fontController.customData["fontra.sourceStatusFieldDefinitions"];
     const nextStatusValue = !statusFieldDefinitions
@@ -187,6 +192,11 @@ class StatusDefinitionBox extends HTMLElement {
   }
 
   checkStatusDefValue(statusDefValue) {
+    if (this.fontController.readOnly) {
+      showDialogCannotEditReadOnly();
+      return false;
+    }
+
     let errorMessage = "";
     const statusDefinitions =
       this.fontController.customData["fontra.sourceStatusFieldDefinitions"];
@@ -213,6 +223,12 @@ class StatusDefinitionBox extends HTMLElement {
   }
 
   replaceStatusDef(newStatusDef) {
+    if (this.fontController.readOnly) {
+      showDialogCannotEditReadOnly();
+      this._updateContents();
+      return;
+    }
+
     const undoLabel = translate("development-status-definitions.undo.change");
     const root = { customData: this.fontController.customData };
     const changes = recordChanges(root, (root) => {
@@ -226,6 +242,11 @@ class StatusDefinitionBox extends HTMLElement {
   }
 
   deleteStatusDef(statusIndex) {
+    if (this.fontController.readOnly) {
+      showDialogCannotEditReadOnly();
+      return;
+    }
+
     const undoLabel = translate(
       "development-status-definitions.undo.delete",
       `'${this.statusDef.label}'`
@@ -244,6 +265,12 @@ class StatusDefinitionBox extends HTMLElement {
   }
 
   changeStatusDefIsDefault(event) {
+    if (this.fontController.readOnly) {
+      showDialogCannotEditReadOnly();
+      this._updateContents();
+      return;
+    }
+
     const undoLabel = translate(
       "development-status-definitions.undo.change-is-default"
     );
@@ -271,6 +298,12 @@ class StatusDefinitionBox extends HTMLElement {
   }
 
   changeStatusDefValue(value) {
+    if (this.fontController.readOnly) {
+      showDialogCannotEditReadOnly();
+      this._updateContents();
+      return;
+    }
+
     const undoLabel = translate("development-status-definitions.undo.change");
     let statusDefinitions =
       this.fontController.customData["fontra.sourceStatusFieldDefinitions"];
@@ -329,6 +362,7 @@ class StatusDefinitionBox extends HTMLElement {
           };
           this.replaceStatusDef(updatedStatusDef);
         },
+        "disabled": this.fontController.readOnly,
         "data-tooltip": translate("development-status-definitions.tooltip.color"),
         "data-tooltipposition": "top",
       })

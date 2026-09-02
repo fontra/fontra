@@ -365,6 +365,8 @@ export class OpenTypeFeatureCodePanel extends BaseInfoPanel {
             this.updateFeatureCode(update);
           }
         }),
+        EditorState.readOnly.of(this.fontController.readOnly),
+        EditorView.editable.of(!this.fontController.readOnly),
       ],
       parent: editorContainer,
     });

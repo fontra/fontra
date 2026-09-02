@@ -181,6 +181,7 @@ export const strings = {
   "dialog.add": "Hinzufügen",
   "dialog.cancel": "Abbrechen",
   "dialog.cant-create-glyph.title": "Kann Glyphen “%0” nicht erstellen",
+  "dialog.cant-edit-font.title": "Can't make changes",
   "dialog.cant-edit-glyph.content": "Der Font ist schreibgeschützt.",
   "dialog.cant-edit-glyph.content.location-not-at-source":
     "Die Location ist nicht bei einer Source.",

@@ -180,6 +180,7 @@ export const strings = {
   "dialog.add": "追加",
   "dialog.cancel": "キャンセル",
   "dialog.cant-create-glyph.title": "グリフ“%0”を作成できませんでした。",
+  "dialog.cant-edit-font.title": "Can't make changes",
   "dialog.cant-edit-glyph.content": "このフォントは読み取り専用です。",
   "dialog.cant-edit-glyph.content.location-not-at-source":
     "現在の補完軸の値はソースと異なります。",

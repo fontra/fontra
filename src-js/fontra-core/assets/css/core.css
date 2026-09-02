@@ -164,6 +164,14 @@ icon-button {
 }
 
 #fontra-project-name {
+  display: flex;
+  gap: 0.2em;
+  align-content: center;
   font-size: 1.2em;
   margin-right: 1em;
+}
+
+#fontra-project-name > inline-svg {
+  width: 1em;
+  transform: translateY(0.08em);
 }

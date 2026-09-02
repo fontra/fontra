@@ -181,6 +181,7 @@ export const strings = {
   "dialog.add": "Idagdag",
   "dialog.cancel": "Kanselahin",
   "dialog.cant-create-glyph.title": "Hindi makagawa ng glyph na “%0”",
+  "dialog.cant-edit-font.title": "Can't make changes",
   "dialog.cant-edit-glyph.content": "Read-only ang font.",
   "dialog.cant-edit-glyph.content.location-not-at-source":
     "Ang lokasyon ay wala sa isang pinagmumulan.",

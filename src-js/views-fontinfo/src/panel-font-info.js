@@ -7,7 +7,7 @@ import { ObservableController } from "@fontra/core/observable-object.ts";
 import { CustomDataList } from "@fontra/web-components/custom-data-list.js";
 import { Accordion } from "@fontra/web-components/ui-accordion.js";
 import { Form } from "@fontra/web-components/ui-form.js";
-import { BaseInfoPanel } from "./panel-base.js";
+import { showDialogCannotEditReadOnly, BaseInfoPanel } from "./panel-base.js";
 
 const fontInfoFields = [
   // [property name, localization key, type]
@@ -107,6 +107,10 @@ export class FontInfoPanel extends BaseInfoPanel {
         ].getDefaultFunction(info),
     }));
     const customDataList = new CustomDataList(customDataController, openTypeSettings);
+    if (this.fontController.readOnly) {
+      customDataList.addRemoveButton.disableAddButton = true;
+      customDataList.addRemoveButton.disableRemoveButton = true;
+    }
     const accordion = new Accordion();
 
     accordion.appendStyle(`
@@ -139,6 +143,12 @@ export class FontInfoPanel extends BaseInfoPanel {
   }
 
   async editFontInfo(editFunc, undoLabel) {
+    if (this.fontController.readOnly) {
+      showDialogCannotEditReadOnly();
+      this.setupUI();
+      return;
+    }
+
     const root = {
       fontInfo: await this.fontController.getFontInfo(),
       unitsPerEm: this.fontController.unitsPerEm,
