@@ -107,6 +107,10 @@ export class FontInfoPanel extends BaseInfoPanel {
         ].getDefaultFunction(info),
     }));
     const customDataList = new CustomDataList(customDataController, openTypeSettings);
+    if (this.fontController.readOnly) {
+      customDataList.addRemoveButton.disableAddButton = true;
+      customDataList.addRemoveButton.disableRemoveButton = true;
+    }
     const accordion = new Accordion();
 
     accordion.appendStyle(`
