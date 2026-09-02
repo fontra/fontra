@@ -7,7 +7,7 @@ import { ObservableController } from "@fontra/core/observable-object.ts";
 import { CustomDataList } from "@fontra/web-components/custom-data-list.js";
 import { Accordion } from "@fontra/web-components/ui-accordion.js";
 import { Form } from "@fontra/web-components/ui-form.js";
-import { BaseInfoPanel } from "./panel-base.js";
+import { showDialogCannotEditReadOnly, BaseInfoPanel } from "./panel-base.js";
 
 const fontInfoFields = [
   // [property name, localization key, type]
@@ -139,6 +139,12 @@ export class FontInfoPanel extends BaseInfoPanel {
   }
 
   async editFontInfo(editFunc, undoLabel) {
+    if (this.fontController.readOnly) {
+      showDialogCannotEditReadOnly();
+      this.setupUI();
+      return;
+    }
+
     const root = {
       fontInfo: await this.fontController.getFontInfo(),
       unitsPerEm: this.fontController.unitsPerEm,
