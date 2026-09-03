@@ -1,5 +1,6 @@
 from ..core.classes import FontSource, LineMetric
 from ..core.protocols import WritableFontBackend
+from . import newFileSystemBackend
 
 defaultLineMetrics = {
     "ascender": (750, 16),
@@ -45,3 +46,10 @@ async def populateBackend(backend: WritableFontBackend) -> None:
 
     await backend.putSources(sources)
     await backend.putCustomData(customData)
+
+
+async def createNewFontAndPopulate(fontPath):
+    # Create a new empty project on disk
+    destBackend = newFileSystemBackend(fontPath)
+    await populateBackend(destBackend)
+    await destBackend.aclose()
