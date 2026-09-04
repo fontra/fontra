@@ -35,12 +35,17 @@ export class PopupMenu extends UnlitElement {
       display: inline-block;
       height: 1.25em;
       width: 1.25em;
-      transform: rotate(180deg);
+      transform: translate(0, 0.1em);
     }
+
+    inline-svg.chevron {
+      transform: translate(0, 0) rotate(180deg);
+    }
+
   `;
 
   static properties = {
-    valueLabel: { type: String },
+    valueLabel: { type: null },
   };
 
   constructor(valueLabel, getMenuItemsFunc) {
@@ -55,6 +60,7 @@ export class PopupMenu extends UnlitElement {
       [
         html.span({}, [this.valueLabel]),
         html.createDomElement("inline-svg", {
+          class: "chevron",
           src: "/tabler-icons/chevron-up.svg",
         }),
       ]
