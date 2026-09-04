@@ -3,7 +3,11 @@ import { getGlyphInfoFromCodePoint } from "@fontra/core/glyph-data.js";
 import * as html from "@fontra/core/html-utils.js";
 import { translate } from "@fontra/core/localization.js";
 import { features, languages, scripts } from "@fontra/core/opentype-tags.js";
-import { labeledCheckbox, labeledPopupSelect } from "@fontra/core/ui-utils.js";
+import {
+  labeledCheckbox,
+  labeledPopupSelect,
+  popupSelect,
+} from "@fontra/core/ui-utils.js";
 import { findNestedActiveElement } from "@fontra/core/utils.ts";
 import { showMenu } from "@fontra/web-components/menu-panel.js";
 import {
@@ -115,35 +119,9 @@ export default class TextEntryPanel extends Panel {
       align-content: start;
     }
 
-    #text-align-menu {
+    #text-options-container {
       display: grid;
-      grid-template-columns: auto auto auto;
-      justify-content: start;
-      gap: 0.5em;
-    }
-
-    #text-align-menu > inline-svg {
-      width: 1.5rem;
-      height: 1.5rem;
-      position: relative;
-      padding: 0.3em 0.45em 0.3em 0.45em;
-      border-radius: 0.75em;
-      cursor: pointer;
-      user-select: none;
-      transition: 120ms;
-      box-sizing: content-box; /* FIXME: use border-box */
-    }
-
-    #text-align-menu > inline-svg:hover {
-      background-color: #c0c0c050;
-    }
-
-    #text-align-menu > inline-svg:active {
-      background-color: #c0c0c080;
-    }
-
-    #text-align-menu > inline-svg.selected {
-      background-color: #c0c0c060;
+      grid-template-columns: min-content auto auto;
     }
 
     #text-entry-textarea {
@@ -179,7 +157,7 @@ export default class TextEntryPanel extends Panel {
     );
 
     this.setupTextEntryElement();
-    this.setupTextAlignElement();
+    this.setupTextOptionsElement();
     this.setupAccordionElement();
     this.setupIntersectionObserver();
   }
@@ -200,26 +178,7 @@ export default class TextEntryPanel extends Panel {
               wrap: "off",
               id: "text-entry-textarea",
             }),
-            html.div(
-              {
-                id: "text-align-menu",
-              },
-              [
-                html.createDomElement("inline-svg", {
-                  "data-align": "left",
-                  "src": "/images/alignleft.svg",
-                }),
-                html.createDomElement("inline-svg", {
-                  "class": "selected",
-                  "data-align": "center",
-                  "src": "/images/aligncenter.svg",
-                }),
-                html.createDomElement("inline-svg", {
-                  "data-align": "right",
-                  "src": "/images/alignright.svg",
-                }),
-              ]
-            ),
+            html.div({ id: "text-options-container" }, []),
             html.div({ id: "text-settings-accordion" }),
           ]
         ),
@@ -309,22 +268,40 @@ export default class TextEntryPanel extends Panel {
     }
   }
 
-  setupTextAlignElement() {
-    this.textAlignElement = this.contentElement.querySelector("#text-align-menu");
-    this.updateAlignElement(this.textSettings.align);
+  setupTextOptionsElement() {
+    this.textOptionsElement = this.contentElement.querySelector(
+      "#text-options-container"
+    );
 
-    this.textSettingsController.addKeyListener("align", (event) => {
-      this.updateAlignElement(this.textSettings.align);
-    });
+    this.textOptionsElement.innerHTML = "";
+    const select = popupSelect(this.textSettingsController, "align", [
+      {
+        value: "left",
+        getLabel: () =>
+          html.createDomElement("inline-svg", {
+            src: "/images/alignleft.svg",
+            style: "width: 1.2em; height: 1.3em",
+          }),
+      },
+      {
+        value: "center",
+        getLabel: () =>
+          html.createDomElement("inline-svg", {
+            src: "/images/aligncenter.svg",
+            style: "width: 1.2em; height: 1.3em",
+          }),
+      },
+      {
+        value: "right",
+        getLabel: () =>
+          html.createDomElement("inline-svg", {
+            src: "/images/alignright.svg",
+            style: "width: 1.2em; height: 1.3em",
+          }),
+      },
+    ]);
 
-    for (const el of this.textAlignElement.children) {
-      el.onclick = (event) => {
-        if (event.target.classList.contains("selected")) {
-          return;
-        }
-        this.textSettings.align = el.dataset.align;
-      };
-    }
+    this.textOptionsElement.appendChild(select);
   }
 
   setupTextEntryElement() {
