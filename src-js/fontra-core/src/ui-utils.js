@@ -204,6 +204,10 @@ export function textInput(controller, key, options) {
     }
   };
 
+  const df = new DraggableFiddler();
+  inputElement.addEventListener("focus", (event) => df.onfocus(inputElement));
+  inputElement.addEventListener("blur", (event) => df.onblur());
+
   controller.addKeyListener(key, (event) => {
     inputElement.value = formatter.toString(event.newValue);
   });
@@ -322,4 +326,36 @@ export function pickFile(fileTypes) {
   inputElement.click();
 
   return resultPromise;
+}
+
+class DraggableFiddler {
+  /*
+    This is to work around a Firefox bug that doesn't let the user mouse-select
+    text in a text input if said text input is inside a draggable element.
+    The workaround is to make the draggable parent temporarily non-draggable.
+    This doesn't work perfectly (you need to focus the element first), but it's
+    still better than no mouse-selectability at all.
+   */
+
+  constructor() {
+    this.draggableElement = null;
+  }
+
+  onfocus(element) {
+    while (element) {
+      element = element.parentElement;
+      if (element?.draggable) {
+        element.draggable = false;
+        break;
+      }
+    }
+
+    this.draggableElement = element;
+  }
+
+  onblur() {
+    if (this.draggableElement) {
+      this.draggableElement.draggable = true;
+    }
+  }
 }
