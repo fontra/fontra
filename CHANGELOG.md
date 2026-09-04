@@ -2,6 +2,10 @@
 
 ## 2026-09-?? [version 2026.9.0]
 
+### New features
+
+[command line] The `fontra` command line tool got a new subcommand `new`, for creating a new font. [Discussion 2761](https://github.com/fontra/fontra/discussions/2761), [PR 2762](https://github.com/fontra/fontra/pull/2762)
+
 ### Fixes
 
 - [glyph editor] Fix text align change when in auto-view-box mode. [PR 2758](https://github.com/fontra/fontra/pull/2758)
