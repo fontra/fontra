@@ -8,6 +8,7 @@
 
 ### Fixes
 
+- [firefox] Work around text selection problem within draggable boxes. [PR 2763](https://github.com/fontra/fontra/pull/2763)
 - [glyph editor] Fix text align change when in auto-view-box mode. [PR 2758](https://github.com/fontra/fontra/pull/2758)
 - [woff/woff2] Fix shaping and OpenType features for woff/woff2 fonts. [PR 2753](https://github.com/fontra/fontra/pull/2753)
 - Remove confusing kerning visualization when "Apply text shaping and features" is off. [PR 2748](https://github.com/fontra/fontra/pull/2748)
