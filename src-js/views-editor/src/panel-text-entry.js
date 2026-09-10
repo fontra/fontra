@@ -7,8 +7,7 @@ import { features, languages, scripts } from "@fontra/core/opentype-tags.js";
 import {
   labeledCheckbox,
   labeledPopupSelect,
-  popupSelect,
-  textInput,
+  labeledTextInput,
 } from "@fontra/core/ui-utils.js";
 import { findNestedActiveElement } from "@fontra/core/utils.ts";
 import { showMenu } from "@fontra/web-components/menu-panel.js";
@@ -121,12 +120,6 @@ export default class TextEntryPanel extends Panel {
       align-content: start;
     }
 
-    #text-options-container {
-      display: grid;
-      grid-template-columns: min-content min-content min-content;
-      gap: 0.5em;
-    }
-
     #text-entry-textarea {
       background-color: var(--text-input-background-color);
       color: var(--text-input-foreground-color);
@@ -145,18 +138,6 @@ export default class TextEntryPanel extends Panel {
     ui-accordion {
       min-height: 0;
     }
-
-    input[type="text"] {
-      background-color: var(--text-input-background-color);
-      color: var(--text-input-foreground-color);
-      border-radius: 0.25em;
-      border: none;
-      outline: none;
-      padding: 0.1em 0.3em;
-      font-family: fontra-ui-regular, sans-serif;
-      font-size: 100%;
-    }
-
   `;
 
   constructor(editorController) {
@@ -172,7 +153,6 @@ export default class TextEntryPanel extends Panel {
     );
 
     this.setupTextEntryElement();
-    this.setupTextOptionsElement();
     this.setupAccordionElement();
     this.setupIntersectionObserver();
   }
@@ -193,7 +173,6 @@ export default class TextEntryPanel extends Panel {
               wrap: "off",
               id: "text-entry-textarea",
             }),
-            html.div({ id: "text-options-container" }, []),
             html.div({ id: "text-settings-accordion" }),
           ]
         ),
@@ -277,60 +256,71 @@ export default class TextEntryPanel extends Panel {
     return this.accordion.querySelector("#gpos-features-contents");
   }
 
-  updateAlignElement(align) {
-    for (const el of this.textAlignElement.children) {
-      el.classList.toggle("selected", align === el.dataset.align);
-    }
-  }
-
-  setupTextOptionsElement() {
-    this.textOptionsElement = this.contentElement.querySelector(
-      "#text-options-container"
+  makeTextOptionsElement() {
+    this.textAlignElement = html.div(
+      {
+        id: "text-align-menu",
+      },
+      [
+        html.createDomElement("inline-svg", {
+          "data-align": "left",
+          "src": "/tabler-icons/align-left.svg",
+        }),
+        html.createDomElement("inline-svg", {
+          "class": "selected",
+          "data-align": "center",
+          "src": "/tabler-icons/align-center.svg",
+        }),
+        html.createDomElement("inline-svg", {
+          "data-align": "right",
+          "src": "/tabler-icons/align-right.svg",
+        }),
+      ]
     );
 
-    this.textOptionsElement.innerHTML = "";
-    const select = popupSelect(this.textSettingsController, "align", [
+    for (const el of this.textAlignElement.children) {
+      el.onclick = (event) => {
+        if (event.target.classList.contains("selected")) {
+          return;
+        }
+        this.textSettings.align = el.dataset.align;
+      };
+    }
+
+    this.textSettingsController.addKeyListener("align", (event) => {
+      this.updateAlignElement(this.textSettings.align);
+    });
+
+    this.updateAlignElement(this.textSettings.align);
+
+    const textSizeInput = labeledTextInput(
+      "Size",
+      this.textSettingsController,
+      "textSize",
       {
-        value: "left",
-        getLabel: () =>
-          html.createDomElement("inline-svg", {
-            src: "/images/alignleft.svg",
-            style: "width: 1.2em; height: 1.3em",
-          }),
-      },
+        formatter: NumberFormatter,
+        continuous: false,
+        id: "text-size-input",
+      }
+    );
+
+    const lineHeightInput = labeledTextInput(
+      "Line height",
+      this.textSettingsController,
+      "lineHeight",
       {
-        value: "center",
-        getLabel: () =>
-          html.createDomElement("inline-svg", {
-            src: "/images/aligncenter.svg",
-            style: "width: 1.2em; height: 1.3em",
-          }),
-      },
-      {
-        value: "right",
-        getLabel: () =>
-          html.createDomElement("inline-svg", {
-            src: "/images/alignright.svg",
-            style: "width: 1.2em; height: 1.3em",
-          }),
-      },
+        formatter: NumberFormatter,
+        continuous: false,
+        id: "line-height-input",
+      }
+    );
+
+    return html.div({ id: "text-options-container" }, [
+      html.label({ style: "white-space: nowrap; text-align: right;" }, ["Alignment"]),
+      this.textAlignElement,
+      ...textSizeInput,
+      ...lineHeightInput,
     ]);
-
-    const textSizeInput = textInput(this.textSettingsController, "textSize", {
-      formatter: NumberFormatter,
-      continuous: false,
-    });
-    textSizeInput.style = "width: 4.5em;";
-
-    const lineHeightInput = textInput(this.textSettingsController, "lineHeight", {
-      formatter: NumberFormatter,
-      continuous: false,
-    });
-    lineHeightInput.style = "width: 4.5em;";
-
-    this.textOptionsElement.appendChild(select);
-    this.textOptionsElement.appendChild(textSizeInput);
-    this.textOptionsElement.appendChild(lineHeightInput);
   }
 
   setupTextEntryElement() {
@@ -376,6 +366,12 @@ export default class TextEntryPanel extends Panel {
     );
   }
 
+  updateAlignElement(align) {
+    for (const el of this.textAlignElement.children) {
+      el.classList.toggle("selected", align === el.dataset.align);
+    }
+  }
+
   setupAccordionElement() {
     this.textSettingsController.addKeyListener("textScript", async (event) => {
       const shaper = await this.getShaper();
@@ -386,6 +382,66 @@ export default class TextEntryPanel extends Panel {
 
     this.accordion = new Accordion();
     this.accordion.appendStyle(`
+      #text-options-container {
+        display: grid;
+        grid-template-columns: min-content min-content;
+        align-items: center;
+        gap: 0.5em;
+      }
+
+      #text-align-menu {
+        display: grid;
+        grid-template-columns: auto auto auto;
+        justify-content: start;
+        gap: 0.25em;
+      }
+
+      #text-align-menu > inline-svg {
+        width: 1.1rem;
+        height: 1.1rem;
+        position: relative;
+        padding: 0.2em 0.3em 0.2em 0.3em;
+        border-radius: 0.4em;
+        cursor: pointer;
+        user-select: none;
+        transition: 120ms;
+        box-sizing: content-box; /* FIXME: use border-box */
+      }
+
+      #text-align-menu > inline-svg:hover {
+        background-color: #c0c0c050;
+      }
+
+      #text-align-menu > inline-svg:active {
+        background-color: #c0c0c080;
+      }
+
+      #text-align-menu > inline-svg.selected {
+        background-color: #c0c0c060;
+      }
+
+      input[type="text"] {
+        background-color: var(--text-input-background-color);
+        color: var(--text-input-foreground-color);
+        border-radius: 0.25em;
+        border: none;
+        outline: none;
+        padding: 0.1em 0.3em;
+        font-family: fontra-ui-regular, sans-serif;
+        font-size: 100%;
+      }
+
+      .labeled-thing {
+        display: flex;
+        gap: 0.3em;
+        align-items: center;
+      }
+
+      #text-size-input,
+      #line-height-input {
+        width: 4.5em;
+      }
+
       .features-container {
         display: grid;
         grid-template-columns: min-content auto;
@@ -508,6 +564,12 @@ export default class TextEntryPanel extends Panel {
     this.textLanguageOptions = [{ label: "Default (dflt)", value: null }];
 
     this.accordion.items = [
+      {
+        id: "text-layout-options-item",
+        label: "Text layout options",
+        open: true,
+        content: this.makeTextOptionsElement(),
+      },
       {
         id: "shaping-options-accordion-item",
         label: translate("sidebar.text-entry.text-shaping-options"),
