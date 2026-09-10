@@ -1,12 +1,14 @@
 import { applicationSettingsController } from "@fontra/core/application-settings.js";
 import { getGlyphInfoFromCodePoint } from "@fontra/core/glyph-data.js";
 import * as html from "@fontra/core/html-utils.js";
+import { NumberFormatter } from "@fontra/core/formatters.js";
 import { translate } from "@fontra/core/localization.js";
 import { features, languages, scripts } from "@fontra/core/opentype-tags.js";
 import {
   labeledCheckbox,
   labeledPopupSelect,
   popupSelect,
+  textInput,
 } from "@fontra/core/ui-utils.js";
 import { findNestedActiveElement } from "@fontra/core/utils.ts";
 import { showMenu } from "@fontra/web-components/menu-panel.js";
@@ -121,7 +123,8 @@ export default class TextEntryPanel extends Panel {
 
     #text-options-container {
       display: grid;
-      grid-template-columns: min-content auto auto;
+      grid-template-columns: min-content min-content min-content;
+      gap: 0.5em;
     }
 
     #text-entry-textarea {
@@ -142,6 +145,18 @@ export default class TextEntryPanel extends Panel {
     ui-accordion {
       min-height: 0;
     }
+
+    input[type="text"] {
+      background-color: var(--text-input-background-color);
+      color: var(--text-input-foreground-color);
+      border-radius: 0.25em;
+      border: none;
+      outline: none;
+      padding: 0.1em 0.3em;
+      font-family: fontra-ui-regular, sans-serif;
+      font-size: 100%;
+    }
+
   `;
 
   constructor(editorController) {
@@ -301,7 +316,19 @@ export default class TextEntryPanel extends Panel {
       },
     ]);
 
+    const textSizeInput = textInput(this.textSettingsController, "textSize", {
+      formatter: NumberFormatter,
+    });
+    textSizeInput.style = "width: 4.5em;";
+
+    const lineHeightInput = textInput(this.textSettingsController, "lineHeight", {
+      formatter: NumberFormatter,
+    });
+    lineHeightInput.style = "width: 4.5em;";
+
     this.textOptionsElement.appendChild(select);
+    this.textOptionsElement.appendChild(textSizeInput);
+    this.textOptionsElement.appendChild(lineHeightInput);
   }
 
   setupTextEntryElement() {
