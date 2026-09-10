@@ -555,7 +555,7 @@ export class SceneController {
     );
 
     this.sceneSettingsController.addKeyListener(
-      "featureSettings",
+      ["featureSettings", "lineHeight"],
       (event) => {
         this.scrollAdjustBehavior = "pin-glyph-center";
       },
@@ -1790,7 +1790,7 @@ function getSceneSettingsDefaults() {
     text: "",
     align: "center",
     textSize: 0, // dynamic: derives from viewBox, sets viewBox
-    lineHeight: 1.5,
+    lineHeight: 1.1,
     editLayerName: null,
     characterLines: [],
     fontLocationUser: {},

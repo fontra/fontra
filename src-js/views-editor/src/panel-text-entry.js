@@ -318,11 +318,13 @@ export default class TextEntryPanel extends Panel {
 
     const textSizeInput = textInput(this.textSettingsController, "textSize", {
       formatter: NumberFormatter,
+      continuous: false,
     });
     textSizeInput.style = "width: 4.5em;";
 
     const lineHeightInput = textInput(this.textSettingsController, "lineHeight", {
       formatter: NumberFormatter,
+      continuous: false,
     });
     lineHeightInput.style = "width: 4.5em;";
 
