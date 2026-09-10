@@ -1757,6 +1757,7 @@ class PathConnectDetector {
 const persistentSceneSettings = [
   // Keep this order, may be important
   { key: "align" },
+  { key: "lineHeight" },
   { key: "featureSettings" },
   { key: "applyTextShaping" },
   { key: "textDirection" },
@@ -1788,6 +1789,8 @@ function getSceneSettingsDefaults() {
   return {
     text: "",
     align: "center",
+    textSize: 0, // dynamic: derives from viewBox, sets viewBox
+    lineHeight: 1.5,
     editLayerName: null,
     characterLines: [],
     fontLocationUser: {},
