@@ -384,6 +384,7 @@ export default class TextEntryPanel extends Panel {
         display: grid;
         grid-template-columns: min-content auto;
         align-items: center;
+        justify-items: start;
         gap: 0.4em;
         padding: 2px;
       }
