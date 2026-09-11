@@ -42,7 +42,7 @@ export const strings = {
   "action.export-as.ufo": "UFO (*.ufo)",
   "action.export-as.woff2": "Webfont (*.woff2)",
   "action.glyph.add-background-image": "Agregar imagen de fondo…",
-  "action.glyph.add-source": "Agregar matriz…",
+  "action.glyph.add-source": "Agregar recurso…",
   "action.glyph.convert-curves": "Convertir tipo de curva",
   "action.glyph.convert-curves-to-cubic": "A cúbica",
   "action.glyph.convert-curves-to-quadratic-1":
@@ -55,7 +55,7 @@ export const strings = {
     "A cuadrática (4 puntos fuera de la curva)",
   "action.glyph.convert-curves-to-quadratic-5":
     "A cuadrática (5 puntos fuera de la curva)",
-  "action.glyph.delete-source": "Eliminar matriz…",
+  "action.glyph.delete-source": "Eliminar recurso",
   "action.glyph.edit-glyph-axes": "Editar ejes del glifo…",
   "action.join-contours": "Unir contornos",
   "action.lock-background-images": "Bloquear imágenes de fondo",
@@ -89,7 +89,7 @@ export const strings = {
   "axes.delete-axis": "Eliminar eje",
   "axes.mapping-graph": "Gráfico de mapeo",
   "axes.mapping-list": "Lista de mapeo",
-  "axes.mapping.source": "Matriz",
+  "axes.mapping.source": "Recurso",
   "axes.mapping.user": "Usuario",
   "axes.mapping.values.elidable": "Elidible",
   "axes.mapping.values.linked": "Vinculado",
@@ -179,7 +179,7 @@ export const strings = {
     "Especificar el color para esta definición de estado",
   "development-status-definitions.tooltip.delete": "Eliminar definición de estado",
   "development-status-definitions.tooltip.is-default":
-    "Si está marcado, este estado se usará como alternativa cuando no haya un estado de matriz establecido",
+    "Si está marcado, este estado se usará como alternativa cuando no haya un estado de recurso establecido",
   "development-status-definitions.undo.change": "cambiar definición de estado",
   "development-status-definitions.undo.change-is-default":
     "cambiar la definición de estado predeterminada",
@@ -189,12 +189,12 @@ export const strings = {
   "dialog.add": "Agregar",
   "dialog.cancel": "Cancelar",
   "dialog.cant-create-glyph.title": 'No se puede crear el glifo "%0"',
-  "dialog.cant-edit-font.title": "Can't make changes",
+  "dialog.cant-edit-font.title": "No se pueden hacer cambios",
   "dialog.cant-edit-glyph.content": "La fuente es de solo lectura.",
   "dialog.cant-edit-glyph.content.location-not-at-source":
-    "La ubicación no corresponde a una matriz.",
+    "La ubicación no corresponde a un recurso.",
   "dialog.cant-edit-glyph.content.location-not-at-source-for-glyphs":
-    "La ubicación no corresponde a una matriz para los siguientes glifos: %0",
+    "La ubicación no corresponde a un recurso para los siguientes glifos: %0",
   "dialog.cant-edit-glyph.content.locked-glyph": "El glifo está bloqueado.",
   "dialog.cant-edit-glyph.title": 'No se puede editar el glifo "%0"',
   "dialog.cant-edit-kerning.content.apply-text-shaping-must-be-on":
@@ -275,7 +275,7 @@ export const strings = {
     "Agregar un sufijo a los nombres de glifos duplicados",
   "font-overview.dialog.option.replace-existing-glyphs": "Reemplazar glifos existentes",
   "font-overview.dialog.replace-existing-glyphs": "¿Reemplazar glifos existentes?",
-  "font-overview.popup.source": "Matriz",
+  "font-overview.popup.source": "Recurso",
   "font-overview.title": "Vista general de la fuente",
   "glyph-organizing.glyph-set.add-custom-glyph-set":
     "Agregar conjunto de glifos personalizado",
@@ -326,13 +326,13 @@ export const strings = {
     "Eliminar glifos seleccionados del lienzo…",
   "menubar.view.replace-selected-glyph-on-canvas":
     "Reemplazar glifos seleccionados del lienzo…",
-  "menubar.view.select-glyph-source-layer": "Seleccionar glifo/matriz/capa",
+  "menubar.view.select-glyph-source-layer": "Seleccionar glifo/recurso/capa",
   "menubar.view.select-next-glyph": "Seleccionar glifo siguiente",
-  "menubar.view.select-next-source": "Seleccionar matriz siguiente",
-  "menubar.view.select-next-source-layer": "Seleccionar capa de matriz siguiente",
+  "menubar.view.select-next-source": "Seleccionar el siguiente recurso",
+  "menubar.view.select-next-source-layer": "Seleccionar capa del siguiente recurso",
   "menubar.view.select-previous-glyph": "Seleccionar glifo anterior",
-  "menubar.view.select-previous-source": "Seleccionar matriz anterior",
-  "menubar.view.select-previous-source-layer": "Seleccionar capa de matriz anterior",
+  "menubar.view.select-previous-source": "Seleccionar recurso anterior",
+  "menubar.view.select-previous-source-layer": "Seleccionar capa del recurso anterior",
   "menubar.window": "Ventana",
   "message.cancel-editing": "Alguien hizo una edición justo antes que tú.",
   "message.edit-has-been-reverted": "La edición se ha revertido.",
@@ -381,13 +381,13 @@ export const strings = {
   "sidebar.designspace-navigation.copy-current-layer": "Copiar capa actual",
   "sidebar.designspace-navigation.dialog.add-source.label.layer": "Capa:",
   "sidebar.designspace-navigation.dialog.add-source.label.source-name":
-    "Nombre de la matriz:",
+    "Nombre del recurso:",
   "sidebar.designspace-navigation.dialog.add-source.ok-button-title": "Agregar",
-  "sidebar.designspace-navigation.dialog.add-source.title": "Agregar matriz",
-  "sidebar.designspace-navigation.dialog.delete-source.title": "Eliminar matriz",
+  "sidebar.designspace-navigation.dialog.add-source.title": "Agregar recurso",
+  "sidebar.designspace-navigation.dialog.delete-source.title": "Eliminar recurso",
   "sidebar.designspace-navigation.dialog.source-properties.ok-button-title": "Listo",
   "sidebar.designspace-navigation.dialog.source-properties.title":
-    "Propiedades de la matriz",
+    "Propiedades del recurso",
   "sidebar.designspace-navigation.font-axes": "Ejes de la fuente",
   "sidebar.designspace-navigation.font-axes-view-options-button.tooltip":
     "Opciones de visualización",
@@ -406,31 +406,31 @@ export const strings = {
   "sidebar.designspace-navigation.glyph-axes": "Ejes del glifo",
   "sidebar.designspace-navigation.glyph-axes.edit": "Editar ejes del glifo",
   "sidebar.designspace-navigation.glyph-axes.reset": "Restablecer ejes del glifo",
-  "sidebar.designspace-navigation.glyph-source-layers": "Capas de matriz",
+  "sidebar.designspace-navigation.glyph-source-layers": "Capas del recurso",
   "sidebar.designspace-navigation.glyph-sources": "Matrices del glifo",
   "sidebar.designspace-navigation.glyph-sources-sort-options":
     "Opciones de ordenamiento",
   "sidebar.designspace-navigation.glyph-sources-sort-options.by-axis-value":
     "Ordenar por valor de ejes",
   "sidebar.designspace-navigation.glyph-sources-sort-options.by-source-name":
-    "Ordenar por nombre de matriz",
+    "Ordenar por nombre de recurso",
   "sidebar.designspace-navigation.glyph-sources-sort-options.no-sorting": "No ordenar",
-  "sidebar.designspace-navigation.glyph-sources.name": "nombre de matriz",
+  "sidebar.designspace-navigation.glyph-sources.name": "nombre de recurso",
   "sidebar.designspace-navigation.glyph-sources.status": "estado",
   "sidebar.designspace-navigation.hidden-font-axes": "Ejes ocultos de la fuente",
   "sidebar.designspace-navigation.source-layer-name-must-be-unique":
     "El nombre de la capa debe ser único",
   "sidebar.designspace-navigation.source-properties.undo":
-    "editar propiedades de la matriz",
+    "editar propiedades del recurso",
   "sidebar.designspace-navigation.source.activate": "activar %0",
   "sidebar.designspace-navigation.source.deactivate": "desactivar %0",
   "sidebar.designspace-navigation.undo.and-layer": " y capa",
-  "sidebar.designspace-navigation.undo.delete-source": "eliminar matriz %0",
+  "sidebar.designspace-navigation.undo.delete-source": "eliminar recurso %0",
   "sidebar.designspace-navigation.warning.delete-associated-layer":
     "Eliminar también la capa asociada %0",
   "sidebar.designspace-navigation.warning.delete-source":
-    "¿Seguro que deseas eliminar la matriz %0?",
-  "sidebar.font-overview.font-source": "Matriz de la fuente",
+    "¿Está seguro de que desea eliminar el recurso %0?",
+  "sidebar.font-overview.font-source": "Recurso de la fuente",
   "sidebar.glyph-note": "Nota del glifo",
   "sidebar.glyph-note.glyph-note-for-glyph": "Nota del glifo para %0",
   "sidebar.glyph-note.no-glyph-selected": "(Sin glifo seleccionado)",
@@ -498,7 +498,7 @@ export const strings = {
   "sidebar.selection-info.glyph-name": "Nombre del glifo",
   "sidebar.selection-info.kern-group-l-r": "Grupo de kerning I/D",
   "sidebar.selection-info.multi-source":
-    "Los cambios de valor multimatriz son absolutos",
+    "Los cambios de valor multi-recurso son absolutos",
   "sidebar.selection-info.sidebearings": "Márgenes laterales",
   "sidebar.selection-info.title": "Información del glifo",
   "sidebar.selection-info.unicode": "Unicode",
@@ -589,23 +589,23 @@ export const strings = {
   "sidebar.user-settings.theme.auto": "Automático (usar configuración del sistema)",
   "sidebar.user-settings.theme.dark": "Oscuro",
   "sidebar.user-settings.theme.light": "Claro",
-  "sources.button.go-to-nearest-source": "Ir a la matriz más cercana",
-  "sources.button.new-font-source": "Nueva matriz de fuente…",
-  "sources.button.new-glyph-source": "Nueva matriz",
-  "sources.dialog.add-source.label.source-name": "Nombre de la matriz",
-  "sources.dialog.add-source.title": "Agregar matriz de fuente",
+  "sources.button.go-to-nearest-source": "Ir al recurso más cercano",
+  "sources.button.new-font-source": "Nuevo recurso de fuente…",
+  "sources.button.new-glyph-source": "Nuevo recurso",
+  "sources.dialog.add-source.label.source-name": "Nombre del recurso:",
+  "sources.dialog.add-source.title": "Agregar recurso de fuente",
   "sources.dialog.cannot-edit-source.title":
-    "No se puede editar la matriz de la fuente",
+    "No se puede editar el recurso de la fuente",
   "sources.dialog.delete.message":
-    "¿Seguro que deseas eliminar la matriz de fuente seleccionada?",
+    "Eliminar un recurso de fuente puede provocar la pérdida del kerning o hacer que los glifos no sean válidos.",
   "sources.dialog.delete.title":
-    "¿Seguro que deseas eliminar la matriz de fuente seleccionada?",
+    "¿Seguro que deseas eliminar el recurso de fuente seleccionada?",
   "sources.dialog.sparse-off.message":
-    "Esto agregará kerning interpolado y métricas de línea para esta matriz.",
+    "Esto agregará kerning interpolado y métricas de línea para este recurso.",
   "sources.dialog.sparse-off.title":
     '¿Seguro que deseas desactivar la opción "Es disperso"?',
   "sources.dialog.sparse-on.message":
-    "Esto eliminará el kerning y las métricas de línea de esta matriz.",
+    "Esto eliminará el kerning y las métricas de línea de este recurso.",
   "sources.dialog.sparse-on.title":
     '¿Seguro que deseas activar la opción "Es disperso"?',
   "sources.labels.ascender": "Ascendente",
@@ -620,14 +620,14 @@ export const strings = {
   "sources.labels.name": "Nombre",
   "sources.labels.x-height": "Altura de la x",
   "sources.title": "Matrices",
-  "sources.tooltip.delete-source": "Eliminar matriz",
-  "sources.undo.delete": "eliminar matriz %0",
-  "sources.untitled-source": "Matriz sin título",
-  "sources.warning.empty-source-name": "El nombre de la matriz no debe estar vacío",
+  "sources.tooltip.delete-source": "Eliminar recurso",
+  "sources.undo.delete": "eliminar recurso %0",
+  "sources.untitled-source": "Recurso sin título",
+  "sources.warning.empty-source-name": "El nombre del recurso no debe estar vacío",
   "sources.warning.interpolation-incompatibility":
-    "La matriz tiene una incompatibilidad de interpolación",
-  "sources.warning.unique-location": "La ubicación de la matriz debe ser única",
-  "sources.warning.unique-source-name": "El nombre de la matriz debe ser único",
+    "El recurso tiene una incompatibilidad de interpolación",
+  "sources.warning.unique-location": "La ubicación del recurso debe ser única",
+  "sources.warning.unique-source-name": "El nombre del recurso debe ser único",
   "toggle-fullscreen": "Alternar pantalla completa",
   "unused.max": "Máx.",
   "unused.min": "Mín.",
