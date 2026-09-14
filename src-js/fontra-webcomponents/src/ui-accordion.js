@@ -197,8 +197,7 @@ export function makeAccordionHeaderButton(button) {
   }
 
   if (button.tooltip) {
-    options["data-tooltip"] = button.tooltip;
-    options["data-tooltipposition"] = button.tooltipposition ?? "bottom";
+    options["title"] = button.tooltip;
   }
 
   return html.createDomElement("icon-button", options);

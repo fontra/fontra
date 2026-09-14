@@ -978,7 +978,7 @@ export class EditorController extends ViewController {
 
     for (const zoomElement of document.querySelectorAll("#zoom-tools > .tool-button")) {
       const toolIdentifier = zoomElement.dataset.tool;
-      zoomElement.dataset.tooltip = translate(toolIdentifier);
+      zoomElement.title = translate(toolIdentifier);
       zoomElement.onclick = () => {
         switch (toolIdentifier) {
           case "zoom-in":
@@ -1041,8 +1041,7 @@ export class EditorController extends ViewController {
           "class":
             wrapperID === "edit-tools" ? "tool-button selected" : "subtool-button",
           "data-tool": tool.identifier,
-          "data-tooltip": translate("editor." + tool.identifier),
-          "data-tooltipposition": index ? "right" : "bottom",
+          "title": translate("editor." + tool.identifier),
         },
         [
           html.createDomElement("inline-svg", {
@@ -1078,10 +1077,6 @@ export class EditorController extends ViewController {
           this._multiToolMouseDownTimer = (withTimeOut ? setTimeout : noTimeout)(() => {
             // Show sub tools
             for (const child of editToolsElement.children) {
-              // When shown, make sure all tooltips are shown on the right, so as
-              // to not obscure the subtool(s) with the tooltip. This will get reset
-              // in collapseSubTools().
-              child.dataset["tooltipposition"] = "right";
               child.style.visibility = "visible";
             }
             window.addEventListener("mousedown", globalListener);
@@ -3697,7 +3692,6 @@ function collapseSubTools(editToolsElement) {
   // Hide sub tools
   for (const [index, child] of enumerate(editToolsElement.children)) {
     child.style.visibility = index ? "hidden" : "visible";
-    child.dataset.tooltipposition = index ? "right" : "bottom";
   }
 }
 

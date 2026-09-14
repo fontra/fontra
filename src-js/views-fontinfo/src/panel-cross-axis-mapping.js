@@ -442,11 +442,10 @@ class CrossAxisMappingBox extends HTMLElement {
             "inactive"
           ),
           html.createDomElement("icon-button", {
-            "class": "fontra-ui-font-info-cross-axis-mapping-panel-icon",
-            "src": "/tabler-icons/trash.svg",
-            "onclick": (event) => this.deleteCrossAxisMapping(),
-            "data-tooltip": translate("cross-axis-mapping.delete"),
-            "data-tooltipposition": "left",
+            class: "fontra-ui-font-info-cross-axis-mapping-panel-icon",
+            src: "/tabler-icons/trash.svg",
+            onclick: (event) => this.deleteCrossAxisMapping(),
+            title: translate("cross-axis-mapping.delete"),
           }),
         ]
       )
@@ -571,11 +570,7 @@ function buildElementLocationsLabel(axis) {
 function buildElementLocationsCheckboxes(axis, controller, checkboxId) {
   const element = labeledCheckbox(null, controller, axis.name);
   element.className = "fontra-ui-font-info-cross-axis-mapping-panel-checkboxes";
-  element.setAttribute(
-    "data-tooltip",
-    translate("cross-axis-mapping.axis-participates")
-  );
-  element.setAttribute("data-tooltipposition", "right");
+  element.title = translate("cross-axis-mapping.axis-participates");
   element.firstChild.id = checkboxId;
   return element;
 }
