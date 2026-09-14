@@ -50,9 +50,20 @@ export class CanvasController {
     // canvas.addEventListener("pointerup", this.onEvent.bind(this), false);
     // canvas.addEventListener("pointercancel", this.onEvent.bind(this), false);
 
-    this.setupSize();
     this.requestUpdate = consolidateCalls(() => this.draw());
+    this.updateDevicePixelRatio();
+  }
+
+  updateDevicePixelRatio() {
+    this.setupSize();
     this.requestUpdate();
+
+    // Make sure we update when the `window.devicePixelRatio` value changes.
+    const mqString = `(resolution: ${window.devicePixelRatio}dppx)`;
+    const media = matchMedia(mqString);
+    media.addEventListener("change", () => this.updateDevicePixelRatio(), {
+      once: true,
+    });
   }
 
   _setupScrollBlocker() {
