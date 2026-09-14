@@ -557,6 +557,10 @@ export const strings = {
   "sidebar.text-entry.section.positioning-from-font-data":
     "Posizionamento dai dati del font",
   "sidebar.text-entry.section.substitution": "Sostituzione",
+  "sidebar.text-entry.text-layout-options": "Text layout options",
+  "sidebar.text-entry.text-layout-options.align": "Align",
+  "sidebar.text-entry.text-layout-options.line-height": "Line height",
+  "sidebar.text-entry.text-layout-options.text-size": "Size",
   "sidebar.text-entry.text-shaping-options": "Opzioni di modellazione del testo",
   "sidebar.text-entry.text-shaping.options.tooltip":
     "Opzioni aggiuntive di modellazione del testo",

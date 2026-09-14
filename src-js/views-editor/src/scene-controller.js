@@ -36,8 +36,10 @@ import {
   equalRect,
   offsetRect,
   rectAddMargin,
+  rectCenter,
   rectFromArray,
   rectRound,
+  rectScaleAroundCenter,
   rectToArray,
 } from "@fontra/core/rectangle.ts";
 import {
@@ -59,6 +61,7 @@ import {
   objectsEqual,
   parseSelection,
   reversed,
+  round,
   withTimeout,
   zip,
 } from "@fontra/core/utils.ts";
@@ -238,6 +241,19 @@ export class SceneController {
     this.sceneSettingsController.addKeyListener(
       "viewBox",
       (event) => {
+        if (event.newValue && !event.senderInfo?.sentFromTextSize) {
+          this.fontController.ensureInitialized.then(() => {
+            this.sceneSettingsController.setItem(
+              "textSize",
+              round(
+                this.canvasController.magnification * this.fontController.unitsPerEm,
+                1
+              ),
+              { sentFromViewBox: true }
+            );
+          });
+        }
+
         if (event.senderInfo?.senderID === this) {
           return;
         }
@@ -268,6 +284,21 @@ export class SceneController {
         this.canvasController.getViewBox(),
         { senderID: this }
       );
+    });
+
+    this.sceneSettingsController.addKeyListener("textSize", (event) => {
+      if (event.senderInfo?.sentFromViewBox) {
+        return;
+      }
+
+      const magnification = event.newValue / this.fontController.unitsPerEm;
+      const scaleFactor = magnification / this.canvasController.magnification;
+      const viewBox = this.canvasController.getViewBox();
+      const viewBoxCenter = rectCenter(viewBox);
+      const newViewBox = rectScaleAroundCenter(viewBox, 1 / scaleFactor, viewBoxCenter);
+      this.sceneSettingsController.setItem("viewBox", newViewBox, {
+        sentFromTextSize: true,
+      });
     });
 
     // Update background layer glyphs
@@ -555,7 +586,7 @@ export class SceneController {
     );
 
     this.sceneSettingsController.addKeyListener(
-      "featureSettings",
+      ["featureSettings", "lineHeight"],
       (event) => {
         this.scrollAdjustBehavior = "pin-glyph-center";
       },
@@ -1757,6 +1788,7 @@ class PathConnectDetector {
 const persistentSceneSettings = [
   // Keep this order, may be important
   { key: "align" },
+  { key: "lineHeight" },
   { key: "featureSettings" },
   { key: "applyTextShaping" },
   { key: "textDirection" },
@@ -1788,6 +1820,8 @@ function getSceneSettingsDefaults() {
   return {
     text: "",
     align: "center",
+    textSize: 0, // dynamic: derives from viewBox, sets viewBox
+    lineHeight: 1.1,
     editLayerName: null,
     characterLines: [],
     fontLocationUser: {},

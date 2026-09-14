@@ -60,6 +60,7 @@ export class SceneModel {
       [
         "characterLines",
         "align",
+        "lineHeight",
         "featureSettings",
         "applyTextShaping",
         "selectedGlyph",
@@ -467,7 +468,7 @@ export class SceneModel {
     const editLayerName = this.sceneSettings.editLayerName;
 
     let y = 0;
-    const lineDistance = 1.1 * fontController.unitsPerEm; // TODO make factor user-configurable
+    const lineHeight = this.sceneSettings.lineHeight * fontController.unitsPerEm;
     const positionedLines = [];
     let longestLineLength = 0;
 
@@ -557,7 +558,7 @@ export class SceneModel {
 
       longestLineLength = Math.max(longestLineLength, positionedLine.endPoint.x);
 
-      y -= lineDistance;
+      y -= lineHeight;
       positionedLines.push(positionedLine);
 
       if (lineShaperMessages) {

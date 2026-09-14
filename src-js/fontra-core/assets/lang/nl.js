@@ -536,6 +536,10 @@ export const strings = {
   "sidebar.text-entry.section.positioning-from-font-data":
     "Positionering vanuit font data",
   "sidebar.text-entry.section.substitution": "Substitutie",
+  "sidebar.text-entry.text-layout-options": "Text layout options",
+  "sidebar.text-entry.text-layout-options.align": "Align",
+  "sidebar.text-entry.text-layout-options.line-height": "Line height",
+  "sidebar.text-entry.text-layout-options.text-size": "Size",
   "sidebar.text-entry.text-shaping-options": "Text shaping opties",
   "sidebar.text-entry.text-shaping.options.tooltip": "Meer text shaping opties",
   "sidebar.user-settings": "Gebruikersinstellingen",
