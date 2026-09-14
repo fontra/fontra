@@ -335,12 +335,16 @@ function getStatusColor(statusFieldDefinitions, varGlyph, sourceIndex) {
 
 function formatGlyphInfoForTooltip(glyphName, codePoints) {
   const formattedCodePoints = codePoints
-    .map(
-      (codePoint) =>
-        `${makeUPlusStringFromCodePoint(codePoint)} (${String.fromCodePoint(
-          codePoint
-        )}) ${getGlyphInfoFromCodePoint(codePoint)?.description ?? ""}`
-    )
+    .map((codePoint) => {
+      const info = getGlyphInfoFromCodePoint(codePoint);
+      let char = String.fromCodePoint(codePoint);
+
+      if (info?.category == "Mark" && info?.subCategory == "Nonspacing") {
+        char = " \u200C" + char + "\u200C "; // pad with space and ZERO WIDTH NON-JOINER
+      }
+
+      return `${char}  ${makeUPlusStringFromCodePoint(codePoint)} ${info?.description ?? ""}`;
+    })
     .join("\n");
 
   return formattedCodePoints ? `${glyphName}\n${formattedCodePoints}` : glyphName;
