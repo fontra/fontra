@@ -310,7 +310,6 @@ export default class CharactersGlyphsPanel extends Panel {
           tooltip: translate(
             "sidebar.characters-glyphs.shaping-debugger.options-menu-tooltip"
           ),
-          tooltipposition: "left",
           onclick: (event) => this.showShapingDebuggerOptionsMenu(event),
         }),
       },
@@ -324,7 +323,6 @@ export default class CharactersGlyphsPanel extends Panel {
           tooltip: translate(
             "sidebar.characters-glyphs.output-glyphs.options-menu-tooltip"
           ),
-          tooltipposition: "left",
           onclick: (event) => this.showOutputGlyphsOptionsMenu(event),
         }),
       },

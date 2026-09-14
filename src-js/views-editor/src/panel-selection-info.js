@@ -178,21 +178,20 @@ export default class SelectionInfoPanel extends Panel {
         type: "header",
         label: translate("sidebar.selection-info.title"),
         auxiliaryElement: html.createDomElement("icon-button", {
-          "id": "glyphLocking",
-          "style": `width: 1.3em; height: 1.3em;`,
-          "src":
+          id: "glyphLocking",
+          style: `width: 1.3em; height: 1.3em;`,
+          src:
             glyphLocked || this.fontController.readOnly
               ? "/tabler-icons/lock.svg"
               : "/tabler-icons/lock-open-2.svg",
-          "onclick": (event) => this._toggleGlyphLock(varGlyphController.glyph),
-          "data-tooltip": translate(
+          onclick: (event) => this._toggleGlyphLock(varGlyphController.glyph),
+          title: translate(
             this.fontController.readOnly
               ? "sidebar.selection-info.glyph-locking.tooltip.read-only"
               : glyphLocked
                 ? "sidebar.selection-info.glyph-locking.tooltip.unlock"
                 : "sidebar.selection-info.glyph-locking.tooltip.lock"
           ),
-          "data-tooltipposition": "left",
         }),
       });
       formContents.push({
@@ -329,13 +328,10 @@ export default class SelectionInfoPanel extends Panel {
         type: "header",
         label: translate("sidebar.user-settings.glyph.background-image"),
         auxiliaryElement: html.createDomElement("icon-button", {
-          "style": `width: 1.3em;`,
-          "src": "/tabler-icons/refresh.svg",
-          "onclick": (event) => this._resetTransformationForBackgroundImage(),
-          "data-tooltip": translate(
-            "sidebar.selection-info.component.reset-transformation"
-          ),
-          "data-tooltipposition": "left",
+          style: `width: 1.3em;`,
+          src: "/tabler-icons/refresh.svg",
+          onclick: (event) => this._resetTransformationForBackgroundImage(),
+          title: translate("sidebar.selection-info.component.reset-transformation"),
         }),
       });
 
@@ -400,13 +396,10 @@ export default class SelectionInfoPanel extends Panel {
         type: "header",
         label: translate("sidebar.selection-info.component.transformation"),
         auxiliaryElement: html.createDomElement("icon-button", {
-          "style": `width: 1.3em;`,
-          "src": "/tabler-icons/refresh.svg",
-          "onclick": (event) => this._resetTransformationForComponent(index),
-          "data-tooltip": translate(
-            "sidebar.selection-info.component.reset-transformation"
-          ),
-          "data-tooltipposition": "left",
+          style: `width: 1.3em;`,
+          src: "/tabler-icons/refresh.svg",
+          onclick: (event) => this._resetTransformationForComponent(index),
+          title: translate("sidebar.selection-info.component.reset-transformation"),
         }),
       });
 
@@ -486,23 +479,21 @@ export default class SelectionInfoPanel extends Panel {
               },
               [
                 html.createDomElement("icon-button", {
-                  "id": "component-axis-options-button",
-                  "style": `width: 1.3em;`,
-                  "src": "/tabler-icons/menu-2.svg",
-                  "onclick": (event) => this.showComponentAxesOptionsMenu(event),
-                  "data-tooltip": translate(
+                  id: "component-axis-options-button",
+                  style: `width: 1.3em;`,
+                  src: "/tabler-icons/menu-2.svg",
+                  onclick: (event) => this.showComponentAxesOptionsMenu(event),
+                  title: translate(
                     "sidebar.designspace-navigation.font-axes-view-options-button.tooltip"
                   ),
-                  "data-tooltipposition": "left",
                 }),
                 html.createDomElement("icon-button", {
-                  "style": `width: 1.3em;`,
-                  "src": "/tabler-icons/refresh.svg",
-                  "onclick": (event) => this._resetAxisValuesForComponent(index),
-                  "data-tooltip": translate(
+                  style: `width: 1.3em;`,
+                  src: "/tabler-icons/refresh.svg",
+                  onclick: (event) => this._resetAxisValuesForComponent(index),
+                  title: translate(
                     "sidebar.selection-info.component.reset-axis-values"
                   ),
-                  "data-tooltipposition": "left",
                 }),
               ]
             ),

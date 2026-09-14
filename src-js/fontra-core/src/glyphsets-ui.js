@@ -139,10 +139,9 @@ export class GlyphSetsUIController {
 
   makeAddGlyphSetButton(toolTip) {
     return html.createDomElement("icon-button", {
-      "src": "/images/plus.svg",
-      "onclick": (event) => this.addGlyphSet(event),
-      "data-tooltip": toolTip,
-      "data-tooltipposition": "left",
+      src: "/images/plus.svg",
+      onclick: (event) => this.addGlyphSet(event),
+      title: toolTip,
     });
   }
 
@@ -270,8 +269,6 @@ export class GlyphSetsUIController {
           }
         );
       },
-      // "data-tooltip": "------",
-      // "data-tooltipposition": "left",
     });
   }
 

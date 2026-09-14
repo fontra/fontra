@@ -140,9 +140,6 @@ export class Form extends SimpleElement {
 
   constructor() {
     super();
-    this.shadowRoot.appendChild(
-      html.link({ href: "/css/tooltip.css", rel: "stylesheet" })
-    );
     this.contentElement = this.shadowRoot.appendChild(document.createElement("div"));
     this.contentElement.classList.add("ui-form");
   }
@@ -290,10 +287,8 @@ export class Form extends SimpleElement {
     inputElement.type = "number";
     inputElement.value = maybeRound(fieldItem.value, fieldItem.numDigits);
 
-    if (fieldItem["data-tooltip"]) {
-      // data-tooltip doesn't work for input number,
-      // default title is used
-      inputElement.setAttribute("title", fieldItem["data-tooltip"]);
+    if (fieldItem["tooltip"]) {
+      inputElement.title = fieldItem["tooltip"];
     }
 
     if ("minValue" in fieldItem) {
@@ -359,10 +354,8 @@ export class Form extends SimpleElement {
     const inputElement = document.createElement("input");
     inputElement.value = maybeRoundToString(fieldItem.value, fieldItem.numDigits);
 
-    if (fieldItem["data-tooltip"]) {
-      // data-tooltip doesn't work for input number,
-      // default title is used
-      inputElement.setAttribute("title", fieldItem["data-tooltip"]);
+    if (fieldItem["tooltip"]) {
+      inputElement.title = fieldItem["tooltip"];
     }
 
     inputElement.disabled = fieldItem.disabled;

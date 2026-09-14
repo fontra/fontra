@@ -214,8 +214,8 @@ export default class TextEntryPanel extends Panel {
 
   _makeResetFeaturesButton(tableTag) {
     return html.createDomElement("icon-button", {
-      "src": "/tabler-icons/refresh.svg",
-      "onclick": async (event) => {
+      src: "/tabler-icons/refresh.svg",
+      onclick: async (event) => {
         const shaper = await this.getShaper();
         if (!shaper) {
           return;
@@ -227,8 +227,7 @@ export default class TextEntryPanel extends Panel {
         });
         this.textSettings.featureSettings = featureSettings;
       },
-      "data-tooltip": translate("sidebar.text-entry.reset-features", tableTag),
-      "data-tooltipposition": "left",
+      title: translate("sidebar.text-entry.reset-features", tableTag),
     });
   }
 

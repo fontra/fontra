@@ -563,12 +563,11 @@ class RuleBox extends HTMLElement {
 
     this.append(
       html.createDomElement("icon-button", {
-        "class": "fontra-ui-font-info-conditional-substitutions-panel-icon",
-        "src": "/tabler-icons/trash.svg",
-        "onclick": (event) => this.deleteRule(),
-        "data-tooltip": translate("conditional-substitutions.rule.remove"),
-        "data-tooltipposition": "left",
-        "tabIndex": -1,
+        class: "fontra-ui-font-info-conditional-substitutions-panel-icon",
+        src: "/tabler-icons/trash.svg",
+        onclick: (event) => this.deleteRule(),
+        title: translate("conditional-substitutions.rule.remove"),
+        tabIndex: -1,
       })
     );
 
@@ -581,16 +580,12 @@ class RuleBox extends HTMLElement {
           this.fontAxesSourceSpace
         )
       ),
-      makePlusButton(
-        () => {
-          this.editRule((rule) => {
-            rule.conditionSets.push({ conditions: [] });
-          }, translate("conditional-substitutions.condition-set.undo-new"));
-          this._updateContents();
-        },
-        "conditional-substitutions.condition-set.new",
-        "right"
-      ),
+      makePlusButton(() => {
+        this.editRule((rule) => {
+          rule.conditionSets.push({ conditions: [] });
+        }, translate("conditional-substitutions.condition-set.undo-new"));
+        this._updateContents();
+      }, "conditional-substitutions.condition-set.new"),
     ]);
 
     if (this.rule.conditionSets.length > 1) {
@@ -690,18 +685,17 @@ class RuleBox extends HTMLElement {
           elements
         ),
         html.createDomElement("icon-button", {
-          "class":
+          class:
             "fontra-ui-font-info-conditional-substitutions-panel-icon auto-show-delete-button",
-          "src": "/tabler-icons/trash.svg",
-          "onclick": (event) => {
+          src: "/tabler-icons/trash.svg",
+          onclick: (event) => {
             this.editRule((rule) => {
               rule.conditionSets.splice(index, 1);
             }, translate("conditional-substitutions.condition-set.undo-remove"));
             this._updateContents();
           },
-          "data-tooltip": translate("conditional-substitutions.condition-set.remove"),
-          "data-tooltipposition": "bottom",
-          "tabIndex": -1,
+          title: translate("conditional-substitutions.condition-set.remove"),
+          tabIndex: -1,
         }),
       ]
     );
@@ -827,13 +821,12 @@ class RuleBox extends HTMLElement {
           html.span({}, ["→"]),
           outputTextInput,
           html.createDomElement("icon-button", {
-            "class":
+            class:
               "fontra-ui-font-info-conditional-substitutions-panel-icon auto-show-delete-button",
-            "src": "/tabler-icons/trash.svg",
-            "onclick": (event) => editSubstitution(input, null, null),
-            "data-tooltip": translate("conditional-substitutions.substitutions.remove"),
-            "data-tooltipposition": "bottom",
-            "tabIndex": -1,
+            src: "/tabler-icons/trash.svg",
+            onclick: (event) => editSubstitution(input, null, null),
+            title: translate("conditional-substitutions.substitutions.remove"),
+            tabIndex: -1,
           }),
         ];
       })
@@ -885,13 +878,12 @@ function elementIsAllSelected(el) {
   return el.selectionStart === 0 && el.selectionEnd === el.value.length;
 }
 
-function makePlusButton(callback, tooltipKey, tooltipPosition = "bottom") {
+function makePlusButton(callback, tooltipKey) {
   return html.button(
     {
-      "onclick": callback,
-      "class": "plus-button",
-      "data-tooltip": translate(tooltipKey),
-      "data-tooltipposition": tooltipPosition,
+      onclick: callback,
+      class: "plus-button",
+      title: translate(tooltipKey),
     },
     [new InlineSVG("/images/plus.svg")]
   );

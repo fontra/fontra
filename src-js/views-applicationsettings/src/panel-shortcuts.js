@@ -419,15 +419,14 @@ class ShortCutElement extends HTMLElement {
     const id = `shortcut-input-${this.actionIdentifier}`;
     this.append(
       html.div({
-        "id": id,
-        "tabindex": "0", // required for focus
-        "class": "fontra-ui-shortcuts-panel-input",
-        "innerHTML": getShortCutRepresentation(this.shortCutDefinition),
-        "onkeydown": (event) => this.recordShortCut(id, event),
-        "onkeyup": (event) => this.recordShortCutKeyUp(id, event),
-        "onblur": (event) => this.handleOnBlur(id),
-        "data-tooltip": translate("shortcuts.tooltip.click-and-record"),
-        "data-tooltipposition": "top",
+        id: id,
+        tabindex: "0", // required for focus
+        class: "fontra-ui-shortcuts-panel-input",
+        innerHTML: getShortCutRepresentation(this.shortCutDefinition),
+        onkeydown: (event) => this.recordShortCut(id, event),
+        onkeyup: (event) => this.recordShortCutKeyUp(id, event),
+        onblur: (event) => this.handleOnBlur(id),
+        title: translate("shortcuts.tooltip.click-and-record"),
       })
     );
 
@@ -437,21 +436,19 @@ class ShortCutElement extends HTMLElement {
 
     iconWrapper.append(
       html.createDomElement("icon-button", {
-        "class": "fontra-ui-shortcuts-panel-icon",
-        "src": "/tabler-icons/refresh.svg",
-        "onclick": (event) => this.resetShortCut(id),
-        "data-tooltip": translate("shortcuts.tooltip.reset-to-default"),
-        "data-tooltipposition": "top",
+        class: "fontra-ui-shortcuts-panel-icon",
+        src: "/tabler-icons/refresh.svg",
+        onclick: (event) => this.resetShortCut(id),
+        title: translate("shortcuts.tooltip.reset-to-default"),
       })
     );
 
     iconWrapper.append(
       html.createDomElement("icon-button", {
-        "class": "fontra-ui-shortcuts-panel-icon",
-        "src": "/tabler-icons/x.svg",
-        "onclick": (event) => this.deleteShortCut(id),
-        "data-tooltip": translate("shortcuts.tooltip.clear"),
-        "data-tooltipposition": "top",
+        class: "fontra-ui-shortcuts-panel-icon",
+        src: "/tabler-icons/x.svg",
+        onclick: (event) => this.deleteShortCut(id),
+        title: translate("shortcuts.tooltip.clear"),
       })
     );
 

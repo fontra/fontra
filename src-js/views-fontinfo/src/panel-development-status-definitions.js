@@ -351,20 +351,19 @@ class StatusDefinitionBox extends HTMLElement {
 
     this.append(
       html.input({
-        "type": "color",
-        "class":
+        type: "color",
+        class:
           "fontra-ui-font-info-status-definitions-panel-status-def-box-color-input",
-        "value": rgbaToHex(statusDef.color.slice(0, 3).concat([1])),
-        "onchange": (event) => {
+        value: rgbaToHex(statusDef.color.slice(0, 3).concat([1])),
+        onchange: (event) => {
           const updatedStatusDef = {
             ...statusDef,
             color: hexToRgba(event.target.value),
           };
           this.replaceStatusDef(updatedStatusDef);
         },
-        "disabled": this.fontController.readOnly,
-        "data-tooltip": translate("development-status-definitions.tooltip.color"),
-        "data-tooltipposition": "top",
+        disabled: this.fontController.readOnly,
+        title: translate("development-status-definitions.tooltip.color"),
       })
     );
 
@@ -386,11 +385,8 @@ class StatusDefinitionBox extends HTMLElement {
     this.append(
       html.div(
         {
-          "style": "margin: auto;",
-          "data-tooltip": translate(
-            "development-status-definitions.tooltip.is-default"
-          ),
-          "data-tooltipposition": "top",
+          style: "margin: auto;",
+          title: translate("development-status-definitions.tooltip.is-default"),
         },
         [
           html.input({
@@ -412,11 +408,10 @@ class StatusDefinitionBox extends HTMLElement {
 
     this.append(
       html.createDomElement("icon-button", {
-        "class": "fontra-ui-font-info-status-definitions-panel-status-def-box-delete",
-        "src": "/tabler-icons/trash.svg",
-        "onclick": (event) => this.deleteStatusDef(this.statusIndex),
-        "data-tooltip": translate("development-status-definitions.tooltip.delete"),
-        "data-tooltipposition": "left",
+        class: "fontra-ui-font-info-status-definitions-panel-status-def-box-delete",
+        src: "/tabler-icons/trash.svg",
+        onclick: (event) => this.deleteStatusDef(this.statusIndex),
+        title: translate("development-status-definitions.tooltip.delete"),
       })
     );
   }
