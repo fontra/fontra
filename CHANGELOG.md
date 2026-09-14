@@ -4,7 +4,8 @@
 
 ### New features
 
-[command line] The `fontra` command line tool got a new subcommand `new`, for creating a new font. [Discussion 2761](https://github.com/fontra/fontra/discussions/2761), [PR 2762](https://github.com/fontra/fontra/pull/2762)
+- [text entry panel] Add fields to set the text size and line height. Add new "Text layout options" accordion section for text alignment, text size and line height. [Issue 105](https://github.com/fontra/fontra/issues/105), [Issue 1400](https://github.com/fontra/fontra/issues/1400), [PR 2765](https://github.com/fontra/fontra/pull/2765)
+- [command line] The `fontra` command line tool got a new subcommand `new`, for creating a new font. [Discussion 2761](https://github.com/fontra/fontra/discussions/2761), [PR 2762](https://github.com/fontra/fontra/pull/2762)
 
 ### Fixes
 
