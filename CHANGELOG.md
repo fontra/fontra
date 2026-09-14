@@ -1,5 +1,15 @@
 # Changelog for Fontra
 
+## 2026-09-?? [version 2026.9.1]
+
+### New features
+
+- [font overview / glyph cell] Add tooltip for each glyph, showing the full glyph name, unicode character, code point and unicode name. [Issue 2767](https://github.com/fontra/fontra/issues/2767), [PR 2768](https://github.com/fontra/fontra/pull/2768)
+
+### Fixes
+
+### Improvements
+
 ## 2026-09-14 [version 2026.9.0]
 
 ### New features
