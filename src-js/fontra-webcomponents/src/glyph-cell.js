@@ -1,10 +1,18 @@
-import { guessGlyphPlaceholderString } from "@fontra/core/glyph-data.js";
+import {
+  getGlyphInfoFromCodePoint,
+  guessGlyphPlaceholderString,
+} from "@fontra/core/glyph-data.js";
 import { SVGPath2D } from "@fontra/core/glyph-svg.js";
 import * as html from "@fontra/core/html-utils.js";
 import { UnlitElement } from "@fontra/core/html-utils.js";
 import * as svg from "@fontra/core/svg-utils.js";
 import { Transform } from "@fontra/core/transform.js";
-import { assert, rgbaToCSS, throttleCalls } from "@fontra/core/utils.ts";
+import {
+  assert,
+  makeUPlusStringFromCodePoint,
+  rgbaToCSS,
+  throttleCalls,
+} from "@fontra/core/utils.ts";
 import { InlineSVG } from "./inline-svg.js";
 import { themeColorCSS } from "./theme-support.js";
 
@@ -129,6 +137,7 @@ export class GlyphCell extends UnlitElement {
 
   constructor(fontController, glyphName, codePoints, locationController, locationKey) {
     super();
+    this.title = formatGlyphInfoForTooltip(glyphName, codePoints);
     this.fontController = fontController;
     this.glyphName = glyphName;
     this.codePoints = codePoints;
@@ -322,6 +331,23 @@ function getStatusColor(statusFieldDefinitions, varGlyph, sourceIndex) {
   }
 
   return statusColor;
+}
+
+function formatGlyphInfoForTooltip(glyphName, codePoints) {
+  const formattedCodePoints = codePoints
+    .map((codePoint) => {
+      const info = getGlyphInfoFromCodePoint(codePoint);
+      let char = String.fromCodePoint(codePoint);
+
+      if (info?.category == "Mark" && info?.subCategory == "Nonspacing") {
+        char = " \u200C" + char + "\u200C "; // pad with space and ZERO WIDTH NON-JOINER
+      }
+
+      return `${char}  ${makeUPlusStringFromCodePoint(codePoint)} ${info?.description ?? ""}`;
+    })
+    .join("\n");
+
+  return formattedCodePoints ? `${glyphName}\n${formattedCodePoints}` : glyphName;
 }
 
 customElements.define("glyph-cell", GlyphCell);
