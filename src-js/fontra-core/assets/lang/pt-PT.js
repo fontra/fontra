@@ -189,7 +189,7 @@ export const strings = {
   "dialog.add": "Adicionar",
   "dialog.cancel": "Cancelar",
   "dialog.cant-create-glyph.title": 'Não é possível criar o glifo "%0"',
-  "dialog.cant-edit-font.title": "Can't make changes",
+  "dialog.cant-edit-font.title": "Não é possível fazer alterações",
   "dialog.cant-edit-glyph.content": "Essa fonte é somente leitura.",
   "dialog.cant-edit-glyph.content.location-not-at-source":
     "O local não é de uma matriz",
@@ -198,9 +198,9 @@ export const strings = {
   "dialog.cant-edit-glyph.content.locked-glyph": "O glifo está bloqueado.",
   "dialog.cant-edit-glyph.title": 'Não é possível editar o glifo "%0"',
   "dialog.cant-edit-kerning.content.apply-text-shaping-must-be-on":
-    'The "Apply text shaping and features" option must be on. Would you like to turn it on?',
+    'A opção "Aplicar e modelação de texto e recursos OT" precisa está ativada. Desejas fazer isso?',
   "dialog.cant-edit-kerning.content.manually-written-feature":
-    "There is a manually written 'kern' OpenType feature without an \"# Automatic Code\" insertion marker.",
+    "Existe um recurso OpenType 'kern' escrito manualmente, sem um marcador de inserção \"# Automatic Code\".",
   "dialog.cant-edit-kerning.title": "Não é possível editar o kerning",
   "dialog.cant-edit-sidebearings.title": "Não é possível editar as margens laterais",
   "dialog.create": "Criar",
@@ -370,9 +370,9 @@ export const strings = {
   "sidebar.characters-glyphs.input-characters": "Caracteres de entrada",
   "sidebar.characters-glyphs.output-glyphs": "Glifos de saída",
   "sidebar.characters-glyphs.output-glyphs.options-menu-tooltip":
-    "Output glyphs display options",
+    "Opções de exibição dos glifos de saída",
   "sidebar.characters-glyphs.output-glyphs.show-kerning-for-advance":
-    "Show kerning in Advance column",
+    "Exibir kerning na coluna Avanço",
   "sidebar.characters-glyphs.shaping-debugger": "Depurador da modelação de texto",
   "sidebar.characters-glyphs.shaping-debugger.options-menu-tooltip":
     "Opções do depurador da modelação de texto",

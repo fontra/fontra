@@ -169,27 +169,27 @@ export const strings = {
   "cross-axis-mapping.undo.reorder": "reordenar mapeamento de eixo cruzado",
   "designspace-navigation.edit-all-compatible-sources":
     "Editar todas as matrizes compatíveis",
-  "development-status-definitions.add": "adicionar definição de status %0",
-  "development-status-definitions.button.new": "Nova definição de status",
+  "development-status-definitions.add": "adicionar definição de situação %0",
+  "development-status-definitions.button.new": "Nova definição de situação",
   "development-status-definitions.dialog.cannot-edit-status-definition.title":
-    "Não é possível editar o valor da definição de status",
+    "Não é possível editar o valor da definição de situação",
   "development-status-definitions.label.is-default": "Padrão",
-  "development-status-definitions.title": "Definições de status",
+  "development-status-definitions.title": "Definições de situação",
   "development-status-definitions.tooltip.color":
-    "Especificar a cor para essa definição de status",
-  "development-status-definitions.tooltip.delete": "Excluir definição de status",
+    "Especificar a cor para essa definição de situação",
+  "development-status-definitions.tooltip.delete": "Excluir definição de situação",
   "development-status-definitions.tooltip.is-default":
-    "Se marcado, este status será usado como reserva quando um status de uma matriz não for definido",
-  "development-status-definitions.undo.change": "alterar definição de status",
+    "Se marcado, esta situação será usado como reserva quando um situação de uma matriz não for definido",
+  "development-status-definitions.undo.change": "alterar definição de situação",
   "development-status-definitions.undo.change-is-default":
-    "alterar definição de status padrão",
-  "development-status-definitions.undo.delete": "excluir definição de status %0",
+    "alterar definição de situação padrão",
+  "development-status-definitions.undo.delete": "excluir definição de situação %0",
   "development-status-definitions.warning.positive-number":
     "O valor precisa ser um número positivo.",
   "dialog.add": "Adicionar",
   "dialog.cancel": "Cancelar",
   "dialog.cant-create-glyph.title": 'Não é possível criar o glifo "%0"',
-  "dialog.cant-edit-font.title": "Can't make changes",
+  "dialog.cant-edit-font.title": "Não é possível fazer alterações",
   "dialog.cant-edit-glyph.content": "Essa fonte é somente leitura.",
   "dialog.cant-edit-glyph.content.location-not-at-source":
     "O local não é de uma matriz",
@@ -198,9 +198,9 @@ export const strings = {
   "dialog.cant-edit-glyph.content.locked-glyph": "O glifo está bloqueado.",
   "dialog.cant-edit-glyph.title": 'Não é possível editar o glifo "%0"',
   "dialog.cant-edit-kerning.content.apply-text-shaping-must-be-on":
-    'The "Apply text shaping and features" option must be on. Would you like to turn it on?',
+    'A opção "Aplicar modelagem de texto e recursos OT" precisa está ativada. Deseja fazer isso?',
   "dialog.cant-edit-kerning.content.manually-written-feature":
-    "There is a manually written 'kern' OpenType feature without an \"# Automatic Code\" insertion marker.",
+    "Existe um recurso OpenType 'kern' escrito manualmente, sem um marcador de inserção \"# Automatic Code\".",
   "dialog.cant-edit-kerning.title": "Não é possível editar o kerning",
   "dialog.cant-edit-sidebearings.title": "Não é possível editar as margens laterais",
   "dialog.create": "Criar",
@@ -370,9 +370,9 @@ export const strings = {
   "sidebar.characters-glyphs.input-characters": "Caracteres de entrada",
   "sidebar.characters-glyphs.output-glyphs": "Glifos de saída",
   "sidebar.characters-glyphs.output-glyphs.options-menu-tooltip":
-    "Output glyphs display options",
+    "Opções de exibição dos glifos de saída",
   "sidebar.characters-glyphs.output-glyphs.show-kerning-for-advance":
-    "Show kerning in Advance column",
+    "Exibir kerning na coluna Avanço",
   "sidebar.characters-glyphs.shaping-debugger": "Depurador da modelagem de texto",
   "sidebar.characters-glyphs.shaping-debugger.options-menu-tooltip":
     "Opções do depurador da modelagem de texto",
@@ -418,7 +418,7 @@ export const strings = {
     "Ordenar por nome da matriz",
   "sidebar.designspace-navigation.glyph-sources-sort-options.no-sorting": "Não ordenar",
   "sidebar.designspace-navigation.glyph-sources.name": "nome da matriz",
-  "sidebar.designspace-navigation.glyph-sources.status": "status",
+  "sidebar.designspace-navigation.glyph-sources.status": "situação",
   "sidebar.designspace-navigation.hidden-font-axes": "Eixos ocultos da fonte",
   "sidebar.designspace-navigation.source-layer-name-must-be-unique":
     "O nome da camada precisa ser único",
@@ -582,7 +582,7 @@ export const strings = {
   "sidebar.user-settings.glyph.referencefont": "Fonte de referência",
   "sidebar.user-settings.glyph.sidebearings": "Margens para glifos não editáveis",
   "sidebar.user-settings.glyph.sidebearings-tool": "Margens laterais (ferramenta)",
-  "sidebar.user-settings.glyph.statuscolor": "Cor do status de desenvolvimento",
+  "sidebar.user-settings.glyph.statuscolor": "Cor da situação de desenvolvimento",
   "sidebar.user-settings.glyph.upmgrid": "Grade de Unidades Por eM (UPM)",
   "sidebar.user-settings.guidelines": "Linhas-guia",
   "sidebar.user-settings.language": "Idioma da interface",
