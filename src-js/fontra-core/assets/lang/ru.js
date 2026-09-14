@@ -530,6 +530,10 @@ export const strings = {
   "sidebar.text-entry.section.positioning-from-font-data":
     "Позиционирование из данных шрифта",
   "sidebar.text-entry.section.substitution": "Замена",
+  "sidebar.text-entry.text-layout-options": "Text layout options",
+  "sidebar.text-entry.text-layout-options.align": "Align",
+  "sidebar.text-entry.text-layout-options.line-height": "Line height",
+  "sidebar.text-entry.text-layout-options.text-size": "Size",
   "sidebar.text-entry.text-shaping-options": "Параметры формирования текста",
   "sidebar.text-entry.text-shaping.options.tooltip":
     "Дополнительные параметры формирования текста",

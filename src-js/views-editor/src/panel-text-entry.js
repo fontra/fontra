@@ -294,7 +294,7 @@ export default class TextEntryPanel extends Panel {
     this.updateAlignElement(this.textSettings.align);
 
     const textSizeInput = labeledTextInput(
-      "Size",
+      translate("sidebar.text-entry.text-layout-options.text-size"),
       this.textSettingsController,
       "textSize",
       {
@@ -305,7 +305,7 @@ export default class TextEntryPanel extends Panel {
     );
 
     const lineHeightInput = labeledTextInput(
-      "Line height",
+      translate("sidebar.text-entry.text-layout-options.line-height"),
       this.textSettingsController,
       "lineHeight",
       {
@@ -316,7 +316,9 @@ export default class TextEntryPanel extends Panel {
     );
 
     return html.div({ id: "text-options-container" }, [
-      html.label({ style: "white-space: nowrap; text-align: right;" }, ["Alignment"]),
+      html.label({ style: "white-space: nowrap; text-align: right;" }, [
+        translate("sidebar.text-entry.text-layout-options.align"),
+      ]),
       this.textAlignElement,
       ...textSizeInput,
       ...lineHeightInput,
@@ -566,7 +568,7 @@ export default class TextEntryPanel extends Panel {
     this.accordion.items = [
       {
         id: "text-layout-options-item",
-        label: "Text layout options",
+        label: translate("sidebar.text-entry.text-layout-options"),
         open: true,
         content: this.makeTextOptionsElement(),
       },
