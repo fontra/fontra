@@ -556,7 +556,7 @@ export default class TransformationPanel extends Panel {
         key: "customDistributionSpacing",
         value: this.transformParameters.customDistributionSpacing,
         allowEmptyField: true,
-        title: translate(
+        tooltip: translate(
           "sidebar.selection-transformation.distribute.distance-in-units"
         ),
       },
