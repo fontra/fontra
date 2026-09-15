@@ -8,6 +8,9 @@
 
 ### Fixes
 
+- [linux] Fix a bug in the version check. [fontra-pak PR 269](https://github.com/fontra/fontra-pak/pull/269)
+- [conditional substitutions] Respond to changes in the set of glyphs, and update the glyphname suggestions in the substitution fields. [PR 2771](https://github.com/fontra/fontra/pull/2771)
+
 ### Improvements
 
 - [tooltips] Use standard HTML "title" tooltip functionality instead of custom and error-prone CSS solution. Looks a little different, works a lot better. [PR 2769](https://github.com/fontra/fontra/pull/2769)
