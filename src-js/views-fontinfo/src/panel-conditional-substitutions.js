@@ -25,7 +25,7 @@ const cardsInfos = {};
 export class ConditionalSubstitutionsPanel extends BaseInfoPanel {
   static title = "conditional-substitutions.title";
   static id = "conditional-substitutions-panel";
-  static fontAttributes = ["conditionalSubstitutions"];
+  static fontAttributes = ["conditionalSubstitutions", "glyphMap"];
 
   initializePanel() {
     super.initializePanel();
@@ -44,6 +44,12 @@ export class ConditionalSubstitutionsPanel extends BaseInfoPanel {
     this.fontController.addChangeListener(
       { axes: null },
       (change, isExternalChange) => this.setupUI(),
+      false
+    );
+
+    this.fontController.addChangeListener(
+      { glyphMap: null },
+      (change, isExternalChange) => this._updateGlyphNames(),
       false
     );
 
