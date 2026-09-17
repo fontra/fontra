@@ -8,6 +8,7 @@
 
 ### Fixes
 
+- [linux] Revert GNOME Wayland appearance fixes as they caused crashes. [fontra-pak PR 270](https://github.com/fontra/fontra-pak/pull/270)
 - [linux] Fix a bug in the version check. [fontra-pak PR 269](https://github.com/fontra/fontra-pak/pull/269)
 - [conditional substitutions] Respond to changes in the set of glyphs, and update the glyphname suggestions in the substitution fields. [PR 2771](https://github.com/fontra/fontra/pull/2771)
 
