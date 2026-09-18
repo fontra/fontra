@@ -17,6 +17,10 @@
 
 - [tooltips] Use standard HTML "title" tooltip functionality instead of custom and error-prone CSS solution. Looks a little different, works a lot better. [PR 2769](https://github.com/fontra/fontra/pull/2769)
 
+### Miscellaneous
+
+- [source code] Drop support for Python 3.10. [PR 2774](https://github.com/fontra/fontra/pull/2774)
+
 ## 2026-09-14 [version 2026.9.0]
 
 ### New features
