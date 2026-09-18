@@ -10,13 +10,8 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from functools import partial
 from importlib import resources
-
-try:
-    from importlib.resources.abc import Traversable
-except ImportError:
-    # < 3.11
-    from importlib.abc import Traversable  # type: ignore
 from importlib.metadata import entry_points
+from importlib.resources.abc import Traversable
 from typing import Any, Optional
 
 from aiohttp import WSCloseCode, web
