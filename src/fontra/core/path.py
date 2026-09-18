@@ -4,7 +4,7 @@ import logging
 from copy import copy, deepcopy
 from dataclasses import dataclass, field, replace
 from enum import IntEnum
-from typing import Optional, TypedDict
+from typing import NotRequired, Optional, TypedDict
 
 from fontTools.misc.roundTools import otRound
 from fontTools.misc.transform import DecomposedTransform, Transform
@@ -22,9 +22,9 @@ class InterpolationError(Exception):
 class Point(TypedDict, total=False):
     x: float
     y: float
-    type: str  # Py 3.11: NotRequired[str]
-    smooth: bool  # Py 3.11: NotRequired[bool]
-    attrs: dict  # Py 3.11: NotRequired[dict]
+    type: NotRequired[str]
+    smooth: NotRequired[bool]
+    attrs: NotRequired[dict]
 
 
 @dataclass

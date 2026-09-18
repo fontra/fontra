@@ -19,7 +19,7 @@ Fontra Pak is also available as [Flatpak](https://github.com/fontra/fontra-flatp
 
 #### Requirements
 
-- Ensure you have **Python >= 3.10** installed, preferably from [python.org](https://www.python.org/downloads/)
+- Ensure you have **Python >= 3.11** installed, preferably from [python.org](https://www.python.org/downloads/)
 
 - Ensure you have **Node.js >= 24** installed, preferably from [nodejs.org](https://nodejs.org/en/download/)
 
@@ -29,9 +29,9 @@ Fontra Pak is also available as [Flatpak](https://github.com/fontra/fontra-flatp
 
 - Create a Python venv in the root of the repo:
 
-  `python3.10 -m venv venv --prompt=fontra`
+  `python3.11 -m venv venv --prompt=fontra`
 
-  (Replace `python3.10` appropriately if you have a newer version installed.)
+  (Replace `python3.11` appropriately if you have a newer version installed.)
 
 - Activate venv:
 

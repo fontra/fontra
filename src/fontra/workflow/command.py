@@ -10,20 +10,7 @@ import yaml
 
 from .workflow import Workflow
 
-if hasattr(logging, "getLevelNamesMapping"):
-    levelNamesMapping = logging.getLevelNamesMapping()
-else:
-    # Python < 3.11
-    levelNamesMapping = {
-        "CRITICAL": 50,
-        "FATAL": 50,
-        "ERROR": 40,
-        "WARN": 30,
-        "WARNING": 30,
-        "INFO": 20,
-        "DEBUG": 10,
-        "NOTSET": 0,
-    }
+levelNamesMapping = logging.getLevelNamesMapping()
 
 sortedlevelNames = [
     name for name, value in sorted(levelNamesMapping.items(), key=lambda item: item[1])

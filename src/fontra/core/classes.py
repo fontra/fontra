@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import sys
 from dataclasses import dataclass, field, is_dataclass, replace
-from enum import Enum
+from enum import StrEnum
 from functools import partial
 from types import NoneType
 from typing import Any, Optional, Union, get_args, get_origin, get_type_hints
@@ -252,8 +252,7 @@ class BackgroundImage:
 # the Font data structure, but are used in the backend protocol.
 
 
-class ImageType(str, Enum):
-    # TODO: use StrEnum once we drop support for Python 3.10
+class ImageType(StrEnum):
     PNG = "png"
     JPEG = "jpeg"
 
@@ -264,8 +263,7 @@ class ImageData:
     data: bytes
 
 
-class ShaperFontGlyphOrderSorting(str, Enum):
-    # TODO: use StrEnum once we drop support for Python 3.10
+class ShaperFontGlyphOrderSorting(StrEnum):
     FROMGLYPHMAP = "from-glyph-map"
     SORTING = "sorted"
 
