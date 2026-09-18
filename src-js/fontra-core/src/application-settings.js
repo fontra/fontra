@@ -9,6 +9,9 @@ export const applicationSettingsController = new ObservableController({
   disableAdHocMarks: false,
   shapingDebuggerShowIneffectiveItems: false,
   outputGlyphsShowKerningForAdvance: true,
+  arrowKeyNudgeValue: 1,
+  arrowKeyNudgeValueShift: 10,
+  arrowKeyNudgeValueShiftControl: 100,
 });
 
 applicationSettingsController.synchronizeWithLocalStorage(

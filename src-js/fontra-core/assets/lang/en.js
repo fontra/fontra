@@ -73,6 +73,13 @@ export const strings = {
   "application-settings.display-language.status.wip": "work in progress",
   "application-settings.display-language.title": "Display Language",
   "application-settings.display-language.title.translated": "Display Language",
+  "application-settings.editor-behavior.arrow-key-section": "Arrow key nudge values",
+  "application-settings.editor-behavior.nudge-shift": "Shift",
+  "application-settings.editor-behavior.nudge-shift-control": "Shift+Control/Command",
+  "application-settings.editor-behavior.rect-select-live-modifier-keys":
+    "Rect-select live modifier keys",
+  "application-settings.editor-behavior.selection-behavior-section":
+    "Selection behavior",
   "application-settings.editor-behavior.title": "Editor Behavior",
   "application-settings.plugins-manager.title": "Plugin Manager",
   "application-settings.server-info.title": "Server info",

@@ -903,11 +903,14 @@ export class SceneController {
     }
     let [dx, dy] = arrowKeyDeltas[event.key];
     if (event.shiftKey && (event.metaKey || event.ctrlKey)) {
-      dx *= 100;
-      dy *= 100;
+      dx *= this.applicationSettings.arrowKeyNudgeValueShiftControl;
+      dy *= this.applicationSettings.arrowKeyNudgeValueShiftControl;
     } else if (event.shiftKey) {
-      dx *= 10;
-      dy *= 10;
+      dx *= this.applicationSettings.arrowKeyNudgeValueShift;
+      dy *= this.applicationSettings.arrowKeyNudgeValueShift;
+    } else {
+      dx *= this.applicationSettings.arrowKeyNudgeValue;
+      dy *= this.applicationSettings.arrowKeyNudgeValue;
     }
     const delta = { x: dx, y: dy };
     await this.editGlyph((sendIncrementalChange, glyph) => {
