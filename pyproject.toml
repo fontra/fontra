@@ -19,7 +19,7 @@ dependencies = [
     "watchfiles>=1.2.0",
     "pyyaml>=6.0.1",
     "ufomerge>=1.9.7",
-    "skia-pathops>=0.8.0.post1",
+    "linesweeper>=0.2.0",
     "pillow>=12.3.0",
     "ufo2ft>=3.9.0",
 ]
