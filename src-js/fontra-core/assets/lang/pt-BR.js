@@ -78,6 +78,13 @@ export const strings = {
   "application-settings.display-language.status.wip": "trabalho em andamento",
   "application-settings.display-language.title": "Display Language",
   "application-settings.display-language.title.translated": "Idioma da interface",
+  "application-settings.editor-behavior.arrow-key-section": "Arrow key nudge values",
+  "application-settings.editor-behavior.nudge-shift": "Shift",
+  "application-settings.editor-behavior.nudge-shift-control": "Shift+Control/Command",
+  "application-settings.editor-behavior.rect-select-live-modifier-keys":
+    "Rect-select live modifier keys",
+  "application-settings.editor-behavior.selection-behavior-section":
+    "Selection behavior",
   "application-settings.editor-behavior.title": "Comportamento do editor",
   "application-settings.plugins-manager.title": "Gerenciador de plug-in",
   "application-settings.server-info.title": "Informações do servidor",

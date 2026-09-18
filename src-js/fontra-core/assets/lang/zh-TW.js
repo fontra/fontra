@@ -73,6 +73,13 @@ export const strings = {
   "application-settings.display-language.status.wip": "開發中",
   "application-settings.display-language.title": "Display Language",
   "application-settings.display-language.title.translated": "顯示語言",
+  "application-settings.editor-behavior.arrow-key-section": "Arrow key nudge values",
+  "application-settings.editor-behavior.nudge-shift": "Shift",
+  "application-settings.editor-behavior.nudge-shift-control": "Shift+Control/Command",
+  "application-settings.editor-behavior.rect-select-live-modifier-keys":
+    "Rect-select live modifier keys",
+  "application-settings.editor-behavior.selection-behavior-section":
+    "Selection behavior",
   "application-settings.editor-behavior.title": "編輯器行為",
   "application-settings.plugins-manager.title": "擴充功能管理器",
   "application-settings.server-info.title": "伺服器資訊",
