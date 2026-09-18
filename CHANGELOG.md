@@ -4,6 +4,7 @@
 
 ### New features
 
+- [glyph editor] Allow the arrow key nudge values to be customized. [Issue 2772](https://github.com/fontra/fontra/issues/2772), [PR 2773](https://github.com/fontra/fontra/pull/2773)
 - [font overview / glyph cell] Add tooltip for each glyph, showing the full glyph name, unicode character, code point and unicode name. [Issue 2767](https://github.com/fontra/fontra/issues/2767), [PR 2768](https://github.com/fontra/fontra/pull/2768)
 
 ### Fixes
