@@ -274,7 +274,7 @@ class FontraServer:
         if ifModSince is not None and ifModSince >= self.startupTime:
             raise web.HTTPNotModified()
 
-        resourcePath = joinpath(contentRoot, *path.split("/"))
+        resourcePath = contentRoot.joinpath(*path.split("/"))
 
         try:
             data = resourcePath.read_bytes()
@@ -300,15 +300,7 @@ class FontraServer:
 
 def getPackageResourcePath(packageName: str) -> Traversable:
     rootPart, *children = packageName.split(".")
-    return joinpath(resources.files(rootPart), *children)
-
-
-def joinpath(path: Traversable, *parts: str) -> Traversable:
-    # This function is not needed for Python 3.11 and up, since t.joinpath()
-    # has been improved to accept multiple arguments
-    for part in parts:
-        path = path / part
-    return path
+    return resources.files(rootPart).joinpath(*children)
 
 
 def splitVersionToken(fileName: str) -> tuple[str, str | None]:
