@@ -731,6 +731,8 @@ export class SceneModel {
 
   segmentSelectionAtPoint(point, size) {
     const pathHit = this.pathHitAtPoint(point, size);
+
+    // Skip if the hit is too close to a node
     if (
       pathHit.segment?.parentPoints.every(
         (point) => vector.distance(pathHit, point) > size
