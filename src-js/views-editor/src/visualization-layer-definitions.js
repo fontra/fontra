@@ -530,131 +530,28 @@ registerVisualizationLayerDefinition({
     strokeDash: 3,
     margin: 5,
     iconSize: 12,
+    smoothSize: 8,
+    hoverStrokeOffset: 4,
+    underlayOffset: 2,
   },
   colors: {
     strokeColor: "#0006",
+    hoveredStrokeColor: "#0001",
+    selectedStrokeColor: "#0002",
+    hoveredSelectedStrokeColor: "#0000002B",
     strokeColorFontGuideline: "#00BFFF",
-  },
-  colorsDarkMode: {
-    strokeColor: "#FFF8",
-    strokeColorFontGuideline: "#00BFFFC0",
-  },
-  draw: (context, positionedGlyph, parameters, model, controller) => {
-    context.font = `${parameters.fontSize}px fontra-ui-regular, sans-serif`;
-    context.textAlign = "center";
-    const { xMin, yMin, xMax, yMax } = controller.getViewBox();
-    parameters.strokeLength = Math.max(
-      Math.sqrt((xMax - xMin) ** 2 + (yMax - yMin) ** 2),
-      2000
-    );
-
-    // Draw glyph guidelines
-    for (const guideline of positionedGlyph.glyph.guidelines) {
-      _drawGuideline(context, parameters, guideline, parameters.strokeColor);
-    }
-
-    // Draw font guidelines
-    if (!model.fontSourceInstance) {
-      return;
-    }
-    for (const guideline of model.fontSourceInstance.guidelines) {
-      _drawGuideline(
-        context,
-        parameters,
-        guideline,
-        parameters.strokeColorFontGuideline
-      );
-    }
-  },
-});
-
-function _drawGuideline(context, parameters, guideline, strokeColor) {
-  withSavedState(context, () => {
-    context.strokeStyle = strokeColor;
-    context.lineWidth = parameters.strokeWidth;
-    //translate to guideline origin
-    context.translate(guideline.x, guideline.y);
-
-    //draw lock icon or the "node"
-    if (guideline.locked) {
-      _drawLockIcon(
-        context,
-        -parameters.iconSize / 2,
-        parameters.iconSize / 2,
-        strokeColor,
-        parameters.iconSize
-      );
-    } else {
-      strokeCircle(context, 0, 0, parameters.originMarkerRadius);
-    }
-
-    withSavedState(context, () => {
-      context.rotate((guideline.angle * Math.PI) / 180);
-      context.scale(1, -1);
-
-      let textWidth;
-      let moveText;
-      const halfMarker = parameters.originMarkerRadius / 2 + parameters.strokeWidth * 2;
-      // draw name
-      if (guideline.name) {
-        const strLine = `${guideline.name}`;
-        textWidth = context.measureText(strLine).width;
-        const textVerticalCenter = getTextVerticalCenter(context, strLine);
-
-        context.fillStyle = strokeColor;
-        moveText =
-          0 - // this is centered to the guideline origin
-          textWidth / 2 - // move half width left -> right aligned to origin
-          halfMarker - // move half of the marker radius left + stroke width
-          parameters.margin * // move one margin to left to get a short line on the left
-            2; // move another margin left to get the margin on the right
-        context.fillText(strLine, moveText, textVerticalCenter);
-      }
-
-      // collect lines
-      let lines = [[halfMarker, parameters.strokeLength]];
-      if (guideline.name) {
-        // with name
-        lines.push([
-          -textWidth / 2 + moveText - parameters.margin,
-          -parameters.strokeLength,
-        ]);
-        lines.push([-parameters.margin * 2, -halfMarker]);
-      } else {
-        // without name
-        lines.push([-halfMarker, -parameters.strokeLength]);
-      }
-      // draw lines
-      for (const [x1, x2] of lines) {
-        strokeLineDashed(context, x1, 0, x2, 0, [
-          parameters.strokeDash * 2,
-          parameters.strokeDash,
-        ]);
-      }
-    });
-  });
-}
-
-registerVisualizationLayerDefinition({
-  identifier: "fontra.selected.guidelines",
-  name: "Selected guidelines",
-  selectionFunc: glyphSelector("editing"),
-  zIndex: 500,
-  screenParameters: {
-    smoothSize: 8,
-    strokeWidth: 1,
-    hoverStrokeOffset: 4,
-    underlayOffset: 2,
-    iconSize: 12,
-  },
-  colors: {
     hoveredColorIcon: "#0006",
     hoveredColor: "#BBB",
     selectedColor: "#000",
     underColor: "#FFFA",
-    underColorIcon: "#f6f6f6",
+    underColorIcon: "#F6F6F6",
   },
   colorsDarkMode: {
+    strokeColor: "#FFF8",
+    hoveredStrokeColor: "#FFFFFF18",
+    selectedStrokeColor: "#FFF3",
+    hoveredSelectedStrokeColor: "#FFF4",
+    strokeColorFontGuideline: "#00BFFFC0",
     hoveredColorIcon: "#BBB",
     hoveredColor: "#BBB",
     selectedColor: "#FFF",
@@ -665,16 +562,51 @@ registerVisualizationLayerDefinition({
     const glyph = positionedGlyph.glyph;
     const smoothSize = parameters.smoothSize;
 
-    const {
-      guideline: hoveredGuidelineIndices,
-      fontGuideline: hoveredFontGuidelineIndices,
-    } = parseSelection(model.hoverSelection);
-    const {
-      guideline: selectedGuidelineIndices,
-      fontGuideline: selectedFontGuidelineIndices,
-    } = parseSelection(model.selection);
+    const hoveredGuidelineIndices =
+      parseSelection(model.hoverSelection).guideline ?? [];
+    const selectedGuidelineIndices = parseSelection(model.selection).guideline ?? [];
 
-    // TODO: Font Guidelines
+    context.font = `${parameters.fontSize}px fontra-ui-regular, sans-serif`;
+    context.textAlign = "center";
+    const { xMin, yMin, xMax, yMax } = controller.getViewBox();
+    parameters.strokeLength = Math.max(
+      Math.sqrt((xMax - xMin) ** 2 + (yMax - yMin) ** 2),
+      2000
+    );
+
+    // Draw glyph guidelines
+    for (const [index, guideline] of enumerate(glyph.guidelines)) {
+      const isHovered = hoveredGuidelineIndices.includes(index);
+      const isSelected = selectedGuidelineIndices.includes(index);
+
+      _drawGuideline(
+        context,
+        parameters,
+        guideline,
+        parameters.strokeColor,
+        isSelected && isHovered
+          ? parameters.hoveredSelectedStrokeColor
+          : isSelected
+            ? parameters.selectedStrokeColor
+            : isHovered
+              ? parameters.hoveredStrokeColor
+              : null
+      );
+    }
+
+    // Draw font guidelines
+    if (model.fontSourceInstance) {
+      for (const guideline of model.fontSourceInstance.guidelines) {
+        _drawGuideline(
+          context,
+          parameters,
+          guideline,
+          parameters.strokeColorFontGuideline
+        );
+      }
+    }
+
+    // Hover / selection
 
     // Under layer
     context.fillStyle = parameters.underColor;
@@ -746,6 +678,84 @@ registerVisualizationLayerDefinition({
     }
   },
 });
+
+function _drawGuideline(context, parameters, guideline, strokeColor, underStrokeColor) {
+  withSavedState(context, () => {
+    context.strokeStyle = strokeColor;
+    context.lineWidth = parameters.strokeWidth;
+    context.translate(guideline.x, guideline.y);
+
+    // Draw lock icon or the "node"
+    if (guideline.locked) {
+      _drawLockIcon(
+        context,
+        -parameters.iconSize / 2,
+        parameters.iconSize / 2,
+        strokeColor,
+        parameters.iconSize
+      );
+    } else {
+      strokeCircle(context, 0, 0, parameters.originMarkerRadius);
+    }
+
+    withSavedState(context, () => {
+      context.rotate((guideline.angle * Math.PI) / 180);
+      context.scale(1, -1);
+
+      let textWidth;
+      let moveText;
+      const halfMarker = parameters.originMarkerRadius / 2 + parameters.strokeWidth * 2;
+      // Draw name
+      if (guideline.name) {
+        const strLine = `${guideline.name}`;
+        textWidth = context.measureText(strLine).width;
+        const textVerticalCenter = getTextVerticalCenter(context, strLine);
+
+        context.fillStyle = strokeColor;
+        moveText =
+          0 - // this is centered to the guideline origin
+          textWidth / 2 - // move half width left -> right aligned to origin
+          halfMarker - // move half of the marker radius left + stroke width
+          parameters.margin * // move one margin to left to get a short line on the left
+            2; // move another margin left to get the margin on the right
+        context.fillText(strLine, moveText, textVerticalCenter);
+      }
+
+      // Collect lines
+      let lines = [[halfMarker, parameters.strokeLength]];
+      if (guideline.name) {
+        // With name
+        lines.push([
+          -textWidth / 2 + moveText - parameters.margin,
+          -parameters.strokeLength,
+        ]);
+        lines.push([-parameters.margin * 2, -halfMarker]);
+      } else {
+        // Without name
+        lines.push([-halfMarker, -parameters.strokeLength]);
+      }
+
+      // Draw lines
+
+      if (underStrokeColor) {
+        context.strokeStyle = underStrokeColor;
+        context.lineWidth = parameters.strokeWidth * 3;
+        for (const [x1, x2] of lines) {
+          strokeLine(context, x1, 0, x2, 0);
+        }
+      }
+
+      context.lineWidth = parameters.strokeWidth;
+      context.strokeStyle = strokeColor;
+      for (const [x1, x2] of lines) {
+        strokeLineDashed(context, x1, 0, x2, 0, [
+          parameters.strokeDash * 2,
+          parameters.strokeDash,
+        ]);
+      }
+    });
+  });
+}
 
 function _drawLockIcon(context, x, y, strokeColor, iconSize, lineWidth = 2) {
   withSavedState(context, () => {
