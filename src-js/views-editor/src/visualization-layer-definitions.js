@@ -73,7 +73,7 @@ registerVisualizationLayerDefinition({
   name: "Empty selected glyph",
   selectionFunc: glyphSelector("selected"),
   selectionFilter: (positionedGlyph) => positionedGlyph.isEmpty,
-  zIndex: 200,
+  zIndex: 50,
   colors: { fillColor: "#D8D8D8" /* Must be six hex digits */ },
   colorsDarkMode: { fillColor: "#585858" /* Must be six hex digits */ },
   draw: _drawEmptyGlyphLayer,
@@ -84,7 +84,7 @@ registerVisualizationLayerDefinition({
   name: "Empty hovered glyph",
   selectionFunc: glyphSelector("hovered"),
   selectionFilter: (positionedGlyph) => positionedGlyph.isEmpty,
-  zIndex: 200,
+  zIndex: 50,
   colors: { fillColor: "#E8E8E8" /* Must be six hex digits */ },
   colorsDarkMode: { fillColor: "#484848" /* Must be six hex digits */ },
   draw: _drawEmptyGlyphLayer,
@@ -442,7 +442,9 @@ registerVisualizationLayerDefinition({
 registerVisualizationLayerDefinition({
   identifier: "fontra.background-image",
   name: "sidebar.user-settings.glyph.background-image",
-  selectionFunc: glyphSelector("editing"),
+  selectionFunc: glyphSelector("all"),
+  selectionFilter: (positionedGlyph) =>
+    positionedGlyph.isEditing || positionedGlyph.isEmpty,
   userSwitchable: true,
   defaultOn: true,
   zIndex: 50,
