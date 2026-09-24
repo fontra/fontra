@@ -1142,8 +1142,9 @@ export class SceneModel {
       const xLeft = positionedGlyph.x;
       const xRight = positionedGlyph.x + glyph.xAdvance;
 
-      const xLeftSB = xLeft + (glyph.leftMargin || 0);
-      const xRightSB = xRight - (glyph.rightMargin || 0);
+      // For empty glyphs, we use fallback sidebearings of 1/4th of the advance
+      const xLeftSB = xLeft + (glyph.leftMargin ?? glyph.xAdvance / 4);
+      const xRightSB = xRight - (glyph.rightMargin ?? glyph.xAdvance / 4);
 
       const [leftZone1, leftZone2] = sorted([xLeft, xLeftSB]);
       const [rightZone1, rightZone2] = sorted([xRight, xRightSB]);
