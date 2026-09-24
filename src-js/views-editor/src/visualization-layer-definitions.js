@@ -547,8 +547,8 @@ registerVisualizationLayerDefinition({
   },
   colorsDarkMode: {
     strokeColor: "#FFF8",
-    hoveredStrokeColor: "#FFF2",
-    selectedStrokeColor: "#FFF5",
+    hoveredStrokeColor: "#FFFFFF18",
+    selectedStrokeColor: "#FFF3",
     strokeColorFontGuideline: "#00BFFFC0",
     hoveredColorIcon: "#BBB",
     hoveredColor: "#BBB",
