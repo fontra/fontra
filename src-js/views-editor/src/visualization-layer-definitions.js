@@ -678,10 +678,9 @@ function _drawGuideline(context, parameters, guideline, strokeColor, underStroke
   withSavedState(context, () => {
     context.strokeStyle = strokeColor;
     context.lineWidth = parameters.strokeWidth;
-    //translate to guideline origin
     context.translate(guideline.x, guideline.y);
 
-    //draw lock icon or the "node"
+    // Draw lock icon or the "node"
     if (guideline.locked) {
       _drawLockIcon(
         context,
@@ -701,7 +700,7 @@ function _drawGuideline(context, parameters, guideline, strokeColor, underStroke
       let textWidth;
       let moveText;
       const halfMarker = parameters.originMarkerRadius / 2 + parameters.strokeWidth * 2;
-      // draw name
+      // Draw name
       if (guideline.name) {
         const strLine = `${guideline.name}`;
         textWidth = context.measureText(strLine).width;
@@ -717,17 +716,17 @@ function _drawGuideline(context, parameters, guideline, strokeColor, underStroke
         context.fillText(strLine, moveText, textVerticalCenter);
       }
 
-      // collect lines
+      // Collect lines
       let lines = [[halfMarker, parameters.strokeLength]];
       if (guideline.name) {
-        // with name
+        // With name
         lines.push([
           -textWidth / 2 + moveText - parameters.margin,
           -parameters.strokeLength,
         ]);
         lines.push([-parameters.margin * 2, -halfMarker]);
       } else {
-        // without name
+        // Without name
         lines.push([-halfMarker, -parameters.strokeLength]);
       }
 
