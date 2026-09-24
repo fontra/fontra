@@ -1142,6 +1142,7 @@ export class SceneModel {
       const xLeft = positionedGlyph.x;
       const xRight = positionedGlyph.x + glyph.xAdvance;
 
+      // For empty glyphs, we use fallback sidebearings of 1/4th of the advance
       const xLeftSB = xLeft + (glyph.leftMargin ?? glyph.xAdvance / 4);
       const xRightSB = xRight - (glyph.rightMargin ?? glyph.xAdvance / 4);
 
