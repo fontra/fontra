@@ -637,14 +637,8 @@ export class SceneModel {
       return selection;
     }
 
-    // Then, look for segment selection (they should *not* participate in the
+    // Then, look for components (they should *not* participate in the
     // "prefer if it's in the current selection" logic)
-    selection = this.segmentSelectionAtPoint(point, size);
-    if (selection.pathHit) {
-      return selection;
-    }
-
-    // Then, look for components (ditto)
     const componentSelection = this.componentSelectionAtPoint(
       point,
       size,
@@ -681,6 +675,15 @@ export class SceneModel {
     );
     if (pointSelection.size) {
       return { selection: pointSelection };
+    }
+
+    const segmentSelection = this.segmentSelectionAtPoint(
+      point,
+      size,
+      parsedCurrentSelection
+    );
+    if (segmentSelection.pathHit) {
+      return segmentSelection;
     }
 
     const guidelineSelection = this.guidelineSelectionAtPoint(
@@ -729,24 +732,44 @@ export class SceneModel {
     return new Set();
   }
 
-  segmentSelectionAtPoint(point, size) {
+  segmentSelectionAtPoint(point, size, parsedCurrentSelection) {
     const pathHit = this.pathHitAtPoint(point, size);
+
+    // Skip if we have parsedCurrentSelection and a hit, but the hit
+    // does not match the parsedCurrentSelection
+    const pointIndices = parsedCurrentSelection
+      ? (parsedCurrentSelection.point ?? [])
+      : undefined;
+
+    if (
+      pointIndices &&
+      pathHit.segment &&
+      !(
+        pointIndices.includes(pathHit.segment.parentPointIndices[0]) &&
+        pointIndices.includes(pathHit.segment.parentPointIndices.at(-1))
+      )
+    ) {
+      return { selection: new Set() };
+    }
 
     // Skip if the hit is too close to a node
     if (
-      pathHit.segment?.parentPoints.every(
+      !pathHit.segment?.parentPoints.every(
         (point) => vector.distance(pathHit, point) > size
       )
     ) {
-      const selection = new Set(
+      return { selection: new Set() };
+    }
+
+    return {
+      selection: new Set(
         [
           pathHit.segment.parentPointIndices[0],
           pathHit.segment.parentPointIndices.at(-1),
         ].map((i) => `point/${i}`)
-      );
-      return { selection, pathHit };
-    }
-    return { selection: new Set() };
+      ),
+      pathHit,
+    };
   }
 
   componentSelectionAtPoint(point, size, currentSelection, preferTCenter) {
