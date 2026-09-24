@@ -538,6 +538,7 @@ registerVisualizationLayerDefinition({
     strokeColor: "#0006",
     hoveredStrokeColor: "#0001",
     selectedStrokeColor: "#0002",
+    hoveredSelectedStrokeColor: "#0000002B",
     strokeColorFontGuideline: "#00BFFF",
     hoveredColorIcon: "#0006",
     hoveredColor: "#BBB",
@@ -549,6 +550,7 @@ registerVisualizationLayerDefinition({
     strokeColor: "#FFF8",
     hoveredStrokeColor: "#FFFFFF18",
     selectedStrokeColor: "#FFF3",
+    hoveredSelectedStrokeColor: "#FFF4",
     strokeColorFontGuideline: "#00BFFFC0",
     hoveredColorIcon: "#BBB",
     hoveredColor: "#BBB",
@@ -576,16 +578,19 @@ registerVisualizationLayerDefinition({
     for (const [index, guideline] of enumerate(glyph.guidelines)) {
       const isHovered = hoveredGuidelineIndices.includes(index);
       const isSelected = selectedGuidelineIndices.includes(index);
+
       _drawGuideline(
         context,
         parameters,
         guideline,
         parameters.strokeColor,
-        isSelected
-          ? parameters.selectedStrokeColor
-          : isHovered
-            ? parameters.hoveredStrokeColor
-            : null
+        isSelected && isHovered
+          ? parameters.hoveredSelectedStrokeColor
+          : isSelected
+            ? parameters.selectedStrokeColor
+            : isHovered
+              ? parameters.hoveredStrokeColor
+              : null
       );
     }
 
