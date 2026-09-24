@@ -4,12 +4,13 @@
 
 ### New features
 
+- [glyph editor] Show the background image for otherwise empty glyphs, even when not editing, so background images can be used as placeholders or references white using the spacing tool. [Issue 2775](https://github.com/fontra/fontra/issues/2775), [PR 2783](https://github.com/fontra/fontra/pull/2783)
 - [glyph editor] Allow the arrow key nudge values to be customized. [Issue 2772](https://github.com/fontra/fontra/issues/2772), [PR 2773](https://github.com/fontra/fontra/pull/2773)
 - [font overview / glyph cell] Add tooltip for each glyph, showing the full glyph name, unicode character, code point and unicode name. [Issue 2767](https://github.com/fontra/fontra/issues/2767), [PR 2768](https://github.com/fontra/fontra/pull/2768)
 
 ### Fixes
 
-- [guidelines] When a guideline overlaps with a (line) segment, make sure that we can select the line segment by clicking on it. Improve visualization of hovered and selected guidelines. [Issue 2777](https://github.com/fontra/fontra/issues/2777), [PR 2781](https://github.com/fontra/fontra/pull/2781), [Issue 2782](https://github.com/fontra/fontra/pull/2782)
+- [glyph editor] When a guideline overlaps with a (line) segment, make sure that we can select the line segment by clicking on it. Improve visualization of hovered and selected guidelines. [Issue 2777](https://github.com/fontra/fontra/issues/2777), [PR 2781](https://github.com/fontra/fontra/pull/2781), [Issue 2782](https://github.com/fontra/fontra/pull/2782)
 - [linux] Revert GNOME Wayland appearance fixes as they caused crashes. [fontra-pak PR 270](https://github.com/fontra/fontra-pak/pull/270)
 - [linux] Fix a bug in the version check. [fontra-pak PR 269](https://github.com/fontra/fontra-pak/pull/269)
 - [conditional substitutions] Respond to changes in the set of glyphs, and update the glyphname suggestions in the substitution fields. [PR 2771](https://github.com/fontra/fontra/pull/2771)
