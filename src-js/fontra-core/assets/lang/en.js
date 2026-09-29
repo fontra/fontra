@@ -26,7 +26,7 @@ export const strings = {
   "action.copy-glyphname": "Copy Glyph Name",
   "action.copy-glyphname.plural": "Copy Glyph Names",
   "action.cut": "Cut",
-  "action.decompose-component": "Decompose %0 Component",
+  "action.decompose-component": "Decompose Component",
   "action.decompose-component.plural": "Decompose %0 Components",
   "action.delete": "Delete",
   "action.delete-glyph": "Delete Glyph",
@@ -77,7 +77,7 @@ export const strings = {
   "application-settings.editor-behavior.nudge-shift": "Shift",
   "application-settings.editor-behavior.nudge-shift-control": "Shift+Control/Command",
   "application-settings.editor-behavior.rect-select-live-modifier-keys":
-    "Rect-select live modifier keys",
+    "Use live modifier keys for rectangle-select",
   "application-settings.editor-behavior.selection-behavior-section":
     "Selection behavior",
   "application-settings.editor-behavior.title": "Editor Behavior",
@@ -241,7 +241,7 @@ export const strings = {
   "editor.pen-tool-cubic": "Pen Tool (cubic)",
   "editor.pen-tool-quad": "Pen Tool (quadratic)",
   "editor.pointer-tool": "Pointer Tool",
-  "editor.pointer-tool-scale": "Pointer Tool (Scaling edit tool behavior)",
+  "editor.pointer-tool-scale": "Pointer Tool (scaling)",
   "editor.pointer-tools": "Pointer Tools",
   "editor.power-ruler-tool": "Power Ruler Tool",
   "editor.shape-tool": "Shape Tool",
