@@ -2,7 +2,7 @@
 
 ## 2026-09-29 [version 2026.9.2]
 
-- Tweaks and improvements to various languages: English, Spanish, French, Italian, Protuguese and Russian. [PR 2786](https://github.com/fontra/fontra/pull/2786)
+- [languages] Tweaks and improvements to various languages: English, Spanish, French, Italian, Protuguese and Russian. [PR 2786](https://github.com/fontra/fontra/pull/2786)
 
 ## 2026-09-29 [version 2026.9.1]
 
