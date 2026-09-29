@@ -786,7 +786,10 @@ export class EditorController extends ViewController {
       const functionName = meta.function;
       let module;
       try {
-        module = await import(`${pluginPath}/${initScript}`);
+        // webpackIgnore: keep this a real dynamic import at runtime; the plug-in
+        // lives outside the bundle (a URL or a server path), webpack must not
+        // try to resolve it at build time.
+        module = await import(/* webpackIgnore: true */ `${pluginPath}/${initScript}`);
       } catch (e) {
         console.error("Module didn't load");
         console.log(e);
