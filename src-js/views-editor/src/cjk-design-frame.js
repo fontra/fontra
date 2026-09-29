@@ -26,7 +26,7 @@ registerVisualizationLayerDefinition({
     strokeColor: "#FFF6",
     secondLineColor: "#A62963AA",
   },
-  draw: (context, positionedGlyph, parameters, model, controller) =>
+  draw: ({ context, positionedGlyph, parameters, model, controller }) =>
     _theCJKDesignFrame.draw(context, positionedGlyph, parameters, model, controller),
 });
 

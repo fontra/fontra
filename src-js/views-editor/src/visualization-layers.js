@@ -88,7 +88,13 @@ export class VisualizationLayers {
       for (const item of layer.selectionFunc(visContext, layer)) {
         withSavedState(context, () => {
           context.translate(item.x, item.y);
-          layer.draw(context, item, layer.parameters, model, controller);
+          layer.draw({
+            context,
+            positionedGlyph: item,
+            parameters: layer.parameters,
+            model,
+            controller,
+          });
         });
       }
     }

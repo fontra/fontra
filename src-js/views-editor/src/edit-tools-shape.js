@@ -231,7 +231,7 @@ registerVisualizationLayerDefinition({
   screenParameters: { strokeWidth: 1 },
   colors: { boxColor: "#FFFB", strokeColor: "#000" },
   colorsDarkMode: { boxColor: "#1118", strokeColor: "#FFF" },
-  draw: (context, positionedGlyph, parameters, model, controller) => {
+  draw: ({ context, positionedGlyph, parameters, model, controller }) => {
     const shape = model.shapeToolShapePath;
     if (!shape) {
       return;

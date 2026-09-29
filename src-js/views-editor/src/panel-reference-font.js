@@ -46,7 +46,7 @@ registerVisualizationLayerDefinition({
   screenParameters: { strokeWidth: 1 },
   colors: { fillColor: "#AAA6" },
   // colorsDarkMode: { strokeColor: "red" },
-  draw: (context, positionedGlyph, parameters, model, controller) => {
+  draw: ({ context, positionedGlyph, parameters, model, controller }) => {
     if (!referenceFontModel?.referenceFontName) {
       return;
     }

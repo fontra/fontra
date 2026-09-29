@@ -409,13 +409,13 @@ registerVisualizationLayerDefinition({
   selectionFunc: glyphSelector("editing"),
 });
 
-function _drawMiniSideBearings(
+function _drawMiniSideBearings({
   context,
   positionedGlyph,
   parameters,
   model,
-  controller
-) {
+  controller,
+}) {
   const glyph = positionedGlyph.glyph;
   context.strokeStyle = parameters.strokeColor;
   context.lineWidth = parameters.strokeWidth;
@@ -1000,7 +1000,7 @@ const kernVisualizationDefinition = {
   zIndex: 190,
   colors: { negativeKernColor: "#F1175933", positiveKernColor: "#1759F133" },
   colorsDarkMode: { negativeKernColor: "#FF336655", positiveKernColor: "#3366FF55" },
-  draw: (context, positionedGlyph, parameters, model, controller) => {
+  draw: ({ context, positionedGlyph, parameters, model, controller }) => {
     if (!positionedGlyph.kernValue) {
       return;
     }
