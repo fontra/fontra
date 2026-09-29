@@ -77,7 +77,7 @@ export const strings = {
   "application-settings.editor-behavior.nudge-shift": "Shift",
   "application-settings.editor-behavior.nudge-shift-control": "Shift+Control/Command",
   "application-settings.editor-behavior.rect-select-live-modifier-keys":
-    "Rect-select live modifier keys",
+    "Use live modifier keys for rectangle-select",
   "application-settings.editor-behavior.selection-behavior-section":
     "Selection behavior",
   "application-settings.editor-behavior.title": "Editor-Verhalten",
