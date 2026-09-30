@@ -1,5 +1,11 @@
 # Changelog for Fontra
 
+## 2026-10-?? [version 2026.10.0]
+
+### Fixes
+
+- [font overview] Fix glitch with translated "Group by" labels. [Issue 2787](https://github.com/fontra/fontra/issues/2787), [PR 2788](https://github.com/fontra/fontra/pull/2788)
+
 ## 2026-09-29 [version 2026.9.2]
 
 - [languages] Tweaks and improvements to various languages: English, Spanish, French, Italian, Portuguese and Russian. [PR 2786](https://github.com/fontra/fontra/pull/2786)
