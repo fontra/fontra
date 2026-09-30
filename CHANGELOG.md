@@ -2,6 +2,11 @@
 
 ## 2026-10-?? [version 2026.10.0]
 
+### New features
+
+- [fontra pak] Added an "Open Font..." button to the main window, using a modified Open dialog that can select font projects that are folders, such as `.fontra` and `.ufo`. Contributed by Khaled Hosny. [Issue 253](https://github.com/fontra/fontra-pak/issues/253), [PR 281](https://github.com/fontra/fontra-pak/pull/281)
+- [fontra pak] Added a menu bar with a "File" menu, that has two items: "New Font..." and "Open Font...". [Issue 89](https://github.com/fontra/fontra-pak/issues/89), [PR 283](https://github.com/fontra/fontra-pak/pull/283)
+
 ### Fixes
 
 - [font overview] Fix glitch with translated "Group by" labels. [Issue 2787](https://github.com/fontra/fontra/issues/2787), [PR 2788](https://github.com/fontra/fontra/pull/2788)
