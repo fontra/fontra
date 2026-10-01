@@ -10,6 +10,7 @@
 ### Fixes
 
 - [font overview] Fix glitch with translated "Group by" labels. [Issue 2787](https://github.com/fontra/fontra/issues/2787), [PR 2788](https://github.com/fontra/fontra/pull/2788)
+- [designspace/ufo/features] Reworded Designspace/UFO feature editing warning to match reality. [PR 2794](https://github.com/fontra/fontra/pull/2794)
 
 ## 2026-09-29 [version 2026.9.2]
 
