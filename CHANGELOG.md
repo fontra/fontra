@@ -11,6 +11,7 @@
 
 - [font overview] Fix glitch with translated "Group by" labels. [Issue 2787](https://github.com/fontra/fontra/issues/2787), [PR 2788](https://github.com/fontra/fontra/pull/2788)
 - [designspace/ufo/features] Reworded Designspace/UFO feature editing warning to match reality. [PR 2794](https://github.com/fontra/fontra/pull/2794)
+- [fontra pak/linux] Fix bundling problem with opening URLs. [fontra-pak Issue 286](https://github.com/fontra/fontra-pak/issues/286), [fontra-pak PR 287](https://github.com/fontra/fontra-pak/pull/287)
 
 ## 2026-09-29 [version 2026.9.2]
 
