@@ -28,10 +28,10 @@
 ### Fixes
 
 - [glyph editor] When a guideline overlaps with a (line) segment, make sure that we can select the line segment by clicking on it. Improve visualization of hovered and selected guidelines. [Issue 2777](https://github.com/fontra/fontra/issues/2777), [PR 2781](https://github.com/fontra/fontra/pull/2781), [Issue 2782](https://github.com/fontra/fontra/pull/2782)
-- [linux] Fix GNOME Wayland appearance issues by upgrading PyQt. [Issue 271](https://github.com/fontra/fontra-pak/issues/271), [PR 278](https://github.com/fontra/fontra-pak/pull/278)
-- [linux] Revert GNOME Wayland appearance fixes as they caused crashes. [fontra-pak PR 270](https://github.com/fontra/fontra-pak/pull/270)
-- [linux] Skip version check when running as a flatpak. [PR 277](https://github.com/fontra/fontra-pak/pull/277)
-- [linux] Fix a bug in the version check. [fontra-pak PR 269](https://github.com/fontra/fontra-pak/pull/269)
+- [fontra-pak/linux] Fix GNOME Wayland appearance issues by upgrading PyQt. [Issue 271](https://github.com/fontra/fontra-pak/issues/271), [PR 278](https://github.com/fontra/fontra-pak/pull/278)
+- [fontra-pak/linux] Revert GNOME Wayland appearance fixes as they caused crashes. [fontra-pak PR 270](https://github.com/fontra/fontra-pak/pull/270)
+- [fontra-pak/linux] Skip version check when running as a flatpak. [PR 277](https://github.com/fontra/fontra-pak/pull/277)
+- [fontra-pak/linux] Fix a bug in the version check. [fontra-pak PR 269](https://github.com/fontra/fontra-pak/pull/269)
 - [conditional substitutions] Respond to changes in the set of glyphs, and update the glyphname suggestions in the substitution fields. [PR 2771](https://github.com/fontra/fontra/pull/2771)
 
 ### Improvements
@@ -52,7 +52,7 @@
 ### Fixes
 
 - [glyph editor] Fix behavior when moving a window between screens with different resolutions. [PR 2766](https://github.com/fontra/fontra/pull/2766)
-- [fontra-pak linux] Fix window appearance and behavior on GNOME Wayland. [fontra-pak PR 267](https://github.com/fontra/fontra-pak/pull/267)
+- [fontra-pak/linux] Fix window appearance and behavior on GNOME Wayland. [fontra-pak PR 267](https://github.com/fontra/fontra-pak/pull/267)
 - [opentype features panel] Recompile when glyphs are being added to or deleted from the font. [PR 2764](https://github.com/fontra/fontra/pull/2764)
 - [firefox] Work around text selection problem within draggable boxes. [PR 2763](https://github.com/fontra/fontra/pull/2763)
 - [glyph editor] Fix text align change when in auto-view-box mode. [PR 2758](https://github.com/fontra/fontra/pull/2758)
