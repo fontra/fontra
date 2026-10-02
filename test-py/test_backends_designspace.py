@@ -628,7 +628,7 @@ async def test_putAxes(writableTestFont):
             minValue=10,
             defaultValue=20,
             maxValue=30,
-            mapping=[[10, 0], [20, 100], [20, 200]],
+            mapping=[[10, 0], [20, 100], [21, 200]],
         )
     )
     await writableTestFont.putAxes(axes)

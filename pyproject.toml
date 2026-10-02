@@ -14,11 +14,11 @@ keywords = ["font", "fonts"]
 license = {text = "GNU General Public License v3"}
 dependencies = [
     "aiohttp>=3.14.3",
-    "cattrs>=23.1.2",
-    "fonttools[ufo,unicode,woff]>=4.63.0",
-    "watchfiles>=1.2.0",
+    "cattrs>=26.2.1",
+    "fonttools[ufo,unicode,woff]>=4.66.0",
+    "watchfiles>=1.3.0",
     "pyyaml>=6.0.1",
-    "ufomerge>=1.9.7",
+    "ufomerge>=1.9.8",
     "skia-pathops>=0.8.0.post1",
     "pillow>=12.3.0",
     "ufo2ft>=3.9.0",
