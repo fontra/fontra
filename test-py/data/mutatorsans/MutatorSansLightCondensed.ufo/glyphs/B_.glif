@@ -3,6 +3,7 @@
   <advance width="443"/>
   <unicode hex="0042"/>
   <unicode hex="0062"/>
+  <guideline x="198" y="569" angle="0" name="NamedTestGuideline"/>
   <outline>
     <contour>
       <point x="60" y="0" type="line"/>
