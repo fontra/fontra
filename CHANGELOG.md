@@ -1,5 +1,11 @@
 # Changelog for Fontra
 
+## 2026-10-?? [version 2026.10.1]
+
+### New features
+
+- [fontra pak/linux] Add native Linux install and uninstall script. [fontra-pak PR 289](https://github.com/fontra/fontra-pak/pull/289)
+
 ## 2026-10-05 [version 2026.10.0]
 
 ### New features
