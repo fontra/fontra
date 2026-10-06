@@ -947,17 +947,17 @@ def _(v: LineMetric, scalar):
 
 @add.register
 def _(v1: Guideline, v2):
-    return _dataClassOperator(v1, v2, add)
+    return _guidelineOperator(v1, v2, add)
 
 
 @subtract.register
 def _(v1: Guideline, v2):
-    return _dataClassOperator(v1, v2, subtract)
+    return _guidelineOperator(v1, v2, subtract)
 
 
 @multiply.register
 def _(v: Guideline, scalar):
-    return _dataClassMul(v, scalar)
+    return _guidelineMul(v, scalar)
 
 
 def _dataClassOperator(v1, v2, op):
@@ -1022,6 +1022,18 @@ def _anchorOperator(anchor1, anchor2, op):
 
 def _anchorMul(anchor, scalar):
     return replace(anchor, x=anchor.x * scalar, y=anchor.y * scalar)
+
+
+def _guidelineOperator(guideline1, guideline2, op):
+    if guideline1.name != guideline2.name:
+        raise InterpolationError("incompatible guideline name")
+    return replace(
+        guideline1, x=op(guideline1.x, guideline2.x), y=op(guideline1.y, guideline2.y)
+    )
+
+
+def _guidelineMul(guideline, scalar):
+    return replace(guideline, x=guideline.x * scalar, y=guideline.y * scalar)
 
 
 def mapLocationFromUserToSource(location, fontAxes):
