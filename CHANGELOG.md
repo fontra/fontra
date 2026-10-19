@@ -8,6 +8,7 @@
 
 ### Fixes
 
+- [vivaldi] Make shortcuts work in the Vivaldi browser. [Issue 2807](https://github.com/fontra/fontra/issues/2807), [PR 2808](https://github.com/fontra/fontra/pull/2808)
 - [fontra-workflow] Fixed instantiating named guidelines. Among other things, this fixes exporting a variable font made with variable components that use named guidelines. [Issue 2800](https://github.com/fontra/fontra/issues/2800), [Issue 2799](https://github.com/fontra/fontra/issues/2799), [PR 2801](https://github.com/fontra/fontra/pull/2801)
 
 ## 2026-10-05 [version 2026.10.0]
