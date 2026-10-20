@@ -1,5 +1,9 @@
 import io
+import os
+import subprocess
+import tempfile
 import uuid
+from contextlib import contextmanager
 from copy import copy, deepcopy
 from itertools import product
 from os import PathLike
@@ -233,8 +237,15 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
         return {}
 
     async def getFeatures(self) -> OpenTypeFeatures:
-        # TODO: do best effort of reading GSUB/GPOS with fontFeatures
-        return OpenTypeFeatures()
+        return OpenTypeFeatures(text=self._getFeaturesFromFont())
+
+    def _getFeaturesFromFont(self) -> str:
+        with self._tmpFontPath() as path:
+            result = subprocess.run(
+                ["sr-aef", path], capture_output=True, encoding="utf-8", check=True
+            )
+
+        return "" if result.returncode != 0 else result.stdout
 
     async def getCustomData(self) -> dict[str, Any]:
         return {}
@@ -258,6 +269,10 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
     def _getShaperFont(self):
         return self._loadFontFromPath(self.path)
 
+    @contextmanager
+    def _tmpFontPath(self):
+        yield self.path
+
     async def fileWatcherProcessChanges(
         self, changes: set[tuple[Change, str]]
     ) -> dict[str, Any] | None:
@@ -278,6 +293,16 @@ class TTXBackend(OTFBackend):
         font = copy(self.font)  # shallow copy
         font.tables = dict(font.tables)  # shallow copy tables dict for table subsetting
         return font
+
+    @contextmanager
+    def _tmpFontPath(self):
+        f = tempfile.NamedTemporaryFile(suffix=".ttf", delete=False)
+        self.font.save(f)
+        f.close()
+        try:
+            yield f.name
+        finally:
+            os.unlink(f.name)
 
 
 def getLocationsFromVarstore(
