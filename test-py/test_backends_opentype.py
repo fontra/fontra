@@ -347,3 +347,15 @@ async def test_os2_version1():
         "baseline": LineMetric(value=0),
         "descender": LineMetric(value=-293),
     }
+
+
+async def test_getFeatures(testFontMutatorSans):
+    features = await testFontMutatorSans.getFeatures()
+    assert "feature kern" in features.text
+
+
+async def test_getFeatures_ttx():
+    path = dataDir / "mutatorsans" / "MutatorSans.subset.ttx"
+    font = getFileSystemBackend(path)
+    features = await font.getFeatures()
+    assert "feature kern" in features.text

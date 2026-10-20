@@ -1,5 +1,9 @@
 import io
+import os
+import subprocess
+import tempfile
 import uuid
+from contextlib import contextmanager
 from copy import copy, deepcopy
 from itertools import product
 from os import PathLike
@@ -63,6 +67,7 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
 
     def _initializeFromPath(self, path: PathLike) -> None:
         self.path = path
+        self._shaperFontData: ShaperFontData | None = None
         self.font = self._loadFontFromPath(path)
         self._initialize()
 
@@ -233,13 +238,26 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
         return {}
 
     async def getFeatures(self) -> OpenTypeFeatures:
-        # TODO: do best effort of reading GSUB/GPOS with fontFeatures
-        return OpenTypeFeatures()
+        return OpenTypeFeatures(text=self._getFeaturesFromFont())
+
+    def _getFeaturesFromFont(self) -> str:
+        with self._tmpFontPath() as path:
+            result = subprocess.run(
+                ["sr-aef", path], capture_output=True, encoding="utf-8", check=True
+            )
+
+        return "" if result.returncode != 0 else result.stdout
 
     async def getCustomData(self) -> dict[str, Any]:
         return {}
 
     async def getShaperFontData(self) -> ShaperFontData | None:
+        return self._getShaperFontData()
+
+    def _getShaperFontData(self) -> ShaperFontData:
+        if self._shaperFontData is not None:
+            return self._shaperFontData
+
         with self._getShaperFont() as font:
             for tableTag in font.keys():
                 if tableTag not in shaperFontTables:
@@ -251,12 +269,17 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
 
         data = f.getvalue()
 
-        return ShaperFontData(
+        self._shaperFontData = ShaperFontData(
             glyphOrderSorting=ShaperFontGlyphOrderSorting.FROMGLYPHMAP, data=data
         )
+        return self._shaperFontData
 
     def _getShaperFont(self):
         return self._loadFontFromPath(self.path)
+
+    @contextmanager
+    def _tmpFontPath(self):
+        yield self.path
 
     async def fileWatcherProcessChanges(
         self, changes: set[tuple[Change, str]]
@@ -278,6 +301,17 @@ class TTXBackend(OTFBackend):
         font = copy(self.font)  # shallow copy
         font.tables = dict(font.tables)  # shallow copy tables dict for table subsetting
         return font
+
+    @contextmanager
+    def _tmpFontPath(self):
+        fontData = self._getShaperFontData()
+        f = tempfile.NamedTemporaryFile(suffix=".ttf", delete=False)
+        try:
+            f.write(fontData.data)
+            f.close()
+            yield f.name
+        finally:
+            os.unlink(f.name)
 
 
 def getLocationsFromVarstore(
