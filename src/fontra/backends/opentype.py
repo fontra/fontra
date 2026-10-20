@@ -67,6 +67,7 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
 
     def _initializeFromPath(self, path: PathLike) -> None:
         self.path = path
+        self._shaperFontData = None
         self.font = self._loadFontFromPath(path)
         self._initialize()
 
@@ -251,6 +252,12 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
         return {}
 
     async def getShaperFontData(self) -> ShaperFontData | None:
+        return self._getShaperFontData()
+
+    def _getShaperFontData(self) -> ShaperFontData | None:
+        if self._shaperFontData is not None:
+            return self._shaperFontData
+
         with self._getShaperFont() as font:
             for tableTag in font.keys():
                 if tableTag not in shaperFontTables:
@@ -262,9 +269,10 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
 
         data = f.getvalue()
 
-        return ShaperFontData(
+        self._shaperFontData = ShaperFontData(
             glyphOrderSorting=ShaperFontGlyphOrderSorting.FROMGLYPHMAP, data=data
         )
+        return self._shaperFontData
 
     def _getShaperFont(self):
         return self._loadFontFromPath(self.path)
@@ -296,10 +304,11 @@ class TTXBackend(OTFBackend):
 
     @contextmanager
     def _tmpFontPath(self):
+        fontData = self._getShaperFontData()
         f = tempfile.NamedTemporaryFile(suffix=".ttf", delete=False)
-        self.font.save(f)
-        f.close()
         try:
+            f.write(fontData.data)
+            f.close()
             yield f.name
         finally:
             os.unlink(f.name)
