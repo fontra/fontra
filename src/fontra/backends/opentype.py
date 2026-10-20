@@ -254,7 +254,7 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
     async def getShaperFontData(self) -> ShaperFontData | None:
         return self._getShaperFontData()
 
-    def _getShaperFontData(self) -> ShaperFontData | None:
+    def _getShaperFontData(self) -> ShaperFontData:
         if self._shaperFontData is not None:
             return self._shaperFontData
 
