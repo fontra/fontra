@@ -4,6 +4,7 @@
 
 ### New features
 
+- [opentype backend] Convert OpenType features to .fea code when reading. This preserves features when exporting as (say) .fontra. This uses the new `sr-aef` tool by Simon Cozens. [Issue 2294](https://github.com/fontra/fontra/issues/2294), [PR 2810](https://github.com/fontra/fontra/pull/2810)
 - [fontra pak/linux] Add native Linux install and uninstall script. [fontra-pak PR 289](https://github.com/fontra/fontra-pak/pull/289)
 
 ### Fixes
@@ -15,7 +16,6 @@
 
 ### New features
 
-- [opentype backend] Convert OpenType features to .fea code when reading. This preserves features when exporting as (say) .fontra. This uses the new `sr-aef` tool by Simon Cozens. [Issue 2294](https://github.com/fontra/fontra/issues/2294), [PR 2810](https://github.com/fontra/fontra/pull/2810)
 - [fontra pak] Added an "Open Font..." button to the main window, using a modified Open dialog that can select font projects that are folders, such as `.fontra` and `.ufo`. Contributed by Khaled Hosny. [fontra-pak Issue 253](https://github.com/fontra/fontra-pak/issues/253), [fontra-pak PR 281](https://github.com/fontra/fontra-pak/pull/281), [fontra-pak PR 282](https://github.com/fontra/fontra-pak/pull/282)
 - [fontra pak] Added a menu bar with a "File" menu, that has two items: "New Font..." and "Open Font...". [fontra-pak Issue 89](https://github.com/fontra/fontra-pak/issues/89), [fontra-pak PR 283](https://github.com/fontra/fontra-pak/pull/283)
 - [fontra pak] Made drop area double-clickable as an alternative to open a font. Contributed by Tarik Rokhsane. [fontra-pak PR 288](https://github.com/fontra/fontra-pak/pull/288)
