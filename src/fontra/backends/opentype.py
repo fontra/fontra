@@ -67,7 +67,7 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
 
     def _initializeFromPath(self, path: PathLike) -> None:
         self.path = path
-        self._shaperFontData = None
+        self._shaperFontData: ShaperFontData | None = None
         self.font = self._loadFontFromPath(path)
         self._initialize()
 
