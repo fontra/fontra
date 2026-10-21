@@ -274,12 +274,9 @@ export class EditorController extends ViewController {
     this.canvasController.canvas.addEventListener("contextmenu", (event) =>
       this.contextMenuHandler(event)
     );
-    this.canvasController.canvas.addEventListener("pointermove", (event) => {
-      if (document.activeElement === this.canvasController.canvas) {
-        const { x, y } = event;
-        this.currentPointerPosition = { x, y };
-      }
-    });
+    this.canvasController.canvas.addEventListener("pointermove", (event) =>
+      this.pointerMoveHandler(event)
+    );
     window.addEventListener("keydown", (event) => this.keyDownHandler(event));
     window.addEventListener("keyup", (event) => this.keyUpHandler(event));
 
@@ -3308,6 +3305,13 @@ export class EditorController extends ViewController {
     const { x, y } = event;
     this.currentPointerPosition = { x, y };
     showMenu(this.buildContextMenuItems(event), { x: x + 1, y: y - 1 });
+  }
+
+  pointerMoveHandler(event) {
+    if (document.activeElement === this.canvasController.canvas) {
+      const { x, y } = event;
+      this.currentPointerPosition = { x, y };
+    }
   }
 
   async externalChange(change, isLiveChange) {
