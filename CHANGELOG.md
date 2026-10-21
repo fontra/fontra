@@ -5,7 +5,7 @@
 ### New features
 
 - [fontra pak] When starting the application from the command line, open any fonts passed as arguments. Contributed by Tarik Rokhsane. [fontra-pak PR 292](https://github.com/fontra/fontra-pak/pull/292)
-- [opentype backend] Convert OpenType features to .fea code when reading. This preserves features when exporting as (say) .fontra. This uses the new `sr-aef` tool by Simon Cozens. [Issue 2294](https://github.com/fontra/fontra/issues/2294), [PR 2810](https://github.com/fontra/fontra/pull/2810)
+- [opentype backend] Convert OpenType features to .fea code when reading. This preserves features when exporting as (say) .fontra. This uses the new `sr-aef` tool by Simon Cozens, with contributions by Khaled Hosny. [Issue 2294](https://github.com/fontra/fontra/issues/2294), [PR 2810](https://github.com/fontra/fontra/pull/2810)
 - [fontra pak/linux] Add native Linux install and uninstall script. [fontra-pak PR 289](https://github.com/fontra/fontra-pak/pull/289)
 
 ### Fixes
