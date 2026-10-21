@@ -2334,22 +2334,35 @@ export class EditorController extends ViewController {
   }
 
   async doAddComponent() {
-    const glyphName = await this.runGlyphSearchDialog(
+    const glyphName = this.sceneController.getSelectedGlyphName();
+
+    const componentGlyphName = await this.runGlyphSearchDialog(
       translate("action.add-component"),
       translate("dialog.add"),
       true,
       this.sceneController.getSelectedGlyphName()
     );
-    if (!glyphName) {
+
+    if (!componentGlyphName) {
       return;
     }
 
-    const baseGlyph = await this.fontController.getGlyph(glyphName);
+    const baseGlyph = await this.fontController.getGlyph(componentGlyphName);
+
+    const nestedComponentNames = await baseGlyph.getGlyphDependenciesDeep();
+    if (nestedComponentNames.has(glyphName)) {
+      await message(
+        `Glyph '${componentGlyphName}' cannot be added as a component`,
+        `It uses '${glyphName}' as a component itself, and would cause a cyclic reference.`
+      );
+      return;
+    }
+
     const location = Object.fromEntries(
       baseGlyph.glyph.axes.map((axis) => [axis.name, axis.defaultValue])
     );
     const newComponent = {
-      name: glyphName,
+      name: componentGlyphName,
       transformation: getDecomposedIdentity(),
       location: location,
     };
