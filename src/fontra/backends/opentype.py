@@ -243,7 +243,7 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
     def _getFeaturesFromFont(self) -> str:
         with self._tmpFontPath() as path:
             result = subprocess.run(
-                ["sr-aef", path], capture_output=True, encoding="utf-8", check=True
+                ["sr-aef", path], capture_output=True, encoding="utf-8"
             )
 
         return "" if result.returncode != 0 else result.stdout
