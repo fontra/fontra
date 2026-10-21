@@ -621,6 +621,22 @@ export class VariableGlyphController {
   foldNLIAxes(sourceLocation) {
     return mapLocationFoldNLI(sourceLocation);
   }
+
+  async getGlyphDependenciesDeep() {
+    const glyphNames = new Set();
+
+    for (const compoName of this.getAllComponentNames()) {
+      const glyphDependencies = await getGlyphAndDependenciesDeep(
+        compoName,
+        this._getGlyphFunc
+      );
+      for (const glyphName of Object.keys(glyphDependencies)) {
+        glyphNames.add(glyphName);
+      }
+    }
+
+    return glyphNames;
+  }
 }
 
 export class StaticGlyphController {
