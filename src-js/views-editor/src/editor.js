@@ -42,6 +42,7 @@ import {
   enumerate,
   eventIsCausedByWritingURLFragment,
   fetchJSON,
+  filterObject,
   hyphenatedToCamelCase,
   hyphenatedToLabel,
   isActiveElementTypeable,
@@ -2336,7 +2337,8 @@ export class EditorController extends ViewController {
     const glyphName = await this.runGlyphSearchDialog(
       translate("action.add-component"),
       translate("dialog.add"),
-      true
+      true,
+      this.sceneController.getSelectedGlyphName()
     );
     if (!glyphName) {
       return;
@@ -3150,7 +3152,8 @@ export class EditorController extends ViewController {
   async runGlyphSearchDialog(
     titleLabel = translate("dialog.glyphs.search"),
     okLabel = translate("dialog.add"),
-    showOnlyGlyphsInFont = false
+    showOnlyGlyphsInFont = false,
+    skipGlyphName = null
   ) {
     const glyphSearch = document.createElement("glyph-search-list");
 
@@ -3160,6 +3163,13 @@ export class EditorController extends ViewController {
       glyphSearch.allowUnknownGlyphSearchResults = true;
     } else {
       glyphSearch.glyphMap = this.fontController.glyphMap;
+    }
+
+    if (skipGlyphName) {
+      glyphSearch.glyphMap = filterObject(
+        this.fontController.glyphMap,
+        (glyphName) => glyphName !== skipGlyphName
+      );
     }
 
     glyphSearch.addEventListener("selectedGlyphNameChanged", (event) => {
