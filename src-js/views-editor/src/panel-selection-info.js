@@ -19,7 +19,7 @@ import {
   throttleCalls,
 } from "@fontra/core/utils.ts";
 import { showMenu } from "@fontra/web-components/menu-panel.js";
-import { dialog } from "@fontra/web-components/modal-dialog.js";
+import { dialog, message } from "@fontra/web-components/modal-dialog.js";
 import { Form } from "@fontra/web-components/ui-form.js";
 import Panel from "./panel.js";
 
@@ -391,6 +391,24 @@ export default class SelectionInfoPanel extends Panel {
         key: componentKey("name"),
         label: translate("sidebar.selection-info.component.base-glyph"),
         value: component.name,
+        validate: async (fieldItem, value) => {
+          const glyph = await this.fontController.getGlyph(value);
+          if (glyph) {
+            const componentNames = await glyph.getGlyphDependenciesDeep();
+            componentNames.add(value);
+            if (componentNames.has(glyphName)) {
+              // TODO: translate, see editor.js
+              await message(
+                `Glyph '${value}' cannot be used as a component here`,
+                value === glyphName
+                  ? "This is the current glyph, and would cause a cyclic reference."
+                  : "It uses the current glyph as a component, and would cause a cyclic reference."
+              );
+              return false;
+            }
+          }
+          return true;
+        },
       });
       formContents.push({
         type: "header",
@@ -807,6 +825,13 @@ export default class SelectionInfoPanel extends Panel {
     const getFieldValue = fieldItem.getValue || defaultGetFieldValue;
     const setFieldValue = fieldItem.setValue || defaultSetFieldValue;
     const deleteFieldValue = fieldItem.deleteValue || defaultDeleteFieldValue;
+
+    if (!valueStream && fieldItem.validate) {
+      if (!(await fieldItem.validate(fieldItem, value))) {
+        await this.update();
+        return;
+      }
+    }
 
     await this.sceneController.editGlyph(async (sendIncrementalChange, glyph) => {
       const layerInfo = [];
