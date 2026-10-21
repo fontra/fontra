@@ -349,7 +349,6 @@ export class FontOverviewController extends ViewController {
     event.preventDefault();
 
     const { x, y } = event;
-    this.contextMenuPosition = { x: x, y: y };
     showMenu(this.getEditMenuItems(), { x: x + 1, y: y - 1 });
   }
 
