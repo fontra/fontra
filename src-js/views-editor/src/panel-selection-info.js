@@ -925,11 +925,9 @@ export default class SelectionInfoPanel extends Panel {
       const referencedGlyphName = name.endsWith("!") ? name.slice(0, -1) : name;
       const referencedGlyph = await this.fontController.getGlyph(referencedGlyphName);
       for (const [layerName, location] of Object.entries(locations)) {
-        const getGlyphFunc = this.fontController.getGlyph.bind(this.fontController);
         const instanceController = await referencedGlyph.instantiateController(
           location,
-          layerName,
-          getGlyphFunc
+          layerName
         );
         if (!layerVariables[layerName]) {
           layerVariables[layerName] = {};
