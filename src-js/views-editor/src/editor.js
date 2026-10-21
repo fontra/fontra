@@ -235,7 +235,7 @@ export class EditorController extends ViewController {
     );
 
     this.sidebars = [];
-    this.contextMenuPosition = { x: 0, y: 0 };
+    this.currentPointerPosition = { x: 0, y: 0 };
 
     this.initSidebars();
     this.initTools();
@@ -274,6 +274,12 @@ export class EditorController extends ViewController {
     this.canvasController.canvas.addEventListener("contextmenu", (event) =>
       this.contextMenuHandler(event)
     );
+    this.canvasController.canvas.addEventListener("pointermove", (event) => {
+      if (document.activeElement === this.canvasController.canvas) {
+        const { x, y } = event;
+        this.currentPointerPosition = { x, y };
+      }
+    });
     window.addEventListener("keydown", (event) => this.keyDownHandler(event));
     window.addEventListener("keyup", (event) => this.keyUpHandler(event));
 
@@ -2361,7 +2367,7 @@ export class EditorController extends ViewController {
   }
 
   async doAddAnchor() {
-    const point = this.sceneController.selectedGlyphPoint(this.contextMenuPosition);
+    const point = this.sceneController.selectedGlyphPoint(this.currentPointerPosition);
     const { anchor: tempAnchor } = await this.doAddEditAnchorDialog(undefined, point);
     if (!tempAnchor) {
       return;
@@ -2605,7 +2611,7 @@ export class EditorController extends ViewController {
 
   async doAddGuideline(global = false) {
     this.visualizationLayersSettings.model["fontra.guidelines"] = true;
-    const point = this.sceneController.selectedGlyphPoint(this.contextMenuPosition);
+    const point = this.sceneController.selectedGlyphPoint(this.currentPointerPosition);
     const { guideline: tempGuideline } = await this.doAddEditGuidelineDialog(
       undefined,
       point,
@@ -3300,7 +3306,7 @@ export class EditorController extends ViewController {
     event.preventDefault();
 
     const { x, y } = event;
-    this.contextMenuPosition = { x: x, y: y };
+    this.currentPointerPosition = { x, y };
     showMenu(this.buildContextMenuItems(event), { x: x + 1, y: y - 1 });
   }
 
