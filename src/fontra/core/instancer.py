@@ -496,8 +496,21 @@ class GlyphInstance:
     parentLocation: dict[str, float]  # LocationCoordinateSystem.SOURCE
     fontInstancer: FontInstancer
 
-    async def decomposed(self, transform: Transform | None = None) -> StaticGlyph:
+    async def decomposed(
+        self,
+        transform: Transform | None = None,
+        _componentStack: list | None = None,
+    ) -> StaticGlyph:
         assert isinstance(self.glyph.path, PackedPath)
+
+        if _componentStack is None:
+            _componentStack = []
+        elif self.glyphName in _componentStack:
+            self.fontInstancer.glyphError(
+                f"cyclical component reference in glyph {self.glyphName}"
+            )
+            return StaticGlyph()
+
         paths: list[PackedPath] = [
             (
                 self.glyph.path
@@ -511,16 +524,21 @@ class GlyphInstance:
             else [transformAnchor(anchor, transform) for anchor in self.glyph.anchors]
         )
 
-        anchorsByName = {anchor.name: anchor for anchor in anchors}
-
         compoAnchorsByName = {}
+        _componentStack.append(self.glyphName)
+
         for component in self.glyph.components:
-            compoGlyph = await self.decomposeComponent(component, transform)
+            compoGlyph = await self.decomposeComponent(
+                component, transform, _componentStack
+            )
             assert isinstance(compoGlyph.path, PackedPath)
             paths.append(compoGlyph.path)
             for anchor in compoGlyph.anchors:
                 compoAnchorsByName[anchor.name] = anchor
 
+        _componentStack.pop()
+
+        anchorsByName = {anchor.name: anchor for anchor in anchors}
         anchors = list((compoAnchorsByName | anchorsByName).values())
 
         return StaticGlyph(path=joinPaths(paths), anchors=anchors)
@@ -564,6 +582,7 @@ class GlyphInstance:
         self,
         component,
         parentTransform: Transform | None = None,
+        _componentStack: list | None = None,
     ) -> StaticGlyph:
         try:
             instancer = await self.fontInstancer.getGlyphInstancer(component.name, True)
@@ -577,7 +596,8 @@ class GlyphInstance:
         transform = component.transformation.toTransform()
         if parentTransform is not None:
             transform = parentTransform.transform(transform)
-        return await instance.decomposed(transform)
+
+        return await instance.decomposed(transform, _componentStack)
 
     async def shallowDecomposeComponent(self, component: Component) -> StaticGlyph:
         try:
