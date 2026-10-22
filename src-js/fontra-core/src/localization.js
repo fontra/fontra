@@ -39,6 +39,12 @@ export const languages = [
     langLang: "Português (Portugal)",
     status: "beta",
   },
+  {
+    code: "nb",
+    langEn: "Norwegian (bokmål)",
+    langLang: "Norsk (bokmål)",
+    status: "wip",
+  },
   { code: "tl", langEn: "Filipino", langLang: "Tagalog", status: "beta" },
   { code: "ru", langEn: "Russian", langLang: "Русский", status: "beta" },
 ];
