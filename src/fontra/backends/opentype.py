@@ -5,7 +5,6 @@ import tempfile
 import uuid
 from contextlib import contextmanager
 from copy import copy, deepcopy
-from dataclasses import replace
 from itertools import product
 from os import PathLike
 from typing import Any, Generator
@@ -20,6 +19,7 @@ from fontTools.varLib.varStore import VarStoreInstancer
 
 from ..core.classes import (
     Axes,
+    Component,
     CrossAxisMapping,
     DiscreteFontAxis,
     FontAxis,
@@ -613,17 +613,23 @@ def buildStaticGlyph(glyphSet, glyphName: str, axes: list[FontAxis]) -> StaticGl
     path = pen.getPath()
     staticGlyph = StaticGlyph()
     staticGlyph.path = path
-    staticGlyph.components = [
-        (
-            replace(compo, location=unnormalizeLocation(compo.location, axes))
-            if compo.location
-            else compo
-        )
-        for compo in pen.components
+    staticGlyph.components = pen.components
+    staticGlyph.components += [
+        unpackVariableComponent(componentData, axes)
+        for componentData in pen.variableComponents
     ]
     staticGlyph.xAdvance = ttGlyph.width
     # TODO: yAdvance, verticalOrigin
     return staticGlyph
+
+
+def unpackVariableComponent(componentData, axes):
+    # TODO: what to do with `componentData.resetUnspecifiedAxes`
+    return Component(
+        name=componentData.name,
+        transformation=componentData.transformation,
+        location=unnormalizeLocation(componentData.location, axes),
+    )
 
 
 def locationToString(loc: dict[str, float]) -> str:
