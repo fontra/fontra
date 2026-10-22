@@ -17,6 +17,7 @@
 
 ### Improvements
 
+- [editor] Prevent adding components that would cause a cyclic reference. [Issue 517](https://github.com/fontra/fontra/issues/517), [PR 2818](https://github.com/fontra/fontra/pull/2818)
 - [export] Improve the error message when exporting a font that contains a glyph with a cyclic component reference. [PR 2815](https://github.com/fontra/fontra/pull/2815)
 
 ## 2026-10-05 [version 2026.10.0]
