@@ -397,12 +397,11 @@ export default class SelectionInfoPanel extends Panel {
             const componentNames = await glyph.getGlyphDependenciesDeep();
             componentNames.add(value);
             if (componentNames.has(glyphName)) {
-              // TODO: translate, see editor.js
               await message(
-                `Glyph '${value}' cannot be used as a component here`,
+                translate("dialog.cant-add-component.title", value),
                 value === glyphName
-                  ? "This is the current glyph, and would cause a cyclic reference."
-                  : "It uses the current glyph as a component, and would cause a cyclic reference."
+                  ? translate("dialog.cant-add-component.content-1")
+                  : translate("dialog.cant-add-component.content-2")
               );
               return false;
             }

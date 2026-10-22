@@ -2351,10 +2351,9 @@ export class EditorController extends ViewController {
 
     const nestedComponentNames = await baseGlyph.getGlyphDependenciesDeep();
     if (nestedComponentNames.has(glyphName)) {
-      // TODO: translate
       await message(
-        `Glyph '${componentGlyphName}' cannot be used as a component here`,
-        "It uses the current glyph as a component, and would cause a cyclic reference."
+        translate("dialog.cant-add-component.title", componentGlyphName),
+        translate("dialog.cant-add-component.content-2")
       );
       return;
     }
