@@ -182,6 +182,11 @@ export const strings = {
   "development-status-definitions.warning.positive-number": "数值必须为正数。",
   "dialog.add": "添加",
   "dialog.cancel": "取消",
+  "dialog.cant-add-component.content-1":
+    "This is the current glyph, and would cause a cyclic reference.",
+  "dialog.cant-add-component.content-2":
+    "It uses the current glyph as a component, and would cause a cyclic reference.",
+  "dialog.cant-add-component.title": "Glyph '%0' cannot be used as a component here",
   "dialog.cant-create-glyph.title": "无法添加字形 “%0”",
   "dialog.cant-edit-font.title": "Can't make changes",
   "dialog.cant-edit-glyph.content": "该字体为只读文件。",

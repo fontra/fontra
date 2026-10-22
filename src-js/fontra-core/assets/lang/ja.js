@@ -186,6 +186,11 @@ export const strings = {
     "値は正の数値である必要があります。",
   "dialog.add": "追加",
   "dialog.cancel": "キャンセル",
+  "dialog.cant-add-component.content-1":
+    "This is the current glyph, and would cause a cyclic reference.",
+  "dialog.cant-add-component.content-2":
+    "It uses the current glyph as a component, and would cause a cyclic reference.",
+  "dialog.cant-add-component.title": "Glyph '%0' cannot be used as a component here",
   "dialog.cant-create-glyph.title": "グリフ“%0”を作成できませんでした。",
   "dialog.cant-edit-font.title": "Can't make changes",
   "dialog.cant-edit-glyph.content": "このフォントは読み取り専用です。",

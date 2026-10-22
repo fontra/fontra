@@ -187,6 +187,11 @@ export const strings = {
     "Waarde moet een positief getal zijn",
   "dialog.add": "Voeg toe",
   "dialog.cancel": "Annuleren",
+  "dialog.cant-add-component.content-1":
+    "This is the current glyph, and would cause a cyclic reference.",
+  "dialog.cant-add-component.content-2":
+    "It uses the current glyph as a component, and would cause a cyclic reference.",
+  "dialog.cant-add-component.title": "Glyph '%0' cannot be used as a component here",
   "dialog.cant-create-glyph.title": "Kan glyph %0 niet aanmaken",
   "dialog.cant-edit-font.title": "Can't make changes",
   "dialog.cant-edit-glyph.content": "Het font is read-only",
