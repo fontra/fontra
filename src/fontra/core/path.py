@@ -520,11 +520,16 @@ class PackedPathPointPen:
         transformation: DecomposedTransform,
         location: dict,
         identifier=None,
+        *,
+        resetUnspecifiedAxes: bool = False,
         **kwargs,
     ) -> None:
         from .classes import Component
 
+        # TODO: figure out what to do with resetUnspecifiedAxes
+
         transformation = copy(transformation)
+        # Note: location is normalized, and needs to be unnormalized by the caller
         self.components.append(
             Component(name=glyphName, transformation=transformation, location=location)
         )
