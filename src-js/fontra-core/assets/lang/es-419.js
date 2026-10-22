@@ -196,6 +196,11 @@ export const strings = {
     "El valor debe ser un número positivo.",
   "dialog.add": "Agregar",
   "dialog.cancel": "Cancelar",
+  "dialog.cant-add-component.content-1":
+    "This is the current glyph, and would cause a cyclic reference.",
+  "dialog.cant-add-component.content-2":
+    "It uses the current glyph as a component, and would cause a cyclic reference.",
+  "dialog.cant-add-component.title": "Glyph '%0' cannot be used as a component here",
   "dialog.cant-create-glyph.title": 'No se puede crear el glifo "%0"',
   "dialog.cant-edit-font.title": "No se pueden hacer cambios",
   "dialog.cant-edit-glyph.content": "La fuente es de solo lectura.",

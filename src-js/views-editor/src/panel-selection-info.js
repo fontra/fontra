@@ -19,7 +19,7 @@ import {
   throttleCalls,
 } from "@fontra/core/utils.ts";
 import { showMenu } from "@fontra/web-components/menu-panel.js";
-import { dialog } from "@fontra/web-components/modal-dialog.js";
+import { dialog, message } from "@fontra/web-components/modal-dialog.js";
 import { Form } from "@fontra/web-components/ui-form.js";
 import Panel from "./panel.js";
 
@@ -391,6 +391,23 @@ export default class SelectionInfoPanel extends Panel {
         key: componentKey("name"),
         label: translate("sidebar.selection-info.component.base-glyph"),
         value: component.name,
+        validate: async (fieldItem, value) => {
+          const glyph = await this.fontController.getGlyph(value);
+          if (glyph) {
+            const componentNames = await glyph.getGlyphDependenciesDeep();
+            componentNames.add(value);
+            if (componentNames.has(glyphName)) {
+              await message(
+                translate("dialog.cant-add-component.title", value),
+                value === glyphName
+                  ? translate("dialog.cant-add-component.content-1")
+                  : translate("dialog.cant-add-component.content-2")
+              );
+              return false;
+            }
+          }
+          return true;
+        },
       });
       formContents.push({
         type: "header",
@@ -807,6 +824,13 @@ export default class SelectionInfoPanel extends Panel {
     const getFieldValue = fieldItem.getValue || defaultGetFieldValue;
     const setFieldValue = fieldItem.setValue || defaultSetFieldValue;
     const deleteFieldValue = fieldItem.deleteValue || defaultDeleteFieldValue;
+
+    if (!valueStream && fieldItem.validate) {
+      if (!(await fieldItem.validate(fieldItem, value))) {
+        await this.update();
+        return;
+      }
+    }
 
     await this.sceneController.editGlyph(async (sendIncrementalChange, glyph) => {
       const layerInfo = [];

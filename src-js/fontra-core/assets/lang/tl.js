@@ -187,6 +187,11 @@ export const strings = {
     "Dapat positibong numero ang halaga.",
   "dialog.add": "Idagdag",
   "dialog.cancel": "Kanselahin",
+  "dialog.cant-add-component.content-1":
+    "This is the current glyph, and would cause a cyclic reference.",
+  "dialog.cant-add-component.content-2":
+    "It uses the current glyph as a component, and would cause a cyclic reference.",
+  "dialog.cant-add-component.title": "Glyph '%0' cannot be used as a component here",
   "dialog.cant-create-glyph.title": "Hindi makagawa ng glyph na “%0”",
   "dialog.cant-edit-font.title": "Can't make changes",
   "dialog.cant-edit-glyph.content": "Read-only ang font.",

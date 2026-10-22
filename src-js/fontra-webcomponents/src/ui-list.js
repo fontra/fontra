@@ -766,6 +766,8 @@ export class UIList extends UnlitElement {
 
   _keyDownHandler(event) {
     if (event.key === "Enter" && this.selectedItemIndex !== undefined) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
       this.doubleClickedRowIndex = this.selectedItemIndex;
       this._dispatchEvent("rowDoubleClicked");
       return;
