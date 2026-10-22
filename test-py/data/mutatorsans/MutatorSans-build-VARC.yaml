@@ -1,0 +1,13 @@
+# To rebuild MutatorSans-VARC.ttf:
+# fontra-workflow test-py/data/mutatorsans/MutatorSans-build-VARC.yaml --output-dir test-py/data/mutatorsans
+
+steps:
+  - input: fontra-read
+    source: "MutatorSans.designspace"
+  - filter: subset-axes
+    axisNames:
+      - weight
+      - width
+  - filter: convert-to-quadratics
+  - output: compile-varc
+    destination: "MutatorSans-VARC.ttf"
