@@ -5,6 +5,7 @@ import tempfile
 import uuid
 from contextlib import contextmanager
 from copy import copy, deepcopy
+from dataclasses import replace
 from itertools import product
 from os import PathLike
 from typing import Any, Generator
@@ -118,7 +119,7 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
         defaultLayerName = defaultSourceIdentifier
 
         glyph = VariableGlyph(name=glyphName)
-        staticGlyph = buildStaticGlyph(self.glyphSet, glyphName)
+        staticGlyph = buildStaticGlyph(self.glyphSet, glyphName, self.axes.axes)
         layers = {defaultLayerName: Layer(glyph=staticGlyph)}
         defaultLocation = {axis.name: 0 for axis in self.axes.axes}
         sources = [
@@ -137,7 +138,7 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
             if varGlyphSet is None:
                 varGlyphSet = self.font.getGlyphSet(location=fullLoc, normalized=True)
                 self.variationGlyphSets[locStr] = varGlyphSet
-            varGlyph = buildStaticGlyph(varGlyphSet, glyphName)
+            varGlyph = buildStaticGlyph(varGlyphSet, glyphName, self.axes.axes)
 
             sourceLocation = unnormalizeLocation(fullLoc, self.axes.axes)
             locationBase = self.fontSourcesInstancer.getSourceIdentifierForLocation(
@@ -605,14 +606,21 @@ def getEnglishNameWithFallback(
     return fallback
 
 
-def buildStaticGlyph(glyphSet, glyphName: str) -> StaticGlyph:
+def buildStaticGlyph(glyphSet, glyphName: str, axes: list[FontAxis]) -> StaticGlyph:
     pen = PackedPathPointPen()
     ttGlyph = glyphSet[glyphName]
     ttGlyph.drawPoints(GuessSmoothPointPen(pen))
     path = pen.getPath()
     staticGlyph = StaticGlyph()
     staticGlyph.path = path
-    staticGlyph.components = pen.components
+    staticGlyph.components = [
+        (
+            replace(compo, location=unnormalizeLocation(compo.location, axes))
+            if compo.location
+            else compo
+        )
+        for compo in pen.components
+    ]
     staticGlyph.xAdvance = ttGlyph.width
     # TODO: yAdvance, verticalOrigin
     return staticGlyph
