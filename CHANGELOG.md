@@ -17,6 +17,7 @@
 
 ### Improvements
 
+- [fontra pak/linux/windows] On Windows and Linux, launch files in an existing Fontra Pak instance instead of opening a new one. Contributed by Tarik Rokhsane. [fontra-pak PR 295](https://github.com/fontra/fontra-pak/pull/295)
 - [editor] Prevent adding components that would cause a cyclic reference. [Issue 517](https://github.com/fontra/fontra/issues/517), [PR 2818](https://github.com/fontra/fontra/pull/2818)
 - [export] Improve the error message when exporting a font that contains a glyph with a cyclic component reference. [PR 2815](https://github.com/fontra/fontra/pull/2815)
 
