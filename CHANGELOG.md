@@ -17,6 +17,7 @@
 
 ### Improvements
 
+- [opentype] Updated the OpenType reader so it can correctly read fonts with variable components according to the latest `VARC` specification. [PR 2819](https://github.com/fontra/fontra/pull/2819)
 - [fontra pak/linux/windows] On Windows and Linux, launch files in an existing Fontra Pak instance instead of opening a new one. Contributed by Tarik Rokhsane. [fontra-pak PR 295](https://github.com/fontra/fontra-pak/pull/295)
 - [editor] Prevent adding components that would cause a cyclic reference. [Issue 517](https://github.com/fontra/fontra/issues/517), [PR 2818](https://github.com/fontra/fontra/pull/2818)
 - [export] Improve the error message when exporting a font that contains a glyph with a cyclic component reference. [PR 2815](https://github.com/fontra/fontra/pull/2815)
