@@ -77,10 +77,10 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
 
     def _initialize(self) -> None:
         self.axes = unpackAxes(self.font)
-        fontAxes: list[FontAxis] = [
+        self.fontAxes: list[FontAxis] = [
             axis for axis in self.axes.axes if isinstance(axis, FontAxis)
         ]
-        self.fontSources = unpackFontSources(self.font, fontAxes)
+        self.fontSources = unpackFontSources(self.font, self.fontAxes)
         self.fontSourcesInstancer = FontSourcesInstancer(
             fontAxes=self.axes.axes, fontSources=self.fontSources
         )
@@ -119,9 +119,7 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
         defaultLayerName = defaultSourceIdentifier
 
         glyph = VariableGlyph(name=glyphName)
-        staticGlyph = buildStaticGlyph(
-            self.glyphSet, glyphName, filterDiscreteAxes(self.axes.axes)
-        )
+        staticGlyph = buildStaticGlyph(self.glyphSet, glyphName, self.fontAxes)
         layers = {defaultLayerName: Layer(glyph=staticGlyph)}
         defaultLocation = {axis.name: 0 for axis in self.axes.axes}
         sources = [
@@ -140,9 +138,7 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
             if varGlyphSet is None:
                 varGlyphSet = self.font.getGlyphSet(location=fullLoc, normalized=True)
                 self.variationGlyphSets[locStr] = varGlyphSet
-            varGlyph = buildStaticGlyph(
-                varGlyphSet, glyphName, filterDiscreteAxes(self.axes.axes)
-            )
+            varGlyph = buildStaticGlyph(varGlyphSet, glyphName, self.fontAxes)
 
             sourceLocation = unnormalizeLocation(fullLoc, self.axes.axes)
             locationBase = self.fontSourcesInstancer.getSourceIdentifierForLocation(
@@ -608,10 +604,6 @@ def getEnglishNameWithFallback(
             return nameRecord.toUnicode()
 
     return fallback
-
-
-def filterDiscreteAxes(axes: list[FontAxis | DiscreteFontAxis]) -> list[FontAxis]:
-    return [axis for axis in axes if isinstance(axis, FontAxis)]
 
 
 def buildStaticGlyph(glyphSet, glyphName: str, axes: list[FontAxis]) -> StaticGlyph:
