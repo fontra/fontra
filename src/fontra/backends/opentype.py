@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import io
 import os
 import subprocess
@@ -5,6 +7,7 @@ import tempfile
 import uuid
 from contextlib import contextmanager
 from copy import copy, deepcopy
+from dataclasses import dataclass
 from itertools import product
 from os import PathLike
 from typing import Any, Generator
@@ -69,6 +72,7 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
     def _initializeFromPath(self, path: PathLike) -> None:
         self.path = path
         self._shaperFontData: ShaperFontData | None = None
+        self._shapingInfo: ShapingInfo | None = None
         self.font = self._loadFontFromPath(path)
         self._initialize()
 
@@ -235,11 +239,22 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
         return self.font["head"].unitsPerEm
 
     async def getKerning(self) -> dict[str, Kerning]:
-        # TODO: extract kerning from GPOS
-        return {}
+        return self._getShapingInfo().kerning
 
     async def getFeatures(self) -> OpenTypeFeatures:
-        return OpenTypeFeatures(text=self._getFeaturesFromFont())
+        return self._getShapingInfo().features
+
+    def _getShapingInfo(self) -> ShapingInfo:
+        if self._shapingInfo is None:
+            featureText = self._getFeaturesFromFont()
+
+            kernKerning = self._extractKerning(featureText)
+
+            self._shapingInfo = ShapingInfo(
+                kerning={"kern": kernKerning} if kernKerning is not None else {},
+                features=OpenTypeFeatures(text=featureText),
+            )
+        return self._shapingInfo
 
     def _getFeaturesFromFont(self) -> str:
         with self._tmpFontPath() as path:
@@ -248,6 +263,10 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
             )
 
         return "" if result.returncode != 0 else result.stdout
+
+    def _extractKerning(self, featureText) -> Kerning | None:
+        # TODO: extract kerning from featureText
+        return None
 
     async def getCustomData(self) -> dict[str, Any]:
         return {}
@@ -290,6 +309,12 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
 
     def fileWatcherWasInstalled(self) -> None:
         self.fileWatcherSetPaths([self.path])
+
+
+@dataclass(kw_only=True)
+class ShapingInfo:
+    kerning: dict[str, Kerning]
+    features: OpenTypeFeatures
 
 
 class TTXBackend(OTFBackend):
