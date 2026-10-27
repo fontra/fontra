@@ -197,10 +197,11 @@ export const strings = {
   "dialog.add": "Adicionar",
   "dialog.cancel": "Cancelar",
   "dialog.cant-add-component.content-1":
-    "This is the current glyph, and would cause a cyclic reference.",
+    "Esse é o glifo atual, e causaria uma referência cíclica.",
   "dialog.cant-add-component.content-2":
-    "It uses the current glyph as a component, and would cause a cyclic reference.",
-  "dialog.cant-add-component.title": "Glyph '%0' cannot be used as a component here",
+    "Isso usa o glifo atual como componente, e causaria uma referência cíclica.",
+  "dialog.cant-add-component.title":
+    "O glifo '%0' não pode ser usado como um componente aqui",
   "dialog.cant-create-glyph.title": 'Não é possível criar o glifo "%0"',
   "dialog.cant-edit-font.title": "Não é possível fazer alterações",
   "dialog.cant-edit-glyph.content": "Essa fonte é somente leitura.",
