@@ -190,10 +190,10 @@ export const strings = {
   "dialog.add": "Legg til",
   "dialog.cancel": "Avbryt",
   "dialog.cant-add-component.content-1":
-    "This is the current glyph, and would cause a cyclic reference.",
+    "Dette er gjeldende glyf, og ville ført til en sirkulær referanse.",
   "dialog.cant-add-component.content-2":
-    "It uses the current glyph as a component, and would cause a cyclic reference.",
-  "dialog.cant-add-component.title": "Glyph '%0' cannot be used as a component here",
+    "Den bruker gjeldende glyf som komponent, og ville ført til en sirkulær referanse.",
+  "dialog.cant-add-component.title": "Glyfen «%0» kan ikke brukes som komponent her",
   "dialog.cant-create-glyph.title": "Kan ikke opprette glyfen «%0»",
   "dialog.cant-edit-font.title": "Kan ikke gjøre endringer",
   "dialog.cant-edit-glyph.content": "Fonten er skrivebeskyttet.",

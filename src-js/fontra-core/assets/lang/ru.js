@@ -188,10 +188,11 @@ export const strings = {
   "dialog.add": "Добавить",
   "dialog.cancel": "Отменить",
   "dialog.cant-add-component.content-1":
-    "This is the current glyph, and would cause a cyclic reference.",
+    "Это текущий глиф, его использование приведёт к циклической ссылке.",
   "dialog.cant-add-component.content-2":
-    "It uses the current glyph as a component, and would cause a cyclic reference.",
-  "dialog.cant-add-component.title": "Glyph '%0' cannot be used as a component here",
+    "В выбранном глифе используется текущий глиф в качестве компонента, это приведёт к циклической ссылке.",
+  "dialog.cant-add-component.title":
+    "Глиф «%0» не может быть использован здесь как компонент",
   "dialog.cant-create-glyph.title": "Не удается создать глиф «%0»",
   "dialog.cant-edit-font.title": "Не удается внести изменения",
   "dialog.cant-edit-glyph.content": "Этот шрифт только для чтения.",
