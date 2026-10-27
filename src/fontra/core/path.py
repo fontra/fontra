@@ -4,6 +4,7 @@ import logging
 from copy import copy, deepcopy
 from dataclasses import dataclass, field, replace
 from enum import IntEnum
+from types import SimpleNamespace
 from typing import NotRequired, Optional, TypedDict
 
 from fontTools.misc.roundTools import otRound
@@ -434,6 +435,7 @@ class PackedPathPointPen:
         self.pointAttributes = []
         self.contourInfo = []
         self.components = []
+        self.variableComponents = []
         self._currentContour = None
 
     def getPath(self) -> PackedPath:
@@ -520,13 +522,19 @@ class PackedPathPointPen:
         transformation: DecomposedTransform,
         location: dict,
         identifier=None,
+        *,
+        resetUnspecifiedAxes: bool = False,
         **kwargs,
     ) -> None:
-        from .classes import Component
-
         transformation = copy(transformation)
-        self.components.append(
-            Component(name=glyphName, transformation=transformation, location=location)
+        # Note: location is normalized, and needs to be unnormalized by the caller
+        self.variableComponents.append(
+            SimpleNamespace(
+                name=glyphName,
+                transformation=transformation,
+                location=location,
+                resetUnspecifiedAxes=resetUnspecifiedAxes,
+            )
         )
 
 
