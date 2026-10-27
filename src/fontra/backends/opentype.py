@@ -119,7 +119,9 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
         defaultLayerName = defaultSourceIdentifier
 
         glyph = VariableGlyph(name=glyphName)
-        staticGlyph = buildStaticGlyph(self.glyphSet, glyphName, self.axes.axes)
+        staticGlyph = buildStaticGlyph(
+            self.glyphSet, glyphName, filterDiscreteAxes(self.axes.axes)
+        )
         layers = {defaultLayerName: Layer(glyph=staticGlyph)}
         defaultLocation = {axis.name: 0 for axis in self.axes.axes}
         sources = [
@@ -138,7 +140,9 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
             if varGlyphSet is None:
                 varGlyphSet = self.font.getGlyphSet(location=fullLoc, normalized=True)
                 self.variationGlyphSets[locStr] = varGlyphSet
-            varGlyph = buildStaticGlyph(varGlyphSet, glyphName, self.axes.axes)
+            varGlyph = buildStaticGlyph(
+                varGlyphSet, glyphName, filterDiscreteAxes(self.axes.axes)
+            )
 
             sourceLocation = unnormalizeLocation(fullLoc, self.axes.axes)
             locationBase = self.fontSourcesInstancer.getSourceIdentifierForLocation(
@@ -606,7 +610,12 @@ def getEnglishNameWithFallback(
     return fallback
 
 
+def filterDiscreteAxes(axes: list[FontAxis | DiscreteFontAxis]) -> list[FontAxis]:
+    return [axis for axis in axes if isinstance(axis, FontAxis)]
+
+
 def buildStaticGlyph(glyphSet, glyphName: str, axes: list[FontAxis]) -> StaticGlyph:
+    assert all(isinstance(axis, FontAxis) for axis in axes)
     pen = PackedPathPointPen()
     ttGlyph = glyphSet[glyphName]
     ttGlyph.drawPoints(GuessSmoothPointPen(pen))
