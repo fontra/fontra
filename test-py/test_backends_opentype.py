@@ -359,3 +359,44 @@ async def test_getFeatures_ttx():
     font = getFileSystemBackend(path)
     features = await font.getFeatures()
     assert "languagesystem DFLT dflt;" in features.text
+
+
+@pytest.mark.parametrize(
+    "testFontPath, assertFunctions",
+    [
+        (
+            dataDir / "sourcesans" / "SourceSans3-Regular.subset.otf",
+            [
+                lambda kerning: (kerning["kern"].values["k"]["t"], [-21]),
+                lambda kerning: (kerning["kern"].values["@y"]["@Y"], [-7]),
+                lambda kerning: (kerning["kern"].values["@C"]["J"], [-10]),
+                lambda kerning: (kerning["kern"].values["z"]["@Y"], [-29]),
+                lambda kerning: (kerning["kern"].groupsSide1["C"], ["C", "Ccedilla"]),
+                lambda kerning: (
+                    kerning["kern"].groupsSide2["f"],
+                    ["f", "f_f", "f_t", "f_f_t"],
+                ),
+            ],
+        ),
+        (
+            dataDir / "sourcesans" / "SourceSans3VF-Upright.subset.otf",
+            [
+                lambda kerning: (kerning["kern"].values["k"]["t"], [-10, 0, -40]),
+                lambda kerning: (kerning["kern"].values["@y"]["@Y"], [0, 0, -20]),
+                lambda kerning: (kerning["kern"].values["@C"]["J"], [-10, -10, -10]),
+                lambda kerning: (kerning["kern"].values["z"]["@Y"], [-40, 0, -10]),
+                lambda kerning: (kerning["kern"].groupsSide1["C"], ["C", "Ccedilla"]),
+                lambda kerning: (
+                    kerning["kern"].groupsSide2["f"],
+                    ["f", "f_f", "f_t", "f_f_t"],
+                ),
+            ],
+        ),
+    ],
+)
+async def test_getKerning(testFontPath, assertFunctions):
+    font = getFileSystemBackend(testFontPath)
+    kerning = await font.getKerning()
+    for assertFunc in assertFunctions:
+        value, expectedValue = assertFunc(kerning)
+        assert value == expectedValue
