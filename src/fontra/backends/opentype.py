@@ -301,7 +301,9 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
 
         seenLookups = set()
 
+        model = self.fontSourcesInstancer.model
         sourceIdentifiers = list(self.fontSources.keys())
+
         groupsSide1 = {}
         groupsSide1ByGlyphSet = {}
         groupsSide2 = {}
@@ -419,9 +421,22 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
                         return None
 
                     if isinstance(valueRecord.xAdvance, VariableScalar):
-                        values = [0] * len(sourceIdentifiers)
+                        values = [None] * len(sourceIdentifiers)
                         for location, value in valueRecord.xAdvance.values.items():
                             values[findSourceIndex(location)] = value
+                        if None in values:
+                            # The wasn't a kern value for every source, which is something that
+                            # Fontra unfortunately requires, for compatibility with the
+                            # .designspace/fontmake. Let's fill in the gaps by interpolating.
+                            deltas = model.getDeltas(values)
+                            for index, (source, value) in enumerate(
+                                zip(self.fontSources.values(), values)
+                            ):
+                                if value is None:
+                                    result = model.interpolateFromDeltas(
+                                        source.location, deltas
+                                    )
+                                    values[index] = round(result.instance)
                     else:
                         values = [valueRecord.xAdvance] * len(sourceIdentifiers)
 
