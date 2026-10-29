@@ -19,6 +19,7 @@ class ShaperBase {
       isGlyphMarkFunc,
       insertMarkers,
       fallbackXAdvance,
+      canEmulateSomeGPOS,
     } = shaperSupport;
 
     this.glyphOrder = glyphOrder;
@@ -26,13 +27,15 @@ class ShaperBase {
     this.insertMarkers = insertMarkers?.filter((marker) =>
       this.constructor._emulatedFeatureTags.includes(marker.tag)
     );
-    this.emulatedDefaultValues = Object.fromEntries(
-      this.constructor._emulatedFeatureTags.map((emulatedTag) => [
-        emulatedTag,
-        !this.insertMarkers ||
-          !!this.insertMarkers.find(({ tag }) => tag === emulatedTag),
-      ])
-    );
+    this.emulatedDefaultValues = canEmulateSomeGPOS
+      ? Object.fromEntries(
+          this.constructor._emulatedFeatureTags.map((emulatedTag) => [
+            emulatedTag,
+            !this.insertMarkers ||
+              !!this.insertMarkers.find(({ tag }) => tag === emulatedTag),
+          ])
+        )
+      : {};
     this.fallbackXAdvance = fallbackXAdvance ?? 500;
 
     if (glyphOrder) {

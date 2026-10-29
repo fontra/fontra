@@ -93,6 +93,7 @@ export class ShaperController {
         isGlyphMarkFunc: (glyphName) => markGlyphsSet.has(glyphName),
         insertMarkers,
         fallbackXAdvance: this.fontController.fallbackXAdvance,
+        canEmulateSomeGPOS,
       };
 
       // If compiling the font failed (!fontData) and we have a previous
@@ -107,7 +108,7 @@ export class ShaperController {
         this._previousShaper = shaper;
       }
 
-      return { shaper, messages, formattedMessages, canEmulateSomeGPOS };
+      return { shaper, messages, formattedMessages };
     }
   }
 
