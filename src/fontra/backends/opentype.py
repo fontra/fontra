@@ -263,6 +263,9 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
                 kernKerning = None
                 logger.error("Failed to extract kerning", exc_info=True)
 
+            if kernKerning is not None:
+                featureText = featureDoc.asFea()
+
             self._shapingInfo = ShapingInfo(
                 kerning={"kern": kernKerning} if kernKerning is not None else {},
                 features=OpenTypeFeatures(text=featureText),
@@ -405,6 +408,12 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
                     "Skip extracting kerning from features: no PairPos statements found"
                 )
                 return None
+
+        for kerningStatement in kerningStatements:
+            featureDoc.statements.remove(kerningStatement)
+
+        for lookup in seenLookups:
+            featureDoc.statements.remove(lookup)
 
         return Kerning(
             sourceIdentifiers=sourceIdentifiers,
