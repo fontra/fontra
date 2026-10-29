@@ -362,11 +362,8 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
                         isRTL = True
                 elif isinstance(statement, ast.PairPosStatement):
                     foundPairPosStatement = True
-                    valueRecord, otherValueRecord = (
-                        (statement.valuerecord2, statement.valuerecord1)
-                        if isRTL
-                        else (statement.valuerecord1, statement.valuerecord2)
-                    )
+                    valueRecord = statement.valuerecord1
+                    otherValueRecord = statement.valuerecord2
 
                     if otherValueRecord is not None:
                         logger.info(
@@ -395,10 +392,7 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
                     else:
                         pairLeft, pairRight = (glyphs1.glyph, glyphs2.glyph)
 
-                    if (
-                        valueRecord.yAdvance is not None
-                        or valueRecord.yPlacement is not None
-                    ):
+                    if valueRecord.yAdvance or valueRecord.yPlacement:
                         logger.info(
                             "Skip extracting kerning from features: "
                             + "unexpected vertical value record found"
