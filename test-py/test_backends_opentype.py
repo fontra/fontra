@@ -402,6 +402,13 @@ async def test_getFeatures_ttx():
                 lambda kerning: (kerning["kern"].groupsSide2, {}),
             ],
         ),
+        (
+            dataDir / "ibm-plex" / "IBMPlexSansArabic-Regular.subset.ttf",
+            [
+                lambda kerning: (kerning["kern"].values["T"]["@c"], [-65]),
+                lambda kerning: (kerning["kern"].values["@uniFB58"]["@uni0631"], [90]),
+            ],
+        ),
     ],
 )
 async def test_getKerning(testFontPath, assertFunctions):
