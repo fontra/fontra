@@ -256,8 +256,12 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
         if self._shapingInfo is None:
             featureText = self._getFeaturesFromFont()
 
-            featureDoc = parseFeatureCode(featureText)
-            kernKerning = self._extractKerning(featureDoc)
+            try:
+                featureDoc = parseFeatureCode(featureText)
+                kernKerning = self._extractKerning(featureDoc)
+            except Exception:
+                kernKerning = None
+                logger.error("Failed to extract kerning", exc_info=True)
 
             self._shapingInfo = ShapingInfo(
                 kerning={"kern": kernKerning} if kernKerning is not None else {},
