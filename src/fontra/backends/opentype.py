@@ -1,17 +1,23 @@
 from __future__ import annotations
 
 import io
+import logging
 import os
 import subprocess
 import tempfile
 import uuid
+from collections import defaultdict
 from contextlib import contextmanager
 from copy import copy, deepcopy
 from dataclasses import dataclass
+from functools import cache
 from itertools import product
 from os import PathLike
 from typing import Any, Generator
 
+from fontTools.feaLib import ast
+from fontTools.feaLib.parser import Parser
+from fontTools.feaLib.variableScalar import VariableScalar
 from fontTools.misc.fixedTools import fixedToFloat
 from fontTools.misc.psCharStrings import SimpleT2Decompiler
 from fontTools.pens.pointPen import GuessSmoothPointPen
@@ -45,6 +51,8 @@ from ..core.varutils import locationToTuple, unnormalizeLocation, unnormalizeVal
 from .base import ReadableBaseBackend
 from .filewatcher import Change
 from .watchable import WatchableBackend
+
+logger = logging.getLogger(__name__)
 
 shaperFontTables = {
     "fvar",
@@ -248,7 +256,8 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
         if self._shapingInfo is None:
             featureText = self._getFeaturesFromFont()
 
-            kernKerning = self._extractKerning(featureText)
+            featureDoc = parseFeatureCode(featureText)
+            kernKerning = self._extractKerning(featureDoc)
 
             self._shapingInfo = ShapingInfo(
                 kerning={"kern": kernKerning} if kernKerning is not None else {},
@@ -264,9 +273,141 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
 
         return "" if result.returncode != 0 else result.stdout
 
-    def _extractKerning(self, featureText) -> Kerning | None:
-        # TODO: extract kerning from featureText
-        return None
+    def _extractKerning(
+        self, featureDoc: ast.FeatureFile, featureTag: str = "kern"
+    ) -> Kerning | None:
+        # This assumes the .fea code was emitted by sr-aef, so it isn't super general
+
+        kerningStatements = [
+            statement
+            for statement in featureDoc.statements
+            if isinstance(statement, ast.FeatureBlock) and statement.name == featureTag
+        ]
+
+        kerningLookups = [
+            kernStatement.lookup
+            for statement in kerningStatements
+            for kernStatement in statement.statements
+            if isinstance(kernStatement, ast.LookupReferenceStatement)
+        ]
+
+        seenLookups = set()
+
+        sourceIdentifiers = list(self.fontSources.keys())
+        groupsSide1 = {}
+        groupsSide2 = {}
+        kernValues = defaultdict(dict)
+
+        sourceLocationIndices = {
+            locationToTuple(
+                self.fontSourcesInstancer.defaultSourceLocation | s.location
+            ): index
+            for index, s in enumerate(self.fontSources.values())
+        }
+
+        @cache
+        def findSourceIndex(scalarLocation):
+            locationTuple = locationToTuple(
+                self.fontSourcesInstancer.defaultSourceLocation
+                | mapLocationForward(dict(scalarLocation), self.fontAxes)
+            )
+
+            index = sourceLocationIndices.get(locationTuple)
+
+            if index is None:
+                raise NotImplementedError(
+                    "TODO: search with a bit of wiggle room for floating point inaccuracies"
+                )
+
+            return index
+
+        for lookup in kerningLookups:
+            if lookup in seenLookups:
+                continue
+
+            seenLookups.add(lookup)
+
+            isRTL = False
+
+            foundPairPosStatement = False
+            for statement in lookup.statements:
+                if isinstance(statement, ast.LookupFlagStatement):
+                    if statement.value & 0x01:
+                        isRTL = True
+                elif isinstance(statement, ast.PairPosStatement):
+                    foundPairPosStatement = True
+                    valueRecord, otherValueRecord = (
+                        (statement.valuerecord2, statement.valuerecord1)
+                        if isRTL
+                        else (statement.valuerecord1, statement.valuerecord2)
+                    )
+
+                    if otherValueRecord is not None:
+                        logger.info(
+                            "Skip extracting kerning from features: unusual value record found"
+                        )
+                        return None
+
+                    glyphs1, glyphs2 = (
+                        (statement.glyphs2, statement.glyphs1)
+                        if isRTL
+                        else (statement.glyphs1, statement.glyphs2)
+                    )
+                    assert type(glyphs1) is type(glyphs2)
+
+                    if isinstance(glyphs1, ast.GlyphClass):
+                        raise NotImplementedError("TODO: handle groups")
+                    else:
+                        pairLeft, pairRight = (glyphs1.glyph, glyphs2.glyph)
+
+                    if (
+                        valueRecord.yAdvance is not None
+                        or valueRecord.yPlacement is not None
+                    ):
+                        logger.info(
+                            "Skip extracting kerning from features: "
+                            + "unexpected vertical value record found"
+                        )
+                        return None
+
+                    if valueRecord.xAdvance is None:
+                        logger.info(
+                            "Skip extracting kerning from features: "
+                            + "no xAdvance found in value record"
+                        )
+                        return None
+
+                    if (isRTL and valueRecord.xAdvance != valueRecord.xPlacement) or (
+                        not isRTL and valueRecord.xPlacement is not None
+                    ):
+                        logger.info(
+                            "Skip extracting kerning from features: non-standard value record found"
+                        )
+                        return None
+
+                    if isinstance(valueRecord.xAdvance, VariableScalar):
+                        values = [0] * len(sourceIdentifiers)
+                        for location, value in valueRecord.xAdvance.values.items():
+                            values[findSourceIndex(location)] = value
+                    else:
+                        values = [valueRecord.xAdvance] * len(sourceIdentifiers)
+
+                    kernValues[pairLeft][pairRight] = values
+
+            if not foundPairPosStatement:
+                # Kerning is not purely PairPos-based, better not be clever and
+                # let the extracted feature code handle it
+                logger.info(
+                    "Skip extracting kerning from features: no PairPos statements found"
+                )
+                return None
+
+        return Kerning(
+            sourceIdentifiers=sourceIdentifiers,
+            groupsSide1=groupsSide1,
+            groupsSide2=groupsSide2,
+            values=dict(kernValues),
+        )
 
     async def getCustomData(self) -> dict[str, Any]:
         return {}
@@ -598,6 +739,18 @@ def findNameForLocationFromInstances(
     return None
 
 
+def mapLocationForward(
+    location: dict[str, float], axes: list[FontAxis]
+) -> dict[str, float]:
+    return {
+        axis.name: piecewiseLinearMap(
+            location.get(axis.name, axis.defaultValue),
+            dict(axis.mapping),
+        )
+        for axis in axes
+    }
+
+
 def mapLocationBackward(
     location: dict[str, float], axes: list[FontAxis]
 ) -> dict[str, float]:
@@ -732,3 +885,9 @@ def checkAndFixCFF2Compatibility(glyphName: str, layers: dict[str, Layer]) -> No
                 firstPoint["smooth"] = False
                 unpackedContours[i]["points"].append(firstPoint)
         layer.glyph.path = PackedPath.fromUnpackedContours(unpackedContours)
+
+
+def parseFeatureCode(featureText: str) -> ast.FeatureFile:
+    f = io.StringIO(featureText)
+    p = Parser(f, followIncludes=False)
+    return p.parse()
