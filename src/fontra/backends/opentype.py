@@ -49,6 +49,7 @@ from ..core.path import PackedPath, PackedPathPointPen
 from ..core.protocols import ReadableFontBackend
 from ..core.varutils import locationToTuple, unnormalizeLocation, unnormalizeValue
 from .base import ReadableBaseBackend
+from .designspace import uniqueNameMaker
 from .filewatcher import Change
 from .watchable import WatchableBackend
 
@@ -302,7 +303,9 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
 
         sourceIdentifiers = list(self.fontSources.keys())
         groupsSide1 = {}
+        groupsSide1ByGlyphSet = {}
         groupsSide2 = {}
+        groupsSide2ByGlyphSet = {}
         kernValues = defaultdict(dict)
 
         sourceLocationIndices = {
@@ -327,6 +330,20 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
                 )
 
             return index
+
+        def registerGroup(glyphSet, groups, groupsByGlyphSet):
+            if len(glyphSet) == 1:
+                return glyphSet[0]
+
+            groupName = groupsByGlyphSet.get(glyphSet)
+
+            if groupName is None:
+                makeUniqueName = uniqueNameMaker(groups.keys(), "_")
+                groupName = makeUniqueName(glyphSet[0])
+                groups[groupName] = list(glyphSet)
+                groupsByGlyphSet[glyphSet] = groupName
+
+            return "@" + groupName
 
         for lookup in kerningLookups:
             if lookup in seenLookups:
@@ -362,8 +379,17 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
                     )
                     assert type(glyphs1) is type(glyphs2)
 
-                    if isinstance(glyphs1, ast.GlyphClass):
-                        raise NotImplementedError("TODO: handle groups")
+                    isGroup = isinstance(glyphs1, ast.GlyphClass)
+
+                    if isGroup:
+                        glyphSet1 = glyphs1.glyphSet()
+                        glyphSet2 = glyphs2.glyphSet()
+                        pairLeft = registerGroup(
+                            glyphSet1, groupsSide1, groupsSide1ByGlyphSet
+                        )
+                        pairRight = registerGroup(
+                            glyphSet2, groupsSide2, groupsSide2ByGlyphSet
+                        )
                     else:
                         pairLeft, pairRight = (glyphs1.glyph, glyphs2.glyph)
 
@@ -399,7 +425,8 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
                     else:
                         values = [valueRecord.xAdvance] * len(sourceIdentifiers)
 
-                    kernValues[pairLeft][pairRight] = values
+                    if not isGroup or any(v != 0 for v in values):
+                        kernValues[pairLeft][pairRight] = values
 
             if not foundPairPosStatement:
                 # Kerning is not purely PairPos-based, better not be clever and
