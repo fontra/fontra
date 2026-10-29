@@ -392,6 +392,16 @@ async def test_getFeatures_ttx():
                 ),
             ],
         ),
+        (
+            dataDir / "mutatorsans" / "MutatorSans.ttf",
+            [
+                lambda kerning: (kerning["kern"].values["A"]["J"], [0, -35, 0, -20]),
+                lambda kerning: (len(kerning["kern"].values.keys()), 16),
+                lambda kerning: (len(kerning["kern"].sourceIdentifiers), 4),
+                lambda kerning: (kerning["kern"].groupsSide1, {}),
+                lambda kerning: (kerning["kern"].groupsSide2, {}),
+            ],
+        ),
     ],
 )
 async def test_getKerning(testFontPath, assertFunctions):
