@@ -455,9 +455,9 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
                 )
                 return None
 
+        # Remove the feature block(s) and lookup(s) from the feature document
         for kerningStatement in kerningStatements:
             featureDoc.statements.remove(kerningStatement)
-
         for lookup in seenLookups:
             featureDoc.statements.remove(lookup)
 
