@@ -2560,7 +2560,7 @@ def getGlyphMapFromGlyphSet(glyphSet):
     return glyphMap
 
 
-def uniqueNameMaker(existingNames=()):
+def uniqueNameMaker(existingNames=(), joiner="#"):
     usedNames = set(existingNames)
 
     def makeUniqueName(name):
@@ -2568,7 +2568,7 @@ def uniqueNameMaker(existingNames=()):
         uniqueName = name
         while uniqueName in usedNames:
             count += 1
-            uniqueName = f"{name}#{count}"
+            uniqueName = f"{name}{joiner}{count}"
         usedNames.add(uniqueName)
         return uniqueName
 
