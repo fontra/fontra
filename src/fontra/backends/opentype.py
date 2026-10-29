@@ -425,6 +425,10 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
                     else:
                         values = [valueRecord.xAdvance] * len(sourceIdentifiers)
 
+                    # We skip zero values for group kerning. Not 100% sure about this, but
+                    # this is what extractor does. https://github.com/robotools/extractor
+                    # However, if this is indeed correct, we could argue that sr-aef should
+                    # handle that.
                     if not isGroup or any(v != 0 for v in values):
                         kernValues[pairLeft][pairRight] = values
 
