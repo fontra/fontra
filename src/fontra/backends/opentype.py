@@ -327,9 +327,12 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
             index = sourceLocationIndices.get(locationTuple)
 
             if index is None:
-                raise NotImplementedError(
-                    "TODO: search with a bit of wiggle room for floating point inaccuracies"
-                )
+                for sourceLocationTuple, i in sourceLocationIndices.items():
+                    if locationTupleFuzzyEquals(locationTuple, sourceLocationTuple):
+                        index = i
+                        break
+
+                assert index is not None, "couldn't find source index"
 
             return index
 
@@ -944,3 +947,14 @@ def parseFeatureCode(featureText: str) -> ast.FeatureFile:
     f = io.StringIO(featureText)
     p = Parser(f, followIncludes=False)
     return p.parse()
+
+
+def locationTupleFuzzyEquals(locationTupleA, locationTupleB) -> bool:
+    for (axisA, valueA), (axisB, valueB) in zip(
+        locationTupleA, locationTupleB, strict=True
+    ):
+        assert axisA == axisB
+        if abs(valueA - valueB) > 0.000001:
+            return False
+
+    return True
