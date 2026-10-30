@@ -407,6 +407,11 @@ async def test_getFeatures_ttx():
             [
                 lambda kerning: (kerning["kern"].values["T"]["@c"], [-65]),
                 lambda kerning: (kerning["kern"].values["@uniFB58"]["@uni0631"], [90]),
+                lambda kerning: (len(kerning["kern"].values), 5),
+                lambda kerning: (
+                    sum(len(v.values()) for v in kerning["kern"].values.values()),
+                    7,
+                ),
             ],
         ),
     ],
