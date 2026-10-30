@@ -19,7 +19,7 @@ class ShaperBase {
       isGlyphMarkFunc,
       insertMarkers,
       fallbackXAdvance,
-      canEmulateSomeGPOS = true,
+      disableEmulation,
     } = shaperSupport;
 
     this.glyphOrder = glyphOrder;
@@ -27,7 +27,7 @@ class ShaperBase {
     this.insertMarkers = insertMarkers?.filter((marker) =>
       this.constructor._emulatedFeatureTags.includes(marker.tag)
     );
-    this.emulatedDefaultValues = canEmulateSomeGPOS
+    this.emulatedDefaultValues = !disableEmulation
       ? Object.fromEntries(
           this.constructor._emulatedFeatureTags.map((emulatedTag) => [
             emulatedTag,
