@@ -58,7 +58,6 @@ sr_aef_executable = (
     os.path.join(sys._MEIPASS, "sr-aef") if hasattr(sys, "_MEIPASS") else "sr-aef"
 )
 
-
 logger = logging.getLogger(__name__)
 
 shaperFontTables = {
