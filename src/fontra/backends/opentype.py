@@ -4,6 +4,7 @@ import io
 import logging
 import os
 import subprocess
+import sys
 import tempfile
 import uuid
 from collections import defaultdict
@@ -52,6 +53,11 @@ from .base import ReadableBaseBackend
 from .designspace import uniqueNameMaker
 from .filewatcher import Change
 from .watchable import WatchableBackend
+
+sr_aef_executable = (
+    os.path.join(sys._MEIPASS, "sr-aef") if hasattr(sys, "_MEIPASS") else "sr-aef"
+)
+
 
 logger = logging.getLogger(__name__)
 
@@ -276,7 +282,7 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
     def _getFeaturesFromFont(self) -> str:
         with self._tmpFontPath() as path:
             result = subprocess.run(
-                ["sr-aef", path], capture_output=True, encoding="utf-8"
+                [sr_aef_executable, path], capture_output=True, encoding="utf-8"
             )
 
         return "" if result.returncode != 0 else result.stdout
