@@ -304,11 +304,11 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
         model = self.fontSourcesInstancer.model
         sourceIdentifiers = list(self.fontSources.keys())
 
-        groupsSide1 = {}
-        groupsSide1ByGlyphSet = {}
-        groupsSide2 = {}
-        groupsSide2ByGlyphSet = {}
-        kernValues = defaultdict(dict)
+        groupsSide1: dict[str, list] = {}
+        groupsSide1ByGlyphSet: dict[tuple, str] = {}
+        groupsSide2: dict[str, list] = {}
+        groupsSide2ByGlyphSet: dict[tuple, str] = {}
+        kernValues: dict[str, dict[str, list[float | None]]] = defaultdict(dict)
 
         sourceLocationIndices = {
             locationToTuple(
@@ -415,7 +415,7 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
                         return None
 
                     if isinstance(valueRecord.xAdvance, VariableScalar):
-                        values = [None] * len(sourceIdentifiers)
+                        values: list[float | None] = [None] * len(sourceIdentifiers)
                         for location, value in valueRecord.xAdvance.values.items():
                             values[findSourceIndex(location)] = value
                         if None in values:
@@ -798,7 +798,7 @@ def mapLocationForward(
     return {
         axis.name: piecewiseLinearMap(
             location.get(axis.name, axis.defaultValue),
-            dict(axis.mapping),
+            dict([(a, b) for a, b in axis.mapping]),
         )
         for axis in axes
     }
