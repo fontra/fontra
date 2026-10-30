@@ -1,5 +1,11 @@
 # Changelog for Fontra
 
+## 2026-10-30 [version 2026.10.2]
+
+### Fixes
+
+- [fontra pak] Fixed extracting OpenType features from binary files. This was caused by a bundling problem. [fontra-pak Issue 302](https://github.com/fontra/fontra-pak/issues/302), [PR 2828](https://github.com/fontra/fontra/pull/2828), [fontra-pak PR 303](https://github.com/fontra/fontra-pak/pull/303)
+
 ## 2026-10-30 [version 2026.10.1]
 
 ### New features
