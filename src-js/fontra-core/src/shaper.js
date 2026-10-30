@@ -19,7 +19,7 @@ class ShaperBase {
       isGlyphMarkFunc,
       insertMarkers,
       fallbackXAdvance,
-      canEmulateSomeGPOS,
+      canEmulateSomeGPOS = true,
     } = shaperSupport;
 
     this.glyphOrder = glyphOrder;
