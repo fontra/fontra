@@ -22,7 +22,7 @@ dependencies = [
     "skia-pathops>=0.8.0.post1",
     "pillow>=13.0.0",
     "ufo2ft>=3.9.0",
-    "sr-aef>=0.1.1",
+    "sr-aef>=0.1.2",
 ]
 dynamic = ["version"]
 requires-python = ">=3.11"
