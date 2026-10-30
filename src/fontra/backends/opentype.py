@@ -954,7 +954,7 @@ def locationTupleFuzzyEquals(locationTupleA, locationTupleB) -> bool:
         locationTupleA, locationTupleB, strict=True
     ):
         assert axisA == axisB
-        if abs(valueA - valueB) > 0.000001:
+        if abs(valueA - valueB) > 0.01:
             return False
 
     return True

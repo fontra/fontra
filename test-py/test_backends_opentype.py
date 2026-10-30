@@ -414,6 +414,12 @@ async def test_getFeatures_ttx():
                 ),
             ],
         ),
+        (
+            dataDir / "kern-test-locations" / "kern-test-locations.ttf",
+            [
+                lambda kerning: (kerning["kern"].values["A"]["B"], [-50, -30, -20]),
+            ],
+        ),
     ],
 )
 async def test_getKerning(testFontPath, assertFunctions):
