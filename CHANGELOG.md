@@ -5,8 +5,9 @@
 ### New features
 
 - [languages] Norwegian (bokmål) contributed by Peder Vatn Austad. [PR 2817](https://github.com/fontra/fontra/pull/2817)
-- [fontra pak] When starting the application from the command line, open any fonts passed as arguments. Contributed by Tarik Rokhsane. [fontra-pak PR 292](https://github.com/fontra/fontra-pak/pull/292)
+- [opentype backend] Extract kerning from binary fonts. [Issue 2137](https://github.com/fontra/fontra/issues/2137), [PR 2827](https://github.com/fontra/fontra/pull/2827)
 - [opentype backend] Convert OpenType features to .fea code when reading. This preserves features when exporting as (say) .fontra. This uses the new `sr-aef` tool by Simon Cozens, with contributions by Khaled Hosny. [Issue 2294](https://github.com/fontra/fontra/issues/2294), [PR 2810](https://github.com/fontra/fontra/pull/2810)
+- [fontra pak] When starting the application from the command line, open any fonts passed as arguments. Contributed by Tarik Rokhsane. [fontra-pak PR 292](https://github.com/fontra/fontra-pak/pull/292)
 - [fontra pak/linux] Add native Linux install and uninstall script. [fontra-pak PR 289](https://github.com/fontra/fontra-pak/pull/289)
 
 ### Fixes
