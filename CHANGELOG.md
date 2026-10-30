@@ -11,6 +11,7 @@
 
 ### Fixes
 
+- [fontra-pak/macOS/Intel/x86] Made Fontra Pak work again on macOS/Intel. [fontra-pak PR 299](https://github.com/fontra/fontra-pak/pull/299)
 - [opentype feature code editor] Make "select all" (and other shortcuts) work in read-only mode. [PR 2824](https://github.com/fontra/fontra/pull/2824)
 - [editor] Fix proposed x/y coordinates for "Add Anchor" and "Add Guideline" dialogs in the case they are triggered by a shortcut instead of the context menu. [Issue 2813](https://github.com/fontra/fontra/issues/2813), [PR 2814](https://github.com/fontra/fontra/pull/2814)
 - [vivaldi] Make shortcuts work in the Vivaldi browser. [Issue 2807](https://github.com/fontra/fontra/issues/2807), [PR 2808](https://github.com/fontra/fontra/pull/2808)
