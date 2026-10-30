@@ -191,7 +191,7 @@ export default class TextEntryPanel extends Panel {
       return null;
     }
 
-    const { shaper, messages, canEmulateSomeGPOS } = await shaperInfoPromise;
+    const { shaper, messages } = await shaperInfoPromise;
 
     if (applyTextShaping != this.textSettings.applyTextShaping) {
       // The setting was changed since we were called: ignore, or else we may
@@ -786,17 +786,6 @@ export default class TextEntryPanel extends Panel {
     }
 
     this.textLanguageOptions.splice(1, Infinity, ...languageOptions);
-  }
-
-  getFeatureInfo(shaper, tableTag) {
-    const info = shaper.getFeatureInfo(tableTag);
-    if (tableTag == "GPOS" && this.canEmulateSomeGPOS) {
-      info["curs-emulated"] = {};
-      info["kern-emulated"] = {};
-      info["mark-emulated"] = {};
-      info["mkmk-emulated"] = {};
-    }
-    return info;
   }
 
   fixTextEntryHeight() {

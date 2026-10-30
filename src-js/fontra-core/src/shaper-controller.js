@@ -80,7 +80,7 @@ export class ShaperController {
       messages,
       formattedMessages,
       insertMarkers,
-      canEmulateSomeGPOS,
+      disableEmulation,
     } = await this.getShaperFontData(textShaping);
 
     {
@@ -93,6 +93,7 @@ export class ShaperController {
         isGlyphMarkFunc: (glyphName) => markGlyphsSet.has(glyphName),
         insertMarkers,
         fallbackXAdvance: this.fontController.fallbackXAdvance,
+        disableEmulation,
       };
 
       // If compiling the font failed (!fontData) and we have a previous
@@ -107,7 +108,7 @@ export class ShaperController {
         this._previousShaper = shaper;
       }
 
-      return { shaper, messages, formattedMessages, canEmulateSomeGPOS };
+      return { shaper, messages, formattedMessages };
     }
   }
 
@@ -116,7 +117,7 @@ export class ShaperController {
     let messages = [];
     let formattedMessages = "";
     let insertMarkers = null;
-    let canEmulateSomeGPOS = false;
+    let disableEmulation = true;
 
     const glyphOrder = Object.keys(this.fontController.glyphMap);
 
@@ -142,7 +143,7 @@ export class ShaperController {
         ensureNotdef(glyphOrder);
         ({ fontData, messages, formattedMessages, insertMarkers } =
           await this.buildShaperFont(glyphOrder));
-        canEmulateSomeGPOS = true;
+        disableEmulation = false;
       }
     } else {
       glyphOrder.sort();
@@ -161,7 +162,7 @@ export class ShaperController {
       messages,
       formattedMessages,
       insertMarkers,
-      canEmulateSomeGPOS,
+      disableEmulation,
     };
   }
 

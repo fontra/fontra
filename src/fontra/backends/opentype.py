@@ -1,14 +1,23 @@
+from __future__ import annotations
+
 import io
+import logging
 import os
 import subprocess
 import tempfile
 import uuid
+from collections import defaultdict
 from contextlib import contextmanager
 from copy import copy, deepcopy
+from dataclasses import dataclass
+from functools import cache
 from itertools import product
 from os import PathLike
 from typing import Any, Generator
 
+from fontTools.feaLib import ast
+from fontTools.feaLib.parser import Parser
+from fontTools.feaLib.variableScalar import VariableScalar
 from fontTools.misc.fixedTools import fixedToFloat
 from fontTools.misc.psCharStrings import SimpleT2Decompiler
 from fontTools.pens.pointPen import GuessSmoothPointPen
@@ -40,8 +49,11 @@ from ..core.path import PackedPath, PackedPathPointPen
 from ..core.protocols import ReadableFontBackend
 from ..core.varutils import locationToTuple, unnormalizeLocation, unnormalizeValue
 from .base import ReadableBaseBackend
+from .designspace import uniqueNameMaker
 from .filewatcher import Change
 from .watchable import WatchableBackend
+
+logger = logging.getLogger(__name__)
 
 shaperFontTables = {
     "fvar",
@@ -69,6 +81,7 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
     def _initializeFromPath(self, path: PathLike) -> None:
         self.path = path
         self._shaperFontData: ShaperFontData | None = None
+        self._shapingInfo: ShapingInfo | None = None
         self.font = self._loadFontFromPath(path)
         self._initialize()
 
@@ -77,10 +90,10 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
 
     def _initialize(self) -> None:
         self.axes = unpackAxes(self.font)
-        fontAxes: list[FontAxis] = [
+        self.fontAxes: list[FontAxis] = [
             axis for axis in self.axes.axes if isinstance(axis, FontAxis)
         ]
-        self.fontSources = unpackFontSources(self.font, fontAxes)
+        self.fontSources = unpackFontSources(self.font, self.fontAxes)
         self.fontSourcesInstancer = FontSourcesInstancer(
             fontAxes=self.axes.axes, fontSources=self.fontSources
         )
@@ -119,9 +132,7 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
         defaultLayerName = defaultSourceIdentifier
 
         glyph = VariableGlyph(name=glyphName)
-        staticGlyph = buildStaticGlyph(
-            self.glyphSet, glyphName, filterDiscreteAxes(self.axes.axes)
-        )
+        staticGlyph = buildStaticGlyph(self.glyphSet, glyphName, self.fontAxes)
         layers = {defaultLayerName: Layer(glyph=staticGlyph)}
         defaultLocation = {axis.name: 0 for axis in self.axes.axes}
         sources = [
@@ -140,9 +151,7 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
             if varGlyphSet is None:
                 varGlyphSet = self.font.getGlyphSet(location=fullLoc, normalized=True)
                 self.variationGlyphSets[locStr] = varGlyphSet
-            varGlyph = buildStaticGlyph(
-                varGlyphSet, glyphName, filterDiscreteAxes(self.axes.axes)
-            )
+            varGlyph = buildStaticGlyph(varGlyphSet, glyphName, self.fontAxes)
 
             sourceLocation = unnormalizeLocation(fullLoc, self.axes.axes)
             locationBase = self.fontSourcesInstancer.getSourceIdentifierForLocation(
@@ -239,11 +248,30 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
         return self.font["head"].unitsPerEm
 
     async def getKerning(self) -> dict[str, Kerning]:
-        # TODO: extract kerning from GPOS
-        return {}
+        return self._getShapingInfo().kerning
 
     async def getFeatures(self) -> OpenTypeFeatures:
-        return OpenTypeFeatures(text=self._getFeaturesFromFont())
+        return self._getShapingInfo().features
+
+    def _getShapingInfo(self) -> ShapingInfo:
+        if self._shapingInfo is None:
+            featureText = self._getFeaturesFromFont()
+
+            try:
+                featureDoc = parseFeatureCode(featureText)
+                kernKerning = self._extractKerning(featureDoc)
+            except Exception:
+                kernKerning = None
+                logger.error("Failed to extract kerning", exc_info=True)
+
+            if kernKerning is not None:
+                featureText = featureDoc.asFea()
+
+            self._shapingInfo = ShapingInfo(
+                kerning={"kern": kernKerning} if kernKerning is not None else {},
+                features=OpenTypeFeatures(text=featureText),
+            )
+        return self._shapingInfo
 
     def _getFeaturesFromFont(self) -> str:
         with self._tmpFontPath() as path:
@@ -252,6 +280,190 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
             )
 
         return "" if result.returncode != 0 else result.stdout
+
+    def _extractKerning(
+        self, featureDoc: ast.FeatureFile, featureTag: str = "kern"
+    ) -> Kerning | None:
+        # This assumes the .fea code was emitted by sr-aef, so it isn't super general
+
+        kerningStatements = [
+            statement
+            for statement in featureDoc.statements
+            if isinstance(statement, ast.FeatureBlock) and statement.name == featureTag
+        ]
+
+        kerningLookups = [
+            kernStatement.lookup
+            for statement in kerningStatements
+            for kernStatement in statement.statements
+            if isinstance(kernStatement, ast.LookupReferenceStatement)
+        ]
+
+        seenLookups = set()
+
+        model = self.fontSourcesInstancer.model
+        sourceIdentifiers = list(self.fontSources.keys())
+
+        groupsSide1: dict[str, list] = {}
+        groupsSide1ByGlyphSet: dict[tuple, str] = {}
+        groupsSide2: dict[str, list] = {}
+        groupsSide2ByGlyphSet: dict[tuple, str] = {}
+        kernValues: dict[str, dict[str, list[float | None]]] = defaultdict(dict)
+
+        sourceLocationIndices = {
+            locationToTuple(
+                self.fontSourcesInstancer.defaultSourceLocation | s.location
+            ): index
+            for index, s in enumerate(self.fontSources.values())
+        }
+
+        @cache
+        def findSourceIndex(scalarLocation):
+            locationTuple = locationToTuple(
+                self.fontSourcesInstancer.defaultSourceLocation
+                | mapLocationForward(dict(scalarLocation), self.fontAxes)
+            )
+
+            index = sourceLocationIndices.get(locationTuple)
+
+            if index is None:
+                for sourceLocationTuple, i in sourceLocationIndices.items():
+                    if locationTupleFuzzyEquals(locationTuple, sourceLocationTuple):
+                        index = i
+                        break
+
+                assert index is not None, "couldn't find source index"
+
+            return index
+
+        def registerGroup(glyphSet, groups, groupsByGlyphSet):
+            if len(glyphSet) == 1:
+                return glyphSet[0]
+
+            groupName = groupsByGlyphSet.get(glyphSet)
+
+            if groupName is None:
+                makeUniqueName = uniqueNameMaker(groups.keys(), "_")
+                groupName = makeUniqueName(glyphSet[0])
+                groups[groupName] = list(glyphSet)
+                groupsByGlyphSet[glyphSet] = groupName
+
+            return "@" + groupName
+
+        for lookup in kerningLookups:
+            if lookup in seenLookups:
+                continue
+
+            seenLookups.add(lookup)
+
+            isRTL = False
+
+            foundPairPosStatement = False
+            for statement in lookup.statements:
+                if isinstance(statement, ast.LookupFlagStatement):
+                    if statement.value & 0x01:
+                        isRTL = True
+                elif isinstance(statement, ast.PairPosStatement):
+                    foundPairPosStatement = True
+                    valueRecord = statement.valuerecord1
+                    otherValueRecord = statement.valuerecord2
+
+                    if otherValueRecord is not None:
+                        logger.info(
+                            "Skip extracting kerning from features: unusual value record found"
+                        )
+                        return None
+
+                    glyphs1, glyphs2 = (
+                        (statement.glyphs2, statement.glyphs1)
+                        if isRTL
+                        else (statement.glyphs1, statement.glyphs2)
+                    )
+                    assert type(glyphs1) is type(glyphs2)
+
+                    isGroup = isinstance(glyphs1, ast.GlyphClass)
+
+                    if isGroup:
+                        glyphSet1 = glyphs1.glyphSet()
+                        glyphSet2 = glyphs2.glyphSet()
+                        pairLeft = registerGroup(
+                            glyphSet1, groupsSide1, groupsSide1ByGlyphSet
+                        )
+                        pairRight = registerGroup(
+                            glyphSet2, groupsSide2, groupsSide2ByGlyphSet
+                        )
+                    else:
+                        pairLeft, pairRight = (glyphs1.glyph, glyphs2.glyph)
+
+                    if valueRecord.yAdvance or valueRecord.yPlacement:
+                        logger.info(
+                            "Skip extracting kerning from features: "
+                            + "unexpected vertical value record found"
+                        )
+                        return None
+
+                    if valueRecord.xAdvance is None:
+                        logger.info(
+                            "Skip extracting kerning from features: "
+                            + "no xAdvance found in value record"
+                        )
+                        return None
+
+                    if (isRTL and valueRecord.xAdvance != valueRecord.xPlacement) or (
+                        not isRTL and valueRecord.xPlacement is not None
+                    ):
+                        logger.info(
+                            "Skip extracting kerning from features: non-standard value record found"
+                        )
+                        return None
+
+                    if isinstance(valueRecord.xAdvance, VariableScalar):
+                        values: list[float | None] = [None] * len(sourceIdentifiers)
+                        for location, value in valueRecord.xAdvance.values.items():
+                            values[findSourceIndex(location)] = value
+                        if None in values:
+                            # The wasn't a kern value for every source, which is something that
+                            # Fontra unfortunately requires, for compatibility with the
+                            # .designspace/fontmake. Let's fill in the gaps by interpolating.
+                            deltas = model.getDeltas(values)
+                            for index, (source, value) in enumerate(
+                                zip(self.fontSources.values(), values)
+                            ):
+                                if value is None:
+                                    result = model.interpolateFromDeltas(
+                                        source.location, deltas
+                                    )
+                                    values[index] = round(result.instance)
+                    else:
+                        values = [valueRecord.xAdvance] * len(sourceIdentifiers)
+
+                    # We skip zero values for group kerning. Not 100% sure about this, but
+                    # this is what extractor does. https://github.com/robotools/extractor
+                    # However, if this is indeed correct, we could argue that sr-aef should
+                    # handle that.
+                    if not isGroup or any(v != 0 for v in values):
+                        kernValues[pairLeft][pairRight] = values
+
+            if not foundPairPosStatement:
+                # Kerning is not purely PairPos-based, better not be clever and
+                # let the extracted feature code handle it
+                logger.info(
+                    "Skip extracting kerning from features: no PairPos statements found"
+                )
+                return None
+
+        # Remove the feature block(s) and lookup(s) from the feature document
+        for kerningStatement in kerningStatements:
+            featureDoc.statements.remove(kerningStatement)
+        for lookup in seenLookups:
+            featureDoc.statements.remove(lookup)
+
+        return Kerning(
+            sourceIdentifiers=sourceIdentifiers,
+            groupsSide1=groupsSide1,
+            groupsSide2=groupsSide2,
+            values=dict(kernValues),
+        )
 
     async def getCustomData(self) -> dict[str, Any]:
         return {}
@@ -294,6 +506,12 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
 
     def fileWatcherWasInstalled(self) -> None:
         self.fileWatcherSetPaths([self.path])
+
+
+@dataclass(kw_only=True)
+class ShapingInfo:
+    kerning: dict[str, Kerning]
+    features: OpenTypeFeatures
 
 
 class TTXBackend(OTFBackend):
@@ -577,6 +795,18 @@ def findNameForLocationFromInstances(
     return None
 
 
+def mapLocationForward(
+    location: dict[str, float], axes: list[FontAxis]
+) -> dict[str, float]:
+    return {
+        axis.name: piecewiseLinearMap(
+            location.get(axis.name, axis.defaultValue),
+            dict([(a, b) for a, b in axis.mapping]),
+        )
+        for axis in axes
+    }
+
+
 def mapLocationBackward(
     location: dict[str, float], axes: list[FontAxis]
 ) -> dict[str, float]:
@@ -608,10 +838,6 @@ def getEnglishNameWithFallback(
             return nameRecord.toUnicode()
 
     return fallback
-
-
-def filterDiscreteAxes(axes: list[FontAxis | DiscreteFontAxis]) -> list[FontAxis]:
-    return [axis for axis in axes if isinstance(axis, FontAxis)]
 
 
 def buildStaticGlyph(glyphSet, glyphName: str, axes: list[FontAxis]) -> StaticGlyph:
@@ -715,3 +941,20 @@ def checkAndFixCFF2Compatibility(glyphName: str, layers: dict[str, Layer]) -> No
                 firstPoint["smooth"] = False
                 unpackedContours[i]["points"].append(firstPoint)
         layer.glyph.path = PackedPath.fromUnpackedContours(unpackedContours)
+
+
+def parseFeatureCode(featureText: str) -> ast.FeatureFile:
+    f = io.StringIO(featureText)
+    p = Parser(f, followIncludes=False)
+    return p.parse()
+
+
+def locationTupleFuzzyEquals(locationTupleA, locationTupleB) -> bool:
+    for (axisA, valueA), (axisB, valueB) in zip(
+        locationTupleA, locationTupleB, strict=True
+    ):
+        assert axisA == axisB
+        if abs(valueA - valueB) > 0.01:
+            return False
+
+    return True
