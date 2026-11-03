@@ -12,7 +12,7 @@ import { enumerate, range } from "@fontra/core/utils.ts";
 import { mapAxesFromUserSpaceToSourceSpace } from "@fontra/core/var-model.js";
 import "@fontra/web-components/add-remove-buttons.js";
 import "@fontra/web-components/designspace-location.js";
-import { BaseInfoPanel } from "./panel-base.js";
+import { showDialogCannotEditReadOnly, BaseInfoPanel } from "./panel-base.js";
 
 const cardsInfos = {};
 
@@ -63,7 +63,9 @@ export class CrossAxisMappingPanel extends BaseInfoPanel {
       );
     }
 
-    setupSortableList(container);
+    if (!this.fontController.readOnly) {
+      setupSortableList(container);
+    }
 
     container.addEventListener("reordered", (event) => {
       const reordered = [];
@@ -101,6 +103,11 @@ export class CrossAxisMappingPanel extends BaseInfoPanel {
   }
 
   async newCrossAxisMapping() {
+    if (this.fontController.readOnly) {
+      showDialogCannotEditReadOnly();
+      return;
+    }
+
     //new empty mapping
     const newMapping = {
       inputLocation: {},
@@ -225,7 +232,7 @@ class CrossAxisMappingBox extends HTMLElement {
     this.classList.add(
       "fontra-ui-font-info-cross-axis-mapping-panel-cross-axis-mapping-box"
     );
-    this.draggable = true;
+    this.draggable = !fontController.readOnly;
     this.fontController = fontController;
     this.fontAxesSourceSpace = fontAxesSourceSpace;
     this.mappings = mappings;
@@ -268,6 +275,12 @@ class CrossAxisMappingBox extends HTMLElement {
   }
 
   editCrossAxisMapping(editFunc, undoLabel) {
+    if (this.fontController.readOnly) {
+      showDialogCannotEditReadOnly();
+      this.setupUI();
+      return;
+    }
+
     const root = { axes: this.fontController.axes };
     const changes = recordChanges(root, (root) => {
       editFunc(root.axes.mappings[this.mappingIndex]);
@@ -278,6 +291,11 @@ class CrossAxisMappingBox extends HTMLElement {
   }
 
   deleteCrossAxisMapping() {
+    if (this.fontController.readOnly) {
+      showDialogCannotEditReadOnly();
+      return;
+    }
+
     const undoLabel = translate("cross-axis-mapping.undo.delete");
     const root = { axes: this.fontController.axes };
     const changes = recordChanges(root, (root) => {
@@ -424,11 +442,10 @@ class CrossAxisMappingBox extends HTMLElement {
             "inactive"
           ),
           html.createDomElement("icon-button", {
-            "class": "fontra-ui-font-info-cross-axis-mapping-panel-icon",
-            "src": "/tabler-icons/trash.svg",
-            "onclick": (event) => this.deleteCrossAxisMapping(),
-            "data-tooltip": translate("cross-axis-mapping.delete"),
-            "data-tooltipposition": "left",
+            class: "fontra-ui-font-info-cross-axis-mapping-panel-icon",
+            src: "/tabler-icons/trash.svg",
+            onclick: (event) => this.deleteCrossAxisMapping(),
+            title: translate("cross-axis-mapping.delete"),
           }),
         ]
       )
@@ -553,11 +570,7 @@ function buildElementLocationsLabel(axis) {
 function buildElementLocationsCheckboxes(axis, controller, checkboxId) {
   const element = labeledCheckbox(null, controller, axis.name);
   element.className = "fontra-ui-font-info-cross-axis-mapping-panel-checkboxes";
-  element.setAttribute(
-    "data-tooltip",
-    translate("cross-axis-mapping.axis-participates")
-  );
-  element.setAttribute("data-tooltipposition", "right");
+  element.title = translate("cross-axis-mapping.axis-participates");
   element.firstChild.id = checkboxId;
   return element;
 }

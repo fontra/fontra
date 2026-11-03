@@ -201,7 +201,14 @@
 }
 ]
 },
-"xAdvance": 797
+"xAdvance": 797,
+"guidelines": [
+{
+"name": "NamedTestGuideline",
+"x": 198,
+"y": 569
+}
+]
 }
 }
 }

@@ -4,7 +4,8 @@ import logging
 from copy import copy, deepcopy
 from dataclasses import dataclass, field, replace
 from enum import IntEnum
-from typing import Optional, TypedDict
+from types import SimpleNamespace
+from typing import NotRequired, Optional, TypedDict
 
 from fontTools.misc.roundTools import otRound
 from fontTools.misc.transform import DecomposedTransform, Transform
@@ -22,9 +23,9 @@ class InterpolationError(Exception):
 class Point(TypedDict, total=False):
     x: float
     y: float
-    type: str  # Py 3.11: NotRequired[str]
-    smooth: bool  # Py 3.11: NotRequired[bool]
-    attrs: dict  # Py 3.11: NotRequired[dict]
+    type: NotRequired[str]
+    smooth: NotRequired[bool]
+    attrs: NotRequired[dict]
 
 
 @dataclass
@@ -434,6 +435,7 @@ class PackedPathPointPen:
         self.pointAttributes = []
         self.contourInfo = []
         self.components = []
+        self.variableComponents = []
         self._currentContour = None
 
     def getPath(self) -> PackedPath:
@@ -520,13 +522,19 @@ class PackedPathPointPen:
         transformation: DecomposedTransform,
         location: dict,
         identifier=None,
+        *,
+        resetUnspecifiedAxes: bool = False,
         **kwargs,
     ) -> None:
-        from .classes import Component
-
         transformation = copy(transformation)
-        self.components.append(
-            Component(name=glyphName, transformation=transformation, location=location)
+        # Note: location is normalized, and needs to be unnormalized by the caller
+        self.variableComponents.append(
+            SimpleNamespace(
+                name=glyphName,
+                transformation=transformation,
+                location=location,
+                resetUnspecifiedAxes=resetUnspecifiedAxes,
+            )
         )
 
 

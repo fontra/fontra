@@ -41,7 +41,7 @@ def _getFileSystemBackend(path: PathLike, create: bool) -> WritableFontBackend:
 
     if create:
         if not hasattr(backendClass, "createFromPath"):
-            raise ValueError(f"Creating a new .{fileType} is not supported")
+            raise ValueError(f"Creating a new .{fileType} file is not supported")
         backend = backendClass.createFromPath(path)
     else:
         backend = backendClass.fromPath(path)

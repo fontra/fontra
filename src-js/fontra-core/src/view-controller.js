@@ -1,5 +1,6 @@
 import * as html from "@fontra/core/html-utils.js";
 import { ensureLanguageHasLoaded } from "@fontra/core/localization.js";
+import { InlineSVG } from "@fontra/web-components/inline-svg.js";
 import { dialog, dialogSetup, message } from "@fontra/web-components/modal-dialog.js";
 import { registerAction } from "./actions.js";
 import { Backend } from "./backend-api.js";
@@ -76,7 +77,13 @@ export class ViewController {
     document.title = this.constructor.titlePattern(projectName);
 
     const topBar = document.querySelector(".top-bar-container");
-    topBar?.appendChild(html.div({ id: "fontra-project-name" }, [projectName]));
+
+    topBar?.appendChild(
+      html.div({ id: "fontra-project-name" }, [
+        this.fontController.readOnly ? new InlineSVG("/tabler-icons/lock.svg") : "",
+        projectName,
+      ])
+    );
 
     for (const format of this.fontController.backendInfo.projectManagerFeatures[
       "export-as"

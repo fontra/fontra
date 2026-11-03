@@ -73,6 +73,13 @@ export const strings = {
   "application-settings.display-language.status.wip": "作業中",
   "application-settings.display-language.title": "Display Language",
   "application-settings.display-language.title.translated": "表示言語",
+  "application-settings.editor-behavior.arrow-key-section": "Arrow key nudge values",
+  "application-settings.editor-behavior.nudge-shift": "Shift",
+  "application-settings.editor-behavior.nudge-shift-control": "Shift+Control/Command",
+  "application-settings.editor-behavior.rect-select-live-modifier-keys":
+    "Use live modifier keys for rectangle-select",
+  "application-settings.editor-behavior.selection-behavior-section":
+    "Selection behavior",
   "application-settings.editor-behavior.title": "エディターの挙動",
   "application-settings.plugins-manager.title": "プラグインマネージャー",
   "application-settings.server-info.title": "サーバー情報",
@@ -120,6 +127,32 @@ export const strings = {
   "background-image.labels.colorize": "彩色",
   "background-image.labels.opacity": "透明度",
   "canvas.clean-view-and-hand-tool": "塗りのプレビューと手のひらツール",
+  "conditional-substitutions.condition-set.new": "New condition set",
+  "conditional-substitutions.condition-set.remove": "Remove condition set",
+  "conditional-substitutions.condition-set.undo-edit": "edit condition set",
+  "conditional-substitutions.condition-set.undo-new": "new condition set",
+  "conditional-substitutions.condition-set.undo-remove": "remove condition set",
+  "conditional-substitutions.condition-sets.title": "Condition sets",
+  "conditional-substitutions.condition-sets.undo-reorder": "reorder condition sets",
+  "conditional-substitutions.rule-processing.after":
+    "After other OpenType features (rclt)",
+  "conditional-substitutions.rule-processing.before":
+    "Before other OpenType features (rvrn)",
+  "conditional-substitutions.rule-processing.feature-tags.enter.title":
+    "Enter one or more four-character feature tags",
+  "conditional-substitutions.rule-processing.feature-tags.menu-title":
+    "Custom OpenType feature tags...",
+  "conditional-substitutions.rule-processing.feature-tags.undo": "edit feature tags",
+  "conditional-substitutions.rule-processing.title": "Rule processing",
+  "conditional-substitutions.rule.name": "Rule name",
+  "conditional-substitutions.rule.new": "New conditional substitution rule",
+  "conditional-substitutions.rule.remove": "Remove rule",
+  "conditional-substitutions.rule.undo-new": "new rule",
+  "conditional-substitutions.rule.undo-remove": "remove rule",
+  "conditional-substitutions.substitutions.new": "New substitution",
+  "conditional-substitutions.substitutions.remove": "Remove substitution",
+  "conditional-substitutions.substitutions.title": "Substitutions",
+  "conditional-substitutions.title": "Conditional substitutions",
   "cross-axis-mapping.axis-participates":
     "チェックすると、この補完軸がマッピング内で有効になります",
   "cross-axis-mapping.delete": "交差補完軸マッピングを削除",
@@ -153,7 +186,13 @@ export const strings = {
     "値は正の数値である必要があります。",
   "dialog.add": "追加",
   "dialog.cancel": "キャンセル",
+  "dialog.cant-add-component.content-1":
+    "This is the current glyph, and would cause a cyclic reference.",
+  "dialog.cant-add-component.content-2":
+    "It uses the current glyph as a component, and would cause a cyclic reference.",
+  "dialog.cant-add-component.title": "Glyph '%0' cannot be used as a component here",
   "dialog.cant-create-glyph.title": "グリフ“%0”を作成できませんでした。",
+  "dialog.cant-edit-font.title": "Can't make changes",
   "dialog.cant-edit-glyph.content": "このフォントは読み取り専用です。",
   "dialog.cant-edit-glyph.content.location-not-at-source":
     "現在の補完軸の値はソースと異なります。",
@@ -161,6 +200,10 @@ export const strings = {
     "The location is not at a source for the following glyphs: %0",
   "dialog.cant-edit-glyph.content.locked-glyph": "このグリフはロックされています。",
   "dialog.cant-edit-glyph.title": "グリフ“%0”を編集できませんでした。",
+  "dialog.cant-edit-kerning.content.apply-text-shaping-must-be-on":
+    'The "Apply text shaping and features" option must be on. Would you like to turn it on?',
+  "dialog.cant-edit-kerning.content.manually-written-feature":
+    "There is a manually written 'kern' OpenType feature without an \"# Automatic Code\" insertion marker.",
   "dialog.cant-edit-kerning.title": "Can’t edit kerning",
   "dialog.cant-edit-sidebearings.title": "Can’t edit sidebearings",
   "dialog.create": "作成",
@@ -322,6 +365,10 @@ export const strings = {
   "sidebar.characters-glyphs.index": "Index",
   "sidebar.characters-glyphs.input-characters": "Input characters",
   "sidebar.characters-glyphs.output-glyphs": "Output glyphs",
+  "sidebar.characters-glyphs.output-glyphs.options-menu-tooltip":
+    "Output glyphs display options",
+  "sidebar.characters-glyphs.output-glyphs.show-kerning-for-advance":
+    "Show kerning in Advance column",
   "sidebar.characters-glyphs.shaping-debugger": "Shaping debugger",
   "sidebar.characters-glyphs.shaping-debugger.options-menu-tooltip":
     "Shaping debugger options",
@@ -492,6 +539,10 @@ export const strings = {
   "sidebar.text-entry.section.positioning": "Positioning",
   "sidebar.text-entry.section.positioning-from-font-data": "Positioning from font data",
   "sidebar.text-entry.section.substitution": "Substitution",
+  "sidebar.text-entry.text-layout-options": "Text layout options",
+  "sidebar.text-entry.text-layout-options.align": "Align",
+  "sidebar.text-entry.text-layout-options.line-height": "Line height",
+  "sidebar.text-entry.text-layout-options.text-size": "Size",
   "sidebar.text-entry.text-shaping-options": "Text shaping options",
   "sidebar.text-entry.text-shaping.options.tooltip": "Additional text shaping options",
   "sidebar.user-settings": "ユーザー設定",
@@ -501,6 +552,8 @@ export const strings = {
   "sidebar.user-settings.glyph": "グリフエディターの表示設定",
   "sidebar.user-settings.glyph.anchornames": "アンカー名を表示",
   "sidebar.user-settings.glyph.background-image": "背景画像を表示",
+  "sidebar.user-settings.glyph.background-nodes-and-handles":
+    "Nodes and handles for background layers",
   "sidebar.user-settings.glyph.baseline": "ベースラインを表示",
   "sidebar.user-settings.glyph.cjkframe": "CJKデザインフレームを表示",
   "sidebar.user-settings.glyph.component": "コンポーネント名とシェイプの順番を表示",
@@ -568,6 +621,8 @@ export const strings = {
     "ソースの補完軸上の座標は他のソースと異なる必要があります。",
   "sources.warning.unique-source-name": "ソース名は他のソースと異なる必要があります。",
   "toggle-fullscreen": "フルスクリーンを切り替え",
+  "unused.max": "max",
+  "unused.min": "min",
   "warning.entry-exists": "%0はすでに存在しているため、他の値を使用してください。",
   "warning.must-be-number": "%0の値は数値である必要があります。",
   "warning.name-must-be-unique": "名前は他と異なる必要があります。",

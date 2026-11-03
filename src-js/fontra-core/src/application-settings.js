@@ -8,6 +8,10 @@ export const applicationSettingsController = new ObservableController({
   sortComponentLocationGlyphAxes: true,
   disableAdHocMarks: false,
   shapingDebuggerShowIneffectiveItems: false,
+  outputGlyphsShowKerningForAdvance: true,
+  arrowKeyNudgeValue: 1,
+  arrowKeyNudgeValueShift: 10,
+  arrowKeyNudgeValueShiftControl: 100,
 });
 
 applicationSettingsController.synchronizeWithLocalStorage(

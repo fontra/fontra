@@ -205,10 +205,7 @@ export default class TransformationPanel extends Panel {
               ? "checked"
               : "",
           "onclick": (event) => this._changeOrigin(keyX, keyY),
-          "data-tooltip": translate(
-            `sidebar.selection-transformation.origin.${keyY}.${keyX}`
-          ),
-          "data-tooltipposition": "bottom",
+          "title": translate(`sidebar.selection-transformation.origin.${keyY}.${keyX}`),
         });
         radioButtonOrigin.appendChild(radioButton);
       }
@@ -237,8 +234,8 @@ export default class TransformationPanel extends Panel {
     formContents.push({ type: "divider" });
 
     const buttonMove = html.createDomElement("icon-button", {
-      "src": "/tabler-icons/arrow-move-right.svg",
-      "onclick": (event) =>
+      src: "/tabler-icons/arrow-move-right.svg",
+      onclick: (event) =>
         this.transformSelection(
           () =>
             new Transform().translate(
@@ -247,9 +244,8 @@ export default class TransformationPanel extends Panel {
             ),
           "move"
         ),
-      "class": "ui-form-icon ui-form-icon-button",
-      "data-tooltip": translate("sidebar.selection-transformation.move"),
-      "data-tooltipposition": "top",
+      class: "ui-form-icon ui-form-icon-button",
+      title: translate("sidebar.selection-transformation.move"),
     });
 
     formContents.push({
@@ -269,8 +265,8 @@ export default class TransformationPanel extends Panel {
     });
 
     const buttonScale = html.createDomElement("icon-button", {
-      "src": "/tabler-icons/resize.svg",
-      "onclick": (event) =>
+      src: "/tabler-icons/resize.svg",
+      onclick: (event) =>
         this.transformSelection(
           () =>
             new Transform().scale(
@@ -281,9 +277,8 @@ export default class TransformationPanel extends Panel {
             ),
           "scale"
         ),
-      "class": "ui-form-icon ui-form-icon-button",
-      "data-tooltip": translate("sidebar.selection-transformation.scale"),
-      "data-tooltipposition": "top",
+      class: "ui-form-icon ui-form-icon-button",
+      title: translate("sidebar.selection-transformation.scale"),
     });
 
     formContents.push({
@@ -305,16 +300,15 @@ export default class TransformationPanel extends Panel {
     });
 
     const buttonRotate = html.createDomElement("icon-button", {
-      "src": "/tabler-icons/rotate.svg",
-      "onclick": (event) =>
+      src: "/tabler-icons/rotate.svg",
+      onclick: (event) =>
         this.transformSelection(
           () =>
             new Transform().rotate((this.transformParameters.rotation * Math.PI) / 180),
           "rotate"
         ),
-      "class": "ui-form-icon ui-form-icon-button",
-      "data-tooltip": translate("sidebar.selection-transformation.rotate"),
-      "data-tooltipposition": "top",
+      class: "ui-form-icon ui-form-icon-button",
+      title: translate("sidebar.selection-transformation.rotate"),
     });
 
     formContents.push({
@@ -328,8 +322,8 @@ export default class TransformationPanel extends Panel {
     });
 
     const buttonSkew = html.createDomElement("icon-button", {
-      "src": "/images/skew.svg",
-      "onclick": (event) =>
+      src: "/images/skew.svg",
+      onclick: (event) =>
         this.transformSelection(
           () =>
             new Transform().skew(
@@ -338,9 +332,8 @@ export default class TransformationPanel extends Panel {
             ),
           "skew"
         ),
-      "class": "ui-form-icon ui-form-icon-button",
-      "data-tooltip": translate("sidebar.selection-transformation.skew"),
-      "data-tooltipposition": "top",
+      class: "ui-form-icon ui-form-icon-button",
+      title: translate("sidebar.selection-transformation.skew"),
     });
 
     formContents.push({
@@ -365,8 +358,8 @@ export default class TransformationPanel extends Panel {
     formContents.push({ type: "divider" });
 
     const buttonDimensions = html.createDomElement("icon-button", {
-      "src": "/tabler-icons/dimensions.svg",
-      "onclick": async (event) => {
+      src: "/tabler-icons/dimensions.svg",
+      onclick: async (event) => {
         const glyph =
           await this.sceneController.sceneModel.getSelectedStaticGlyphController();
         const bounds = glyph?.getSelectionBounds(
@@ -392,9 +385,8 @@ export default class TransformationPanel extends Panel {
           }, "set dimensions");
         }
       },
-      "class": "ui-form-icon ui-form-icon-button",
-      "data-tooltip": translate("sidebar.selection-info.dimensions"),
-      "data-tooltipposition": "top",
+      class: "ui-form-icon ui-form-icon-button",
+      title: translate("sidebar.selection-info.dimensions"),
     });
 
     formContents.push({
@@ -431,11 +423,10 @@ export default class TransformationPanel extends Panel {
         type: "auxiliaryElement",
         key: "FlipVertically",
         auxiliaryElement: html.createDomElement("icon-button", {
-          "class": "ui-form-icon",
-          "src": "/tabler-icons/flip-vertical.svg",
-          "data-tooltip": translate("sidebar.selection-transformation.flip.vertically"),
-          "data-tooltipposition": "top",
-          "onclick": (event) =>
+          class: "ui-form-icon",
+          src: "/tabler-icons/flip-vertical.svg",
+          title: translate("sidebar.selection-transformation.flip.vertically"),
+          onclick: (event) =>
             this.transformSelection(
               () => new Transform().scale(-1, 1),
               "flip vertically"
@@ -446,13 +437,10 @@ export default class TransformationPanel extends Panel {
         type: "auxiliaryElement",
         key: "FlipHorizontally",
         auxiliaryElement: html.createDomElement("icon-button", {
-          "class": "ui-form-icon",
-          "src": "/tabler-icons/flip-horizontal.svg",
-          "data-tooltip": translate(
-            "sidebar.selection-transformation.flip.horizontally"
-          ),
-          "data-tooltipposition": "top-right",
-          "onclick": (event) =>
+          class: "ui-form-icon",
+          src: "/tabler-icons/flip-horizontal.svg",
+          title: translate("sidebar.selection-transformation.flip.horizontally"),
+          onclick: (event) =>
             this.transformSelection(
               () => new Transform().scale(1, -1),
               "flip horizontally"
@@ -473,33 +461,30 @@ export default class TransformationPanel extends Panel {
         type: "auxiliaryElement",
         key: "AlignLeft",
         auxiliaryElement: html.createDomElement("icon-button", {
-          "src": "/tabler-icons/vertical-align-left.svg",
-          "onclick": (event) => this.moveObjects(alignLeft),
-          "class": "ui-form-icon ui-form-icon-button",
-          "data-tooltip": translate("sidebar.selection-transformation.align.left"),
-          "data-tooltipposition": "bottom-left",
+          src: "/tabler-icons/vertical-align-left.svg",
+          onclick: (event) => this.moveObjects(alignLeft),
+          class: "ui-form-icon ui-form-icon-button",
+          title: translate("sidebar.selection-transformation.align.left"),
         }),
       },
       field2: {
         type: "auxiliaryElement",
         key: "AlignCenter",
         auxiliaryElement: html.createDomElement("icon-button", {
-          "src": "/tabler-icons/vertical-align-center.svg",
-          "onclick": (event) => this.moveObjects(alignCenter),
-          "data-tooltip": translate("sidebar.selection-transformation.align.center"),
-          "data-tooltipposition": "bottom",
-          "class": "ui-form-icon",
+          src: "/tabler-icons/vertical-align-center.svg",
+          onclick: (event) => this.moveObjects(alignCenter),
+          title: translate("sidebar.selection-transformation.align.center"),
+          class: "ui-form-icon",
         }),
       },
       field3: {
         type: "auxiliaryElement",
         key: "AlignRight",
         auxiliaryElement: html.createDomElement("icon-button", {
-          "src": "/tabler-icons/vertical-align-right.svg",
-          "onclick": (event) => this.moveObjects(alignRight),
-          "data-tooltip": translate("sidebar.selection-transformation.align.right"),
-          "data-tooltipposition": "bottom-right",
-          "class": "ui-form-icon",
+          src: "/tabler-icons/vertical-align-right.svg",
+          onclick: (event) => this.moveObjects(alignRight),
+          title: translate("sidebar.selection-transformation.align.right"),
+          class: "ui-form-icon",
         }),
       },
     });
@@ -510,33 +495,30 @@ export default class TransformationPanel extends Panel {
         type: "auxiliaryElement",
         key: "AlignTop",
         auxiliaryElement: html.createDomElement("icon-button", {
-          "src": "/tabler-icons/horizontal-align-top.svg",
-          "onclick": (event) => this.moveObjects(alignTop),
-          "class": "ui-form-icon ui-form-icon-button",
-          "data-tooltip": translate("sidebar.selection-transformation.align.top"),
-          "data-tooltipposition": "bottom-left",
+          src: "/tabler-icons/horizontal-align-top.svg",
+          onclick: (event) => this.moveObjects(alignTop),
+          class: "ui-form-icon ui-form-icon-button",
+          title: translate("sidebar.selection-transformation.align.top"),
         }),
       },
       field2: {
         type: "auxiliaryElement",
         key: "AlignMiddle",
         auxiliaryElement: html.createDomElement("icon-button", {
-          "src": "/tabler-icons/horizontal-align-center.svg",
-          "onclick": (event) => this.moveObjects(alignMiddle),
-          "data-tooltip": translate("sidebar.selection-transformation.align.middle"),
-          "data-tooltipposition": "bottom",
-          "class": "ui-form-icon",
+          src: "/tabler-icons/horizontal-align-center.svg",
+          onclick: (event) => this.moveObjects(alignMiddle),
+          title: translate("sidebar.selection-transformation.align.middle"),
+          class: "ui-form-icon",
         }),
       },
       field3: {
         type: "auxiliaryElement",
         key: "AlignMiddle",
         auxiliaryElement: html.createDomElement("icon-button", {
-          "src": "/tabler-icons/horizontal-align-bottom.svg",
-          "onclick": (event) => this.moveObjects(alignBottom),
-          "data-tooltip": translate("sidebar.selection-transformation.align.bottom"),
-          "data-tooltipposition": "bottom-right",
-          "class": "ui-form-icon",
+          src: "/tabler-icons/horizontal-align-bottom.svg",
+          onclick: (event) => this.moveObjects(alignBottom),
+          title: translate("sidebar.selection-transformation.align.bottom"),
+          class: "ui-form-icon",
         }),
       },
     });
@@ -553,37 +535,30 @@ export default class TransformationPanel extends Panel {
         type: "auxiliaryElement",
         key: "distributeHorizontally",
         auxiliaryElement: html.createDomElement("icon-button", {
-          "src": "/tabler-icons/layout-distribute-vertical.svg",
-          "onclick": (event) => this.moveObjects(distributeHorizontally),
-          "data-tooltip": translate(
-            "sidebar.selection-transformation.distribute.horizontally"
-          ),
-          "data-tooltipposition": "top-left",
-          "class": "ui-form-icon ui-form-icon-button",
+          src: "/tabler-icons/layout-distribute-vertical.svg",
+          onclick: (event) => this.moveObjects(distributeHorizontally),
+          title: translate("sidebar.selection-transformation.distribute.horizontally"),
+          class: "ui-form-icon ui-form-icon-button",
         }),
       },
       field2: {
         type: "auxiliaryElement",
         key: "distributeVertically",
         auxiliaryElement: html.createDomElement("icon-button", {
-          "src": "/tabler-icons/layout-distribute-horizontal.svg",
-          "onclick": (event) => this.moveObjects(distributeVertically),
-          "data-tooltip": translate(
-            "sidebar.selection-transformation.distribute.vertically"
-          ),
-          "data-tooltipposition": "top",
-          "class": "ui-form-icon",
+          src: "/tabler-icons/layout-distribute-horizontal.svg",
+          onclick: (event) => this.moveObjects(distributeVertically),
+          title: translate("sidebar.selection-transformation.distribute.vertically"),
+          class: "ui-form-icon",
         }),
       },
       field3: {
-        "type": "edit-number",
-        "key": "customDistributionSpacing",
-        "value": this.transformParameters.customDistributionSpacing,
-        "allowEmptyField": true,
-        "data-tooltip": translate(
+        type: "edit-number",
+        key: "customDistributionSpacing",
+        value: this.transformParameters.customDistributionSpacing,
+        allowEmptyField: true,
+        tooltip: translate(
           "sidebar.selection-transformation.distribute.distance-in-units"
         ),
-        "data-tooltipposition": "top-right",
       },
     });
 
@@ -602,36 +577,33 @@ export default class TransformationPanel extends Panel {
         type: "auxiliaryElement",
         key: "removeOverlaps",
         auxiliaryElement: html.createDomElement("icon-button", {
-          "src": "/tabler-icons/layers-union.svg",
-          "onclick": (event) =>
+          src: "/tabler-icons/layers-union.svg",
+          onclick: (event) =>
             this.doPathOperations(this.pathOperations.unionPath, "union"),
-          "data-tooltip": translate(`${labelKeyPathOperations}.union`),
-          "data-tooltipposition": "top-left",
-          "class": "ui-form-icon ui-form-icon-button",
+          title: translate(`${labelKeyPathOperations}.union`),
+          class: "ui-form-icon ui-form-icon-button",
         }),
       },
       field2: {
         type: "auxiliaryElement",
         key: "subtractContours",
         auxiliaryElement: html.createDomElement("icon-button", {
-          "src": "/tabler-icons/layers-subtract.svg",
-          "onclick": (event) =>
+          src: "/tabler-icons/layers-subtract.svg",
+          onclick: (event) =>
             this.doPathOperations(this.pathOperations.subtractPath, "subtract"),
-          "data-tooltip": translate(`${labelKeyPathOperations}.subtract`),
-          "data-tooltipposition": "top",
-          "class": "ui-form-icon",
+          title: translate(`${labelKeyPathOperations}.subtract`),
+          class: "ui-form-icon",
         }),
       },
       field3: {
         type: "auxiliaryElement",
         key: "intersectContours",
         auxiliaryElement: html.createDomElement("icon-button", {
-          "src": "/tabler-icons/layers-intersect-2.svg",
-          "onclick": (event) =>
+          src: "/tabler-icons/layers-intersect-2.svg",
+          onclick: (event) =>
             this.doPathOperations(this.pathOperations.intersectPath, "intersect"),
-          "data-tooltip": translate(`${labelKeyPathOperations}.intersect`),
-          "data-tooltipposition": "top-right",
-          "class": "ui-form-icon",
+          title: translate(`${labelKeyPathOperations}.intersect`),
+          class: "ui-form-icon",
         }),
       },
     });
@@ -642,12 +614,11 @@ export default class TransformationPanel extends Panel {
         type: "auxiliaryElement",
         key: "excludeContours",
         auxiliaryElement: html.createDomElement("icon-button", {
-          "src": "/tabler-icons/layers-difference.svg",
-          "onclick": (event) =>
+          src: "/tabler-icons/layers-difference.svg",
+          onclick: (event) =>
             this.doPathOperations(this.pathOperations.excludePath, "exclude"),
-          "data-tooltip": translate(`${labelKeyPathOperations}.exclude`),
-          "data-tooltipposition": "top-left",
-          "class": "ui-form-icon ui-form-icon-button",
+          title: translate(`${labelKeyPathOperations}.exclude`),
+          class: "ui-form-icon ui-form-icon-button",
         }),
       },
       field2: {},

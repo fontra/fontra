@@ -271,7 +271,9 @@ export function getBaseKeyFromKeyEvent(event) {
       fetchKeyboardLayout();
     }
     baseKey = currentKeyboardLayoutMap.get(event.code);
-  } else if ([...event.key].length === 1) {
+  }
+
+  if (!baseKey && [...event.key].length === 1) {
     // Use deprecated .keyCode property: "best effort"
     baseKey =
       ((event.code.length == 4 && event.code.slice(0, 3) == "Key") ||

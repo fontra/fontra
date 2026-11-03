@@ -1,9 +1,14 @@
 import { applicationSettingsController } from "@fontra/core/application-settings.js";
 import { getGlyphInfoFromCodePoint } from "@fontra/core/glyph-data.js";
 import * as html from "@fontra/core/html-utils.js";
+import { NumberFormatter } from "@fontra/core/formatters.js";
 import { translate } from "@fontra/core/localization.js";
 import { features, languages, scripts } from "@fontra/core/opentype-tags.js";
-import { labeledCheckbox, labeledPopupSelect } from "@fontra/core/ui-utils.js";
+import {
+  labeledCheckbox,
+  labeledPopupSelect,
+  labeledTextInput,
+} from "@fontra/core/ui-utils.js";
 import { findNestedActiveElement } from "@fontra/core/utils.ts";
 import { showMenu } from "@fontra/web-components/menu-panel.js";
 import {
@@ -115,37 +120,6 @@ export default class TextEntryPanel extends Panel {
       align-content: start;
     }
 
-    #text-align-menu {
-      display: grid;
-      grid-template-columns: auto auto auto;
-      justify-content: start;
-      gap: 0.5em;
-    }
-
-    #text-align-menu > inline-svg {
-      width: 1.5rem;
-      height: 1.5rem;
-      position: relative;
-      padding: 0.3em 0.45em 0.3em 0.45em;
-      border-radius: 0.75em;
-      cursor: pointer;
-      user-select: none;
-      transition: 120ms;
-      box-sizing: content-box; /* FIXME: use border-box */
-    }
-
-    #text-align-menu > inline-svg:hover {
-      background-color: #c0c0c050;
-    }
-
-    #text-align-menu > inline-svg:active {
-      background-color: #c0c0c080;
-    }
-
-    #text-align-menu > inline-svg.selected {
-      background-color: #c0c0c060;
-    }
-
     #text-entry-textarea {
       background-color: var(--text-input-background-color);
       color: var(--text-input-foreground-color);
@@ -179,7 +153,6 @@ export default class TextEntryPanel extends Panel {
     );
 
     this.setupTextEntryElement();
-    this.setupTextAlignElement();
     this.setupAccordionElement();
     this.setupIntersectionObserver();
   }
@@ -200,26 +173,6 @@ export default class TextEntryPanel extends Panel {
               wrap: "off",
               id: "text-entry-textarea",
             }),
-            html.div(
-              {
-                id: "text-align-menu",
-              },
-              [
-                html.createDomElement("inline-svg", {
-                  "data-align": "left",
-                  "src": "/images/alignleft.svg",
-                }),
-                html.createDomElement("inline-svg", {
-                  "class": "selected",
-                  "data-align": "center",
-                  "src": "/images/aligncenter.svg",
-                }),
-                html.createDomElement("inline-svg", {
-                  "data-align": "right",
-                  "src": "/images/alignright.svg",
-                }),
-              ]
-            ),
             html.div({ id: "text-settings-accordion" }),
           ]
         ),
@@ -238,7 +191,7 @@ export default class TextEntryPanel extends Panel {
       return null;
     }
 
-    const { shaper, messages, canEmulateSomeGPOS } = await shaperInfoPromise;
+    const { shaper, messages } = await shaperInfoPromise;
 
     if (applyTextShaping != this.textSettings.applyTextShaping) {
       // The setting was changed since we were called: ignore, or else we may
@@ -261,8 +214,8 @@ export default class TextEntryPanel extends Panel {
 
   _makeResetFeaturesButton(tableTag) {
     return html.createDomElement("icon-button", {
-      "src": "/tabler-icons/refresh.svg",
-      "onclick": async (event) => {
+      src: "/tabler-icons/refresh.svg",
+      onclick: async (event) => {
         const shaper = await this.getShaper();
         if (!shaper) {
           return;
@@ -274,8 +227,7 @@ export default class TextEntryPanel extends Panel {
         });
         this.textSettings.featureSettings = featureSettings;
       },
-      "data-tooltip": translate("sidebar.text-entry.reset-features", tableTag),
-      "data-tooltipposition": "left",
+      title: translate("sidebar.text-entry.reset-features", tableTag),
     });
   }
 
@@ -303,19 +255,27 @@ export default class TextEntryPanel extends Panel {
     return this.accordion.querySelector("#gpos-features-contents");
   }
 
-  updateAlignElement(align) {
-    for (const el of this.textAlignElement.children) {
-      el.classList.toggle("selected", align === el.dataset.align);
-    }
-  }
-
-  setupTextAlignElement() {
-    this.textAlignElement = this.contentElement.querySelector("#text-align-menu");
-    this.updateAlignElement(this.textSettings.align);
-
-    this.textSettingsController.addKeyListener("align", (event) => {
-      this.updateAlignElement(this.textSettings.align);
-    });
+  makeTextOptionsElement() {
+    this.textAlignElement = html.div(
+      {
+        id: "text-align-menu",
+      },
+      [
+        html.createDomElement("inline-svg", {
+          "data-align": "left",
+          "src": "/tabler-icons/align-left.svg",
+        }),
+        html.createDomElement("inline-svg", {
+          "class": "selected",
+          "data-align": "center",
+          "src": "/tabler-icons/align-center.svg",
+        }),
+        html.createDomElement("inline-svg", {
+          "data-align": "right",
+          "src": "/tabler-icons/align-right.svg",
+        }),
+      ]
+    );
 
     for (const el of this.textAlignElement.children) {
       el.onclick = (event) => {
@@ -325,6 +285,43 @@ export default class TextEntryPanel extends Panel {
         this.textSettings.align = el.dataset.align;
       };
     }
+
+    this.textSettingsController.addKeyListener("align", (event) => {
+      this.updateAlignElement(this.textSettings.align);
+    });
+
+    this.updateAlignElement(this.textSettings.align);
+
+    const textSizeInput = labeledTextInput(
+      translate("sidebar.text-entry.text-layout-options.text-size"),
+      this.textSettingsController,
+      "textSize",
+      {
+        formatter: NumberFormatter,
+        continuous: false,
+        id: "text-size-input",
+      }
+    );
+
+    const lineHeightInput = labeledTextInput(
+      translate("sidebar.text-entry.text-layout-options.line-height"),
+      this.textSettingsController,
+      "lineHeight",
+      {
+        formatter: NumberFormatter,
+        continuous: false,
+        id: "line-height-input",
+      }
+    );
+
+    return html.div({ id: "text-options-container" }, [
+      html.label({ style: "white-space: nowrap; text-align: right;" }, [
+        translate("sidebar.text-entry.text-layout-options.align"),
+      ]),
+      this.textAlignElement,
+      ...textSizeInput,
+      ...lineHeightInput,
+    ]);
   }
 
   setupTextEntryElement() {
@@ -370,6 +367,12 @@ export default class TextEntryPanel extends Panel {
     );
   }
 
+  updateAlignElement(align) {
+    for (const el of this.textAlignElement.children) {
+      el.classList.toggle("selected", align === el.dataset.align);
+    }
+  }
+
   setupAccordionElement() {
     this.textSettingsController.addKeyListener("textScript", async (event) => {
       const shaper = await this.getShaper();
@@ -380,10 +383,71 @@ export default class TextEntryPanel extends Panel {
 
     this.accordion = new Accordion();
     this.accordion.appendStyle(`
+      #text-options-container {
+        display: grid;
+        grid-template-columns: min-content min-content;
+        align-items: center;
+        gap: 0.5em;
+      }
+
+      #text-align-menu {
+        display: grid;
+        grid-template-columns: auto auto auto;
+        justify-content: start;
+        gap: 0.25em;
+      }
+
+      #text-align-menu > inline-svg {
+        width: 1.1rem;
+        height: 1.1rem;
+        position: relative;
+        padding: 0.2em 0.3em 0.2em 0.3em;
+        border-radius: 0.4em;
+        cursor: pointer;
+        user-select: none;
+        transition: 120ms;
+        box-sizing: content-box; /* FIXME: use border-box */
+      }
+
+      #text-align-menu > inline-svg:hover {
+        background-color: #c0c0c050;
+      }
+
+      #text-align-menu > inline-svg:active {
+        background-color: #c0c0c080;
+      }
+
+      #text-align-menu > inline-svg.selected {
+        background-color: #c0c0c060;
+      }
+
+      input[type="text"] {
+        background-color: var(--text-input-background-color);
+        color: var(--text-input-foreground-color);
+        border-radius: 0.25em;
+        border: none;
+        outline: none;
+        padding: 0.1em 0.3em;
+        font-family: fontra-ui-regular, sans-serif;
+        font-size: 100%;
+      }
+
+      .labeled-thing {
+        display: flex;
+        gap: 0.3em;
+        align-items: center;
+      }
+
+      #text-size-input,
+      #line-height-input {
+        width: 4.5em;
+      }
+
       .features-container {
         display: grid;
         grid-template-columns: min-content auto;
         align-items: center;
+        justify-items: start;
         gap: 0.4em;
         padding: 2px;
       }
@@ -501,6 +565,12 @@ export default class TextEntryPanel extends Panel {
     this.textLanguageOptions = [{ label: "Default (dflt)", value: null }];
 
     this.accordion.items = [
+      {
+        id: "text-layout-options-item",
+        label: translate("sidebar.text-entry.text-layout-options"),
+        open: true,
+        content: this.makeTextOptionsElement(),
+      },
       {
         id: "shaping-options-accordion-item",
         label: translate("sidebar.text-entry.text-shaping-options"),
@@ -716,17 +786,6 @@ export default class TextEntryPanel extends Panel {
     }
 
     this.textLanguageOptions.splice(1, Infinity, ...languageOptions);
-  }
-
-  getFeatureInfo(shaper, tableTag) {
-    const info = shaper.getFeatureInfo(tableTag);
-    if (tableTag == "GPOS" && this.canEmulateSomeGPOS) {
-      info["curs-emulated"] = {};
-      info["kern-emulated"] = {};
-      info["mark-emulated"] = {};
-      info["mkmk-emulated"] = {};
-    }
-    return info;
   }
 
   fixTextEntryHeight() {

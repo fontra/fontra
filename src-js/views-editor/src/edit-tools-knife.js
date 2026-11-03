@@ -114,7 +114,7 @@ registerVisualizationLayerDefinition({
   screenParameters: { strokeWidth: 1, nodeSize: 10 },
   colors: { strokeColor: "#1118", nodeColor: "#3080FF80" },
   colorsDarkMode: { strokeColor: "#FFFB", nodeColor: "#50A0FF80" },
-  draw: (context, positionedGlyph, parameters, model, controller) => {
+  draw: ({ context, positionedGlyph, parameters, model, controller }) => {
     const pointA = model.knifeToolPointA;
     const pointB = model.knifeToolPointB;
     if (!pointA || !pointB) {

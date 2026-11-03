@@ -48,7 +48,7 @@ registerVisualizationLayerDefinition({
   screenParameters: { strokeWidth: 2 },
   colors: { strokeColor: "#FFF" },
   colorsDarkMode: { strokeColor: "#3C3C3C" },
-  draw: (context, positionedGlyph, parameters, model, controller) => {
+  draw: ({ context, positionedGlyph, parameters, model, controller }) => {
     if (controller.magnification < 4) {
       return;
     }
@@ -73,7 +73,7 @@ registerVisualizationLayerDefinition({
   name: "Empty selected glyph",
   selectionFunc: glyphSelector("selected"),
   selectionFilter: (positionedGlyph) => positionedGlyph.isEmpty,
-  zIndex: 200,
+  zIndex: 50,
   colors: { fillColor: "#D8D8D8" /* Must be six hex digits */ },
   colorsDarkMode: { fillColor: "#585858" /* Must be six hex digits */ },
   draw: _drawEmptyGlyphLayer,
@@ -84,13 +84,19 @@ registerVisualizationLayerDefinition({
   name: "Empty hovered glyph",
   selectionFunc: glyphSelector("hovered"),
   selectionFilter: (positionedGlyph) => positionedGlyph.isEmpty,
-  zIndex: 200,
+  zIndex: 50,
   colors: { fillColor: "#E8E8E8" /* Must be six hex digits */ },
   colorsDarkMode: { fillColor: "#484848" /* Must be six hex digits */ },
   draw: _drawEmptyGlyphLayer,
 });
 
-function _drawEmptyGlyphLayer(context, positionedGlyph, parameters, model, controller) {
+function _drawEmptyGlyphLayer({
+  context,
+  positionedGlyph,
+  parameters,
+  model,
+  controller,
+}) {
   const box = positionedGlyph.unpositionedBounds;
   const fillColor = parameters.fillColor;
   if (fillColor[0] === "#" && fillColor.length === 7) {
@@ -114,7 +120,7 @@ registerVisualizationLayerDefinition({
   zIndex: 200,
   colors: { fillColor: "#000", errorColor: "#AAA" },
   colorsDarkMode: { fillColor: "#FFF", errorColor: "#999" },
-  draw: (context, positionedGlyph, parameters, model, controller) => {
+  draw: ({ context, positionedGlyph, parameters, model, controller }) => {
     context.fillStyle = positionedGlyph.glyph.errors?.length
       ? parameters.errorColor
       : parameters.fillColor;
@@ -138,7 +144,7 @@ registerVisualizationLayerDefinition({
     fillColor: "#FFF6",
     emptyFillColor: "#FFF2",
   },
-  draw: (context, positionedGlyph, parameters, model, controller) => {
+  draw: ({ context, positionedGlyph, parameters, model, controller }) => {
     context.fillStyle = positionedGlyph.isUndefined
       ? parameters.fillColor
       : parameters.emptyFillColor;
@@ -196,7 +202,7 @@ registerVisualizationLayerDefinition({
   screenParameters: { strokeWidth: 1 },
   colors: { strokeColor: "#0004" },
   colorsDarkMode: { strokeColor: "#FFF6" },
-  draw: (context, positionedGlyph, parameters, model, controller) => {
+  draw: ({ context, positionedGlyph, parameters, model, controller }) => {
     context.strokeStyle = parameters.strokeColor;
     context.lineWidth = parameters.strokeWidth;
     strokeLine(context, 0, 0, positionedGlyph.glyph.xAdvance, 0);
@@ -221,7 +227,7 @@ registerVisualizationLayerDefinition({
     zoneColor: "#00BFFF18",
     zoneStrokeColor: "#80DFFF18",
   },
-  draw: (context, positionedGlyph, parameters, model, controller) => {
+  draw: ({ context, positionedGlyph, parameters, model, controller }) => {
     context.lineWidth = parameters.strokeWidth;
 
     if (!model.fontSourceInstance) {
@@ -306,7 +312,13 @@ registerVisualizationLayerDefinition({
   draw: _drawGlyphLockIcon,
 });
 
-function _drawGlyphLockIcon(context, positionedGlyph, parameters, model, controller) {
+function _drawGlyphLockIcon({
+  context,
+  positionedGlyph,
+  parameters,
+  model,
+  controller,
+}) {
   if (
     !!positionedGlyph.varGlyph?.glyph.customData["fontra.glyph.locked"] ||
     model.fontController.readOnly
@@ -334,7 +346,7 @@ registerVisualizationLayerDefinition({
   colors: { strokeColor: "#999" },
   colorsDarkMode: { strokeColor: "#999" },
 
-  draw: (context, positionedGlyph, parameters, model, controller) => {
+  draw: ({ context, positionedGlyph, parameters, model, controller }) => {
     context.strokeStyle = parameters.strokeColor;
     context.lineWidth = parameters.strokeWidth;
     for (const anchor of positionedGlyph.glyph.anchors) {
@@ -356,7 +368,7 @@ registerVisualizationLayerDefinition({
   },
   colors: { hoveredColor: "#BBB", selectedColor: "#000", underColor: "#FFFA" },
   colorsDarkMode: { hoveredColor: "#BBB", selectedColor: "#FFF", underColor: "#0008" },
-  draw: (context, positionedGlyph, parameters, model, controller) => {
+  draw: ({ context, positionedGlyph, parameters, model, controller }) => {
     const glyph = positionedGlyph.glyph;
     const smoothSize = parameters.smoothSize;
 
@@ -406,7 +418,7 @@ registerVisualizationLayerDefinition({
   screenParameters: { fontSize: 10, marginFromTop: 6 },
   colors: { boxColor: "#FFFB", color: "#000" },
   colorsDarkMode: { boxColor: "#1118", color: "#FFF" },
-  draw: (context, positionedGlyph, parameters, model, controller) => {
+  draw: ({ context, positionedGlyph, parameters, model, controller }) => {
     const fontSize = parameters.fontSize;
     const marginFromTop = parameters.marginFromTop;
 
@@ -442,7 +454,9 @@ registerVisualizationLayerDefinition({
 registerVisualizationLayerDefinition({
   identifier: "fontra.background-image",
   name: "sidebar.user-settings.glyph.background-image",
-  selectionFunc: glyphSelector("editing"),
+  selectionFunc: glyphSelector("all"),
+  selectionFilter: (positionedGlyph) =>
+    positionedGlyph.isEditing || positionedGlyph.isEmpty,
   userSwitchable: true,
   defaultOn: true,
   zIndex: 50,
@@ -452,7 +466,7 @@ registerVisualizationLayerDefinition({
   colors: { strokeColor: "#888", hoverStrokeColor: "#8885" },
   colorsDarkMode: { strokeColor: "#FFF", hoverStrokeColor: "#FFF5" },
 
-  draw: (context, positionedGlyph, parameters, model, controller) => {
+  draw: ({ context, positionedGlyph, parameters, model, controller }) => {
     const backgroundImage = positionedGlyph.glyph.backgroundImage;
     if (!backgroundImage) {
       return;
@@ -530,16 +544,42 @@ registerVisualizationLayerDefinition({
     strokeDash: 3,
     margin: 5,
     iconSize: 12,
+    smoothSize: 8,
+    hoverStrokeOffset: 4,
+    underlayOffset: 2,
   },
   colors: {
     strokeColor: "#0006",
+    hoveredStrokeColor: "#0001",
+    selectedStrokeColor: "#0002",
+    hoveredSelectedStrokeColor: "#0000002B",
     strokeColorFontGuideline: "#00BFFF",
+    hoveredColorIcon: "#0006",
+    hoveredColor: "#BBB",
+    selectedColor: "#000",
+    underColor: "#FFFA",
+    underColorIcon: "#F6F6F6",
   },
   colorsDarkMode: {
     strokeColor: "#FFF8",
+    hoveredStrokeColor: "#FFFFFF18",
+    selectedStrokeColor: "#FFF3",
+    hoveredSelectedStrokeColor: "#FFF4",
     strokeColorFontGuideline: "#00BFFFC0",
+    hoveredColorIcon: "#BBB",
+    hoveredColor: "#BBB",
+    selectedColor: "#FFF",
+    underColor: "#0008",
+    underColorIcon: "#333",
   },
-  draw: (context, positionedGlyph, parameters, model, controller) => {
+  draw: ({ context, positionedGlyph, parameters, model, controller }) => {
+    const glyph = positionedGlyph.glyph;
+    const smoothSize = parameters.smoothSize;
+
+    const hoveredGuidelineIndices =
+      parseSelection(model.hoverSelection).guideline ?? [];
+    const selectedGuidelineIndices = parseSelection(model.selection).guideline ?? [];
+
     context.font = `${parameters.fontSize}px fontra-ui-regular, sans-serif`;
     context.textAlign = "center";
     const { xMin, yMin, xMax, yMax } = controller.getViewBox();
@@ -549,132 +589,38 @@ registerVisualizationLayerDefinition({
     );
 
     // Draw glyph guidelines
-    for (const guideline of positionedGlyph.glyph.guidelines) {
-      _drawGuideline(context, parameters, guideline, parameters.strokeColor);
-    }
+    for (const [index, guideline] of enumerate(glyph.guidelines)) {
+      const isHovered = hoveredGuidelineIndices.includes(index);
+      const isSelected = selectedGuidelineIndices.includes(index);
 
-    // Draw font guidelines
-    if (!model.fontSourceInstance) {
-      return;
-    }
-    for (const guideline of model.fontSourceInstance.guidelines) {
       _drawGuideline(
         context,
         parameters,
         guideline,
-        parameters.strokeColorFontGuideline
+        parameters.strokeColor,
+        isSelected && isHovered
+          ? parameters.hoveredSelectedStrokeColor
+          : isSelected
+            ? parameters.selectedStrokeColor
+            : isHovered
+              ? parameters.hoveredStrokeColor
+              : null
       );
     }
-  },
-});
 
-function _drawGuideline(context, parameters, guideline, strokeColor) {
-  withSavedState(context, () => {
-    context.strokeStyle = strokeColor;
-    context.lineWidth = parameters.strokeWidth;
-    //translate to guideline origin
-    context.translate(guideline.x, guideline.y);
-
-    //draw lock icon or the "node"
-    if (guideline.locked) {
-      _drawLockIcon(
-        context,
-        -parameters.iconSize / 2,
-        parameters.iconSize / 2,
-        strokeColor,
-        parameters.iconSize
-      );
-    } else {
-      strokeCircle(context, 0, 0, parameters.originMarkerRadius);
+    // Draw font guidelines
+    if (model.fontSourceInstance) {
+      for (const guideline of model.fontSourceInstance.guidelines) {
+        _drawGuideline(
+          context,
+          parameters,
+          guideline,
+          parameters.strokeColorFontGuideline
+        );
+      }
     }
 
-    withSavedState(context, () => {
-      context.rotate((guideline.angle * Math.PI) / 180);
-      context.scale(1, -1);
-
-      let textWidth;
-      let moveText;
-      const halfMarker = parameters.originMarkerRadius / 2 + parameters.strokeWidth * 2;
-      // draw name
-      if (guideline.name) {
-        const strLine = `${guideline.name}`;
-        textWidth = context.measureText(strLine).width;
-        const textVerticalCenter = getTextVerticalCenter(context, strLine);
-
-        context.fillStyle = strokeColor;
-        moveText =
-          0 - // this is centered to the guideline origin
-          textWidth / 2 - // move half width left -> right aligned to origin
-          halfMarker - // move half of the marker radius left + stroke width
-          parameters.margin * // move one margin to left to get a short line on the left
-            2; // move another margin left to get the margin on the right
-        context.fillText(strLine, moveText, textVerticalCenter);
-      }
-
-      // collect lines
-      let lines = [[halfMarker, parameters.strokeLength]];
-      if (guideline.name) {
-        // with name
-        lines.push([
-          -textWidth / 2 + moveText - parameters.margin,
-          -parameters.strokeLength,
-        ]);
-        lines.push([-parameters.margin * 2, -halfMarker]);
-      } else {
-        // without name
-        lines.push([-halfMarker, -parameters.strokeLength]);
-      }
-      // draw lines
-      for (const [x1, x2] of lines) {
-        strokeLineDashed(context, x1, 0, x2, 0, [
-          parameters.strokeDash * 2,
-          parameters.strokeDash,
-        ]);
-      }
-    });
-  });
-}
-
-registerVisualizationLayerDefinition({
-  identifier: "fontra.selected.guidelines",
-  name: "Selected guidelines",
-  selectionFunc: glyphSelector("editing"),
-  zIndex: 500,
-  screenParameters: {
-    smoothSize: 8,
-    strokeWidth: 1,
-    hoverStrokeOffset: 4,
-    underlayOffset: 2,
-    iconSize: 12,
-  },
-  colors: {
-    hoveredColorIcon: "#0006",
-    hoveredColor: "#BBB",
-    selectedColor: "#000",
-    underColor: "#FFFA",
-    underColorIcon: "#f6f6f6",
-  },
-  colorsDarkMode: {
-    hoveredColorIcon: "#BBB",
-    hoveredColor: "#BBB",
-    selectedColor: "#FFF",
-    underColor: "#0008",
-    underColorIcon: "#333",
-  },
-  draw: (context, positionedGlyph, parameters, model, controller) => {
-    const glyph = positionedGlyph.glyph;
-    const smoothSize = parameters.smoothSize;
-
-    const {
-      guideline: hoveredGuidelineIndices,
-      fontGuideline: hoveredFontGuidelineIndices,
-    } = parseSelection(model.hoverSelection);
-    const {
-      guideline: selectedGuidelineIndices,
-      fontGuideline: selectedFontGuidelineIndices,
-    } = parseSelection(model.selection);
-
-    // TODO: Font Guidelines
+    // Hover / selection
 
     // Under layer
     context.fillStyle = parameters.underColor;
@@ -747,6 +693,84 @@ registerVisualizationLayerDefinition({
   },
 });
 
+function _drawGuideline(context, parameters, guideline, strokeColor, underStrokeColor) {
+  withSavedState(context, () => {
+    context.strokeStyle = strokeColor;
+    context.lineWidth = parameters.strokeWidth;
+    context.translate(guideline.x, guideline.y);
+
+    // Draw lock icon or the "node"
+    if (guideline.locked) {
+      _drawLockIcon(
+        context,
+        -parameters.iconSize / 2,
+        parameters.iconSize / 2,
+        strokeColor,
+        parameters.iconSize
+      );
+    } else {
+      strokeCircle(context, 0, 0, parameters.originMarkerRadius);
+    }
+
+    withSavedState(context, () => {
+      context.rotate((guideline.angle * Math.PI) / 180);
+      context.scale(1, -1);
+
+      let textWidth;
+      let moveText;
+      const halfMarker = parameters.originMarkerRadius / 2 + parameters.strokeWidth * 2;
+      // Draw name
+      if (guideline.name) {
+        const strLine = `${guideline.name}`;
+        textWidth = context.measureText(strLine).width;
+        const textVerticalCenter = getTextVerticalCenter(context, strLine);
+
+        context.fillStyle = strokeColor;
+        moveText =
+          0 - // this is centered to the guideline origin
+          textWidth / 2 - // move half width left -> right aligned to origin
+          halfMarker - // move half of the marker radius left + stroke width
+          parameters.margin * // move one margin to left to get a short line on the left
+            2; // move another margin left to get the margin on the right
+        context.fillText(strLine, moveText, textVerticalCenter);
+      }
+
+      // Collect lines
+      let lines = [[halfMarker, parameters.strokeLength]];
+      if (guideline.name) {
+        // With name
+        lines.push([
+          -textWidth / 2 + moveText - parameters.margin,
+          -parameters.strokeLength,
+        ]);
+        lines.push([-parameters.margin * 2, -halfMarker]);
+      } else {
+        // Without name
+        lines.push([-halfMarker, -parameters.strokeLength]);
+      }
+
+      // Draw lines
+
+      if (underStrokeColor) {
+        context.strokeStyle = underStrokeColor;
+        context.lineWidth = parameters.strokeWidth * 3;
+        for (const [x1, x2] of lines) {
+          strokeLine(context, x1, 0, x2, 0);
+        }
+      }
+
+      context.lineWidth = parameters.strokeWidth;
+      context.strokeStyle = strokeColor;
+      for (const [x1, x2] of lines) {
+        strokeLineDashed(context, x1, 0, x2, 0, [
+          parameters.strokeDash * 2,
+          parameters.strokeDash,
+        ]);
+      }
+    });
+  });
+}
+
 function _drawLockIcon(context, x, y, strokeColor, iconSize, lineWidth = 2) {
   withSavedState(context, () => {
     context.translate(x, y);
@@ -767,7 +791,7 @@ registerVisualizationLayerDefinition({
   screenParameters: { strokeWidth: 1, lineDash: [4, 4] },
   colors: { strokeColor: "#8888" },
   colorsDarkMode: { strokeColor: "#AAA8" },
-  draw: (context, positionedGlyph, parameters, model, controller) => {
+  draw: ({ context, positionedGlyph, parameters, model, controller }) => {
     const pointIndex = model.initialClickedPointIndex;
     if (pointIndex === undefined) {
       return;
@@ -794,7 +818,7 @@ registerVisualizationLayerDefinition({
   screenParameters: { strokeWidth: 1 },
   colors: { strokeColor: "#AAA6" },
   colorsDarkMode: { strokeColor: "#8886" },
-  draw: (context, positionedGlyph, parameters, model, controller) => {
+  draw: ({ context, positionedGlyph, parameters, model, controller }) => {
     if (!model.ghostPath) {
       return;
     }
@@ -813,7 +837,7 @@ registerVisualizationLayerDefinition({
   screenParameters: { strokeWidth: 1 },
   colors: { fillColor: "#0001" },
   colorsDarkMode: { fillColor: "#FFF3" },
-  draw: (context, positionedGlyph, parameters, model, controller) => {
+  draw: ({ context, positionedGlyph, parameters, model, controller }) => {
     context.fillStyle = parameters.fillColor;
     context.fill(positionedGlyph.glyph.closedContoursPath2d);
   },
@@ -843,7 +867,7 @@ registerVisualizationLayerDefinition({
   draw: _drawSelectedGlyphLayer,
 });
 
-function _drawSelectedGlyphLayer(context, positionedGlyph, parameters) {
+function _drawSelectedGlyphLayer({ context, positionedGlyph, parameters }) {
   drawWithDoubleStroke(
     context,
     positionedGlyph.glyph.flattenedPath2d,
@@ -879,7 +903,7 @@ registerVisualizationLayerDefinition({
     originMarkerColor: "#BBB",
     tCenterMarkerColor: "#DDD",
   },
-  draw: (context, positionedGlyph, parameters, model, controller) => {
+  draw: ({ context, positionedGlyph, parameters, model, controller }) => {
     const glyph = positionedGlyph.glyph;
 
     const selectedItems = parseComponentSelection(
@@ -1051,7 +1075,7 @@ registerVisualizationLayerDefinition({
   screenParameters: { radius: 9, strokeWidth: 2 },
   colors: { color: "#989898A0" },
   colorsDarkMode: { color: "#989898A0" },
-  draw: (context, positionedGlyph, parameters, model, controller) => {
+  draw: ({ context, positionedGlyph, parameters, model, controller }) => {
     const glyph = positionedGlyph.glyph;
     context.strokeStyle = parameters.color;
     context.lineWidth = parameters.strokeWidth;
@@ -1089,7 +1113,7 @@ registerVisualizationLayerDefinition({
   screenParameters: { fontSize: 11 },
   colors: { boxColor: "#FFFB", color: "#000" },
   colorsDarkMode: { boxColor: "#1118", color: "#FFF" },
-  draw: (context, positionedGlyph, parameters, model, controller) => {
+  draw: ({ context, positionedGlyph, parameters, model, controller }) => {
     const glyph = positionedGlyph.glyph;
     const fontSize = parameters.fontSize;
 
@@ -1136,7 +1160,7 @@ registerVisualizationLayerDefinition({
   screenParameters: { fontSize: 11 },
   colors: { boxColor: "#FFFB", color: "#000" },
   colorsDarkMode: { boxColor: "#1118", color: "#FFF" },
-  draw: (context, positionedGlyph, parameters, model, controller) => {
+  draw: ({ context, positionedGlyph, parameters, model, controller }) => {
     const glyph = positionedGlyph.glyph;
     const fontSize = parameters.fontSize;
 
@@ -1201,7 +1225,7 @@ registerVisualizationLayerDefinition({
   },
   colors: { color: "#BBB5" },
   colorsDarkMode: { color: "#8885" },
-  draw: (context, positionedGlyph, parameters, model, controller) => {
+  draw: ({ context, positionedGlyph, parameters, model, controller }) => {
     const glyph = positionedGlyph.glyph;
     const cornerSize = parameters.cornerSize;
     const smoothSize = parameters.smoothSize;
@@ -1228,7 +1252,7 @@ registerVisualizationLayerDefinition({
   screenParameters: { strokeWidth: 1 },
   colors: { color: "#BBB" },
   colorsDarkMode: { color: "#777" },
-  draw: (context, positionedGlyph, parameters, model, controller) => {
+  draw: ({ context, positionedGlyph, parameters, model, controller }) => {
     const glyph = positionedGlyph.glyph;
     context.strokeStyle = parameters.color;
     context.lineWidth = parameters.strokeWidth;
@@ -1246,7 +1270,7 @@ registerVisualizationLayerDefinition({
   screenParameters: { cornerSize: 8, smoothSize: 8, handleSize: 6.5 },
   colors: { color: "#BBB" },
   colorsDarkMode: { color: "#BBB" },
-  draw: (context, positionedGlyph, parameters, model, controller) => {
+  draw: ({ context, positionedGlyph, parameters, model, controller }) => {
     const glyph = positionedGlyph.glyph;
     const cornerSize = parameters.cornerSize;
     const smoothSize = parameters.smoothSize;
@@ -1274,7 +1298,7 @@ registerVisualizationLayerDefinition({
   },
   colors: { hoveredColor: "#BBB", selectedColor: "#000", underColor: "#FFFA" },
   colorsDarkMode: { hoveredColor: "#BBB", selectedColor: "#FFF", underColor: "#0008" },
-  draw: (context, positionedGlyph, parameters, model, controller) => {
+  draw: ({ context, positionedGlyph, parameters, model, controller }) => {
     const glyph = positionedGlyph.glyph;
     const cornerSize = parameters.cornerSize;
     const smoothSize = parameters.smoothSize;
@@ -1326,7 +1350,7 @@ registerVisualizationLayerDefinition({
   screenParameters: { fontSize: 10 },
   colors: { boxColor: "#FFFB", color: "#000" },
   colorsDarkMode: { boxColor: "#1118", color: "#FFF" },
-  draw: (context, positionedGlyph, parameters, model, controller) => {
+  draw: ({ context, positionedGlyph, parameters, model, controller }) => {
     const glyph = positionedGlyph.glyph;
     const fontSize = parameters.fontSize;
 
@@ -1387,7 +1411,7 @@ registerVisualizationLayerDefinition({
   screenParameters: { fontSize: 10 },
   colors: { boxColor: "#FFFB", color: "#000" },
   colorsDarkMode: { boxColor: "#1118", color: "#FFF" },
-  draw: (context, positionedGlyph, parameters, model, controller) => {
+  draw: ({ context, positionedGlyph, parameters, model, controller }) => {
     const glyph = positionedGlyph.glyph;
     const fontSize = parameters.fontSize;
 
@@ -1438,7 +1462,7 @@ registerVisualizationLayerDefinition({
   },
   colors: { color: "#3080FF80" },
   colorsDarkMode: { color: "#50A0FF80" },
-  draw: (context, positionedGlyph, parameters, model, controller) => {
+  draw: ({ context, positionedGlyph, parameters, model, controller }) => {
     const targetPoint = model.pathConnectTargetPoint;
     const insertHandles = model.pathInsertHandles;
     const danglingOffCurve = model.pathDanglingOffCurve;
@@ -1494,7 +1518,7 @@ registerVisualizationLayerDefinition({
     minThickness: 3,
     maxThickness: 15,
   },
-  draw: (context, positionedGlyph, parameters, model, controller) => {
+  draw: ({ context, positionedGlyph, parameters, model, controller }) => {
     const statusFieldDefinitions =
       model.fontController.customData["fontra.sourceStatusFieldDefinitions"];
     if (!statusFieldDefinitions) {
@@ -1544,6 +1568,67 @@ registerVisualizationLayerDefinition({
 });
 
 registerVisualizationLayerDefinition({
+  identifier: "fontra.edit.background.layers.nodes-and-handles",
+  name: "sidebar.user-settings.glyph.background-nodes-and-handles",
+  userSwitchable: true,
+  defaultOn: false,
+  selectionFunc: glyphSelector("editing"),
+  zIndex: 490,
+  screenParameters: {
+    strokeWidth: 0.5,
+    cornerSize: 5.5,
+    smoothSize: 5.5,
+    handleSize: 4.5,
+  },
+  colors: { backgroundColor: "#DDDF", editColor: "#BBFF" },
+  colorsDarkMode: { backgroundColor: "#555F", editColor: "#559F" },
+
+  draw: ({ context, positionedGlyph, parameters, model, controller }) => {
+    context.lineWidth = parameters.strokeWidth;
+
+    context.strokeStyle = parameters.backgroundColor;
+    context.fillStyle = parameters.backgroundColor;
+
+    drawBackgroundHandlesAndNodes(
+      context,
+      Object.values(model.backgroundLayerGlyphs || {}),
+      parameters.cornerSize,
+      parameters.smoothSize,
+      parameters.handleSize
+    );
+
+    context.strokeStyle = parameters.editColor;
+    context.fillStyle = parameters.editColor;
+
+    drawBackgroundHandlesAndNodes(
+      context,
+      Object.values(model.editingLayerGlyphs || {}),
+      parameters.cornerSize,
+      parameters.smoothSize,
+      parameters.handleSize
+    );
+  },
+});
+
+function drawBackgroundHandlesAndNodes(
+  context,
+  glyphs,
+  cornerSize,
+  smoothSize,
+  handleSize
+) {
+  for (const glyph of glyphs) {
+    for (const [pt1, pt2] of glyph.path.iterHandles()) {
+      strokeLine(context, pt1.x, pt1.y, pt2.x, pt2.y);
+    }
+
+    for (const pt of glyph.path.iterPoints()) {
+      fillNode(context, pt, cornerSize, smoothSize, handleSize);
+    }
+  }
+}
+
+registerVisualizationLayerDefinition({
   identifier: "fontra.edit.background.layers",
   name: "Background glyph layers",
   selectionFunc: glyphSelector("editing"),
@@ -1552,9 +1637,9 @@ registerVisualizationLayerDefinition({
     strokeWidth: 1,
     anchorRadius: 4,
   },
-  colors: { color: "#AAA8", colorAnchor: "#AAA7" },
-  colorsDarkMode: { color: "#8888", colorAnchor: "#8887" },
-  draw: (context, positionedGlyph, parameters, model, controller) => {
+  colors: { color: "#CCCF", colorAnchor: "#DDDF" },
+  colorsDarkMode: { color: "#666F", colorAnchor: "#555F" },
+  draw: ({ context, positionedGlyph, parameters, model, controller }) => {
     context.lineJoin = "round";
     context.lineWidth = parameters.strokeWidth;
     for (const layerGlyph of Object.values(model.backgroundLayerGlyphs || {})) {
@@ -1579,9 +1664,9 @@ registerVisualizationLayerDefinition({
     strokeWidth: 1,
     anchorRadius: 4,
   },
-  colors: { color: "#66FA", colorAnchor: "#66F5" },
-  colorsDarkMode: { color: "#88FA", colorAnchor: "#88F7" },
-  draw: (context, positionedGlyph, parameters, model, controller) => {
+  colors: { color: "#99FF", colorAnchor: "#AAFF" },
+  colorsDarkMode: { color: "#559F", colorAnchor: "#558F" },
+  draw: ({ context, positionedGlyph, parameters, model, controller }) => {
     const primaryEditingInstance = positionedGlyph.glyph;
     context.lineJoin = "round";
     context.lineWidth = parameters.strokeWidth;
@@ -1610,7 +1695,7 @@ registerVisualizationLayerDefinition({
   },
   colors: { color: "#FFF6" },
   colorsDarkMode: { color: "#0004" },
-  draw: (context, positionedGlyph, parameters, model, controller) => {
+  draw: ({ context, positionedGlyph, parameters, model, controller }) => {
     context.lineJoin = "round";
     context.lineWidth = parameters.strokeWidth;
     context.strokeStyle = parameters.color;
@@ -1628,7 +1713,7 @@ registerVisualizationLayerDefinition({
   },
   colors: { color: "#000" },
   colorsDarkMode: { color: "#FFF" },
-  draw: (context, positionedGlyph, parameters, model, controller) => {
+  draw: ({ context, positionedGlyph, parameters, model, controller }) => {
     context.lineJoin = "round";
     context.lineWidth = parameters.strokeWidth;
     context.strokeStyle = parameters.color;
@@ -1645,7 +1730,7 @@ registerVisualizationLayerDefinition({
     strokeWidth: 1,
     lineDash: [10, 10],
   },
-  draw: (context, positionedGlyph, parameters, model, controller) => {
+  draw: ({ context, positionedGlyph, parameters, model, controller }) => {
     if (model.selectionRect === undefined) {
       return;
     }
@@ -1674,7 +1759,7 @@ export const allGlyphsCleanVisualizationLayerDefinition = {
   zIndex: 500,
   colors: { fillColor: "#000" },
   colorsDarkMode: { fillColor: "#FFF" },
-  draw: (context, positionedGlyph, parameters, model, controller) => {
+  draw: ({ context, positionedGlyph, parameters, model, controller }) => {
     context.fillStyle = parameters.fillColor;
     context.fill(positionedGlyph.glyph.flattenedPath2d);
   },
@@ -1840,7 +1925,7 @@ function* iterComponentOriginsByIndex(components, componentIndices) {
 //   glyphParameters: {},  // in glyph units
 //   colors: {},
 //   colorsDarkMode: {},
-//   draw: (context, positionedGlyph, parameters, model, controller) => { /* ... */ },
+//   draw: ({context, positionedGlyph, parameters, model, controller}) => { /* ... */ },
 // }
 
 function drawRoundRect(context, x, y, width, height, radii) {

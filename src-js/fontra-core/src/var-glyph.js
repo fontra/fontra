@@ -70,6 +70,11 @@ export class StaticGlyph {
     return StaticGlyph.fromObject(this);
   }
 
+  move(dx, dy) {
+    const reference = this.getMoveReference();
+    this.moveWithReference(reference, dx, dy);
+  }
+
   getMoveReference() {
     const [x, y] = this.path.getPointPosition(0);
     return {

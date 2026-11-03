@@ -17,7 +17,7 @@ import "@fontra/web-components/add-remove-buttons.js";
 import { IconButton } from "@fontra/web-components/icon-button.js"; // for <icon-button>
 import { dialogSetup } from "@fontra/web-components/modal-dialog.js";
 import { UIList } from "@fontra/web-components/ui-list.js";
-import { BaseInfoPanel } from "./panel-base.js";
+import { showDialogCannotEditReadOnly, BaseInfoPanel } from "./panel-base.js";
 
 const presetAxes = [
   {
@@ -84,11 +84,18 @@ export class AxesPanel extends BaseInfoPanel {
     const axes = this.fontController.axes;
     for (const index of range(axes.axes.length)) {
       axisContainer.appendChild(
-        new AxisBox(axes, index, this.postChange.bind(this), this.deleteAxis.bind(this))
+        new AxisBox(
+          axes,
+          index,
+          this.postChange.bind(this),
+          this.deleteAxis.bind(this),
+          this.fontController.readOnly
+        )
       );
     }
-
-    setupSortableList(axisContainer);
+    if (!this.fontController.readOnly) {
+      setupSortableList(axisContainer);
+    }
 
     axisContainer.addEventListener("reordered", (event) => {
       const reorderedAxes = [];
@@ -117,6 +124,11 @@ export class AxesPanel extends BaseInfoPanel {
   }
 
   async newAxis() {
+    if (this.fontController.readOnly) {
+      showDialogCannotEditReadOnly();
+      return;
+    }
+
     const dialog = await dialogSetup(translate("axes.create"), "", [
       { title: translate("dialog.cancel"), isCancelButton: true },
       { title: translate("axes.add"), resultValue: "ok", isDefaultButton: true },
@@ -228,6 +240,11 @@ export class AxesPanel extends BaseInfoPanel {
   }
 
   async deleteAxis(axisIndex) {
+    if (this.fontController.readOnly) {
+      showDialogCannotEditReadOnly();
+      return;
+    }
+
     const undoLabel = translate(
       "axes.undo.delete",
       this.fontController.axes.axes[axisIndex].name
@@ -270,12 +287,12 @@ addStyleSheet(`
 }
 
 .fontra-ui-font-info-axes-panel-axis-box-mapping-list {
-  width: 9em;
+  width: 10em;
   max-height: var(--fontra-ui-font-info-axes-panel-max-list-height);
 }
 
 .fontra-ui-font-info-axes-panel-axis-box-label-list {
-  max-width: max-content;
+  width: max-content;
   max-height: var(--fontra-ui-font-info-axes-panel-max-list-height);
 }
 
@@ -285,7 +302,7 @@ addStyleSheet(`
 }
 
 select {
-  font-family: "fontra-ui-regular";
+  font-family: "fontra-ui-regular", sans-serif;
 }
 
 .fontra-ui-font-info-axes-panel-axis-box-header {
@@ -298,14 +315,15 @@ select {
 `);
 
 class AxisBox extends HTMLElement {
-  constructor(axes, axisIndex, postChange, deleteAxis) {
+  constructor(axes, axisIndex, postChange, deleteAxis, readOnly) {
     super();
     this.classList.add("fontra-ui-font-info-axes-panel-axis-box");
-    this.draggable = true;
+    this.draggable = !readOnly;
     this.axes = axes;
     this.axisIndex = axisIndex;
     this.postChange = postChange;
     this.deleteAxis = deleteAxis;
+    this.readOnly = readOnly;
     this._updateContents();
   }
 
@@ -314,6 +332,12 @@ class AxisBox extends HTMLElement {
   }
 
   editAxis(editFunc, undoLabel) {
+    if (this.readOnly) {
+      showDialogCannotEditReadOnly();
+      this._updateContents();
+      return;
+    }
+
     const root = { axes: this.axes };
     const changes = recordChanges(root, (root) => {
       editFunc(root.axes.axes[this.axisIndex]);
@@ -324,6 +348,12 @@ class AxisBox extends HTMLElement {
   }
 
   replaceAxis(newAxis, undoLabel) {
+    if (this.readOnly) {
+      showDialogCannotEditReadOnly();
+      this._updateContents();
+      return;
+    }
+
     const root = { axes: this.axes };
     const changes = recordChanges(root, (root) => {
       root.axes.axes[this.axisIndex] = newAxis;
@@ -415,11 +445,10 @@ class AxisBox extends HTMLElement {
         translate("axes.axis-values"),
       ]),
       html.createDomElement("icon-button", {
-        "class": "fontra-ui-font-info-axes-panel-axis-box-delete",
-        "src": "/tabler-icons/trash.svg",
-        "onclick": (event) => this.deleteAxis(this.axisIndex),
-        "data-tooltip": translate("axes.delete-axis"),
-        "data-tooltipposition": "left",
+        class: "fontra-ui-font-info-axes-panel-axis-box-delete",
+        src: "/tabler-icons/trash.svg",
+        onclick: (event) => this.deleteAxis(this.axisIndex),
+        title: translate("axes.delete-axis"),
       }),
 
       html.div(
@@ -741,7 +770,7 @@ function buildMappingList(axisController) {
     {
       key: "user",
       title: translate("axes.mapping.user"),
-      width: "3.5em",
+      width: "4em",
       align: "right",
       editable: true,
       formatter: NumberFormatter,
@@ -750,7 +779,7 @@ function buildMappingList(axisController) {
     {
       key: "source",
       title: translate("axes.mapping.source"),
-      width: "3.5em",
+      width: "4em",
       align: "right",
       editable: true,
       formatter: NumberFormatter,
@@ -822,7 +851,6 @@ function buildValueLabelList(axisController) {
 
   const labelList = new UIList();
   labelList.classList.add("fontra-ui-font-info-axes-panel-axis-box-label-list");
-  labelList.style = `min-width: 9em;`;
   labelList.columnDescriptions = [
     {
       key: "name",
@@ -834,7 +862,7 @@ function buildValueLabelList(axisController) {
     {
       key: "value",
       title: translate("axes.mapping.values.value"),
-      width: "3em",
+      width: "5em",
       align: "right",
       editable: true,
       formatter: NumberFormatter,
@@ -843,7 +871,7 @@ function buildValueLabelList(axisController) {
     {
       key: "minValue",
       title: translate("axes.mapping.values.min"),
-      width: "3.5em",
+      width: "5em",
       align: "right",
       editable: true,
       formatter: OptionalNumberFormatter,
@@ -852,7 +880,7 @@ function buildValueLabelList(axisController) {
     {
       key: "maxValue",
       title: translate("axes.mapping.values.max"),
-      width: "3.5em",
+      width: "5em",
       align: "right",
       editable: true,
       formatter: OptionalNumberFormatter,
@@ -861,7 +889,7 @@ function buildValueLabelList(axisController) {
     {
       key: "linkedValue",
       title: translate("axes.mapping.values.linked"),
-      width: "3.5em",
+      width: "6em",
       align: "right",
       editable: true,
       formatter: OptionalNumberFormatter,
@@ -875,7 +903,7 @@ function buildValueLabelList(axisController) {
     {
       key: "elidable",
       title: translate("axes.mapping.values.elidable"),
-      width: "3.5em",
+      width: "6em",
       cellFactory: checkboxListCell,
     },
     // {

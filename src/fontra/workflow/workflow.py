@@ -3,7 +3,7 @@ from __future__ import annotations
 import os
 import pathlib
 import re
-from contextlib import AsyncExitStack, asynccontextmanager, contextmanager
+from contextlib import AsyncExitStack, asynccontextmanager, chdir
 from dataclasses import dataclass, field
 from functools import singledispatch
 from importlib.metadata import entry_points
@@ -266,17 +266,6 @@ def _loadActionsEntryPoints():
 
     for entryPoint in entry_points(group="fontra.workflow.actions"):
         _ = entryPoint.load()
-
-
-@contextmanager
-def chdir(path):
-    # contextlib.chdir() requires Python >= 3.11
-    currentDir = os.getcwd()
-    os.chdir(path)
-    try:
-        yield
-    finally:
-        os.chdir(currentDir)
 
 
 def substituteStrings(config: dict, substitutions: dict[str, Any]) -> dict:

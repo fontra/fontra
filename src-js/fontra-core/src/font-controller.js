@@ -616,8 +616,7 @@ export class FontController {
     if (!varGlyph) {
       return;
     }
-    const getGlyphFunc = this.getGlyph.bind(this);
-    return await varGlyph.getLayerGlyphController(layerName, sourceIndex, getGlyphFunc);
+    return await varGlyph.getLayerGlyphController(layerName, sourceIndex);
   }
 
   requestGlyphInstance(glyphName, sourceLocation) {
@@ -665,11 +664,9 @@ export class FontController {
     if (!varGlyph) {
       return null;
     }
-    const getGlyphFunc = this.getGlyph.bind(this);
     const instanceController = await varGlyph.instantiateController(
       sourceLocation,
-      layerName,
-      getGlyphFunc
+      layerName
     );
     return instanceController;
   }

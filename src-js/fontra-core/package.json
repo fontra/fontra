@@ -3,9 +3,9 @@
   "dependencies": {
     "@fontra/core": "file:",
     "bezier-js": "^6.1.4",
-    "build-shaper-font": "^0.1.8",
+    "build-shaper-font": "^0.1.9",
     "fflate": "^0.8.3",
-    "harfbuzzjs": "^1.4.0",
+    "harfbuzzjs": "^1.6.4",
     "lib-font": "^3.0.4",
     "tsc": "^2.0.4"
   },
@@ -19,8 +19,8 @@
   },
   "type": "module",
   "devDependencies": {
-    "chai": "^6.2.2",
+    "chai": "^6.3.0",
     "chai-almost": "^1.0.1",
-    "mocha": "^11.7.6"
+    "mocha": "^12.0.3"
   }
 }

@@ -409,13 +409,13 @@ registerVisualizationLayerDefinition({
   selectionFunc: glyphSelector("editing"),
 });
 
-function _drawMiniSideBearings(
+function _drawMiniSideBearings({
   context,
   positionedGlyph,
   parameters,
   model,
-  controller
-) {
+  controller,
+}) {
   const glyph = positionedGlyph.glyph;
   context.strokeStyle = parameters.strokeColor;
   context.lineWidth = parameters.strokeWidth;
@@ -664,7 +664,6 @@ class SidebearingTool extends MetricsBaseTool {
   }
 
   async showDialogLocationNotAtSource(glyphNames) {
-    const glyphName = this.sceneSettings.selectedGlyphName;
     const result = await dialog(
       translate("dialog.cant-edit-sidebearings.title"),
       translate(
@@ -1001,7 +1000,7 @@ const kernVisualizationDefinition = {
   zIndex: 190,
   colors: { negativeKernColor: "#F1175933", positiveKernColor: "#1759F133" },
   colorsDarkMode: { negativeKernColor: "#FF336655", positiveKernColor: "#3366FF55" },
-  draw: (context, positionedGlyph, parameters, model, controller) => {
+  draw: ({ context, positionedGlyph, parameters, model, controller }) => {
     if (!positionedGlyph.kernValue) {
       return;
     }
@@ -1085,7 +1084,7 @@ class KerningTool extends MetricsBaseTool {
       return;
     }
 
-    const { editContext, values } = this.getEditContext();
+    const { editContext, values } = await this.getEditContext();
     if (!editContext) {
       return;
     }
@@ -1124,7 +1123,7 @@ class KerningTool extends MetricsBaseTool {
 
     deltaX *= this.getStepValue(event);
 
-    const { editContext, values } = this.getEditContext();
+    const { editContext, values } = await this.getEditContext();
     if (!editContext) {
       return;
     }
@@ -1137,10 +1136,25 @@ class KerningTool extends MetricsBaseTool {
     this.pushUndoItem(changes, undoLabel);
   }
 
-  getEditContext(wantValues = true) {
+  async getEditContext(wantValues = true) {
     const sourceIdentifier = this.getSourceIdentifier();
     if (!sourceIdentifier && wantValues) {
       this.showDialogLocationNotAtSource();
+      return {};
+    }
+
+    if (!this.sceneSettings.applyTextShaping) {
+      this.showDialogTextShapingOff();
+      return {};
+    }
+
+    const shaper = this.sceneSettings.shaper;
+
+    if (
+      shaper.getFeatureInfo("GPOS")["kern"] &&
+      !shaper.insertMarkers.find((item) => item.tag === "kern")
+    ) {
+      this.showDialogManualKernFeature();
       return {};
     }
 
@@ -1188,7 +1202,6 @@ class KerningTool extends MetricsBaseTool {
   }
 
   async showDialogLocationNotAtSource() {
-    const glyphName = this.sceneSettings.selectedGlyphName;
     const result = await dialog(
       translate("dialog.cant-edit-kerning.title"),
       translate("dialog.cant-edit-glyph.content.location-not-at-source"),
@@ -1208,6 +1221,35 @@ class KerningTool extends MetricsBaseTool {
     if (result === "goToNearestSource") {
       this.editor.goToNearestSource(false);
     }
+  }
+
+  async showDialogTextShapingOff() {
+    const result = await dialog(
+      translate("dialog.cant-edit-kerning.title"),
+      translate("dialog.cant-edit-kerning.content.apply-text-shaping-must-be-on"),
+      [
+        {
+          title: translate("dialog.cancel"),
+          resultValue: "cancel",
+          isCancelButton: true,
+        },
+        {
+          title: translate("dialog.yes"),
+          resultValue: "turn-on",
+          isDefaultButton: true,
+        },
+      ]
+    );
+    if (result === "turn-on") {
+      this.sceneSettings.applyTextShaping = true;
+    }
+  }
+
+  showDialogManualKernFeature() {
+    message(
+      translate("dialog.cant-edit-kerning.title"),
+      translate("dialog.cant-edit-kerning.content.manually-written-feature")
+    );
   }
 
   getSourceIdentifier() {
@@ -1275,7 +1317,7 @@ class KerningTool extends MetricsBaseTool {
   }
 
   async deleteSelectedKerningPairs(forThisSource) {
-    const { editContext, values } = this.getEditContext(forThisSource);
+    const { editContext, values } = await this.getEditContext(forThisSource);
     if (!editContext) {
       return;
     }

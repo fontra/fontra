@@ -3,7 +3,7 @@ import { DefaultFormatter } from "./formatters.js";
 import * as html from "./html-utils.js";
 import { uniqueID, zip } from "./utils.ts";
 
-const containerClassName = "fontra-ui-sortable-list-container";
+const containerClassNamePrefix = "fontra-ui-sortable-list-container-";
 const draggingClassName = "fontra-ui-sortable-list-dragging";
 
 html.addStyleSheet(`
@@ -12,7 +12,12 @@ html.addStyleSheet(`
 }
 `);
 
+let containerCounter = 0;
+
 export function setupSortableList(listContainer) {
+  const containerClassName = containerClassNamePrefix + containerCounter;
+  containerCounter += 1;
+
   listContainer.classList.add(containerClassName);
   let originalItems;
   // We need to compare the vertical middle of the dragged item with the sibling,
@@ -25,6 +30,12 @@ export function setupSortableList(listContainer) {
     const draggingItem = listContainer.querySelector(
       `.${containerClassName} > .${draggingClassName}`
     );
+
+    if (!draggingItem) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      return;
+    }
 
     // Getting all items except currently dragging and making array of them
     const siblings = [
@@ -55,6 +66,7 @@ export function setupSortableList(listContainer) {
       event.stopImmediatePropagation();
       return;
     }
+
     setTimeout(() => {
       event.target.classList.add(draggingClassName);
     }, 0);
@@ -70,6 +82,13 @@ export function setupSortableList(listContainer) {
     const draggingItem = listContainer.querySelector(
       `.${containerClassName} > .${draggingClassName}`
     );
+
+    if (!draggingItem) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      return;
+    }
+
     draggingItem.classList.remove(draggingClassName);
 
     const currentItems = [
@@ -169,7 +188,11 @@ export function textInput(controller, key, options) {
   const inputID = options?.id || `input-${uniqueID()}-${key}`;
   const formatter = options?.formatter || DefaultFormatter;
 
-  const inputElement = html.input({ type: options?.type || "text", id: inputID });
+  const inputElement = html.input({
+    type: options?.type || "text",
+    id: inputID,
+    placeholder: options.placeholder ?? "",
+  });
   if (options?.class) {
     inputElement.className = options.class;
   }
@@ -180,6 +203,10 @@ export function textInput(controller, key, options) {
       controller.model[key] = value;
     }
   };
+
+  const df = new DraggableFiddler();
+  inputElement.addEventListener("focus", (event) => df.onfocus(inputElement));
+  inputElement.addEventListener("blur", (event) => df.onblur());
 
   controller.addKeyListener(key, (event) => {
     inputElement.value = formatter.toString(event.newValue);
@@ -208,8 +235,9 @@ export function labeledTextInput(label, controller, key, options) {
 
 export function popupSelect(controller, key, popupItems, options) {
   function findLabel() {
-    const option = popupItems.find(({ value }) => value === controller.model[key]);
-    return option?.label || "";
+    const { getLabel, label } =
+      popupItems.find(({ value }) => value === controller.model[key]) ?? {};
+    return getLabel?.() ?? label ?? "";
   }
 
   controller.addKeyListener(key, (event) => {
@@ -217,12 +245,13 @@ export function popupSelect(controller, key, popupItems, options) {
   });
 
   const menu = new PopupMenu(findLabel(), () =>
-    popupItems.map(({ value, label }) => ({
-      title: label,
+    popupItems.map(({ value, getLabel, label, callback }) => ({
+      title: getLabel ?? label,
       checked: value === controller.model[key],
       callback: () => {
         controller.model[key] = value;
-        menu.valueLabel = label;
+        menu.valueLabel = getLabel?.() ?? label;
+        callback?.();
       },
     }))
   );
@@ -297,4 +326,36 @@ export function pickFile(fileTypes) {
   inputElement.click();
 
   return resultPromise;
+}
+
+class DraggableFiddler {
+  /*
+    This is to work around a Firefox bug that doesn't let the user mouse-select
+    text in a text input if said text input is inside a draggable element.
+    The workaround is to make the draggable parent temporarily non-draggable.
+    This doesn't work perfectly (you need to focus the element first), but it's
+    still better than no mouse-selectability at all.
+   */
+
+  constructor() {
+    this.draggableElement = null;
+  }
+
+  onfocus(element) {
+    while (element) {
+      element = element.parentElement;
+      if (element?.draggable) {
+        element.draggable = false;
+        break;
+      }
+    }
+
+    this.draggableElement = element;
+  }
+
+  onblur() {
+    if (this.draggableElement) {
+      this.draggableElement.draggable = true;
+    }
+  }
 }

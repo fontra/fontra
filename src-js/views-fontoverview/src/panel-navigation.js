@@ -113,7 +113,9 @@ export class FontOverviewNavigation extends HTMLElement {
       {
         label: translate("glyph-organizing.group-by"),
         id: "group-by",
-        content: this.groupByCheckboxGroup.makeCheckboxUI(groupByProperties),
+        content: this.groupByCheckboxGroup.makeCheckboxUI(
+          groupByProperties.map(({ key, label }) => ({ key, label: translate(label) }))
+        ),
       },
       this.projectGlyphSets.accordionItem,
       this.myGlyphSets.accordionItem,

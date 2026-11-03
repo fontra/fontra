@@ -1,0 +1,124 @@
+{
+"fontInfo": {
+"familyName": "kern-test-locations"
+},
+"axes": {
+"axes": [
+{
+"name": "weight",
+"label": "Weight",
+"tag": "wght",
+"minValue": 100,
+"defaultValue": 100,
+"maxValue": 200,
+"mapping": [
+[
+100,
+100
+],
+[
+140,
+160
+],
+[
+200,
+200
+]
+]
+}
+]
+},
+"sources": {
+"6eb4c6f6": {
+"name": "Medium",
+"location": {
+"weight": 160
+},
+"lineMetricsHorizontalLayout": {
+"ascender": {
+"value": 750,
+"zone": 16
+},
+"descender": {
+"value": -250,
+"zone": -16
+},
+"xHeight": {
+"value": 500,
+"zone": 16
+},
+"capHeight": {
+"value": 750,
+"zone": 16
+},
+"baseline": {
+"value": 0,
+"zone": -16
+}
+}
+},
+"b5d8682d": {
+"name": "Regular",
+"lineMetricsHorizontalLayout": {
+"ascender": {
+"value": 750,
+"zone": 16
+},
+"descender": {
+"value": -250,
+"zone": -16
+},
+"xHeight": {
+"value": 500,
+"zone": 16
+},
+"capHeight": {
+"value": 750,
+"zone": 16
+},
+"baseline": {
+"value": 0,
+"zone": -16
+}
+}
+},
+"d4824af8": {
+"name": "Bold",
+"location": {
+"weight": 200
+},
+"lineMetricsHorizontalLayout": {
+"ascender": {
+"value": 750,
+"zone": 16
+},
+"descender": {
+"value": -250,
+"zone": -16
+},
+"xHeight": {
+"value": 500,
+"zone": 16
+},
+"capHeight": {
+"value": 750,
+"zone": 16
+},
+"baseline": {
+"value": 0,
+"zone": -16
+}
+}
+}
+},
+"customData": {
+"fontra.projectGlyphSets": [
+{
+"commentChars": "#",
+"dataFormat": "glyph-names",
+"name": "GF Latin Kernel",
+"url": "https://cdn.jsdelivr.net/gh/googlefonts/glyphsets/data/results/txt/nice-names/GF_Latin_Kernel.txt"
+}
+]
+}
+}

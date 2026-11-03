@@ -1,5 +1,5 @@
-import enum
 from dataclasses import dataclass, field
+from enum import StrEnum
 from typing import Iterable
 
 import ufomerge
@@ -9,25 +9,7 @@ from fontra.core.classes import OpenTypeFeatures
 EnumBaseClass: type
 
 
-if hasattr(enum, "StrEnum"):
-    # Python >= 3.11
-    EnumBaseClass = enum.StrEnum
-else:
-
-    class ReprEnum(enum.Enum):
-        pass
-
-    class StrEnum(str, ReprEnum):
-        def __new__(cls, value):
-            value = str(value)
-            member = str.__new__(cls, value)
-            member._value_ = value
-            return member
-
-    EnumBaseClass = StrEnum
-
-
-class LayoutHandling(EnumBaseClass):
+class LayoutHandling(StrEnum):
     SUBSET = "subset"
     CLOSURE = "closure"
     IGNORE = "ignore"

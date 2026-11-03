@@ -42,6 +42,7 @@ import {
   enumerate,
   eventIsCausedByWritingURLFragment,
   fetchJSON,
+  filterObject,
   hyphenatedToCamelCase,
   hyphenatedToLabel,
   isActiveElementTypeable,
@@ -235,7 +236,7 @@ export class EditorController extends ViewController {
     );
 
     this.sidebars = [];
-    this.contextMenuPosition = { x: 0, y: 0 };
+    this.currentPointerPosition = { x: 0, y: 0 };
 
     this.initSidebars();
     this.initTools();
@@ -273,6 +274,9 @@ export class EditorController extends ViewController {
 
     this.canvasController.canvas.addEventListener("contextmenu", (event) =>
       this.contextMenuHandler(event)
+    );
+    this.canvasController.canvas.addEventListener("pointermove", (event) =>
+      this.pointerMoveHandler(event)
     );
     window.addEventListener("keydown", (event) => this.keyDownHandler(event));
     window.addEventListener("keyup", (event) => this.keyUpHandler(event));
@@ -786,7 +790,10 @@ export class EditorController extends ViewController {
       const functionName = meta.function;
       let module;
       try {
-        module = await import(`${pluginPath}/${initScript}`);
+        // webpackIgnore: keep this a real dynamic import at runtime; the plug-in
+        // lives outside the bundle (a URL or a server path), webpack must not
+        // try to resolve it at build time.
+        module = await import(/* webpackIgnore: true */ `${pluginPath}/${initScript}`);
       } catch (e) {
         console.error("Module didn't load");
         console.log(e);
@@ -824,7 +831,10 @@ export class EditorController extends ViewController {
       false
     );
 
-    await this.fontController.subscribeChanges({ kerning: null, features: null }, true);
+    await this.fontController.subscribeChanges(
+      { kerning: null, features: null, conditionalSubstitutions: null },
+      true
+    );
 
     const blankFont = new FontFace("AdobeBlank", `url("/fonts/AdobeBlank.woff2")`, {});
     document.fonts.add(blankFont);
@@ -975,7 +985,7 @@ export class EditorController extends ViewController {
 
     for (const zoomElement of document.querySelectorAll("#zoom-tools > .tool-button")) {
       const toolIdentifier = zoomElement.dataset.tool;
-      zoomElement.dataset.tooltip = translate(toolIdentifier);
+      zoomElement.title = translate(toolIdentifier);
       zoomElement.onclick = () => {
         switch (toolIdentifier) {
           case "zoom-in":
@@ -1038,8 +1048,7 @@ export class EditorController extends ViewController {
           "class":
             wrapperID === "edit-tools" ? "tool-button selected" : "subtool-button",
           "data-tool": tool.identifier,
-          "data-tooltip": translate("editor." + tool.identifier),
-          "data-tooltipposition": index ? "right" : "bottom",
+          "title": translate("editor." + tool.identifier),
         },
         [
           html.createDomElement("inline-svg", {
@@ -1075,10 +1084,6 @@ export class EditorController extends ViewController {
           this._multiToolMouseDownTimer = (withTimeOut ? setTimeout : noTimeout)(() => {
             // Show sub tools
             for (const child of editToolsElement.children) {
-              // When shown, make sure all tooltips are shown on the right, so as
-              // to not obscure the subtool(s) with the tooltip. This will get reset
-              // in collapseSubTools().
-              child.dataset["tooltipposition"] = "right";
               child.style.visibility = "visible";
             }
             window.addEventListener("mousedown", globalListener);
@@ -2329,21 +2334,35 @@ export class EditorController extends ViewController {
   }
 
   async doAddComponent() {
-    const glyphName = await this.runGlyphSearchDialog(
+    const glyphName = this.sceneController.getSelectedGlyphName();
+
+    const componentGlyphName = await this.runGlyphSearchDialog(
       translate("action.add-component"),
       translate("dialog.add"),
-      true
+      true,
+      this.sceneController.getSelectedGlyphName()
     );
-    if (!glyphName) {
+
+    if (!componentGlyphName) {
       return;
     }
 
-    const baseGlyph = await this.fontController.getGlyph(glyphName);
+    const baseGlyph = await this.fontController.getGlyph(componentGlyphName);
+
+    const nestedComponentNames = await baseGlyph.getGlyphDependenciesDeep();
+    if (nestedComponentNames.has(glyphName)) {
+      await message(
+        translate("dialog.cant-add-component.title", componentGlyphName),
+        translate("dialog.cant-add-component.content-2")
+      );
+      return;
+    }
+
     const location = Object.fromEntries(
       baseGlyph.glyph.axes.map((axis) => [axis.name, axis.defaultValue])
     );
     const newComponent = {
-      name: glyphName,
+      name: componentGlyphName,
       transformation: getDecomposedIdentity(),
       location: location,
     };
@@ -2360,7 +2379,7 @@ export class EditorController extends ViewController {
   }
 
   async doAddAnchor() {
-    const point = this.sceneController.selectedGlyphPoint(this.contextMenuPosition);
+    const point = this.sceneController.selectedGlyphPoint(this.currentPointerPosition);
     const { anchor: tempAnchor } = await this.doAddEditAnchorDialog(undefined, point);
     if (!tempAnchor) {
       return;
@@ -2604,7 +2623,7 @@ export class EditorController extends ViewController {
 
   async doAddGuideline(global = false) {
     this.visualizationLayersSettings.model["fontra.guidelines"] = true;
-    const point = this.sceneController.selectedGlyphPoint(this.contextMenuPosition);
+    const point = this.sceneController.selectedGlyphPoint(this.currentPointerPosition);
     const { guideline: tempGuideline } = await this.doAddEditGuidelineDialog(
       undefined,
       point,
@@ -3101,7 +3120,9 @@ export class EditorController extends ViewController {
     switch (await theDialog.run()) {
       case "copy": {
         const glyphNamesString = chunks(usedBy, 16)
-          .map((chunked) => chunked.map((glyphName) => "/" + glyphName).join(""))
+          .map((chunked) =>
+            chunked.map((glyphName) => "/" + glyphName.replaceAll(" ", "\\ ")).join("")
+          )
           .join("\n");
         const clipboardObject = {
           "text/plain": glyphNamesString,
@@ -3144,7 +3165,8 @@ export class EditorController extends ViewController {
   async runGlyphSearchDialog(
     titleLabel = translate("dialog.glyphs.search"),
     okLabel = translate("dialog.add"),
-    showOnlyGlyphsInFont = false
+    showOnlyGlyphsInFont = false,
+    skipGlyphName = null
   ) {
     const glyphSearch = document.createElement("glyph-search-list");
 
@@ -3154,6 +3176,13 @@ export class EditorController extends ViewController {
       glyphSearch.allowUnknownGlyphSearchResults = true;
     } else {
       glyphSearch.glyphMap = this.fontController.glyphMap;
+    }
+
+    if (skipGlyphName) {
+      glyphSearch.glyphMap = filterObject(
+        this.fontController.glyphMap,
+        (glyphName) => glyphName !== skipGlyphName
+      );
     }
 
     glyphSearch.addEventListener("selectedGlyphNameChanged", (event) => {
@@ -3297,8 +3326,15 @@ export class EditorController extends ViewController {
     event.preventDefault();
 
     const { x, y } = event;
-    this.contextMenuPosition = { x: x, y: y };
+    this.currentPointerPosition = { x, y };
     showMenu(this.buildContextMenuItems(event), { x: x + 1, y: y - 1 });
+  }
+
+  pointerMoveHandler(event) {
+    if (document.activeElement === this.canvasController.canvas) {
+      const { x, y } = event;
+      this.currentPointerPosition = { x, y };
+    }
   }
 
   async externalChange(change, isLiveChange) {
@@ -3692,7 +3728,6 @@ function collapseSubTools(editToolsElement) {
   // Hide sub tools
   for (const [index, child] of enumerate(editToolsElement.children)) {
     child.style.visibility = index ? "hidden" : "visible";
-    child.dataset.tooltipposition = index ? "right" : "bottom";
   }
 }
 

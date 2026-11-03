@@ -37,7 +37,7 @@ registerVisualizationLayerDefinition({
     outsideTextColor: "#444B",
     intersectionColor: "#F696",
   },
-  draw: (context, positionedGlyph, parameters, model, controller) =>
+  draw: ({ context, positionedGlyph, parameters, model, controller }) =>
     thePowerRulerTool?.draw(context, positionedGlyph, parameters, model, controller),
 });
 

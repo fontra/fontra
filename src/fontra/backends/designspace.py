@@ -236,7 +236,7 @@ featuresWarning = """\
 # Fontra is not a general purpose UFO features editor, and has limitations that affect
 # how the features are written back to the UFO(s) when edited:
 # - 'Included files' are resolved and are inlined
-# - Only the UFO at the default designspace location will contain features
+# - The same edited feature data is written to all UFOs
 # - Variable GPOS features currently lose their variability, unless they use
 #   fonttools variable feature syntax: https://github.com/fontra/fontra/issues/2185
 #   In a future version of Fontra, variable GPOS features that are spread out over
@@ -2560,7 +2560,7 @@ def getGlyphMapFromGlyphSet(glyphSet):
     return glyphMap
 
 
-def uniqueNameMaker(existingNames=()):
+def uniqueNameMaker(existingNames=(), joiner="#"):
     usedNames = set(existingNames)
 
     def makeUniqueName(name):
@@ -2568,7 +2568,7 @@ def uniqueNameMaker(existingNames=()):
         uniqueName = name
         while uniqueName in usedNames:
             count += 1
-            uniqueName = f"{name}#{count}"
+            uniqueName = f"{name}{joiner}{count}"
         usedNames.add(uniqueName)
         return uniqueName
 

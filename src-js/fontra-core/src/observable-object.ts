@@ -314,7 +314,11 @@ function synchronizeWithLocalStorage<T extends {}>(
       // TypeScript isn't smart enough to figure out that the above check
       // of presence of the key in `mapKeyToStorage` implies that it is
       // necessarily a string and a keyof T.
-      setItemOnObject(mapKeyToObject[event.key], event.newValue);
+      //
+      // Get the new value from localStorage itself rather than from event.newValue,
+      // as we can receive stale newEvent values if a value changes somewhat rapidly.
+      // This in turn causes a nasty feedback loop (in Firefox only it seems)
+      setItemOnObject(mapKeyToObject[event.key], localStorage.getItem(event.key));
     }
   });
 

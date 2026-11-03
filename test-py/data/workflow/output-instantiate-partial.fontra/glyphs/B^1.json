@@ -218,7 +218,14 @@
 }
 ]
 },
-"xAdvance": 735
+"xAdvance": 735,
+"guidelines": [
+{
+"name": "NamedTestGuideline",
+"x": 198,
+"y": 569
+}
+]
 }
 },
 "weight=595": {
@@ -415,7 +422,14 @@
 }
 ]
 },
-"xAdvance": 894
+"xAdvance": 894,
+"guidelines": [
+{
+"name": "NamedTestGuideline",
+"x": 198,
+"y": 569
+}
+]
 }
 },
 "weight=850": {
@@ -612,7 +626,14 @@
 }
 ]
 },
-"xAdvance": 934
+"xAdvance": 934,
+"guidelines": [
+{
+"name": "NamedTestGuideline",
+"x": 198,
+"y": 569
+}
+]
 }
 }
 }

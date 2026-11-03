@@ -826,7 +826,7 @@ registerVisualizationLayerDefinition({
 
   colors: { handleColor: "#BBB", strokeColor: "#DDD" },
   colorsDarkMode: { handleColor: "#777", strokeColor: "#555" },
-  draw: (context, positionedGlyph, parameters, model, controller) => {
+  draw: ({ context, positionedGlyph, parameters, model, controller }) => {
     if (!model.showTransformSelection) {
       return;
     }

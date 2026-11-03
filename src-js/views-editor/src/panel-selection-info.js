@@ -19,7 +19,7 @@ import {
   throttleCalls,
 } from "@fontra/core/utils.ts";
 import { showMenu } from "@fontra/web-components/menu-panel.js";
-import { dialog } from "@fontra/web-components/modal-dialog.js";
+import { dialog, message } from "@fontra/web-components/modal-dialog.js";
 import { Form } from "@fontra/web-components/ui-form.js";
 import Panel from "./panel.js";
 
@@ -178,21 +178,20 @@ export default class SelectionInfoPanel extends Panel {
         type: "header",
         label: translate("sidebar.selection-info.title"),
         auxiliaryElement: html.createDomElement("icon-button", {
-          "id": "glyphLocking",
-          "style": `width: 1.3em; height: 1.3em;`,
-          "src":
+          id: "glyphLocking",
+          style: `width: 1.3em; height: 1.3em;`,
+          src:
             glyphLocked || this.fontController.readOnly
               ? "/tabler-icons/lock.svg"
               : "/tabler-icons/lock-open-2.svg",
-          "onclick": (event) => this._toggleGlyphLock(varGlyphController.glyph),
-          "data-tooltip": translate(
+          onclick: (event) => this._toggleGlyphLock(varGlyphController.glyph),
+          title: translate(
             this.fontController.readOnly
               ? "sidebar.selection-info.glyph-locking.tooltip.read-only"
               : glyphLocked
                 ? "sidebar.selection-info.glyph-locking.tooltip.unlock"
                 : "sidebar.selection-info.glyph-locking.tooltip.lock"
           ),
-          "data-tooltipposition": "left",
         }),
       });
       formContents.push({
@@ -254,12 +253,7 @@ export default class SelectionInfoPanel extends Panel {
                 -layerGlyph.xAdvance,
                 undefined
               );
-              for (const i of range(0, layerGlyph.path.coordinates.length, 2)) {
-                layerGlyph.path.coordinates[i] += translationX;
-              }
-              for (const compo of layerGlyph.components) {
-                compo.transformation.translateX += translationX;
-              }
+              layerGlyph.move(translationX, 0);
               layerGlyph.xAdvance += translationX;
             },
           },
@@ -334,13 +328,10 @@ export default class SelectionInfoPanel extends Panel {
         type: "header",
         label: translate("sidebar.user-settings.glyph.background-image"),
         auxiliaryElement: html.createDomElement("icon-button", {
-          "style": `width: 1.3em;`,
-          "src": "/tabler-icons/refresh.svg",
-          "onclick": (event) => this._resetTransformationForBackgroundImage(),
-          "data-tooltip": translate(
-            "sidebar.selection-info.component.reset-transformation"
-          ),
-          "data-tooltipposition": "left",
+          style: `width: 1.3em;`,
+          src: "/tabler-icons/refresh.svg",
+          onclick: (event) => this._resetTransformationForBackgroundImage(),
+          title: translate("sidebar.selection-info.component.reset-transformation"),
         }),
       });
 
@@ -400,18 +391,32 @@ export default class SelectionInfoPanel extends Panel {
         key: componentKey("name"),
         label: translate("sidebar.selection-info.component.base-glyph"),
         value: component.name,
+        validate: async (fieldItem, value) => {
+          const glyph = await this.fontController.getGlyph(value);
+          if (glyph) {
+            const componentNames = await glyph.getGlyphDependenciesDeep();
+            componentNames.add(value);
+            if (componentNames.has(glyphName)) {
+              await message(
+                translate("dialog.cant-add-component.title", value),
+                value === glyphName
+                  ? translate("dialog.cant-add-component.content-1")
+                  : translate("dialog.cant-add-component.content-2")
+              );
+              return false;
+            }
+          }
+          return true;
+        },
       });
       formContents.push({
         type: "header",
         label: translate("sidebar.selection-info.component.transformation"),
         auxiliaryElement: html.createDomElement("icon-button", {
-          "style": `width: 1.3em;`,
-          "src": "/tabler-icons/refresh.svg",
-          "onclick": (event) => this._resetTransformationForComponent(index),
-          "data-tooltip": translate(
-            "sidebar.selection-info.component.reset-transformation"
-          ),
-          "data-tooltipposition": "left",
+          style: `width: 1.3em;`,
+          src: "/tabler-icons/refresh.svg",
+          onclick: (event) => this._resetTransformationForComponent(index),
+          title: translate("sidebar.selection-info.component.reset-transformation"),
         }),
       });
 
@@ -491,23 +496,21 @@ export default class SelectionInfoPanel extends Panel {
               },
               [
                 html.createDomElement("icon-button", {
-                  "id": "component-axis-options-button",
-                  "style": `width: 1.3em;`,
-                  "src": "/tabler-icons/menu-2.svg",
-                  "onclick": (event) => this.showComponentAxesOptionsMenu(event),
-                  "data-tooltip": translate(
+                  id: "component-axis-options-button",
+                  style: `width: 1.3em;`,
+                  src: "/tabler-icons/menu-2.svg",
+                  onclick: (event) => this.showComponentAxesOptionsMenu(event),
+                  title: translate(
                     "sidebar.designspace-navigation.font-axes-view-options-button.tooltip"
                   ),
-                  "data-tooltipposition": "left",
                 }),
                 html.createDomElement("icon-button", {
-                  "style": `width: 1.3em;`,
-                  "src": "/tabler-icons/refresh.svg",
-                  "onclick": (event) => this._resetAxisValuesForComponent(index),
-                  "data-tooltip": translate(
+                  style: `width: 1.3em;`,
+                  src: "/tabler-icons/refresh.svg",
+                  onclick: (event) => this._resetAxisValuesForComponent(index),
+                  title: translate(
                     "sidebar.selection-info.component.reset-axis-values"
                   ),
-                  "data-tooltipposition": "left",
                 }),
               ]
             ),
@@ -822,6 +825,13 @@ export default class SelectionInfoPanel extends Panel {
     const setFieldValue = fieldItem.setValue || defaultSetFieldValue;
     const deleteFieldValue = fieldItem.deleteValue || defaultDeleteFieldValue;
 
+    if (!valueStream && fieldItem.validate) {
+      if (!(await fieldItem.validate(fieldItem, value))) {
+        await this.update();
+        return;
+      }
+    }
+
     await this.sceneController.editGlyph(async (sendIncrementalChange, glyph) => {
       const layerInfo = [];
       for (const [layerName, layerGlyph] of Object.entries(
@@ -939,11 +949,9 @@ export default class SelectionInfoPanel extends Panel {
       const referencedGlyphName = name.endsWith("!") ? name.slice(0, -1) : name;
       const referencedGlyph = await this.fontController.getGlyph(referencedGlyphName);
       for (const [layerName, location] of Object.entries(locations)) {
-        const getGlyphFunc = this.fontController.getGlyph.bind(this.fontController);
         const instanceController = await referencedGlyph.instantiateController(
           location,
-          layerName,
-          getGlyphFunc
+          layerName
         );
         if (!layerVariables[layerName]) {
           layerVariables[layerName] = {};

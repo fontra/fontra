@@ -9,9 +9,9 @@ export function getShaper(shaperSupport) {
 
 export const MAX_UNICODE = 0x0110000;
 
-const EMULATED_FEATURE_TAGS = ["curs", "kern", "mark", "mkmk"];
-
 class ShaperBase {
+  static _emulatedFeatureTags = [];
+
   constructor(shaperSupport) {
     const {
       nominalGlyphFunc,
@@ -19,20 +19,23 @@ class ShaperBase {
       isGlyphMarkFunc,
       insertMarkers,
       fallbackXAdvance,
+      disableEmulation,
     } = shaperSupport;
 
     this.glyphOrder = glyphOrder;
     this.isGlyphMarkFunc = isGlyphMarkFunc;
     this.insertMarkers = insertMarkers?.filter((marker) =>
-      EMULATED_FEATURE_TAGS.includes(marker.tag)
+      this.constructor._emulatedFeatureTags.includes(marker.tag)
     );
-    this.emulatedDefaultValues = Object.fromEntries(
-      EMULATED_FEATURE_TAGS.map((emulatedTag) => [
-        emulatedTag,
-        !this.insertMarkers ||
-          !!this.insertMarkers.find(({ tag }) => tag === emulatedTag),
-      ])
-    );
+    this.emulatedDefaultValues = !disableEmulation
+      ? Object.fromEntries(
+          this.constructor._emulatedFeatureTags.map((emulatedTag) => [
+            emulatedTag,
+            !this.insertMarkers ||
+              !!this.insertMarkers.find(({ tag }) => tag === emulatedTag),
+          ])
+        )
+      : {};
     this.fallbackXAdvance = fallbackXAdvance ?? 500;
 
     if (glyphOrder) {
@@ -54,7 +57,7 @@ class ShaperBase {
       emulatedFeatures = {};
     }
     return new Set(
-      EMULATED_FEATURE_TAGS.filter(
+      this.constructor._emulatedFeatureTags.filter(
         (tag) => !(emulatedFeatures[tag] ?? this.emulatedDefaultValues[tag])
       )
     );
@@ -74,7 +77,7 @@ class ShaperBase {
     return otTableTag == "GPOS-emulated"
       ? this.insertMarkers
         ? Object.fromEntries(
-            EMULATED_FEATURE_TAGS.map((tag) => [
+            this.constructor._emulatedFeatureTags.map((tag) => [
               `${tag}-emulated`,
               {
                 defaultOn: this.emulatedDefaultValues[tag],
@@ -114,6 +117,8 @@ class ShaperBase {
 }
 
 class HBShaper extends ShaperBase {
+  static _emulatedFeatureTags = ["curs", "kern", "mark", "mkmk"];
+
   constructor(shaperSupport) {
     super(shaperSupport);
     const { fontData } = shaperSupport;

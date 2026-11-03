@@ -4,7 +4,7 @@ import { addStyleSheet } from "@fontra/core/html-utils.js";
 import { translate } from "@fontra/core/localization.js";
 import { enumerate, hexToRgba, range, rgbaToHex } from "@fontra/core/utils.ts";
 import { message } from "@fontra/web-components/modal-dialog.js";
-import { BaseInfoPanel } from "./panel-base.js";
+import { showDialogCannotEditReadOnly, BaseInfoPanel } from "./panel-base.js";
 
 const defaultStatusFieldDefinitions = {
   "fontra.sourceStatusFieldDefinitions": [
@@ -85,6 +85,11 @@ export class DevelopmentStatusDefinitionsPanel extends BaseInfoPanel {
   }
 
   async newStatusDefinition() {
+    if (this.fontController.readOnly) {
+      showDialogCannotEditReadOnly();
+      return;
+    }
+
     const statusFieldDefinitions =
       this.fontController.customData["fontra.sourceStatusFieldDefinitions"];
     const nextStatusValue = !statusFieldDefinitions
@@ -187,6 +192,11 @@ class StatusDefinitionBox extends HTMLElement {
   }
 
   checkStatusDefValue(statusDefValue) {
+    if (this.fontController.readOnly) {
+      showDialogCannotEditReadOnly();
+      return false;
+    }
+
     let errorMessage = "";
     const statusDefinitions =
       this.fontController.customData["fontra.sourceStatusFieldDefinitions"];
@@ -213,6 +223,12 @@ class StatusDefinitionBox extends HTMLElement {
   }
 
   replaceStatusDef(newStatusDef) {
+    if (this.fontController.readOnly) {
+      showDialogCannotEditReadOnly();
+      this._updateContents();
+      return;
+    }
+
     const undoLabel = translate("development-status-definitions.undo.change");
     const root = { customData: this.fontController.customData };
     const changes = recordChanges(root, (root) => {
@@ -226,6 +242,11 @@ class StatusDefinitionBox extends HTMLElement {
   }
 
   deleteStatusDef(statusIndex) {
+    if (this.fontController.readOnly) {
+      showDialogCannotEditReadOnly();
+      return;
+    }
+
     const undoLabel = translate(
       "development-status-definitions.undo.delete",
       `'${this.statusDef.label}'`
@@ -244,6 +265,12 @@ class StatusDefinitionBox extends HTMLElement {
   }
 
   changeStatusDefIsDefault(event) {
+    if (this.fontController.readOnly) {
+      showDialogCannotEditReadOnly();
+      this._updateContents();
+      return;
+    }
+
     const undoLabel = translate(
       "development-status-definitions.undo.change-is-default"
     );
@@ -271,6 +298,12 @@ class StatusDefinitionBox extends HTMLElement {
   }
 
   changeStatusDefValue(value) {
+    if (this.fontController.readOnly) {
+      showDialogCannotEditReadOnly();
+      this._updateContents();
+      return;
+    }
+
     const undoLabel = translate("development-status-definitions.undo.change");
     let statusDefinitions =
       this.fontController.customData["fontra.sourceStatusFieldDefinitions"];
@@ -318,19 +351,19 @@ class StatusDefinitionBox extends HTMLElement {
 
     this.append(
       html.input({
-        "type": "color",
-        "class":
+        type: "color",
+        class:
           "fontra-ui-font-info-status-definitions-panel-status-def-box-color-input",
-        "value": rgbaToHex(statusDef.color.slice(0, 3).concat([1])),
-        "onchange": (event) => {
+        value: rgbaToHex(statusDef.color.slice(0, 3).concat([1])),
+        onchange: (event) => {
           const updatedStatusDef = {
             ...statusDef,
             color: hexToRgba(event.target.value),
           };
           this.replaceStatusDef(updatedStatusDef);
         },
-        "data-tooltip": translate("development-status-definitions.tooltip.color"),
-        "data-tooltipposition": "top",
+        disabled: this.fontController.readOnly,
+        title: translate("development-status-definitions.tooltip.color"),
       })
     );
 
@@ -352,11 +385,8 @@ class StatusDefinitionBox extends HTMLElement {
     this.append(
       html.div(
         {
-          "style": "margin: auto;",
-          "data-tooltip": translate(
-            "development-status-definitions.tooltip.is-default"
-          ),
-          "data-tooltipposition": "top",
+          style: "margin: auto;",
+          title: translate("development-status-definitions.tooltip.is-default"),
         },
         [
           html.input({
@@ -378,11 +408,10 @@ class StatusDefinitionBox extends HTMLElement {
 
     this.append(
       html.createDomElement("icon-button", {
-        "class": "fontra-ui-font-info-status-definitions-panel-status-def-box-delete",
-        "src": "/tabler-icons/trash.svg",
-        "onclick": (event) => this.deleteStatusDef(this.statusIndex),
-        "data-tooltip": translate("development-status-definitions.tooltip.delete"),
-        "data-tooltipposition": "left",
+        class: "fontra-ui-font-info-status-definitions-panel-status-def-box-delete",
+        src: "/tabler-icons/trash.svg",
+        onclick: (event) => this.deleteStatusDef(this.statusIndex),
+        title: translate("development-status-definitions.tooltip.delete"),
       })
     );
   }

@@ -906,7 +906,7 @@ getGlyphTestData = [
                                     "tCenterX": 250,
                                     "tCenterY": 300,
                                 },
-                                "location": {"wght": 0.5},
+                                "location": {"wght": 500},
                             },
                             {
                                 "name": "varcotest2",
@@ -952,7 +952,7 @@ getGlyphTestData = [
                                     "tCenterX": 250,
                                     "tCenterY": 300,
                                 },
-                                "location": {"wght": 0},
+                                "location": {"wght": 100},
                             },
                             {
                                 "name": "varcotest2",

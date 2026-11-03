@@ -1,0 +1,17 @@
+{
+"name": "B",
+"sources": [
+{
+"name": "",
+"layerName": "b5d8682d",
+"locationBase": "b5d8682d"
+}
+],
+"layers": {
+"b5d8682d": {
+"glyph": {
+"xAdvance": 500
+}
+}
+}
+}

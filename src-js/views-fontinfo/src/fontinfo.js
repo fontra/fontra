@@ -5,6 +5,7 @@ import { translate } from "@fontra/core/localization.js";
 import { MultiPanelController } from "@fontra/core/multi-panel.js";
 import { ViewController } from "@fontra/core/view-controller.js";
 import { AxesPanel } from "./panel-axes.js";
+import { ConditionalSubstitutionsPanel } from "./panel-conditional-substitutions.js";
 import { CrossAxisMappingPanel } from "./panel-cross-axis-mapping.js";
 import { DevelopmentStatusDefinitionsPanel } from "./panel-development-status-definitions.js";
 import { FontInfoPanel } from "./panel-font-info.js";
@@ -16,6 +17,7 @@ const panelClasses = [
   AxesPanel,
   SourcesPanel,
   OpenTypeFeatureCodePanel,
+  ConditionalSubstitutionsPanel,
   CrossAxisMappingPanel,
   DevelopmentStatusDefinitionsPanel,
 ];
@@ -30,7 +32,7 @@ export class FontInfoController extends ViewController {
 
     this.initActions();
 
-    const myMenuBar = makeFontraMenuBar(["File", "Edit", "Font"], this);
+    const myMenuBar = makeFontraMenuBar(["File", "Edit", "View", "Font"], this);
     document.querySelector(".top-bar-container").appendChild(myMenuBar);
 
     this.multiPanelController = new MultiPanelController(
@@ -73,6 +75,17 @@ export class FontInfoController extends ViewController {
       () => this.canUndoRedo(true),
       () => this.getUndoRedoLabel(true)
     );
+
+    registerActionCallbacks(
+      "action.zoom-in",
+      () => this.zoomIn(),
+      () => this.canZoomIn()
+    );
+    registerActionCallbacks(
+      "action.zoom-out",
+      () => this.zoomOut(),
+      () => this.canZoomOut()
+    );
   }
 
   getUndoRedoLabel(isRedo) {
@@ -85,5 +98,21 @@ export class FontInfoController extends ViewController {
 
   doUndoRedo(isRedo) {
     return this.multiPanelController.selectedPanel?.doUndoRedo(isRedo);
+  }
+
+  zoomIn() {
+    this.multiPanelController.selectedPanel?.zoomIn?.();
+  }
+
+  canZoomIn() {
+    return this.multiPanelController.selectedPanel?.canZoomIn?.();
+  }
+
+  zoomOut() {
+    this.multiPanelController.selectedPanel?.zoomOut?.();
+  }
+
+  canZoomOut() {
+    return this.multiPanelController.selectedPanel?.canZoomOut?.();
   }
 }

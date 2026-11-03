@@ -222,7 +222,14 @@
 }
 ]
 },
-"xAdvance": 532.5
+"xAdvance": 532.5,
+"guidelines": [
+{
+"name": "NamedTestGuideline",
+"x": 148.5,
+"y": 426.75
+}
+]
 }
 },
 "bold-wide": {
@@ -419,7 +426,14 @@
 }
 ]
 },
-"xAdvance": 952.5
+"xAdvance": 952.5,
+"guidelines": [
+{
+"name": "NamedTestGuideline",
+"x": 148.5,
+"y": 426.75
+}
+]
 }
 },
 "light-condensed": {
@@ -616,7 +630,14 @@
 }
 ]
 },
-"xAdvance": 332.25
+"xAdvance": 332.25,
+"guidelines": [
+{
+"name": "NamedTestGuideline",
+"x": 148.5,
+"y": 426.75
+}
+]
 }
 },
 "light-wide": {
@@ -813,7 +834,14 @@
 }
 ]
 },
-"xAdvance": 879.75
+"xAdvance": 879.75,
+"guidelines": [
+{
+"name": "NamedTestGuideline",
+"x": 148.5,
+"y": 426.75
+}
+]
 }
 },
 "support.crossbar": {
@@ -1010,7 +1038,14 @@
 }
 ]
 },
-"xAdvance": 483.75
+"xAdvance": 483.75,
+"guidelines": [
+{
+"name": "NamedTestGuideline",
+"x": 148.5,
+"y": 426.75
+}
+]
 }
 }
 }

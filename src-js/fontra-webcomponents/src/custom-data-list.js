@@ -121,7 +121,7 @@ export class CustomDataList extends SimpleElement {
         return { ...customData };
       });
       model.customData = newCustomData;
-      addRemoveButton.scrollIntoView({
+      this.addRemoveButton.scrollIntoView({
         behavior: "auto",
         block: "nearest",
         inline: "nearest",
@@ -130,7 +130,7 @@ export class CustomDataList extends SimpleElement {
     };
 
     labelList.addEventListener("deleteKey", deleteSelectedItem);
-    const addRemoveButton = html.createDomElement("add-remove-buttons", {
+    this.addRemoveButton = html.createDomElement("add-remove-buttons", {
       addButtonCallback: async () => {
         const currentKeys = labelList.items.map((customData) => {
           return customData.key;
@@ -151,7 +151,7 @@ export class CustomDataList extends SimpleElement {
         labelList.setItems(newItems);
         const itemIndex = newItems.indexOf(newItem);
         labelList.editCell(itemIndex, "key");
-        addRemoveButton.scrollIntoView({
+        this.addRemoveButton.scrollIntoView({
           behavior: "auto",
           block: "nearest",
           inline: "nearest",
@@ -161,11 +161,11 @@ export class CustomDataList extends SimpleElement {
       disableRemoveButton: true,
     });
 
-    updateRemoveButton(labelList, addRemoveButton);
+    updateRemoveButton(labelList, this.addRemoveButton);
 
     return html.div({ style: "display: grid; grid-gap: 0.3em;" }, [
       labelList,
-      addRemoveButton,
+      this.addRemoveButton,
     ]);
   }
 

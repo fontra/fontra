@@ -73,6 +73,13 @@ export const strings = {
   "application-settings.display-language.status.wip": "in ontwikkeling",
   "application-settings.display-language.title": "Display Language",
   "application-settings.display-language.title.translated": "Weergavetaal",
+  "application-settings.editor-behavior.arrow-key-section": "Arrow key nudge values",
+  "application-settings.editor-behavior.nudge-shift": "Shift",
+  "application-settings.editor-behavior.nudge-shift-control": "Shift+Control/Command",
+  "application-settings.editor-behavior.rect-select-live-modifier-keys":
+    "Use live modifier keys for rectangle-select",
+  "application-settings.editor-behavior.selection-behavior-section":
+    "Selection behavior",
   "application-settings.editor-behavior.title": "Editor gedrag",
   "application-settings.plugins-manager.title": "Plugin Manager",
   "application-settings.server-info.title": "Server info",
@@ -120,6 +127,32 @@ export const strings = {
   "background-image.labels.colorize": "Kleuren",
   "background-image.labels.opacity": "Opaciteit",
   "canvas.clean-view-and-hand-tool": "Schone weergave en Hand gereedschap",
+  "conditional-substitutions.condition-set.new": "New condition set",
+  "conditional-substitutions.condition-set.remove": "Remove condition set",
+  "conditional-substitutions.condition-set.undo-edit": "edit condition set",
+  "conditional-substitutions.condition-set.undo-new": "new condition set",
+  "conditional-substitutions.condition-set.undo-remove": "remove condition set",
+  "conditional-substitutions.condition-sets.title": "Condition sets",
+  "conditional-substitutions.condition-sets.undo-reorder": "reorder condition sets",
+  "conditional-substitutions.rule-processing.after":
+    "After other OpenType features (rclt)",
+  "conditional-substitutions.rule-processing.before":
+    "Before other OpenType features (rvrn)",
+  "conditional-substitutions.rule-processing.feature-tags.enter.title":
+    "Enter one or more four-character feature tags",
+  "conditional-substitutions.rule-processing.feature-tags.menu-title":
+    "Custom OpenType feature tags...",
+  "conditional-substitutions.rule-processing.feature-tags.undo": "edit feature tags",
+  "conditional-substitutions.rule-processing.title": "Rule processing",
+  "conditional-substitutions.rule.name": "Rule name",
+  "conditional-substitutions.rule.new": "Nieuwe conditionele regel",
+  "conditional-substitutions.rule.remove": "Remove rule",
+  "conditional-substitutions.rule.undo-new": "new rule",
+  "conditional-substitutions.rule.undo-remove": "remove rule",
+  "conditional-substitutions.substitutions.new": "New substitution",
+  "conditional-substitutions.substitutions.remove": "Remove substitution",
+  "conditional-substitutions.substitutions.title": "Substitutions",
+  "conditional-substitutions.title": "Conditionele regels",
   "cross-axis-mapping.axis-participates":
     "Indien aangevinkt doet deze as mee in de mapping",
   "cross-axis-mapping.delete": "Verwijder asoverschrijdende mapping",
@@ -154,7 +187,13 @@ export const strings = {
     "Waarde moet een positief getal zijn",
   "dialog.add": "Voeg toe",
   "dialog.cancel": "Annuleren",
+  "dialog.cant-add-component.content-1":
+    "This is the current glyph, and would cause a cyclic reference.",
+  "dialog.cant-add-component.content-2":
+    "It uses the current glyph as a component, and would cause a cyclic reference.",
+  "dialog.cant-add-component.title": "Glyph '%0' cannot be used as a component here",
   "dialog.cant-create-glyph.title": "Kan glyph %0 niet aanmaken",
+  "dialog.cant-edit-font.title": "Can't make changes",
   "dialog.cant-edit-glyph.content": "Het font is read-only",
   "dialog.cant-edit-glyph.content.location-not-at-source":
     "De locatie is niet op een source",
@@ -162,6 +201,10 @@ export const strings = {
     "De locatie is niet op een source voor de volgende glyphs: %0",
   "dialog.cant-edit-glyph.content.locked-glyph": "De glyph is vergrendeld",
   "dialog.cant-edit-glyph.title": "Kan glyph %0 niet bewerken",
+  "dialog.cant-edit-kerning.content.apply-text-shaping-must-be-on":
+    'The "Apply text shaping and features" option must be on. Would you like to turn it on?',
+  "dialog.cant-edit-kerning.content.manually-written-feature":
+    "There is a manually written 'kern' OpenType feature without an \"# Automatic Code\" insertion marker.",
   "dialog.cant-edit-kerning.title": "Kan kerning niet bewerken",
   "dialog.cant-edit-sidebearings.title": "Kan marges niet bewerken",
   "dialog.create": "Creëer",
@@ -325,6 +368,10 @@ export const strings = {
   "sidebar.characters-glyphs.index": "Index",
   "sidebar.characters-glyphs.input-characters": "Invoer karakters",
   "sidebar.characters-glyphs.output-glyphs": "Uitvoer glyphs",
+  "sidebar.characters-glyphs.output-glyphs.options-menu-tooltip":
+    "Output glyphs display options",
+  "sidebar.characters-glyphs.output-glyphs.show-kerning-for-advance":
+    "Show kerning in Advance column",
   "sidebar.characters-glyphs.shaping-debugger": "Shaping debugger",
   "sidebar.characters-glyphs.shaping-debugger.options-menu-tooltip":
     "Shaping debugger opties",
@@ -501,6 +548,10 @@ export const strings = {
   "sidebar.text-entry.section.positioning-from-font-data":
     "Positionering vanuit font data",
   "sidebar.text-entry.section.substitution": "Substitutie",
+  "sidebar.text-entry.text-layout-options": "Text layout options",
+  "sidebar.text-entry.text-layout-options.align": "Align",
+  "sidebar.text-entry.text-layout-options.line-height": "Line height",
+  "sidebar.text-entry.text-layout-options.text-size": "Size",
   "sidebar.text-entry.text-shaping-options": "Text shaping opties",
   "sidebar.text-entry.text-shaping.options.tooltip": "Meer text shaping opties",
   "sidebar.user-settings": "Gebruikersinstellingen",
@@ -510,6 +561,8 @@ export const strings = {
   "sidebar.user-settings.glyph": "Glyph editor uiterlijk",
   "sidebar.user-settings.glyph.anchornames": "Ankernamen",
   "sidebar.user-settings.glyph.background-image": "Achtergrondafbeelding",
+  "sidebar.user-settings.glyph.background-nodes-and-handles":
+    "Nodes and handles for background layers",
   "sidebar.user-settings.glyph.baseline": "Basislijn",
   "sidebar.user-settings.glyph.cjkframe": "CJK Design Frame",
   "sidebar.user-settings.glyph.component": "Component namen en indexen",
@@ -573,6 +626,8 @@ export const strings = {
   "sources.warning.unique-location": "De sourcelocatie moet uniek zijn",
   "sources.warning.unique-source-name": "De sourcenaam moet uniek zijn",
   "toggle-fullscreen": "Schakel volledig scherm",
+  "unused.max": "max",
+  "unused.min": "min",
   "warning.entry-exists": "%0 bestaat al, gebruik een andere waarde.",
   "warning.must-be-number": "De %0 waarde moet een getal zijn",
   "warning.name-must-be-unique": "De naam moet uniek zijn",

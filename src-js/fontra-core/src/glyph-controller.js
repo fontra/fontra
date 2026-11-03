@@ -57,6 +57,7 @@ export class VariableGlyphController {
   constructor(glyph, fontController) {
     this.glyph = glyph;
     this._fontController = fontController;
+    this._getGlyphFunc = (glyphName) => fontController.getGlyph(glyphName);
     this._locationToSourceIndex = {};
     this._layerGlyphControllers = {};
     this._layerNameToSourceIndex = {};
@@ -384,7 +385,7 @@ export class VariableGlyphController {
     return orderedContributions;
   }
 
-  async getLayerGlyphController(layerName, sourceIndex, getGlyphFunc) {
+  async getLayerGlyphController(layerName, sourceIndex) {
     const cacheKey = `${layerName}/${sourceIndex}`;
     let instanceController = this._layerGlyphControllers[cacheKey];
     if (instanceController === undefined) {
@@ -399,7 +400,7 @@ export class VariableGlyphController {
           this
         );
         await instanceController.setupComponents(
-          getGlyphFunc,
+          this._getGlyphFunc,
           filterLocation(
             this.getSourceLocation(this.sources[sourceIndex]),
             this.fontAxisNames
@@ -414,10 +415,10 @@ export class VariableGlyphController {
     return instanceController;
   }
 
-  async instantiate(sourceLocation, getGlyphFunc) {
+  async instantiate(sourceLocation) {
     const glyphDependencies = await getGlyphAndDependenciesShallow(
       this.name,
-      getGlyphFunc
+      this._getGlyphFunc
     );
     return this.instantiateSync(sourceLocation, glyphDependencies);
   }
@@ -435,7 +436,7 @@ export class VariableGlyphController {
     return { instance, errors };
   }
 
-  async instantiateController(sourceLocation, layerName, getGlyphFunc) {
+  async instantiateController(sourceLocation, layerName) {
     let sourceIndex = this.getSourceIndex(sourceLocation);
     sourceLocation = this.expandNLIAxes(sourceLocation);
 
@@ -453,11 +454,11 @@ export class VariableGlyphController {
       }
     }
 
-    if (layerName != undefined) {
-      return await this.getLayerGlyphController(layerName, sourceIndex, getGlyphFunc);
+    if (layerName != undefined && sourceIndex != undefined) {
+      return await this.getLayerGlyphController(layerName, sourceIndex);
     }
 
-    const { instance, errors } = await this.instantiate(sourceLocation, getGlyphFunc);
+    const { instance, errors } = await this.instantiate(sourceLocation);
 
     if (!instance) {
       throw new Error("assert -- instance is undefined");
@@ -472,7 +473,7 @@ export class VariableGlyphController {
     );
 
     await instanceController.setupComponents(
-      getGlyphFunc,
+      this._getGlyphFunc,
       filterLocation(sourceLocation, this.fontAxisNames),
       this.fontAxisNames
     );
@@ -619,6 +620,22 @@ export class VariableGlyphController {
 
   foldNLIAxes(sourceLocation) {
     return mapLocationFoldNLI(sourceLocation);
+  }
+
+  async getGlyphDependenciesDeep() {
+    const glyphNames = new Set();
+
+    for (const compoName of this.getAllComponentNames()) {
+      const glyphDependencies = await getGlyphAndDependenciesDeep(
+        compoName,
+        this._getGlyphFunc
+      );
+      for (const glyphName of Object.keys(glyphDependencies)) {
+        glyphNames.add(glyphName);
+      }
+    }
+
+    return glyphNames;
   }
 }
 
@@ -1149,10 +1166,7 @@ export async function decomposeComponents(
       ...component.location,
     };
 
-    const { instance: compoInstance, errors } = await baseGlyph.instantiate(
-      location,
-      getGlyphFunc
-    );
+    const { instance: compoInstance, errors } = await baseGlyph.instantiate(location);
     const t = decomposedToTransform(component.transformation);
     newPaths.push(compoInstance.path.transformed(t));
     for (const nestedCompo of compoInstance.components) {

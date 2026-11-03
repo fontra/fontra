@@ -246,6 +246,27 @@ async def test_getShaperFontData_ttx():
     ]
 
 
+async def test_getShaperFontData_woff2():
+    path = dataDir / "mutatorsans" / "MutatorSans.subset.woff2"
+    font = getFileSystemBackend(path)
+    shaperFontData = await font.getShaperFontData()
+    assert shaperFontData is not None
+    f = io.BytesIO(shaperFontData.data)
+    font = TTFont(f)
+    assert font.flavor is None
+    assert sorted(font.keys()) == [
+        "GDEF",
+        "GPOS",
+        "GSUB",
+        "GlyphOrder",
+        "fvar",
+        "head",
+        "maxp",
+        "name",
+        "post",
+    ]
+
+
 async def test_getSources(testFontMutatorSans):
     sources = await testFontMutatorSans.getSources()
     assert len(sources) == 4
@@ -326,3 +347,84 @@ async def test_os2_version1():
         "baseline": LineMetric(value=0),
         "descender": LineMetric(value=-293),
     }
+
+
+async def test_getFeatures(testFontMutatorSans):
+    features = await testFontMutatorSans.getFeatures()
+    assert "languagesystem DFLT dflt;" in features.text
+
+
+async def test_getFeatures_ttx():
+    path = dataDir / "mutatorsans" / "MutatorSans.subset.ttx"
+    font = getFileSystemBackend(path)
+    features = await font.getFeatures()
+    assert "languagesystem DFLT dflt;" in features.text
+
+
+@pytest.mark.parametrize(
+    "testFontPath, assertFunctions",
+    [
+        (
+            dataDir / "sourcesans" / "SourceSans3-Regular.subset.otf",
+            [
+                lambda kerning: (kerning["kern"].values["k"]["t"], [-21]),
+                lambda kerning: (kerning["kern"].values["@y"]["@Y"], [-7]),
+                lambda kerning: (kerning["kern"].values["@C"]["J"], [-10]),
+                lambda kerning: (kerning["kern"].values["z"]["@Y"], [-29]),
+                lambda kerning: (kerning["kern"].groupsSide1["C"], ["C", "Ccedilla"]),
+                lambda kerning: (
+                    kerning["kern"].groupsSide2["f"],
+                    ["f", "f_f", "f_t", "f_f_t"],
+                ),
+            ],
+        ),
+        (
+            dataDir / "sourcesans" / "SourceSans3VF-Upright.subset.otf",
+            [
+                lambda kerning: (kerning["kern"].values["k"]["t"], [-10, -28, -40]),
+                lambda kerning: (kerning["kern"].values["@y"]["@Y"], [0, -12, -20]),
+                lambda kerning: (kerning["kern"].values["@C"]["J"], [-10, -10, -10]),
+                lambda kerning: (kerning["kern"].values["z"]["@Y"], [-40, -22, -10]),
+                lambda kerning: (kerning["kern"].groupsSide1["C"], ["C", "Ccedilla"]),
+                lambda kerning: (
+                    kerning["kern"].groupsSide2["f"],
+                    ["f", "f_f", "f_t", "f_f_t"],
+                ),
+            ],
+        ),
+        (
+            dataDir / "mutatorsans" / "MutatorSans.ttf",
+            [
+                lambda kerning: (kerning["kern"].values["A"]["J"], [0, -35, 0, -20]),
+                lambda kerning: (len(kerning["kern"].values.keys()), 16),
+                lambda kerning: (len(kerning["kern"].sourceIdentifiers), 4),
+                lambda kerning: (kerning["kern"].groupsSide1, {}),
+                lambda kerning: (kerning["kern"].groupsSide2, {}),
+            ],
+        ),
+        (
+            dataDir / "ibm-plex" / "IBMPlexSansArabic-Regular.subset.ttf",
+            [
+                lambda kerning: (kerning["kern"].values["T"]["@c"], [-65]),
+                lambda kerning: (kerning["kern"].values["@uniFB58"]["@uni0631"], [90]),
+                lambda kerning: (len(kerning["kern"].values), 5),
+                lambda kerning: (
+                    sum(len(v.values()) for v in kerning["kern"].values.values()),
+                    7,
+                ),
+            ],
+        ),
+        (
+            dataDir / "kern-test-locations" / "kern-test-locations.ttf",
+            [
+                lambda kerning: (kerning["kern"].values["A"]["B"], [-50, -30, -20]),
+            ],
+        ),
+    ],
+)
+async def test_getKerning(testFontPath, assertFunctions):
+    font = getFileSystemBackend(testFontPath)
+    kerning = await font.getKerning()
+    for assertFunc in assertFunctions:
+        value, expectedValue = assertFunc(kerning)
+        assert value == expectedValue

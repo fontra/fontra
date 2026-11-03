@@ -122,7 +122,7 @@ export function stringFromCharacterLines(characterLines) {
       } else if (glyphInfo.character) {
         textLine += glyphInfo.character;
       } else {
-        textLine += "/" + glyphInfo.glyphName;
+        textLine += "/" + glyphInfo.glyphName.replaceAll(" ", "\\ ");
         if (characterLine[i + 1]?.character) {
           textLine += " ";
         }
@@ -165,7 +165,7 @@ function characterFromGlyphName(
   return character;
 }
 
-const glyphNameEndRE = /[//\s]/g;
+const glyphNameEndRE = /(\/)|((?<!\\)\s)/g;
 
 function parseGlyphName(string, i) {
   let glyphName;
@@ -186,6 +186,8 @@ function parseGlyphName(string, i) {
       i = j;
     }
   }
+
+  glyphName = glyphName.replaceAll("\\ ", " ");
 
   return { glyphName, i };
 }

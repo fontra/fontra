@@ -73,6 +73,13 @@ export const strings = {
   "application-settings.display-language.status.wip": "trabahong isinasagawa",
   "application-settings.display-language.title": "Display Language",
   "application-settings.display-language.title.translated": "Wika ng Pagpapakita",
+  "application-settings.editor-behavior.arrow-key-section": "Arrow key nudge values",
+  "application-settings.editor-behavior.nudge-shift": "Shift",
+  "application-settings.editor-behavior.nudge-shift-control": "Shift+Control/Command",
+  "application-settings.editor-behavior.rect-select-live-modifier-keys":
+    "Use live modifier keys for rectangle-select",
+  "application-settings.editor-behavior.selection-behavior-section":
+    "Selection behavior",
   "application-settings.editor-behavior.title": "Pag-uugali ng Editor",
   "application-settings.plugins-manager.title": "Tagapamahala ng Plugin",
   "application-settings.server-info.title": "Impormasyon ng server",
@@ -120,6 +127,32 @@ export const strings = {
   "background-image.labels.colorize": "Kulayan",
   "background-image.labels.opacity": "Kadiliman",
   "canvas.clean-view-and-hand-tool": "Malinis na Pananaw at Kagamitan sa Kamay",
+  "conditional-substitutions.condition-set.new": "New condition set",
+  "conditional-substitutions.condition-set.remove": "Remove condition set",
+  "conditional-substitutions.condition-set.undo-edit": "edit condition set",
+  "conditional-substitutions.condition-set.undo-new": "new condition set",
+  "conditional-substitutions.condition-set.undo-remove": "remove condition set",
+  "conditional-substitutions.condition-sets.title": "Condition sets",
+  "conditional-substitutions.condition-sets.undo-reorder": "reorder condition sets",
+  "conditional-substitutions.rule-processing.after":
+    "After other OpenType features (rclt)",
+  "conditional-substitutions.rule-processing.before":
+    "Before other OpenType features (rvrn)",
+  "conditional-substitutions.rule-processing.feature-tags.enter.title":
+    "Enter one or more four-character feature tags",
+  "conditional-substitutions.rule-processing.feature-tags.menu-title":
+    "Custom OpenType feature tags...",
+  "conditional-substitutions.rule-processing.feature-tags.undo": "edit feature tags",
+  "conditional-substitutions.rule-processing.title": "Rule processing",
+  "conditional-substitutions.rule.name": "Rule name",
+  "conditional-substitutions.rule.new": "New conditional substitution rule",
+  "conditional-substitutions.rule.remove": "Remove rule",
+  "conditional-substitutions.rule.undo-new": "new rule",
+  "conditional-substitutions.rule.undo-remove": "remove rule",
+  "conditional-substitutions.substitutions.new": "New substitution",
+  "conditional-substitutions.substitutions.remove": "Remove substitution",
+  "conditional-substitutions.substitutions.title": "Substitutions",
+  "conditional-substitutions.title": "Conditional substitutions",
   "cross-axis-mapping.axis-participates":
     "Kapag nasuri, ang aksis na ito ay nakikilahok sa pagmamapa",
   "cross-axis-mapping.delete": "Burahin ang cross-axis mapping",
@@ -154,7 +187,13 @@ export const strings = {
     "Dapat positibong numero ang halaga.",
   "dialog.add": "Idagdag",
   "dialog.cancel": "Kanselahin",
+  "dialog.cant-add-component.content-1":
+    "This is the current glyph, and would cause a cyclic reference.",
+  "dialog.cant-add-component.content-2":
+    "It uses the current glyph as a component, and would cause a cyclic reference.",
+  "dialog.cant-add-component.title": "Glyph '%0' cannot be used as a component here",
   "dialog.cant-create-glyph.title": "Hindi makagawa ng glyph na “%0”",
+  "dialog.cant-edit-font.title": "Can't make changes",
   "dialog.cant-edit-glyph.content": "Read-only ang font.",
   "dialog.cant-edit-glyph.content.location-not-at-source":
     "Ang lokasyon ay wala sa isang pinagmumulan.",
@@ -162,6 +201,10 @@ export const strings = {
     "Ang lokasyon ay wala sa pinagmulan para sa mga sumusunod na glyph: %0",
   "dialog.cant-edit-glyph.content.locked-glyph": "Naka-lock ang gliph.",
   "dialog.cant-edit-glyph.title": "Hindi ma-edit ang gliph na “%0”",
+  "dialog.cant-edit-kerning.content.apply-text-shaping-must-be-on":
+    'The "Apply text shaping and features" option must be on. Would you like to turn it on?',
+  "dialog.cant-edit-kerning.content.manually-written-feature":
+    "There is a manually written 'kern' OpenType feature without an \"# Automatic Code\" insertion marker.",
   "dialog.cant-edit-kerning.title": "Hindi ma-edit ang kerning",
   "dialog.cant-edit-sidebearings.title": "Hindi ma-edit ang mga sidebearing",
   "dialog.create": "Gumawa",
@@ -329,6 +372,10 @@ export const strings = {
   "sidebar.characters-glyphs.index": "Index",
   "sidebar.characters-glyphs.input-characters": "Mga karakter sa pag-input",
   "sidebar.characters-glyphs.output-glyphs": "Mga output glyph",
+  "sidebar.characters-glyphs.output-glyphs.options-menu-tooltip":
+    "Output glyphs display options",
+  "sidebar.characters-glyphs.output-glyphs.show-kerning-for-advance":
+    "Show kerning in Advance column",
   "sidebar.characters-glyphs.shaping-debugger": "Shaping debugger",
   "sidebar.characters-glyphs.shaping-debugger.options-menu-tooltip":
     "Shaping debugger options",
@@ -510,6 +557,10 @@ export const strings = {
   "sidebar.text-entry.section.positioning": "Positioning",
   "sidebar.text-entry.section.positioning-from-font-data": "Positioning from font data",
   "sidebar.text-entry.section.substitution": "Substitution",
+  "sidebar.text-entry.text-layout-options": "Text layout options",
+  "sidebar.text-entry.text-layout-options.align": "Align",
+  "sidebar.text-entry.text-layout-options.line-height": "Line height",
+  "sidebar.text-entry.text-layout-options.text-size": "Size",
   "sidebar.text-entry.text-shaping-options": "Text shaping options",
   "sidebar.text-entry.text-shaping.options.tooltip": "Additional text shaping options",
   "sidebar.user-settings": "Mga Setting ng Gumagamit",
@@ -519,6 +570,8 @@ export const strings = {
   "sidebar.user-settings.glyph": "Hitsura ng editor ng Glyph",
   "sidebar.user-settings.glyph.anchornames": "Mga pangalan ng angkla",
   "sidebar.user-settings.glyph.background-image": "Larawan sa background",
+  "sidebar.user-settings.glyph.background-nodes-and-handles":
+    "Nodes and handles for background layers",
   "sidebar.user-settings.glyph.baseline": "Baseline",
   "sidebar.user-settings.glyph.cjkframe": "Disenyo ng Frame ng CJK",
   "sidebar.user-settings.glyph.component": "Mga pangalan at indeks ng bahagi",
@@ -585,6 +638,8 @@ export const strings = {
   "sources.warning.unique-location": "Dapat na natatangi ang lokasyon ng pinagmulan",
   "sources.warning.unique-source-name": "Dapat na natatangi ang pangalan ng pinagmulan",
   "toggle-fullscreen": "I-toggle ang Fullscreen",
+  "unused.max": "max",
+  "unused.min": "min",
   "warning.entry-exists": "Mayroon nang %0, mangyaring gumamit ng ibang halaga.",
   "warning.must-be-number": "Ang halagang %0 ay dapat isang numero",
   "warning.name-must-be-unique": "Dapat na kakaiba ang pangalan",

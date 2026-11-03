@@ -142,13 +142,6 @@ export class FontOverviewController extends ViewController {
     return menuItems;
   }
 
-  getViewMenuItems() {
-    return [
-      { actionIdentifier: "action.zoom-in" },
-      { actionIdentifier: "action.zoom-out" },
-    ];
-  }
-
   async start() {
     await loaderSpinner(this._start());
   }
@@ -356,7 +349,6 @@ export class FontOverviewController extends ViewController {
     event.preventDefault();
 
     const { x, y } = event;
-    this.contextMenuPosition = { x: x, y: y };
     showMenu(this.getEditMenuItems(), { x: x + 1, y: y - 1 });
   }
 
@@ -976,7 +968,7 @@ function openGlyphsInEditor(
       viewInfo.text +=
         0x002f === codePoints[0] ? "//" : String.fromCodePoint(codePoints[0]);
     } else {
-      viewInfo.text += `/${glyphName}`;
+      viewInfo.text += `/${glyphName.replaceAll(" ", "\\ ")}`;
     }
   }
 

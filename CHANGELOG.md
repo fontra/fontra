@@ -1,10 +1,125 @@
 # Changelog for Fontra
 
-## 2026-07-?? [version 2026.7.3]
+## 2026-10-30 [version 2026.10.2]
 
 ### Fixes
 
+- [fontra pak] Fixed extracting OpenType features from binary files. This was caused by a bundling problem. [fontra-pak Issue 302](https://github.com/fontra/fontra-pak/issues/302), [PR 2828](https://github.com/fontra/fontra/pull/2828), [fontra-pak PR 303](https://github.com/fontra/fontra-pak/pull/303)
+
+## 2026-10-30 [version 2026.10.1]
+
+### New features
+
+- [languages] Norwegian (bokmål) contributed by Peder Vatn Austad. [PR 2817](https://github.com/fontra/fontra/pull/2817)
+- [opentype backend] Extract kerning from binary fonts. [Issue 2137](https://github.com/fontra/fontra/issues/2137), [PR 2827](https://github.com/fontra/fontra/pull/2827)
+- [opentype backend] Convert OpenType features to .fea code when reading. This preserves features when exporting as (say) .fontra. This uses the new `sr-aef` tool by Simon Cozens, with contributions by Khaled Hosny. [Issue 2294](https://github.com/fontra/fontra/issues/2294), [PR 2810](https://github.com/fontra/fontra/pull/2810)
+- [fontra pak] When starting the application from the command line, open any fonts passed as arguments. Contributed by Tarik Rokhsane. [fontra-pak PR 292](https://github.com/fontra/fontra-pak/pull/292)
+- [fontra pak/linux] Add native Linux install and uninstall script. [fontra-pak PR 289](https://github.com/fontra/fontra-pak/pull/289)
+
+### Fixes
+
+- [fontra pak/macOS/Intel/x86] Made Fontra Pak work again on macOS/Intel. [fontra-pak Issue 298](https://github.com/fontra/fontra-pak/issues/298), [fontra-pak PR 299](https://github.com/fontra/fontra-pak/pull/299)
+- [opentype feature code editor] Make "select all" (and other shortcuts) work in read-only mode. [PR 2824](https://github.com/fontra/fontra/pull/2824)
+- [editor] Fix proposed x/y coordinates for "Add Anchor" and "Add Guideline" dialogs in the case they are triggered by a shortcut instead of the context menu. [Issue 2813](https://github.com/fontra/fontra/issues/2813), [PR 2814](https://github.com/fontra/fontra/pull/2814)
+- [vivaldi] Make shortcuts work in the Vivaldi browser. [Issue 2807](https://github.com/fontra/fontra/issues/2807), [PR 2808](https://github.com/fontra/fontra/pull/2808)
+- [fontra-workflow] Fixed instantiating named guidelines. Among other things, this fixes exporting a variable font made with variable components that use named guidelines. [Issue 2800](https://github.com/fontra/fontra/issues/2800), [Issue 2799](https://github.com/fontra/fontra/issues/2799), [PR 2801](https://github.com/fontra/fontra/pull/2801)
+
+### Improvements
+
+- [fontra pak/windows] Show the Fontra icon in the titlebar. Contributed by Tarik Rokhsane. [PR 297](https://github.com/fontra/fontra-pak/pull/297)
+- [opentype] Updated the OpenType reader so it can correctly read fonts with variable components according to the latest `VARC` specification. [PR 2819](https://github.com/fontra/fontra/pull/2819)
+- [fontra pak/linux/windows] On Windows and Linux, launch files in an existing Fontra Pak instance instead of opening a new one. Contributed by Tarik Rokhsane. [fontra-pak PR 295](https://github.com/fontra/fontra-pak/pull/295)
+- [editor] Prevent adding components that would cause a cyclic reference. [Issue 517](https://github.com/fontra/fontra/issues/517), [PR 2818](https://github.com/fontra/fontra/pull/2818)
+- [export] Improve the error message when exporting a font that contains a glyph with a cyclic component reference. [PR 2815](https://github.com/fontra/fontra/pull/2815)
+
+## 2026-10-05 [version 2026.10.0]
+
+### New features
+
+- [fontra pak] Added an "Open Font..." button to the main window, using a modified Open dialog that can select font projects that are folders, such as `.fontra` and `.ufo`. Contributed by Khaled Hosny. [fontra-pak Issue 253](https://github.com/fontra/fontra-pak/issues/253), [fontra-pak PR 281](https://github.com/fontra/fontra-pak/pull/281), [fontra-pak PR 282](https://github.com/fontra/fontra-pak/pull/282)
+- [fontra pak] Added a menu bar with a "File" menu, that has two items: "New Font..." and "Open Font...". [fontra-pak Issue 89](https://github.com/fontra/fontra-pak/issues/89), [fontra-pak PR 283](https://github.com/fontra/fontra-pak/pull/283)
+- [fontra pak] Made drop area double-clickable as an alternative to open a font. Contributed by Tarik Rokhsane. [fontra-pak PR 288](https://github.com/fontra/fontra-pak/pull/288)
+
+### Fixes
+
+- [font overview] Fix glitch with translated "Group by" labels. [Issue 2787](https://github.com/fontra/fontra/issues/2787), [PR 2788](https://github.com/fontra/fontra/pull/2788)
+- [designspace/ufo/features] Reworded Designspace/UFO feature editing warning to match reality. [PR 2794](https://github.com/fontra/fontra/pull/2794)
+- [fontra pak/linux] Fix bundling problem with opening URLs. [fontra-pak Issue 286](https://github.com/fontra/fontra-pak/issues/286), [fontra-pak PR 287](https://github.com/fontra/fontra-pak/pull/287)
+
+## 2026-09-29 [version 2026.9.2]
+
+- [languages] Tweaks and improvements to various languages: English, Spanish, French, Italian, Portuguese and Russian. [PR 2786](https://github.com/fontra/fontra/pull/2786)
+
+## 2026-09-29 [version 2026.9.1]
+
+### New features
+
+- [glyph editor] Show the background image for otherwise empty glyphs, even when not editing, so background images can be used as placeholders or references white using the spacing tool. [Issue 2775](https://github.com/fontra/fontra/issues/2775), [PR 2783](https://github.com/fontra/fontra/pull/2783)
+- [glyph editor] Allow the arrow key nudge values to be customized. [Issue 2772](https://github.com/fontra/fontra/issues/2772), [PR 2773](https://github.com/fontra/fontra/pull/2773)
+- [font overview / glyph cell] Add tooltip for each glyph, showing the full glyph name, unicode character, code point and unicode name. [Issue 2767](https://github.com/fontra/fontra/issues/2767), [PR 2768](https://github.com/fontra/fontra/pull/2768)
+
+### Fixes
+
+- [glyph editor] When a guideline overlaps with a (line) segment, make sure that we can select the line segment by clicking on it. Improve visualization of hovered and selected guidelines. [Issue 2777](https://github.com/fontra/fontra/issues/2777), [PR 2781](https://github.com/fontra/fontra/pull/2781), [Issue 2782](https://github.com/fontra/fontra/pull/2782)
+- [fontra-pak/linux] Fix GNOME Wayland appearance issues by upgrading PyQt. [Issue 271](https://github.com/fontra/fontra-pak/issues/271), [PR 278](https://github.com/fontra/fontra-pak/pull/278)
+- [fontra-pak/linux] Revert GNOME Wayland appearance fixes as they caused crashes. [fontra-pak PR 270](https://github.com/fontra/fontra-pak/pull/270)
+- [fontra-pak/linux] Skip version check when running as a flatpak. [PR 277](https://github.com/fontra/fontra-pak/pull/277)
+- [fontra-pak/linux] Fix a bug in the version check. [fontra-pak PR 269](https://github.com/fontra/fontra-pak/pull/269)
+- [conditional substitutions] Respond to changes in the set of glyphs, and update the glyphname suggestions in the substitution fields. [PR 2771](https://github.com/fontra/fontra/pull/2771)
+
+### Improvements
+
+- [tooltips] Use standard HTML "title" tooltip functionality instead of custom and error-prone CSS solution. Looks a little different, works a lot better. [PR 2769](https://github.com/fontra/fontra/pull/2769)
+
+### Miscellaneous
+
+- [source code] Drop support for Python 3.10. [PR 2774](https://github.com/fontra/fontra/pull/2774)
+
+## 2026-09-14 [version 2026.9.0]
+
+### New features
+
+- [text entry panel] Add fields to set the text size and line height. Add new "Text layout options" accordion section for text alignment, text size and line height. [Issue 105](https://github.com/fontra/fontra/issues/105), [Issue 1400](https://github.com/fontra/fontra/issues/1400), [PR 2765](https://github.com/fontra/fontra/pull/2765)
+- [command line] The `fontra` command line tool got a new subcommand `new`, for creating a new font. [Discussion 2761](https://github.com/fontra/fontra/discussions/2761), [PR 2762](https://github.com/fontra/fontra/pull/2762)
+
+### Fixes
+
+- [glyph editor] Fix behavior when moving a window between screens with different resolutions. [PR 2766](https://github.com/fontra/fontra/pull/2766)
+- [fontra-pak/linux] Fix window appearance and behavior on GNOME Wayland. [fontra-pak PR 267](https://github.com/fontra/fontra-pak/pull/267)
+- [opentype features panel] Recompile when glyphs are being added to or deleted from the font. [PR 2764](https://github.com/fontra/fontra/pull/2764)
+- [firefox] Work around text selection problem within draggable boxes. [PR 2763](https://github.com/fontra/fontra/pull/2763)
+- [glyph editor] Fix text align change when in auto-view-box mode. [PR 2758](https://github.com/fontra/fontra/pull/2758)
+- [woff/woff2] Fix shaping and OpenType features for woff/woff2 fonts. [PR 2753](https://github.com/fontra/fontra/pull/2753)
+- Remove confusing kerning visualization when "Apply text shaping and features" is off. [PR 2748](https://github.com/fontra/fontra/pull/2748)
+- Refuse to edit kerning when it can't or won't be shown. [Issue 2692](https://github.com/fontra/fontra/issues/2692), [PR 2750](https://github.com/fontra/fontra/pull/2750)
+
+### Improvements
+
+- [font info] Make sure various font info can't be edited when in read-only mode. [PR 2759](https://github.com/fontra/fontra/pull/2759)
+- [shaping debugger] Make showing kerning as part of the advance width field opt-out. [Issue 2522](https://github.com/fontra/fontra/issues/2522), [PR 2749](https://github.com/fontra/fontra/pull/2749)
+
+## 2026-08-29 [version 2026.8.0]
+
+### New features
+
+- Added a new font info panel to author and edit conditional substitutions (Designspace "Rules"). [Issue 2688](https://github.com/fontra/fontra/issues/2688), [PR 2743](https://github.com/fontra/fontra/pull/2743)
+- [fontra-glyphs] Support reading of Glyphs-specific feature variation syntax. [fontra-glyphs Issue 144](https://github.com/fontra/fontra-glyphs/issues/144), [fontra-glyphs PR 154](https://github.com/fontra/fontra-glyphs/pull/154), [PR 2736](https://github.com/fontra/fontra/pull/2736)
+- Allow the font size in the OpenType code editor to be changed with Zoom In and Zoom out menu items (command/control plus/minus) in the (new) View menu. [Issue 2470](https://github.com/fontra/fontra/issues/2470), [PR 2735](https://github.com/fontra/fontra/pull/2735)
+- Optionally show handles and nodes in background layers. To toggle, use the "Nodes and handles for background layers" menu in "View -> Glyph editor appearance". [PR 2733](https://github.com/fontra/fontra/pull/2733)
+- [languages] Initial Russian translation contributed by Dmitry Sivukhin. [PR 2738](https://github.com/fontra/fontra/pull/2738)
+- [languages] Initial Italian translation. [PR 2732](https://github.com/fontra/fontra/pull/2732)
+- [languages] Separate Spanish for Spain and Latin America. [PR 2732](https://github.com/fontra/fontra/pull/2732)
+
+### Fixes
+
+- Fix editing the left sidebearing in the Selection Info panel: move anchors and guidelines as well. [Issue 2745](https://github.com/fontra/fontra/issues/2745), [PR 2746](https://github.com/fontra/fontra/pull/2746)
+- Support glyph names with spaces. [Issue 2740](https://github.com/fontra/fontra/issues/2740), [PR 2741](https://github.com/fontra/fontra/pull/2741)
+- Fix the menu item background color in dark mode when the item has a submenu; Don't dismiss a menu panel when clicking on an item with a submenu. [PR 2739](https://github.com/fontra/fontra/pull/2739)
 - Fixes behavior when a character is not encoded, but the (suggested) glyph name for it does exist in the font. [PR 2724](https://github.com/fontra/fontra/pull/2724)
+
+### Improvements
+
+- Spanish, Portuguese, Chinese, French improvements. [PR 2732](https://github.com/fontra/fontra/pull/2732)
 
 ## 2026-07-23 [version 2026.7.2]
 

@@ -17,7 +17,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v7
         with:
-          node-version: 24.x
+          node-version: 26.x
           cache: "npm"
 
       - name: Install Node dependencies
@@ -35,11 +35,11 @@ jobs:
     strategy:
       matrix:
         os: [windows-latest, ubuntu-latest]
-        python-version: ["3.10", "3.14"]
-        node-version: [24.x]
+        python-version: ["3.11", "3.14"]
+        node-version: [26.x]
         exclude:
           - os: windows-latest
-            python-version: "3.10"
+            python-version: "3.11"
 
     steps:
       - uses: actions/checkout@v7

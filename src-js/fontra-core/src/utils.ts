@@ -320,8 +320,9 @@ export async function writeToClipboard(
   } catch (error) {
     console.log("Error while writing to clipboard, falling back to text/plain", error);
     // Write at least the plain/text MIME type to the clipboard
-    if (typeof clipboardObject["text/plain"] === "string") {
-      await navigator.clipboard.writeText(await clipboardObject["text/plain"]);
+    const plainText = await clipboardObject["text/plain"];
+    if (typeof plainText === "string") {
+      await navigator.clipboard.writeText(plainText);
     }
   }
 }
