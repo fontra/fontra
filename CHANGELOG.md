@@ -1,5 +1,11 @@
 # Changelog for Fontra
 
+## 2026-11-?? [version 2026.11.0]
+
+### Improvements
+
+- [fontra pak] Added Help menu, added Quit menu item, reorganized buttons, improved tabbing behavior. Contributed by MrPropre. [fontra-pak PR 307](https://github.com/fontra/fontra-pak/pull/307), [fontra-pak PR 308](https://github.com/fontra/fontra-pak/pull/308), [fontra-pak PR 309](https://github.com/fontra/fontra-pak/pull/309)
+
 ## 2026-10-30 [version 2026.10.2]
 
 ### Fixes
