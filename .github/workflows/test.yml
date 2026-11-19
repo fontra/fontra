@@ -23,6 +23,7 @@ jobs:
       - name: Install Node dependencies
         run: |
           npm install
+          npm install -g typescript
 
       - name: Run pre-commit
         uses: pre-commit/action@v3.0.1
