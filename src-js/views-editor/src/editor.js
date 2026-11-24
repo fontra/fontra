@@ -113,6 +113,8 @@ const MIN_CANVAS_SPACE = 200;
 const PASTE_BEHAVIOR_REPLACE = "replace";
 const PASTE_BEHAVIOR_ADD = "add";
 
+const importTimeStamp = Date.now(); /* for cache busting */
+
 export class EditorController extends ViewController {
   static titlePattern(displayName) {
     return `Glyph Editor — ${displayName}`;
@@ -781,7 +783,7 @@ export class EditorController extends ViewController {
       const pluginPath = parsePluginBasePath(address);
       let meta;
       try {
-        meta = await fetchJSON(`${pluginPath}/plugin.json`);
+        meta = await fetchJSON(`${pluginPath}/plugin.json?t=${importTimeStamp}`);
       } catch (e) {
         console.error(`${address} Plugin metadata not found.`);
         continue;
@@ -793,7 +795,9 @@ export class EditorController extends ViewController {
         // webpackIgnore: keep this a real dynamic import at runtime; the plug-in
         // lives outside the bundle (a URL or a server path), webpack must not
         // try to resolve it at build time.
-        module = await import(/* webpackIgnore: true */ `${pluginPath}/${initScript}`);
+        module = await import(
+          /* webpackIgnore: true */ `${pluginPath}/${initScript}?t=${importTimeStamp}`
+        );
       } catch (e) {
         console.error("Module didn't load");
         console.log(e);

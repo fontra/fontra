@@ -66,10 +66,6 @@ applicationsettings = "fontra.client"
 filesystem = "fontra.filesystem.projectmanager:FileSystemProjectManagerFactory"
 
 
-[project.entry-points."fontra.webcontent"]
-localplugins = "fontra.localplugins"
-
-
 [project.entry-points."fontra.filesystem.backends"]
 designspace = "fontra.backends.designspace:DesignspaceBackend"
 ufo = "fontra.backends.designspace:UFOBackend"

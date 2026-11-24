@@ -60,6 +60,7 @@ def runServer(args, parser: argparse.ArgumentParser) -> None:
         launchWebBrowser=args.launch,
         versionToken=secrets.token_hex(4),
         contentRoot=args.content_root,
+        pluginsDirectory=args.plugins_dir,
     )
     server.setup()
     server.run()
@@ -88,6 +89,7 @@ def main() -> None:
         "--launch", action="store_true", help="Launch the default browser"
     )
     parser.add_argument("--content-root", type=pathlib.Path)
+    parser.add_argument("--plugins-dir", type=pathlib.Path)
     parser.add_argument(
         "-V",
         "--version",
