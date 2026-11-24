@@ -4,6 +4,7 @@
 
 ### New features
 
+- [fontra-pak] Add "Open Recent" menu. Contributed my MrPropre. [fontra-pak Issue 305](https://github.com/fontra/fontra-pak/issues/305), [fontra-pak PR 319](https://github.com/fontra/fontra-pak/pull/319)
 - [plugins] Use a user-settable local folder for plugins, to make it easier to develop plugins locally. Fontra Pak now has a Preferences panel for this. [PR 2839](https://github.com/fontra/fontra/pull/2839), [fontra-pak PR 317](https://github.com/fontra/fontra-pak/pull/317)
 
 ### Improvements
