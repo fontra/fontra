@@ -9,7 +9,7 @@
 ### Improvements
 
 - [fontra pak] Miscellaneous visual and coding improvements, contributed my MrPropre. [fontra-pak PR](https://github.com/fontra/fontra-pak/pull/312)
-- [fontra pak/windows] Register selected file types with the Fontra Pak application. Contributed by Tarik Rokhsane. [fontra-pak Issue 210](https://github.com/fontra/fontra-pak/issues/210), [fontra-pak PR 306](https://github.com/fontra/fontra-pak/pull/306), [fontra-pak PR 315](https://github.com/fontra/fontra-pak/pull/315)
+- [fontra pak/windows] Register selected file types with the Fontra Pak application. Contributed by Tarik Rokhsane. [fontra-pak Issue 210](https://github.com/fontra/fontra-pak/issues/210), [fontra-pak PR 306](https://github.com/fontra/fontra-pak/pull/306), [fontra-pak PR 315](https://github.com/fontra/fontra-pak/pull/315), [fontra-pak PR 316](https://github.com/fontra/fontra-pak/pull/316)
 - [fontra pak] Added Help menu, added Quit menu item, reorganized buttons, improved tabbing behavior. Contributed by MrPropre. [fontra-pak PR 307](https://github.com/fontra/fontra-pak/pull/307), [fontra-pak PR 308](https://github.com/fontra/fontra-pak/pull/308), [fontra-pak PR 309](https://github.com/fontra/fontra-pak/pull/309)
 
 ## 2026-10-30 [version 2026.10.2]
