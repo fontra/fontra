@@ -12,7 +12,10 @@ export const applicationSettingsController = new ObservableController({
   arrowKeyNudgeValue: 1,
   arrowKeyNudgeValueShift: 10,
   arrowKeyNudgeValueShiftControl: 100,
+  plugins: [],
 });
+
+export const applicationSettings = applicationSettingsController.model;
 
 applicationSettingsController.synchronizeWithLocalStorage(
   "fontra-application-settings-"
