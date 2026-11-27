@@ -68,7 +68,7 @@ import { VarPackedPath, joinPaths } from "@fontra/core/var-path.js";
 import "@fontra/web-components/inline-svg.js";
 import { MenuItemDivider, showMenu } from "@fontra/web-components/menu-panel.js";
 import { dialog, dialogSetup, message } from "@fontra/web-components/modal-dialog.js";
-import { parsePluginBasePath } from "@fontra/web-components/plugin-manager.js";
+import { loadPlugins } from "@fontra/core/plugins.js";
 import { CJKDesignFrame } from "./cjk-design-frame.js";
 import { HandTool } from "./edit-tools-hand.js";
 import { KnifeTool } from "./edit-tools-knife.js";
@@ -112,8 +112,6 @@ const MIN_CANVAS_SPACE = 200;
 
 const PASTE_BEHAVIOR_REPLACE = "replace";
 const PASTE_BEHAVIOR_ADD = "add";
-
-const importTimeStamp = Date.now(); /* for cache busting */
 
 export class EditorController extends ViewController {
   static titlePattern(displayName) {
@@ -775,42 +773,7 @@ export class EditorController extends ViewController {
   }
 
   async initPlugins() {
-    const observablePlugins = new ObservableController({
-      plugins: [],
-    });
-    observablePlugins.synchronizeWithLocalStorage("fontra.plugins");
-    for (const { address } of observablePlugins.model.plugins) {
-      const pluginPath = parsePluginBasePath(address);
-      let meta;
-      try {
-        meta = await fetchJSON(`${pluginPath}/plugin.json?t=${importTimeStamp}`);
-      } catch (e) {
-        console.error(`${address} Plugin metadata not found.`);
-        continue;
-      }
-      const initScript = meta.init;
-      const functionName = meta.function;
-      let module;
-      try {
-        // webpackIgnore: keep this a real dynamic import at runtime; the plug-in
-        // lives outside the bundle (a URL or a server path), webpack must not
-        // try to resolve it at build time.
-        module = await import(
-          /* webpackIgnore: true */ `${pluginPath}/${initScript}?t=${importTimeStamp}`
-        );
-      } catch (e) {
-        console.error("Module didn't load");
-        console.log(e);
-        continue;
-      }
-      try {
-        module[functionName](this, pluginPath);
-      } catch (e) {
-        console.error(`Error occured when running (${meta.name || address}) plugin.`);
-        console.log(e);
-        continue;
-      }
-    }
+    await loadPlugins("editor", this);
   }
 
   async updateWithDelay() {

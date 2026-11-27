@@ -1,7 +1,11 @@
 import * as html from "@fontra/core/html-utils.js";
+import {
+  applicationSettings,
+  applicationSettingsController,
+} from "@fontra/core/application-settings.js";
+import { parsePluginBasePath, validatePlugin } from "@fontra/core/plugins.js";
 import { SimpleElement, createDomElement } from "@fontra/core/html-utils.js";
 import { translate } from "@fontra/core/localization.js";
-import { ObservableController } from "@fontra/core/observable-object.ts";
 import "@fontra/web-components/add-remove-buttons.js";
 import { dialogSetup, message } from "@fontra/web-components/modal-dialog.js";
 import { UIList } from "@fontra/web-components/ui-list.js";
@@ -28,18 +32,13 @@ export class PluginManager extends SimpleElement {
     super();
     this.contentElement = this.shadowRoot.appendChild(html.div());
     this.contentElement.classList.add("plugin-manager");
-    const observable = new ObservableController({
-      plugins: [],
-    });
-    observable.synchronizeWithLocalStorage("fontra.plugins");
-    this.observable = observable;
     this.pluginList = new UIList();
     this.pluginList.minHeight = "5em";
-    this.pluginList.setItems(observable.model.plugins);
+    this.pluginList.setItems(applicationSettings.plugins);
     this.pluginList.columnDescriptions = [
       {
         key: "address",
-        title: "Github repository",
+        title: "Plugin address",
       },
     ];
     this.render();
@@ -97,49 +96,24 @@ export class PluginManager extends SimpleElement {
     newPluginPrompt.setContent(pluginContent);
     const pluginPromptResult = await newPluginPrompt.run();
     if (pluginPromptResult === "ok") {
-      const newPlugin = { address };
-      const [ok, errorMessage] = await this.validatePlugin(
-        parsePluginBasePath(address)
-      );
-      if (ok) {
-        this.observable.setItem("plugins", [
-          ...this.observable.model.plugins,
-          newPlugin,
-        ]);
+      const { pluginInfo, error } = await validatePlugin(parsePluginBasePath(address));
+      if (pluginInfo) {
+        const types = pluginInfo["entry-points"].map(({ type }) => type);
+        const newPlugin = { address, types };
+        applicationSettings.plugins = [...applicationSettings.plugins, newPlugin];
         this.renderPlugins();
       } else {
         await message(
           translate("plugin-manager.add-plugin-dialog.warning.title"),
-          errorMessage
+          translate(error)
         );
         return this.promptAddPlugin(address);
       }
     }
   }
 
-  async validatePlugin(pluginPath) {
-    if (
-      this.observable.model.plugins.some(
-        ({ address }) => parsePluginBasePath(address) === pluginPath
-      )
-    ) {
-      return [false, translate("plugin-manager.warning.plugin-exists")];
-    }
-    let response;
-    try {
-      response = await fetch(`${pluginPath}/plugin.json`);
-    } catch (e) {
-      return [false, translate("plugin-manager.warning.fetching-error")];
-    }
-    if (response.status === 404) {
-      return [false, translate("plugin-manager.warning.not-found")];
-    }
-    return [true];
-  }
-
   renderPlugins() {
-    const plugins = this.observable.model.plugins;
-    this.pluginList.setItems(plugins);
+    this.pluginList.setItems(applicationSettings.plugins);
   }
 
   render() {
@@ -152,11 +126,8 @@ export class PluginManager extends SimpleElement {
           this.promptAddPlugin();
         },
         removeButtonCallback: () => {
-          this.observable.setItem(
-            "plugins",
-            this.observable.model.plugins.filter(
-              (plugin, index) => index !== this.pluginList.getSelectedItemIndex()
-            )
+          applicationSettings.plugins = applicationSettings.plugins.filter(
+            (plugin, index) => index !== this.pluginList.getSelectedItemIndex()
           );
           this.renderPlugins();
         },
@@ -168,13 +139,3 @@ export class PluginManager extends SimpleElement {
 }
 
 customElements.define("plugin-manager", PluginManager);
-
-export function parsePluginBasePath(address, version = "latest") {
-  let baseURL;
-  if (address.split("/").length === 2) {
-    baseURL = `https://cdn.jsdelivr.net/gh/${address}@${version}`;
-  } else {
-    baseURL = address.endsWith("/") ? address.slice(0, -1) : address;
-  }
-  return baseURL;
-}
